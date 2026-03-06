@@ -34,6 +34,14 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
             delete productData.stock;
             delete productData.branch;
 
+            // Görsel değerlerini kazara null/overwrite etmemek için koruma:
+            if (productData.imageUrl === undefined || productData.imageUrl === null) {
+                delete productData.imageUrl;
+            }
+            if (productData.imageKey === undefined || productData.imageKey === null) {
+                delete productData.imageKey;
+            }
+
             // 2. Update Product Basic Info
             const product = await tx.product.update({
                 where: { id: params.id },

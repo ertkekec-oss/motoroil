@@ -571,6 +571,7 @@ function InventoryContent() {
         "category",
         "description",
         "imageUrl",
+        "imageKey",
         "minStock",
         "brand",
         "type",
@@ -728,7 +729,9 @@ function InventoryContent() {
       salesOtv: 0,
       otvType: "Ö.T.V yok",
       branch: activeBranchName || "Merkez",
-    });
+      imageUrl: undefined,
+      imageKey: undefined,
+    } as any);
     setUseVariants(false);
     setSelectedAttributes([]);
     setGeneratedVariants([]);

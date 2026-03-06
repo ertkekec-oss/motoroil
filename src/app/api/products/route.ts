@@ -116,7 +116,7 @@ export async function POST(request: Request) {
         const { name, code, barcode, brand, category, type, stock, price, buyPrice, supplier, branch,
             salesVat, salesVatIncluded, purchaseVat, purchaseVatIncluded,
             salesOiv, salesOtv, otvType, isParent, variantsData, unit,
-            currency, purchaseCurrency } = body;
+            currency, purchaseCurrency, imageUrl, imageKey } = body;
 
         const targetBranch = branch || 'Merkez';
         const initialQty = parseFloat(stock) || 0;
@@ -148,6 +148,8 @@ export async function POST(request: Request) {
                     salesOiv: parseFloat(salesOiv) || 0,
                     salesOtv: parseFloat(salesOtv) || 0,
                     otvType: otvType || 'Ö.T.V yok',
+                    imageUrl: imageUrl || undefined,
+                    imageKey: imageKey || undefined,
                     isParent: isParent || false,
                     stocks: !isParent ? {
                         create: {
@@ -182,6 +184,8 @@ export async function POST(request: Request) {
                             unit: unit || 'Adet',
                             salesVat: mainProduct.salesVat,
                             purchaseVat: mainProduct.purchaseVat,
+                            imageUrl: imageUrl || undefined,
+                            imageKey: imageKey || undefined,
                             stocks: {
                                 create: {
                                     branch: targetBranch,

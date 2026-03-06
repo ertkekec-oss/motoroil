@@ -60,6 +60,7 @@ model Company {
   CommissionSnapshot    CommissionSnapshot[]
   tenant                Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   companyProductMaps    CompanyProductMap[]
+  companyDocuments      CompanyDocument[]
   coupons               Coupon[]
   customers             Customer[]
   customerCategories    CustomerCategory[]
@@ -128,6 +129,23 @@ model Company {
 
   @@unique([tenantId, vkn])
   @@index([vkn])
+}
+
+model CompanyDocument {
+  id        String   @id @default(cuid())
+  companyId String
+  tenantId  String
+  name      String
+  fileKey   String
+  fileName  String
+  mimeType  String?
+  size      Int?
+  createdAt DateTime @default(now())
+
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([tenantId])
 }
 
 model IntegratorSettings {
@@ -289,7 +307,8 @@ model Product {
   reservedStock       Int                     @default(0)
   category            String?
   description         String?
-  imageUrl            String?
+  imageUrl            String?                 @db.VarChar(2048)
+  imageKey            String?                 @db.VarChar(1024)
   minStock            Int                     @default(5)
   brand               String?
   type                String?                 @default("Ürün")

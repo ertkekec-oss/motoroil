@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ProductPricesTab } from "@/components/pricing/ProductPricesTab";
+import ProductImageUpload from "./ProductImageUpload";
 
 export default function ProductWizardModal({
     isOpen,
@@ -32,6 +33,12 @@ export default function ProductWizardModal({
 }: any) {
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 5;
+
+    useEffect(() => {
+        if (isOpen) {
+            setCurrentStep(1);
+        }
+    }, [isOpen, data?.id]);
 
     if (!isOpen || !data) return null;
 
@@ -187,9 +194,20 @@ function StepIdentity({ data, onChange, categories }: any) {
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Ürününüzün sistemde ve listelerde nasıl görüneceğini belirleyin.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Adı <span className="text-red-500">*</span></label>
-                    <input type="text" value={data.name || ''} onChange={e => onChange({ ...data, name: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors placeholder:text-slate-400 text-sm" placeholder="Örn: Motul 7100 10w40" />
+                <div className="space-y-6">
+                    <div className="flex justify-center mb-4">
+                        <ProductImageUpload
+                            productId={data.id}
+                            imageUrl={data.imageUrl}
+                            onImageUpload={({ imageUrl, imageKey }) => {
+                                onChange({ ...data, imageUrl, imageKey });
+                            }}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Adı <span className="text-red-500">*</span></label>
+                        <input type="text" value={data.name || ''} onChange={e => onChange({ ...data, name: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors placeholder:text-slate-400 text-sm" placeholder="Örn: Motul 7100 10w40" />
+                    </div>
                 </div>
                 <div className="space-y-2">
                     <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Kategori <span className="text-red-500">*</span></label>

@@ -1,9 +1,9 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { redisConnection } from "./queue/redis";
 
 const s3Config: any = {
-    region: process.env.AWS_REGION || "eu-central-1"
+    region: process.env.AWS_REGION || "eu-north-1"
 };
 
 if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_ACCESS_KEY_ID.trim() !== "") {
@@ -81,4 +81,130 @@ export function generateLabelStorageKey(
     shipmentPackageId: string
 ) {
     return `labels/${companyId}/${marketplace}/${shipmentPackageId}.pdf`;
+}
+
+// ------------------------------------------------------------------------------------------
+// NEW MULTI-TENANT ENTERPRISE S3 HELPERS (PROD)
+// ------------------------------------------------------------------------------------------
+
+const PUBLIC_BUCKET = process.env.S3_PUBLIC_BUCKET || "periodya-prod-public";
+const PRIVATE_BUCKET = process.env.S3_PRIVATE_BUCKET || "periodya-prod-private";
+
+function getBucketName(bucketType: 'public' | 'private'): string {
+    return bucketType === 'public' ? PUBLIC_BUCKET : PRIVATE_BUCKET;
+}
+
+export function sanitizeS3Key(key: string): string {
+    let normalized = key.replace(/\\/g, '/');
+    normalized = normalized.replace(/\/+/g, '/');
+    normalized = normalized.replace(/^\/+/, '');
+
+    const segments = normalized.split('/');
+    const safeSegments = [];
+
+    for (const segment of segments) {
+        if (!segment) continue;
+        if (segment === '.' || segment === '..') {
+            throw new Error('Invalid S3 Key: directory traversal is not allowed');
+        }
+        if (segment.includes('\0')) {
+            throw new Error('Invalid S3 Key: contains null byte');
+        }
+        safeSegments.push(segment.replace(/[^a-zA-Z0-9\-_=.]/g, '-'));
+    }
+
+    return safeSegments.join('/');
+}
+
+export async function uploadToS3(params: {
+    bucket: 'public' | 'private';
+    key: string;
+    body: Buffer;
+    contentType: string;
+    cacheControl?: string;
+    metadata?: Record<string, string>;
+}) {
+    const bucketName = getBucketName(params.bucket);
+    const safeKey = sanitizeS3Key(params.key);
+
+    const defaultCache = params.bucket === 'public'
+        ? 'public, max-age=31536000, immutable'
+        : 'no-store';
+
+    const command = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: safeKey,
+        Body: params.body,
+        ContentType: params.contentType,
+        CacheControl: params.cacheControl || defaultCache,
+        Metadata: params.metadata,
+    });
+
+    try {
+        await s3Client.send(command);
+        return { success: true, key: safeKey };
+    } catch (e: any) {
+        console.error(`[S3 Multi-Tenant Upload] Failed: ${e.message}`);
+        throw new Error(`S3 Upload failed: ${e.message}`);
+    }
+}
+
+export async function getSignedUploadUrl(params: {
+    bucket: 'public' | 'private';
+    key: string;
+    contentType: string;
+    expiresInSeconds?: number;
+}) {
+    const command = new PutObjectCommand({
+        Bucket: getBucketName(params.bucket),
+        Key: sanitizeS3Key(params.key),
+        ContentType: params.contentType,
+    });
+
+    return await getSignedUrl(s3Client, command, { expiresIn: params.expiresInSeconds || 3600 });
+}
+
+export async function getSignedDownloadUrl(params: {
+    bucket: 'public' | 'private';
+    key: string;
+    expiresInSeconds?: number;
+    downloadFilename?: string;
+}) {
+    const options: any = {
+        Bucket: getBucketName(params.bucket),
+        Key: sanitizeS3Key(params.key),
+    };
+
+    if (params.downloadFilename) {
+        options.ResponseContentDisposition = `attachment; filename="${params.downloadFilename}"`;
+    }
+
+    const command = new GetObjectCommand(options);
+    return await getSignedUrl(s3Client, command, { expiresIn: params.expiresInSeconds || 3600 });
+}
+
+export async function deleteFromS3(params: {
+    bucket: 'public' | 'private';
+    key: string;
+}) {
+    const command = new DeleteObjectCommand({
+        Bucket: getBucketName(params.bucket),
+        Key: sanitizeS3Key(params.key),
+    });
+
+    try {
+        await s3Client.send(command);
+        return { success: true };
+    } catch (e: any) {
+        console.error(`[S3 Multi-Tenant Delete] Failed: ${e.message}`);
+        throw new Error(`S3 Delete failed: ${e.message}`);
+    }
+}
+
+export function getPublicObjectUrl(key: string): string {
+    const region = process.env.AWS_REGION || "eu-north-1";
+    const safeKey = sanitizeS3Key(key);
+    const encodedKey = encodeURIComponent(safeKey).replace(/%2F/g, '/');
+
+    return `https://${PUBLIC_BUCKET}.s3.${region}.amazonaws.com/${encodedKey}`;
 }

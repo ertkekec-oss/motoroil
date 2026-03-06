@@ -68,6 +68,112 @@ export default function CompanyProfileForm(props: any) {
         handleSaveCompany,
     } = props;
 
+    const [documents, setDocuments] = React.useState<any[]>([]);
+    const [isDocsLoading, setIsDocsLoading] = React.useState(false);
+    const [isUploading, setIsUploading] = React.useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    React.useEffect(() => {
+        fetchDocs();
+    }, []);
+
+    const fetchDocs = async () => {
+        setIsDocsLoading(true);
+        try {
+            const res = await fetch('/api/company-docs');
+            const data = await res.json();
+            if (data.success) setDocuments(data.documents);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsDocsLoading(false);
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const validTypes = [
+            'application/pdf',
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ];
+
+        if (!validTypes.includes(file.type)) {
+            alert('Desteklenmeyen formattır.');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Dosya boyutu 10MB limitini aşıyor.');
+            return;
+        }
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', file.name);
+
+        try {
+            const res = await fetch('/api/company-docs/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                // reset or fast refresh
+                fetchDocs();
+                if (fileInputRef.current) fileInputRef.current.value = "";
+            } else {
+                alert(data.error || 'Yüklemekte sorun yaşandı');
+            }
+        } catch (e: any) {
+            alert('Sunucu hatası: ' + e.message);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleDownload = async (id: string, fileName: string) => {
+        try {
+            const res = await fetch(`/api/company-docs/${id}/download`);
+            const data = await res.json();
+            if (data.success && data.url) {
+                // Link'e tıklayıp frontend'den doğrudan indirme başlatılır
+                const link = document.createElement('a');
+                link.href = data.url;
+                link.download = fileName || "belge";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert(data.error || 'İndirme adresi alınamadı');
+            }
+        } catch (e) {
+            alert('İndirmede bir hata oluştu.');
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Bu belgeyi kalıcı olarak silmek istediğinize emin misiniz?')) return;
+
+        try {
+            const res = await fetch(`/api/company-docs/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                fetchDocs();
+            } else {
+                alert(data.error || 'Silinirken bir hata oluştu');
+            }
+        } catch (e) {
+            alert('Sunucu hatası oluştu');
+        }
+    };
+
     return (
         <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
             {/* Header Alanı */}
@@ -234,6 +340,74 @@ export default function CompanyProfileForm(props: any) {
                                     placeholder="Mahalle, mevkii, cadde, numara vb. açık adresi giriniz"
                                 />
                             </ERPField>
+                        </div>
+                    </ERPBlock>
+
+                    {/* Private Documents Box */}
+                    <ERPBlock
+                        title="Gizli Firma Belgeleri"
+                        description="Şirketinize ait imza sirküleri, vergi levhası ve yasal dosyalarınızı özel (private) bulut alanında saklayın."
+                        action={
+                            <div className="flex items-center">
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    ref={fileInputRef}
+                                    onChange={handleFileUpload}
+                                    accept=".pdf,.png,.jpg,.jpeg,.docx,.xlsx"
+                                />
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={isUploading}
+                                    className="px-3 py-1.5 text-xs font-medium bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded disabled:opacity-50"
+                                >
+                                    {isUploading ? 'Yükleniyor...' : '+ Belge Yükle'}
+                                </button>
+                            </div>
+                        }
+                    >
+                        <div className="space-y-2">
+                            {isDocsLoading ? (
+                                <div className="text-sm text-slate-500">Belgeler yükleniyor...</div>
+                            ) : documents.length === 0 ? (
+                                <div className="text-sm text-slate-500 italic">Henüz özel belgeniz bulunmuyor.</div>
+                            ) : (
+                                documents.map((doc: any) => (
+                                    <div key={doc.id} className="flex items-center justify-between p-3 border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b] rounded-lg">
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded shadow-sm">
+                                                <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                            <div className="flex flex-col overflow-hidden">
+                                                <span className="text-sm font-medium text-slate-900 dark:text-white truncate" title={doc.name}>{doc.name}</span>
+                                                <span className="text-xs text-slate-500 truncate">{new Date(doc.createdAt).toLocaleDateString('tr-TR')} • {(doc.size / 1024).toFixed(0)} KB</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <button
+                                                onClick={() => handleDownload(doc.id, doc.fileName)}
+                                                className="shrink-0 p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors"
+                                                title="İndir (Signed URL)"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(doc.id)}
+                                                className="shrink-0 p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors ml-1"
+                                                title="Sistemden Sil"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </ERPBlock>
                 </div>

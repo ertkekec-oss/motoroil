@@ -150,112 +150,121 @@ export default function InventoryDetailModal({
                             </div>
                         )}
                         {detailTab === 'general' && (
-                            <div className="grid grid-cols-2 gap-6 animate-fade-in">
-                                <div className="space-y-5">
-                                    <div>
-                                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Ürün Adı</label>
-                                        <input
-                                            type="text"
-                                            value={selectedProduct.name}
-                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
-                                            disabled={!canEdit}
-                                            className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                        />
+                            <div className="animate-fade-in space-y-6">
+                                {selectedProduct.imageUrl && (
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-32 h-32 rounded-[16px] overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm bg-slate-50 relative">
+                                            <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="w-full h-full object-cover" />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Stok Kodu</label>
-                                        <input
-                                            type="text"
-                                            value={selectedProduct.code}
-                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, code: e.target.value })}
-                                            disabled={!canEdit}
-                                            className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Barkod</label>
-                                        <input
-                                            type="text"
-                                            value={selectedProduct.barcode}
-                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, barcode: e.target.value })}
-                                            disabled={!canEdit}
-                                            className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-5">
-                                    <div>
-                                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Marka</label>
-                                        <input
-                                            type="text"
-                                            value={selectedProduct.brand}
-                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, brand: e.target.value })}
-                                            disabled={!canEdit}
-                                            className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Kategori</label>
-                                        <select
-                                            value={selectedProduct.category}
-                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e.target.value })}
-                                            disabled={!canEdit}
-                                            className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors appearance-none shadow-sm disabled:opacity-50"
-                                        >
-                                            {categories.length > 0 ? (
-                                                categories.map(cat => (
-                                                    <option key={cat} value={cat}>{cat}</option>
-                                                ))
-                                            ) : (
-                                                <>
-                                                    <option value="Genel">Genel</option>
-                                                    <option value="Motosiklet">Motosiklet</option>
-                                                    <option value="Otomobil">Otomobil</option>
-                                                    <option value="Aksesuar">Aksesuar</option>
-                                                    <option value="Yedek Parça">Yedek Parça</option>
-                                                </>
-                                            )}
-                                        </select>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                )}
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-5">
                                         <div>
-                                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Stok Miktarı</label>
+                                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Ürün Adı</label>
                                             <input
-                                                type="number"
-                                                value={selectedProduct.stock}
-                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, stock: parseFloat(e.target.value) })}
+                                                type="text"
+                                                value={selectedProduct.name}
+                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
                                                 disabled={!canEdit}
                                                 className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Satış Birimi</label>
+                                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Stok Kodu</label>
+                                            <input
+                                                type="text"
+                                                value={selectedProduct.code}
+                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, code: e.target.value })}
+                                                disabled={!canEdit}
+                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Barkod</label>
+                                            <input
+                                                type="text"
+                                                value={selectedProduct.barcode}
+                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, barcode: e.target.value })}
+                                                disabled={!canEdit}
+                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-5">
+                                        <div>
+                                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Marka</label>
+                                            <input
+                                                type="text"
+                                                value={selectedProduct.brand}
+                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, brand: e.target.value })}
+                                                disabled={!canEdit}
+                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Kategori</label>
                                             <select
-                                                value={selectedProduct.unit || 'Adet'}
-                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, unit: e.target.value })}
+                                                value={selectedProduct.category}
+                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e.target.value })}
                                                 disabled={!canEdit}
                                                 className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors appearance-none shadow-sm disabled:opacity-50"
                                             >
-                                                <option value="Adet">Adet</option>
-                                                <option value="KG">Kilogram (KG)</option>
-                                                <option value="Litre">Litre (L)</option>
-                                                <option value="Metre">Metre (M)</option>
-                                                <option value="Paket">Paket</option>
-                                                <option value="Koli">Koli</option>
-                                                <option value="Set">Set</option>
+                                                {categories.length > 0 ? (
+                                                    categories.map(cat => (
+                                                        <option key={cat} value={cat}>{cat}</option>
+                                                    ))
+                                                ) : (
+                                                    <>
+                                                        <option value="Genel">Genel</option>
+                                                        <option value="Motosiklet">Motosiklet</option>
+                                                        <option value="Otomobil">Otomobil</option>
+                                                        <option value="Aksesuar">Aksesuar</option>
+                                                        <option value="Yedek Parça">Yedek Parça</option>
+                                                    </>
+                                                )}
                                             </select>
                                         </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Stok Miktarı</label>
+                                                <input
+                                                    type="number"
+                                                    value={selectedProduct.stock}
+                                                    onChange={(e) => setSelectedProduct({ ...selectedProduct, stock: parseFloat(e.target.value) })}
+                                                    disabled={!canEdit}
+                                                    className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Satış Birimi</label>
+                                                <select
+                                                    value={selectedProduct.unit || 'Adet'}
+                                                    onChange={(e) => setSelectedProduct({ ...selectedProduct, unit: e.target.value })}
+                                                    disabled={!canEdit}
+                                                    className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors appearance-none shadow-sm disabled:opacity-50"
+                                                >
+                                                    <option value="Adet">Adet</option>
+                                                    <option value="KG">Kilogram (KG)</option>
+                                                    <option value="Litre">Litre (L)</option>
+                                                    <option value="Metre">Metre (M)</option>
+                                                    <option value="Paket">Paket</option>
+                                                    <option value="Koli">Koli</option>
+                                                    <option value="Set">Set</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Açıklama</label>
-                                    <textarea
-                                        rows={3}
-                                        value={selectedProduct.description || ''}
-                                        onChange={(e) => setSelectedProduct({ ...selectedProduct, description: e.target.value })}
-                                        disabled={!canEdit}
-                                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-4 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none shadow-sm disabled:opacity-50"
-                                    />
+                                    <div className="col-span-2">
+                                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Açıklama</label>
+                                        <textarea
+                                            rows={3}
+                                            value={selectedProduct.description || ''}
+                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, description: e.target.value })}
+                                            disabled={!canEdit}
+                                            className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-4 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none shadow-sm disabled:opacity-50"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
