@@ -3,6 +3,8 @@
 import { createReconciliation } from "./core";
 import { prisma } from "@/lib/prisma";
 import { ReconDeliveryMethod, ReconAuthMethod } from "@prisma/client";
+import { sendMail } from "@/lib/mail";
+import crypto from "crypto";
 
 export async function createReconAction(data: {
     tenantId: string;
@@ -75,6 +77,52 @@ export async function sendReconAction(data: {
             }
         });
 
+        // Generate Token
+        const rawToken = crypto.randomBytes(32).toString('hex');
+        const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        await prisma.reconciliationPortalToken.create({
+            data: {
+                reconciliationId: recon.id,
+                tokenHash,
+                expiresAt,
+                companyId: recon.companyId
+            }
+        });
+
+        // ACTUALLY SEND THE EMAIL
+        const account = await prisma.customer.findUnique({ where: { id: recon.accountId } });
+        if (account && account.email && data.deliveryMethod === 'EMAIL') {
+            const documentLink = `https://www.periodya.com/portal/mutabakat/access?token=${rawToken}`;
+            await sendMail({
+                to: account.email,
+                subject: `Mutabakat Talebi: ${recon.periodStart.toLocaleDateString()} - ${recon.periodEnd.toLocaleDateString()}`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+                        <div style="background-color: #0f172a; padding: 24px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Yeni Mutabakat Kaydı Talebi</h1>
+                        </div>
+                        <div style="padding: 32px; background-color: #ffffff;">
+                            <h2 style="color: #334155; margin-top: 0; font-size: 20px;">Merhaba ${account.name || ''},</h2>
+                            <p style="color: #475569; font-size: 16px; line-height: 1.5;">
+                                Şirketimiz ile aranızdaki <strong>${recon.periodStart.toLocaleDateString()}</strong> - <strong>${recon.periodEnd.toLocaleDateString()}</strong> dönemine ait hesap mutabakatı Periodya sistemimiz üzerinden oluşturulmuştur.
+                            </p>
+                            <div style="text-align: center; margin: 32px 0;">
+                                <a href="${documentLink}" style="display: inline-block; background-color: #0ea5e9; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                                    Mutabakatı İncele ve Onayla
+                                </a>
+                            </div>
+                            <p style="color: #64748b; font-size: 14px; text-align: center; margin-bottom: 0;">
+                                Bu işlem için dijital mutabakat merkezimizi kullanabilirsiniz. Belirtilen tarihe kadar (7 gün) lütfen dönüş yapınız.
+                            </p>
+                        </div>
+                    </div>
+                `,
+                companyId: recon.companyId
+            });
+        }
+
         return { success: true, reconciliation: updated };
     } catch (e: any) {
         return { success: false, error: e.message };
@@ -106,6 +154,55 @@ export async function resendReconAction(reconId: string) {
                 metaJson: { note: 'Resent verification link.' }
             }
         });
+
+        // Invalidate old tokens
+        await prisma.reconciliationPortalToken.updateMany({
+            where: { reconciliationId: recon.id, revokedAt: null, usedAt: null },
+            data: { revokedAt: new Date() }
+        });
+
+        // Generate new Token
+        const rawToken = crypto.randomBytes(32).toString('hex');
+        const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        await prisma.reconciliationPortalToken.create({
+            data: {
+                reconciliationId: recon.id,
+                tokenHash,
+                expiresAt,
+                companyId: recon.companyId
+            }
+        });
+
+        // ACTUALLY SEND THE EMAIL
+        const account = await prisma.customer.findUnique({ where: { id: recon.accountId } });
+        if (account && account.email && recon.deliveryMethod === 'EMAIL') {
+            const documentLink = `https://www.periodya.com/portal/mutabakat/access?token=${rawToken}`;
+            await sendMail({
+                to: account.email,
+                subject: `Hatırlatma: Mutabakat Talebiniz Bekliyor`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+                        <div style="background-color: #0f172a; padding: 24px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Mutabakat Hatırlatması</h1>
+                        </div>
+                        <div style="padding: 32px; background-color: #ffffff;">
+                            <h2 style="color: #334155; margin-top: 0; font-size: 20px;">Merhaba ${account.name || ''},</h2>
+                            <p style="color: #475569; font-size: 16px; line-height: 1.5;">
+                                Daha önce size iletmiş olduğumuz <strong>${recon.periodStart.toLocaleDateString()}</strong> - <strong>${recon.periodEnd.toLocaleDateString()}</strong> dönemine ait mutabakatımız henüz onaylanmamıştır veya işlemsiz kalmıştır.
+                            </p>
+                            <div style="text-align: center; margin: 32px 0;">
+                                <a href="${documentLink}" style="display: inline-block; background-color: #0ea5e9; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                                    Mutabakata Git
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                companyId: recon.companyId
+            });
+        }
 
         return { success: true, reconciliation: updated };
     } catch (e: any) {
@@ -182,9 +279,9 @@ export async function openReconDisputeAction(reconId: string, reason: string, no
             data: {
                 tenantId: recon.tenantId,
                 reconciliationId: recon.id,
-                reason: reason as any,
-                notes,
-                createdByActorType: 'USER'
+                companyId: recon.companyId,
+                message: `${reason}: ${notes}`,
+                status: 'OPEN'
             }
         });
 
@@ -202,3 +299,64 @@ export async function openReconDisputeAction(reconId: string, reason: string, no
         return { success: false, error: e.message };
     }
 }
+
+export async function updateDisputeStatusAction(disputeId: string, status: 'OPEN' | 'RESOLVED' | 'REJECTED') {
+    try {
+        const dispute = await prisma.reconciliationDispute.findUnique({ where: { id: disputeId } });
+        if (!dispute) throw new Error("Dispute not found");
+
+        const updated = await prisma.reconciliationDispute.update({
+            where: { id: disputeId },
+            data: {
+                status: status as any,
+                resolvedAt: status === 'RESOLVED' ? new Date() : null
+            }
+        });
+
+        await prisma.reconciliationAuditEvent.create({
+            data: {
+                tenantId: dispute.tenantId,
+                reconciliationId: dispute.reconciliationId,
+                action: status === 'RESOLVED' ? 'DISPUTE_RESOLVED' : 'DISPUTE_REJECTED' as any,
+                metaJson: { disputeId, newStatus: status }
+            }
+        });
+
+        return { success: true, dispute: updated };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
+
+export async function addDisputeInternalNoteAction(disputeId: string, note: string) {
+    try {
+        const dispute = await prisma.reconciliationDispute.findUnique({ where: { id: disputeId } });
+        if (!dispute) throw new Error("Dispute not found");
+
+        const updated = await prisma.reconciliationDispute.update({
+            where: { id: disputeId },
+            data: { internalNotes: note }
+        });
+
+        return { success: true, dispute: updated };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
+
+export async function assignDisputeAction(disputeId: string, assigneeId: string | null) {
+    try {
+        const dispute = await prisma.reconciliationDispute.findUnique({ where: { id: disputeId } });
+        if (!dispute) throw new Error("Dispute not found");
+
+        const updated = await prisma.reconciliationDispute.update({
+            where: { id: disputeId },
+            data: { assigneeId }
+        });
+
+        return { success: true, dispute: updated };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
+

@@ -1,17 +1,22 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { getSession, hasPermission } from '@/lib/auth';
+import { storageError } from '@/lib/storage/security';
 
 export async function GET() {
     try {
         const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        if (!session) return storageError('Oturum gerekli', 401);
+
+        if (!hasPermission(session, 'company_manage') && session.role !== 'ADMIN') {
+            return storageError('Bu işlem için yetkiniz yok', 403);
+        }
 
         const tenantId = (session as any).tenantId;
         const companyId = session.companyId;
 
         if (!tenantId || !companyId) {
-            return NextResponse.json({ error: 'Tenant veya Company bilgisi eksik' }, { status: 400 });
+            return storageError('Tenant veya Company bilgisi eksik', 400);
         }
 
         // Seçici getirme (asla fileKey dahil edilmiyor)
@@ -39,7 +44,7 @@ export async function GET() {
         });
 
     } catch (error: any) {
-        console.error('Company docs list error:', error);
-        return NextResponse.json({ success: false, error: 'Belgeler alınamadı' }, { status: 500 });
+        console.error('[Storage Error] Company docs list:', error);
+        return storageError('Belgeler alınamadı', 500);
     }
 }

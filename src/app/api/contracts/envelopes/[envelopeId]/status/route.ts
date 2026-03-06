@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getStrictTenantId } from '@/services/contracts/tenantContext';
 
-export async function GET(req: Request, { params }: { params: { envelopeId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ envelopeId: string }> }) {
     try {
         const tenantId = await getStrictTenantId();
 
         const env = await prisma.envelope.findUnique({
-            where: { id: params.envelopeId },
+            where: { id: (await params).envelopeId },
             include: { documentVersion: true, recipients: true }
         });
 

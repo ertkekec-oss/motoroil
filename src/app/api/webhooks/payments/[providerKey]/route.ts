@@ -3,9 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { getPaymentProvider } from '@/services/payments/providers';
 import { processPaymentWebhookQueue } from '@/services/payments/queue';
 
-export async function POST(req: Request, { params }: { params: { providerKey: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ providerKey: string }> }) {
     try {
-        const { providerKey } = params;
+        const { providerKey } = await params;
         const provider = getPaymentProvider(providerKey);
 
         const rawBody = await req.arrayBuffer();

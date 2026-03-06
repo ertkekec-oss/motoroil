@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(req: Request, { params }: { params: { documentId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ documentId: string }> }) {
     try {
-        const { documentId } = params;
+        const { documentId } = await params;
 
         // Public verification endpoint. Resolves the document explicitly and securely.
         const document = await prisma.document.findUnique({

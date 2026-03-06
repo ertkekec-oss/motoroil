@@ -125,8 +125,11 @@ export default function StaffManagementContent() {
     const fetchStaffDocuments = async (staffId: string) => {
         if (!staffId) return;
         try {
-            const res = await fetch(`/api/staff/documents?staffId=${staffId}`);
-            if (res.ok) setStaffDocuments(await res.json());
+            const res = await fetch(`/api/employees/${staffId}/documents`);
+            if (res.ok) {
+                const data = await res.json();
+                setStaffDocuments(data.documents || []);
+            }
         } catch (e) { console.error(e); }
     };
 
@@ -404,49 +407,63 @@ export default function StaffManagementContent() {
         const file = e.target.files?.[0];
         if (!file || !editStaff.id) return;
 
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            showError("Hata", "Dosya boyutu 5MB'dan küçük olmalıdır.");
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            showError("Hata", "Dosya boyutu 10MB'dan küçük olmalıdır.");
             return;
         }
 
         setIsUploading(true);
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64 = reader.result as string;
-            try {
-                const res = await fetch('/api/staff/documents', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        staffId: editStaff.id,
-                        fileName: file.name,
-                        fileType: file.type,
-                        fileSize: file.size,
-                        fileData: base64
-                    })
-                });
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', file.name);
 
-                if (res.ok) {
-                    await fetchStaffDocuments(editStaff.id);
-                    showSuccess("Dosya Yüklendi", "Personel belgesi başarıyla kaydedildi.");
-                } else {
-                    const err = await res.json();
-                    showSuccess("Hata", err.error || "Dosya yüklenemedi.");
-                }
-            } catch (e) {
-                console.error("Upload error", e);
-                showSuccess("Hata", "Dosya yüklenirken bir sorun oluştu.");
-            } finally {
-                setIsUploading(false);
+            const res = await fetch(`/api/employees/${editStaff.id}/documents/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                await fetchStaffDocuments(editStaff.id);
+                showSuccess("Dosya Yüklendi", "Personel belgesi başarıyla kaydedildi.");
+            } else {
+                const err = await res.json();
+                showError("Hata", err.error || "Dosya yüklenemedi.");
             }
-        };
-        reader.readAsDataURL(file);
+        } catch (e) {
+            console.error("Upload error", e);
+            showError("Hata", "Dosya yüklenirken bir sorun oluştu.");
+        } finally {
+            setIsUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const handleDownloadDocument = async (docId: string, fileName: string) => {
+        try {
+            const res = await fetch(`/api/employees/documents/${docId}/download`);
+            const data = await res.json();
+
+            if (data.success && data.url) {
+                const link = document.createElement('a');
+                link.href = data.url;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode?.removeChild(link);
+            } else {
+                showError("Hata", data.error || "İndirme bağlantısı alınamadı");
+            }
+        } catch (e) {
+            console.error(e);
+            showError("Hata", "İndirme sırasında bir hata oluştu");
+        }
     };
 
     const handleDeleteDocument = async (docId: string) => {
         showConfirm("Belgeyi Sil", "Belgeyi silmek istediğinize emin misiniz?", async () => {
             try {
-                const res = await fetch(`/api/staff/documents?id=${docId}`, { method: 'DELETE' });
+                const res = await fetch(`/api/employees/documents/${docId}`, { method: 'DELETE' });
                 if (res.ok) {
                     await fetchStaffDocuments(editStaff.id);
                     showSuccess("Silindi", "Belge başarıyla silindi.");
@@ -2256,15 +2273,15 @@ export default function StaffManagementContent() {
                                                     <div key={doc.id} className="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/50 rounded-xl flex justify-between items-center group transition-all">
                                                         <div className="flex items-center gap-3 overflow-hidden">
                                                             <div className="w-9 h-9 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-lg">
-                                                                {doc.fileType.includes('pdf') ? '📕' : '🖼️'}
+                                                                {doc.mimeType?.includes('pdf') ? '📕' : '🖼️'}
                                                             </div>
                                                             <div className="truncate">
-                                                                <div className="text-[12px] font-bold text-slate-200 truncate">{doc.fileName}</div>
-                                                                <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-medium tracking-wide mt-0.5">{new Date(doc.uploadedAt).toLocaleDateString()} • {(doc.fileSize / 1024).toFixed(0)} KB</div>
+                                                                <div className="text-[12px] font-bold text-slate-200 truncate">{doc.name || doc.fileName}</div>
+                                                                <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-medium tracking-wide mt-0.5">{new Date(doc.createdAt).toLocaleDateString()} • {(doc.size / 1024).toFixed(0)} KB</div>
                                                             </div>
                                                         </div>
                                                         <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
-                                                            <a href={doc.fileData} download={doc.fileName} className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all text-sm border border-emerald-500/20">⬇</a>
+                                                            <button onClick={() => handleDownloadDocument(doc.id, doc.fileName)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all text-sm border border-emerald-500/20">⬇</button>
                                                             <button onClick={() => handleDeleteDocument(doc.id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all text-sm border border-red-500/20">🗑️</button>
                                                         </div>
                                                     </div>

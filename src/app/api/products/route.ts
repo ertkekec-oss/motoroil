@@ -153,6 +153,7 @@ export async function POST(request: Request) {
                     isParent: isParent || false,
                     stocks: !isParent ? {
                         create: {
+                            companyId: company.id,
                             branch: targetBranch,
                             quantity: initialQty
                         }
@@ -188,6 +189,7 @@ export async function POST(request: Request) {
                             imageKey: imageKey || undefined,
                             stocks: {
                                 create: {
+                                    companyId: company.id,
                                     branch: targetBranch,
                                     quantity: parseFloat(v.stock) || 0
                                 }

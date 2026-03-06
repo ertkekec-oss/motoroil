@@ -1,4 +1,4 @@
-import { EnterprisePageShell, EnterpriseCard, EnterpriseTable, EnterpriseButton, EnterpriseBadge } from "@/components/ui/enterprise";
+import { EnterprisePageShell, EnterpriseCard, EnterpriseTable, EnterpriseButton } from "@/components/ui/enterprise";
 import { prisma } from "@/lib/prisma";
 import { getStrictTenantId } from "@/services/contracts/tenantContext";
 import { CreditCard, Download, PlayCircle, CheckCircle } from "lucide-react";

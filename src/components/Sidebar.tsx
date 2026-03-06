@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -58,6 +58,8 @@ export default function Sidebar() {
                 '/dealer-network/settings'
             ],
             'customers-parent': ['/customers', '/suppliers'],
+            'signatures-parent': ['/signatures', '/signatures/envelopes', '/signatures/new', '/signatures/templates', '/signatures/inbox', '/signatures/completed'],
+            'reconciliation-parent': ['/reconciliation', '/reconciliation/list', '/reconciliation/new', '/reconciliation/disputes'],
             'field-sales-parent': ['/field-sales', '/field-sales/admin/routes', '/field-sales/admin/live'],
             'reports-parent': ['/reports', '/reports/ceo', '/reports/daily', '/reports/suppliers']
         };
@@ -140,6 +142,13 @@ export default function Sidebar() {
             '/fintech/open-banking': { perm: 'finance_view' },
             '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
             '/notifications': { perm: 'pos_access' },
+            '/signatures': { perm: 'finance_view' },
+            '/signatures/envelopes': { perm: 'finance_view' },
+            '/signatures/inbox': { perm: 'finance_view' },
+            '/signatures/completed': { perm: 'finance_view' },
+            '/reconciliation': { perm: 'finance_view' },
+            '/reconciliation/list': { perm: 'finance_view' },
+            '/reconciliation/disputes': { perm: 'finance_view' },
             '/hub/buyer/orders': { perm: 'supplier_view' },
             '/hub/seller/orders': { perm: 'sales_archive' },
         };
@@ -199,6 +208,29 @@ export default function Sidebar() {
                 group: "Operasyonlar",
                 items: [
                     { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
+                    {
+                        name: 'İmzalar',
+                        icon: PenTool,
+                        isParent: true,
+                        id: 'signatures-parent',
+                        subItems: [
+                            { name: 'İmza Panosu', href: '/signatures' },
+                            { name: 'Belge & Zarflar', href: '/signatures/envelopes' },
+                            { name: 'Gelen Talepler', href: '/signatures/inbox' },
+                            { name: 'Tamamlananlar', href: '/signatures/completed' },
+                        ]
+                    },
+                    {
+                        name: 'Mutabakatlar',
+                        icon: Handshake,
+                        isParent: true,
+                        id: 'reconciliation-parent',
+                        subItems: [
+                            { name: 'Açık Mutabakatlar', href: '/reconciliation' },
+                            { name: 'Tüm Mutabakatlar', href: '/reconciliation/list' },
+                            { name: 'İtiraz Yönetimi', href: '/reconciliation/disputes' },
+                        ]
+                    },
                     { name: 'Finansal Yönetim', href: '/accounting', icon: Landmark },
                     { name: 'Satış Yönetimi', href: '/sales', icon: Receipt },
                     {

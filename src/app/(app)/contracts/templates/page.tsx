@@ -1,4 +1,4 @@
-import { EnterprisePageShell, EnterpriseCard, EnterpriseTable, EnterpriseButton, EnterpriseBadge } from '@/components/ui/enterprise';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseTable, EnterpriseButton } from '@/components/ui/enterprise';
 import { fetchTemplates } from '@/actions/contracts/templates';
 import Link from 'next/link';
 

@@ -2,25 +2,23 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession, hasPermission } from '@/lib/auth';
 import { deleteFromS3 } from '@/lib/s3';
+import { storageError } from '@/lib/storage/security';
 
-// Future-ready comment: v2 direct replace (upload bypassing delete steps on client) can be implemented here via dynamic form processing
-
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        if (!session) return storageError('Oturum gerekli', 401);
 
-        // Belge yönetme yetkisi - download ve upload ile aynı
         if (!hasPermission(session, 'company_manage') && session.role !== 'ADMIN') {
-            return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+            return storageError('Bu işlem için yetkiniz yok', 403);
         }
 
-        const documentId = params.id;
+        const documentId = (await params).id;
         const tenantId = (session as any).tenantId;
         const companyId = session.companyId;
 
         if (!tenantId || !companyId || !documentId) {
-            return NextResponse.json({ error: 'Geçersiz istek parametreleri' }, { status: 400 });
+            return storageError('Geçersiz istek parametreleri', 400);
         }
 
         // DB'den belgeyi bul (İzolasyon korumalı filtrelenmiş şekilde)
@@ -33,7 +31,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
         });
 
         if (!doc) {
-            return NextResponse.json({ error: 'Belge bulunamadı veya erişim yetkiniz yok' }, { status: 404 });
+            return storageError('Belge bulunamadı veya erişim yetkiniz yok', 404);
         }
 
         // Önce S3'ten sil (Private bucket)
@@ -57,7 +55,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
         return NextResponse.json({ success: true });
 
     } catch (error: any) {
-        console.error('Company doc delete error:', error);
-        return NextResponse.json({ success: false, error: 'Silme işlemi sırasında hata oluştu' }, { status: 500 });
+        console.error('[Storage Error] Company doc delete:', error);
+        return storageError('Silme işlemi sırasında hata oluştu', 500);
     }
 }

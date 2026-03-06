@@ -1,0 +1,2 @@
+﻿src/app/api/contracts/verify/[documentId]/route.ts(6,17): error TS2339: Property 'documentId' does not exist on type 'Promise<{ documentId: string; }>'.
+src/app/api/webhooks/payments/[providerKey]/route.ts(8,17): error TS2339: Property 'providerKey' does not exist on type 'Promise<{ providerKey: string; }>'.

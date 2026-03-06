@@ -126,6 +126,7 @@ model Company {
   transactions          Transaction[]
   trustScoreRecalcJobs  TrustScoreRecalcJob[]
   users                 UserCompanyAccess[]
+  exportReports         ExportReport[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -142,10 +143,29 @@ model CompanyDocument {
   size      Int?
   createdAt DateTime @default(now())
 
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
   @@index([tenantId])
+}
+
+model EmployeeDocument {
+  id         String   @id @default(cuid())
+  companyId  String
+  tenantId   String
+  employeeId String
+  name       String
+  fileKey    String
+  fileName   String
+  mimeType   String?
+  size       Int?
+  createdAt  DateTime @default(now())
+
+  employee Staff @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([tenantId])
+  @@index([employeeId])
 }
 
 model IntegratorSettings {
@@ -693,10 +713,35 @@ model Reconciliation {
   counterparties ReconciliationCounterparty[]
   disputes       ReconciliationDispute[]
   auditEvents    ReconciliationAuditEvent[]
+  documents      ReconciliationDocument[]
+  tokens         ReconciliationPortalToken[]
 
   @@index([tenantId])
   @@index([accountId])
   @@index([status])
+}
+
+model ReconciliationDocument {
+  id               String  @id @default(cuid())
+  tenantId         String
+  reconciliationId String
+  name             String
+  fileKey          String
+  fileName         String
+  mimeType         String?
+  size             Int?
+
+  // Future Signature & Contract linking (Gate Signal)
+  // signatureStatus String?
+  // envelopeId      String?
+  // signedFileKey   String?
+
+  createdAt DateTime @default(now())
+
+  reconciliation Reconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([reconciliationId])
 }
 
 model ReconciliationSnapshot {
@@ -753,6 +798,12 @@ model ReconciliationDispute {
   id                 String             @id @default(cuid())
   tenantId           String
   reconciliationId   String
+  companyId          String?
+  message            String?            @db.Text
+  attachmentKey      String?
+  attachmentUrl      String?
+  assigneeId         String?
+  internalNotes      String?            @db.Text
   status             ReconDisputeStatus @default(OPEN)
   reason             ReconDisputeReason @default(OTHER)
   notes              String?
@@ -1155,6 +1206,7 @@ model Staff {
   shifts              Shift[]
   company             Company?                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   documents           StaffDocument[]
+  employeeDocuments   EmployeeDocument[]
   targets             StaffTarget[]
 
   @@index([tenantId])
@@ -2793,24 +2845,51 @@ model SellerOfferItem {
 }
 
 model Contract {
-  id              String           @id @default(cuid())
+  id              String             @id @default(cuid())
   buyerCompanyId  String
   sellerCompanyId String
-  status          ContractStatus   @default(DRAFT)
+  status          ContractStatus     @default(DRAFT)
   startDate       DateTime?
   endDate         DateTime?
-  currency        String           @default("TRY")
-  paymentMode     PaymentMode      @default(DIRECT)
-  settlementCycle SettlementCycle  @default(INSTANT)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  currency        String             @default("TRY")
+  paymentMode     PaymentMode        @default(DIRECT)
+  settlementCycle SettlementCycle    @default(INSTANT)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
   items           ContractItem[]
   slas            ContractSLA[]
   recurringOrders RecurringOrder[]
+  documents       ContractDocument[]
 
   @@index([buyerCompanyId])
   @@index([sellerCompanyId])
   @@index([status])
+}
+
+model ContractDocument {
+  id         String  @id @default(cuid())
+  tenantId   String
+  companyId  String
+  contractId String
+  name       String
+  fileKey    String
+  fileName   String
+  mimeType   String?
+  size       Int?
+
+  // Future Signature & Reconciliation
+  // signatureStatus String?
+  // envelopeId      String?
+  // signedFileKey   String?
+  // auditTrailRef   String?
+
+  createdAt DateTime @default(now())
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([tenantId])
+  @@index([contractId])
 }
 
 model ContractItem {
@@ -5430,3 +5509,165 @@ model OpsDrillRun {
   detailsJson Json?
   createdBy   String?
 }
+
+enum ExportReportStatus {
+  PENDING
+  READY
+  FAILED
+}
+
+model ExportReport {
+  id         String             @id @default(cuid())
+  tenantId   String
+  companyId  String
+  reportType String             @default("GENERAL")
+  name       String
+  fileKey    String?
+  fileName   String?
+  mimeType   String?
+  size       Int?
+  status     ExportReportStatus @default(READY)
+
+  // Future background task metadata
+  // jobId     String?
+  // errorMsg  String?
+
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([companyId])
+  @@index([status])
+  @@index([reportType])
+}
+
+model ReconciliationPortalToken {
+  id               String    @id @default(cuid())
+  reconciliationId String
+  tokenHash        String    @unique
+  expiresAt        DateTime
+  usedAt           DateTime?
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  companyId        String?
+
+  reconciliation Reconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+}
+
+enum ReconciliationDisputeStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+}
+
+// ------------------------------------------------------------------------------------------------
+// SIGNATURE MODULE V1
+// ------------------------------------------------------------------------------------------------
+
+enum SignatureEnvelopeStatus {
+  DRAFT
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+  CANCELLED
+  FAILED
+}
+
+enum SignatureRecipientRole {
+  SIGNER
+  CC
+  APPROVER
+}
+
+enum SignatureRecipientStatus {
+  PENDING
+  VIEWED
+  SIGNED
+  REJECTED
+}
+
+model SignatureEnvelope {
+  id               String                  @id @default(cuid())
+  tenantId         String
+  companyId        String?
+  title            String
+  documentKey      String                  // e.g. tenants/{tenantId}/signatures/...
+  documentFileName String
+  status           SignatureEnvelopeStatus @default(DRAFT)
+  provider         String?                 // internal, esign, etc.
+  createdByUserId  String?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+
+  recipients       SignatureRecipient[]
+  sessions         SignatureSession[]
+  auditEvents      SignatureAuditEvent[]
+
+  @@index([tenantId])
+  @@index([companyId])
+}
+
+model SignatureRecipient {
+  id           String                   @id @default(cuid())
+  envelopeId   String
+  name         String
+  email        String?
+  phone        String?
+  role         SignatureRecipientRole   @default(SIGNER)
+  orderIndex   Int                      @default(0)
+  status       SignatureRecipientStatus @default(PENDING)
+  signedAt     DateTime?
+
+  envelope     SignatureEnvelope        @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  sessions     SignatureSession[]
+
+  @@index([envelopeId])
+}
+
+model SignatureSession {
+  id           String    @id @default(cuid())
+  envelopeId   String
+  recipientId  String
+  tokenHash    String    @unique
+  expiresAt    DateTime
+  usedAt       DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  envelope     SignatureEnvelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  recipient    SignatureRecipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
+  @@index([recipientId])
+}
+
+enum SignatureAuditAction {
+  ENVELOPE_CREATED
+  RECIPIENT_ADDED
+  SESSION_STARTED
+  SIGN_PORTAL_VIEWED
+  RECIPIENT_SIGNED
+  RECIPIENT_REJECTED
+  ENVELOPE_COMPLETED
+}
+
+model SignatureAuditEvent {
+  id           String               @id @default(cuid())
+  tenantId     String
+  envelopeId   String
+  action       SignatureAuditAction
+  actorId      String?
+  ip           String?
+  userAgent    String?
+  metaJson     Json?
+  createdAt    DateTime             @default(now())
+
+  envelope     SignatureEnvelope    @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
+  @@index([tenantId])
+}
+
+

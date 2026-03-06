@@ -10,6 +10,7 @@ import { useCRM } from '@/contexts/CRMContext';
 import { useModal } from '@/contexts/ModalContext';
 import DailyReportContent from '@/components/DailyReportContent';
 import SupplierReportContent from '@/components/SupplierReportContent';
+import ExportReportsContent from '@/components/ExportReportsContent';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, Legend
@@ -46,7 +47,7 @@ export default function ReportsPage() {
     const canViewAll = isSystemAdmin || !hasPermission('branch_isolation');
 
     // States
-    const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'finance' | 'inventory' | 'customers' | 'cashflow' | 'daily' | 'suppliers'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'finance' | 'inventory' | 'customers' | 'cashflow' | 'daily' | 'suppliers' | 'exports'>('overview');
     const [reportScope, setReportScope] = useState<'all' | 'single'>(canViewAll ? 'all' : 'single');
     const [selectedBranch, setSelectedBranch] = useState(currentUser?.branch || 'Merkez');
     const [dateRange, setDateRange] = useState({
@@ -422,6 +423,7 @@ export default function ReportsPage() {
                             { id: 'inventory', icon: '📦', label: 'Envanter' },
                             { id: 'customers', icon: '👥', label: 'Müşteriler' },
                             { id: 'cashflow', icon: '🏦', label: 'Nakit Akışı' },
+                            { id: 'exports', icon: '📥', label: 'Üretilen Raporlar' },
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -800,6 +802,11 @@ export default function ReportsPage() {
                     {/* Suppliers Report Tab */}
                     {activeTab === 'suppliers' && (
                         <SupplierReportContent />
+                    )}
+
+                    {/* Export Reports Tab */}
+                    {activeTab === 'exports' && (
+                        <ExportReportsContent />
                     )}
                 </div>
             </div>

@@ -4,12 +4,12 @@ import { getStrictTenantId } from '@/services/contracts/tenantContext';
 import { getObject } from '@/services/storage/objectStorage';
 import { ContractAuditAction, ContractActorType } from '@prisma/client';
 
-export async function GET(req: Request, { params }: { params: { blobId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ blobId: string }> }) {
     try {
         const tenantId = await getStrictTenantId();
 
         const blob = await prisma.fileBlob.findUnique({
-            where: { id: params.blobId }
+            where: { id: (await params).blobId }
         });
 
         if (!blob || blob.tenantId !== tenantId) return NextResponse.json({ error: "File not found" }, { status: 404 });

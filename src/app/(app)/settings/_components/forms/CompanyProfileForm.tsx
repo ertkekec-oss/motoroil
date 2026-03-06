@@ -66,6 +66,9 @@ export default function CompanyProfileForm(props: any) {
         setTempCompanyInfo,
         isSaving,
         handleSaveCompany,
+        showError,
+        showSuccess,
+        showConfirm
     } = props;
 
     const [documents, setDocuments] = React.useState<any[]>([]);
@@ -104,12 +107,12 @@ export default function CompanyProfileForm(props: any) {
         ];
 
         if (!validTypes.includes(file.type)) {
-            alert('Desteklenmeyen formattır.');
+            showError('Hata', 'Desteklenmeyen formattır.');
             return;
         }
 
         if (file.size > 10 * 1024 * 1024) {
-            alert('Dosya boyutu 10MB limitini aşıyor.');
+            showError('Hata', 'Dosya boyutu 10MB limitini aşıyor.');
             return;
         }
 
@@ -128,11 +131,12 @@ export default function CompanyProfileForm(props: any) {
                 // reset or fast refresh
                 fetchDocs();
                 if (fileInputRef.current) fileInputRef.current.value = "";
+                showSuccess('Başarılı', 'Belge başarıyla yüklendi.');
             } else {
-                alert(data.error || 'Yüklemekte sorun yaşandı');
+                showError('Hata', data.error || 'Yüklemekte sorun yaşandı');
             }
         } catch (e: any) {
-            alert('Sunucu hatası: ' + e.message);
+            showError('Hata', 'Sunucu hatası: ' + e.message);
         } finally {
             setIsUploading(false);
         }
@@ -151,27 +155,28 @@ export default function CompanyProfileForm(props: any) {
                 link.click();
                 document.body.removeChild(link);
             } else {
-                alert(data.error || 'İndirme adresi alınamadı');
+                showError('Hata', data.error || 'İndirme adresi alınamadı');
             }
         } catch (e) {
-            alert('İndirmede bir hata oluştu.');
+            showError('Hata', 'İndirmede bir hata oluştu.');
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Bu belgeyi kalıcı olarak silmek istediğinize emin misiniz?')) return;
-
-        try {
-            const res = await fetch(`/api/company-docs/${id}`, { method: 'DELETE' });
-            const data = await res.json();
-            if (data.success) {
-                fetchDocs();
-            } else {
-                alert(data.error || 'Silinirken bir hata oluştu');
+        showConfirm('Belgeyi Sil', 'Bu belgeyi kalıcı olarak silmek istediğinize emin misiniz?', async () => {
+            try {
+                const res = await fetch(`/api/company-docs/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    fetchDocs();
+                    showSuccess('Silindi', 'Belge başarıyla silindi.');
+                } else {
+                    showError('Hata', data.error || 'Silinirken bir hata oluştu');
+                }
+            } catch (e) {
+                showError('Hata', 'Sunucu hatası oluştu');
             }
-        } catch (e) {
-            alert('Sunucu hatası oluştu');
-        }
+        });
     };
 
     return (

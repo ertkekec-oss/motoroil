@@ -1,11 +1,102 @@
 "use client";
 
-import { useTransition, useRef } from "react";
+import { useTransition, useRef, useState, useEffect } from "react";
 import { setupRecurringOrderAction, activateContractAction } from "@/actions/contractActions";
 
 export default function ContractDetailClient({ contract, items }: { contract: any, items: any[] }) {
     const [isPending, startTransition] = useTransition();
     const formRef = useRef<HTMLFormElement>(null);
+
+    const [documents, setDocuments] = useState<any[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const fetchDocuments = async () => {
+        try {
+            const res = await fetch(`/api/contracts/${contract.id}/documents`);
+            if (res.ok) {
+                const data = await res.json();
+                setDocuments(data.documents || []);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    useEffect(() => {
+        fetchDocuments();
+    }, [contract.id]);
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 10 * 1024 * 1024) {
+            alert("Dosya boyutu 10MB'dan küçük olmalıdır.");
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', file.name);
+
+            const res = await fetch(`/api/contracts/${contract.id}/documents/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                await fetchDocuments();
+                alert("Belge başarıyla yüklendi.");
+            } else {
+                const err = await res.json();
+                alert(err.error || "Dosya yüklenemedi.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Dosya yüklenirken bir sorun oluştu.");
+        } finally {
+            setIsUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const handleDownloadDocument = async (docId: string, fileName: string) => {
+        try {
+            const res = await fetch(`/api/contracts/documents/${docId}/download`);
+            const data = await res.json();
+
+            if (data.success && data.url) {
+                const link = document.createElement('a');
+                link.href = data.url;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode?.removeChild(link);
+            } else {
+                alert(data.error || "İndirme bağlantısı alınamadı");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("İndirme sırasında bir hata oluştu");
+        }
+    };
+
+    const handleDeleteDocument = async (docId: string) => {
+        if (!confirm("Belgeyi silmek istediğinize emin misiniz?")) return;
+        try {
+            const res = await fetch(`/api/contracts/documents/${docId}`, { method: 'DELETE' });
+            if (res.ok) {
+                await fetchDocuments();
+            } else {
+                alert("Belge silinemedi.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Silme sırasında bir hata oluştu.");
+        }
+    };
 
     const handleRecurring = (e: React.FormEvent) => {
         e.preventDefault();
@@ -154,6 +245,42 @@ export default function ContractDetailClient({ contract, items }: { contract: an
                                 )}
                             </div>
                         )}
+                    </div>
+
+                    {/* Documents Panel */}
+                    <div className="bg-white border border-slate-200 rounded-md p-5 shadow-sm">
+                        <div className="flex justify-between items-center border-b border-slate-100 pb-2 mb-3">
+                            <h2 className="text-sm font-bold text-slate-800">Documents</h2>
+                            <label className={`text-[10px] uppercase font-bold px-2 py-1 rounded bg-indigo-50 text-indigo-600 cursor-pointer hover:bg-indigo-100 transition-colors ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                {isUploading ? 'Yükleniyor...' : '+ Yükle'}
+                                <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} />
+                            </label>
+                        </div>
+
+                        <div className="space-y-3">
+                            {documents.length === 0 ? (
+                                <p className="text-xs text-slate-500 italic">No documents attached.</p>
+                            ) : (
+                                documents.map(doc => (
+                                    <div key={doc.id} className="flex items-center justify-between p-2 rounded border border-slate-100 bg-slate-50 group hover:border-slate-300 transition-colors">
+                                        <div className="overflow-hidden mr-2">
+                                            <p className="text-xs font-semibold text-slate-700 truncate" title={doc.fileName}>{doc.name || doc.fileName}</p>
+                                            <p className="text-[10px] text-slate-500 uppercase mt-0.5">
+                                                {new Date(doc.createdAt).toLocaleDateString()} • {(doc.size / 1024).toFixed(0)} KB
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-1 shrink-0">
+                                            <button onClick={() => handleDownloadDocument(doc.id, doc.fileName)} className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded" title="İndir">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                            </button>
+                                            <button onClick={() => handleDeleteDocument(doc.id)} className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded" title="Sil">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
 

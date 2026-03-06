@@ -63,6 +63,7 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
                     update: { quantity: newQty },
                     create: {
                         productId: params.id,
+                        companyId: companyId,
                         branch: targetBranch,
                         quantity: newQty
                     }

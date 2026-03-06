@@ -1,0 +1,55 @@
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { getSession, hasPermission } from '@/lib/auth';
+import { deleteFromS3 } from '@/lib/s3';
+import { storageError } from '@/lib/storage/security';
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ documentId: string }> }) {
+    try {
+        const session = await getSession();
+        if (!session) return storageError('Oturum gerekli', 401);
+
+        if (!hasPermission(session, 'accounting_manage') && !hasPermission(session, 'reconciliation_manage') && session.role !== 'ADMIN') {
+            return storageError('Bu işlem için yetkiniz yok', 403);
+        }
+
+        const documentId = (await params).documentId;
+        const tenantId = (session as any).tenantId;
+
+        if (!tenantId || !documentId) {
+            return storageError('Geçersiz parametreler', 400);
+        }
+
+        const doc = await prisma.reconciliationDocument.findFirst({
+            where: {
+                id: documentId,
+                tenantId: tenantId
+            }
+        });
+
+        if (!doc) {
+            return storageError('Belge bulunamadı veya yetkiniz yok', 404);
+        }
+
+        // S3'ten kalıcı silme
+        try {
+            await deleteFromS3({
+                bucket: 'private',
+                key: doc.fileKey
+            });
+        } catch (s3Error: any) {
+            console.warn('S3 file could not be deleted while preparing to delete Reconciliation doc. Maybe it is orphan:', s3Error);
+        }
+
+        // Veritabanından silme
+        await prisma.reconciliationDocument.delete({
+            where: { id: doc.id }
+        });
+
+        return NextResponse.json({ success: true });
+
+    } catch (error: any) {
+        console.error('[Storage Error] Reconciliation doc delete:', error);
+        return storageError('Silme işlemi sırasında hata oluştu', 500);
+    }
+}

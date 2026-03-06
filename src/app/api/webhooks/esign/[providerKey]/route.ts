@@ -3,13 +3,13 @@ import { prisma } from '@/lib/prisma';
 import { enqueueWebhookIngest } from '@/services/contracts/jobs';
 import crypto from 'crypto';
 
-export async function POST(req: Request, { params }: { params: { providerKey: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ providerKey: string }> }) {
     try {
         const rawBody = await req.text();
         const headersList = Object.fromEntries(req.headers.entries());
 
         // Dynamic generic verification for demo MVP purposes
-        const secret = process.env[`CONTRACTS_WEBHOOK_SECRET_${params.providerKey.toUpperCase()}`];
+        const secret = process.env[`CONTRACTS_WEBHOOK_SECRET_${(await params).providerKey.toUpperCase()}`];
         if (secret) {
             const hmac = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
             const providedSignature = headersList['x-signature'] || headersList['x-hub-signature'];
@@ -31,7 +31,7 @@ export async function POST(req: Request, { params }: { params: { providerKey: st
         const inbox = await prisma.webhookInbox.create({
             data: {
                 tenantId: "SYSTEM_MAPPED", // Will be resolved natively via enqueue matching in worker
-                providerKey: params.providerKey,
+                providerKey: (await params).providerKey,
                 headers: headersList,
                 payload: payloadJson,
                 status: 'PENDING'

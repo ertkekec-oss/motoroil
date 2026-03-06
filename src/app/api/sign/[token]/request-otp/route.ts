@@ -5,9 +5,9 @@ import { appendAuditEvent } from '@/services/contracts/audit';
 import { enqueueSendSmsOtp } from '@/services/contracts/jobs';
 import { ContractActorType, ContractAuditAction } from '@prisma/client';
 
-export async function POST(req: Request, { params }: { params: { token: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ token: string }> }) {
     try {
-        const rawToken = params.token;
+        const rawToken = (await params).token;
         const publicTokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
 
         // Fetch session regardless of tenant since it's a public publicTokenHash unique search

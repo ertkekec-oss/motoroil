@@ -20,7 +20,6 @@ export default async function ReconDetailPage({ params }: { params: Promise<{ id
             items: { orderBy: { date: 'asc' } },
             auditEvents: { orderBy: { createdAt: 'desc' } },
             disputes: {
-                include: { items: true },
                 orderBy: { createdAt: 'desc' }
             }
         }

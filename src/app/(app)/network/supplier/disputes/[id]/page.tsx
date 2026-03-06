@@ -1,4 +1,4 @@
-import { EnterprisePageShell, EnterpriseCard, EnterpriseButton } from "@/components/ui/enterprise";
+import { EnterprisePageShell, EnterpriseCard, EnterpriseButton, EnterpriseSectionHeader } from "@/components/ui/enterprise";
 import { prisma } from "@/lib/prisma";
 import { getStrictTenantId } from "@/services/contracts/tenantContext";
 import { AlertTriangle, Download, ArrowRight } from "lucide-react";
@@ -19,7 +19,7 @@ export default async function DisputeDetailPage({ params }: { params: { id: stri
     if (!dispute) {
         return (
             <EnterprisePageShell title="Uyuşmazlık Ayrıntısı">
-                <EnterpriseCard title="Hata">Bulunamadı veya Yetkisiz Erişim.</EnterpriseCard>
+                <EnterpriseCard><EnterpriseSectionHeader title="Hata" />Bulunamadı veya Yetkisiz Erişim.</EnterpriseCard>
             </EnterprisePageShell>
         );
     }

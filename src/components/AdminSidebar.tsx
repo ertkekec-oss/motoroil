@@ -6,7 +6,7 @@ import {
     LayoutDashboard, Wallet, TrendingUp, ShieldAlert,
     Network, HardDrive, FileText, Settings, Users, Percent,
     CreditCard, Server, Activity, ArrowRightLeft, DatabaseZap, CheckCircle, Store, AlertTriangle, ShieldCheck,
-    Search, Inbox, Library, Mail
+    Search, Inbox, Library, Mail, PenTool, Handshake
 } from 'lucide-react';
 
 export function AdminSidebar({ userRole }: { userRole: string }) {
@@ -160,6 +160,33 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                     </NavGroup>
                 )}
             </div>
+
+            {/* SÜREÇ YÖNETİMİ */}
+            {isSuper && (
+                <div className="space-y-1 mb-6">
+                    <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
+                        SÜREÇ YÖNETİMİ
+                    </div>
+
+                    <NavGroup title="İmza Yönetimi" icon={PenTool} groupKey="admin_signatures">
+                        <NavItem href="/admin/signatures" icon={LayoutDashboard} label="İmza Dashboard" />
+                        <NavItem href="/admin/signatures/templates" icon={FileText} label="Şablonlar" />
+                        <NavItem href="/admin/signatures/providers" icon={Server} label="Sağlayıcılar" />
+                        <NavItem href="/admin/signatures/policies" icon={ShieldCheck} label="Kurallar (Policy)" />
+                        <NavItem href="/admin/signatures/webhooks" icon={Activity} label="Webhook & Callback" />
+                        <NavItem href="/admin/signatures/audit" icon={Search} label="İmza Denetimi" />
+                    </NavGroup>
+
+                    <NavGroup title="Mutabakat Yönetimi" icon={Handshake} groupKey="admin_recon">
+                        <NavItem href="/admin/reconciliation" icon={LayoutDashboard} label="Mutabakat Dashboard" />
+                        <NavItem href="/admin/reconciliation/templates" icon={FileText} label="Şablonlar" />
+                        <NavItem href="/admin/reconciliation/policies" icon={ShieldCheck} label="Kurallar (Policy)" />
+                        <NavItem href="/admin/reconciliation/jobs" icon={Inbox} label="Gönderim İşleri" />
+                        <NavItem href="/admin/reconciliation/disputes" icon={AlertTriangle} label="Uyuşmazlıklar" />
+                        <NavItem href="/admin/reconciliation/audit" icon={Search} label="Mutabakat Denetimi" />
+                    </NavGroup>
+                </div>
+            )}
 
             {/* GÜVENLİK VE AYARLAR - SABİT BAŞLIK */}
             {isSuper && (

@@ -4,13 +4,13 @@ import { getStrictTenantId } from '@/services/contracts/tenantContext';
 import { enqueueRenderPdf } from '@/services/contracts/jobs';
 import { ContractAuditAction, ContractActorType } from '@prisma/client';
 
-export async function POST(req: Request, { params }: { params: { documentId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ documentId: string }> }) {
     try {
         const tenantId = await getStrictTenantId();
 
         // Find latest version or specified. Assuming latest.
         const d = await prisma.document.findUnique({
-            where: { id: params.documentId },
+            where: { id: (await params).documentId },
             include: { versions: { orderBy: { version: 'desc' }, take: 1 } }
         });
 

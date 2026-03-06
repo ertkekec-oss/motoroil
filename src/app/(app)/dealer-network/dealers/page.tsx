@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { EnterpriseCard, EnterpriseTable } from "@/components/ui/enterprise";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 export default function DealersPage() {
     const [dealers, setDealers] = useState<any[]>([]);
@@ -36,45 +37,53 @@ export default function DealersPage() {
 
     const handleInvite = async () => {
         if (inviteType === 'email' && !inviteEmail) {
-            alert('Lütfen e-posta adresi girin.');
+            toast.error('Lütfen e-posta adresi girin.');
             return;
         }
         if (inviteType === 'customer' && !selectedCustomerId) {
-            alert('Lütfen bir cari seçin.');
+            toast.error('Lütfen bir cari seçin.');
             return;
         }
 
         try {
-            await fetch("/api/dealer-network/dealers/invite", {
+            const res = await fetch("/api/dealer-network/dealers/invite", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(inviteType === 'email' ? { email: inviteEmail } : { customerId: selectedCustomerId })
             });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || "Davetiye gönderilemedi.");
+            }
             setIsInviteModalOpen(false);
             setInviteEmail("");
             setSelectedCustomerId("");
-            alert("Davetiye başarıyla gönderildi.");
-        } catch (error) {
-            alert("Davetiye gönderilemedi.");
+            toast.success("Davetiye başarıyla gönderildi.");
+        } catch (error: any) {
+            toast.error(error.message || "Davetiye gönderilemedi.");
         }
     };
 
     const handleUpdateCreditLine = async () => {
         if (!selectedDealer) return;
         try {
-            await fetch(`/api/dealer-network/dealers/${selectedDealer.id}/credit-limit`, {
+            const res = await fetch(`/api/dealer-network/dealers/${selectedDealer.id}/credit-limit`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ creditLimit: parseFloat(newCreditLimit) })
             });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || "Limit güncellenemedi.");
+            }
             setIsDrawerOpen(false);
             setSelectedDealer(null);
             setNewCreditLimit("");
-            alert("Kredi limiti güncellendi.");
+            toast.success("Kredi limiti güncellendi.");
             // Ideally refetch dealers, here bypassing for demo
             setDealers(prev => prev.map(d => d.id === selectedDealer.id ? { ...d, creditLimit: newCreditLimit } : d));
-        } catch (error) {
-            alert("Limit güncellenemedi.");
+        } catch (error: any) {
+            toast.error(error.message || "Limit güncellenemedi.");
         }
     };
 

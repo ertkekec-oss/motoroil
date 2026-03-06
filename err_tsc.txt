@@ -1,0 +1,6 @@
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(1091,25): error TS2367: This comparison appears to be unintentional because the types '"payments" | "sales" | "all"' and '"reconciliations"' have no overlap.
+src/app/api/contracts/verify/[documentId]/route.ts(6,17): error TS2339: Property 'documentId' does not exist on type 'Promise<{ documentId: string; }>'.
+src/app/api/portal/reconciliation/access/route.ts(20,72): error TS2339: Property 'error' does not exist on type '{ ok: boolean; ip: string; userAgent: string; status: number; }'.
+src/app/api/portal/reconciliation/respond/route.ts(20,72): error TS2339: Property 'error' does not exist on type '{ ok: boolean; ip: string; userAgent: string; status: number; }'.
+src/app/api/portal/reconciliation/upload-dispute/route.ts(29,56): error TS2339: Property 'error' does not exist on type '{ ok: boolean; ip: string; userAgent: string; status: number; }'.
+src/app/api/webhooks/payments/[providerKey]/route.ts(8,17): error TS2339: Property 'providerKey' does not exist on type 'Promise<{ providerKey: string; }>'.

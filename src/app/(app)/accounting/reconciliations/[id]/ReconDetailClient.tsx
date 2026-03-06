@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
-import { resendReconAction, voidReconAction, exportReconEvidenceAction, openReconDisputeAction } from "@/services/finance/reconciliation/actions";
+import { resendReconAction, voidReconAction, exportReconEvidenceAction, openReconDisputeAction, updateDisputeStatusAction, addDisputeInternalNoteAction, assignDisputeAction } from "@/services/finance/reconciliation/actions";
 import { useRouter } from "next/navigation";
 
 export default function ReconDetailClient({ reconciliation: r }: { reconciliation: any }) {
@@ -11,11 +11,145 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'ITEMS' | 'DISPUTES' | 'AUDIT'>('ITEMS');
     const [processing, setProcessing] = useState<string | null>(null);
+    const [noteInputs, setNoteInputs] = useState<Record<string, string>>({});
+
+    // --- DOC STATE & HANDLERS ---
+    const [documents, setDocuments] = useState<any[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const fetchDocuments = async () => {
+        try {
+            const res = await fetch(`/api/reconciliation/${r.id}/documents`);
+            if (res.ok) {
+                const data = await res.json();
+                setDocuments(data.documents || []);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    useEffect(() => {
+        fetchDocuments();
+    }, [r.id]);
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 10 * 1024 * 1024) {
+            showError("Hata", "Dosya boyutu 10MB'dan küçük olmalıdır.");
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', file.name);
+
+            const res = await fetch(`/api/reconciliation/${r.id}/documents/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                await fetchDocuments();
+                showSuccess("Başarılı", "Belge başarıyla yüklendi.");
+            } else {
+                const err = await res.json();
+                showError("Hata", err.error || "Dosya yüklenemedi.");
+            }
+        } catch (e) {
+            console.error(e);
+            showError("Hata", "Dosya yüklenirken bir sorun oluştu.");
+        } finally {
+            setIsUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const handleDownloadDocument = async (docId: string, fileName: string) => {
+        try {
+            const res = await fetch(`/api/reconciliation/documents/${docId}/download`);
+            const data = await res.json();
+
+            if (data.success && data.url) {
+                const link = document.createElement('a');
+                link.href = data.url;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode?.removeChild(link);
+            } else {
+                showError("Hata", data.error || "İndirme bağlantısı alınamadı");
+            }
+        } catch (e) {
+            console.error(e);
+            showError("Hata", "İndirme sırasında bir hata oluştu");
+        }
+    };
+
+    const handleDeleteDocument = async (docId: string) => {
+        showConfirm("Belgeyi Sil", "Mutabakat ekini silmek istediğinize emin misiniz?", async () => {
+            try {
+                const res = await fetch(`/api/reconciliation/documents/${docId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await fetchDocuments();
+                } else {
+                    showError("Hata", "Belge silinemedi.");
+                }
+            } catch (e) {
+                console.error(e);
+                showError("Hata", "Silme sırasında bir hata oluştu.");
+            }
+        });
+    };
 
     const handleResend = async () => {
         setProcessing('RESEND');
         const res = await resendReconAction(r.id);
         if (res.success) { showSuccess("Başarılı", "Mutabakat tekrar gönderildi."); router.refresh(); }
+        else { showError("Hata", res.error); }
+        setProcessing(null);
+    };
+
+    const handleDownloadDisputeAttachment = async (disputeId: string) => {
+        try {
+            showSuccess("İndiriliyor", "İtiraz dosyası hazırlanıyor...");
+            const res = await fetch(`/api/reconciliation/${r.id}/disputes/download?disputeId=${disputeId}`);
+            const data = await res.json();
+
+            if (data.success && data.url) {
+                const link = document.createElement('a');
+                link.href = data.url;
+                link.setAttribute('target', '_blank');
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode?.removeChild(link);
+            } else {
+                showError("Hata", data.error || "İndirme bağlantısı alınamadı");
+            }
+        } catch (e) {
+            console.error(e);
+            showError("Hata", "İndirme sırasında bir hata oluştu");
+        }
+    };
+
+    const handleUpdateDisputeStatus = async (disputeId: string, status: 'OPEN' | 'RESOLVED' | 'REJECTED') => {
+        setProcessing(`STATUS_${disputeId}`);
+        const res = await updateDisputeStatusAction(disputeId, status);
+        if (res.success) { showSuccess("Başarılı", "İtiraz durumu güncellendi."); router.refresh(); }
+        else { showError("Hata", res.error); }
+        setProcessing(null);
+    };
+
+    const handleSaveNote = async (disputeId: string) => {
+        const note = noteInputs[disputeId];
+        if (!note) return;
+        setProcessing(`NOTE_${disputeId}`);
+        const res = await addDisputeInternalNoteAction(disputeId, note);
+        if (res.success) { showSuccess("Başarılı", "İç not eklendi."); router.refresh(); }
         else { showError("Hata", res.error); }
         setProcessing(null);
     };
@@ -73,6 +207,9 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                             </button>
                             <button onClick={handleDispute} disabled={!!processing} className="btn" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
                                 ⚠️ İtiraz (Dispute) Aç
+                            </button>
+                            <button onClick={() => alert('Future-ready: İmzaya Gönder V1 Katmanı')} disabled={!!processing} className="btn hover:bg-emerald-500/20" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: 'bold' }}>
+                                ✍️ İmzaya Gönder
                             </button>
                         </div>
                     </div>
@@ -165,6 +302,45 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                     </div>
                 </div>
 
+                {/* DOCUMENTS PANEL */}
+                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '32px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                        <div>
+                            <h2 style={{ fontSize: '16px', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--text-muted)', margin: 0 }}>Mutabakat Ekleri</h2>
+                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Manuel yüklenen referans veya ek belgeleri buradan yönetebilirsiniz.</p>
+                        </div>
+                        <label style={{ padding: '8px 16px', background: 'rgba(16,185,129,0.1)', color: '#10b981', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', opacity: isUploading ? 0.5 : 1, pointerEvents: isUploading ? 'none' : 'auto' }} className="hover:bg-[rgba(16,185,129,0.2)]">
+                            {isUploading ? 'Yükleniyor...' : '+ Ek Yükle'}
+                            <input type="file" style={{ display: 'none' }} accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} />
+                        </label>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {documents.length === 0 ? (
+                            <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Henüz eklenen bir belge yok.</p>
+                        ) : (
+                            documents.map(doc => (
+                                <div key={doc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'rgba(0,0,0,0.1)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <div style={{ overflow: 'hidden', paddingRight: '16px' }}>
+                                        <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={doc.fileName}>{doc.name || doc.fileName}</div>
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '4px' }}>
+                                            {new Date(doc.createdAt).toLocaleDateString()} • {(doc.size / 1024).toFixed(0)} KB
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                                        <button onClick={() => handleDownloadDocument(doc.id, doc.fileName)} style={{ padding: '6px', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '6px' }} title="İndir" className="hover:text-blue-500 hover:bg-blue-500/10">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                        </button>
+                                        <button onClick={() => handleDeleteDocument(doc.id)} style={{ padding: '6px', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '6px' }} title="Sil" className="hover:text-red-500 hover:bg-red-500/10">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
                 {/* TABS FOR DETAILS */}
                 <div style={{ display: 'flex', gap: '32px', borderBottom: '1px solid var(--border-color)', marginTop: '24px' }}>
                     {[
@@ -229,13 +405,50 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                                     {r.disputes.map((d: any) => (
                                         <div key={d.id} style={{ padding: '24px', border: '1px solid rgba(245,158,11,0.3)', background: 'rgba(245,158,11,0.05)', borderRadius: '16px' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                                <div style={{ fontWeight: '800', fontSize: '16px', color: '#f59e0b' }}>[#{d.id.substring(d.id.length - 6).toUpperCase()}] İtiraz: {d.reason}</div>
-                                                <div style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '12px' }}>Durum: {d.status}</div>
+                                                <div style={{ fontWeight: '800', fontSize: '16px', color: '#f59e0b' }}>[#{d.id.substring(d.id.length - 6).toUpperCase()}] İtiraz Formu</div>
+                                                <div style={{ display: 'flex', gap: '8px' }}>
+                                                    {d.status === 'OPEN' && (
+                                                        <>
+                                                            <button onClick={() => handleUpdateDisputeStatus(d.id, 'RESOLVED')} disabled={!!processing} style={{ padding: '4px 12px', background: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }} className="hover:bg-emerald-500/20">✔ Çözüldü İşaretle</button>
+                                                            <button onClick={() => handleUpdateDisputeStatus(d.id, 'REJECTED')} disabled={!!processing} style={{ padding: '4px 12px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }} className="hover:bg-red-500/20">✖ İtirazı Reddet</button>
+                                                        </>
+                                                    )}
+                                                    <div style={{ padding: '4px 12px', background: d.status === 'OPEN' ? 'rgba(245,158,11,0.1)' : 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '12px', color: d.status === 'OPEN' ? '#f59e0b' : 'white' }}>Durum: {d.status}</div>
+                                                </div>
                                             </div>
                                             <div style={{ fontSize: '14px', color: 'white', lineHeight: '1.6', marginBottom: '16px' }}>
-                                                Notlar: {d.notes || 'Detay girilmedi.'}
+                                                {d.message || 'Detay girilmedi.'}
                                             </div>
-                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Açan: {d.createdByActorType} • Tarih: {new Date(d.createdAt).toLocaleString()}</div>
+
+                                            {d.internalNotes && (
+                                                <div style={{ padding: '12px', background: 'rgba(59,130,246,0.1)', borderLeft: '2px solid #3b82f6', marginBottom: '16px', fontSize: '13px', color: '#e2e8f0', borderRadius: '4px' }}>
+                                                    <span style={{ fontWeight: 'bold', color: '#3b82f6', display: 'block', marginBottom: '4px' }}>İç Not (Ops):</span>
+                                                    {d.internalNotes}
+                                                </div>
+                                            )}
+
+                                            {d.status === 'OPEN' && !d.internalNotes && (
+                                                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Sadece iç ekibin görebileceği not ekle..."
+                                                        value={noteInputs[d.id] || ''}
+                                                        onChange={e => setNoteInputs({ ...noteInputs, [d.id]: e.target.value })}
+                                                        style={{ flex: 1, padding: '8px 12px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', fontSize: '13px' }}
+                                                    />
+                                                    <button onClick={() => handleSaveNote(d.id)} disabled={!noteInputs[d.id] || !!processing} style={{ padding: '8px 16px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: noteInputs[d.id] ? 'pointer' : 'not-allowed', opacity: noteInputs[d.id] ? 1 : 0.5 }}>Kaydet</button>
+                                                </div>
+                                            )}
+
+                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <span>Açan: Portal (Dış Müşteri) • Tarih: {new Date(d.createdAt).toLocaleString()}{d.assigneeId ? ` • Sorumlu: ${d.assigneeId}` : ''}</span>
+                                                {d.attachmentKey && (
+                                                    <button onClick={() => handleDownloadDisputeAttachment(d.id)} className="btn hover:text-blue-500" style={{ padding: '6px 16px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#3b82f6', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}>
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                        Ek Dosya (İndir)
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
