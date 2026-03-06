@@ -91,10 +91,11 @@ export async function sendReconAction(data: {
             }
         });
 
-        // ACTUALLY SEND THE EMAIL
+        // ACTUALLY SEND THE EMAIL via Mail Engine
         const account = await prisma.customer.findUnique({ where: { id: recon.accountId } });
         if (account && account.email && data.deliveryMethod === 'EMAIL') {
             const documentLink = `https://www.periodya.com/portal/mutabakat/access?token=${rawToken}`;
+
             await sendMail({
                 to: account.email,
                 subject: `Mutabakat Talebi: ${recon.periodStart.toLocaleDateString()} - ${recon.periodEnd.toLocaleDateString()}`,
@@ -119,7 +120,11 @@ export async function sendReconAction(data: {
                         </div>
                     </div>
                 `,
-                companyId: recon.companyId
+                tenantId: recon.tenantId,
+                companyId: recon.companyId,
+                category: 'RECONCILIATION_INVITATION',
+                relatedEntityType: 'Reconciliation',
+                relatedEntityId: recon.id
             });
         }
 

@@ -5723,3 +5723,36 @@ model OtpVerification {
   @@index([phone])
 }
 
+
+// ===================================
+// Transaction Mail Engine
+// ===================================
+
+enum MailDeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model MailDeliveryLog {
+  id                String             @id @default(cuid())
+  tenantId          String
+  companyId         String?
+  provider          String
+  to                String
+  subject           String
+  category          String
+  status            MailDeliveryStatus @default(PENDING)
+  errorMessage      String?            @db.Text
+  relatedEntityType String?
+  relatedEntityId   String?
+  createdAt         DateTime           @default(now())
+  sentAt            DateTime?
+
+  @@index([tenantId])
+  @@index([companyId])
+  @@index([status])
+  @@index([category])
+  @@index([relatedEntityType, relatedEntityId])
+}
+

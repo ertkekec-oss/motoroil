@@ -2,12 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { randomBytes, createHash } from "crypto";
 import { sendNetgsmOtp } from "@/lib/otp/netgsm";
 
-// Dummy email service
-async function sendEmail({ to, subject, body }: { to: string; subject: string; body: string }) {
-    console.log(`[EMAIL to ${to}]: Subject: ${subject} | Body: ${body.substring(0, 50)}...`);
-    // Ideally use Resend/AWS SES here
-    return { success: true };
-}
+import { sendMail } from "@/lib/mail";
 
 export async function sendSignatureInvitation(envelopeId: string) {
     const envelope = await prisma.signatureEnvelope.findUnique({
@@ -92,7 +87,16 @@ export async function sendSignatureInvitation(envelopeId: string) {
             const subject = 'Periodya – İmza Daveti';
             const body = `Şirket: Periodya Test \nBelge: ${envelope.title}\n\nİmzalamak için:\n${portalLink}`;
 
-            await sendEmail({ to: recipient.email, subject, body });
+            await sendMail({
+                to: recipient.email,
+                subject,
+                text: body,
+                tenantId: envelope.tenantId,
+                companyId: envelope.companyId,
+                category: 'SIGNATURE_INVITATION',
+                relatedEntityType: 'SignatureEnvelope',
+                relatedEntityId: envelope.id
+            });
 
             await prisma.signatureAuditEvent.create({
                 data: {
