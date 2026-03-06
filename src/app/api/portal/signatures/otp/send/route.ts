@@ -6,10 +6,10 @@ import { createHash } from 'crypto';
 
 export async function POST(req: Request) {
     try {
-        const { token, phone } = await req.json();
+        const { token } = await req.json();
 
-        if (!token || !phone) {
-            return NextResponse.json({ error: 'Token and phone are required' }, { status: 400 });
+        if (!token) {
+            return NextResponse.json({ error: 'Token is required' }, { status: 400 });
         }
 
         const security = await applyPortalRateLimit(req, token);
@@ -19,7 +19,12 @@ export async function POST(req: Request) {
 
         const session = await prisma.signatureSession.findUnique({
             where: { tokenHash: token },
-            include: { envelope: true }
+            include: {
+                envelope: true,
+                recipient: {
+                    include: { signer: true }
+                }
+            }
         });
 
         if (!session || session.revokedAt || session.expiresAt < new Date()) {
@@ -38,6 +43,13 @@ export async function POST(req: Request) {
 
         if (!config || !config.isEnabled) {
             return NextResponse.json({ error: 'OTP configuration disabled' }, { status: 500 });
+        }
+
+        // Phone Resolution Logic
+        const resolvedPhone = session.recipient.phone || session.recipient.signer?.phone;
+
+        if (!resolvedPhone) {
+            return NextResponse.json({ error: 'No phone number available for OTP verification.' }, { status: 400 });
         }
 
         // Cooldown and rate limit check
@@ -70,14 +82,14 @@ export async function POST(req: Request) {
         await prisma.otpVerification.create({
             data: {
                 tenantId: envelope.tenantId,
-                phone,
+                phone: resolvedPhone,
                 codeHash,
                 expiresAt,
                 sessionId: session.id
             }
         });
 
-        const sendResult = await sendNetgsmOtp(config, phone, code);
+        const sendResult = await sendNetgsmOtp(config, resolvedPhone, code);
 
         await prisma.signatureAuditEvent.create({
             data: {
@@ -85,7 +97,7 @@ export async function POST(req: Request) {
                 envelopeId: envelope.id,
                 action: 'OTP_SENT',
                 actorId: session.recipientId,
-                metaJson: { phone, success: sendResult.success }
+                metaJson: { phone: resolvedPhone, success: sendResult.success }
             }
         });
 

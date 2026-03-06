@@ -51,11 +51,12 @@ export async function POST(req: Request) {
             'image/jpg',
             'image/png',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/csv'
         ];
 
         if (!validMimeTypes.includes(file.type)) {
-            return NextResponse.json({ error: 'Invalid file type.' }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid file type. Only PDF, images, Word, Excel, and CSV are allowed.' }, { status: 400 });
         }
 
         // Validation: Size (Max 10MB)

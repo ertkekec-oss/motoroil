@@ -3,14 +3,20 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
-export default async function SignatureEnvelopesPage() {
+export default async function SignatureEnvelopesPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
     const session = await getSession();
     if (!session) return notFound();
 
     const tenantId = session.companyId || (session as any).tenantId;
+    const { category } = await searchParams;
+
+    const whereClause: any = { tenantId };
+    if (category) {
+        whereClause.documentCategory = category;
+    }
 
     const envelopes = await prisma.signatureEnvelope.findMany({
-        where: { tenantId },
+        where: whereClause,
         orderBy: { createdAt: 'desc' },
         include: { recipients: true }
     });
@@ -30,51 +36,76 @@ export default async function SignatureEnvelopesPage() {
                     </div>
                 </div>
 
-                <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ background: 'rgba(0,0,0,0.2)', borderBottom: '1px solid var(--border-color)' }}>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tarih</th>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Zarf Başlığı</th>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Durum</th>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Alıcı Sayısı</th>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Aksiyonlar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {envelopes.length === 0 ? (
-                                <tr>
-                                    <td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Henüz zarf oluşturulmadı.</td>
+                <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+
+                    <div style={{ padding: '16px 24px', background: 'rgba(255,255,255,0.01)', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        <div style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Filtrele:</div>
+                        <form method="GET" style={{ margin: 0, padding: 0 }}>
+                            <select
+                                name="category"
+                                defaultValue={category || ''}
+                                onChange={(e) => e.target.form?.submit()}
+                                style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)', borderRadius: '6px', fontSize: '12px', outline: 'none' }}>
+                                <option value="" style={{ color: 'black' }}>Tüm Kategoriler</option>
+                                <option value="CONTRACT" style={{ color: 'black' }}>Sözleşmeler (Contract)</option>
+                                <option value="AGREEMENT" style={{ color: 'black' }}>Anlaşmalar (Agreement)</option>
+                                <option value="COMPANY_DOCUMENT" style={{ color: 'black' }}>Şirket Evrakları</option>
+                                <option value="EMPLOYEE_DOCUMENT" style={{ color: 'black' }}>Özlük Evrakları</option>
+                                <option value="FORM" style={{ color: 'black' }}>Genel Formlar</option>
+                            </select>
+                        </form>
+                    </div>
+
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead>
+                                <tr style={{ background: 'rgba(0,0,0,0.2)', borderBottom: '1px solid var(--border-color)' }}>
+                                    <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tarih</th>
+                                    <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Zarf Başlığı</th>
+                                    <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Kategori</th>
+                                    <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Durum</th>
+                                    <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Alıcı Sayısı</th>
+                                    <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Aksiyonlar</th>
                                 </tr>
-                            ) : envelopes.map((env: any) => (
-                                <tr key={env.id} className="hover:bg-slate-800/20" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                    <td style={{ padding: '16px 24px', fontSize: '13px' }}>{new Date(env.createdAt).toLocaleDateString()}</td>
-                                    <td style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 'bold' }}>
-                                        {env.title}
-                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{env.documentFileName}</div>
-                                    </td>
-                                    <td style={{ padding: '16px 24px' }}>
-                                        <span style={{
-                                            padding: '4px 12px',
-                                            borderRadius: '6px',
-                                            fontSize: '11px',
-                                            fontWeight: '800',
-                                            background: env.status === 'COMPLETED' ? 'rgba(16,185,129,0.1)' : env.status === 'REJECTED' || env.status === 'FAILED' ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)',
-                                            color: env.status === 'COMPLETED' ? '#10b981' : env.status === 'REJECTED' || env.status === 'FAILED' ? '#ef4444' : '#3b82f6'
-                                        }}>
-                                            {env.status}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 'bold' }}>{env.recipients.length} Kişi</td>
-                                    <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                                        <Link href={`/signatures/envelopes/${env.id}`} style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: '600', textDecoration: 'none' }} className="hover:bg-white/10">
-                                            Detayları Görüntüle
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {envelopes.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Henüz zarf oluşturulmadı.</td>
+                                    </tr>
+                                ) : envelopes.map((env: any) => (
+                                    <tr key={env.id} className="hover:bg-slate-800/20" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                        <td style={{ padding: '16px 24px', fontSize: '13px' }}>{new Date(env.createdAt).toLocaleDateString()}</td>
+                                        <td style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 'bold' }}>
+                                            {env.title}
+                                            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{env.documentFileName}</div>
+                                        </td>
+                                        <td style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                                            {env.documentCategory || '-'}
+                                        </td>
+                                        <td style={{ padding: '16px 24px' }}>
+                                            <span style={{
+                                                padding: '4px 12px',
+                                                borderRadius: '6px',
+                                                fontSize: '11px',
+                                                fontWeight: '800',
+                                                background: env.status === 'COMPLETED' ? 'rgba(16,185,129,0.1)' : env.status === 'REJECTED' || env.status === 'FAILED' ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)',
+                                                color: env.status === 'COMPLETED' ? '#10b981' : env.status === 'REJECTED' || env.status === 'FAILED' ? '#ef4444' : '#3b82f6'
+                                            }}>
+                                                {env.status}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 'bold' }}>{env.recipients.length} Kişi</td>
+                                        <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                                            <Link href={`/signatures/envelopes/${env.id}`} style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: '600', textDecoration: 'none' }} className="hover:bg-white/10">
+                                                Detayları Görüntüle
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

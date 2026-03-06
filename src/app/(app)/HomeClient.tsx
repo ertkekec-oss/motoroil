@@ -489,6 +489,37 @@ function POSContent() {
             <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artışı</div><div className={theme === 'light' ? "text-xs font-bold text-pos" : "text-xs font-bold text-white"}>{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
           </div>
         </div>
+
+        {/* ROW 6: WORKFLOW TASKS */}
+        <div className={theme === 'light' ? "card p-4 flex flex-col mt-2" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex flex-col mt-2 shadow-2xl"}>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-sm font-bold opacity-80 uppercase tracking-widest flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Bekleyen Görevler ({insightsData?.workflowTasks?.length || 0})
+            </h3>
+            <button onClick={() => router.push('/tasks')} className="text-[10px] font-bold text-primary hover:underline uppercase">Tümünü Gör</button>
+          </div>
+
+          {insightsData?.workflowTasks?.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              {insightsData.workflowTasks.map((t: any) => (
+                <div key={t.id} onClick={() => router.push(`/tasks/${t.id}`)} className={theme === 'light' ? "p-3 rounded-lg border border-border-pos bg-gray-50 flex items-center justify-between cursor-pointer hover:bg-white transition-colors" : "p-3 rounded-lg border border-white/5 bg-white/5 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors"}>
+                  <div className="flex items-center gap-3">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${t.priority === 'CRITICAL' ? 'bg-red-500/10 text-red-500' :
+                        t.priority === 'HIGH' ? 'bg-amber-500/10 text-amber-500' :
+                          'bg-blue-500/10 text-blue-500'
+                      }`}>
+                      {t.priority}
+                    </span>
+                    <span className="text-sm font-semibold">{t.title}</span>
+                  </div>
+                  <span className="text-[10px] opacity-50">{new Date(t.createdAt).toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 opacity-30 text-xs font-semibold">Tüm görevler tamamlandı, harika! 🎉</div>
+          )}
+        </div>
       </div>
 
       {/* RIGHT PANEL (Payment) */}

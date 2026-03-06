@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import crypto from "crypto";
 
-export async function createSignatureEnvelope(data: { title: string; documentKey: string; documentFileName: string; provider?: string }) {
+export async function createSignatureEnvelope(data: { title: string; documentKey: string; documentFileName: string; provider?: string; documentCategory?: string }) {
     try {
         const session = await getSession();
         if (!session) throw new Error("Unauthorized");
@@ -18,6 +18,7 @@ export async function createSignatureEnvelope(data: { title: string; documentKey
                 title: data.title,
                 documentKey: data.documentKey,
                 documentFileName: data.documentFileName,
+                documentCategory: data.documentCategory as any,
                 provider: data.provider || "INTERNAL",
                 createdByUserId: session.id,
                 status: "DRAFT"
@@ -30,7 +31,7 @@ export async function createSignatureEnvelope(data: { title: string; documentKey
     }
 }
 
-export async function addSignatureRecipient(data: { envelopeId: string; name: string; email: string; phone?: string; role?: 'SIGNER' | 'CC' | 'APPROVER'; orderIndex?: number }) {
+export async function addSignatureRecipient(data: { envelopeId: string; name: string; email: string; phone?: string; role?: 'SIGNER' | 'CC' | 'APPROVER'; orderIndex?: number; signerId?: string }) {
     try {
         const session = await getSession();
         if (!session) throw new Error("Unauthorized");
@@ -46,6 +47,7 @@ export async function addSignatureRecipient(data: { envelopeId: string; name: st
                 name: data.name,
                 email: data.email,
                 phone: data.phone,
+                signerId: data.signerId,
                 role: data.role || 'SIGNER',
                 orderIndex: data.orderIndex || 0,
                 status: 'PENDING'

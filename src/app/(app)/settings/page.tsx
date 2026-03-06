@@ -35,6 +35,7 @@ import AccountPanel from './_components/forms/AccountPanel';
 import BranchesPanel from './_components/forms/BranchesPanel';
 import CompanyProfileForm from './_components/forms/CompanyProfileForm';
 import IntegrationsPanel from './_components/forms/IntegrationsPanel';
+import AuthorizedSignersPanel from './_components/forms/AuthorizedSignersPanel';
 import PricingPage from './pricing/page';
 import BranchSettingsPage from './branch/page';
 
@@ -1096,6 +1097,7 @@ export default function SettingsPage() {
                 <nav className="flex-1 p-3 flex flex-col gap-0.5">
                     {[
                         { id: 'company', label: 'Firma Profili', icon: <Building2 className="w-5 h-5 text-indigo-500" /> },
+                        { id: 'authorized_signers', label: 'İmza Yetkilileri', icon: <ShieldCheck className="w-5 h-5 text-emerald-600" /> },
                         { id: 'integrations', label: 'Entegrasyonlar', icon: <Plug className="w-5 h-5 text-emerald-500" /> },
                         { id: 'branches', label: 'Şubeler & Depo', icon: <Building className="w-5 h-5 text-sky-500" /> },
                         { id: 'branch_auth', label: 'Şube-Kasa Yetkileri', icon: <ShieldCheck className="w-5 h-5 text-rose-500" /> },
@@ -1149,6 +1151,8 @@ export default function SettingsPage() {
                 {/* 0. FİRMA PROFİLİ */}
                 {activeTab === 'company' && <CompanyProfileForm {...sharedProps} />}
 
+                {/* IMZA YETKILILERI */}
+                {activeTab === 'authorized_signers' && <AuthorizedSignersPanel />}
 
                 {/* 0. ENTEGRASYONLAR */}
                 {activeTab === 'integrations' && <IntegrationsPanel {...sharedProps} />}

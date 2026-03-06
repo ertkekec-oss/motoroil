@@ -1,5 +1,6 @@
 import { AppEvent } from "./types";
 import { handleNotificationEvent } from "./handlers/notification-handler";
+import { handleWorkflowEvent } from "./handlers/workflow-handler";
 
 type EventHandler = (event: AppEvent) => Promise<void>;
 
@@ -11,12 +12,17 @@ class EventDispatcher {
         this.register('SIGNATURE_INVITATION_SENT', handleNotificationEvent);
         this.register('SIGNATURE_COMPLETED', handleNotificationEvent);
         this.register('SIGNATURE_REJECTED', handleNotificationEvent);
-        this.register('RECONCILIATION_SENT', handleNotificationEvent);
-        this.register('RECONCILIATION_VIEWED', handleNotificationEvent);
-        this.register('RECONCILIATION_DISPUTED', handleNotificationEvent);
         this.register('DISPUTE_RESOLVED', handleNotificationEvent);
         this.register('OTP_FAILED', handleNotificationEvent);
         this.register('MAIL_FAILED', handleNotificationEvent);
+        this.register('TASK_CREATED', handleNotificationEvent);
+
+        // Workflow Defaults
+        this.register('RECONCILIATION_DISPUTED', handleWorkflowEvent);
+        this.register('SIGNATURE_REJECTED', handleWorkflowEvent);
+        this.register('SIGNATURE_COMPLETED', handleWorkflowEvent);
+        this.register('MAIL_FAILED', handleWorkflowEvent);
+        this.register('OTP_FAILED', handleWorkflowEvent);
     }
 
     register(eventType: string, handler: EventHandler) {

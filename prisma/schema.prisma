@@ -5604,6 +5604,7 @@ model SignatureEnvelope {
   signedDocumentKey String?
   otpRequired      Boolean                 @default(false)
   sequentialSigning Boolean                @default(true)
+  documentCategory DocumentCategory?
 
   recipients       SignatureRecipient[]
   sessions         SignatureSession[]
@@ -5624,10 +5625,14 @@ model SignatureRecipient {
   status       SignatureRecipientStatus @default(PENDING)
   signedAt     DateTime?
 
+  signerId     String?
+  signer       AuthorizedSigner?        @relation(fields: [signerId], references: [id], onDelete: SetNull)
+
   envelope     SignatureEnvelope        @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
   sessions     SignatureSession[]
 
   @@index([envelopeId])
+  @@index([signerId])
 }
 
 model SignatureSession {
@@ -5783,3 +5788,90 @@ model AppNotification {
   @@index([type])
 }
 
+// ===================================
+// Document Categories & Authorized Signers
+// ===================================
+
+enum DocumentCategory {
+  CONTRACT
+  AGREEMENT
+  RECONCILIATION
+  COMPANY_DOCUMENT
+  EMPLOYEE_DOCUMENT
+  FORM
+  OTHER
+}
+
+model AuthorizedSigner {
+  id                String             @id @default(cuid())
+  tenantId          String
+  companyId         String?
+  name              String
+  title             String?
+  email             String
+  phone             String?
+  isActive          Boolean            @default(true)
+  allowedCategories DocumentCategory[]
+  defaultSigner     Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  recipients        SignatureRecipient[]
+
+  @@index([tenantId])
+  @@index([companyId])
+  @@index([isActive])
+}
+
+// ===================================
+// Workflow Task Engine
+// ===================================
+
+enum WorkflowTaskType {
+  RECON_DISPUTE
+  SIGNATURE_REVIEW
+  SIGNATURE_REJECTED
+  MAIL_FAILURE
+  OTP_FAILURE
+  SYSTEM_ALERT
+}
+
+enum WorkflowTaskStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum WorkflowTaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model WorkflowTask {
+  id                String               @id @default(cuid())
+  tenantId          String
+  companyId         String?
+  type              WorkflowTaskType
+  title             String
+  description       String               @db.Text
+  status            WorkflowTaskStatus   @default(OPEN)
+  priority          WorkflowTaskPriority @default(MEDIUM)
+  assigneeId        String?              // User ID
+  relatedEntityType String?
+  relatedEntityId   String?
+  metaJson          Json?
+  dueAt             DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime             @default(now())
+
+  @@index([tenantId])
+  @@index([companyId])
+  @@index([assigneeId])
+  @@index([type])
+  @@index([status])
+  @@index([priority])
+  @@index([relatedEntityType, relatedEntityId])
+}

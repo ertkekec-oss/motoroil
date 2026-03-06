@@ -198,6 +198,19 @@ export async function GET(req: NextRequest) {
             severity: 'info'
         });
 
+        // 7. Workflow Tasks
+        const recentTasks = await prisma.workflowTask.findMany({
+            where: {
+                tenantId: ctx.tenantId,
+                status: 'OPEN'
+            },
+            orderBy: [
+                { priority: 'desc' },
+                { createdAt: 'desc' }
+            ],
+            take: 5
+        });
+
         const responseData = {
             stats: {
                 thisMonthDocs,
@@ -209,6 +222,7 @@ export async function GET(req: NextRequest) {
                 forecast
             },
             insights,
+            workflowTasks: recentTasks,
             upsellSignal // Adding to response for logging/conversion tracking
         };
 

@@ -54,7 +54,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             'image/png',
             'image/webp',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/csv'
         ];
 
         const validationErr = validateStorageFile(file, validTypes, 10);

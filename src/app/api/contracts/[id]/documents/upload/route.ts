@@ -53,12 +53,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const title = formData.get('title') as string | null;
 
         const validTypes = [
-            'application/pdf',
-            'image/jpeg',
-            'image/png',
-            'image/webp',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            'application/pdf'
         ];
 
         const validationErr = validateStorageFile(file, validTypes, 10);

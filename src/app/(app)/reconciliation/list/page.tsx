@@ -3,15 +3,21 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from 'next/link';
 
-export default async function ReconciliationListPage() {
+export default async function ReconciliationListPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
     const session = await getSession();
     if (!session) return notFound();
 
     const tenantId = session.companyId || (session as any).tenantId;
+    const { category } = await searchParams;
+
+    const whereClause: any = { tenantId };
+    if (category) {
+        whereClause.documentCategory = category;
+    }
 
     // Fetch latest 50 reconciliations for simplicity in V1
     const recons = await prisma.reconciliation.findMany({
-        where: { tenantId },
+        where: whereClause,
         orderBy: { updatedAt: 'desc' },
         take: 50,
         include: {
@@ -41,16 +47,29 @@ export default async function ReconciliationListPage() {
                     {/* Filters */}
                     <div style={{ padding: '16px 24px', background: 'rgba(255,255,255,0.01)', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '16px', alignItems: 'center' }}>
                         <div style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Filtrele:</div>
-                        <select style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', borderRadius: '6px', fontSize: '12px' }}>
-                            <option>Tüm Durumlar</option>
-                            <option>Bekleyenler (SENT/VIEWED)</option>
-                            <option>Onaylananlar (SIGNED)</option>
-                            <option>İtiraz Edilenler (DISPUTED)</option>
-                        </select>
-                        <input type="text" placeholder="Firma Adı veya Zarf ID..." style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', borderRadius: '6px', fontSize: '12px', width: '250px' }} />
-                        <button style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold' }}>
-                            Uygula
-                        </button>
+                        <form method="GET" style={{ margin: 0, padding: 0, display: 'flex', gap: '16px' }}>
+                            <select
+                                name="category"
+                                defaultValue={category || ''}
+                                onChange={(e) => e.target.form?.submit()}
+                                style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)', borderRadius: '6px', fontSize: '12px' }}>
+                                <option value="" style={{ color: 'black' }}>Tüm Kategoriler</option>
+                                <option value="RECONCILIATION" style={{ color: 'black' }}>Mutabakatlar</option>
+                                <option value="CONTRACT" style={{ color: 'black' }}>Sözleşmeler</option>
+                                <option value="AGREEMENT" style={{ color: 'black' }}>Sözleşme & Anlaşma</option>
+                                <option value="OTHER" style={{ color: 'black' }}>Diğer</option>
+                            </select>
+                            <select style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', borderRadius: '6px', fontSize: '12px' }}>
+                                <option>Tüm Durumlar</option>
+                                <option>Bekleyenler (SENT/VIEWED)</option>
+                                <option>Onaylananlar (SIGNED)</option>
+                                <option>İtiraz Edilenler (DISPUTED)</option>
+                            </select>
+                            <input type="text" placeholder="Firma Adı veya Zarf ID..." style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', borderRadius: '6px', fontSize: '12px', width: '250px' }} />
+                            <button style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold' }}>
+                                Uygula
+                            </button>
+                        </form>
                     </div>
 
                     <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-color)', display: 'grid', gridTemplateColumns: '150px minmax(200px, 2fr) 150px 150px 100px', gap: '16px', background: 'rgba(255,255,255,0.01)', fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>

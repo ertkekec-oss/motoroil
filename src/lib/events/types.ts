@@ -9,7 +9,8 @@ export type EventType =
     | 'OTP_SENT'
     | 'OTP_FAILED'
     | 'MAIL_SENT'
-    | 'MAIL_FAILED';
+    | 'MAIL_FAILED'
+    | 'TASK_CREATED';
 
 export interface AppEvent {
     type: EventType;
