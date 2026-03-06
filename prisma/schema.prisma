@@ -5756,3 +5756,30 @@ model MailDeliveryLog {
   @@index([relatedEntityType, relatedEntityId])
 }
 
+
+// ===================================
+// Event Bus & Notification Center
+// ===================================
+
+model AppNotification {
+  id                String   @id @default(cuid())
+  tenantId          String
+  companyId         String?
+  userId            String?  // If null, it's a tenant-wide broadcast
+  title             String
+  message           String   @db.Text
+  type              String
+  isRead            Boolean  @default(false)
+  relatedEntityType String?
+  relatedEntityId   String?
+  metaJson          Json?
+  createdAt         DateTime @default(now())
+  readAt            DateTime?
+
+  @@index([tenantId])
+  @@index([companyId])
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+}
+

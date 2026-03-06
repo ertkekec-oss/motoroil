@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { handleFailedMailLog } from "./retry";
 import { MockMailProvider } from "./providers/mock";
 import { SesMailProvider } from "./providers/aws-ses";
 import { ResendMailProvider } from "./providers/resend";
@@ -63,13 +64,7 @@ export async function sendMail(payload: MailPayload): Promise<{ success: boolean
         const result = await provider.send(payload);
 
         if (result.error) {
-            await prisma.mailDeliveryLog.update({
-                where: { id: deliveryLog.id },
-                data: {
-                    status: 'FAILED',
-                    errorMessage: result.error
-                }
-            });
+            await handleFailedMailLog(deliveryLog.id, result.error);
             return { success: false, error: result.error };
         }
 
@@ -89,13 +84,7 @@ export async function sendMail(payload: MailPayload): Promise<{ success: boolean
         // 4) Catch any unexpected runtime errors
         const errorMessage = error instanceof Error ? error.message : String(error);
 
-        await prisma.mailDeliveryLog.update({
-            where: { id: deliveryLog.id },
-            data: {
-                status: 'FAILED',
-                errorMessage
-            }
-        });
+        await handleFailedMailLog(deliveryLog.id, errorMessage);
 
         return { success: false, error: errorMessage };
     }
