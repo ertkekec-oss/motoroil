@@ -69,9 +69,7 @@ export async function createSession(user: any) {
     return token;
 }
 
-import { cache } from 'react';
-
-export const getSession = cache(async () => {
+export const getSession = async () => {
     let token: string | undefined;
     try {
         const cookieStore = await cookies();
