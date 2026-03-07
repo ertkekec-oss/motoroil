@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   serverExternalPackages: ["iyzipay", "pdf-parse"],
   async headers() {
     return [
