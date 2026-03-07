@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 // SECURITY: JWT_SECRET must be set in production
 const getJWTSecret = () => {
@@ -74,15 +74,19 @@ export const getSession = async () => {
     try {
         const cookieStore = await cookies();
         token = cookieStore.get('session')?.value;
-    } catch {
-        // Not in a request context (e.g. background job, script)
+    } catch (error: any) {
+        if (error?.digest?.startsWith('NEXT_') || error?.message?.includes('Dynamic-')) {
+            throw error;
+        }
     }
 
     let headersList: any = null;
     try {
-        headersList = await (await import('next/headers')).headers();
-    } catch {
-        // Not in a request context
+        headersList = await headers();
+    } catch (error: any) {
+        if (error?.digest?.startsWith('NEXT_') || error?.message?.includes('Dynamic-')) {
+            throw error;
+        }
     }
 
     const cronSecret = headersList?.get('x-cron-secret');

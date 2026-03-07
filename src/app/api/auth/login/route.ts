@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         */
 
         console.log(`[LOGIN_DEBUG] Attempting login for: ${username}`);
+        console.log(`[LOGIN_DEBUG] Calling Prisma Staff.findFirst...`);
 
         // 1. Search in Staff
         let targetUser = await prisma.staff.findFirst({
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
                 deletedAt: null
             }
         });
+        console.log(`[LOGIN_DEBUG] Prisma Staff result:`, targetUser ? 'FOUND' : 'NOT FOUND');
 
         let foundInStaff = false;
 
@@ -54,6 +56,7 @@ export async function POST(request: Request) {
 
         // 2. Search in User if not found in Staff
         if (!targetUser) {
+            console.log(`[LOGIN_DEBUG] Calling Prisma User.findFirst...`);
             targetUser = await prisma.user.findFirst({
                 where: {
                     OR: [
@@ -101,17 +104,21 @@ export async function POST(request: Request) {
         const isMatch = await comparePassword(password, targetUser.password);
         console.log(`[LOGIN_DEBUG] User found: ${targetUser.email}, Match: ${isMatch}`);
 
+        console.log(`[LOGIN_DEBUG] Password match:`, isMatch);
+
         if (!isMatch) {
             // Record failed attempt
             await prisma.loginAttempt.create({ data: { ip, username, success: false } });
             return NextResponse.json({ error: 'Geçersiz kullanıcı adı veya şifre' }, { status: 401 });
         }
 
+        console.log(`[LOGIN_DEBUG] Recording successful attempt...`);
         // Record successful attempt
         await prisma.loginAttempt.create({ data: { ip, username, success: true } });
 
         // Auto-migration: If password was plain text, hash it now
         if (!targetUser.password.startsWith('$2')) {
+            console.log(`[LOGIN_DEBUG] Auto-migrating plain-text password...`);
             const hashed = await hashPassword(password);
             if (foundInStaff) {
                 await prisma.staff.update({
@@ -126,6 +133,7 @@ export async function POST(request: Request) {
             }
         }
 
+        console.log(`[LOGIN_DEBUG] Creating session context...`);
         // Create optimized session with only essential data
         // This prevents the JWT from exceeding the 4KB cookie limit
         await createSession({
