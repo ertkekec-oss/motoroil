@@ -2,7 +2,7 @@ import { getSession } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createDraftShipment, attachShipmentItems } from '@/services/shipping/core/shipmentService';
 
-export async function POST(request: NextRequest, { params }: { params: { orderId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
     const user = await getSession();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest, { params }: { params: { orderId
     try {
         const shipment = await createDraftShipment({
             tenantId: user.companyId,
-            orderId: params.orderId,
+            orderId: params.id,
             sellerTenantId: user.companyId, // Mock assumption for now
             carrierCode,
             shipmentDirection,
