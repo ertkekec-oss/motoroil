@@ -1,0 +1,67 @@
+﻿
+> periodya@0.1.0 dev
+> next dev
+
+node.exe : ÔÜá `eslint` confi
+guration in next.config.ts is
+ no longer supported. See mor
+e info here: https://nextjs.o
+rg/docs/app/api-reference/cli
+/next#next-lint-options
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (ÔÜá `es  
+  lint` co...xt-lint-optio   
+ ns:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+ÔÜá Invalid next.config.ts op
+tions detected: 
+ÔÜá     Unrecognized key(s) i
+n object: 'eslint'
+ÔÜá See more info here: https
+://nextjs.org/docs/messages/i
+nvalid-next-config
+Ôû▓ Next.js 16.1.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.188:3000
+- Environments: .env.local, .env
+
+Ô£ô Starting...
+ÔÜá The "middleware" file con
+vention is deprecated. Please
+ use "proxy" instead. Learn m
+ore: https://nextjs.org/docs/
+messages/middleware-to-proxy
+Ô£ô Ready in 3.6s
+ÔÜá Failed to reload dynamic 
+routes: Error: You cannot use
+ different slug names for the
+ same dynamic path ('id' !== 
+'orderId').
+    at ignore-listed frames
+Error: You cannot use differe
+nt slug names for the same dy
+namic path ('id' !== 'orderId
+').
+    at ignore-listed frames
+Ô¿» unhandledRejection: Error
+: You cannot use different sl
+ug names for the same dynamic
+ path ('id' !== 'orderId').
+    at ignore-listed frames
+Ô¿» unhandledRejection:  Erro
+r: You cannot use different s
+lug names for the same dynami
+c path ('id' !== 'orderId').
+    at ignore-listed frames
+ GET / 200 in 893ms (compile: 580ms, proxy.ts: 126ms, render: 187ms)
+[?25h

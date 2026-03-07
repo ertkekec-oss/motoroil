@@ -1,6 +1,5 @@
-import { PrismaClient, NetworkTradeProposalStatus, NetworkTradeProposalDecisionType } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { NetworkTradeProposalStatus, NetworkTradeProposalDecisionType } from '@prisma/client';
+import prisma from '@/lib/prisma';
 
 export class CounterpartyWorkflow {
 

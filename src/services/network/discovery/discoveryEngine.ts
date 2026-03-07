@@ -1,6 +1,5 @@
-import { PrismaClient, NetworkVisibilityLevel } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { NetworkVisibilityLevel } from '@prisma/client';
+import prisma from '@/lib/prisma';
 
 export class DiscoveryEngine {
 

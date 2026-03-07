@@ -1,6 +1,5 @@
-import { PrismaClient, NetworkTradeProposalStatus } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { NetworkTradeProposalStatus } from '@prisma/client';
+import prisma from '@/lib/prisma';
 
 export class ProposalConversion {
 
