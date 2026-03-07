@@ -21,7 +21,7 @@ const getJWTSecret = () => {
     return secret;
 };
 
-const JWT_SECRET = new TextEncoder().encode(getJWTSecret());
+const getJWTAscii = () => new TextEncoder().encode(getJWTSecret());
 
 export async function hashPassword(password: string) {
     return await bcrypt.hash(password, 10);
@@ -55,7 +55,7 @@ export async function createSession(user: any) {
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
         .setExpirationTime('24h')
-        .sign(JWT_SECRET);
+        .sign(getJWTAscii());
 
     const cookieStore = await cookies();
     cookieStore.set('session', token, {
@@ -104,7 +104,7 @@ export const getSession = async () => {
     if (!token) return null;
 
     try {
-        const { payload } = await jwtVerify(token, JWT_SECRET);
+        const { payload } = await jwtVerify(token, getJWTAscii());
 
         // TRANSFORM: Map flat JWT payload to structured session.user object
         // This ensures session.user.companyId is the single source of truth

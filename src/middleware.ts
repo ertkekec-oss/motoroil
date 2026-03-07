@@ -20,7 +20,7 @@ const getJWTSecret = () => {
     return secret;
 };
 
-const JWT_SECRET = new TextEncoder().encode(getJWTSecret());
+const getJWTAscii = () => new TextEncoder().encode(getJWTSecret());
 
 function portalBasePath() {
     const p = process.env.NEXT_PUBLIC_PORTAL_BASE_PATH || "/network"
@@ -52,7 +52,7 @@ export async function middleware(request: NextRequest) {
         }
 
         try {
-            const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
+            const { payload } = await jwtVerify(sessionToken, getJWTAscii());
             const allowedAdminRoles = ['SUPER_ADMIN', 'PLATFORM_ADMIN', 'SUPPORT_AGENT'];
             // @ts-ignore Let's safely check payload role
             const userRole = payload?.role as string;
@@ -113,7 +113,8 @@ export async function middleware(request: NextRequest) {
         '/', '/login', '/register', '/reset-password',
         '/api/auth', '/api/public', '/api/network',
         '/api/admin/marketplace/queue/health',
-        '/pdks', '/api/v1/pdks/display'
+        '/pdks', '/api/v1/pdks/display',
+        '/api/test-me', '/api/test-db', '/api/test-cookies'
     ];
     if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
         return NextResponse.next();
@@ -135,7 +136,7 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-        await jwtVerify(sessionToken, JWT_SECRET);
+        await jwtVerify(sessionToken, getJWTAscii());
         return NextResponse.next();
     } catch (err) {
         console.error('Middleware global session error:', err);
