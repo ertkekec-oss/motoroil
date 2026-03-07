@@ -1,0 +1,15 @@
+scripts/test_market_signals.ts(36,47): error TS2339: Property 'map' does not exist on type '{ skipped: boolean; idempotencyKey: string; result?: undefined; } | { skipped: boolean; result: any; idempotencyKey: string; }'.
+  Property 'map' does not exist on type '{ skipped: boolean; idempotencyKey: string; result?: undefined; }'.
+scripts/test_market_signals.ts(38,17): error TS2339: Property 'length' does not exist on type '{ skipped: boolean; idempotencyKey: string; result?: undefined; } | { skipped: boolean; result: any; idempotencyKey: string; }'.
+  Property 'length' does not exist on type '{ skipped: boolean; idempotencyKey: string; result?: undefined; }'.
+scripts/test_market_signals.ts(42,34): error TS2339: Property 'find' does not exist on type '{ skipped: boolean; idempotencyKey: string; result?: undefined; } | { skipped: boolean; result: any; idempotencyKey: string; }'.
+  Property 'find' does not exist on type '{ skipped: boolean; idempotencyKey: string; result?: undefined; }'.
+src/app/api/admin/network/market-insights/route.ts(7,35): error TS2554: Expected 0 arguments, but got 1.
+src/app/api/admin/network/market-signals/[id]/route.ts(7,35): error TS2554: Expected 0 arguments, but got 1.
+src/app/api/admin/network/market-signals/recompute/route.ts(6,35): error TS2554: Expected 0 arguments, but got 1.
+src/app/api/admin/network/market-signals/route.ts(7,35): error TS2554: Expected 0 arguments, but got 1.
+src/app/api/network/market-insights/[id]/route.ts(7,35): error TS2554: Expected 0 arguments, but got 1.
+src/app/api/network/market-insights/route.ts(8,35): error TS2554: Expected 0 arguments, but got 1.
+src/app/api/network/market-signals/categories/route.ts(7,35): error TS2554: Expected 0 arguments, but got 1.
+src/app/api/network/market-signals/route.ts(8,35): error TS2554: Expected 0 arguments, but got 1.
+\n

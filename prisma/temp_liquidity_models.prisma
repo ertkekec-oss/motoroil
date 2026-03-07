@@ -1,0 +1,122 @@
+// FAZ 16 - GLOBAL LIQUIDITY ENGINE
+
+enum NetworkLiquidityOpportunityType {
+  SUPPLY_SURPLUS
+  DEMAND_SHORTAGE
+  DIRECT_MATCH
+  CLUSTER_MATCH
+}
+
+enum NetworkLiquidityOpportunityStatus {
+  DISCOVERED
+  RANKED
+  ROUTED
+  CONSUMED
+  EXPIRED
+}
+
+model NetworkLiquidityOpportunity {
+  id                    String      @id @default(cuid())
+  categoryId            String?
+  productRef            String?
+  regionCode            String?
+  supplyTenantId        String?
+  demandTenantId        String?
+  clusterId             String?
+
+  opportunityType       NetworkLiquidityOpportunityType
+  
+  confidenceScore       Float       @default(0)
+  matchScore            Float       @default(0)
+  liquidityVolumeScore  Float       @default(0)
+
+  routingEligibilityScore  Float    @default(0)
+  shippingFeasibilityScore Float    @default(0)
+  financialSafetyScore     Float    @default(0)
+
+  status                NetworkLiquidityOpportunityStatus @default(DISCOVERED)
+  
+  expiresAt             DateTime?
+  dedupeKey             String      @unique
+  calculationVersion    String
+  
+  explainJson           Json?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  matches               NetworkLiquidityMatch[]
+
+  @@index([categoryId, regionCode])
+  @@index([status, expiresAt])
+  @@index([supplyTenantId])
+  @@index([demandTenantId])
+  @@index([matchScore])
+}
+
+enum NetworkLiquidityMatchStatus {
+  CANDIDATE
+  PROPOSED
+  ROUTED
+  REJECTED
+  ACCEPTED
+}
+
+model NetworkLiquidityMatch {
+  id                    String      @id @default(cuid())
+  opportunityId         String
+  opportunity           NetworkLiquidityOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  
+  buyerTenantId         String
+  sellerTenantId        String
+  
+  productRef            String?
+  categoryId            String?
+
+  graphDistance         Int         @default(0)
+  trustScore            Float       @default(0)
+  reputationScore       Float       @default(0)
+  
+  shippingReliabilityScore Float    @default(0)
+  financialRiskScore       Float    @default(0)
+
+  estimatedPriceRangeLow   Float?
+  estimatedPriceRangeHigh  Float?
+
+  finalMatchScore       Float       @default(0)
+
+  status                NetworkLiquidityMatchStatus @default(CANDIDATE)
+
+  explainJson           Json?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([buyerTenantId])
+  @@index([sellerTenantId])
+  @@index([opportunityId])
+  @@index([status])
+}
+
+model NetworkLiquiditySnapshot {
+  id                    String      @id @default(cuid())
+  categoryId            String?
+  regionCode            String?
+
+  supplyVolumeScore     Float       @default(0)
+  demandVolumeScore     Float       @default(0)
+  liquidityGapScore     Float       @default(0)
+
+  clusterNodeCount      Int         @default(0)
+  activeSupplierCount   Int         @default(0)
+  activeBuyerCount      Int         @default(0)
+
+  calculationVersion    String
+  expiresAt             DateTime?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([categoryId, regionCode])
+  @@index([expiresAt])
+}

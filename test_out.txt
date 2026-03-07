@@ -1,0 +1,3 @@
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+=== MARKET SIGNAL ENGINE TEST ===
+Setting up mock dummy signals for Category: test-cat-1772848268610

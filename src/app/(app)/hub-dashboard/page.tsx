@@ -20,6 +20,7 @@ export default function TenantNetworkDashboard() {
     const [earningsData, setEarningsData] = useState<any>(null);
     const [billingData, setBillingData] = useState<any>(null);
     const [ordersData, setOrdersData] = useState<any>({ buyerPending: 0, buyerEscrow: 0, sellerPending: 0, sellerEscrow: 0 });
+    const [opportunities, setOpportunities] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,10 +28,18 @@ export default function TenantNetworkDashboard() {
             setLoading(true);
             try {
                 // Sadece mevcut API'lerden derliyoruz:
-                const [earnRes, billRes] = await Promise.all([
+                const [earnRes, billRes, oppRes] = await Promise.all([
                     fetch('/api/dealer-network/earnings').catch(() => null),
-                    fetch('/api/billing/boost-invoices').catch(() => null)
+                    fetch('/api/billing/boost-invoices').catch(() => null),
+                    fetch('/api/network/trade-opportunities').catch(() => null)
                 ]);
+
+                if (oppRes?.ok) {
+                    const oData = await oppRes.json();
+                    if (oData.success) {
+                        setOpportunities(oData.opportunities || []);
+                    }
+                }
 
                 if (earnRes?.ok) {
                     const eData = await earnRes.json();
@@ -102,6 +111,42 @@ export default function TenantNetworkDashboard() {
                             </div>
                         </div>
                         <span className="text-[12px] font-bold bg-orange-200 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-4 py-2 rounded-xl">Öde &rarr;</span>
+                    </div>
+                )}
+
+                {/* TRADE OPPORTUNITIES WIDGET */}
+                {opportunities.length > 0 && (
+                    <div className="mb-6 xl:mb-8 space-y-4">
+                        <h2 className="text-[17px] font-bold text-[#0F172A] dark:text-slate-100 border-b border-[#0F172A]/[0.06] dark:border-white/5 pb-3 flex items-center gap-2">
+                            <span className="text-xl">🎯</span> Trade Opportunities (AI Matches)
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {opportunities.map((opp: any) => (
+                                <div key={opp.id} className="p-5 rounded-[24px] bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/50 hover:shadow-sm transition-shadow">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className={`text-[11px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${opp.signalType === 'OVERSTOCK' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400' : 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400'}`}>
+                                            {opp.signalType?.replace('_', ' ')}
+                                        </div>
+                                        <div className="text-[12px] font-bold text-slate-600 dark:text-slate-400">
+                                            {Math.round(opp.confidence)}% Match
+                                        </div>
+                                    </div>
+                                    <h3 className="font-bold text-[#0F172A] dark:text-white line-clamp-1">{opp.supplierProfile?.displayName || opp.buyerProfile?.displayName}</h3>
+                                    <p className="text-[13px] text-slate-500 mt-1 mb-4">Kategori: {opp.categoryId}</p>
+                                    <div className="flex gap-2">
+                                        <button className="flex-1 bg-white dark:bg-slate-800 text-sm font-bold border border-slate-200 dark:border-slate-700 rounded-xl py-2 shadow-sm text-slate-700 dark:text-slate-200 min-w-0" onClick={() => router.push(`/network/profile?id=${opp.supplierProfile?.id || opp.buyerProfile?.id}`)}>İncele</button>
+                                        <button className="flex-1 bg-indigo-600 text-white text-sm font-bold rounded-xl py-2 shadow-sm hover:bg-indigo-700 min-w-0" onClick={() => {
+                                            fetch(`/api/network/opportunities/${opp.id}/generate-rfq`, { method: 'POST' })
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    if (data.success) alert('Auto RFQ Draft Generated!');
+                                                    else alert('Error: ' + data.error);
+                                                });
+                                        }}>Auto RFQ</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 

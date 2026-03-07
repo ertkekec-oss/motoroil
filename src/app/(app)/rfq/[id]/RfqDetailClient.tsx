@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { submitRfqAction } from "@/actions/rfqActions";
 import { acceptOfferAction } from "@/actions/rfqResponseActions";
 
+import RoutingWidget from "./RoutingWidget";
+
 export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, items: any[], offers: any[] }) {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
@@ -38,6 +40,8 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
 
     return (
         <div className="space-y-6">
+            <RoutingWidget rfqId={rfq.id} />
+
             <div className="bg-white border border-slate-200 rounded-md p-6">
                 <h2 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">RFQ Details</h2>
 
@@ -87,8 +91,8 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
                                         <div className="flex justify-between items-start mb-3">
                                             <h3 className="font-bold text-[#1F3A5F]">{offer.sellerName}</h3>
                                             <span className={`text-xs font-bold px-2 py-0.5 rounded ${offer.status === 'ACCEPTED' ? 'bg-emerald-100 text-emerald-700' :
-                                                    offer.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-                                                        offer.status === 'COUNTERED' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600'
+                                                offer.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                                                    offer.status === 'COUNTERED' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600'
                                                 }`}>
                                                 {offer.status}
                                             </span>

@@ -1,0 +1,270 @@
+enum NetworkReputationTier {
+  NEW
+  DEVELOPING
+  STABLE
+  HIGH_CONFIDENCE
+  PREMIUM
+  WATCHLIST
+  RESTRICTED
+}
+
+enum NetworkReputationSignalType {
+  TRUST_STRONG
+  SHIPPING_RELIABLE
+  SHIPPING_UNRELIABLE
+  HIGH_DISPUTE_RATE
+  LOW_DISPUTE_RATE
+  RFQ_RESPONSE_STRONG
+  RFQ_RESPONSE_WEAK
+  ESCROW_REFUND_HEAVY
+  ESCROW_SUCCESSFUL
+  STRONG_MARKET_ACTIVITY
+  STRONG_CLUSTER_POSITION
+  WATCHLIST_PATTERN
+  ADMIN_RESTRICTION
+  PAYMENT_BEHAVIOR_POSITIVE
+  PAYMENT_BEHAVIOR_NEGATIVE
+}
+
+enum NetworkReputationSignalDirection {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum NetworkReputationTrendDirection {
+  UP
+  DOWN
+  STABLE
+  VOLATILE
+}
+
+model NetworkReputationScore {
+  id String @id @default(cuid())
+  tenantId String
+  profileId String?
+  overallScore Float
+  supplierScore Float?
+  buyerScore Float?
+  partnerScore Float?
+  trustComponentScore Float
+  shippingComponentScore Float
+  disputeComponentScore Float
+  routingComponentScore Float
+  escrowComponentScore Float
+  activityComponentScore Float
+  marketComponentScore Float?
+  confidenceScore Float
+  reputationTier NetworkReputationTier
+  explanationJson Json
+  calculationVersion String
+  dedupeKey String @unique
+  status String
+  isStale Boolean @default(false)
+  expiresAt DateTime?
+  lastCalculatedAt DateTime
+  supersededAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId, status, createdAt])
+  @@index([profileId, status])
+  @@index([reputationTier, status])
+  @@index([overallScore, status])
+  @@index([calculationVersion, isStale])
+}
+
+model NetworkReputationSignal {
+  id String @id @default(cuid())
+  tenantId String
+  profileId String?
+  signalType NetworkReputationSignalType
+  signalDirection NetworkReputationSignalDirection
+  weight Float
+  scoreImpact Float
+  confidence Float
+  summary String
+  explanationJson Json
+  relatedEntityType String?
+  relatedEntityId String?
+  calculationVersion String
+  dedupeKey String @unique
+  status String
+  isStale Boolean @default(false)
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId, status, createdAt])
+  @@index([signalType, status, createdAt])
+}
+
+model NetworkReputationSnapshot {
+  id String @id @default(cuid())
+  tenantId String
+  profileId String?
+  overallScore Float
+  reputationTier NetworkReputationTier
+  scoreChangeDelta Float?
+  trendDirection NetworkReputationTrendDirection
+  topPositiveSignalCount Int
+  topNegativeSignalCount Int
+  lastCalculatedAt DateTime
+  calculationVersion String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId, createdAt])
+  @@index([trendDirection, reputationTier])
+}
+
+enum NetworkTradeRiskContextType {
+  TENANT
+  COUNTERPARTY_PAIR
+  ORDER
+  ESCROW
+  SHIPMENT
+}
+
+enum NetworkTradeRiskTier {
+  VERY_LOW
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+  RESTRICTED
+}
+
+enum NetworkTradeRiskSignalType {
+  HIGH_DISPUTE_PROBABILITY
+  LOW_PAYMENT_RELIABILITY
+  REFUND_HEAVY_PATTERN
+  HIGH_SHIPPING_FAILURE_RATE
+  STRONG_REPUTATION_PROTECTION
+  TRUSTED_COUNTERPARTY_PAIR
+  NEW_UNPROVEN_RELATIONSHIP
+  ESCROW_DELAY_REQUIRED
+  MANUAL_REVIEW_REQUIRED
+  STRONG_DELIVERY_HISTORY
+  HIGH_RISK_CLUSTER
+  WATCHLIST_COUNTERPARTY
+}
+
+enum NetworkTradeRiskSignalDirection {
+  RISK_UP
+  RISK_DOWN
+  NEUTRAL
+}
+
+enum NetworkEscrowPolicyDecisionType {
+  AUTO_APPROVED
+  STANDARD_ESCROW
+  EXTENDED_HOLD
+  BUYER_CONFIRMATION_REQUIRED
+  MANUAL_REVIEW
+  RESTRICTED_FLOW
+}
+
+model NetworkTradeRiskScore {
+  id String @id @default(cuid())
+  buyerTenantId String?
+  sellerTenantId String?
+  orderId String?
+  escrowHoldId String?
+  contextType NetworkTradeRiskContextType
+  overallRiskScore Float
+  paymentReliabilityScore Float
+  disputeProbabilityScore Float
+  shippingRiskScore Float
+  reputationRiskScore Float
+  escrowRiskScore Float
+  routingRiskScore Float?
+  confidenceScore Float
+  riskTier NetworkTradeRiskTier
+  explanationJson Json
+  calculationVersion String
+  dedupeKey String @unique
+  status String
+  isStale Boolean @default(false)
+  expiresAt DateTime?
+  lastCalculatedAt DateTime
+  supersededAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([buyerTenantId, sellerTenantId, status])
+  @@index([orderId, status])
+  @@index([escrowHoldId, status])
+  @@index([riskTier, status])
+  @@index([calculationVersion, isStale])
+}
+
+model NetworkTradeRiskSignal {
+  id String @id @default(cuid())
+  buyerTenantId String?
+  sellerTenantId String?
+  relatedOrderId String?
+  relatedEscrowHoldId String?
+  signalType NetworkTradeRiskSignalType
+  signalDirection NetworkTradeRiskSignalDirection
+  weight Float
+  scoreImpact Float
+  confidence Float
+  summary String
+  explanationJson Json
+  relatedEntityType String?
+  relatedEntityId String?
+  calculationVersion String
+  dedupeKey String @unique
+  status String
+  isStale Boolean @default(false)
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([buyerTenantId, sellerTenantId, status])
+  @@index([signalType, status, createdAt])
+}
+
+model NetworkEscrowPolicyDecision {
+  id String @id @default(cuid())
+  escrowHoldId String
+  buyerTenantId String
+  sellerTenantId String
+  riskScoreId String?
+  decisionType NetworkEscrowPolicyDecisionType
+  releaseStrategy String
+  holdDays Int
+  disputeWindowHours Int
+  manualReviewRequired Boolean
+  notes String
+  explanationJson Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([escrowHoldId, decisionType])
+  @@index([decisionType, createdAt])
+}
+
+model NetworkPaymentReliabilitySnapshot {
+  id String @id @default(cuid())
+  tenantId String
+  successfulEscrowCount Int
+  refundedEscrowCount Int
+  disputedEscrowCount Int
+  avgReleaseDelayHours Float?
+  paymentReliabilityScore Float
+  confidenceScore Float
+  explanationJson Json
+  calculationVersion String
+  dedupeKey String @unique
+  status String
+  isStale Boolean @default(false)
+  expiresAt DateTime?
+  lastCalculatedAt DateTime
+  supersededAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId, paymentReliabilityScore, status])
+}

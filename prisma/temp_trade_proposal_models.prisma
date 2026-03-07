@@ -1,0 +1,114 @@
+// FAZ 17 - AUTONOMOUS TRADE EXECUTION
+
+enum NetworkTradeProposalStatus {
+  SUGGESTION
+  DRAFT
+  PROPOSED
+  NEGOTIATION
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CONVERTED_TO_ORDER
+}
+
+enum NetworkTradePolicyMode {
+  DISCOVERY_ONLY
+  SUGGEST_ONLY
+  AUTO_RFQ
+  AUTO_ROUTE
+}
+
+model NetworkTradeProposal {
+  id                    String      @id @default(cuid())
+  opportunityId         String
+  liquidityMatchId      String
+
+  buyerTenantId         String
+  sellerTenantId        String
+
+  categoryId            String?
+  productRef            String?
+
+  proposedQuantityLow   Int         @default(0)
+  proposedQuantityHigh  Int         @default(0)
+
+  proposedPriceLow      Float       @default(0)
+  proposedPriceHigh     Float       @default(0)
+
+  currency              String      @default("TRY")
+
+  shippingMode          String      @default("STANDARD")
+  paymentMode           String      @default("ESCROW")
+  escrowRequired        Boolean     @default(true)
+
+  status                NetworkTradeProposalStatus @default(DRAFT)
+  policyMode            NetworkTradePolicyMode     @default(SUGGEST_ONLY)
+
+  confidenceScore       Float       @default(0)
+  riskScore             Float       @default(0)
+
+  expiresAt             DateTime?
+  dedupeKey             String      @unique
+  calculationVersion    String
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  messages              NetworkTradeProposalMessage[]
+  decisions             NetworkTradeProposalDecision[]
+
+  @@index([buyerTenantId, status])
+  @@index([sellerTenantId, status])
+  @@index([opportunityId])
+  @@index([liquidityMatchId])
+  @@index([status, expiresAt])
+}
+
+enum NetworkTradeProposalMessageType {
+  COMMENT
+  COUNTER_OFFER
+  QUANTITY_CHANGE
+  PRICE_CHANGE
+  SHIPPING_CHANGE
+}
+
+model NetworkTradeProposalMessage {
+  id                    String      @id @default(cuid())
+  proposalId            String
+  proposal              NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  
+  senderTenantId        String
+
+  messageType           NetworkTradeProposalMessageType @default(COMMENT)
+  
+  payloadJson           Json?
+
+  createdAt             DateTime    @default(now())
+  
+  @@index([proposalId])
+  @@index([senderTenantId])
+}
+
+enum NetworkTradeProposalDecisionType {
+  ACCEPT
+  REJECT
+  EXPIRE
+  MANUAL_CANCEL
+}
+
+model NetworkTradeProposalDecision {
+  id                    String      @id @default(cuid())
+  proposalId            String
+  proposal              NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  decisionType          NetworkTradeProposalDecisionType
+  
+  decidedByTenantId     String?
+  autoPolicy            Boolean     @default(false)
+
+  decisionReason        String?
+
+  createdAt             DateTime    @default(now())
+  
+  @@index([proposalId])
+}

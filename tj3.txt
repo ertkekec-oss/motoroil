@@ -1,0 +1,12 @@
+src/services/network/market/categoryHeat.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkMarketSignalType'.
+src/services/network/market/categoryHeat.ts(2,35): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkTrendDirection'.
+src/services/network/market/demandPrediction.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkMarketSignalType'.
+src/services/network/market/demandPrediction.ts(3,35): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkMarketSignalScopeType'.
+src/services/network/market/demandPrediction.ts(3,65): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkTrendDirection'.
+src/services/network/market/explanations.ts(1,10): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkMarketSignalType'.
+src/services/network/market/marketSignalEngine.ts(10,10): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkMarketSignalScopeType'.
+src/services/network/market/supplyPressure.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkMarketSignalType'.
+src/services/network/market/supplyPressure.ts(2,35): error TS2305: Module '"@prisma/client"' has no exported member 'NetworkTrendDirection'.
+src/services/network/market/tenantInsights.ts(4,10): error TS2305: Module '"@prisma/client"' has no exported member 'TenantMarketInsightType'.
+src/services/network/market/tenantInsights.ts(4,35): error TS2305: Module '"@prisma/client"' has no exported member 'TenantRecommendedAction'.
+\n

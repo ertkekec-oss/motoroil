@@ -1,0 +1,123 @@
+// FAZ 17.x - PRICING INTELLIGENCE
+model NetworkPriceSignal {
+  id                    String      @id @default(cuid())
+  categoryId            String
+  regionCode            String?
+
+  medianPrice           Float       @default(0)
+  p25Price              Float       @default(0)
+  p75Price              Float       @default(0)
+
+  priceVolatility       Float       @default(0)
+  supplyPressureScore   Float       @default(0)
+  demandPressureScore   Float       @default(0)
+
+  sampleSize            Int         @default(0)
+
+  calculationVersion    String
+  expiresAt             DateTime?
+  dedupeKey             String      @unique
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([categoryId, regionCode])
+  @@index([expiresAt])
+}
+
+// 17.2 - SUPPLIER CAPACITY
+model NetworkSupplierCapacity {
+  id                    String      @id @default(cuid())
+  tenantId              String
+
+  categoryId            String?
+
+  estimatedDailyCapacity  Int       @default(0)
+  estimatedWeeklyCapacity Int       @default(0)
+
+  avgLeadTimeDays         Float     @default(0)
+
+  shipmentThroughputScore Float     @default(0)
+  fulfillmentSuccessRate  Float     @default(0)
+
+  capacityConfidenceScore Float     @default(0)
+
+  calculationVersion      String
+  expiresAt               DateTime?
+
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+  
+  @@index([tenantId, categoryId])
+}
+
+// 17.3 - NETWORK DISCOVERY
+enum NetworkVisibilityLevel {
+  PUBLIC
+  NETWORK_ONLY
+  PRIVATE
+}
+
+model NetworkDiscoveryProfile {
+  id                    String      @id @default(cuid())
+  tenantId              String      @unique
+
+  companyName           String?
+  categories            Json?       
+  regions               Json?       
+
+  trustScore            Float       @default(0)
+  reputationTier        String      @default("STANDARD")
+
+  shippingReliability   Float       @default(0)
+  capacityScore         Float       @default(0)
+
+  visibilityLevel       NetworkVisibilityLevel @default(NETWORK_ONLY)
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  
+  @@index([tenantId])
+}
+
+// 17.4 - TRADE EXECUTION HARDENING
+enum NetworkTradeAbuseSignalType {
+  RFQ_SPAM
+  NEGOTIATION_ABUSE
+  PRICE_MANIPULATION
+}
+
+model NetworkTradeAbuseSignal {
+  id                    String      @id @default(cuid())
+  tenantId              String
+  signalType            NetworkTradeAbuseSignalType
+  
+  severityScore         Float       @default(0)
+
+  contextJson           Json?
+
+  createdAt             DateTime    @default(now())
+  
+  @@index([tenantId, signalType])
+}
+
+// 17.5 - NETWORK TRADE ANALYTICS
+model NetworkTradeSnapshot {
+  id                    String      @id @default(cuid())
+
+  categoryId            String?
+  regionCode            String?
+
+  tradeVolume           Float       @default(0)
+  avgDealSize           Float       @default(0)
+
+  liquidityScore        Float       @default(0)
+
+  activeSupplierCount   Int         @default(0)
+  activeBuyerCount      Int         @default(0)
+
+  calculationVersion    String
+  expiresAt             DateTime?
+
+  createdAt             DateTime    @default(now())
+}

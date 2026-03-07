@@ -1,0 +1,8 @@
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+=== ENDPOINT PROJECTION TEST ===
+
+Testing GET /api/network/market-signals
+Tenant Signals Count: 1
+✓ Tenant raw internal fields are hidden
+
+Testing GET /api/network/market-insights

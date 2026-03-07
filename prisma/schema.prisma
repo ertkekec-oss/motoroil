@@ -9,22 +9,32 @@ datasource db {
 }
 
 model Tenant {
-  id                String             @id @default(cuid())
-  name              String
-  ownerEmail        String
-  phone             String?
-  status            String             @default("ACTIVE")
-  setupState        String             @default("PENDING")
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  companies         Company[]
-  growthEvents      GrowthEvent[]
-  subscription      Subscription?
-  upsellEvents      UpsellEvent[]
-  users             User[]
-  dealerMemberships DealerMembership[]
-  dealerPriceRules  DealerPriceRule[]
-  dealerInvites     DealerInvite[]
+  id                   String                   @id @default(cuid())
+  name                 String
+  ownerEmail           String
+  phone                String?
+  status               String                   @default("ACTIVE")
+  setupState           String                   @default("PENDING")
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  companies            Company[]
+  growthEvents         GrowthEvent[]
+  subscription         Subscription?
+  upsellEvents         UpsellEvent[]
+  users                User[]
+  dealerMemberships    DealerMembership[]
+  dealerPriceRules     DealerPriceRule[]
+  dealerInvites        DealerInvite[]
+  networkMembership    NetworkMembership?
+  networkProfile       NetworkCompanyProfile?
+  NetworkTrustScore    NetworkTrustScore?
+  routingPolicy        NetworkRoutingPolicy?
+  automationPolicy     NetworkAutomationPolicy?
+  tenantMarketInsights TenantMarketInsight[]
+  carrierAccounts      CarrierAccount[]
+  networkShipments     NetworkShipment[]
+  escrowAccount        NetworkEscrowAccount?
+  networkDisputes      NetworkDispute[]
 }
 
 model Company {
@@ -5123,31 +5133,6 @@ enum EscrowAction {
   DISPUTE_CLOSED
 }
 
-enum NetworkDisputeStatus {
-  OPEN
-  UNDER_REVIEW
-  RESOLVED
-  REJECTED
-  CANCELED
-}
-
-enum NetworkDisputeReason {
-  DAMAGED
-  MISSING
-  NOT_DELIVERED
-  PRICE_MISMATCH
-  OTHER
-}
-
-enum NetworkDisputeAction {
-  OPENED
-  MESSAGE_ADDED
-  EVIDENCE_ATTACHED
-  ESCALATED
-  RESOLVED
-  REJECTED
-}
-
 model NetworkAgreement {
   id               String          @id @default(cuid())
   supplierTenantId String
@@ -5232,41 +5217,6 @@ model EscrowEvent {
 
   @@index([supplierTenantId])
   @@index([escrowCaseId])
-}
-
-model NetworkDisputeCase {
-  id                   String               @id @default(cuid())
-  supplierTenantId     String
-  membershipId         String
-  orderId              String
-  escrowCaseId         String?
-  status               NetworkDisputeStatus @default(OPEN)
-  reason               NetworkDisputeReason
-  claimedAmount        Decimal?
-  notes                String?
-  evidenceBundleBlobId String?
-  createdBy            String?
-  resolvedAt           DateTime?
-  createdAt            DateTime             @default(now())
-
-  events NetworkDisputeEvent[]
-
-  @@index([supplierTenantId])
-  @@index([orderId])
-}
-
-model NetworkDisputeEvent {
-  id               String               @id @default(cuid())
-  supplierTenantId String
-  disputeCaseId    String
-  action           NetworkDisputeAction
-  metaJson         Json?
-  createdAt        DateTime             @default(now())
-
-  case NetworkDisputeCase @relation(fields: [disputeCaseId], references: [id], onDelete: Cascade)
-
-  @@index([supplierTenantId])
-  @@index([disputeCaseId])
 }
 
 // --- PAYMENT & SETTLEMENT MODELS ---
@@ -5589,64 +5539,64 @@ enum SignatureRecipientStatus {
 }
 
 model SignatureEnvelope {
-  id               String                  @id @default(cuid())
-  tenantId         String
-  companyId        String?
-  title            String
-  documentKey      String                  // e.g. tenants/{tenantId}/signatures/...
-  documentFileName String
-  status           SignatureEnvelopeStatus @default(DRAFT)
-  provider         String?                 // internal, esign, etc.
-  createdByUserId  String?
-  createdAt        DateTime                @default(now())
-  updatedAt        DateTime                @updatedAt
-  completedAt      DateTime?
+  id                String                  @id @default(cuid())
+  tenantId          String
+  companyId         String?
+  title             String
+  documentKey       String // e.g. tenants/{tenantId}/signatures/...
+  documentFileName  String
+  status            SignatureEnvelopeStatus @default(DRAFT)
+  provider          String? // internal, esign, etc.
+  createdByUserId   String?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  completedAt       DateTime?
   signedDocumentKey String?
-  otpRequired      Boolean                 @default(false)
-  sequentialSigning Boolean                @default(true)
-  documentCategory DocumentCategory?
+  otpRequired       Boolean                 @default(false)
+  sequentialSigning Boolean                 @default(true)
+  documentCategory  DocumentCategory?
 
-  recipients       SignatureRecipient[]
-  sessions         SignatureSession[]
-  auditEvents      SignatureAuditEvent[]
+  recipients  SignatureRecipient[]
+  sessions    SignatureSession[]
+  auditEvents SignatureAuditEvent[]
 
   @@index([tenantId])
   @@index([companyId])
 }
 
 model SignatureRecipient {
-  id           String                   @id @default(cuid())
-  envelopeId   String
-  name         String
-  email        String?
-  phone        String?
-  role         SignatureRecipientRole   @default(SIGNER)
-  orderIndex   Int                      @default(0)
-  status       SignatureRecipientStatus @default(PENDING)
-  signedAt     DateTime?
+  id         String                   @id @default(cuid())
+  envelopeId String
+  name       String
+  email      String?
+  phone      String?
+  role       SignatureRecipientRole   @default(SIGNER)
+  orderIndex Int                      @default(0)
+  status     SignatureRecipientStatus @default(PENDING)
+  signedAt   DateTime?
 
-  signerId     String?
-  signer       AuthorizedSigner?        @relation(fields: [signerId], references: [id], onDelete: SetNull)
+  signerId String?
+  signer   AuthorizedSigner? @relation(fields: [signerId], references: [id], onDelete: SetNull)
 
-  envelope     SignatureEnvelope        @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  sessions     SignatureSession[]
+  envelope SignatureEnvelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  sessions SignatureSession[]
 
   @@index([envelopeId])
   @@index([signerId])
 }
 
 model SignatureSession {
-  id           String    @id @default(cuid())
-  envelopeId   String
-  recipientId  String
-  tokenHash    String    @unique
-  expiresAt    DateTime
-  usedAt       DateTime?
-  revokedAt    DateTime?
-  createdAt    DateTime  @default(now())
+  id          String    @id @default(cuid())
+  envelopeId  String
+  recipientId String
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  usedAt      DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
 
-  envelope     SignatureEnvelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  recipient    SignatureRecipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  envelope  SignatureEnvelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  recipient SignatureRecipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 
   @@index([envelopeId])
   @@index([recipientId])
@@ -5670,64 +5620,61 @@ enum SignatureAuditAction {
 }
 
 model SignatureAuditEvent {
-  id           String               @id @default(cuid())
-  tenantId     String
-  envelopeId   String
-  action       SignatureAuditAction
-  actorId      String?
-  ip           String?
-  userAgent    String?
-  metaJson     Json?
-  createdAt    DateTime             @default(now())
+  id         String               @id @default(cuid())
+  tenantId   String
+  envelopeId String
+  action     SignatureAuditAction
+  actorId    String?
+  ip         String?
+  userAgent  String?
+  metaJson   Json?
+  createdAt  DateTime             @default(now())
 
-  envelope     SignatureEnvelope    @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  envelope SignatureEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 
   @@index([envelopeId])
   @@index([tenantId])
 }
-
-
 
 // ------------------------------------------------------------------------------------------------
 // OTP & PROVIDER CONF V1
 // ------------------------------------------------------------------------------------------------
 
 model OtpProviderConfig {
-  id                  String    @id @default(cuid())
-  tenantId            String
-  providerName        String
-  isEnabled           Boolean   @default(false)
-  apiUsername         String?
+  id                   String   @id @default(cuid())
+  tenantId             String
+  providerName         String
+  isEnabled            Boolean  @default(false)
+  apiUsername          String?
   apiPasswordEncrypted String?
-  sender              String?
-  otpTemplate         String?
-  codeLength          Int       @default(6)
-  ttlSeconds          Int       @default(180)
-  cooldownSeconds     Int       @default(60)
-  maxDailyAttempts    Int       @default(5)
-  testPhone           String?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  sender               String?
+  otpTemplate          String?
+  codeLength           Int      @default(6)
+  ttlSeconds           Int      @default(180)
+  cooldownSeconds      Int      @default(60)
+  maxDailyAttempts     Int      @default(5)
+  testPhone            String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   @@unique([tenantId, providerName])
   @@index([tenantId])
 }
 
 model OtpVerification {
-  id           String    @id @default(cuid())
-  tenantId     String
-  phone        String
-  codeHash     String
-  expiresAt    DateTime
-  usedAt       DateTime?
-  attempts     Int       @default(0)
-  sessionId    String?   // Links verification to a specific signing session
-  createdAt    DateTime  @default(now())
+  id        String    @id @default(cuid())
+  tenantId  String
+  phone     String
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+  sessionId String? // Links verification to a specific signing session
+  createdAt DateTime  @default(now())
 
   @@index([tenantId])
   @@index([phone])
 }
-
 
 // ===================================
 // Transaction Mail Engine
@@ -5761,24 +5708,23 @@ model MailDeliveryLog {
   @@index([relatedEntityType, relatedEntityId])
 }
 
-
 // ===================================
 // Event Bus & Notification Center
 // ===================================
 
 model AppNotification {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   tenantId          String
   companyId         String?
-  userId            String?  // If null, it's a tenant-wide broadcast
+  userId            String? // If null, it's a tenant-wide broadcast
   title             String
-  message           String   @db.Text
+  message           String    @db.Text
   type              String
-  isRead            Boolean  @default(false)
+  isRead            Boolean   @default(false)
   relatedEntityType String?
   relatedEntityId   String?
   metaJson          Json?
-  createdAt         DateTime @default(now())
+  createdAt         DateTime  @default(now())
   readAt            DateTime?
 
   @@index([tenantId])
@@ -5816,7 +5762,7 @@ model AuthorizedSigner {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
-  recipients        SignatureRecipient[]
+  recipients SignatureRecipient[]
 
   @@index([tenantId])
   @@index([companyId])
@@ -5859,7 +5805,7 @@ model WorkflowTask {
   description       String               @db.Text
   status            WorkflowTaskStatus   @default(OPEN)
   priority          WorkflowTaskPriority @default(MEDIUM)
-  assigneeId        String?              // User ID
+  assigneeId        String? // User ID
   relatedEntityType String?
   relatedEntityId   String?
   metaJson          Json?
@@ -5874,4 +5820,2215 @@ model WorkflowTask {
   @@index([status])
   @@index([priority])
   @@index([relatedEntityType, relatedEntityId])
+}
+
+// ===================================
+// Trade Graph / B2B Network Engine
+// ===================================
+
+enum NetworkMembershipStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum NetworkProfileVisibilityLevel {
+  PRIVATE
+  NETWORK
+  PUBLIC
+}
+
+enum NetworkVerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  RESTRICTED
+}
+
+enum CompanyRelationshipType {
+  SUPPLIER
+  BUYER
+  DEALER
+  LOGISTICS_PARTNER
+  FINANCE_PARTNER
+  SERVICE_PARTNER
+  PROSPECT
+}
+
+enum CompanyRelationshipDirectionType {
+  ONE_WAY
+  MUTUAL
+}
+
+enum CompanyRelationshipStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  SUSPENDED
+  ARCHIVED
+}
+
+enum CompanyRelationshipVisibilityScope {
+  RELATIONSHIP_ONLY
+  LIMITED_NETWORK
+  PUBLIC_SIGNAL_ONLY
+}
+
+enum NetworkInviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELED
+}
+
+// 1) NetworkMembership
+// Amaç: Bir tenant’ın Hub / Trade Network üyelik kaydı
+model NetworkMembership {
+  id                     String                  @id @default(cuid())
+  tenantId               String                  @unique
+  status                 NetworkMembershipStatus @default(PENDING)
+  joinedAt               DateTime                @default(now())
+  subscriptionTier       String?
+  discoveryEnabled       Boolean                 @default(false)
+  profileCompletionScore Int                     @default(0)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([discoveryEnabled])
+}
+
+// 2) NetworkCompanyProfile
+// Amaç: Tenant’ın network yüzü / public-discoverable şirket profili
+model NetworkCompanyProfile {
+  id                     String                        @id @default(cuid())
+  tenantId               String                        @unique
+  slug                   String                        @unique
+  displayName            String
+  legalName              String?
+  shortDescription       String?
+  longDescription        String?                       @db.Text
+  logoFileKey            String?
+  website                String?
+  email                  String?
+  phone                  String?
+  country                String?                       @default("Turkey")
+  city                   String?
+  sectors                Json?
+  capabilities           Json?
+  visibilityLevel        NetworkProfileVisibilityLevel @default(PRIVATE)
+  verificationStatus     NetworkVerificationStatus     @default(UNVERIFIED)
+  isPublicListingEnabled Boolean                       @default(false)
+  isDiscoveryEnabled     Boolean                       @default(false)
+  createdAt              DateTime                      @default(now())
+  updatedAt              DateTime                      @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations mapping for relationships
+  sourceRelationships CompanyRelationship[]     @relation("SourceProfileRel")
+  targetRelationships CompanyRelationship[]     @relation("TargetProfileRel")
+  sentInvites         NetworkConnectionInvite[] @relation("FromProfileInviteRel")
+  receivedInvites     NetworkConnectionInvite[] @relation("ToProfileInviteRel")
+
+  profileCompleteness Float              @default(0)
+  trustScore          NetworkTrustScore?
+
+  networkCapabilities NetworkCapability[]
+  categorySignals     NetworkCategorySignal[]
+  recommendations     NetworkRecommendation[] @relation("TargetProfileRecRel")
+
+  inventorySignals      NetworkInventorySignal[]
+  supplierOpportunities NetworkTradeOpportunity[] @relation("SupplierOpportunityRel")
+  buyerOpportunities    NetworkTradeOpportunity[] @relation("BuyerOpportunityRel")
+  NetworkSupplierScore  NetworkSupplierScore[]
+  tenantMarketInsights  TenantMarketInsight[]
+
+  @@index([visibilityLevel])
+  @@index([verificationStatus])
+  @@index([isDiscoveryEnabled])
+  @@index([isPublicListingEnabled])
+  @@index([city])
+  @@index([country])
+}
+
+// 3) CompanyRelationship
+// Amaç: İki tenant arasındaki graph edge
+model CompanyRelationship {
+  id                  String                             @id @default(cuid())
+  sourceTenantId      String
+  targetTenantId      String
+  sourceProfileId     String
+  targetProfileId     String
+  relationshipType    CompanyRelationshipType
+  directionType       CompanyRelationshipDirectionType   @default(ONE_WAY)
+  status              CompanyRelationshipStatus          @default(PENDING)
+  initiatedByTenantId String
+  approvedByTenantId  String?
+  visibilityScope     CompanyRelationshipVisibilityScope @default(RELATIONSHIP_ONLY)
+  notes               String?                            @db.Text
+  connectedAt         DateTime?
+  healthStatus        RelationshipHealthStatus           @default(NEW)
+  lastActivityAt      DateTime?
+  createdAt           DateTime                           @default(now())
+  updatedAt           DateTime                           @updatedAt
+
+  sourceProfile NetworkCompanyProfile      @relation("SourceProfileRel", fields: [sourceProfileId], references: [id], onDelete: Cascade)
+  targetProfile NetworkCompanyProfile      @relation("TargetProfileRel", fields: [targetProfileId], references: [id], onDelete: Cascade)
+  events        CompanyRelationshipEvent[]
+
+  @@unique([sourceTenantId, targetTenantId, relationshipType]) // Prevent duplicate same-type relationships between same tenants
+  @@index([sourceTenantId, status])
+  @@index([targetTenantId, status])
+  @@index([relationshipType])
+}
+
+// 4) NetworkConnectionInvite
+// Amaç: Bağlantı isteği / davet akışı
+model NetworkConnectionInvite {
+  id                       String                  @id @default(cuid())
+  fromTenantId             String
+  toTenantId               String
+  fromProfileId            String
+  toProfileId              String
+  proposedRelationshipType CompanyRelationshipType
+  message                  String?                 @db.Text
+  status                   NetworkInviteStatus     @default(PENDING)
+  expiresAt                DateTime?
+  respondedAt              DateTime?
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+
+  fromProfile NetworkCompanyProfile @relation("FromProfileInviteRel", fields: [fromProfileId], references: [id], onDelete: Cascade)
+  toProfile   NetworkCompanyProfile @relation("ToProfileInviteRel", fields: [toProfileId], references: [id], onDelete: Cascade)
+
+  @@index([fromTenantId, status])
+  @@index([toTenantId, status])
+  @@index([status, expiresAt])
+}
+
+enum CompanyTrustBadge {
+  UNVERIFIED
+  NEW_MEMBER
+  ACTIVE_TRADER
+  TRUSTED_PARTNER
+  VERIFIED_BUSINESS
+}
+
+enum RelationshipHealthStatus {
+  NEW
+  ACTIVE
+  DORMANT
+  STRONG
+}
+
+model NetworkTrustScore {
+  id                 String                @id @default(cuid())
+  tenantId           String                @unique
+  tenant             Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profileId          String                @unique
+  profile            NetworkCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  score              Float                 @default(0)
+  badge              CompanyTrustBadge     @default(UNVERIFIED)
+  identityScore      Float                 @default(0)
+  activityScore      Float                 @default(0)
+  networkScore       Float                 @default(0)
+  profileScore       Float                 @default(0)
+  lastCalculatedAt   DateTime?
+  calculationVersion Int                   @default(1)
+  dedupeKey          String?
+  expiresAt          DateTime?
+  isStale            Boolean               @default(false)
+  supersededAt       DateTime?
+  status             String                @default("ACTIVE")
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@index([calculationVersion, isStale])
+  @@index([status, expiresAt])
+}
+
+// === FAZ 2 / PROMPT 4: SUPPLIER DISCOVERY & NETWORK RECOMMENDATION ENGINE ===
+
+enum CapabilityType {
+  MANUFACTURER
+  WHOLESALER
+  DISTRIBUTOR
+  SERVICE_PROVIDER
+  LOGISTICS
+  FINANCE
+}
+
+model NetworkCapability {
+  id             String         @id @default(cuid())
+  profileId      String
+  categoryId     String
+  capabilityType CapabilityType
+  keywords       String[]
+  metadata       Json?
+  createdAt      DateTime       @default(now())
+
+  profile NetworkCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+  @@index([profileId])
+}
+
+model NetworkCategorySignal {
+  id                 String    @id @default(cuid())
+  profileId          String
+  categoryId         String
+  strengthScore      Float     @default(0)
+  lastActivityAt     DateTime?
+  calculationVersion Int       @default(1)
+  dedupeKey          String?
+  lastCalculatedAt   DateTime?
+  expiresAt          DateTime?
+  isStale            Boolean   @default(false)
+  supersededAt       DateTime?
+  status             String    @default("ACTIVE")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  profile NetworkCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, categoryId])
+  @@index([categoryId, strengthScore, status])
+  @@index([calculationVersion, isStale])
+}
+
+enum RecommendationType {
+  SUPPLIER
+  BUYER
+  PARTNER
+  SERVICE
+}
+
+model NetworkRecommendation {
+  id                 String             @id @default(cuid())
+  viewerTenantId     String
+  targetProfileId    String
+  recommendationType RecommendationType
+  score              Float              @default(0)
+  reason             String?            @db.Text
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  calculationVersion Int                @default(1)
+  dedupeKey          String?
+  lastCalculatedAt   DateTime?
+  expiresAt          DateTime?
+  isStale            Boolean            @default(false)
+  supersededAt       DateTime?
+  status             String             @default("ACTIVE")
+
+  targetProfile NetworkCompanyProfile @relation("TargetProfileRecRel", fields: [targetProfileId], references: [id], onDelete: Cascade)
+
+  @@index([viewerTenantId, recommendationType, status])
+  @@index([targetProfileId])
+  @@index([score])
+  @@index([calculationVersion, isStale])
+}
+
+// === FAZ 3 / PROMPT 5: INVENTORY INTELLIGENCE ENGINE ===
+
+enum NetworkInventorySignalType {
+  OVERSTOCK
+  STOCKOUT_RISK
+  HIGH_DEMAND
+  SEASONAL_DEMAND
+  SLOW_MOVING
+}
+
+model NetworkInventorySignal {
+  id                 String                     @id @default(cuid())
+  tenantId           String
+  profileId          String
+  productCategoryId  String
+  signalType         NetworkInventorySignalType
+  quantityBand       String?
+  velocityScore      Float                      @default(0)
+  confidenceScore    Float                      @default(0)
+  visibilityScope    String                     @default("NETWORK")
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  calculationVersion Int                        @default(1)
+  dedupeKey          String?
+  lastCalculatedAt   DateTime?
+  expiresAt          DateTime?
+  isStale            Boolean                    @default(false)
+  supersededAt       DateTime?
+  status             String                     @default("ACTIVE")
+
+  profile NetworkCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([profileId])
+  @@index([productCategoryId, signalType, status])
+  @@index([calculationVersion, isStale])
+}
+
+model NetworkTradeOpportunity {
+  id                 String                     @id @default(cuid())
+  supplierProfileId  String
+  buyerProfileId     String
+  categoryId         String
+  signalType         NetworkInventorySignalType
+  opportunityScore   Float                      @default(0)
+  confidence         Float                      @default(0)
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  calculationVersion Int                        @default(1)
+  dedupeKey          String?
+  lastCalculatedAt   DateTime?
+  expiresAt          DateTime?
+  isStale            Boolean                    @default(false)
+  supersededAt       DateTime?
+  status             String                     @default("ACTIVE")
+
+  supplierProfile NetworkCompanyProfile @relation("SupplierOpportunityRel", fields: [supplierProfileId], references: [id], onDelete: Cascade)
+  buyerProfile    NetworkCompanyProfile @relation("BuyerOpportunityRel", fields: [buyerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([supplierProfileId, status])
+  @@index([buyerProfileId, status])
+  @@index([categoryId, signalType, status])
+  @@index([calculationVersion, isStale])
+}
+
+// === FAZ 4 / PROMPT 6: AUTONOMOUS TRADE ROUTING ===
+
+enum NetworkRecommendationTier {
+  PRIMARY
+  SECONDARY
+  FALLBACK
+}
+
+enum RoutingWaveCandidate {
+  WAVE_1
+  WAVE_2
+  WAVE_3
+  NONE
+}
+
+model NetworkSupplierScore {
+  id                 String                    @id @default(cuid())
+  rfqId              String?
+  opportunityId      String?
+  buyerTenantId      String
+  supplierTenantId   String
+  supplierProfileId  String
+  score              Float                     @default(0)
+  confidence         Float                     @default(0)
+  scoreBreakdown     Json?
+  recommendationTier NetworkRecommendationTier @default(FALLBACK)
+  waveCandidate      RoutingWaveCandidate      @default(NONE)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  supplierProfile NetworkCompanyProfile @relation(fields: [supplierProfileId], references: [id], onDelete: Cascade)
+
+  @@index([buyerTenantId])
+  @@index([supplierTenantId])
+  @@index([supplierProfileId])
+  @@index([rfqId])
+}
+
+model NetworkRoutingPolicy {
+  id                              String   @id @default(cuid())
+  tenantId                        String   @unique
+  autoRoutingEnabled              Boolean  @default(false)
+  maxPrimarySuppliers             Int      @default(3)
+  maxFallbackSuppliers            Int      @default(5)
+  minTrustScore                   Float    @default(50)
+  minConfidenceScore              Float    @default(60)
+  allowWaveRouting                Boolean  @default(true)
+  allowAutoDraftCreation          Boolean  @default(false)
+  requireManualApprovalBeforeSend Boolean  @default(true)
+  preferredSupplierTypes          Json?
+  excludedSupplierIds             Json?
+  createdAt                       DateTime @default(now())
+  updatedAt                       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+enum RFQRoutingStatus {
+  DRAFT
+  READY
+  ROUTING
+  PARTIALLY_ROUTED
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+enum RFQRoutingMode {
+  MANUAL
+  ASSISTED
+  AUTO
+}
+
+model RFQRoutingSession {
+  id              String           @id @default(cuid())
+  rfqId           String           @unique
+  buyerTenantId   String
+  status          RFQRoutingStatus @default(DRAFT)
+  routingMode     RFQRoutingMode   @default(ASSISTED)
+  startedAt       DateTime         @default(now())
+  completedAt     DateTime?
+  currentWave     Int              @default(1)
+  totalCandidates Int              @default(0)
+  notes           String?          @db.Text
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  waves RFQRoutingWave[]
+
+  @@index([buyerTenantId])
+  @@index([rfqId])
+}
+
+enum RFQRoutingWaveStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+  FAILED
+}
+
+model RFQRoutingWave {
+  id                    String               @id @default(cuid())
+  sessionId             String
+  waveNumber            Int
+  plannedSuppliersCount Int                  @default(0)
+  routedSuppliersCount  Int                  @default(0)
+  status                RFQRoutingWaveStatus @default(PENDING)
+  startedAt             DateTime             @default(now())
+  completedAt           DateTime?
+
+  session RFQRoutingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+// === FAZ 4: HARDENING & FOUNDATION 0 ===
+
+enum CompanyRelationshipEventType {
+  CREATED
+  INVITED
+  ACCEPTED
+  REJECTED
+  ACTIVATED
+  SUSPENDED
+  REACTIVATED
+  ARCHIVED
+  VISIBILITY_CHANGED
+  TYPE_CHANGED
+  NOTE_UPDATED
+}
+
+model CompanyRelationshipEvent {
+  id             String                       @id @default(cuid())
+  relationshipId String
+  sourceTenantId String
+  targetTenantId String
+  eventType      CompanyRelationshipEventType
+  previousStatus CompanyRelationshipStatus?
+  nextStatus     CompanyRelationshipStatus?
+  metadata       Json?
+  actorTenantId  String?
+  actorUserId    String?
+  createdAt      DateTime                     @default(now())
+
+  relationship CompanyRelationship @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+
+  @@index([relationshipId])
+  @@index([sourceTenantId, targetTenantId])
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  SKIPPED
+  RETRIED
+}
+
+model NetworkProcessingCheckpoint {
+  id               String           @id @default(cuid())
+  processorType    String
+  entityType       String
+  entityId         String
+  idempotencyKey   String           @unique
+  processingStatus ProcessingStatus @default(PENDING)
+  lastProcessedAt  DateTime?
+  payloadHash      String?
+  resultHash       String?
+  errorCode        String?
+  retryCount       Int              @default(0)
+  expiresAt        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([processorType, processingStatus])
+  @@index([entityId])
+  @@index([expiresAt])
+}
+
+model CompanyGraphAdjacencyCache {
+  id                      String    @id @default(cuid())
+  tenantId                String
+  neighborTenantId        String
+  relationshipCount       Int       @default(1)
+  directConnection        Boolean   @default(true)
+  shortestPathDistance    Int?
+  mutualConnectionsCount  Int       @default(0)
+  sharedCategoryCount     Int       @default(0)
+  calculationVersion      Int       @default(1)
+  isStale                 Boolean   @default(false)
+  lastRelationshipEventId String?
+  lastComputedAt          DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@unique([tenantId, neighborTenantId])
+  @@index([tenantId])
+}
+
+model CompanyGraphMetricSnapshot {
+  id                      String    @id @default(cuid())
+  tenantId                String    @unique
+  directConnectionsCount  Int       @default(0)
+  activeSuppliersCount    Int       @default(0)
+  activeBuyersCount       Int       @default(0)
+  mutualNetworkDensity    Float     @default(0)
+  categoryDiversityScore  Float     @default(0)
+  calculationVersion      Int       @default(1)
+  isStale                 Boolean   @default(false)
+  lastRelationshipEventId String?
+  lastComputedAt          DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+model NetworkAutomationPolicy {
+  id                               String   @id @default(cuid())
+  tenantId                         String   @unique
+  autoRecommendationEnabled        Boolean  @default(false)
+  autoOpportunityGenerationEnabled Boolean  @default(false)
+  autoRFQDraftEnabled              Boolean  @default(false)
+  autoRoutingEnabled               Boolean  @default(false)
+  requireManualApprovalForRouting  Boolean  @default(true)
+  minTrustScoreForAutomation       Float    @default(50)
+  minConfidenceForAutomation       Float    @default(60)
+  allowFallbackRouting             Boolean  @default(false)
+  restrictedSupplierHandling       String   @default("EXCLUDE")
+  excludedRelationshipStatuses     Json?
+  createdAt                        DateTime @default(now())
+  updatedAt                        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model NetworkCalculationRegistry {
+  modelName      String   @id
+  currentVersion Int      @default(1)
+  notes          String?  @db.Text
+  updatedAt      DateTime @updatedAt
+}
+
+// === FAZ 6: MARKET SIGNAL ENGINE ===
+
+enum NetworkMarketSignalScopeType {
+  GLOBAL
+  REGION
+  CITY
+  CATEGORY
+  CATEGORY_REGION
+  NETWORK_CLUSTER
+}
+
+enum NetworkMarketSignalType {
+  DEMAND_SPIKE
+  DEMAND_GROWTH
+  SUPPLY_SURPLUS
+  SUPPLY_SHORTAGE
+  PRICE_PRESSURE
+  MARKET_HEAT
+  RFQ_SURGE
+  EMERGING_CATEGORY
+  NETWORK_CLUSTER_OPPORTUNITY
+}
+
+enum NetworkTrendDirection {
+  UP
+  DOWN
+  FLAT
+  VOLATILE
+}
+
+model NetworkMarketSignal {
+  id                    String                       @id @default(cuid())
+  signalScopeType       NetworkMarketSignalScopeType
+  categoryId            String?
+  regionCode            String?
+  city                  String?
+  clusterKey            String?
+  signalType            NetworkMarketSignalType
+  intensityScore        Float                        @default(0)
+  confidenceScore       Float                        @default(0)
+  supportingSignalCount Int                          @default(0)
+  trendDirection        NetworkTrendDirection        @default(FLAT)
+  signalSummary         String
+  explanationJson       Json?
+
+  // Hardening
+  calculationVersion Int       @default(1)
+  dedupeKey          String?
+  status             String    @default("ACTIVE")
+  isStale            Boolean   @default(false)
+  expiresAt          DateTime?
+  lastCalculatedAt   DateTime?
+  supersededAt       DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([signalType, status, expiresAt])
+  @@index([categoryId, regionCode, status])
+  @@index([calculationVersion, isStale])
+  @@index([trendDirection, confidenceScore])
+}
+
+enum TenantMarketInsightType {
+  SELL_OPPORTUNITY
+  BUY_OPPORTUNITY
+  CATEGORY_TO_WATCH
+  DEMAND_RISK
+  SUPPLY_RISK
+  RFQ_OPPORTUNITY
+  PRICE_ADVANTAGE_WINDOW
+  NETWORK_EXPANSION_HINT
+}
+
+enum TenantRecommendedAction {
+  OPEN_B2B_LISTING
+  CREATE_RFQ
+  REVIEW_SUPPLIERS
+  EXPAND_CATEGORY
+  ACTIVATE_ROUTING
+  WAIT_AND_MONITOR
+  BOOST_VISIBILITY
+}
+
+model TenantMarketInsight {
+  id                    String                  @id @default(cuid())
+  tenantId              String
+  profileId             String
+  categoryId            String?
+  insightType           TenantMarketInsightType
+  score                 Float                   @default(0)
+  confidence            Float                   @default(0)
+  priority              Int                     @default(0)
+  summary               String
+  explanationJson       Json?
+  relatedMarketSignalId String?
+  recommendedAction     TenantRecommendedAction
+
+  // Hardening
+  calculationVersion Int       @default(1)
+  dedupeKey          String?
+  status             String    @default("ACTIVE")
+  isStale            Boolean   @default(false)
+  expiresAt          DateTime?
+  lastCalculatedAt   DateTime?
+  supersededAt       DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  tenant  Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile NetworkCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, insightType, status])
+  @@index([tenantId, priority, status])
+  @@index([categoryId, status])
+  @@index([calculationVersion, isStale])
+}
+
+// === FAZ 8: SHIPPING INFRASTRUCTURE FOUNDATION ===
+
+enum CarrierAccountType {
+  PLATFORM_MANAGED
+  TENANT_MANAGED
+}
+
+model CarrierAccount {
+  id          String             @id @default(cuid())
+  tenantId    String?
+  carrierCode String
+  accountType CarrierAccountType
+  isActive    Boolean            @default(true)
+  configJson  Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([carrierCode, isActive])
+  @@index([tenantId])
+}
+
+enum NetworkShipmentStatus {
+  DRAFT
+  LABEL_PENDING
+  LABEL_CREATED
+  READY_FOR_PICKUP
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  DELIVERY_FAILED
+  CANCELED
+  RETURNED
+}
+
+enum NetworkShipmentDirection {
+  OUTBOUND
+  RETURN
+  REPLACEMENT
+}
+
+enum NetworkShipmentType {
+  STANDARD
+  PARTIAL
+  SPLIT
+  MANUAL_REVIEW
+}
+
+model NetworkShipment {
+  id                 String                   @id @default(cuid())
+  tenantId           String
+  orderId            String?
+  sellerTenantId     String?
+  buyerTenantId      String?
+  carrierCode        String
+  externalShipmentId String?
+  trackingNumber     String?
+  labelFileKey       String?
+  status             NetworkShipmentStatus
+  shipmentDirection  NetworkShipmentDirection
+  shipmentType       NetworkShipmentType
+  totalPackages      Int                      @default(1)
+  totalWeight        Float?
+  currency           String?
+  shippingCost       Float?
+
+  shippedAt   DateTime?
+  pickedUpAt  DateTime?
+  deliveredAt DateTime?
+  canceledAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  packages       NetworkShipmentPackage[]
+  items          NetworkShipmentItem[]
+  trackingEvents NetworkShipmentTrackingEvent[]
+  labelRequests  NetworkShipmentLabelRequest[]
+
+  @@index([tenantId, status, createdAt])
+  @@index([sellerTenantId, buyerTenantId, createdAt])
+  @@index([orderId, status])
+  @@index([carrierCode, trackingNumber])
+  @@index([externalShipmentId])
+}
+
+enum NetworkShipmentPackageStatus {
+  PENDING
+  READY
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+  RETURNED
+}
+
+model NetworkShipmentPackage {
+  id                String                       @id @default(cuid())
+  shipmentId        String
+  packageNo         Int
+  externalPackageId String?
+  trackingNumber    String?
+  barcode           String?
+  weight            Float?
+  width             Float?
+  height            Float?
+  length            Float?
+  status            NetworkShipmentPackageStatus
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shipment NetworkShipment                @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  items    NetworkShipmentItem[]
+  events   NetworkShipmentTrackingEvent[]
+
+  @@unique([shipmentId, packageNo])
+  @@index([externalPackageId])
+}
+
+model NetworkShipmentItem {
+  id                String  @id @default(cuid())
+  shipmentId        String
+  shipmentPackageId String?
+  orderItemId       String
+  productId         String?
+  quantity          Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shipment NetworkShipment         @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  package  NetworkShipmentPackage? @relation(fields: [shipmentPackageId], references: [id], onDelete: SetNull)
+
+  @@index([shipmentId])
+  @@index([orderItemId])
+}
+
+enum NetworkShipmentTrackingNormalizedStatus {
+  LABEL_CREATED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  DELIVERY_EXCEPTION
+  CANCELED
+  RETURNED
+}
+
+model NetworkShipmentTrackingEvent {
+  id                String                                  @id @default(cuid())
+  shipmentId        String
+  shipmentPackageId String?
+  carrierCode       String
+  externalEventId   String?
+  carrierEventCode  String?
+  normalizedStatus  NetworkShipmentTrackingNormalizedStatus
+  locationText      String?
+  description       String?
+  rawPayload        Json?
+
+  eventTime   DateTime
+  processedAt DateTime @default(now())
+  dedupeKey   String   @unique
+  createdAt   DateTime @default(now())
+
+  shipment NetworkShipment         @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  package  NetworkShipmentPackage? @relation(fields: [shipmentPackageId], references: [id], onDelete: SetNull)
+
+  @@index([shipmentId, eventTime])
+  @@index([normalizedStatus, eventTime])
+  @@index([externalEventId])
+}
+
+enum NetworkShipmentLabelRequestStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  RETRYING
+}
+
+model NetworkShipmentLabelRequest {
+  id                  String                            @id @default(cuid())
+  shipmentId          String
+  carrierCode         String
+  requestStatus       NetworkShipmentLabelRequestStatus
+  requestPayloadHash  String?
+  responsePayloadHash String?
+  errorCode           String?
+
+  requestedAt DateTime  @default(now())
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  shipment NetworkShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId, requestStatus])
+}
+
+// === FAZ 9: ESCROW ORCHESTRATION ENGINE ===
+
+model NetworkEscrowAccount {
+  id               String   @id @default(cuid())
+  tenantId         String   @unique
+  availableBalance Float    @default(0)
+  lockedBalance    Float    @default(0)
+  currency         String   @default("TRY")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant       Tenant                     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  transactions NetworkEscrowTransaction[]
+}
+
+enum NetworkEscrowTransactionType {
+  DEPOSIT
+  HOLD
+  RELEASE
+  REFUND
+  ADJUSTMENT
+}
+
+enum NetworkEscrowTransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REVERSED
+}
+
+model NetworkEscrowTransaction {
+  id                String                         @id @default(cuid())
+  tenantId          String
+  orderId           String?
+  escrowId          String
+  transactionType   NetworkEscrowTransactionType
+  amount            Float
+  currency          String                         @default("TRY")
+  status            NetworkEscrowTransactionStatus
+  externalPaymentId String?
+  metadata          Json?
+
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+
+  escrowAccount NetworkEscrowAccount @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  @@index([escrowId, status])
+  @@index([transactionType, status])
+}
+
+enum NetworkEscrowHoldStatus {
+  CREATED
+  FUNDS_HELD
+  SHIPMENT_PENDING
+  IN_TRANSIT
+  DELIVERY_CONFIRMED
+  DISPUTED
+  RELEASED
+  REFUNDED
+  CANCELED
+}
+
+enum NetworkEscrowReleaseStrategy {
+  DELIVERY_PLUS_DELAY
+  BUYER_CONFIRMATION
+  INSTANT_FOR_TRUSTED
+  ADMIN_REVIEW
+}
+
+model NetworkEscrowHold {
+  id                String                       @id @default(cuid())
+  orderId           String                       @unique
+  buyerTenantId     String
+  sellerTenantId    String
+  amount            Float
+  currency          String                       @default("TRY")
+  status            NetworkEscrowHoldStatus
+  releaseStrategy   NetworkEscrowReleaseStrategy
+  releaseDelayHours Int                          @default(48)
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  releasedAt DateTime?
+  refundedAt DateTime?
+
+  lifecycleEvents NetworkEscrowLifecycleEvent[]
+
+  @@index([buyerTenantId, createdAt])
+  @@index([sellerTenantId, createdAt])
+  @@index([orderId, status])
+}
+
+enum NetworkEscrowLifecycleEventType {
+  ESCROW_CREATED
+  FUNDS_CAPTURED
+  SHIPMENT_CREATED
+  SHIPMENT_PICKED_UP
+  SHIPMENT_DELIVERED
+  SHIPMENT_DELIVERY_FAILED
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  ESCROW_RELEASE_SCHEDULED
+  ESCROW_RELEASED
+  ESCROW_REFUNDED
+}
+
+model NetworkEscrowLifecycleEvent {
+  id            String                          @id @default(cuid())
+  escrowHoldId  String
+  eventType     NetworkEscrowLifecycleEventType
+  previousState String?
+  newState      String
+  source        String
+  sourceId      String?
+  metadata      Json?
+
+  createdAt DateTime @default(now())
+
+  escrowHold NetworkEscrowHold @relation(fields: [escrowHoldId], references: [id], onDelete: Cascade)
+
+  @@index([escrowHoldId, createdAt])
+}
+
+// === FAZ 10: DISPUTE & EVIDENCE ENGINE ===
+
+enum NetworkDisputeType {
+  DELIVERY_NOT_RECEIVED
+  WRONG_ITEM
+  DAMAGED_ITEM
+  MISSING_ITEMS
+  DELIVERY_DELAY
+  PARTIAL_DELIVERY
+  REFUND_REQUEST
+  PAYMENT_DISPUTE
+  OTHER
+}
+
+enum NetworkDisputeStatus {
+  OPEN
+  EVIDENCE_PENDING
+  UNDER_REVIEW
+  WAITING_COUNTERPARTY
+  ADMIN_REVIEW
+  RESOLVED
+  CLOSED
+  REJECTED
+}
+
+enum NetworkDisputePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model NetworkDispute {
+  id               String                 @id @default(cuid())
+  tenantId         String
+  orderId          String
+  shipmentId       String?
+  escrowHoldId     String?
+  openedByTenantId String
+  againstTenantId  String
+  disputeType      NetworkDisputeType
+  status           NetworkDisputeStatus
+  priority         NetworkDisputePriority
+
+  title         String
+  summary       String
+  claimedAmount Float?
+  currency      String? @default("TRY")
+
+  resolutionType    NetworkDisputeDecision?
+  resolutionSummary String?
+
+  openedAt   DateTime  @default(now())
+  resolvedAt DateTime?
+  closedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  tenant      Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  evidences   NetworkDisputeEvidence[]
+  events      NetworkDisputeTimelineEvent[]
+  resolutions NetworkDisputeResolution[]
+
+  @@index([orderId, status])
+  @@index([shipmentId, status])
+  @@index([escrowHoldId, status])
+  @@index([tenantId, createdAt])
+  @@index([disputeType, status, priority])
+}
+
+enum NetworkDisputeEvidenceType {
+  PHOTO
+  DOCUMENT
+  DELIVERY_RECEIPT
+  CARRIER_PROOF
+  INVOICE
+  MESSAGE_LOG
+  TEXT_STATEMENT
+  SYSTEM_EVENT_SNAPSHOT
+}
+
+enum NetworkDisputeEvidenceVisibility {
+  ADMIN_ONLY
+  BOTH_PARTIES
+  UPLOADER_AND_ADMIN
+}
+
+model NetworkDisputeEvidence {
+  id                 String                           @id @default(cuid())
+  disputeId          String
+  uploadedByTenantId String
+  uploadedByUserId   String?
+  evidenceType       NetworkDisputeEvidenceType
+  fileKey            String?
+  fileName           String?
+  mimeType           String?
+  textContent        String?
+  metadata           Json?
+  visibilityScope    NetworkDisputeEvidenceVisibility
+
+  createdAt DateTime @default(now())
+
+  dispute NetworkDispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId, createdAt])
+  @@index([uploadedByTenantId, createdAt])
+}
+
+enum NetworkDisputeTimelineEventType {
+  DISPUTE_OPENED
+  EVIDENCE_ADDED
+  COUNTERPARTY_RESPONDED
+  ADMIN_NOTE_ADDED
+  ESCROW_LOCKED
+  ESCROW_RELEASED
+  ESCROW_REFUNDED
+  SHIPMENT_DELIVERED
+  SHIPMENT_FAILED
+  RESOLUTION_PROPOSED
+  RESOLUTION_ACCEPTED
+  RESOLUTION_REJECTED
+  DISPUTE_RESOLVED
+  DISPUTE_CLOSED
+}
+
+enum NetworkDisputeActorType {
+  BUYER
+  SELLER
+  ADMIN
+  SYSTEM
+}
+
+model NetworkDisputeTimelineEvent {
+  id            String                          @id @default(cuid())
+  disputeId     String
+  eventType     NetworkDisputeTimelineEventType
+  actorType     NetworkDisputeActorType
+  actorTenantId String?
+  actorUserId   String?
+  summary       String
+  metadata      Json?
+  createdAt     DateTime                        @default(now())
+
+  dispute NetworkDispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId, createdAt])
+}
+
+enum NetworkDisputeDecision {
+  FULL_REFUND
+  FULL_RELEASE
+  PARTIAL_REFUND
+  PARTIAL_RELEASE
+  REJECT_CLAIM
+  MANUAL_SETTLEMENT
+}
+
+enum NetworkDisputeDecidedByType {
+  ADMIN
+  SYSTEM
+  MUTUAL
+}
+
+model NetworkDisputeResolution {
+  id              String                      @id @default(cuid())
+  disputeId       String
+  decidedByType   NetworkDisputeDecidedByType
+  decidedByUserId String?
+  decision        NetworkDisputeDecision
+  refundAmount    Float?
+  releaseAmount   Float?
+  notes           String?
+  createdAt       DateTime                    @default(now())
+
+  dispute NetworkDispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId, createdAt])
+}
+
+model NetworkShippingReliabilityScore {
+  id                     String    @id @default(cuid())
+  tenantId               String
+  profileId              String?
+  score                  Float
+  onTimeDeliveryScore    Float
+  disputePenaltyScore    Float
+  deliverySuccessScore   Float
+  refundPenaltyScore     Float
+  carrierDiversityScore  Float?
+  completedShipmentCount Int
+  completedDisputeCount  Int
+  explanationJson        Json
+  calculationVersion     String
+  dedupeKey              String    @unique
+  status                 String
+  isStale                Boolean   @default(false)
+  expiresAt              DateTime?
+  lastCalculatedAt       DateTime
+  supersededAt           DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([tenantId, status, isStale])
+  @@index([profileId, status])
+  @@index([calculationVersion, dedupeKey])
+}
+
+model NetworkCarrierPerformanceSnapshot {
+  id                         String    @id @default(cuid())
+  carrierCode                String
+  regionCode                 String?
+  city                       String?
+  onTimeRate                 Float
+  deliverySuccessRate        Float
+  failureRate                Float
+  avgDeliveryHours           Float?
+  shipmentCount              Int
+  disputeLinkedShipmentCount Int
+  confidenceScore            Float
+  explanationJson            Json
+  calculationVersion         String
+  dedupeKey                  String    @unique
+  status                     String
+  isStale                    Boolean   @default(false)
+  expiresAt                  DateTime?
+  lastCalculatedAt           DateTime
+  supersededAt               DateTime?
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+
+  @@index([carrierCode, status, isStale])
+  @@index([carrierCode, regionCode, status])
+  @@index([calculationVersion, dedupeKey])
+}
+
+enum NetworkOperationalSignalType {
+  LATE_DELIVERY_RISK
+  HIGH_DISPUTE_RATE
+  CARRIER_UNDERPERFORMANCE
+  STRONG_DELIVERY_RELIABILITY
+  REFUND_RISK
+  ESCROW_DELAY_PATTERN
+}
+
+model NetworkOperationalSignal {
+  id                 String                       @id @default(cuid())
+  tenantId           String?
+  profileId          String?
+  carrierCode        String?
+  signalType         NetworkOperationalSignalType
+  severity           String
+  summary            String
+  explanationJson    Json
+  relatedShipmentId  String?
+  relatedDisputeId   String?
+  calculationVersion String
+  dedupeKey          String                       @unique
+  status             String
+  isStale            Boolean                      @default(false)
+  expiresAt          DateTime?
+  createdAt          DateTime                     @default(now())
+  updatedAt          DateTime                     @updatedAt
+
+  @@index([tenantId, status, isStale])
+  @@index([profileId, status])
+  @@index([carrierCode, status])
+  @@index([relatedShipmentId])
+  @@index([relatedDisputeId])
+  @@index([calculationVersion, dedupeKey])
+}
+
+model CompanyGraphNeighborhoodSnapshot {
+  id                     String    @id @default(cuid())
+  tenantId               String
+  profileId              String?
+  hopDistance            Int
+  categoryId             String?
+  regionCode             String?
+  totalReachableNodes    Int
+  directSupplierCount    Int
+  directBuyerCount       Int
+  indirectSupplierCount  Int
+  indirectBuyerCount     Int
+  avgTrustScore          Float?
+  avgShippingReliability Float?
+  clusterDensityScore    Float?
+  explanationJson        Json
+  calculationVersion     String
+  dedupeKey              String    @unique
+  status                 String
+  isStale                Boolean   @default(false)
+  expiresAt              DateTime?
+  lastCalculatedAt       DateTime
+  supersededAt           DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([tenantId, hopDistance, status])
+  @@index([categoryId, regionCode, hopDistance, status])
+  @@index([calculationVersion, isStale])
+}
+
+model CompanyGraphClusterSnapshot {
+  id                       String    @id @default(cuid())
+  clusterKey               String
+  categoryId               String?
+  regionCode               String?
+  city                     String?
+  clusterSize              Int
+  avgTrustScore            Float?
+  avgShippingReliability   Float?
+  activeSupplierCount      Int
+  activeBuyerCount         Int
+  categoryDensityScore     Float
+  relationshipDensityScore Float
+  growthScore              Float?
+  explanationJson          Json
+  calculationVersion       String
+  dedupeKey                String    @unique
+  status                   String
+  isStale                  Boolean   @default(false)
+  expiresAt                DateTime?
+  lastCalculatedAt         DateTime
+  supersededAt             DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  @@index([clusterKey, status])
+  @@index([categoryId, clusterSize, status])
+  @@index([regionCode, city, status])
+  @@index([calculationVersion, isStale])
+}
+
+enum GraphQueryActorType {
+  TENANT
+  ADMIN
+  SYSTEM
+}
+
+enum GraphQueryType {
+  NEIGHBORHOOD_LOOKUP
+  SUPPLIER_NEIGHBORHOOD
+  BUYER_NEIGHBORHOOD
+  CATEGORY_CLUSTER_DISCOVERY
+  REGION_CLUSTER_DISCOVERY
+  GRAPH_PROXIMITY_SEARCH
+  CAPABILITY_MATCH_GRAPH_SEARCH
+  TRUST_WEIGHTED_GRAPH_SEARCH
+}
+
+enum GraphQueryExecutionMode {
+  CACHE_ONLY
+  CACHE_WITH_FALLBACK
+  LIVE_COMPUTE
+  REBUILD_TRIGGERED
+}
+
+model GraphQueryAuditLog {
+  id            String                  @id @default(cuid())
+  tenantId      String?
+  profileId     String?
+  actorType     GraphQueryActorType
+  queryType     GraphQueryType
+  filtersJson   Json
+  resultCount   Int
+  executionMode GraphQueryExecutionMode
+  cacheHit      Boolean
+  durationMs    Int
+  createdAt     DateTime                @default(now())
+
+  @@index([tenantId, queryType, createdAt])
+  @@index([queryType, createdAt])
+}
+
+enum NetworkReputationTier {
+  NEW
+  DEVELOPING
+  STABLE
+  HIGH_CONFIDENCE
+  PREMIUM
+  WATCHLIST
+  RESTRICTED
+}
+
+enum NetworkReputationSignalType {
+  TRUST_STRONG
+  SHIPPING_RELIABLE
+  SHIPPING_UNRELIABLE
+  HIGH_DISPUTE_RATE
+  LOW_DISPUTE_RATE
+  RFQ_RESPONSE_STRONG
+  RFQ_RESPONSE_WEAK
+  ESCROW_REFUND_HEAVY
+  ESCROW_SUCCESSFUL
+  STRONG_MARKET_ACTIVITY
+  STRONG_CLUSTER_POSITION
+  WATCHLIST_PATTERN
+  ADMIN_RESTRICTION
+  PAYMENT_BEHAVIOR_POSITIVE
+  PAYMENT_BEHAVIOR_NEGATIVE
+}
+
+enum NetworkReputationSignalDirection {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum NetworkReputationTrendDirection {
+  UP
+  DOWN
+  STABLE
+  VOLATILE
+}
+
+model NetworkReputationScore {
+  id                     String                @id @default(cuid())
+  tenantId               String
+  profileId              String?
+  overallScore           Float
+  supplierScore          Float?
+  buyerScore             Float?
+  partnerScore           Float?
+  trustComponentScore    Float
+  shippingComponentScore Float
+  disputeComponentScore  Float
+  routingComponentScore  Float
+  escrowComponentScore   Float
+  activityComponentScore Float
+  marketComponentScore   Float?
+  confidenceScore        Float
+  reputationTier         NetworkReputationTier
+  explanationJson        Json
+  calculationVersion     String
+  dedupeKey              String                @unique
+  status                 String
+  isStale                Boolean               @default(false)
+  expiresAt              DateTime?
+  lastCalculatedAt       DateTime
+  supersededAt           DateTime?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  @@index([tenantId, status, createdAt])
+  @@index([profileId, status])
+  @@index([reputationTier, status])
+  @@index([overallScore, status])
+  @@index([calculationVersion, isStale])
+}
+
+model NetworkReputationSignal {
+  id                 String                           @id @default(cuid())
+  tenantId           String
+  profileId          String?
+  signalType         NetworkReputationSignalType
+  signalDirection    NetworkReputationSignalDirection
+  weight             Float
+  scoreImpact        Float
+  confidence         Float
+  summary            String
+  explanationJson    Json
+  relatedEntityType  String?
+  relatedEntityId    String?
+  calculationVersion String
+  dedupeKey          String                           @unique
+  status             String
+  isStale            Boolean                          @default(false)
+  expiresAt          DateTime?
+  createdAt          DateTime                         @default(now())
+  updatedAt          DateTime                         @updatedAt
+
+  @@index([tenantId, status, createdAt])
+  @@index([signalType, status, createdAt])
+}
+
+model NetworkReputationSnapshot {
+  id                     String                          @id @default(cuid())
+  tenantId               String
+  profileId              String?
+  overallScore           Float
+  reputationTier         NetworkReputationTier
+  scoreChangeDelta       Float?
+  trendDirection         NetworkReputationTrendDirection
+  topPositiveSignalCount Int
+  topNegativeSignalCount Int
+  lastCalculatedAt       DateTime
+  calculationVersion     String
+  createdAt              DateTime                        @default(now())
+  updatedAt              DateTime                        @updatedAt
+
+  @@index([tenantId, createdAt])
+  @@index([trendDirection, reputationTier])
+}
+
+enum NetworkTradeRiskContextType {
+  TENANT
+  COUNTERPARTY_PAIR
+  ORDER
+  ESCROW
+  SHIPMENT
+}
+
+enum NetworkTradeRiskTier {
+  VERY_LOW
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+  RESTRICTED
+}
+
+enum NetworkTradeRiskSignalType {
+  HIGH_DISPUTE_PROBABILITY
+  LOW_PAYMENT_RELIABILITY
+  REFUND_HEAVY_PATTERN
+  HIGH_SHIPPING_FAILURE_RATE
+  STRONG_REPUTATION_PROTECTION
+  TRUSTED_COUNTERPARTY_PAIR
+  NEW_UNPROVEN_RELATIONSHIP
+  ESCROW_DELAY_REQUIRED
+  MANUAL_REVIEW_REQUIRED
+  STRONG_DELIVERY_HISTORY
+  HIGH_RISK_CLUSTER
+  WATCHLIST_COUNTERPARTY
+}
+
+enum NetworkTradeRiskSignalDirection {
+  RISK_UP
+  RISK_DOWN
+  NEUTRAL
+}
+
+enum NetworkEscrowPolicyDecisionType {
+  AUTO_APPROVED
+  STANDARD_ESCROW
+  EXTENDED_HOLD
+  BUYER_CONFIRMATION_REQUIRED
+  MANUAL_REVIEW
+  RESTRICTED_FLOW
+}
+
+model NetworkTradeRiskScore {
+  id                      String                      @id @default(cuid())
+  buyerTenantId           String?
+  sellerTenantId          String?
+  orderId                 String?
+  escrowHoldId            String?
+  contextType             NetworkTradeRiskContextType
+  overallRiskScore        Float
+  paymentReliabilityScore Float
+  disputeProbabilityScore Float
+  shippingRiskScore       Float
+  reputationRiskScore     Float
+  escrowRiskScore         Float
+  routingRiskScore        Float?
+  confidenceScore         Float
+  riskTier                NetworkTradeRiskTier
+  explanationJson         Json
+  calculationVersion      String
+  dedupeKey               String                      @unique
+  status                  String
+  isStale                 Boolean                     @default(false)
+  expiresAt               DateTime?
+  lastCalculatedAt        DateTime
+  supersededAt            DateTime?
+  createdAt               DateTime                    @default(now())
+  updatedAt               DateTime                    @updatedAt
+
+  @@index([buyerTenantId, sellerTenantId, status])
+  @@index([orderId, status])
+  @@index([escrowHoldId, status])
+  @@index([riskTier, status])
+  @@index([calculationVersion, isStale])
+}
+
+model NetworkTradeRiskSignal {
+  id                  String                          @id @default(cuid())
+  buyerTenantId       String?
+  sellerTenantId      String?
+  relatedOrderId      String?
+  relatedEscrowHoldId String?
+  signalType          NetworkTradeRiskSignalType
+  signalDirection     NetworkTradeRiskSignalDirection
+  weight              Float
+  scoreImpact         Float
+  confidence          Float
+  summary             String
+  explanationJson     Json
+  relatedEntityType   String?
+  relatedEntityId     String?
+  calculationVersion  String
+  dedupeKey           String                          @unique
+  status              String
+  isStale             Boolean                         @default(false)
+  expiresAt           DateTime?
+  createdAt           DateTime                        @default(now())
+  updatedAt           DateTime                        @updatedAt
+
+  @@index([buyerTenantId, sellerTenantId, status])
+  @@index([signalType, status, createdAt])
+}
+
+model NetworkEscrowPolicyDecision {
+  id                   String                          @id @default(cuid())
+  escrowHoldId         String
+  buyerTenantId        String
+  sellerTenantId       String
+  riskScoreId          String?
+  decisionType         NetworkEscrowPolicyDecisionType
+  releaseStrategy      String
+  holdDays             Int
+  disputeWindowHours   Int
+  manualReviewRequired Boolean
+  notes                String
+  explanationJson      Json
+  createdAt            DateTime                        @default(now())
+  updatedAt            DateTime                        @updatedAt
+
+  @@index([escrowHoldId, decisionType])
+  @@index([decisionType, createdAt])
+}
+
+model NetworkPaymentReliabilitySnapshot {
+  id                      String    @id @default(cuid())
+  tenantId                String
+  successfulEscrowCount   Int
+  refundedEscrowCount     Int
+  disputedEscrowCount     Int
+  avgReleaseDelayHours    Float?
+  paymentReliabilityScore Float
+  confidenceScore         Float
+  explanationJson         Json
+  calculationVersion      String
+  dedupeKey               String    @unique
+  status                  String
+  isStale                 Boolean   @default(false)
+  expiresAt               DateTime?
+  lastCalculatedAt        DateTime
+  supersededAt            DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([tenantId, paymentReliabilityScore, status])
+}
+
+enum SystemJobStatus {
+  PENDING
+  SCHEDULED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  RETRYING
+  DEAD_LETTER
+  CANCELED
+  SKIPPED
+}
+
+enum SystemJobPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum SystemJobExecutionStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+  SKIPPED
+  RETRIED
+}
+
+model SystemJob {
+  id               String            @id @default(cuid())
+  queueName        String
+  jobType          String
+  status           SystemJobStatus   @default(PENDING)
+  priority         SystemJobPriority @default(NORMAL)
+  tenantId         String?
+  moduleScope      String
+  payloadHash      String
+  idempotencyKey   String?           @unique
+  scheduledFor     DateTime?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  failedAt         DateTime?
+  retryCount       Int               @default(0)
+  maxRetries       Int               @default(3)
+  backoffStrategy  String?
+  lastErrorCode    String?
+  lastErrorMessage String?
+  resultSummary    String?
+  lockedByWorker   String?
+  lockExpiresAt    DateTime?
+  metadata         Json?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  executions SystemJobExecutionLog[]
+
+  @@index([queueName, status, scheduledFor])
+  @@index([jobType, status, createdAt])
+  @@index([tenantId, moduleScope, status])
+  @@index([status, priority, scheduledFor])
+  @@index([lockedByWorker, lockExpiresAt])
+}
+
+model SystemJobExecutionLog {
+  id           String                   @id @default(cuid())
+  systemJobId  String
+  systemJob    SystemJob                @relation(fields: [systemJobId], references: [id], onDelete: Cascade)
+  attemptNo    Int
+  workerName   String
+  startedAt    DateTime
+  completedAt  DateTime?
+  status       SystemJobExecutionStatus
+  errorCode    String?
+  errorMessage String?
+  durationMs   Int?
+  metadata     Json?
+  createdAt    DateTime                 @default(now())
+
+  @@index([systemJobId, attemptNo])
+}
+
+model SystemDeadLetterJob {
+  id             String   @id @default(cuid())
+  originalJobId  String
+  queueName      String
+  jobType        String
+  tenantId       String?
+  payloadHash    String
+  idempotencyKey String?
+  errorCode      String?
+  errorMessage   String?
+  failedAttempts Int
+  movedAt        DateTime @default(now())
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([originalJobId])
+  @@index([queueName, jobType])
+}
+
+model SystemWorkerHeartbeat {
+  id              String   @id @default(cuid())
+  workerName      String   @unique
+  queueName       String
+  hostInfo        String?
+  lastHeartbeatAt DateTime
+  activeJobCount  Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([workerName, lastHeartbeatAt])
+}
+
+// FAZ 16 - GLOBAL LIQUIDITY ENGINE
+
+enum NetworkLiquidityOpportunityType {
+  SUPPLY_SURPLUS
+  DEMAND_SHORTAGE
+  DIRECT_MATCH
+  CLUSTER_MATCH
+}
+
+enum NetworkLiquidityOpportunityStatus {
+  DISCOVERED
+  RANKED
+  ROUTED
+  CONSUMED
+  EXPIRED
+}
+
+model NetworkLiquidityOpportunity {
+  id                    String      @id @default(cuid())
+  categoryId            String?
+  productRef            String?
+  regionCode            String?
+  supplyTenantId        String?
+  demandTenantId        String?
+  clusterId             String?
+
+  opportunityType       NetworkLiquidityOpportunityType
+  
+  confidenceScore       Float       @default(0)
+  matchScore            Float       @default(0)
+  liquidityVolumeScore  Float       @default(0)
+
+  routingEligibilityScore  Float    @default(0)
+  shippingFeasibilityScore Float    @default(0)
+  financialSafetyScore     Float    @default(0)
+
+  status                NetworkLiquidityOpportunityStatus @default(DISCOVERED)
+  
+  expiresAt             DateTime?
+  dedupeKey             String      @unique
+  calculationVersion    String
+  
+  explainJson           Json?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  matches               NetworkLiquidityMatch[]
+
+  @@index([categoryId, regionCode])
+  @@index([status, expiresAt])
+  @@index([supplyTenantId])
+  @@index([demandTenantId])
+  @@index([matchScore])
+}
+
+enum NetworkLiquidityMatchStatus {
+  CANDIDATE
+  PROPOSED
+  ROUTED
+  REJECTED
+  ACCEPTED
+}
+
+model NetworkLiquidityMatch {
+  id                    String      @id @default(cuid())
+  opportunityId         String
+  opportunity           NetworkLiquidityOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  
+  buyerTenantId         String
+  sellerTenantId        String
+  
+  productRef            String?
+  categoryId            String?
+
+  graphDistance         Int         @default(0)
+  trustScore            Float       @default(0)
+  reputationScore       Float       @default(0)
+  
+  shippingReliabilityScore Float    @default(0)
+  financialRiskScore       Float    @default(0)
+
+  estimatedPriceRangeLow   Float?
+  estimatedPriceRangeHigh  Float?
+
+  finalMatchScore       Float       @default(0)
+
+  status                NetworkLiquidityMatchStatus @default(CANDIDATE)
+
+  explainJson           Json?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([buyerTenantId])
+  @@index([sellerTenantId])
+  @@index([opportunityId])
+  @@index([status])
+}
+
+model NetworkLiquiditySnapshot {
+  id                    String      @id @default(cuid())
+  categoryId            String?
+  regionCode            String?
+
+  supplyVolumeScore     Float       @default(0)
+  demandVolumeScore     Float       @default(0)
+  liquidityGapScore     Float       @default(0)
+
+  clusterNodeCount      Int         @default(0)
+  activeSupplierCount   Int         @default(0)
+  activeBuyerCount      Int         @default(0)
+
+  calculationVersion    String
+  expiresAt             DateTime?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([categoryId, regionCode])
+  @@index([expiresAt])
+}
+
+// FAZ 17 - AUTONOMOUS TRADE EXECUTION
+
+enum NetworkTradeProposalStatus {
+  SUGGESTION
+  DRAFT
+  PROPOSED
+  NEGOTIATION
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CONVERTED_TO_ORDER
+}
+
+enum NetworkTradePolicyMode {
+  DISCOVERY_ONLY
+  SUGGEST_ONLY
+  AUTO_RFQ
+  AUTO_ROUTE
+}
+
+model NetworkTradeProposal {
+  id                    String      @id @default(cuid())
+  opportunityId         String
+  liquidityMatchId      String
+
+  buyerTenantId         String
+  sellerTenantId        String
+
+  categoryId            String?
+  productRef            String?
+
+  proposedQuantityLow   Int         @default(0)
+  proposedQuantityHigh  Int         @default(0)
+
+  proposedPriceLow      Float       @default(0)
+  proposedPriceHigh     Float       @default(0)
+
+  currency              String      @default("TRY")
+
+  shippingMode          String      @default("STANDARD")
+  paymentMode           String      @default("ESCROW")
+  escrowRequired        Boolean     @default(true)
+
+  status                NetworkTradeProposalStatus @default(DRAFT)
+  policyMode            NetworkTradePolicyMode     @default(SUGGEST_ONLY)
+
+  confidenceScore       Float       @default(0)
+  riskScore             Float       @default(0)
+
+  expiresAt             DateTime?
+  dedupeKey             String      @unique
+  calculationVersion    String
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  messages              NetworkTradeProposalMessage[]
+  decisions             NetworkTradeProposalDecision[]
+
+  @@index([buyerTenantId, status])
+  @@index([sellerTenantId, status])
+  @@index([opportunityId])
+  @@index([liquidityMatchId])
+  @@index([status, expiresAt])
+}
+
+enum NetworkTradeProposalMessageType {
+  COMMENT
+  COUNTER_OFFER
+  QUANTITY_CHANGE
+  PRICE_CHANGE
+  SHIPPING_CHANGE
+}
+
+model NetworkTradeProposalMessage {
+  id                    String      @id @default(cuid())
+  proposalId            String
+  proposal              NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  
+  senderTenantId        String
+
+  messageType           NetworkTradeProposalMessageType @default(COMMENT)
+  
+  payloadJson           Json?
+
+  createdAt             DateTime    @default(now())
+  
+  @@index([proposalId])
+  @@index([senderTenantId])
+}
+
+enum NetworkTradeProposalDecisionType {
+  ACCEPT
+  REJECT
+  EXPIRE
+  MANUAL_CANCEL
+}
+
+model NetworkTradeProposalDecision {
+  id                    String      @id @default(cuid())
+  proposalId            String
+  proposal              NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  decisionType          NetworkTradeProposalDecisionType
+  
+  decidedByTenantId     String?
+  autoPolicy            Boolean     @default(false)
+
+  decisionReason        String?
+
+  createdAt             DateTime    @default(now())
+  
+  @@index([proposalId])
+}
+
+// FAZ 17.x - PRICING INTELLIGENCE
+model NetworkPriceSignal {
+  id                    String      @id @default(cuid())
+  categoryId            String
+  regionCode            String?
+
+  medianPrice           Float       @default(0)
+  p25Price              Float       @default(0)
+  p75Price              Float       @default(0)
+
+  priceVolatility       Float       @default(0)
+  supplyPressureScore   Float       @default(0)
+  demandPressureScore   Float       @default(0)
+
+  sampleSize            Int         @default(0)
+
+  calculationVersion    String
+  expiresAt             DateTime?
+  dedupeKey             String      @unique
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([categoryId, regionCode])
+  @@index([expiresAt])
+}
+
+// 17.2 - SUPPLIER CAPACITY
+model NetworkSupplierCapacity {
+  id                    String      @id @default(cuid())
+  tenantId              String
+
+  categoryId            String?
+
+  estimatedDailyCapacity  Int       @default(0)
+  estimatedWeeklyCapacity Int       @default(0)
+
+  avgLeadTimeDays         Float     @default(0)
+
+  shipmentThroughputScore Float     @default(0)
+  fulfillmentSuccessRate  Float     @default(0)
+
+  capacityConfidenceScore Float     @default(0)
+
+  calculationVersion      String
+  expiresAt               DateTime?
+
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+  
+  @@index([tenantId, categoryId])
+}
+
+// 17.3 - NETWORK DISCOVERY
+enum NetworkVisibilityLevel {
+  PUBLIC
+  NETWORK_ONLY
+  PRIVATE
+}
+
+model NetworkDiscoveryProfile {
+  id                    String      @id @default(cuid())
+  tenantId              String      @unique
+
+  companyName           String?
+  categories            Json?       
+  regions               Json?       
+
+  trustScore            Float       @default(0)
+  reputationTier        String      @default("STANDARD")
+
+  shippingReliability   Float       @default(0)
+  capacityScore         Float       @default(0)
+
+  visibilityLevel       NetworkVisibilityLevel @default(NETWORK_ONLY)
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  
+  @@index([tenantId])
+}
+
+// 17.4 - TRADE EXECUTION HARDENING
+enum NetworkTradeAbuseSignalType {
+  RFQ_SPAM
+  NEGOTIATION_ABUSE
+  PRICE_MANIPULATION
+}
+
+model NetworkTradeAbuseSignal {
+  id                    String      @id @default(cuid())
+  tenantId              String
+  signalType            NetworkTradeAbuseSignalType
+  
+  severityScore         Float       @default(0)
+
+  contextJson           Json?
+
+  createdAt             DateTime    @default(now())
+  
+  @@index([tenantId, signalType])
+}
+
+// 17.5 - NETWORK TRADE ANALYTICS
+model NetworkTradeSnapshot {
+  id                    String      @id @default(cuid())
+
+  categoryId            String?
+  regionCode            String?
+
+  tradeVolume           Float       @default(0)
+  avgDealSize           Float       @default(0)
+
+  liquidityScore        Float       @default(0)
+
+  activeSupplierCount   Int         @default(0)
+  activeBuyerCount      Int         @default(0)
+
+  calculationVersion    String
+  expiresAt             DateTime?
+
+  createdAt             DateTime    @default(now())
+}
+
+// B2B NETWORK GOVERNANCE LAYER
+
+enum NetworkAccessLevel {
+  UNVERIFIED
+  LIMITED_NETWORK
+  FULL_NETWORK
+  RESTRICTED
+}
+
+model NetworkComplianceProfile {
+  id                    String      @id @default(cuid())
+  tenantId              String      @unique
+
+  kycStatus             String      @default("PENDING")
+  verificationLevel     String      @default("TIER_1")
+  businessType          String?
+
+  riskFlags             Json?
+  
+  networkAccessLevel    NetworkAccessLevel @default(UNVERIFIED)
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  
+  @@index([tenantId])
 }

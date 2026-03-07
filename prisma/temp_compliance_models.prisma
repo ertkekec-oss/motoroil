@@ -1,0 +1,26 @@
+// B2B NETWORK GOVERNANCE LAYER
+
+enum NetworkAccessLevel {
+  UNVERIFIED
+  LIMITED_NETWORK
+  FULL_NETWORK
+  RESTRICTED
+}
+
+model NetworkComplianceProfile {
+  id                    String      @id @default(cuid())
+  tenantId              String      @unique
+
+  kycStatus             String      @default("PENDING")
+  verificationLevel     String      @default("TIER_1")
+  businessType          String?
+
+  riskFlags             Json?
+  
+  networkAccessLevel    NetworkAccessLevel @default(UNVERIFIED)
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  
+  @@index([tenantId])
+}

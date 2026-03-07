@@ -1,0 +1,22 @@
+export enum NetworkProcessingErrorType {
+    VALIDATION_ERROR = 'VALIDATION_ERROR',
+    AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR',
+    POLICY_BLOCKED = 'POLICY_BLOCKED',
+    DUPLICATE_SKIPPED = 'DUPLICATE_SKIPPED',
+    STALE_DATA = 'STALE_DATA',
+    REBUILD_REQUIRED = 'REBUILD_REQUIRED',
+    PROCESSING_TIMEOUT = 'PROCESSING_TIMEOUT',
+    EXTERNAL_DEPENDENCY_ERROR = 'EXTERNAL_DEPENDENCY_ERROR',
+    INSUFFICIENT_SIGNAL_DATA = 'INSUFFICIENT_SIGNAL_DATA',
+    MARKET_SCOPE_UNSUPPORTED = 'MARKET_SCOPE_UNSUPPORTED',
+    STALE_GRAPH_CONTEXT = 'STALE_GRAPH_CONTEXT',
+    PREDICTION_SKIPPED = 'PREDICTION_SKIPPED',
+    LOW_CONFIDENCE_SIGNAL = 'LOW_CONFIDENCE_SIGNAL'
+}
+
+export class NetworkHardeningError extends Error {
+    constructor(public type: NetworkProcessingErrorType, message: string, public context?: any) {
+        super(`[${type}] ${message}`);
+        this.name = 'NetworkHardeningError';
+    }
+}

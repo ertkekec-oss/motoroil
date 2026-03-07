@@ -1,0 +1,111 @@
+enum SystemJobStatus {
+  PENDING
+  SCHEDULED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  RETRYING
+  DEAD_LETTER
+  CANCELED
+  SKIPPED
+}
+
+enum SystemJobPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum SystemJobExecutionStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+  SKIPPED
+  RETRIED
+}
+
+model SystemJob {
+  id String @id @default(cuid())
+  queueName String
+  jobType String
+  status SystemJobStatus @default(PENDING)
+  priority SystemJobPriority @default(NORMAL)
+  tenantId String?
+  moduleScope String
+  payloadHash String
+  idempotencyKey String? @unique
+  scheduledFor DateTime?
+  startedAt DateTime?
+  completedAt DateTime?
+  failedAt DateTime?
+  retryCount Int @default(0)
+  maxRetries Int @default(3)
+  backoffStrategy String?
+  lastErrorCode String?
+  lastErrorMessage String?
+  resultSummary String?
+  lockedByWorker String?
+  lockExpiresAt DateTime?
+  metadata Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  executions SystemJobExecutionLog[]
+
+  @@index([queueName, status, scheduledFor])
+  @@index([jobType, status, createdAt])
+  @@index([tenantId, moduleScope, status])
+  @@index([status, priority, scheduledFor])
+  @@index([lockedByWorker, lockExpiresAt])
+}
+
+model SystemJobExecutionLog {
+  id String @id @default(cuid())
+  systemJobId String
+  systemJob SystemJob @relation(fields: [systemJobId], references: [id], onDelete: Cascade)
+  attemptNo Int
+  workerName String
+  startedAt DateTime
+  completedAt DateTime?
+  status SystemJobExecutionStatus
+  errorCode String?
+  errorMessage String?
+  durationMs Int?
+  metadata Json?
+  createdAt DateTime @default(now())
+
+  @@index([systemJobId, attemptNo])
+}
+
+model SystemDeadLetterJob {
+  id String @id @default(cuid())
+  originalJobId String
+  queueName String
+  jobType String
+  tenantId String?
+  payloadHash String
+  idempotencyKey String?
+  errorCode String?
+  errorMessage String?
+  failedAttempts Int
+  movedAt DateTime @default(now())
+  metadata Json?
+  createdAt DateTime @default(now())
+
+  @@index([originalJobId])
+  @@index([queueName, jobType])
+}
+
+model SystemWorkerHeartbeat {
+  id String @id @default(cuid())
+  workerName String @unique
+  queueName String
+  hostInfo String?
+  lastHeartbeatAt DateTime
+  activeJobCount Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workerName, lastHeartbeatAt])
+}
