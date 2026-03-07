@@ -27,6 +27,9 @@ export async function GET() {
             }
         });
     } catch (error: any) {
+        if (error?.digest?.startsWith('NEXT_') || error?.message?.includes('Dynamic-')) {
+            throw error;
+        }
         return NextResponse.json({ authenticated: false, error: error.message }, { status: 500 });
     }
 }

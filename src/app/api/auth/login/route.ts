@@ -3,6 +3,8 @@ import { prismaBase as prisma } from '@/lib/prismaBase';
 import { comparePassword, createSession, hashPassword } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
@@ -176,6 +178,9 @@ export async function POST(request: Request) {
             setupState: (targetUser as any).setupState || 'COMPLETED'
         });
     } catch (error: any) {
+        if (error?.digest?.startsWith('NEXT_') || error?.message?.includes('Dynamic-')) {
+            throw error;
+        }
         console.error('Login error:', error);
         return NextResponse.json({ error: 'Giriş işlemi sırasında bir hata oluştu' }, { status: 500 });
     }
