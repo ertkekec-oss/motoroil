@@ -51,6 +51,7 @@ export default async function SignPortalPage({ searchParams }: { searchParams: {
                         id: env.id,
                         title: env.title,
                         status: env.status,
+                        otpRequired: env.otpRequired,
                         createdAt: env.createdAt.toISOString()
                     }}
                     recipient={{

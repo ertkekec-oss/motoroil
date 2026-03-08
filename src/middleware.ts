@@ -112,7 +112,7 @@ export async function middleware(request: NextRequest) {
     const publicPaths = [
         '/', '/login', '/register', '/reset-password',
         '/portal/login', '/portal/signatures',
-        '/api/auth', '/api/public', '/api/network',
+        '/api/auth', '/api/public', '/api/network', '/api/portal',
         '/api/admin/marketplace/queue/health',
         '/pdks', '/api/v1/pdks/display',
         '/api/test-me', '/api/test-db', '/api/test-cookies'
