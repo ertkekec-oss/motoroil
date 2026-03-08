@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { applyPortalRateLimit, buildPortalAuditPayload } from '@/lib/portal-security';
+import { sendSignatureInvitation } from '@/services/signatures/invitation';
 
 export async function POST(req: Request) {
     try {
@@ -161,12 +162,11 @@ export async function POST(req: Request) {
         }
 
         // 7. Sequential Invitation Trigger
-        if (action === 'SIGNED' && newEnvStatus === 'IN_PROGRESS' && env.sequentialSigning) {
+        const isSequential = env.sequentialSigning !== false; // Default to true matching UI
+
+        if (action === 'SIGNED' && newEnvStatus === 'IN_PROGRESS' && isSequential) {
             const nextSigner = updatedRecipients.find(r => r.orderIndex > session.recipient.orderIndex && r.status === 'PENDING');
             if (nextSigner) {
-                // We would normally fire an event here (e.g. queue a job to send email/sms to nextSigner).
-                // For V1 we just log that the next signer should be invited. The worker takes care.
-
                 await prisma.signatureAuditEvent.create({
                     data: {
                         tenantId: env.tenantId,
@@ -177,7 +177,12 @@ export async function POST(req: Request) {
                     }
                 });
 
-                // TODO: Call actual `sendSignatureInvitation` for nextSigner here or via queue
+                // Call actual `sendSignatureInvitation` for nextSigner
+                try {
+                    await sendSignatureInvitation(env.id);
+                } catch (e) {
+                    console.error("Failed to send signature invitation to next signer:", e);
+                }
             }
         }
 

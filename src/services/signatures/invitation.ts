@@ -30,7 +30,9 @@ export async function sendSignatureInvitation(envelopeId: string) {
 
     const sortedRecipients = [...envelope.recipients].sort((a, b) => a.orderIndex - b.orderIndex);
 
-    if (envelope.sequentialSigning) {
+    const isSequential = envelope.sequentialSigning !== false; // Default to true matching UI "Sıralı İmza Rejimi"
+
+    if (isSequential) {
         // Find if anyone rejected (blocks the entire line)
         const hasRejected = sortedRecipients.some(r => r.status === 'REJECTED');
         if (hasRejected) {

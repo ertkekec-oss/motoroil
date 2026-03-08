@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendSignatureInvitation } from "@/services/signatures/invitation";
 
 export async function POST(req: NextRequest) {
     try {
@@ -49,6 +50,14 @@ export async function POST(req: NextRequest) {
                 metaJson: { createdBy: userEmail, recipients: recipients.length }
             }
         });
+
+        // Trigger invitations immediately upon creation
+        try {
+            await sendSignatureInvitation(envelope.id);
+        } catch (inviteError) {
+            console.error("Failed to send invitations for envelope", envelope.id, inviteError);
+            // We shouldn't fail the whole envelope creation just because the email failed, but log it
+        }
 
         return NextResponse.json({ success: true, envelope });
     } catch (e: any) {
