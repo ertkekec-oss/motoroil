@@ -55,16 +55,16 @@ export async function GET(req: Request) {
             return new NextResponse('Document body empty', { status: 500 });
         }
 
-        // Convert the S3 payload into a Web ReadableStream
-        const stream = s3Response.Body.transformToWebStream();
+        // Convert the S3 payload into a byte array
+        const byteArray = await s3Response.Body.transformToByteArray();
 
         const headers = new Headers();
         headers.set('Content-Type', 'application/pdf');
         headers.set('Content-Disposition', `inline; filename="${env.documentFileName}"`);
         headers.set('Cache-Control', 'private, max-age=3600');
 
-        // Return stream directly!
-        return new NextResponse(stream, {
+        // Return byte array directly
+        return new NextResponse(byteArray, {
             status: 200,
             headers,
         });
