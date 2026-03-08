@@ -3,6 +3,7 @@ import { handleFailedMailLog } from "./retry";
 import { MockMailProvider } from "./providers/mock";
 import { SesMailProvider } from "./providers/aws-ses";
 import { ResendMailProvider } from "./providers/resend";
+import { SmtpMailProvider } from "./providers/smtp";
 
 export interface MailPayload {
     to: string;
@@ -24,13 +25,15 @@ export interface MailProvider {
 }
 
 function getProvider(): MailProvider {
-    const providerType = process.env.MAIL_PROVIDER?.toLowerCase() || 'mock';
+    const providerType = process.env.MAIL_PROVIDER?.toLowerCase() || 'smtp'; // default to smtp when empty
 
     switch (providerType) {
         case 'ses':
             return new SesMailProvider();
         case 'resend':
             return new ResendMailProvider();
+        case 'smtp':
+            return new SmtpMailProvider();
         case 'mock':
         default:
             return new MockMailProvider();
