@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function AdminSignaturesPoliciesClient() {
     const router = useRouter();
     const [saving, setSaving] = useState(false);
 
-    // Mock state for policies since we don't have a dedicated Global Settings Table yet
-    // In a real scenario, this would write to TenantSettings or similar JSON column
     const [policies, setPolicies] = useState({
         sequentialDefault: true,
         otpRequiredDefault: false,
@@ -17,15 +16,43 @@ export default function AdminSignaturesPoliciesClient() {
         allowDocumentDownload: true,
         retentionDays: 365,
     });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/admin/signatures/policies')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.error) {
+                    setPolicies({
+                        ...policies,
+                        ...data
+                    });
+                }
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
 
     const handleSave = async () => {
         setSaving(true);
-        // Simulate network save
-        setTimeout(() => {
-            alert('Kurallar başarıyla kaydedildi (Mock)');
+        try {
+            const res = await fetch('/api/admin/signatures/policies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(policies)
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success('İmza Politikaları başarıyla kaydedildi.');
+                router.refresh();
+            } else {
+                toast.error(data.error || 'Kaydetme başarısız oldu.');
+            }
+        } catch (error) {
+            toast.error('Sunucu bağlantı hatası.');
+        } finally {
             setSaving(false);
-            router.refresh();
-        }, 800);
+        }
     };
 
     return (
