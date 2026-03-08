@@ -1,0 +1,35 @@
+model Reconciliation {
+  id               String               @id @default(cuid())
+  tenantId         String
+  accountId        String // Matches Customer.id
+  periodStart      DateTime
+  periodEnd        DateTime
+  balance          Decimal              @db.Decimal(15, 2)
+  currency         String               @default("TRY")
+  status           ReconciliationStatus @default(DRAFT)
+  deliveryMethod   ReconDeliveryMethod  @default(INTERNAL)
+  authMethod       ReconAuthMethod      @default(OTP)
+  linkedContractId String? // Link to Contract engine
+  linkedEnvelopeId String? // Link to Signature engine
+  signedAt         DateTime?
+  sentAt           DateTime?
+  viewedAt         DateTime?
+  dueAt            DateTime?
+  createdByUserId  String?
+  metaJson         Json?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  customer       Customer                     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  snapshot       ReconciliationSnapshot?
+  items          ReconciliationItem[]
+  counterparties ReconciliationCounterparty[]
+  disputes       ReconciliationDispute[]
+  auditEvents    ReconciliationAuditEvent[]
+  documents      ReconciliationDocument[]
+  tokens         ReconciliationPortalToken[]
+
+  @@index([tenantId])
+  @@index([accountId])
+  @@index([status])
+}

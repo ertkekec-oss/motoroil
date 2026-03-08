@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function NewSignaturePage() {
     const [title, setTitle] = useState('');
-    const [fileName, setFileName] = useState('');
+    const [file, setFile] = useState<File | null>(null);
     const [category, setCategory] = useState('CONTRACT');
     const [recipients, setRecipients] = useState([{ name: '', email: '', role: 'SIGNER' }]);
     const [submitting, setSubmitting] = useState(false);
@@ -24,33 +24,57 @@ export default function NewSignaturePage() {
         setRecipients(newR);
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0]);
+        }
+    };
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        if (!title || !fileName || recipients.some(r => !r.name || !r.email)) {
-            return alert('Lütfen tüm alanları doldurun.');
+        if (!title || !file || recipients.some(r => !r.name || !r.email)) {
+            return alert('Lütfen tüm alanları doldurun ve yüklemek için bir PDF dosyası seçin.');
         }
 
         setSubmitting(true);
         try {
+            // First upload the file
+            const uploadFormData = new FormData();
+            uploadFormData.append('file', file);
+
+            const uploadRes = await fetch('/api/uploads/signatures', {
+                method: 'POST',
+                body: uploadFormData
+            });
+            const uploadData = await uploadRes.json();
+
+            if (!uploadRes.ok || !uploadData.ok) {
+                alert(uploadData.error || 'Dosya yükleme başarısız oldu.');
+                setSubmitting(false);
+                return;
+            }
+
+            // Then create the envelope with the S3 key
             const res = await fetch('/api/signatures/envelopes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title,
-                    documentFileName: fileName,
-                    documentKey: `demo-doc-${Date.now()}.pdf`, // Mock for now
+                    documentFileName: uploadData.fileName || file.name,
+                    documentKey: uploadData.key,
                     category,
                     recipients
                 })
             });
             const data = await res.json();
             if (data.success) {
-                alert('Zarf başarıyla oluşturuldu ve imzacılara gönderildi!');
+                alert('Zarf başarıyla oluşturuldu ve hazırlandı!');
                 window.location.href = `/signatures/envelopes/${data.envelope.id}`;
             } else {
                 alert(data.error || 'Zarf oluşturulamadı.');
             }
         } catch (error) {
+            console.error(error);
             alert('Bağlantı hatası.');
         } finally {
             setSubmitting(false);
@@ -81,8 +105,8 @@ export default function NewSignaturePage() {
                             </div>
                             <div style={{ display: 'flex', gap: '16px' }}>
                                 <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '8px' }}>Dosya Adı (Simülasyon)</label>
-                                    <input required value={fileName} onChange={e => setFileName(e.target.value)} type="text" placeholder="sozlesme_taslagi.pdf" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.2)', color: 'var(--text-main)', fontSize: '14px' }} />
+                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '8px' }}>Yüklenecek PDF Dosyası (Max 15MB)</label>
+                                    <input required type="file" accept="application/pdf" onChange={handleFileChange} style={{ width: '100%', padding: '9px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.2)', color: 'var(--text-main)', fontSize: '14px' }} />
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '8px' }}>İşlem Kategorisi</label>

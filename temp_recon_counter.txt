@@ -1,0 +1,18 @@
+model ReconciliationCounterparty {
+  id               String                  @id @default(cuid())
+  tenantId         String
+  reconciliationId String
+  name             String
+  email            String?
+  phone            String?
+  whatsappPhone    String?
+  role             ReconCounterpartyRole   @default(COUNTERPARTY)
+  status           ReconCounterpartyStatus @default(PENDING)
+  lastNotifiedAt   DateTime?
+  createdAt        DateTime                @default(now())
+
+  reconciliation Reconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+
+  @@index([reconciliationId])
+  @@index([tenantId])
+}
