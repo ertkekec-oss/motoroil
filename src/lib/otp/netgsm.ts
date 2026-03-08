@@ -57,23 +57,26 @@ export async function sendNetgsmOtp(config: OtpProviderConfigParams, phone: stri
         const textResponse = await response.text();
         const firstCode = textResponse.split(' ')[0];
 
-        // XML error parsing helper
+        // XML parsing helper for Netgsm OTP format
         let parsedErrorMsg = textResponse;
         let parsedCode = '';
+        const matchCode = textResponse.match(/<code>(.*?)<\/code>/);
+        if (matchCode && matchCode[1]) {
+            parsedCode = matchCode[1];
+        }
+
         if (textResponse.includes('<error>')) {
             const matchMsg = textResponse.match(/<error>(.*?)<\/error>/);
             if (matchMsg && matchMsg[1]) {
                 parsedErrorMsg = matchMsg[1];
             }
-            const matchCode = textResponse.match(/<code>(.*?)<\/code>/);
-            if (matchCode && matchCode[1]) {
-                parsedCode = matchCode[1];
-            }
         }
 
-        // Netgsm returns codes starting with 00 for success
-        if (firstCode === '00' || textResponse.startsWith('00')) {
-            return { success: true, raw: textResponse };
+        // Netgsm returns <code>0</code> or plain text starting with 00 for success
+        if (parsedCode === '0' || firstCode === '00' || textResponse.startsWith('00')) {
+            const jobIdMatch = textResponse.match(/<jobID>(.*?)<\/jobID>/);
+            const jobId = jobIdMatch ? jobIdMatch[1] : '';
+            return { success: true, raw: textResponse, jobId };
         } else {
             return { success: false, error: parsedErrorMsg === textResponse ? `Netgsm API Error: ${textResponse}` : `Netgsm Hatası: ${parsedErrorMsg} ${parsedCode ? '(Kod: ' + parsedCode + ')' : ''}` };
         }
