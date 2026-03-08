@@ -43,6 +43,11 @@ export default function NetgsmClient({ config }: { config: any }) {
             return;
         }
 
+        if (!formData.apiUsername || !formData.apiPasswordEncrypted || !formData.sender) {
+            setTestResult({ success: false, message: 'Lütfen API Kullanıcı Adı, Şifre ve Gönderici (Sender) alanlarını doldurup önce "Ayarları Kaydet" butonuna basınız.' });
+            return;
+        }
+
         // Save first so test uses latest values if we want true testing but let's test straight with save/read sequence.
         // Actually, our API does a findUnique on the DB so it's strictly testing what's applied. Wait, we should ask user to save first.
         setTesting(true);
