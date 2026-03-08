@@ -7,7 +7,7 @@ import { sendNetgsmOtp } from "@/lib/otp/netgsm";
 
 export async function saveOtpConfig(providerName: string, data: any) {
     const session = await getSession();
-    if (!session || (session.role !== 'SUPERADMIN' && session.role !== 'ADMIN')) {
+    if (!session || (session.role !== 'SUPER_ADMIN' && session.role !== 'PLATFORM_ADMIN')) {
         return { success: false, error: 'Unauthorized' };
     }
 
@@ -60,7 +60,7 @@ export async function saveOtpConfig(providerName: string, data: any) {
 
 export async function testOtpProvider(providerName: string, phone: string, rawCode: string) {
     const session = await getSession();
-    if (!session || (session.role !== 'SUPERADMIN' && session.role !== 'ADMIN')) {
+    if (!session || (session.role !== 'SUPER_ADMIN' && session.role !== 'PLATFORM_ADMIN')) {
         return { success: false, error: 'Unauthorized' };
     }
 
