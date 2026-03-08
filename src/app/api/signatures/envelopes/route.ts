@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendSignatureInvitation } from "@/services/signatures/invitation";
+import { embedVerificationQRCode } from "@/services/signatures/qrCodeService";
 
 export async function POST(req: NextRequest) {
     try {
@@ -53,6 +54,9 @@ export async function POST(req: NextRequest) {
                 metaJson: { createdBy: userEmail, recipients: recipients.length }
             }
         });
+
+        // Add QR Code asynchronously (wait for it to ensure DB is clean, or just await it)
+        await embedVerificationQRCode(envelope.id, envelope.documentKey);
 
         // Trigger invitations immediately upon creation
         try {
