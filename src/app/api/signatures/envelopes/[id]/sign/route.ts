@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { embedFinalSignatureProof } from "@/services/signatures/signatureProofService";
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -42,8 +43,8 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
             data: {
                 envelopeId,
                 tenantId: recipient.envelope.tenantId,
-                action: 'ENVELOPE_SIGNED',
-                metaJson: { signerEmail: userEmail, role: recipient.role, recipientId: recipient.id }
+                action: 'RECIPIENT_SIGNED',
+                metaJson: { signerEmail: userEmail, role: recipient.role, recipientId: recipient.id, ip: req.headers.get("x-forwarded-for") || '127.0.0.1' }
             }
         });
 
@@ -61,10 +62,13 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
             await prisma.signatureEnvelope.update({
                 where: { id: envelopeId },
                 data: {
-                    status: finalStatus,
-                    signedDocumentKey: "mock-final-document-key.pdf" // mock
+                    status: finalStatus
                 }
             });
+
+            if (finalStatus === 'COMPLETED') {
+                embedFinalSignatureProof(envelopeId).catch(console.error);
+            }
 
             await prisma.signatureAuditEvent.create({
                 data: {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { applyPortalRateLimit, buildPortalAuditPayload } from '@/lib/portal-security';
 import { sendSignatureInvitation } from '@/services/signatures/invitation';
+import { embedFinalSignatureProof } from '@/services/signatures/signatureProofService';
 
 export async function POST(req: Request) {
     try {
@@ -135,12 +136,9 @@ export async function POST(req: Request) {
         });
 
         if (newEnvStatus === 'COMPLETED') {
-            // Optional Final Artifact Logic Placeholder
-            // Here you would merge audit payload to PDF, but for V1 we copy the file path.
-            await prisma.signatureEnvelope.update({
-                where: { id: env.id },
-                data: { signedDocumentKey: env.documentKey }
-            });
+            // Embed Final Signature Proof (Audit Certificate) Page to PDF
+            // This runs in background/async and updates signedDocumentKey
+            embedFinalSignatureProof(env.id).catch(e => console.error("Proof embedding error:", e));
 
             await prisma.signatureAuditEvent.create({
                 data: {

@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
-export default async function VerifyDocumentPage({ params }: { params: { envelopeId: string } }) {
-    const { envelopeId } = params;
+export default async function VerifyDocumentPage({ params }: { params: Promise<{ envelopeId: string }> }) {
+    const { envelopeId } = await params;
 
     const envelope = await prisma.signatureEnvelope.findUnique({
         where: { id: envelopeId },
