@@ -270,7 +270,7 @@ export function MarketplaceOpsPanel() {
                                 { label: "Completed", value: data?.counts?.completed ?? 0, icon: CheckCircle2, color: "emerald" },
                                 { label: "Retrying", value: data?.counts?.failed ?? 0, icon: RefreshCw, color: "orange" },
                                 { label: "Killed (DLQ)", value: data?.counts?.dlq ?? 0, icon: Skull, color: "rose" },
-                            ].map((s, i) => (
+                            ]?.map((s, i) => (
                                 <div key={i} className="bg-white p-5 rounded-3xl border border-slate-100 hover:shadow-sm transition-all group overflow-hidden relative">
                                     <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity`}>
                                         <s.icon className={`h-12 w-12 text-${s.color}-600`} />
@@ -308,7 +308,7 @@ export function MarketplaceOpsPanel() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-50">
-                                                {(data?.audits || []).map((a: any) => (
+                                                {(data?.audits || [])?.map((a: any) => (
                                                     <tr key={a.id} className="hover:bg-indigo-50/10 transition-colors group">
                                                         <td className="px-8 py-5 whitespace-nowrap">
                                                             <div className="font-black text-slate-900 text-sm">{new Date(a.createdAt).toLocaleTimeString("tr-TR")}</div>
@@ -349,7 +349,7 @@ export function MarketplaceOpsPanel() {
                                     </div>
                                     <div className="space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar pr-3 relative z-10">
                                         {(!data?.forensics || data.forensics.length === 0) && <div className="py-20 text-center text-slate-600 font-mono italic text-sm">No forensic evidence found. Radar clear.</div>}
-                                        {(data?.forensics || []).map((f: any) => (
+                                        {(data?.forensics || [])?.map((f: any) => (
                                             <div key={f.id} className="bg-white/5 border border-white/5 rounded-3xl p-5 space-y-3 hover:bg-white/10 transition-all border-l-4 border-l-rose-500/50 hover:border-l-rose-500">
                                                 <div className="flex justify-between items-start">
                                                     <div>
@@ -387,7 +387,7 @@ export function MarketplaceOpsPanel() {
                                     { label: "DLQ Saturation (10m)", value: health?.metrics?.recentDlqCount ?? 0, threshold: "< 5", status: (health?.metrics?.recentDlqCount ?? 0) < 5 ? 'pass' : 'fail' },
                                     { label: "Auth Integrity", value: (health?.metrics?.recentAuthFailures ?? 0) + " Fails", threshold: "0", status: (health?.metrics?.recentAuthFailures ?? 0) === 0 ? 'pass' : 'fail' },
                                     { label: "In-Flight Concurrency", value: data?.counts?.active ?? 0, threshold: "< 20", status: (data?.counts?.active ?? 0) < 20 ? 'pass' : 'fail' },
-                                ].map((m, i) => (
+                                ]?.map((m, i) => (
                                     <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                                         <div>
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{m.label}</p>
@@ -409,14 +409,14 @@ export function MarketplaceOpsPanel() {
                                 <h2 className="text-xl font-black text-white tracking-tight uppercase">Operational Runbook</h2>
                             </div>
                             <div className="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-3">
-                                {Object.entries(RUNBOOK).map(([code, p]) => (
+                                {Object.entries(RUNBOOK)?.map(([code, p]) => (
                                     <div key={code} className="p-6 bg-white/5 border border-white/5 rounded-3xl space-y-4">
                                         <div className="flex justify-between items-center">
                                             <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{code}</span>
                                             <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase ${p.priority === 'high' ? 'bg-rose-500 text-white' : 'bg-blue-500 text-white'}`}>{p.priority} priority</span>
                                         </div>
                                         <div className="space-y-2">
-                                            {p.steps.map((step, idx) => (
+                                            {p.steps?.map((step, idx) => (
                                                 <div key={idx} className="flex gap-3 items-start group">
                                                     <div className="h-4 w-4 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-black text-slate-400 mt-0.5 group-hover:bg-amber-500 group-hover:text-black transition-colors">{idx + 1}</div>
                                                     <p className="text-sm text-slate-300 leading-snug">{step}</p>

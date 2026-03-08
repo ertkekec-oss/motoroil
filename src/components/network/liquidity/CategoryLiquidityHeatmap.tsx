@@ -32,7 +32,7 @@ export function CategoryLiquidityHeatmap() {
             </h3>
 
             <div className="space-y-4">
-                {snapshots.slice(0, 5).map(snap => (
+                {snapshots.slice(0, 5)?.map(snap => (
                     <div key={snap.id} className="group">
                         <div className="flex justify-between items-center text-sm font-medium mb-1.5">
                             <span className="text-gray-900">{snap.categoryId || 'General'}</span>

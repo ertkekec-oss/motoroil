@@ -178,7 +178,7 @@ export default function AdminPlans() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {plans.map((plan) => (
+                            {plans?.map((plan) => (
                                 <tr key={plan.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="font-bold text-slate-900">{plan.name}</div>
@@ -196,7 +196,7 @@ export default function AdminPlans() {
                                     <td className="px-6 py-4 text-[10px] text-slate-500 font-mono leading-relaxed">
                                         <div className="space-y-0.5">
                                             {Array.isArray(plan.limits) ? (
-                                                plan.limits.map((l: any, i: number) => (
+                                                plan.limits?.map((l: any, i: number) => (
                                                     <div key={i} className="flex gap-2">
                                                         <span className="text-slate-400 uppercase w-8">{l.resource.substring(0, 3)}:</span>
                                                         <span className="font-bold">{l.limit === -1 ? '∞' : l.limit}</span>
@@ -376,7 +376,7 @@ export default function AdminPlans() {
                                         <span className="w-6 h-[1px] bg-indigo-600"></span> Modül & Fonksiyon Yetkileri
                                     </h4>
                                     <div className="bg-slate-50 border border-slate-100 p-4 rounded-3xl space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
-                                        {availableFeatures.map(feat => {
+                                        {availableFeatures?.map(feat => {
                                             const isSelected = formData.selectedFeatures.includes(feat.id);
                                             return (
                                                 <label

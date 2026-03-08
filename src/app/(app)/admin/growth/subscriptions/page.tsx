@@ -67,7 +67,7 @@ export default function AdminGrowthSubscriptions() {
                             </tr>
                         </thead>
                         <tbody className="divide-y text-sm">
-                            {subs.map(s => (
+                            {subs?.map(s => (
                                 <tr key={s.subscriptionId} className="hover:bg-slate-50">
                                     <td className="p-4">
                                         <div className="font-mono font-bold text-slate-800 text-xs">{s.tenantId}</div>

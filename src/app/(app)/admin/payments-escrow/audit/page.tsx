@@ -58,7 +58,7 @@ export default function AuditPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y text-sm">
-                            {logs.map(log => (
+                            {logs?.map(log => (
                                 <tr key={log.id} className="hover:bg-slate-50">
                                     <td className="p-4 font-medium text-slate-600 space-y-1">
                                         <div>{new Date(log.createdAt).toLocaleDateString()}</div>

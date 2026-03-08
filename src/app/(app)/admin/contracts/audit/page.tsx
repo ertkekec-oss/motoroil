@@ -14,7 +14,7 @@ export default async function AuditPage() {
                     <div className="p-8 text-center text-slate-500">Log kaydı bulunamadı.</div>
                 ) : (
                     <EnterpriseTable headers={['Zaman Damgası', 'Olay', 'Aktör', 'Aktör Tipi', 'Zarf / Belge ID', 'IP / Metadata']}>
-                        {logs.map(log => (
+                        {logs?.map(log => (
                             <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 text-xs">
                                 <td className="p-4 font-mono">{new Date(log.createdAt).toLocaleString('tr-TR')}</td>
                                 <td className="p-4 font-bold">{log.action}</td>

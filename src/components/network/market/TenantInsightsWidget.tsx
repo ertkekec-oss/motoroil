@@ -57,7 +57,7 @@ export function TenantInsightsWidget({ insights, isLoading, onActionClick }: Ten
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-                {insights.map((insight) => (
+                {insights?.map((insight) => (
                     <div key={insight.id} className="flex flex-col gap-2 p-3 bg-white border border-emerald-100 rounded-lg shadow-sm">
                         <div className="flex items-center gap-2">
                             <Badge variant={insight.priority === 1 ? 'destructive' : 'secondary'} className="text-[10px] uppercase font-semibold">

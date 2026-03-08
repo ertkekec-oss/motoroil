@@ -4,7 +4,8 @@ import prisma from '@/lib/prisma';
 import { refundEscrowFunds } from '@/services/escrow/escrowLedger';
 import { transitionEscrowState } from '@/services/escrow/escrowStateMachine';
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     const user = await getSession();
 
     try {

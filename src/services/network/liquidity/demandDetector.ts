@@ -1,3 +1,7 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 export interface DemandCandidate {
     tenantId: string;
     categoryId?: string;
@@ -12,25 +16,27 @@ export class DemandDetector {
      * Detects demand shortage across network by scanning stockout risks and RFQ signals.
      */
     static async detectDemandShortage(categoryId?: string, region?: string): Promise<DemandCandidate[]> {
-        const mockDemands = [
-            {
-                tenantId: "TENANT_BUYER_01",
-                categoryId: categoryId || "CAT_LUBRICANTS",
-                productRef: "PROD_MOTOR_OIL_5W40",
-                volumeScore: 90,
-                regionCode: region || "TR-34",
-                clusterId: "CLUSTER_MARMARA"
-            },
-            {
-                tenantId: "TENANT_BUYER_02",
-                categoryId: categoryId || "CAT_TYRES",
-                productRef: "PROD_WINTER_TYRE",
-                volumeScore: 75,
-                regionCode: region || "TR-06",
-                clusterId: "CLUSTER_IC_ANADOLU"
-            }
-        ];
+        const whereClause: any = {
+            signalType: { in: ['HIGH_DEMAND', 'STOCKOUT_RISK'] },
+            status: 'ACTIVE'
+        };
 
-        return mockDemands;
+        if (categoryId) whereClause.productCategoryId = categoryId;
+
+        const signals = await prisma.networkInventorySignal.findMany({
+            where: whereClause,
+            take: 100, // Reasonable cap
+            orderBy: { confidenceScore: 'desc' }
+        });
+
+        // Use real data to map to DemandCandidate
+        return signals.map(sig => ({
+            tenantId: sig.tenantId,
+            categoryId: sig.productCategoryId,
+            // Volume score might be mapped from velocity
+            volumeScore: sig.velocityScore > 0 ? sig.velocityScore : 50,
+            regionCode: region || "TR-ALL",
+            clusterId: "CLUSTER_GENERIC"
+        }));
     }
 }

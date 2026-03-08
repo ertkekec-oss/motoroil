@@ -98,7 +98,7 @@ const TABS: { id: TabId; label: string; desc: string }[] = [
 function NavStrip({ activeTab, onTabChange }: { activeTab: TabId; onTabChange: (id: TabId) => void }) {
     return (
         <div className="flex bg-white dark:bg-[#0B1220] px-8 pt-2">
-            {TABS.map(tab => {
+            {TABS?.map(tab => {
                 const isActive = activeTab === tab.id;
                 return (
                     <button
@@ -156,7 +156,7 @@ function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) 
                     {[
                         { value: 'test', label: 'Test Ortamı' },
                         { value: 'production', label: 'Canlı Ortam' },
-                    ].map(env => (
+                    ]?.map(env => (
                         <button
                             key={env.value}
                             onClick={() => onChange({ ...settings, environment: env.value })}
@@ -296,7 +296,7 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
                         { val: `${stats?.financials?.pendingSettlements || 0}`, label: 'Bekleyen Settlement' },
                         { val: `${stats?.orders?.last24h || 0}`, label: '24s Sipariş' },
                         { val: `${activeCount} / ${MARKETPLACE_CONFIGS.length}`, label: 'Bağlı Kanal' },
-                    ].map((s, i) => (
+                    ]?.map((s, i) => (
                         <div key={i} className="p-5">
                             <p className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">{s.val}</p>
                             <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{s.label}</p>
@@ -307,7 +307,7 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
 
             {/* Kanal Konfigürasyonları - Liste Formati */}
             <div className="space-y-4">
-                {MARKETPLACE_CONFIGS.map(ch => {
+                {MARKETPLACE_CONFIGS?.map(ch => {
                     const mktSettings = (settings as any)[ch.key] || {};
                     const enabled = mktSettings.enabled ?? false;
 
@@ -390,7 +390,7 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
                                         {ch.fields.includes('branch') && (
                                             <ERPField label="İşlem Deposu (Envanter)">
                                                 <ERPSelect value={mktSettings.branch || 'Merkez'} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, branch: e.target.value } })}>
-                                                    {branches.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                                    {branches?.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>)}
                                                     {branches.length === 0 && <option value="Merkez">Merkez</option>}
                                                 </ERPSelect>
                                             </ERPField>

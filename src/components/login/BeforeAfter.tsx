@@ -14,7 +14,7 @@ export default function BeforeAfter() {
                     <p className="text-gray-400">Periodya'ya geçen işletmelerin gerçek farkı</p>
                 </div>
                 <div className="space-y-3">
-                    {BEFORE_AFTER.map((item, i) => (
+                    {BEFORE_AFTER?.map((item, i) => (
                         <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div className="p-4 rounded-2xl border border-red-500/10 flex items-start gap-3"
                                 style={{ backgroundColor: 'rgba(239,68,68,0.04)' }}>

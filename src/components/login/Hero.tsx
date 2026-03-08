@@ -28,7 +28,7 @@ export default function Hero({ onDemoClick }: HeroProps) {
 
                 {/* Trust signals */}
                 <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-gray-500 font-bold uppercase tracking-widest">
-                    {['KVKK Uyumlu', 'SSL Şifreli', '7/24 Destek', 'Bulut Tabanlı'].map(t => (
+                    {['KVKK Uyumlu', 'SSL Şifreli', '7/24 Destek', 'Bulut Tabanlı']?.map(t => (
                         <span key={t} className="flex items-center gap-1.5">
                             <span className="text-green-500">✓</span> {t}
                         </span>
@@ -55,7 +55,7 @@ export default function Hero({ onDemoClick }: HeroProps) {
                                     { label: 'Bekleyen Sipariş', val: '37', color: '#3B82F6' },
                                     { label: 'Aktif Müşteri', val: '1.204', color: '#10B981' },
                                     { label: 'Stok Uyarısı', val: '12', color: '#F59E0B' },
-                                ].map(s => (
+                                ]?.map(s => (
                                     <div key={s.label} className="rounded-xl p-3 border border-white/5" style={{ backgroundColor: '#161b22' }}>
                                         <div className="text-[10px] text-gray-500 font-bold mb-1">{s.label}</div>
                                         <div className="text-lg font-black" style={{ color: s.color }}>{s.val}</div>
@@ -63,10 +63,10 @@ export default function Hero({ onDemoClick }: HeroProps) {
                                 ))}
                             </div>
                             <div className="px-4 grid grid-cols-3 gap-3">
-                                {[65, 40, 80].map((h, i) => (
+                                {[65, 40, 80]?.map((h, i) => (
                                     <div key={i} className="rounded-xl border border-white/5 p-3" style={{ backgroundColor: '#161b22' }}>
                                         <div className="h-16 flex items-end gap-1">
-                                            {Array.from({ length: 7 }).map((_, j) => (
+                                            {Array.from({ length: 7 })?.map((_, j) => (
                                                 <div key={j} className="flex-1 rounded-t"
                                                     style={{ height: `${Math.random() * h + 20}%`, background: `linear-gradient(to top, #FF5500, #FF8C42)`, opacity: 0.6 + j * 0.05 }} />
                                             ))}

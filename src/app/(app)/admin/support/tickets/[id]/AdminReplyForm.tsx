@@ -112,7 +112,7 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
                         }}
                     >
                         <option value="">Hazır Yanıtlar...</option>
-                        {cannedResponses.map(r => <option key={r.title} value={r.title}>{r.title}</option>)}
+                        {cannedResponses?.map(r => <option key={r.title} value={r.title}>{r.title}</option>)}
                     </select>
                     {!isInternal && (
                         <select
@@ -132,7 +132,7 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
 
             {files.length > 0 && (
                 <div className="flex flex-wrap gap-2 px-2">
-                    {files.map((f, i) => (
+                    {files?.map((f, i) => (
                         <div key={i} className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs text-slate-600 flex items-center gap-2 font-medium">
                             <span className="truncate max-w-[150px]">{f.fileName}</span>
                             <button type="button" onClick={() => setFiles(files.filter((_, idx) => idx !== i))} className="text-rose-500 hover:text-rose-600 font-bold">×</button>

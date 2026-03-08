@@ -34,7 +34,7 @@ export default async function AdminProvidersPage() {
                             <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">All Systems Green</span>
                         </div>
                         <div className="divide-y">
-                            {paymentProviders.map(p => (
+                            {paymentProviders?.map(p => (
                                 <div key={p.id} className="p-4 flex justify-between items-center hover:bg-slate-50">
                                     <div>
                                         <div className="font-bold text-sm">{p.name}</div>
@@ -56,7 +56,7 @@ export default async function AdminProvidersPage() {
                             <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded">3 Adapters Loaded</span>
                         </div>
                         <div className="divide-y">
-                            {carriers.map(c => (
+                            {carriers?.map(c => (
                                 <div key={c.id} className="p-4 flex justify-between items-center hover:bg-slate-50">
                                     <div>
                                         <div className="font-bold text-sm">{c.name}</div>

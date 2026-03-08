@@ -21,7 +21,7 @@ export default function InfoBoxes() {
         <section className="py-16 px-6" aria-label="Platform Avantajları">
             <div className="max-w-4xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    {INFO_BOXES.map(b => (
+                    {INFO_BOXES?.map(b => (
                         <div key={b.title}
                             className="p-6 rounded-2xl border border-white/5 relative overflow-hidden group hover:border-white/10 transition-all"
                             style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>

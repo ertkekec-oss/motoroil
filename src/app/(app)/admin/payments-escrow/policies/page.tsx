@@ -140,7 +140,7 @@ export default function PoliciesPage() {
                             { key: 'escrowPaused', label: 'Emanet Alımı Durdur (Satışları kapatır)' },
                             { key: 'payoutPaused', label: 'Satıcı Çekimlerini Durdur (Risk Algısı)' },
                             { key: 'boostPaused', label: 'Boost Satın Alımlarını Durdur' }
-                        ].map(sw => (
+                        ]?.map(sw => (
                             <div key={sw.key} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
                                 <label className="text-sm font-medium text-slate-800">{sw.label}</label>
                                 <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
@@ -174,7 +174,7 @@ export default function PoliciesPage() {
                     </h2>
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        {['A', 'B', 'C', 'D'].map(tier => (
+                        {['A', 'B', 'C', 'D']?.map(tier => (
                             <div key={tier} className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
                                 <div className="text-lg font-black mb-1">Tier {tier}</div>
                                 <label className="text-xs font-semibold text-slate-500">Hold Days Delta</label>

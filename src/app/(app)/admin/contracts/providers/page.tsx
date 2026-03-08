@@ -22,7 +22,7 @@ export default async function ProvidersPage() {
                     <div className="p-8 text-center text-slate-500">Henüz konfigürasyon eklenmedi.</div>
                 ) : (
                     <EnterpriseTable headers={['Sağlayıcı', 'Durum', 'Kurulum Tarihi']}>
-                        {providers.map(p => (
+                        {providers?.map(p => (
                             <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                                 <td className="p-4 text-sm font-medium">{p.providerKey}</td>
                                 <td className="p-4 text-sm">

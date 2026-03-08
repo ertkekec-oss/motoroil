@@ -55,7 +55,7 @@ export function NewWayslipModal({
                                 style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                             >
                                 <option value="">Müşteri Seçin...</option>
-                                {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                {customers?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
                         ) : (
                             <select
@@ -64,7 +64,7 @@ export function NewWayslipModal({
                                 style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                             >
                                 <option value="">Tedarikçi Seçin...</option>
-                                {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                {suppliers?.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                             </select>
                         )}
                     </div>
@@ -92,7 +92,7 @@ export function NewWayslipModal({
                     <div className="flex gap-2 mb-4">
                         <select id="irs-item-select" className="flex-1 p-2 bg-black/20 border border-white/10 rounded-lg text-white">
                             <option value="">Ürün Seçin...</option>
-                            {inventoryProducts.map(p => <option key={p.id} value={p.id}>{p.name} ({p.stock} Adet)</option>)}
+                            {inventoryProducts?.map(p => <option key={p.id} value={p.id}>{p.name} ({p.stock} Adet)</option>)}
                         </select>
                         <input id="irs-item-qty" type="number" defaultValue="1" className="w-20 p-2 bg-black/20 border border-white/10 rounded-lg text-white" />
                         <button
@@ -115,7 +115,7 @@ export function NewWayslipModal({
                     <table className="w-full text-sm">
                         <thead><tr className="text-muted border-b border-white/10"><th align="left">Ürün</th><th>Miktar</th><th></th></tr></thead>
                         <tbody>
-                            {newWayslipData.items.map((item: any, i: number) => (
+                            {newWayslipData.items?.map((item: any, i: number) => (
                                 <tr key={i} className="border-b border-white/5">
                                     <td className="py-2">{item.name}</td>
                                     <td align="center">{item.qty}</td>

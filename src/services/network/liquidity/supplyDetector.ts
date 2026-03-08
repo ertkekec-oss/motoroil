@@ -16,26 +16,28 @@ export class SupplyDetector {
      * Detects supply surplus across the network by scanning inventory signals and overstock risks.
      */
     static async detectSupplySurplus(categoryId?: string, region?: string): Promise<SupplyCandidate[]> {
-        // Mock logic for prototype. Represents detecting slow moving inventory, high capacity suppliers, etc.
-        const mockSupplies = [
-            {
-                tenantId: "TENANT_OVERSTOCK_SUPPLIER_01",
-                categoryId: categoryId || "CAT_LUBRICANTS",
-                productRef: "PROD_MOTOR_OIL_5W40",
-                volumeScore: 85,
-                regionCode: region || "TR-34",
-                clusterId: "CLUSTER_MARMARA"
-            },
-            {
-                tenantId: "TENANT_SUPPLIER_02",
-                categoryId: categoryId || "CAT_SPARE_PARTS",
-                productRef: "PROD_BRAKE_PAD",
-                volumeScore: 60,
-                regionCode: region || "TR-06",
-                clusterId: "CLUSTER_IC_ANADOLU"
-            }
-        ];
+        const whereClause: any = {
+            signalType: { in: ['OVERSTOCK', 'SLOW_MOVING'] },
+            status: 'ACTIVE'
+        };
 
-        return mockSupplies;
+        if (categoryId) whereClause.productCategoryId = categoryId;
+
+        const signals = await prisma.networkInventorySignal.findMany({
+            where: whereClause,
+            take: 100, // Reasonable cap for processing loop
+            orderBy: { confidenceScore: 'desc' }
+        });
+
+        // Use real data to map to SupplyCandidate
+        return signals.map(sig => ({
+            tenantId: sig.tenantId,
+            categoryId: sig.productCategoryId,
+            // Since we don't have canonical reference precisely mapped in Inventory Signal yet, we can omit productRef or map if available
+            volumeScore: sig.velocityScore > 0 ? sig.velocityScore : 50, // default if velocity not properly set
+            // Regions and Clusters would need profile joining later, for now we map defaults or from known sources
+            regionCode: region || "TR-ALL",
+            clusterId: "CLUSTER_GENERIC"
+        }));
     }
 }

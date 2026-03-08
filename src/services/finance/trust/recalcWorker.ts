@@ -1,6 +1,5 @@
 import { PrismaClient, RecalcReason } from '@prisma/client';
-import { aggregateSellerSignals } from './signals';
-import { computeSellerScore } from './scoring';
+
 import { withIdempotency } from '../../../lib/idempotency';
 
 const prisma = new PrismaClient();
@@ -26,31 +25,29 @@ export async function submitTrustScoreRecalc(sellerTenantId: string, reason: Rec
             });
 
             try {
-                // Execute Recalc 
-                const windowEnd = new Date();
-                const windowStart = new Date();
-                windowStart.setDate(windowStart.getDate() - 90); // 90 days rolling window
+                // Execute Recalc using the Unified Engine
+                const { recalculateCompanyTrustProfile } = await import('@/domains/company-identity/services/companyTrust.service');
+                const { buildTenantTrustPresentation } = await import('@/domains/company-identity/utils/trustPresentation');
 
-                const signals = await aggregateSellerSignals(sellerTenantId, windowStart, windowEnd);
-                const scoreResult = computeSellerScore(signals);
+                const profile = await recalculateCompanyTrustProfile(sellerTenantId);
+                const presentation = buildTenantTrustPresentation(profile);
+                const tier = presentation.segmentLabel as any; // Map to A, B, C, D
 
-                // Upsert Score Update
+                // Upsert Score Update for legacy compatibility
                 await tx.sellerTrustScore.upsert({
                     where: { sellerTenantId },
                     create: {
                         sellerTenantId,
-                        score: scoreResult.finalScore,
-                        tier: scoreResult.tier,
-                        componentsJson: scoreResult as any,
-                        windowStart,
-                        windowEnd
+                        score: presentation.score100,
+                        tier: tier,
+                        componentsJson: presentation.metrics,
+                        windowStart: new Date(),
+                        windowEnd: new Date()
                     },
                     update: {
-                        score: scoreResult.finalScore,
-                        tier: scoreResult.tier,
-                        componentsJson: scoreResult as any,
-                        windowStart,
-                        windowEnd,
+                        score: presentation.score100,
+                        tier: tier,
+                        componentsJson: presentation.metrics,
                         computedAt: new Date(),
                         version: { increment: 1 }
                     }

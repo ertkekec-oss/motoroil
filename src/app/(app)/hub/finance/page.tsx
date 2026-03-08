@@ -44,7 +44,7 @@ function FinanceTabs() {
                     </div>
 
                     <div className="flex bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden p-1 shrink-0">
-                        {tabs.map(tab => (
+                        {tabs?.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => router.push(`?tab=${tab.id}`)}

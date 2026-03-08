@@ -120,7 +120,7 @@ export default function StaffList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {staff.map((p: any) => (
+                        {staff?.map((p: any) => (
                             <tr key={p.id} className="hover:bg-white/5">
                                 <td className="font-bold">{p.name}</td>
                                 <td>{p.role}</td>

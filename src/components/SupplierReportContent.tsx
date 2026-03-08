@@ -58,7 +58,7 @@ export default function SupplierReportContent() {
     }, [suppliers, filteredTransactions, selectedBranch]);
 
     const topSuppliersData = useMemo(() => {
-        return supplierStats.slice(0, 5).map(s => ({ name: s.name, value: s.totalPurchase }));
+        return supplierStats.slice(0, 5)?.map(s => ({ name: s.name, value: s.totalPurchase }));
     }, [supplierStats]);
 
     const totalStats = useMemo(() => {
@@ -86,7 +86,7 @@ export default function SupplierReportContent() {
                         style={{ padding: '10px', borderRadius: '8px', background: 'var(--bg-card)', color: 'white', border: "1px solid rgba(255,255,255,0.05)" }}
                     >
                         <option value="all">Tüm Şubeler</option>
-                        {branches.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
+                        {branches?.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                     </select>
 
                     <div style={{ display: 'flex', gap: '10px', background: 'var(--bg-card)', padding: '10px', borderRadius: '10px', border: "1px solid rgba(255,255,255,0.05)" }}>
@@ -137,7 +137,7 @@ export default function SupplierReportContent() {
                                 paddingAngle={5}
                                 dataKey="value"
                             >
-                                {topSuppliersData.map((entry, index) => (
+                                {topSuppliersData?.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -164,7 +164,7 @@ export default function SupplierReportContent() {
                         </tr>
                     </thead>
                     <tbody>
-                        {supplierStats.map(s => (
+                        {supplierStats?.map(s => (
                             <tr key={s.id} style={{ borderBottom: '1px solid var(--border-light)' }} className="hover:bg-white/5">
                                 <td style={{ padding: '15px 20px', fontWeight: 'bold' }}>{s.name}</td>
                                 <td>{s.count}</td>

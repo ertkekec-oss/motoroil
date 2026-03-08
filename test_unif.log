@@ -1,0 +1,110 @@
+﻿[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+--- TRUST SCORE UNIFICATION TEST ---
+Created Identity.
+CompanyTrustProfile overallScore: 1, trustLevel: VERIFIED_HIGH
+Presentation Output - Score: 100, Segment: A
+Running Legacy Recalc Worker Wrapper...
+node.exe : Test failed with e
+xception: PrismaClientValidat
+ionError: 
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Test fa  
+  iled wit...lidationError   
+ : :String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Invalid `tx.trustScoreRecalcJ
+ob.create()` invocation in
+C:\Users\ertke\OneDrive\Masa├
+╝st├╝\periodya\muhasebeapp\mo
+toroil\src\services\finance\t
+rust\recalcWorker.ts:18:54
+
+  15 sellerTenantId,
+  16 async (tx: any) => {
+  17     // Register Recalc J
+ob
+ÔåÆ 18     const job = await 
+tx.trustScoreRecalcJob.create
+({
+           data: {
+             sellerTenantId: 
+"tenant_unification_test",
+             reason: "SYSTEM"
+,
+                     ~~~~~~~~
+             idempotencyKey: 
+"TRUST_RECALC:tenant_unificat
+ion_test:2026-03-08",
+             status: "RUNNING
+"
+           }
+         })
+
+Invalid value for argument `r
+eason`. Expected RecalcReason
+.
+    at wn (C:\Users\ertke\One
+Drive\Masa├╝st├╝\periodya\muh
+asebeapp\motoroil\node_module
+s\@prisma\client\runtime\libr
+ary.js:29:1363)
+    at $n.handleRequestError 
+(C:\Users\ertke\OneDrive\Masa
+├╝st├╝\periodya\muhasebeapp\m
+otoroil\node_modules\@prisma\
+client\runtime\library.js:121
+:6958)
+    at $n.handleAndLogRequest
+Error (C:\Users\ertke\OneDriv
+e\Masa├╝st├╝\periodya\muhaseb
+eapp\motoroil\node_modules\@p
+risma\client\runtime\library.
+js:121:6623)
+    at $n.request (C:\Users\e
+rtke\OneDrive\Masa├╝st├╝\peri
+odya\muhasebeapp\motoroil\nod
+e_modules\@prisma\client\runt
+ime\library.js:121:6307)
+    at async l (C:\Users\ertk
+e\OneDrive\Masa├╝st├╝\periody
+a\muhasebeapp\motoroil\node_m
+odules\@prisma\client\runtime
+\library.js:130:9633)
+    at async <anonymous> (C:\
+Users\ertke\OneDrive\Masa├╝st
+├╝\periodya\muhasebeapp\motor
+oil\src\services\finance\trus
+t\recalcWorker.ts:18:25)
+    at async <anonymous> (C:\
+Users\ertke\OneDrive\Masa├╝st
+├╝\periodya\muhasebeapp\motor
+oil\src\lib\idempotency.ts:60
+:28)
+    at async Proxy._transacti
+onWithCallback (C:\Users\ertk
+e\OneDrive\Masa├╝st├╝\periody
+a\muhasebeapp\motoroil\node_m
+odules\@prisma\client\runtime
+\library.js:130:8000)
+    at async withIdempotency 
+(C:\Users\ertke\OneDrive\Masa
+├╝st├╝\periodya\muhasebeapp\m
+otoroil\src\lib\idempotency.t
+s:15:12)
+    at async runTest (C:\User
+s\ertke\OneDrive\Masa├╝st├╝\p
+eriodya\muhasebeapp\motoroil\
+scripts\test_trust_score_unif
+ication.ts:63:9) {
+  clientVersion: '5.22.0'
+}

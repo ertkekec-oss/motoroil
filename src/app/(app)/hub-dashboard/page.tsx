@@ -121,7 +121,7 @@ export default function TenantNetworkDashboard() {
                             <span className="text-xl">🎯</span> Trade Opportunities (AI Matches)
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {opportunities.map((opp: any) => (
+                            {opportunities?.map((opp: any) => (
                                 <div key={opp.id} className="p-5 rounded-[24px] bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/50 hover:shadow-sm transition-shadow">
                                     <div className="flex justify-between items-start mb-3">
                                         <div className={`text-[11px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${opp.signalType === 'OVERSTOCK' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400' : 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400'}`}>

@@ -37,7 +37,7 @@ export default function AdminLogs() {
                     <span className="ml-4 text-slate-400 text-xs">system_logs_20260205.log — Terminal View</span>
                 </div>
                 <div className="p-6 space-y-3 max-h-[600px] overflow-y-auto">
-                    {logs.map((log) => (
+                    {logs?.map((log) => (
                         <div key={log.id} className="flex gap-4 group">
                             <span className="text-slate-600 shrink-0">[{log.time}]</span>
                             <span className={`font-bold shrink-0 ${log.type === 'ERROR' ? 'text-rose-500' :

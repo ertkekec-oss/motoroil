@@ -20,7 +20,7 @@ export default function FAQ() {
                     <h2 id="faq-heading" className="text-3xl font-black text-white mt-2 mb-3">Sık Sorulan Sorular</h2>
                 </div>
                 <div className="space-y-3">
-                    {FAQS.map((faq, i) => (
+                    {FAQS?.map((faq, i) => (
                         <div key={i}
                             className="rounded-2xl border border-white/5 overflow-hidden transition-all hover:border-white/10"
                             style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>

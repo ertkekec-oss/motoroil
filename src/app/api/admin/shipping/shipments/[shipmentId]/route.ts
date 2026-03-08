@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { projectShipmentForAdmin } from '@/services/shipping/projection/adminShipmentProjection';
 
-export async function GET(request: NextRequest, { params }: { params: { shipmentId: string } }) {
+export async function GET(request: NextRequest, props: { params: Promise<{ shipmentId: string }> }) {
+    const params = await props.params;
     const user = await getSession();
 
     try {

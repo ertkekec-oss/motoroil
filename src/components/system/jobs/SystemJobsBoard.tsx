@@ -47,7 +47,7 @@ export function SystemJobsBoard() {
                     </p>
 
                     <div className="space-y-2">
-                        {deadLetters.map(dl => (
+                        {deadLetters?.map(dl => (
                             <div key={dl.id} className="flex justify-between items-center bg-white border border-red-100 p-4 rounded-lg shadow-sm">
                                 <div>
                                     <span className="font-semibold text-gray-800 tracking-tight">{dl.jobType}</span>
@@ -82,7 +82,7 @@ export function SystemJobsBoard() {
                             </tr>
                         </thead>
                         <tbody className="divide-y text-gray-700">
-                            {jobs.map(job => (
+                            {jobs?.map(job => (
                                 <tr key={job.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-4 py-3">
                                         <p className="font-bold text-slate-800">{job.jobType}</p>

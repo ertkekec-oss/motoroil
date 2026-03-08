@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getEscrowDetails } from '@/services/escrow/escrowService';
 import { projectEscrowForTenant } from '@/services/escrow/escrowProjection';
 
-export async function GET(request: NextRequest, { params }: { params: { orderId: string } }) {
+export async function GET(request: NextRequest, props: { params: Promise<{ orderId: string }> }) {
+    const params = await props.params;
     const user = await getSession();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

@@ -178,7 +178,7 @@ export default function CommandPalette({ isAdmin = false }: CommandPaletteProps)
                         {/* Database Search Results */}
                         {search.length >= 2 && apiResults.length > 0 && (
                             <Command.Group heading="Global Search Results">
-                                {apiResults.map((item, i) => (
+                                {apiResults?.map((item, i) => (
                                     <Command.Item
                                         key={`api-${i}`}
                                         className="flex flex-col gap-0.5 px-3 py-2.5 rounded-lg cursor-pointer data-[selected=true]:bg-slate-50 select-none outline-none"

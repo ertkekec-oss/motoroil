@@ -80,7 +80,7 @@ export function InventoryFilters({
                         >
                             <option value="all">Tümü</option>
                             <option value="uncategorized">Kategorisiz</option>
-                            {categories.filter(c => c).map(c => (
+                            {categories.filter(c => c)?.map(c => (
                                 <option key={c} value={c}>{c}</option>
                             ))}
                         </select>
@@ -100,7 +100,7 @@ export function InventoryFilters({
                             }}
                         >
                             <option value="all">Tümü</option>
-                            {brands.map(b => (
+                            {brands?.map(b => (
                                 <option key={b} value={b}>{b}</option>
                             ))}
                         </select>

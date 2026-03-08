@@ -34,7 +34,7 @@ export default function AnomalyAlert() {
             </div>
 
             <div className="space-y-3">
-                {anomalies.map((alert, idx) => (
+                {anomalies?.map((alert, idx) => (
                     <div key={idx} className="bg-black/30 p-3 rounded-lg border border-red-500/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                         <div>
                             <div className="font-bold text-white text-sm flex items-center gap-2">

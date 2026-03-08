@@ -76,7 +76,7 @@ export default async function AdminOrdersMonitorPage({
 
     const companyIds = Array.from(new Set(orders.flatMap(o => [o.buyerCompanyId, o.sellerCompanyId])));
     const companies = await prisma.company.findMany({ where: { id: { in: companyIds } }, select: { id: true, name: true } });
-    const companyMap = new Map(companies.map(c => [c.id, c.name]));
+    const companyMap = new Map(companies?.map(c => [c.id, c.name]));
 
     return (
         <div className="min-h-screen bg-[#F6F7F9] text-[#1F3A5F] p-4 font-sans">
@@ -162,7 +162,7 @@ export default async function AdminOrdersMonitorPage({
                                 {orders.length === 0 ? (
                                     <tr><td colSpan={9} className="text-center py-8 text-slate-500 font-medium">No records found matching filters.</td></tr>
                                 ) : (
-                                    orders.map(order => {
+                                    orders?.map(order => {
                                         const pay = order.payments[0];
                                         const shpCount = order.shipments.length;
                                         const delivCount = order.shipments.filter(s => s.status === 'DELIVERED').length;

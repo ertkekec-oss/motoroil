@@ -23,7 +23,7 @@ export default function Features() {
                     </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {FEATURES.map(f => (
+                    {FEATURES?.map(f => (
                         <div key={f.title}
                             className="p-5 rounded-2xl border border-white/5 hover:border-orange-500/20 transition-all group cursor-default"
                             style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>

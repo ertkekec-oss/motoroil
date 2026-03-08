@@ -53,7 +53,7 @@ export function MarketSignalsWidget({ signals, isLoading }: MarketSignalProps) {
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                {signals.map((signal) => (
+                {signals?.map((signal) => (
                     <div key={signal.id} className="flex flex-col gap-2 p-3 border rounded-lg bg-card hover:bg-muted/30 transition-colors">
                         <div className="flex justify-between items-start">
                             <div className="flex items-center gap-2">

@@ -7662,36 +7662,36 @@ enum NetworkLiquidityOpportunityStatus {
 }
 
 model NetworkLiquidityOpportunity {
-  id                    String      @id @default(cuid())
-  categoryId            String?
-  productRef            String?
-  regionCode            String?
-  supplyTenantId        String?
-  demandTenantId        String?
-  clusterId             String?
+  id             String  @id @default(cuid())
+  categoryId     String?
+  productRef     String?
+  regionCode     String?
+  supplyTenantId String?
+  demandTenantId String?
+  clusterId      String?
 
-  opportunityType       NetworkLiquidityOpportunityType
-  
-  confidenceScore       Float       @default(0)
-  matchScore            Float       @default(0)
-  liquidityVolumeScore  Float       @default(0)
+  opportunityType NetworkLiquidityOpportunityType
 
-  routingEligibilityScore  Float    @default(0)
-  shippingFeasibilityScore Float    @default(0)
-  financialSafetyScore     Float    @default(0)
+  confidenceScore      Float @default(0)
+  matchScore           Float @default(0)
+  liquidityVolumeScore Float @default(0)
 
-  status                NetworkLiquidityOpportunityStatus @default(DISCOVERED)
-  
-  expiresAt             DateTime?
-  dedupeKey             String      @unique
-  calculationVersion    String
-  
-  explainJson           Json?
+  routingEligibilityScore  Float @default(0)
+  shippingFeasibilityScore Float @default(0)
+  financialSafetyScore     Float @default(0)
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  status NetworkLiquidityOpportunityStatus @default(DISCOVERED)
 
-  matches               NetworkLiquidityMatch[]
+  expiresAt          DateTime?
+  dedupeKey          String    @unique
+  calculationVersion String
+
+  explainJson Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  matches NetworkLiquidityMatch[]
 
   @@index([categoryId, regionCode])
   @@index([status, expiresAt])
@@ -7709,34 +7709,34 @@ enum NetworkLiquidityMatchStatus {
 }
 
 model NetworkLiquidityMatch {
-  id                    String      @id @default(cuid())
-  opportunityId         String
-  opportunity           NetworkLiquidityOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  
-  buyerTenantId         String
-  sellerTenantId        String
-  
-  productRef            String?
-  categoryId            String?
+  id            String                      @id @default(cuid())
+  opportunityId String
+  opportunity   NetworkLiquidityOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
 
-  graphDistance         Int         @default(0)
-  trustScore            Float       @default(0)
-  reputationScore       Float       @default(0)
-  
-  shippingReliabilityScore Float    @default(0)
-  financialRiskScore       Float    @default(0)
+  buyerTenantId  String
+  sellerTenantId String
 
-  estimatedPriceRangeLow   Float?
-  estimatedPriceRangeHigh  Float?
+  productRef String?
+  categoryId String?
 
-  finalMatchScore       Float       @default(0)
+  graphDistance   Int   @default(0)
+  trustScore      Float @default(0)
+  reputationScore Float @default(0)
 
-  status                NetworkLiquidityMatchStatus @default(CANDIDATE)
+  shippingReliabilityScore Float @default(0)
+  financialRiskScore       Float @default(0)
 
-  explainJson           Json?
+  estimatedPriceRangeLow  Float?
+  estimatedPriceRangeHigh Float?
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  finalMatchScore Float @default(0)
+
+  status NetworkLiquidityMatchStatus @default(CANDIDATE)
+
+  explainJson Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([buyerTenantId])
   @@index([sellerTenantId])
@@ -7745,23 +7745,23 @@ model NetworkLiquidityMatch {
 }
 
 model NetworkLiquiditySnapshot {
-  id                    String      @id @default(cuid())
-  categoryId            String?
-  regionCode            String?
+  id         String  @id @default(cuid())
+  categoryId String?
+  regionCode String?
 
-  supplyVolumeScore     Float       @default(0)
-  demandVolumeScore     Float       @default(0)
-  liquidityGapScore     Float       @default(0)
+  supplyVolumeScore Float @default(0)
+  demandVolumeScore Float @default(0)
+  liquidityGapScore Float @default(0)
 
-  clusterNodeCount      Int         @default(0)
-  activeSupplierCount   Int         @default(0)
-  activeBuyerCount      Int         @default(0)
+  clusterNodeCount    Int @default(0)
+  activeSupplierCount Int @default(0)
+  activeBuyerCount    Int @default(0)
 
-  calculationVersion    String
-  expiresAt             DateTime?
+  calculationVersion String
+  expiresAt          DateTime?
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId, regionCode])
   @@index([expiresAt])
@@ -7788,43 +7788,43 @@ enum NetworkTradePolicyMode {
 }
 
 model NetworkTradeProposal {
-  id                    String      @id @default(cuid())
-  opportunityId         String
-  liquidityMatchId      String
+  id               String @id @default(cuid())
+  opportunityId    String
+  liquidityMatchId String
 
-  buyerTenantId         String
-  sellerTenantId        String
+  buyerTenantId  String
+  sellerTenantId String
 
-  categoryId            String?
-  productRef            String?
+  categoryId String?
+  productRef String?
 
-  proposedQuantityLow   Int         @default(0)
-  proposedQuantityHigh  Int         @default(0)
+  proposedQuantityLow  Int @default(0)
+  proposedQuantityHigh Int @default(0)
 
-  proposedPriceLow      Float       @default(0)
-  proposedPriceHigh     Float       @default(0)
+  proposedPriceLow  Float @default(0)
+  proposedPriceHigh Float @default(0)
 
-  currency              String      @default("TRY")
+  currency String @default("TRY")
 
-  shippingMode          String      @default("STANDARD")
-  paymentMode           String      @default("ESCROW")
-  escrowRequired        Boolean     @default(true)
+  shippingMode   String  @default("STANDARD")
+  paymentMode    String  @default("ESCROW")
+  escrowRequired Boolean @default(true)
 
-  status                NetworkTradeProposalStatus @default(DRAFT)
-  policyMode            NetworkTradePolicyMode     @default(SUGGEST_ONLY)
+  status     NetworkTradeProposalStatus @default(DRAFT)
+  policyMode NetworkTradePolicyMode     @default(SUGGEST_ONLY)
 
-  confidenceScore       Float       @default(0)
-  riskScore             Float       @default(0)
+  confidenceScore Float @default(0)
+  riskScore       Float @default(0)
 
-  expiresAt             DateTime?
-  dedupeKey             String      @unique
-  calculationVersion    String
+  expiresAt          DateTime?
+  dedupeKey          String    @unique
+  calculationVersion String
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  messages              NetworkTradeProposalMessage[]
-  decisions             NetworkTradeProposalDecision[]
+  messages  NetworkTradeProposalMessage[]
+  decisions NetworkTradeProposalDecision[]
 
   @@index([buyerTenantId, status])
   @@index([sellerTenantId, status])
@@ -7842,18 +7842,18 @@ enum NetworkTradeProposalMessageType {
 }
 
 model NetworkTradeProposalMessage {
-  id                    String      @id @default(cuid())
-  proposalId            String
-  proposal              NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  
-  senderTenantId        String
+  id         String               @id @default(cuid())
+  proposalId String
+  proposal   NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
-  messageType           NetworkTradeProposalMessageType @default(COMMENT)
-  
-  payloadJson           Json?
+  senderTenantId String
 
-  createdAt             DateTime    @default(now())
-  
+  messageType NetworkTradeProposalMessageType @default(COMMENT)
+
+  payloadJson Json?
+
+  createdAt DateTime @default(now())
+
   @@index([proposalId])
   @@index([senderTenantId])
 }
@@ -7866,44 +7866,44 @@ enum NetworkTradeProposalDecisionType {
 }
 
 model NetworkTradeProposalDecision {
-  id                    String      @id @default(cuid())
-  proposalId            String
-  proposal              NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  id         String               @id @default(cuid())
+  proposalId String
+  proposal   NetworkTradeProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
-  decisionType          NetworkTradeProposalDecisionType
-  
-  decidedByTenantId     String?
-  autoPolicy            Boolean     @default(false)
+  decisionType NetworkTradeProposalDecisionType
 
-  decisionReason        String?
+  decidedByTenantId String?
+  autoPolicy        Boolean @default(false)
 
-  createdAt             DateTime    @default(now())
-  
+  decisionReason String?
+
+  createdAt DateTime @default(now())
+
   @@index([proposalId])
 }
 
 // FAZ 17.x - PRICING INTELLIGENCE
 model NetworkPriceSignal {
-  id                    String      @id @default(cuid())
-  categoryId            String
-  regionCode            String?
+  id         String  @id @default(cuid())
+  categoryId String
+  regionCode String?
 
-  medianPrice           Float       @default(0)
-  p25Price              Float       @default(0)
-  p75Price              Float       @default(0)
+  medianPrice Float @default(0)
+  p25Price    Float @default(0)
+  p75Price    Float @default(0)
 
-  priceVolatility       Float       @default(0)
-  supplyPressureScore   Float       @default(0)
-  demandPressureScore   Float       @default(0)
+  priceVolatility     Float @default(0)
+  supplyPressureScore Float @default(0)
+  demandPressureScore Float @default(0)
 
-  sampleSize            Int         @default(0)
+  sampleSize Int @default(0)
 
-  calculationVersion    String
-  expiresAt             DateTime?
-  dedupeKey             String      @unique
+  calculationVersion String
+  expiresAt          DateTime?
+  dedupeKey          String    @unique
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId, regionCode])
   @@index([expiresAt])
@@ -7911,27 +7911,27 @@ model NetworkPriceSignal {
 
 // 17.2 - SUPPLIER CAPACITY
 model NetworkSupplierCapacity {
-  id                    String      @id @default(cuid())
-  tenantId              String
+  id       String @id @default(cuid())
+  tenantId String
 
-  categoryId            String?
+  categoryId String?
 
-  estimatedDailyCapacity  Int       @default(0)
-  estimatedWeeklyCapacity Int       @default(0)
+  estimatedDailyCapacity  Int @default(0)
+  estimatedWeeklyCapacity Int @default(0)
 
-  avgLeadTimeDays         Float     @default(0)
+  avgLeadTimeDays Float @default(0)
 
-  shipmentThroughputScore Float     @default(0)
-  fulfillmentSuccessRate  Float     @default(0)
+  shipmentThroughputScore Float @default(0)
+  fulfillmentSuccessRate  Float @default(0)
 
-  capacityConfidenceScore Float     @default(0)
+  capacityConfidenceScore Float @default(0)
 
-  calculationVersion      String
-  expiresAt               DateTime?
+  calculationVersion String
+  expiresAt          DateTime?
 
-  createdAt               DateTime    @default(now())
-  updatedAt               DateTime    @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([tenantId, categoryId])
 }
 
@@ -7943,24 +7943,24 @@ enum NetworkVisibilityLevel {
 }
 
 model NetworkDiscoveryProfile {
-  id                    String      @id @default(cuid())
-  tenantId              String      @unique
+  id       String @id @default(cuid())
+  tenantId String @unique
 
-  companyName           String?
-  categories            Json?       
-  regions               Json?       
+  companyName String?
+  categories  Json?
+  regions     Json?
 
-  trustScore            Float       @default(0)
-  reputationTier        String      @default("STANDARD")
+  trustScore     Float  @default(0)
+  reputationTier String @default("STANDARD")
 
-  shippingReliability   Float       @default(0)
-  capacityScore         Float       @default(0)
+  shippingReliability Float @default(0)
+  capacityScore       Float @default(0)
 
-  visibilityLevel       NetworkVisibilityLevel @default(NETWORK_ONLY)
+  visibilityLevel NetworkVisibilityLevel @default(NETWORK_ONLY)
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([tenantId])
 }
 
@@ -7972,38 +7972,38 @@ enum NetworkTradeAbuseSignalType {
 }
 
 model NetworkTradeAbuseSignal {
-  id                    String      @id @default(cuid())
-  tenantId              String
-  signalType            NetworkTradeAbuseSignalType
-  
-  severityScore         Float       @default(0)
+  id         String                      @id @default(cuid())
+  tenantId   String
+  signalType NetworkTradeAbuseSignalType
 
-  contextJson           Json?
+  severityScore Float @default(0)
 
-  createdAt             DateTime    @default(now())
-  
+  contextJson Json?
+
+  createdAt DateTime @default(now())
+
   @@index([tenantId, signalType])
 }
 
 // 17.5 - NETWORK TRADE ANALYTICS
 model NetworkTradeSnapshot {
-  id                    String      @id @default(cuid())
+  id String @id @default(cuid())
 
-  categoryId            String?
-  regionCode            String?
+  categoryId String?
+  regionCode String?
 
-  tradeVolume           Float       @default(0)
-  avgDealSize           Float       @default(0)
+  tradeVolume Float @default(0)
+  avgDealSize Float @default(0)
 
-  liquidityScore        Float       @default(0)
+  liquidityScore Float @default(0)
 
-  activeSupplierCount   Int         @default(0)
-  activeBuyerCount      Int         @default(0)
+  activeSupplierCount Int @default(0)
+  activeBuyerCount    Int @default(0)
 
-  calculationVersion    String
-  expiresAt             DateTime?
+  calculationVersion String
+  expiresAt          DateTime?
 
-  createdAt             DateTime    @default(now())
+  createdAt DateTime @default(now())
 }
 
 // B2B NETWORK GOVERNANCE LAYER
@@ -8016,19 +8016,305 @@ enum NetworkAccessLevel {
 }
 
 model NetworkComplianceProfile {
-  id                    String      @id @default(cuid())
-  tenantId              String      @unique
+  id       String @id @default(cuid())
+  tenantId String @unique
 
-  kycStatus             String      @default("PENDING")
-  verificationLevel     String      @default("TIER_1")
-  businessType          String?
+  kycStatus         String  @default("PENDING")
+  verificationLevel String  @default("TIER_1")
+  businessType      String?
 
-  riskFlags             Json?
-  
-  networkAccessLevel    NetworkAccessLevel @default(UNVERIFIED)
+  riskFlags Json?
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-  
+  networkAccessLevel NetworkAccessLevel @default(UNVERIFIED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([tenantId])
+}
+
+// --- PRODUCT INTELLIGENCE (PHASE A) ---
+
+model ProductTaxonomyNode {
+  id        String   @id @default(cuid())
+  parentId  String?
+  name      String
+  slug      String
+  level     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent            ProductTaxonomyNode?  @relation("TaxonomyTree", fields: [parentId], references: [id])
+  children          ProductTaxonomyNode[] @relation("TaxonomyTree")
+  canonicalProducts CanonicalProduct[]
+}
+
+model CanonicalProduct {
+  id             String   @id @default(cuid())
+  name           String
+  brand          String?
+  normalizedName String
+  taxonomyNodeId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  taxonomyNode      ProductTaxonomyNode?   @relation(fields: [taxonomyNodeId], references: [id])
+  tenantMappings    TenantProductMapping[]
+  ProductCluster    ProductCluster[]
+  ProductSimilarity ProductSimilarity[]
+}
+
+model TenantProductMapping {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  productId          String
+  canonicalProductId String
+  confidenceScore    Float
+  createdAt          DateTime @default(now())
+
+  canonicalProduct CanonicalProduct @relation(fields: [canonicalProductId], references: [id])
+
+  @@index([tenantId])
+  @@index([productId])
+}
+
+// --- PRODUCT INTELLIGENCE (PHASE A - NORMALIZATION ENGINE) ---
+
+model ProductCluster {
+  id                 String   @id @default(cuid())
+  canonicalProductId String?
+  clusterKey         String
+  confidenceScore    Float?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  canonicalProduct CanonicalProduct?   @relation(fields: [canonicalProductId], references: [id])
+  similarities     ProductSimilarity[]
+}
+
+model ProductSimilarity {
+  id                     String   @id @default(cuid())
+  tenantProductMappingId String?
+  canonicalProductId     String?
+  comparedName           String
+  normalizedName         String
+  similarityScore        Float
+  matchType              String
+  clusterId              String?
+  createdAt              DateTime @default(now())
+
+  cluster          ProductCluster?   @relation(fields: [clusterId], references: [id])
+  canonicalProduct CanonicalProduct? @relation(fields: [canonicalProductId], references: [id])
+}
+
+model ProductMatchSuggestion {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  productId          String
+  canonicalProductId String
+  suggestedScore     Float
+  status             String   @default("PENDING")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+// --- COMPANY IDENTITY & KYB (PHASE B) ---
+
+model CompanyIdentity {
+  id                 String   @id @default(cuid())
+  tenantId           String   @unique
+  legalName          String
+  taxNumber          String
+  tradeRegistryNo    String?
+  country            String
+  city               String?
+  address            String?
+  website            String?
+  phone              String?
+  verificationStatus String   @default("UNVERIFIED")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  documents           CompanyVerificationDocument[]
+  CompanyTrustProfile CompanyTrustProfile[]
+}
+
+model CompanyVerificationDocument {
+  id           String   @id @default(cuid())
+  companyId    String
+  documentType String
+  documentUrl  String
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+
+  company CompanyIdentity @relation(fields: [companyId], references: [id])
+}
+
+// --- COMPANY TRUST ENGINE (PHASE B) ---
+
+model CompanyTrustProfile {
+  id                String    @id @default(cuid())
+  tenantId          String    @unique
+  companyIdentityId String?
+  identityScore     Float     @default(0)
+  tradeScore        Float     @default(0)
+  shippingScore     Float     @default(0)
+  paymentScore      Float     @default(0)
+  disputeScore      Float     @default(0)
+  overallScore      Float     @default(0)
+  trustLevel        String    @default("LOW")
+  lastCalculatedAt  DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  companyIdentity CompanyIdentity? @relation(fields: [companyIdentityId], references: [id])
+}
+
+model CompanyTrustSignal {
+  id          String   @id @default(cuid())
+  tenantId    String
+  signalType  String
+  signalValue Float
+  weight      Float
+  sourceRef   String?
+  createdAt   DateTime @default(now())
+}
+
+model CompanyTrustScoreHistory {
+  id              String   @id @default(cuid())
+  tenantId        String
+  overallScore    Float
+  trustLevel      String
+  calculatedAt    DateTime @default(now())
+  explanationJson String?
+}
+
+// --- LIQUIDITY AMPLIFIER (PHASE C) ---
+
+model DemandSignal {
+  id                      String    @id @default(cuid())
+  tenantId                String
+  productId               String?
+  canonicalProductId      String?
+  signalType              String
+  signalStrength          Float
+  confidenceScore         Float     @default(0)
+  salesVelocity           Float?
+  stockLevel              Float?
+  projectedDaysToStockout Float?
+  reorderRecommendation   Float?
+  status                  String    @default("OPEN")
+  detectedAt              DateTime  @default(now())
+  expiresAt               DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([canonicalProductId])
+}
+
+model DemandSignalHistory {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  productId          String?
+  canonicalProductId String?
+  signalType         String
+  signalStrength     Float
+  confidenceScore    Float
+  explanationJson    String?
+  createdAt          DateTime @default(now())
+}
+
+model DemandForecastSnapshot {
+  id                    String   @id @default(cuid())
+  tenantId              String
+  productId             String?
+  canonicalProductId    String?
+  avgDailySales         Float    @default(0)
+  avgWeeklySales        Float    @default(0)
+  stockLevel            Float    @default(0)
+  daysToStockout        Float?
+  recommendedReorderQty Float?
+  snapshotDate          DateTime @default(now())
+  createdAt             DateTime @default(now())
+}
+
+
+// --- UNIFIED TRADE LEDGER ---
+
+model TradeLedgerEntry {
+  id                String   @id @default(cuid())
+  tenantId          String?
+  buyerTenantId     String?
+  sellerTenantId    String?
+  canonicalProductId String?
+  productId         String?
+  opportunityId     String?
+  proposalId        String?
+  contractId        String?
+  escrowId          String?
+  shipmentId        String?
+  disputeId         String?
+  eventType         String
+  eventStatus       String?
+  amount            Float?
+  quantity          Float?
+  currency          String?
+  metadataJson      Json?
+  sourceType        String?
+  sourceRef         String?
+  occurredAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+
+  @@index([buyerTenantId])
+  @@index([sellerTenantId])
+  @@index([eventType])
+  @@index([occurredAt])
+}
+
+model TradeLedgerLink {
+  id                String   @id @default(cuid())
+  ledgerEntryId     String
+  linkedEntityType  String
+  linkedEntityId    String
+  createdAt         DateTime @default(now())
+
+  @@index([ledgerEntryId])
+  @@index([linkedEntityType, linkedEntityId])
+}
+
+// --- NETWORK GROWTH ENGINE ---
+
+model NetworkGrowthTrigger {
+  id                  String   @id @default(cuid())
+  tenantId            String?
+  buyerTenantId       String?
+  sellerTenantId      String?
+  canonicalProductId  String?
+  triggerType         String
+  triggerStrength     Float
+  status              String   @default("OPEN")
+  metadataJson        Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([tenantId, status])
+  @@index([canonicalProductId])
+  @@index([triggerType])
+}
+
+model NetworkGrowthAction {
+  id                  String   @id @default(cuid())
+  triggerId           String
+  actionType          String
+  targetType          String?
+  targetRef           String?
+  status              String   @default("PENDING")
+  payloadJson         Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([triggerId])
+  @@index([status])
 }

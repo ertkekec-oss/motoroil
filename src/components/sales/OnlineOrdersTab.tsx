@@ -147,7 +147,7 @@ export function OnlineOrdersTab({
 
     const toggleSelectAll = () => {
         if (selectedOrders.length === paginatedOrders.length && paginatedOrders.length > 0) setSelectedOrders([]);
-        else setSelectedOrders(paginatedOrders.map(o => o.id));
+        else setSelectedOrders(paginatedOrders?.map(o => o.id));
     };
 
     useEffect(() => { setCurrentPage(1); }, [statusFilter, marketplaceFilter, dateFilter, customStartDate, customEndDate]);
@@ -257,7 +257,7 @@ export function OnlineOrdersTab({
                     {/* Groups container internally separating, but visually unified */}
                     <div className="flex gap-2">
                         <OutlineChip active={marketplaceFilter === 'ALL'} onClick={() => setMarketplaceFilter('ALL')}>Tüm Platformlar</OutlineChip>
-                        {['Trendyol', 'Hepsiburada', 'N11', 'Pazarama'].map(mp => (
+                        {['Trendyol', 'Hepsiburada', 'N11', 'Pazarama']?.map(mp => (
                             <OutlineChip key={mp} active={marketplaceFilter === mp} onClick={() => setMarketplaceFilter(mp)}>
                                 {mp}
                             </OutlineChip>
@@ -272,7 +272,7 @@ export function OnlineOrdersTab({
                             { val: 'NEW', label: 'Yeni' },
                             { val: 'SHIPPED', label: 'Kargolandı' },
                             { val: 'COMPLETED', label: 'Tamamlandı' },
-                        ].map(({ val, label }) => (
+                        ]?.map(({ val, label }) => (
                             <OutlineChip key={val} active={statusFilter === val} onClick={() => setStatusFilter(val)}>{label}</OutlineChip>
                         ))}
                     </div>
@@ -294,7 +294,7 @@ export function OnlineOrdersTab({
                                     <th className="h-[48px] px-4 w-[40px]">
                                         <input type="checkbox" checked={paginatedOrders.length > 0 && selectedOrders.length === paginatedOrders.length} onChange={toggleSelectAll} className="cursor-pointer" />
                                     </th>
-                                    {['Sipariş No', 'Platform', 'Müşteri', 'Tutar', 'Durum', 'İşlem'].map(h => (
+                                    {['Sipariş No', 'Platform', 'Müşteri', 'Tutar', 'Durum', 'İşlem']?.map(h => (
                                         <th key={h} className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
                                             {h}
                                         </th>
@@ -302,7 +302,7 @@ export function OnlineOrdersTab({
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
-                                {paginatedOrders.map(o => {
+                                {paginatedOrders?.map(o => {
                                     const isExpanded = expandedOrderId === o.id;
                                     const isCompleted = ['Faturalandırıldı', 'Delivered', 'Cancelled'].includes(o.status);
                                     return (
@@ -373,7 +373,7 @@ export function OnlineOrdersTab({
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800'}`}>
-                                                                    {o.items && o.items.map((item: any, idx: number) => (
+                                                                    {o.items && o.items?.map((item: any, idx: number) => (
                                                                         <tr key={idx}>
                                                                             <td className={`py-2 ${textValueClass}`}>{item.name || item.productName}</td>
                                                                             <td className={`py-2 text-center ${textValueClass}`}>{item.qty || item.quantity}</td>

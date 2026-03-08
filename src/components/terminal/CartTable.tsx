@@ -26,7 +26,7 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                    {cart.map((item, idx) => (
+                    {cart?.map((item, idx) => (
                         <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
                             <td className="py-4 px-4 min-w-[200px]">
                                 <div className="font-bold text-sm text-slate-900 dark:text-white truncate max-w-[300px]">{item.name}</div>
@@ -40,7 +40,7 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
                             <td className="py-4 px-4">
                                 <div className="flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit mx-auto border border-slate-200 dark:border-white/5">
                                     <button
-                                        onClick={() => setCart((c: any) => c.map((x: any, i: number) => i === idx ? { ...x, qty: Math.max(1, x.qty - 1) } : x))}
+                                        onClick={() => setCart((c: any) => c?.map((x: any, i: number) => i === idx ? { ...x, qty: Math.max(1, x.qty - 1) } : x))}
                                         className="w-8 h-8 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center justify-center shadow-sm text-slate-600 dark:text-slate-300"
                                     >
                                         <Minus size={16} strokeWidth={2.5} />
@@ -49,7 +49,7 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
                                         {item.qty}
                                     </span>
                                     <button
-                                        onClick={() => setCart((c: any) => c.map((x: any, i: number) => i === idx ? { ...x, qty: x.qty + 1 } : x))}
+                                        onClick={() => setCart((c: any) => c?.map((x: any, i: number) => i === idx ? { ...x, qty: x.qty + 1 } : x))}
                                         className="w-8 h-8 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center justify-center shadow-sm text-slate-600 dark:text-slate-300"
                                     >
                                         <Plus size={16} strokeWidth={2.5} />

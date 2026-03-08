@@ -120,7 +120,7 @@ export default async function BuyerOrderDetailPage({
                             <p className="text-sm text-gray-500 py-4 italic text-center text-amber-600 bg-amber-50 rounded-lg">Satıcı henüz kargo gönderimi başlatmadı.</p>
                         ) : (
                             <div className="space-y-4 lg:space-y-6">
-                                {order.shipments.map((shp) => (
+                                {order.shipments?.map((shp) => (
                                     <div key={shp.id} className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
                                         <div className="flex justify-between items-center mb-4">
                                             <div className="flex gap-3">

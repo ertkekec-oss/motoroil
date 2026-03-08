@@ -56,7 +56,7 @@ export function OperationalReliabilityCard() {
                 </p>
 
                 <div className="grid grid-cols-2 gap-4">
-                    {score.explanation.keyMetrics.map((m, i) => (
+                    {score.explanation.keyMetrics?.map((m, i) => (
                         <div key={i} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
                             <p className="text-xs text-gray-500">{m.label}</p>
                             <p className="text-lg font-semibold">{m.value}</p>

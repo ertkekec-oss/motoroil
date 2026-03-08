@@ -114,7 +114,7 @@ export default async function SellerBalancesPage() {
                         {recentTransactions.length === 0 ? (
                             <tr><td colSpan={4} className="text-center py-10 text-gray-500">Henüz bir hesap hareketi bulunmuyor.</td></tr>
                         ) : (
-                            recentTransactions.map((tx) => (
+                            recentTransactions?.map((tx) => (
                                 <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-5 py-4 text-gray-600 font-mono text-xs">
                                         {new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "medium" }).format(tx.createdAt)}

@@ -213,7 +213,7 @@ export const EnterpriseTable = ({
             <table className="w-full text-left border-collapse">
                 <thead className="bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                        {headers.map((h, i: number) => (
+                        {headers?.map((h, i: number) => (
                             <th key={i} className={`h-10 px-4 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap ${typeof h === 'object' && h.alignRight ? 'text-right' : ''}`}>
                                 {typeof h === 'object' ? h.label : h}
                             </th>
@@ -281,7 +281,7 @@ export const EnterpriseTabs = ({
 }) => {
     return (
         <div className={`flex flex-wrap gap-1 p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 w-fit mb-6 shadow-sm ${className}`}>
-            {tabs.map((tab) => (
+            {tabs?.map((tab) => (
                 <button
                     key={tab.id}
                     onClick={() => onTabChange(tab.id)}

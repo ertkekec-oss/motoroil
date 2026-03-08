@@ -66,7 +66,7 @@ export default function DisputeQueuePage() {
                     </div>
 
                     <div className="flex bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden p-1 shrink-0">
-                        {['ALL', 'OPEN', 'NEEDS_INFO', 'IN_REVIEW', 'RESOLVED'].map(f => (
+                        {['ALL', 'OPEN', 'NEEDS_INFO', 'IN_REVIEW', 'RESOLVED']?.map(f => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
@@ -115,7 +115,7 @@ export default function DisputeQueuePage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 text-[14px]">
-                                    {disputes.map(d => (
+                                    {disputes?.map(d => (
                                         <tr key={d.ticketId} className="hover:bg-slate-50 transition-colors group">
                                             <td className="px-6 py-4 font-mono text-[13px] text-slate-600 font-medium">#{d.ticketId.substring(0, 12)}</td>
                                             <td className="px-6 py-4">

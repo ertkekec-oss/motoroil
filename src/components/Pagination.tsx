@@ -40,7 +40,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 ← Önceki
             </button>
 
-            {uniquePages.map((p, idx) => (
+            {uniquePages?.map((p, idx) => (
                 <button
                     key={idx}
                     onClick={() => typeof p === 'number' ? onPageChange(p) : null}

@@ -194,7 +194,7 @@ export default function TenantDetailPage({ params: paramsPromise }: { params: Pr
                             <tbody className="divide-y divide-slate-100 text-slate-600">
                                 {errors.length === 0 ? (
                                     <tr><td colSpan={5} className="py-4 text-center text-slate-400">Hata kaydı bulunmuyor.</td></tr>
-                                ) : errors.map(err => (
+                                ) : errors?.map(err => (
                                     <tr key={err.id}>
                                         <td className="py-2">{new Date(err.updatedAt).toLocaleString()}</td>
                                         <td className="py-2 font-medium">{err.provider}</td>
@@ -211,7 +211,7 @@ export default function TenantDetailPage({ params: paramsPromise }: { params: Pr
                     <ul className="space-y-3">
                         {history.length === 0 ? (
                             <li className="text-sm text-slate-400">Kayıt yok.</li>
-                        ) : history.map(h => (
+                        ) : history?.map(h => (
                             <li key={h.id} className="text-sm flex gap-2">
                                 <span className="text-slate-400 font-mono text-xs">{new Date(h.createdAt).toLocaleDateString()}</span>
                                 <span className="font-medium text-slate-800">{h.action}</span>
@@ -230,7 +230,7 @@ export default function TenantDetailPage({ params: paramsPromise }: { params: Pr
                             <>
                                 <h3 className="text-lg font-bold mb-4">Plan Değiştir</h3>
                                 <div className="space-y-2 mb-6">
-                                    {plans.map(p => (
+                                    {plans?.map(p => (
                                         <label key={p.id} className={`flex items-center p-3 border rounded-lg cursor-pointer hover:bg-slate-50 ${selectedPlan === p.id ? 'border-blue-500 bg-blue-50' : 'border-slate-200'}`}>
                                             <input type="radio" name="plan" value={p.id} checked={selectedPlan === p.id} onChange={(e) => setSelectedPlan(e.target.value)} className="mr-3" />
                                             <div>
@@ -254,7 +254,7 @@ export default function TenantDetailPage({ params: paramsPromise }: { params: Pr
                                 <h3 className="text-lg font-bold mb-4">Trial Süresini Uzat</h3>
                                 <p className="text-sm text-slate-500 mb-4">Mevcut bitiş tarihine seçilen gün kadar eklenir.</p>
                                 <div className="flex gap-2 mb-6">
-                                    {[3, 7, 14, 30].map(d => (
+                                    {[3, 7, 14, 30]?.map(d => (
                                         <button key={d} onClick={() => setTrialDays(d)} className={`flex-1 py-2 border rounded-lg ${trialDays === d ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:bg-slate-50'}`}>
                                             +{d} Gün
                                         </button>

@@ -1,45 +1,36 @@
 import prisma from '@/lib/prisma';
 import { publishEvent } from '@/lib/events/dispatcher';
+import { ProposalEngine } from '@/services/network/tradeExecution/proposalEngine';
 
-export async function generateAutoRFQ(opportunityId: string, tenantId: string) {
-    const opportunity = await prisma.networkTradeOpportunity.findUnique({
-        where: { id: opportunityId },
-        include: {
-            supplierProfile: true,
-            buyerProfile: true
-        }
+export async function generateAutoRFQ(matchId: string, tenantId: string) {
+    console.log(`[RFQ Draft Engine] Generating Auto Draft (Trade Proposal) for Match ${matchId}...`);
+
+    // Verify ownership
+    const match = await prisma.networkLiquidityMatch.findUnique({
+        where: { id: matchId },
+        include: { opportunity: true }
     });
 
-    if (!opportunity) throw new Error("Opportunity not found");
+    if (!match) throw new Error("Match not found");
 
-    if (opportunity.buyerProfile.tenantId !== tenantId) {
-        throw new Error("Unauthorized to access this opportunity");
+    if (match.buyerTenantId !== tenantId && match.sellerTenantId !== tenantId) {
+        throw new Error("Unauthorized to access this match");
     }
 
-    console.log(`[RFQ Draft Engine] Generating Auto Draft for Opportunity ${opportunityId}...`);
-
-    // In a full implementation, we would create a Draft RFQ in the ERP/RFQ module here.
-    // Given the constraints, we will just simulate the payload and log the event.
-
-    const mockDraftPayload = {
-        title: `Suggested RFQ - Category ${opportunity.categoryId}`,
-        status: 'DRAFT',
-        supplierCompanyId: opportunity.supplierProfile.id,
-        buyerCompanyId: opportunity.buyerProfile.id,
-        confidenceDesc: `${Math.round(opportunity.confidence)}% AI Matching Score`,
-        suggestedDate: new Date()
-    };
+    // Call the real unified Proposal Engine without forcing intent so policy can decide
+    const proposal = await ProposalEngine.generateProposalForMatch(matchId);
 
     await publishEvent({
         type: 'NETWORK_RFQ_DRAFT_GENERATED',
         tenantId,
         meta: {
-            opportunityId,
-            draftPayload: mockDraftPayload,
-            buyerId: opportunity.buyerProfile.tenantId,
-            supplierId: opportunity.supplierProfile.tenantId
+            opportunityId: match.opportunityId,
+            matchId: match.id,
+            proposalId: proposal.id,
+            buyerId: match.buyerTenantId,
+            supplierId: match.sellerTenantId
         }
     });
 
-    return { success: true, draft: mockDraftPayload };
+    return { success: true, draft: proposal };
 }

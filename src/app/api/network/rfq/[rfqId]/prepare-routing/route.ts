@@ -5,7 +5,8 @@ import { generateTradeMatchCandidates } from '@/services/network/routing/aiMatch
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request, { params }: { params: { rfqId: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ rfqId: string }> }) {
+    const params = await props.params;
     try {
         const sessionAuth = await getSession();
         if (!sessionAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

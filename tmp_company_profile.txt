@@ -1,0 +1,52 @@
+model NetworkCompanyProfile {
+  id                     String                        @id @default(cuid())
+  tenantId               String                        @unique
+  slug                   String                        @unique
+  displayName            String
+  legalName              String?
+  shortDescription       String?
+  longDescription        String?                       @db.Text
+  logoFileKey            String?
+  website                String?
+  email                  String?
+  phone                  String?
+  country                String?                       @default("Turkey")
+  city                   String?
+  sectors                Json?
+  capabilities           Json?
+  visibilityLevel        NetworkProfileVisibilityLevel @default(PRIVATE)
+  verificationStatus     NetworkVerificationStatus     @default(UNVERIFIED)
+  isPublicListingEnabled Boolean                       @default(false)
+  isDiscoveryEnabled     Boolean                       @default(false)
+  createdAt              DateTime                      @default(now())
+  updatedAt              DateTime                      @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations mapping for relationships
+  sourceRelationships CompanyRelationship[]     @relation("SourceProfileRel")
+  targetRelationships CompanyRelationship[]     @relation("TargetProfileRel")
+  sentInvites         NetworkConnectionInvite[] @relation("FromProfileInviteRel")
+  receivedInvites     NetworkConnectionInvite[] @relation("ToProfileInviteRel")
+
+  profileCompleteness Float              @default(0)
+  trustScore          NetworkTrustScore?
+
+  networkCapabilities NetworkCapability[]
+  categorySignals     NetworkCategorySignal[]
+  recommendations     NetworkRecommendation[] @relation("TargetProfileRecRel")
+
+  inventorySignals      NetworkInventorySignal[]
+  supplierOpportunities NetworkTradeOpportunity[] @relation("SupplierOpportunityRel")
+  buyerOpportunities    NetworkTradeOpportunity[] @relation("BuyerOpportunityRel")
+  NetworkSupplierScore  NetworkSupplierScore[]
+  tenantMarketInsights  TenantMarketInsight[]
+
+  @@index([visibilityLevel])
+  @@index([verificationStatus])
+  @@index([isDiscoveryEnabled])
+  @@index([isPublicListingEnabled])
+  @@index([city])
+  @@index([country])
+}
+

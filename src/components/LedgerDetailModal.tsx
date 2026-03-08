@@ -46,7 +46,7 @@ export default function LedgerDetailModal({ isOpen, onClose, account }: LedgerDe
 
     // --- Calculation of Running Balance ---
     let runningBalance = openingBalance.money;
-    const computedItems = items.map(item => {
+    const computedItems = items?.map(item => {
         const debt = Number(item.debt);
         const credit = Number(item.credit);
 
@@ -130,7 +130,7 @@ export default function LedgerDetailModal({ isOpen, onClose, account }: LedgerDe
                                 </tr>
 
                                 {/* ITEMS */}
-                                {computedItems.map((item, idx) => (
+                                {computedItems?.map((item, idx) => (
                                     <tr key={idx} className="hover:bg-white/5 transition-colors group">
                                         <td className="p-4 text-gray-300 whitespace-nowrap">{formatDate(item.journal.date)}</td>
                                         <td className="p-4 text-blue-400 group-hover:underline cursor-pointer">{item.journal.fisNo}</td>

@@ -99,7 +99,7 @@ export default function AdminGrowthBillingHealth() {
                     { label: 'Tolerans (Grace)', val: 'grace' },
                     { label: 'Gecikmiş (Overdue)', val: 'overdue' },
                     { label: 'Açılmayı Bekleyen (Blocked)', val: 'blocked' }
-                ].map(f => (
+                ]?.map(f => (
                     <button key={f.val} onClick={() => setFilter(f.val)} className={`px-4 py-2 text-xs font-bold rounded shadow-sm border ${filter === f.val ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                         {f.label}
                     </button>
@@ -118,7 +118,7 @@ export default function AdminGrowthBillingHealth() {
                         </tr>
                     </thead>
                     <tbody className="divide-y text-sm">
-                        {data?.tenants.map((t: any) => (
+                        {data?.tenants?.map((t: any) => (
                             <tr key={t.invoiceId} className="hover:bg-slate-50">
                                 <td className="p-4">
                                     <div className="font-bold text-slate-800 font-mono text-xs">{t.tenantId}</div>

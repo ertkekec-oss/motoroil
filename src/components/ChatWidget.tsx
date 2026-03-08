@@ -130,7 +130,7 @@ export default function ChatWidget() {
                                 {conversations.length > 0 && (
                                     <div className="space-y-1">
                                         <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1 mb-2">Son Mesajlar</div>
-                                        {conversations.map(conv => (
+                                        {conversations?.map(conv => (
                                             <div
                                                 key={conv.userId}
                                                 onClick={() => startChat({ id: conv.userId, name: conv.name })}
@@ -161,7 +161,7 @@ export default function ChatWidget() {
                                 )}
                                 <div className="space-y-1">
                                     <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1 mb-2">Tüm Personel</div>
-                                    {availableStaff.map(s => (
+                                    {availableStaff?.map(s => (
                                         <div
                                             key={s.id}
                                             onClick={() => startChat(s)}
@@ -184,7 +184,7 @@ export default function ChatWidget() {
                                         Henüz mesaj yok. Merhaba de! 👋
                                     </div>
                                 )}
-                                {messages.map((msg, i) => {
+                                {messages?.map((msg, i) => {
                                     const isMe = msg.senderId === currentUser.id;
                                     return (
                                         <div key={msg.id || i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>

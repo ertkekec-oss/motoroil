@@ -2,7 +2,8 @@ import { getSession } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { cancelShipment } from '@/services/shipping/core/shipmentService';
 
-export async function POST(request: NextRequest, { params }: { params: { shipmentId: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ shipmentId: string }> }) {
+    const params = await props.params;
     const user = await getSession();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

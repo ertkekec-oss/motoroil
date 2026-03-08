@@ -4,7 +4,8 @@ import { verifyCompany } from '@/services/network/trust/admin';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const sessionResult: any = await getSession();
         const session = sessionResult?.user || sessionResult;

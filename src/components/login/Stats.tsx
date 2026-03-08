@@ -10,7 +10,7 @@ export default function Stats() {
         <section className="py-16 px-6" aria-label="Platform İstatistikleri">
             <div className="max-w-4xl mx-auto">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {STATS.map(s => (
+                    {STATS?.map(s => (
                         <div key={s.label}
                             className="text-center p-6 rounded-2xl border border-white/5 hover:border-orange-500/20 transition-all group"
                             style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>

@@ -186,7 +186,7 @@ export default function CommissionsPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y">
-                            {plans.map(p => (
+                            {plans?.map(p => (
                                 <tr key={p.id} className="hover:bg-slate-50">
                                     <td className="p-4 font-medium">{p.name}</td>
                                     <td className="p-4"><span className={`px-2 py-1 rounded text-xs font-bold ${p.scope === 'GLOBAL' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{p.scope}</span></td>

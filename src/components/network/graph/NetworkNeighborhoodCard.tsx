@@ -41,7 +41,7 @@ export function NetworkNeighborhoodCard() {
                 </p>
 
                 <div className="flex flex-wrap gap-2">
-                    {summary.tags.map((tag: string, i: number) => (
+                    {summary.tags?.map((tag: string, i: number) => (
                         <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md border">
                             {tag.replace(/_/g, ' ')}
                         </span>

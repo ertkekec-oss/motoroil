@@ -107,7 +107,7 @@ export default async function LedgersAuditPage({
 
     const companyIds = Array.from(new Set(ordersWithLedgers.flatMap(o => [o.buyerCompanyId, o.sellerCompanyId])));
     const companies = await prisma.company.findMany({ where: { id: { in: companyIds } }, select: { id: true, name: true } });
-    const companyMap = new Map(companies.map(c => [c.id, c.name]));
+    const companyMap = new Map(companies?.map(c => [c.id, c.name]));
 
     // Strip out orders that don't match the payment filter (if active)
     const displayOrders = Object.keys(paymentFilters).length > 0
@@ -249,7 +249,7 @@ export default async function LedgersAuditPage({
                                 {displayOrders.length === 0 ? (
                                     <tr><td colSpan={11} className="text-center py-6 text-slate-500 font-medium text-xs">No records found matching current matrices.</td></tr>
                                 ) : (
-                                    displayOrders.map(order => {
+                                    displayOrders?.map(order => {
                                         const payment = order.payments?.[0]; // Safe array 0 index check
                                         const inbox = payment?.payoutEvents?.[0];
 

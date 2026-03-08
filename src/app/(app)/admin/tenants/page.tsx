@@ -251,7 +251,7 @@ export default function TenantsPage() {
                         ) : tenants.length === 0 ? (
                             <tr><td colSpan={7} className="px-6 py-12 text-center text-slate-500">Kayıt bulunamadı.</td></tr>
                         ) : (
-                            tenants.map(t => (
+                            tenants?.map(t => (
                                 <tr key={t.id} className="hover:bg-slate-50/50 transition">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">

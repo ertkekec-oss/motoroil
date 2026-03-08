@@ -67,7 +67,7 @@ export default function FinancialAuditContent() {
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {issues.map((issue, idx) => (
+                    {issues?.map((issue, idx) => (
                         <div key={idx} className={`pricing-card p-4 rounded-lg flex items-start gap-4 ${getColor(issue.type)} border border-slate-200 dark:border-slate-800`}>
                             <div className="text-2xl mt-1">{getIcon(issue.type)}</div>
                             <div className="flex-1">

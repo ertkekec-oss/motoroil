@@ -15,7 +15,7 @@ export default function Analytics() {
                     <p className="text-gray-400">Geçiş yapan işletmelerin 6 ay sonra ölçtüğü sonuçlar</p>
                 </div>
                 <div className="space-y-5">
-                    {METRICS.map(m => (
+                    {METRICS?.map(m => (
                         <div key={m.label} className="p-5 rounded-2xl border border-white/5" style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-sm font-bold text-white">{m.label}</span>

@@ -87,7 +87,7 @@ export default async function AdminTicketsPage({
                                 </tr>
                             </thead>
                             <tbody>
-                                {tickets.map(ticket => (
+                                {tickets?.map(ticket => (
                                     <tr key={ticket.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group cursor-pointer">
                                         <td className="px-6 py-4">
                                             <div className="text-sm font-bold text-slate-900 mb-1">{ticket.tenantId}</div>

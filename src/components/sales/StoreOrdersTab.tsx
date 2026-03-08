@@ -158,7 +158,7 @@ export function StoreOrdersTab({
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
-                                {paginatedOrders.map(o => {
+                                {paginatedOrders?.map(o => {
                                     const isExpanded = expandedStoreOrderId === o.id;
                                     return (
                                         <Fragment key={o.id}>
@@ -217,7 +217,7 @@ export function StoreOrdersTab({
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800'}`}>
-                                                                    {o.items && Array.isArray(o.items) && o.items.length > 0 ? o.items.map((item: any, i: number) => {
+                                                                    {o.items && Array.isArray(o.items) && o.items.length > 0 ? o.items?.map((item: any, i: number) => {
                                                                         const pName = item.name || item.productName || 'Ürün';
                                                                         const pQty = item.qty || item.quantity || 1;
                                                                         const pPrice = Number(item.price || item.unitPrice || 0);

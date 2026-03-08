@@ -29,7 +29,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
 
                 {/* Tabs */}
                 <div className="flex gap-4 border-b border-slate-200">
-                    {[ProductStatus.PENDING, ProductStatus.APPROVED, ProductStatus.REJECTED].map(s => (
+                    {[ProductStatus.PENDING, ProductStatus.APPROVED, ProductStatus.REJECTED]?.map(s => (
                         <Link
                             key={s}
                             href={`/admin/products?status=${s}`}
@@ -57,7 +57,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                                     <td colSpan={5} className="p-10 text-center text-slate-400">No products in this queue.</td>
                                 </tr>
                             ) : (
-                                products.map(prod => (
+                                products?.map(prod => (
                                     <tr key={prod.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="p-4">
                                             <div className="font-bold text-[#1F3A5F]">{prod.name}</div>
@@ -68,7 +68,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                                         </td>
                                         <td className="p-4">
                                             <div className="flex flex-wrap gap-1">
-                                                {prod.listings.map(l => (
+                                                {prod.listings?.map(l => (
                                                     <span key={l.id} className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100">
                                                         {l.company.name}
                                                     </span>

@@ -149,7 +149,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                             required
                         >
                             <option value="">Bir müşteri seçin...</option>
-                            {customers.map((c: any) => (
+                            {customers?.map((c: any) => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
                         </select>
@@ -269,7 +269,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                     </td>
                                 </tr>
                             ) : (
-                                formData.items.map((item, i) => (
+                                formData.items?.map((item, i) => (
                                     <tr key={i} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors duration-200 group min-h-[52px]">
                                         <td className="p-3 text-center font-mono text-xs text-slate-400">{i + 1}</td>
                                         <td className="p-3">
@@ -280,7 +280,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                                     onChange={e => updateItem(i, 'productId', e.target.value)}
                                                 >
                                                     <option value="">Envanterden Seç (Opsiyonel)</option>
-                                                    {products.map((p: any) => (
+                                                    {products?.map((p: any) => (
                                                         <option key={p.id} value={p.id}>{p.name} ({p.brand})</option>
                                                     ))}
                                                 </select>

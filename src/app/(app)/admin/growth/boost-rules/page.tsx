@@ -165,7 +165,7 @@ export default function AdminBoostRules() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 text-[14px]">
-                                    {rules.map(r => (
+                                    {rules?.map(r => (
                                         <tr key={r.id} className="hover:bg-slate-50 transition-colors group">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">

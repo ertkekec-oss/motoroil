@@ -336,7 +336,7 @@ export default function WebsiteManagerPage() {
                     { id: 'general', label: 'Genel Ayarlar', icon: '⚙️' },
                     { id: 'pages', label: 'Sayfa Üreticisi', icon: '📄' },
                     { id: 'menus', label: 'Menü Yönetimi', icon: '🍔' }
-                ].map(tab => (
+                ]?.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
@@ -445,7 +445,7 @@ export default function WebsiteManagerPage() {
                                     </button>
                                 </div>
                                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
-                                    {data.pages.map((p: any) => (
+                                    {data.pages?.map((p: any) => (
                                         <div key={p.id} className="relative group flex-shrink-0">
                                             <button
                                                 onClick={() => setSelectedPage(p)}
@@ -764,10 +764,10 @@ export default function WebsiteManagerPage() {
                                                                         <textarea
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900 min-h-[100px]"
                                                                             placeholder="Ürünler|/products&#10;Hakkımızda|/about"
-                                                                            value={(section.content.menuItems || []).map((m: any) => `${m.title}|${m.url}`).join('\n')}
+                                                                            value={(section.content.menuItems || [])?.map((m: any) => `${m.title}|${m.url}`).join('\n')}
                                                                             onChange={(e) => {
                                                                                 const lines = e.target.value.split('\n').filter(l => l.includes('|'));
-                                                                                const newMenuItems = lines.map(l => {
+                                                                                const newMenuItems = lines?.map(l => {
                                                                                     const [title, url] = l.split('|');
                                                                                     return { title: title.trim(), url: url.trim() };
                                                                                 });
@@ -896,7 +896,7 @@ export default function WebsiteManagerPage() {
                                                             <div className="space-y-4">
                                                                 <label className="text-[10px] font-black text-slate-500 uppercase block">{section.type === 'PARTNERS' ? 'LOGOLAR / REFERANSLAR' : 'ÖĞELER / MADDELER'}</label>
                                                                 <div className="space-y-3 max-h-[400px] overflow-y-auto bg-slate-100 p-4 rounded-xl border border-slate-200 text-slate-900">
-                                                                    {(section.content.items || []).map((item: any, iidx: number) => (
+                                                                    {(section.content.items || [])?.map((item: any, iidx: number) => (
                                                                         <div key={iidx} className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 space-y-3 relative group/item">
                                                                             <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                                                                                 <span className="text-[11px] font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded"># {iidx + 1}</span>
@@ -1342,7 +1342,7 @@ export default function WebsiteManagerPage() {
                                                             <div>
                                                                 <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">ROLLER (ACCORDION ITEMS)</label>
                                                                 <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 max-h-[400px] overflow-y-auto">
-                                                                    {(section.content.items || []).map((role: any, rIdx: number) => (
+                                                                    {(section.content.items || [])?.map((role: any, rIdx: number) => (
                                                                         <div key={rIdx} className="bg-white p-3 rounded-lg border border-slate-200 space-y-2 text-xs">
                                                                             <div className="flex gap-2 items-end">
                                                                                 <div className="flex-1 space-y-1">
@@ -1405,7 +1405,7 @@ export default function WebsiteManagerPage() {
                                                                                 value={(role.list || role.items || []).join(', ')}
                                                                                 onChange={(e) => {
                                                                                     const newItems = [...section.content.items];
-                                                                                    newItems[rIdx].list = e.target.value.split(',').map(s => s.trim());
+                                                                                    newItems[rIdx].list = e.target.value.split(',')?.map(s => s.trim());
                                                                                     updateSectionContent(idx, 'items', newItems);
                                                                                 }}
                                                                             />
@@ -1550,7 +1550,7 @@ export default function WebsiteManagerPage() {
                                         </div>
 
                                         <div className="space-y-4">
-                                            {(menu.items || []).map((item: any, i: number) => (
+                                            {(menu.items || [])?.map((item: any, i: number) => (
                                                 <div key={i} className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden transition-all hover:border-blue-300 group">
                                                     {/* Item Header / Summary */}
                                                     <div className="p-4 flex gap-4 items-start">
@@ -1660,7 +1660,7 @@ export default function WebsiteManagerPage() {
                                                                                 >+ EKLE</button>
                                                                             </div>
                                                                             <div className="space-y-2 max-h-[250px] overflow-y-auto">
-                                                                                {(item.sidebar || []).map((sb: any, sbIdx: number) => (
+                                                                                {(item.sidebar || [])?.map((sb: any, sbIdx: number) => (
                                                                                     <div key={sbIdx} className="flex gap-1 items-center bg-slate-50 p-1 rounded-lg border border-slate-100">
                                                                                         <input
                                                                                             type="text"
@@ -1723,7 +1723,7 @@ export default function WebsiteManagerPage() {
                                                                                 >+ KARTI EKLE</button>
                                                                             </div>
                                                                             <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-                                                                                {(item.content || []).map((content: any, cIdx: number) => (
+                                                                                {(item.content || [])?.map((content: any, cIdx: number) => (
                                                                                     <div key={cIdx} className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-3 relative group/card">
                                                                                         <div className="flex gap-2 items-center">
                                                                                             <div className="w-1/3">
@@ -1738,7 +1738,7 @@ export default function WebsiteManagerPage() {
                                                                                                     }}
                                                                                                 >
                                                                                                     <option value="">Kategori Seç...</option>
-                                                                                                    {(item.sidebar || []).map((s: any) => (
+                                                                                                    {(item.sidebar || [])?.map((s: any) => (
                                                                                                         <option key={s.id} value={s.id}>{s.label}</option>
                                                                                                     ))}
                                                                                                 </select>

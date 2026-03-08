@@ -25,7 +25,7 @@ export default async function AdminHealthDashboard() {
                         <ShieldAlert className="w-4 h-4 mr-2" /> Active Alerts & Drift Warnings
                     </h3>
                     <ul className="list-disc leading-relaxed text-sm pl-5 text-amber-700 font-medium">
-                        {healthData.warnings.map((w: string, i: number) => <li key={i}>{w}</li>)}
+                        {healthData.warnings?.map((w: string, i: number) => <li key={i}>{w}</li>)}
                     </ul>
                 </div>
             )}

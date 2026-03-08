@@ -323,7 +323,7 @@ export default function SalesMonitor({
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {suspiciousEvents.slice(0, 10).map(event => (
+                                {suspiciousEvents.slice(0, 10)?.map(event => (
                                     <div
                                         key={event.id}
                                         style={{

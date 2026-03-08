@@ -135,7 +135,7 @@ export default function TrialBalanceContent() {
                             ) : filteredData.length === 0 ? (
                                 <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Kayıt bulunamadı.</td></tr>
                             ) : (
-                                filteredData.map(row => (
+                                filteredData?.map(row => (
                                     <tr
                                         key={row.id}
                                         onClick={() => openLedger(row)}

@@ -20,7 +20,7 @@ export default function NetworkEarningsPage() {
             })
             .then(data => {
                 if (data.page && data.page.items) {
-                    setEarnings(data.page.items.map((e: any) => ({
+                    setEarnings(data.page.items?.map((e: any) => ({
                         id: e.id,
                         createdAt: e.createdAt,
                         refId: e.reference?.orderId || "-",
@@ -128,7 +128,7 @@ export default function NetworkEarningsPage() {
                                     <td colSpan={8} className="px-6 py-12 text-center text-slate-400">Bu sekmede kayıt bulunmuyor.</td>
                                 </tr>
                             ) : (
-                                filteredEarnings.map(item => (
+                                filteredEarnings?.map(item => (
                                     <tr key={item.id} className="hover:bg-slate-50 dark:bg-[#1e293b] transition-colors group">
                                         <td className="px-6 py-4 whitespace-nowrap">{formatDate(item.createdAt)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">{item.refId}</td>

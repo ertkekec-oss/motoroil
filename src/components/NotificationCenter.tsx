@@ -122,7 +122,7 @@ export default function NotificationCenter() {
                                 Henüz bildirim yok.
                             </div>
                         ) : (
-                            notifications.map((n) => (
+                            notifications?.map((n) => (
                                 <div
                                     key={n.id}
                                     onClick={() => !n.isRead && markAsRead(n.id)}

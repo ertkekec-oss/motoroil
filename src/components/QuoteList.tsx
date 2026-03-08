@@ -104,7 +104,7 @@ export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading,
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                        {filteredQuotes.map((quote) => (
+                        {filteredQuotes?.map((quote) => (
                             <tr key={quote.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors duration-200 group">
                                 <td className="px-6 py-4">
                                     <div className="font-mono text-blue-600 dark:text-blue-400 font-medium tracking-wide text-[13px] mb-1">{quote.quoteNo}</div>
@@ -166,7 +166,7 @@ export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading,
 
             {/* Mobile View */}
             <div className="md:hidden flex flex-col gap-3">
-                {filteredQuotes.map((quote) => (
+                {filteredQuotes?.map((quote) => (
                     <div key={quote.id} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[14px] p-5 hover:border-blue-500/30 transition-colors shadow-sm cursor-pointer" onClick={() => onEdit(quote)}>
                         <div className="flex justify-between items-start mb-3">
                             <div>

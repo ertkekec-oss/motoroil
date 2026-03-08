@@ -122,7 +122,7 @@ export default function SecuritySettingsPage() {
                         </p>
                     </div>
 
-                    {words.map((word) => (
+                    {words?.map((word) => (
                         <div
                             key={word}
                             className="flex justify-between items-center p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-red-200 group transition-all"

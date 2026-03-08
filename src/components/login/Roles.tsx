@@ -17,7 +17,7 @@ export default function Roles() {
                     <p className="text-gray-400">Periodya; farklı departmanlara, tek platformda özel deneyim sunar.</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {ROLES.map(r => (
+                    {ROLES?.map(r => (
                         <div key={r.title}
                             className="p-5 rounded-2xl border border-white/5 hover:border-orange-500/20 transition-all group"
                             style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>

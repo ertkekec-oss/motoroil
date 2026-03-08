@@ -82,7 +82,7 @@ export default function DisputeDetailPage() {
                     "Content-Type": "application/json",
                     "x-idempotency-key": crypto.randomUUID()
                 },
-                body: JSON.stringify({ fieldsRequested: fields.split(',').map(s => s.trim()) })
+                body: JSON.stringify({ fieldsRequested: fields.split(',')?.map(s => s.trim()) })
             });
 
             if (res.ok) {
@@ -152,7 +152,7 @@ export default function DisputeDetailPage() {
                         <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">PLATFORM FİNANS DENETİM BEYAZ MASA</h2>
                         <div className="space-y-4">
                             {actions.length === 0 ? <p className="text-sm text-slate-500 text-center py-4">Henüz finansal veya idari müdahale yapılmamış.</p> : null}
-                            {actions.map((act: any) => (
+                            {actions?.map((act: any) => (
                                 <div key={act.id} className="relative pl-4 border-l-2 border-slate-200">
                                     <div className="absolute -left-1.5 top-1.5 w-3 h-3 bg-white border-2 border-slate-400 rounded-full"></div>
                                     <div className="text-xs font-bold text-slate-800">{act.actionType}</div>
@@ -179,7 +179,7 @@ export default function DisputeDetailPage() {
                             </button>
                         </div>
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-                            {messages.map((m: any) => (
+                            {messages?.map((m: any) => (
                                 <div key={m.id} className={`flex flex-col max-w-[80%] ${m.actorType === 'SYSTEM' ? 'mx-auto w-full max-w-[90%]' : m.actorType === 'ADMIN' ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
                                     <span className="text-[10px] font-bold text-slate-400 mb-1">{m.actorType} | {new Date(m.createdAt).toLocaleTimeString()}</span>
                                     <div className={`p-3 rounded-lg text-sm shadow-sm whitespace-pre-wrap ${m.actorType === 'SYSTEM' ? 'bg-amber-50 border border-amber-200 text-amber-900 w-full font-medium' :

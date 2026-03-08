@@ -130,7 +130,7 @@ export default function ReconciliationWizard({
 
                 {/* Steps */}
                 <div style={{ display: 'flex', padding: '16px 32px', gap: '8px', background: 'rgba(0,0,0,0.2)' }}>
-                    {[1, 2, 3].map(s => (
+                    {[1, 2, 3]?.map(s => (
                         <div key={s} style={{ flex: 1, height: '4px', background: s <= step ? '#3b82f6' : 'rgba(255,255,255,0.1)', borderRadius: '2px', transition: 'background 0.3s' }} />
                     ))}
                 </div>
@@ -183,7 +183,7 @@ export default function ReconciliationWizard({
                                 </div>
                                 <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', marginTop: '8px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', wordBreak: 'break-all' }}>
                                     <span style={{ opacity: 0.6 }}>Hash: </span>
-                                    {Array(8).fill("").map(() => Math.random().toString(36).substring(2, 6)).join("")}
+                                    {Array(8).fill("")?.map(() => Math.random().toString(36).substring(2, 6)).join("")}
                                     {/* Mock Hash visual */}
                                 </div>
                             </div>

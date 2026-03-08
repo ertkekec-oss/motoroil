@@ -36,7 +36,7 @@ export function LiquidityOpportunityBoard() {
                 <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-lg">{opportunities.length} Total</span>
             </div>
             <div className="divide-y divide-gray-100">
-                {opportunities.map(opp => (
+                {opportunities?.map(opp => (
                     <div key={opp.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
                         <div className="flex flex-col">
                             <span className="text-sm font-semibold text-gray-900">

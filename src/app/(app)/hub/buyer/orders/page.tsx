@@ -99,9 +99,9 @@ export default async function BuyerOrdersPage({
         },
     });
 
-    const companyIds = Array.from(new Set(orders.map(o => o.sellerCompanyId)));
+    const companyIds = Array.from(new Set(orders?.map(o => o.sellerCompanyId)));
     const companies = await prisma.company.findMany({ where: { id: { in: companyIds } }, select: { id: true, name: true } });
-    const companyMap = new Map(companies.map(c => [c.id, c.name]));
+    const companyMap = new Map(companies?.map(c => [c.id, c.name]));
 
     const hasNext = orders.length > pageSize;
     const data = hasNext ? orders.slice(0, pageSize) : orders;
@@ -178,7 +178,7 @@ export default async function BuyerOrdersPage({
                                         </td>
                                     </tr>
                                 ) : (
-                                    data.map((o) => (
+                                    data?.map((o) => (
                                         <tr key={o.id} className="hover:bg-slate-50 dark:bg-[#0f172a] transition-colors group">
                                             <td className="px-6 py-4">
                                                 <Link

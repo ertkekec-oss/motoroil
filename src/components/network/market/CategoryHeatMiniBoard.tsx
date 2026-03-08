@@ -53,7 +53,7 @@ export function CategoryHeatMiniBoard({ categories, isLoading }: CategoryHeatPro
             </CardHeader>
             <CardContent className="px-3 pb-3">
                 <div className="flex flex-col gap-1">
-                    {categories.slice(0, 5).map((cat, index) => (
+                    {categories.slice(0, 5)?.map((cat, index) => (
                         <div key={index} className="flex justify-between items-center p-2 rounded hover:bg-muted/50 transition">
                             <span className="text-sm font-medium">{cat.categoryId}</span>
                             <div className="flex items-center gap-3">

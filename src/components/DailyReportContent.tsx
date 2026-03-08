@@ -221,7 +221,7 @@ export default function DailyReportContent() {
 
                     <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                         {filteredTransactions.length > 0 ? (
-                            filteredTransactions.slice(0, 20).map((t, i) => (
+                            filteredTransactions.slice(0, 20)?.map((t, i) => (
                                 <div key={i} className="flex-between p-5 group rounded-2xl bg-subtle border border-subtle hover:bg-hover hover:border-main hover:translate-x-1 transition-all">
                                     <div className="flex gap-5 items-center">
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-sm ${t.type === 'Sales' ? 'bg-orange-500/10 text-orange-400 ' :
@@ -262,7 +262,7 @@ export default function DailyReportContent() {
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-10">
                         <h3 className="text-lg font-black text-white mb-6">Kasa Dağılımı</h3>
                         <div className="space-y-7">
-                            {kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch).slice(0, 6).map((kasa, i) => {
+                            {kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch).slice(0, 6)?.map((kasa, i) => {
                                 const relevantKasas = kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch);
                                 const totalWeight = relevantKasas.reduce((a, b) => a + Math.abs(Number(b.balance)), 0) || 1;
                                 const percentage = (Math.abs(Number(kasa.balance)) / totalWeight) * 100;

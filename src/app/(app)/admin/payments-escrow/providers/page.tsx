@@ -50,7 +50,7 @@ export default function ProvidersPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {providers.map(p => (
+                {providers?.map(p => (
                     <div key={p.name} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
                         <div className="flex justify-between items-start mb-4">
                             <h2 className="text-lg font-bold flex items-center gap-2">

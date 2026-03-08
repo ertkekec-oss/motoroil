@@ -94,12 +94,12 @@ export default function AdminGrowthRevenue() {
                             <div className="w-full h-80 bg-white border border-slate-100 rounded-xl flex items-end px-4 pt-10 space-x-3 pb-0 overflow-hidden relative">
                                 {/* Grid Lines Behind Chart */}
                                 <div className="absolute inset-0 flex flex-col justify-between pointer-events-none p-4 pb-0 opacity-40">
-                                    {[...Array(5)].map((_, i) => (
+                                    {[...Array(5)]?.map((_, i) => (
                                         <div key={i} className="w-full border-b border-dashed border-slate-300 h-0 flex-1"></div>
                                     ))}
                                 </div>
 
-                                {data.chartData && data.chartData.map((pt: any, i: number) => {
+                                {data.chartData && data.chartData?.map((pt: any, i: number) => {
                                     // Calculate responsive heights
                                     const rawRevenueHeight = Math.max((pt.revenue / (data.totalBoostRev || 1)) * 100, 5);
                                     // Scale up revenue visualization so it's not all tiny

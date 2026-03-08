@@ -123,7 +123,7 @@ export function InvoiceMappingModal({
                         </div>
 
                         {/* Items */}
-                        {selectedOrder.items.map((item: any, idx: number) => {
+                        {selectedOrder.items?.map((item: any, idx: number) => {
                             const info = getMappingInfo(item);
                             const currentMap = mappedItems[item.name];
                             const isDone = !!(currentMap?.productId);
@@ -176,7 +176,7 @@ export function InvoiceMappingModal({
                                             {/* Put top suggestions first */}
                                             {(info.suggestions || []).length > 0 && (
                                                 <optgroup label={`🤖 AI Önerileri (en iyi ${info.suggestions.length})`}>
-                                                    {(info.suggestions as any[]).map((s: any) => (
+                                                    {(info.suggestions as any[])?.map((s: any) => (
                                                         <option key={s.product.id} value={s.product.id}>
                                                             {s.product.name} — Stok: {s.product.stock} — Skor: {s.score}
                                                         </option>
@@ -184,7 +184,7 @@ export function InvoiceMappingModal({
                                                 </optgroup>
                                             )}
                                             <optgroup label="📦 Tüm Stok Kartları">
-                                                {inventoryProducts.map((inv: any) => (
+                                                {inventoryProducts?.map((inv: any) => (
                                                     <option key={inv.id} value={inv.id}>
                                                         {inv.name} ({inv.stock} Adet)
                                                     </option>
@@ -202,7 +202,7 @@ export function InvoiceMappingModal({
                                                         onChange={e => setMappedItems({ ...mappedItems, [item.name]: { productId: e.target.value, status: 'manual' } })}
                                                     >
                                                         <option value="">— Manuel Seçim Yap —</option>
-                                                        {inventoryProducts.map((inv: any) => (
+                                                        {inventoryProducts?.map((inv: any) => (
                                                             <option key={inv.id} value={inv.id}>{inv.name} ({inv.stock} Adet)</option>
                                                         ))}
                                                     </select>

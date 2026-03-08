@@ -123,7 +123,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
             )}
 
             <div className="space-y-6">
-                {categories.map(cat => (
+                {categories?.map(cat => (
                     <div key={cat.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
                             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -214,7 +214,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
                                     <div>
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kategori</label>
                                         <select value={topicForm.categoryId} onChange={e => setTopicForm({ ...topicForm, categoryId: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-4 text-slate-900 rounded-xl mt-1 outline-none focus:border-orange-500/50 transition-colors">
-                                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                            {categories?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                         </select>
                                     </div>
                                     <div>

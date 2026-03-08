@@ -4,7 +4,8 @@ import { getConnectionDetails } from '@/services/network/engine/relationship';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request, { params }: { params: { relationshipId: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ relationshipId: string }> }) {
+    const params = await props.params;
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

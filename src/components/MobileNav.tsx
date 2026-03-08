@@ -46,7 +46,7 @@ export function MobileNav() {
                 boxShadow: '0 -4px 12px rgba(0,0,0,0.3)',
             }}
         >
-            {navItems.map((item) => {
+            {navItems?.map((item) => {
                 const isActive = pathname === item.path;
                 return (
                     <button

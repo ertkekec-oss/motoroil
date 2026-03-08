@@ -267,7 +267,7 @@ export default function StaffManagementContent() {
     ];
 
     const roleTemplates: Record<string, string[]> = {
-        'Yönetici': allPermissions.map(p => p.id),
+        'Yönetici': allPermissions?.map(p => p.id),
         'Şube Müdürü': ['pos_access', 'sales_archive', 'discount_auth', 'inventory_view', 'customer_view', 'customer_edit', 'service_view', 'service_create', 'branch_isolation'],
         'Saha Satış': ['field_sales_access', 'field_sales_admin', 'customer_view', 'customer_edit', 'inventory_view', 'pos_access', 'sales_archive'],
         'E-Ticaret Uzmanı': ['ecommerce_view', 'ecommerce_manage', 'inventory_view', 'inventory_edit', 'sales_archive'],
@@ -933,7 +933,7 @@ export default function StaffManagementContent() {
                         { id: 'attendance', label: 'PDKS' },
                         { id: 'puantaj', label: 'Puantaj' },
                         { id: 'payroll', label: 'Bordro' }
-                    ].map(tab => (
+                    ]?.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
@@ -987,7 +987,7 @@ export default function StaffManagementContent() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {filteredStaff.length > 0 ? filteredStaff.map(person => {
+                                {filteredStaff.length > 0 ? filteredStaff?.map(person => {
                                     const activeAtt = attendance.find(a => a.staffId === person.id && !a.checkOut);
                                     const isAvailable = person.status === 'Müsait' || person.status === 'Boşta' || !person.status;
 
@@ -1088,7 +1088,7 @@ export default function StaffManagementContent() {
                                 <input type="text" placeholder="Rol ara..." className="w-full h-10 pl-9 pr-3 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] outline-none focus:border-blue-500 transition-colors" />
                             </div>
                             <div className="flex flex-col gap-2">
-                                {Object.keys(roleTemplates).map((roleName, idx) => (
+                                {Object.keys(roleTemplates)?.map((roleName, idx) => (
                                     <button key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left ${idx === 0 ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'}`}>
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg ${idx === 0 ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}>
@@ -1216,7 +1216,7 @@ export default function StaffManagementContent() {
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {targets.length > 0 ? (
-                                            targets.map((t, idx) => {
+                                            targets?.map((t, idx) => {
                                                 const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
                                                 return (
                                                     <tr key={t.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[56px]">
@@ -1321,7 +1321,7 @@ export default function StaffManagementContent() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {staff.map((person) => (
+                                {staff?.map((person) => (
                                     <tr key={person.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/50 transition-colors h-[60px] group">
                                         <td className="p-4 pl-6 border-r border-slate-100 dark:border-white/5 font-bold sticky left-0 bg-white dark:bg-[#0f172a] group-hover:bg-slate-50/95 z-10 transition-colors shadow-[1px_0_0_0_#f1f5f9]">
                                             <div className="flex items-center gap-3">
@@ -1334,7 +1334,7 @@ export default function StaffManagementContent() {
                                                 </div>
                                             </div>
                                         </td>
-                                        {[0, 1, 2, 3, 4, 5, 6].map((offset) => {
+                                        {[0, 1, 2, 3, 4, 5, 6]?.map((offset) => {
                                             const d = new Date(currentWeekStart);
                                             d.setDate(d.getDate() + offset);
                                             const shift = shifts.find(s => s.staffId === person.id && new Date(s.start).getDate() === d.getDate());
@@ -1427,7 +1427,7 @@ export default function StaffManagementContent() {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {leaves.length > 0 ? (
-                                        leaves.map((leave, idx) => (
+                                        leaves?.map((leave, idx) => (
                                             <tr key={leave.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[56px] group">
                                                 <td className="p-4 pl-6 align-middle font-bold text-slate-900 dark:text-white text-[13px]">{leave.staff?.name}</td>
                                                 <td className="p-4 align-middle">
@@ -1525,7 +1525,7 @@ export default function StaffManagementContent() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {staff.map((person) => {
+                                {staff?.map((person) => {
                                     const payroll = payrolls.find(p => p.staffId === person.id);
                                     return (
                                         <tr key={person.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[64px]">
@@ -1619,7 +1619,7 @@ export default function StaffManagementContent() {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {attendance.length > 0 ? (
-                                        attendance.map(a => (
+                                        attendance?.map(a => (
                                             <tr key={a.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[56px]">
                                                 <td className="p-4 pl-6 align-middle font-bold text-slate-900 dark:text-white text-[13px]">{a.staff?.name}</td>
                                                 <td className="p-4 align-middle text-[12px] text-slate-500 dark:text-slate-400 font-medium">{new Date(a.date).toLocaleDateString('tr-TR')}</td>
@@ -1672,20 +1672,20 @@ export default function StaffManagementContent() {
                             <thead>
                                 <tr className="bg-slate-50 dark:bg-[#1e293b] text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest border-b border-slate-200 dark:border-white/5">
                                     <th className="p-4 pl-6 sticky left-0 bg-slate-50 dark:bg-[#1e293b] z-10 w-[180px] border-r border-slate-200 dark:border-white/5">Personel</th>
-                                    {[...Array(31)].map((_, i) => (
+                                    {[...Array(31)]?.map((_, i) => (
                                         <th key={i} className="py-4 text-center w-8 border-l border-slate-200 dark:border-white/5/50">{i + 1}</th>
                                     ))}
                                     <th className="p-4 pr-6 text-center border-l border-slate-200 dark:border-white/5">Toplam</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {puantaj.map((row: any) => (
+                                {puantaj?.map((row: any) => (
                                     <tr key={row.staffId} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[56px]">
                                         <td className="p-4 pl-6 font-bold text-[13px] sticky left-0 bg-white dark:bg-[#0f172a] border-r border-slate-100 dark:border-white/5 z-10">
                                             {row.name}
                                             <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5 tracking-wider">{row.role}</div>
                                         </td>
-                                        {row.dailyStats.map((stat: any, idx: number) => (
+                                        {row.dailyStats?.map((stat: any, idx: number) => (
                                             <td key={idx} className="p-1.5 border-l border-slate-100 dark:border-white/5/50 text-center align-middle">
                                                 <div className={`w-5 h-5 mx-auto rounded flex items-center justify-center text-[10px] font-bold shadow-sm ${stat.status === 'WORKED' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' :
                                                     stat.status === 'LEAVE' ? 'bg-blue-50 text-blue-600 border border-blue-200' :
@@ -1738,7 +1738,7 @@ export default function StaffManagementContent() {
                             />
 
                             <div className="flex gap-2">
-                                {['düşük', 'normal', 'yüksek'].map(p => (
+                                {['düşük', 'normal', 'yüksek']?.map(p => (
                                     <button
                                         key={p}
                                         onClick={() => setTaskPriority(p)}
@@ -1784,7 +1784,7 @@ export default function StaffManagementContent() {
                         <div className="px-6 py-4 bg-white dark:bg-[#0f172a] border-b border-slate-100 dark:border-white/5 flex items-center gap-4 shrink-0 overflow-x-auto">
                             <span className="text-[11px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> HIZLI ŞABLONLAR:</span>
                             <div className="flex gap-2">
-                                {Object.keys(roleTemplates).map(roleName => (
+                                {Object.keys(roleTemplates)?.map(roleName => (
                                     <button
                                         key={roleName}
                                         onClick={() => {
@@ -1801,13 +1801,13 @@ export default function StaffManagementContent() {
 
                         <div className="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-[#1e293b]/30">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {Array.from(new Set(allPermissions.map(p => p.category))).map(category => (
+                                {Array.from(new Set(allPermissions?.map(p => p.category)))?.map(category => (
                                     <div key={category} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] p-5 shadow-sm">
                                         <h3 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div> {category} YETKİLERİ
                                         </h3>
                                         <div className="space-y-3">
-                                            {allPermissions.filter(p => p.category === category).map(perm => {
+                                            {allPermissions.filter(p => p.category === category)?.map(perm => {
                                                 const isActive = (selectedStaff.permissions || []).includes(perm.id);
                                                 return (
                                                     <label key={perm.id} className="flex items-start gap-3 cursor-pointer group select-none">
@@ -1851,7 +1851,7 @@ export default function StaffManagementContent() {
                                     Bu personel <span className="font-bold">sadece seçili kategorideki</span> müşterilere erişebilir. Seçim yapılmazsa veri kısıtı uygulanmaz (tümünü görür).
                                 </p>
                                 <div className="flex flex-wrap gap-2 pt-2">
-                                    {customerCategories.map(cat => {
+                                    {customerCategories?.map(cat => {
                                         const isActive = (selectedStaff.assignedCategoryIds || []).includes(cat.id);
                                         return (
                                             <button
@@ -1952,7 +1952,7 @@ export default function StaffManagementContent() {
                                             <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Kan Grubu</label>
                                             <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.bloodType} onChange={(e) => setNewStaff({ ...newStaff, bloodType: e.target.value })}>
                                                 <option value="">Seçiniz</option>
-                                                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'].map(t => <option key={t} value={t}>{t}</option>)}
+                                                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-']?.map(t => <option key={t} value={t}>{t}</option>)}
                                             </select>
                                         </div>
                                         <div className="space-y-1.5">
@@ -2039,7 +2039,7 @@ export default function StaffManagementContent() {
                                             <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Şube</label>
                                             <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.branch} onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}>
                                                 <option value="">Şube Seçiniz</option>
-                                                {branches.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                                {branches?.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                                             </select>
                                         </div>
                                         <div className="space-y-1.5">
@@ -2055,7 +2055,7 @@ export default function StaffManagementContent() {
                                             <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Boş bırakılırsa tümünü görür</span>
                                         </div>
                                         <div className="flex flex-wrap gap-2 pt-1">
-                                            {customerCategories.map(cat => {
+                                            {customerCategories?.map(cat => {
                                                 const isActive = newStaff.assignedCategoryIds.includes(cat.id);
                                                 return (
                                                     <button
@@ -2130,7 +2130,7 @@ export default function StaffManagementContent() {
                                                         <label className="text-[11px] font-bold tracking-widest text-slate-600 dark:text-slate-400 uppercase pb-1 block">Kan Grubu</label>
                                                         <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all outline-none" value={editStaff.bloodType || ''} onChange={(e) => setEditStaff({ ...editStaff, bloodType: e.target.value })}>
                                                             <option value="">Seçiniz</option>
-                                                            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'].map(t => <option key={t} value={t}>{t}</option>)}
+                                                            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-']?.map(t => <option key={t} value={t}>{t}</option>)}
                                                         </select>
                                                     </div>
                                                 </div>
@@ -2221,7 +2221,7 @@ export default function StaffManagementContent() {
                                         </div>
                                         <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mb-2">Seçim yapılmazsa personel tüm müşterilere erişebilir.</p>
                                         <div className="flex flex-wrap gap-2 pt-2">
-                                            {customerCategories.map(cat => {
+                                            {customerCategories?.map(cat => {
                                                 const isActive = (editStaff.assignedCategoryIds || []).includes(cat.id);
                                                 return (
                                                     <button
@@ -2269,7 +2269,7 @@ export default function StaffManagementContent() {
                                                     <span className="text-[11px] font-bold uppercase tracking-widest">Arşiv Henüz Boş</span>
                                                 </div>
                                             ) : (
-                                                staffDocuments.map(doc => (
+                                                staffDocuments?.map(doc => (
                                                     <div key={doc.id} className="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/50 rounded-xl flex justify-between items-center group transition-all">
                                                         <div className="flex items-center gap-3 overflow-hidden">
                                                             <div className="w-9 h-9 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-lg">
@@ -2330,7 +2330,7 @@ export default function StaffManagementContent() {
                                         onChange={(e) => setNewShift({ ...newShift, staffId: e.target.value })}
                                     >
                                         <option value="">Personel Seçiniz</option>
-                                        {staff.map(p => (
+                                        {staff?.map(p => (
                                             <option key={p.id} value={p.id}>{p.name} ({p.role})</option>
                                         ))}
                                     </select>
@@ -2360,7 +2360,7 @@ export default function StaffManagementContent() {
                                 <div className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Vardiya Türü</label>
                                     <div className="grid grid-cols-3 gap-3">
-                                        {['Normal', 'Fazla Mesai', 'İzinli'].map(type => (
+                                        {['Normal', 'Fazla Mesai', 'İzinli']?.map(type => (
                                             <button
                                                 key={type}
                                                 onClick={() => setNewShift({ ...newShift, type })}
@@ -2418,7 +2418,7 @@ export default function StaffManagementContent() {
                                         onChange={(e) => setNewLeave({ ...newLeave, staffId: e.target.value })}
                                     >
                                         <option value="">Personel Seçiniz</option>
-                                        {staff.map(p => (
+                                        {staff?.map(p => (
                                             <option key={p.id} value={p.id}>{p.name}</option>
                                         ))}
                                     </select>
@@ -2427,7 +2427,7 @@ export default function StaffManagementContent() {
                                 <div className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">İzin Türü</label>
                                     <div className="grid grid-cols-3 gap-3">
-                                        {['Yıllık İzin', 'Raporlu', 'Ücretsiz İzin'].map(type => (
+                                        {['Yıllık İzin', 'Raporlu', 'Ücretsiz İzin']?.map(type => (
                                             <button
                                                 key={type}
                                                 onClick={() => setNewLeave({ ...newLeave, type })}
@@ -2606,7 +2606,7 @@ export default function StaffManagementContent() {
                                     onChange={(e) => setNewTarget({ ...newTarget, staffId: e.target.value })}
                                 >
                                     <option value="">Personel Seçiniz</option>
-                                    {staff.map(p => (
+                                    {staff?.map(p => (
                                         <option key={p.id} value={p.id}>{p.name} ({p.role})</option>
                                     ))}
                                 </select>

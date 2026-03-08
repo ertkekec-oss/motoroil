@@ -49,6 +49,9 @@ export default async function ReconciliationDashboardPage() {
                         <Link href="/reconciliation/list" style={{ padding: '10px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold', border: '1px solid var(--border-color)' }} className="hover:bg-white/10">
                             Tüm Listeyi Gör
                         </Link>
+                        <Link href="/reconciliation/new" style={{ padding: '10px 16px', borderRadius: '8px', background: '#3b82f6', color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }} className="hover:bg-blue-600">
+                            + Yeni Oluştur
+                        </Link>
                     </div>
                 </div>
 

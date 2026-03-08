@@ -147,7 +147,7 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
         if (existing) {
             setPurchaseData({
                 ...purchaseData,
-                items: purchaseData.items.map(i => i.productId === prod.id ? { ...i, qty: i.qty + quantity } : i)
+                items: purchaseData.items?.map(i => i.productId === prod.id ? { ...i, qty: i.qty + quantity } : i)
             });
         } else {
             setPurchaseData({
@@ -180,7 +180,7 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
                         <div className="flex-col gap-2">
                             <label className="text-muted" style={{ fontSize: '11px' }}>ÜRÜN KATALOĞU (Envanter)</label>
                             <div style={{ maxHeight: '350px', overflowY: 'auto', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
-                                {products.length > 0 ? products.map(p => (
+                                {products.length > 0 ? products?.map(p => (
                                     <div key={p.id} onClick={() => addItemToPurchase(p)} className="flex-between hover-bg-item" style={{ padding: '8px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                                         <div className="flex-col">
                                             <span>{p.name}</span>
@@ -206,7 +206,7 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
                             <span className="text-muted" style={{ fontSize: '12px' }}>{purchaseData.items.length} Ürün</span>
                         </div>
                         <div className="flex-col gap-2" style={{ minHeight: '200px', maxHeight: '300px', overflowY: 'auto' }}>
-                            {purchaseData.items.map((item, idx) => (
+                            {purchaseData.items?.map((item, idx) => (
                                 <div key={idx} className="flex-between" style={{ fontSize: '13px', background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: '500' }}>{item.name}</div>
@@ -282,7 +282,7 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
                                     { label: 'Stok Kodu (SKU)', key: 'code', placeholder: 'SKU-0001' },
                                     { label: 'Üretim Kodu', key: 'productCode', placeholder: 'P-998-X' },
                                     { label: 'Barkod', key: 'barcode', placeholder: 'EAN-13' }
-                                ].map(field => (
+                                ]?.map(field => (
                                     <div className="flex-col gap-2" key={field.key}>
                                         <label className="text-muted" style={{ fontSize: '10px', fontWeight: '800', letterSpacing: '1px' }}>{field.label.toUpperCase()}</label>
                                         <input

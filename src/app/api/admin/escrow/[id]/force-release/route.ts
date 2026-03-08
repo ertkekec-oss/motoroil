@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { executeRelease } from '@/services/escrow/escrowReleaseEngine';
 import prisma from '@/lib/prisma';
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     const user = await getSession();
 
     try {

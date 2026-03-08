@@ -89,7 +89,7 @@ export default function CheckModule() {
             }
 
             // Simple selection for now, could be a modal
-            const kasaOptions = banks.map(b => `${b.name}`).join(', ');
+            const kasaOptions = banks?.map(b => `${b.name}`).join(', ');
             const selectedKasaName = prompt(`Tahsilat/Ödeme yapılacak kasayı yazınız:\n(${kasaOptions})`, banks[0].name);
 
             if (!selectedKasaName) return;
@@ -261,7 +261,7 @@ export default function CheckModule() {
                                     <tr>
                                         <td colSpan={6} className="p-20 text-center text-slate-900 dark:text-white/20 italic">Henüz kayıtlı çek bulunmuyor.</td>
                                     </tr>
-                                ) : checks.map(item => (
+                                ) : checks?.map(item => (
                                     <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
                                         <td className="p-6">
                                             <div className="flex items-center gap-3">
@@ -330,19 +330,19 @@ export default function CheckModule() {
                     </div>
 
                     <div className="grid grid-cols-7 gap-3 mb-3">
-                        {['PT', 'SA', 'ÇR', 'PR', 'CU', 'CT', 'PA'].map(d => (
+                        {['PT', 'SA', 'ÇR', 'PR', 'CU', 'CT', 'PA']?.map(d => (
                             <div key={d} className="text-center text-[10px] font-black text-slate-900 dark:text-white/20 tracking-widest">{d}</div>
                         ))}
                     </div>
 
                     <div className="grid grid-cols-7 gap-3">
                         {/* Fill empty start days */}
-                        {Array(daysInMonth.adjustedFirstDay).fill(0).map((_, i) => (
+                        {Array(daysInMonth.adjustedFirstDay).fill(0)?.map((_, i) => (
                             <div key={`empty-${i}`} className="aspect-square rounded-[24px] bg-transparent opacity-10 border border-dashed border-slate-200 dark:border-slate-800" />
                         ))}
 
                         {/* Days */}
-                        {Array(daysInMonth.lastDate).fill(0).map((_, i) => {
+                        {Array(daysInMonth.lastDate).fill(0)?.map((_, i) => {
                             const day = i + 1;
                             const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
                             const dateStr = d.toDateString();
@@ -353,7 +353,7 @@ export default function CheckModule() {
                                 <div key={day} className={`aspect-square rounded-[24px] border ${isToday ? 'border-sky-500/50 bg-sky-500/5' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50'} p-3 relative group hover:border-sky-500/30 transition-all cursor-pointer`}>
                                     <div className={`text-xs font-black ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-white/30'} group-hover:text-slate-900 dark:text-white transition-colors`}>{day}</div>
                                     <div className="mt-2 flex flex-col gap-1 overflow-y-auto custom-scroll max-h-full pb-2">
-                                        {dayChecks.map(c => (
+                                        {dayChecks?.map(c => (
                                             <div
                                                 key={c.id}
                                                 className={`text-[8px] px-1.5 py-0.5 rounded-lg font-black truncate ${c.type === 'In' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}
@@ -403,8 +403,8 @@ export default function CheckModule() {
                             <select className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold" required value={formData.type === 'In' ? formData.customerId : formData.supplierId} onChange={e => setFormData({ ...formData, [formData.type === 'In' ? 'customerId' : 'supplierId']: e.target.value })}>
                                 <option value="">Bir cari seçiniz...</option>
                                 {formData.type === 'In'
-                                    ? customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
-                                    : suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+                                    ? customers?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
+                                    : suppliers?.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
                                 }
                             </select>
                         </div>

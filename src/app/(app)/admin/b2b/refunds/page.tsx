@@ -150,7 +150,7 @@ export default function AdminB2BRefundsPage() {
                             <td colSpan={7} className="p-8 text-center text-sm text-slate-500 font-medium">Bu kriterlere uygun iade kaydı bulunamadı.</td>
                         </tr>
                     ) : (
-                        refunds.map((refund) => (
+                        refunds?.map((refund) => (
                             <tr key={refund.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                 <td className="p-4 align-middle">
                                     <div className="font-semibold text-slate-900 dark:text-white text-xs">{refund.id.slice(0, 8)}...</div>
@@ -272,7 +272,7 @@ export default function AdminB2BRefundsPage() {
 
                                         <div className="space-y-4">
                                             {drawerData.audit?.length > 0 ? (
-                                                drawerData.audit.map((log: any, idx: number) => (
+                                                drawerData.audit?.map((log: any, idx: number) => (
                                                     <div key={log.id} className="flex gap-4 group">
                                                         <div className="flex flex-col items-center">
                                                             <div className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-slate-900 dark:group-hover:bg-slate-100 transition-colors mt-1.5" />

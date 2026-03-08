@@ -113,7 +113,7 @@ const SeoSchema: React.FC = () => {
 
     return (
         <>
-            {schemas.map((schema, index) => (
+            {schemas?.map((schema, index) => (
                 <script
                     key={index}
                     type="application/ld+json"

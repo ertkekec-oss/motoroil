@@ -20,7 +20,7 @@ export default function AppSkeleton() {
 
                 {/* Menu Items */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px', flex: 1 }}>
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                    {[1, 2, 3, 4, 5, 6]?.map((i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0' }}>
                             <div className="skeleton-pulse" style={{ width: '24px', height: '24px', borderRadius: '6px' }} />
                             <div className="skeleton-pulse" style={{ width: '60%', height: '16px', borderRadius: '4px' }} />
@@ -40,7 +40,7 @@ export default function AppSkeleton() {
 
                     {/* Stats Grid */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-                        {[1, 2, 3, 4].map(i => (
+                        {[1, 2, 3, 4]?.map(i => (
                             <div key={i} className="skeleton-pulse" style={{ height: '140px', borderRadius: '20px' }} />
                         ))}
                     </div>

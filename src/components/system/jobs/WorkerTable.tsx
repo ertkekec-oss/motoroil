@@ -37,7 +37,7 @@ export function WorkerTable() {
             </div>
 
             <div className="space-y-3">
-                {workers.map((w: any) => {
+                {workers?.map((w: any) => {
                     const isAlive = new Date(w.lastHeartbeatAt).getTime() > Date.now() - 300000;
                     return (
                         <div key={w.id} className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">

@@ -17,11 +17,11 @@ export default function PartialShipmentManager({
 
     // Basic local state: check items all default to full quantity.
     const [selectedItems, setSelectedItems] = useState(
-        originalItems.map(i => ({ productId: i.productId || i.id, qty: i.quantity || i.qty, max: i.quantity || i.qty }))
+        originalItems?.map(i => ({ productId: i.productId || i.id, qty: i.quantity || i.qty, max: i.quantity || i.qty }))
     );
 
     const handleShipItems = async () => {
-        const payloadItems = selectedItems.filter(i => i.qty > 0).map(i => ({ productId: i.productId, qty: i.qty }));
+        const payloadItems = selectedItems.filter(i => i.qty > 0)?.map(i => ({ productId: i.productId, qty: i.qty }));
 
         if (payloadItems.length === 0) {
             alert("Gönderilecek en az 1 miktar belirtmelisiniz.");
@@ -64,7 +64,7 @@ export default function PartialShipmentManager({
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {selectedItems.map((item, idx) => (
+                        {selectedItems?.map((item, idx) => (
                             <tr key={item.productId} className="bg-white">
                                 <td className="px-4 py-3 font-medium text-gray-900">
                                     {/* Placeholder name as we stripped real names off the item JSON typically, in prod join them */}

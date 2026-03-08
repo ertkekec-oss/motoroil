@@ -47,7 +47,7 @@ export default async function AdminCategoriesPage() {
                                 <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Parent Category</label>
                                 <select name="parentId" className="w-full border rounded p-2 text-sm outline-none">
                                     <option value="">None (Root)</option>
-                                    {categories.map(c => (
+                                    {categories?.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
                                 </select>
@@ -63,7 +63,7 @@ export default async function AdminCategoriesPage() {
                             {categories.length === 0 ? (
                                 <div className="p-10 text-center text-slate-400">No categories defined.</div>
                             ) : (
-                                categories.map(cat => (
+                                categories?.map(cat => (
                                     <div key={cat.id} className="p-4 hover:bg-slate-50 transition-colors">
                                         <div className="flex justify-between items-center font-bold text-[#1F3A5F]">
                                             <span>{cat.name}</span>
@@ -71,7 +71,7 @@ export default async function AdminCategoriesPage() {
                                         </div>
                                         {cat.children && cat.children.length > 0 && (
                                             <div className="ml-6 mt-2 space-y-2 border-l-2 border-slate-100 pl-4">
-                                                {cat.children.map(sub => (
+                                                {cat.children?.map(sub => (
                                                     <div key={sub.id} className="flex justify-between items-center text-sm text-slate-600">
                                                         <span>{sub.name}</span>
                                                         <span className="text-[10px] text-slate-400 italic">/{sub.slug}</span>

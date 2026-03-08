@@ -53,7 +53,7 @@ export default function TransactionDetailModal({ isOpen, onClose, transaction }:
                         <div>
                             <h4 className="mb-3">Ürün Kalemleri</h4>
                             <div className="flex-col gap-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                {items.map((item: any, idx: number) => (
+                                {items?.map((item: any, idx: number) => (
                                     <div key={idx} className="flex-between" style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                         <div>
                                             <div style={{ fontWeight: '500' }}>{item.name}</div>

@@ -146,7 +146,7 @@ export default function ExportReportsContent() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {reports.map((report) => (
+                                {reports?.map((report) => (
                                     <tr key={report.id} className="border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                                         <td className="py-4 pl-2">
                                             <div className="flex items-center gap-3">

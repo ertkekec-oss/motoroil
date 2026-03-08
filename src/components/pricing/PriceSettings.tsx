@@ -120,7 +120,7 @@ function PriceListsManager({ lists, onRefresh }: { lists: any[], onRefresh: () =
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {lists.map(l => (
+                    {lists?.map(l => (
                         <TableRow key={l.id}>
                             <TableCell className="font-medium">{l.name}</TableCell>
                             <TableCell>{l.currency}</TableCell>
@@ -165,7 +165,7 @@ function CustomerCategoriesManager({ categories, lists, onRefresh }: { categorie
                 <Input placeholder="Kategori Adı (örn: VIP)" value={newName} onChange={e => setNewName(e.target.value)} />
                 <select className="border rounded px-2 py-2 text-sm" value={defList} onChange={e => setDefList(e.target.value)}>
                     <option value="">Varsayılan Liste Seç</option>
-                    {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    {lists?.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                 </select>
                 <Button onClick={handleAdd}><Plus className="h-4 w-4" /></Button>
             </div>
@@ -178,7 +178,7 @@ function CustomerCategoriesManager({ categories, lists, onRefresh }: { categorie
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {categories.map(c => (
+                    {categories?.map(c => (
                         <TableRow key={c.id}>
                             <TableCell>{c.name}</TableCell>
                             <TableCell>{c.defaultPriceList?.name || '-'}</TableCell>
@@ -237,7 +237,7 @@ function BulkPriceUpdater({ lists }: { lists: any[] }) {
                 <label className="text-sm font-medium">Hedef Liste (Güncellenecek)</label>
                 <select className="w-full border rounded p-2" value={targetList} onChange={e => setTargetList(e.target.value)}>
                     <option value="">Seçiniz...</option>
-                    {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    {lists?.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                 </select>
             </div>
 
@@ -259,7 +259,7 @@ function BulkPriceUpdater({ lists }: { lists: any[] }) {
                         <label className="text-sm font-medium">Kaynak Liste</label>
                         <select className="w-full border rounded p-2" value={sourceList} onChange={e => setSourceList(e.target.value)}>
                             <option value="">Seçiniz...</option>
-                            {lists.filter(l => l.id !== targetList).map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                            {lists.filter(l => l.id !== targetList)?.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                         </select>
                     </div>
                 ) : (

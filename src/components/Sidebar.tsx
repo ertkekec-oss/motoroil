@@ -292,7 +292,7 @@ export default function Sidebar() {
             }
         ];
 
-        return rawGroups.map(group => {
+        return rawGroups?.map(group => {
             const items = group.items.filter(item => {
                 const config = permMap[item.href || ''];
                 if (!config && !item.isParent) return true;
@@ -304,7 +304,7 @@ export default function Sidebar() {
                 if (isSystemAdmin && !config?.platformOnly) return true;
                 if (config?.perm) return checkPerm(config.perm);
                 return true;
-            }).map((item: any) => {
+            })?.map((item: any) => {
                 if (item.subItems) {
                     return {
                         ...item,
@@ -406,7 +406,7 @@ export default function Sidebar() {
                             style={activeTenantId ? { background: 'var(--sb-active)', borderColor: 'var(--sb-accent)', color: 'var(--sb-text)' } : {}}
                         >
                             <option value="null">🌐 TÜM SİSTEM</option>
-                            {availableTenants.map(t => (
+                            {availableTenants?.map(t => (
                                 <option key={t.id} value={t.id}>{t.name?.toUpperCase()}</option>
                             ))}
                         </select>
@@ -423,7 +423,7 @@ export default function Sidebar() {
                             className="w-full px-3 py-2.5 rounded-[14px] font-semibold text-[13px] outline-none cursor-pointer transition-colors pdy-sb-select"
                         >
                             {branches.length > 0 ? (
-                                branches.map(b => (
+                                branches?.map(b => (
                                     <option key={b.id} value={b.name}>
                                         {b.type === 'Merkez' ? '🏢' : '🔧'} {b.name.toUpperCase()}
                                     </option>
@@ -446,7 +446,7 @@ export default function Sidebar() {
 
             {/* SCROLLABLE NAVIGATION */}
             <div className="flex-1 overflow-y-auto px-3 pb-8 custom-scrollbar space-y-5">
-                {filteredGroups.map((group, gIdx) => (
+                {filteredGroups?.map((group, gIdx) => (
                     <div key={gIdx} className="nav-group flex flex-col gap-1">
                         {!isDesktopSidebarCollapsed && (
                             <div className="px-3 mb-1 mt-1 text-[11px] font-bold uppercase tracking-[0.08em] sb-header">
@@ -454,7 +454,7 @@ export default function Sidebar() {
                             </div>
                         )}
 
-                        {group.items.map((item) => {
+                        {group.items?.map((item) => {
                             const Icon = item.icon;
 
                             if (item.isParent) {

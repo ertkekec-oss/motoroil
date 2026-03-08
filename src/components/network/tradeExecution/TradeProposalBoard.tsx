@@ -36,7 +36,7 @@ export function TradeProposalBoard() {
             </div>
 
             <div className="divide-y divide-gray-50 flex flex-col">
-                {proposals.map(prop => (
+                {proposals?.map(prop => (
                     <div key={prop.id} className="p-4 hover:bg-gray-50 transition-colors">
                         <div className="flex justify-between items-start mb-2">
                             <div className="flex flex-col">

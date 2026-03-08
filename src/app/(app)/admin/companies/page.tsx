@@ -31,7 +31,7 @@ export default async function AdminCompaniesPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {companies.map(comp => (
+                            {companies?.map(comp => (
                                 <tr key={comp.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="p-4">
                                         <div className="font-bold text-[#1F3A5F]">{comp.name}</div>

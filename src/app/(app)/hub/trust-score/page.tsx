@@ -9,20 +9,20 @@ export default function TrustScorePage() {
 
     useEffect(() => {
         setLoading(true);
-        fetch("/api/network/trust-score")
+        fetch("/api/company/trust")
             .then(res => res.ok ? res.json() : null)
             .then(data => {
-                if (data && data.score) {
+                if (data && data.status !== "NO_PROFILE") {
                     setScoreData({
-                        score: data.score.value,
-                        tier: data.score.tier,
-                        lastCalculatedAt: data.score.computedAt,
+                        score: data.overallScore,
+                        tier: data.trustLevel,
+                        lastCalculatedAt: data.lastCalculatedAt,
                         components: {
-                            onTimeRatio: data.components?.onTimeRatio || { value: "100%", weight: 40, status: "EXCELLENT" },
-                            disputeRate: data.components?.disputeRate || { value: "0%", weight: 30, status: "EXCELLENT" },
-                            slaBreachCount: data.components?.slaBreachCount || { value: 0, weight: 10, status: "EXCELLENT" },
-                            chargebackRate: data.components?.chargebackRate || { value: "0%", weight: 20, status: "EXCELLENT" },
-                            overrideCount: data.components?.overrideCount || { value: 0, weight: 0, status: "NEUTRAL" }
+                            onTimeRatio: { value: data.metrics?.shippingScore + "%", weight: 20, status: data.metrics?.shippingScore > 80 ? "EXCELLENT" : "AVERAGE" },
+                            disputeRate: { value: data.metrics?.disputeScore + "%", weight: 10, status: data.metrics?.disputeScore > 80 ? "EXCELLENT" : "POOR" },
+                            slaBreachCount: { value: data.metrics?.identityScore === 100 ? "Verified" : "Unverified", weight: 35, status: data.metrics?.identityScore === 100 ? "EXCELLENT" : "POOR" },
+                            chargebackRate: { value: data.metrics?.paymentScore + "%", weight: 10, status: data.metrics?.paymentScore > 80 ? "EXCELLENT" : "AVERAGE" },
+                            overrideCount: { value: data.metrics?.tradeScore + "%", weight: 25, status: data.metrics?.tradeScore > 80 ? "EXCELLENT" : "AVERAGE" }
                         }
                     });
                 } else {
@@ -153,34 +153,41 @@ export default function TrustScorePage() {
                                     <div className="grid grid-cols-1 gap-4">
                                         {[
                                             {
-                                                title: "Zamanında Teslimat Başarısı (On-Time Ratio)",
-                                                weight: scoreData.components.onTimeRatio.weight,
-                                                val: scoreData.components.onTimeRatio.value,
-                                                status: scoreData.components.onTimeRatio.status,
-                                                icon: "⏱"
-                                            },
-                                            {
-                                                title: "İhtilaf ve Anlaşmazlık Oranı (Dispute Rate)",
-                                                weight: scoreData.components.disputeRate.weight,
-                                                val: scoreData.components.disputeRate.value,
-                                                status: scoreData.components.disputeRate.status,
-                                                icon: "⚖️"
-                                            },
-                                            {
-                                                title: "SLA (Hizmet Seviyesi) İhlali Sayısı",
+                                                title: "Şirket Kimlik Doğrulaması (KYB)",
                                                 weight: scoreData.components.slaBreachCount.weight,
                                                 val: scoreData.components.slaBreachCount.value,
                                                 status: scoreData.components.slaBreachCount.status,
-                                                icon: "⏳"
+                                                icon: "🛡️"
                                             },
                                             {
-                                                title: "Finansal Ters İbraz / İade Oranı",
+                                                title: "Kargo ve Operasyonel Başarı (Shipping)",
+                                                weight: scoreData.components.onTimeRatio.weight,
+                                                val: scoreData.components.onTimeRatio.value,
+                                                status: scoreData.components.onTimeRatio.status,
+                                                icon: "📦"
+                                            },
+                                            {
+                                                title: "Ticari İşlem Tamamlama (Trade Completion)",
+                                                weight: scoreData.components.overrideCount.weight,
+                                                val: scoreData.components.overrideCount.value,
+                                                status: scoreData.components.overrideCount.status,
+                                                icon: "🤝"
+                                            },
+                                            {
+                                                title: "Finansal İtibar & Ödeme Disiplini",
                                                 weight: scoreData.components.chargebackRate.weight,
                                                 val: scoreData.components.chargebackRate.value,
                                                 status: scoreData.components.chargebackRate.status,
                                                 icon: "💳"
+                                            },
+                                            {
+                                                title: "İhtilaf ve Anlaşmazlık Oranı (Dispute Scale)",
+                                                weight: scoreData.components.disputeRate.weight,
+                                                val: scoreData.components.disputeRate.value,
+                                                status: scoreData.components.disputeRate.status,
+                                                icon: "⚖️"
                                             }
-                                        ].map((item, idx) => (
+                                        ]?.map((item, idx) => (
                                             <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between bg-white dark:bg-[#0f172a] p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm hover:border-slate-300 transition-colors gap-4">
                                                 <div className="flex items-start gap-4">
                                                     <div className="w-10 h-10 bg-slate-50 dark:bg-[#1e293b] border border-slate-100 rounded-lg flex items-center justify-center text-lg shrink-0 mt-0.5">

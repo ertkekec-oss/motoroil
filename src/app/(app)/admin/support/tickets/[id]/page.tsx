@@ -107,7 +107,7 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                         </div>
                         {ticket.attachments && (ticket.attachments as any).length > 0 && (
                             <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
-                                {(ticket.attachments as any).map((att: any) => (
+                                {(ticket.attachments as any)?.map((att: any) => (
                                     <AttachmentLink key={att.id} attachment={att} />
                                 ))}
                             </div>
@@ -115,7 +115,7 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                     </div>
 
                     {/* Messages */}
-                    {messages.map((msg) => {
+                    {messages?.map((msg) => {
                         const isSystem = msg.authorType === 'SYSTEM';
                         const isAdmin = msg.authorType === 'ADMIN';
                         const isCustomer = msg.authorType === 'CUSTOMER';
@@ -141,7 +141,7 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                                 </div>
                                 {msg.attachments && (msg.attachments as any).length > 0 && (
                                     <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
-                                        {(msg.attachments as any).map((att: any) => (
+                                        {(msg.attachments as any)?.map((att: any) => (
                                             <AttachmentLink key={att.id} attachment={att} />
                                         ))}
                                     </div>

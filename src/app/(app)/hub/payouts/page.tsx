@@ -73,7 +73,7 @@ export default function PayoutsPage() {
                         <p className="text-sm text-slate-500 dark:text-slate-400">Yükleniyor...</p>
                     ) : (
                         <div className="space-y-3">
-                            {destinations.map(d => (
+                            {destinations?.map(d => (
                                 <div key={d.id} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg p-4 shadow-sm flex flex-col group hover:border-blue-300 transition-colors">
                                     <div className="flex justify-between items-start mb-2">
                                         <span className="font-bold text-slate-800 text-sm">Banka Hesabı</span>
@@ -114,7 +114,7 @@ export default function PayoutsPage() {
                                 ) : requests.length === 0 ? (
                                     <tr><td colSpan={4} className="px-6 py-12 text-center text-slate-400">Henüz para çekme talebiniz bulunmuyor.</td></tr>
                                 ) : (
-                                    requests.map(req => (
+                                    requests?.map(req => (
                                         <tr key={req.id} className="hover:bg-slate-50 dark:bg-[#1e293b] transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">{formatDate(req.createdAt)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap font-bold text-slate-900 dark:text-white">{formatMoney(req.amount)}</td>

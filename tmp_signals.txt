@@ -1,0 +1,63 @@
+model NetworkInventorySignal {
+  id                 String                     @id @default(cuid())
+  tenantId           String
+  profileId          String
+  productCategoryId  String
+  signalType         NetworkInventorySignalType
+  quantityBand       String?
+  velocityScore      Float                      @default(0)
+  confidenceScore    Float                      @default(0)
+  visibilityScope    String                     @default("NETWORK")
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  calculationVersion Int                        @default(1)
+  dedupeKey          String?
+  lastCalculatedAt   DateTime?
+  expiresAt          DateTime?
+  isStale            Boolean                    @default(false)
+  supersededAt       DateTime?
+  status             String                     @default("ACTIVE")
+
+  profile NetworkCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([profileId])
+  @@index([productCategoryId, signalType, status])
+  @@index([calculationVersion, isStale])
+}
+
+model DemandSignal {
+  id                      String    @id @default(cuid())
+  tenantId                String
+  productId               String?
+  canonicalProductId      String?
+  signalType              String
+  signalStrength          Float
+  confidenceScore         Float     @default(0)
+  salesVelocity           Float?
+  stockLevel              Float?
+  projectedDaysToStockout Float?
+  reorderRecommendation   Float?
+  status                  String    @default("OPEN")
+  detectedAt              DateTime  @default(now())
+  expiresAt               DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([canonicalProductId])
+}
+
+model DemandSignalHistory {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  productId          String?
+  canonicalProductId String?
+  signalType         String
+  signalStrength     Float
+  confidenceScore    Float
+  explanationJson    String?
+  createdAt          DateTime @default(now())
+}
+

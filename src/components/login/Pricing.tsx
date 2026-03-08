@@ -32,7 +32,7 @@ export default function Pricing({ onDemoClick }: { onDemoClick?: () => void }) {
                     <p className="text-gray-400">İlk 30 gün ücretsiz deneyin. Kredi kartı gerekmez.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    {PLANS.map(p => (
+                    {PLANS?.map(p => (
                         <div key={p.name}
                             className={`relative p-6 rounded-2xl border transition-all flex flex-col ${p.accent
                                 ? 'border-orange-500/40'
@@ -53,7 +53,7 @@ export default function Pricing({ onDemoClick }: { onDemoClick?: () => void }) {
                                 <span className="text-sm text-gray-500 font-bold">{p.period}</span>
                             </div>
                             <ul className="space-y-2 mb-6 flex-1">
-                                {p.features.map(f => (
+                                {p.features?.map(f => (
                                     <li key={f} className="flex items-center gap-2 text-xs text-gray-400 font-medium">
                                         <span className="text-green-500 flex-shrink-0">✓</span> {f}
                                     </li>

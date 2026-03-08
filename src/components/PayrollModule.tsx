@@ -85,7 +85,7 @@ export default function PayrollModule() {
                         </tr>
                     </thead>
                     <tbody>
-                        {payrolls.map((p: any) => (
+                        {payrolls?.map((p: any) => (
                             <tr key={p.id} className="hover:bg-white/5">
                                 <td className="font-bold">{p.staff?.name}</td>
                                 <td>{Number(p.salary).toLocaleString('tr-TR')} ₺</td>

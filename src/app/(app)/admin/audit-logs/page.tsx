@@ -149,7 +149,7 @@ export default function AuditLogsPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {isLoading && logs.length === 0 ? (
-                                Array.from({ length: 5 }).map((_, i) => (
+                                Array.from({ length: 5 })?.map((_, i) => (
                                     <tr key={i} className="animate-pulse">
                                         <td colSpan={6} className="p-8">
                                             <div className="h-4 bg-slate-100 rounded w-full"></div>
@@ -163,7 +163,7 @@ export default function AuditLogsPage() {
                                     </td>
                                 </tr>
                             ) : (
-                                logs.map((log) => (
+                                logs?.map((log) => (
                                     <tr key={log.id} className="hover:bg-slate-50 transition-colors group text-sm">
                                         <td className="p-4 whitespace-nowrap">
                                             <div className="text-slate-900 font-medium">

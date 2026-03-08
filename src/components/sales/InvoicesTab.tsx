@@ -78,7 +78,7 @@ export function InvoicesTab({
                     {[
                         { key: 'sales', label: '📄 Satış Faturaları', onClick: () => setInvoiceSubTab('sales') },
                         { key: 'incoming', label: '📥 Gelen Faturalar', onClick: () => setInvoiceSubTab('incoming') }
-                    ].map(({ key, label, onClick }) => {
+                    ]?.map(({ key, label, onClick }) => {
                         const isActive = invoiceSubTab === key;
                         return (
                             <button
@@ -131,7 +131,7 @@ export function InvoicesTab({
                                     <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
                                         {paginatedList.length === 0 ? (
                                             <tr><td colSpan={6} className={`text-center py-8 font-medium ${textLabelClass}`}>Kayıt bulunamadı.</td></tr>
-                                        ) : paginatedList.map(inv => {
+                                        ) : paginatedList?.map(inv => {
                                             const isExpanded = expandedOrderId === inv.id;
                                             return (
                                                 <Fragment key={inv.id}>
@@ -187,7 +187,7 @@ export function InvoicesTab({
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800'}`}>
-                                                                            {(inv.items as any[]).map((item, idx) => (
+                                                                            {(inv.items as any[])?.map((item, idx) => (
                                                                                 <tr key={idx}>
                                                                                     <td className={`py-2 ${textValueClass}`}>{item.name}</td>
                                                                                     <td className={`py-2 text-center ${textValueClass}`}>{item.qty}</td>
@@ -275,7 +275,7 @@ export function InvoicesTab({
                                     <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
                                         {paginatedList.length === 0 ? (
                                             <tr><td colSpan={5} className={`text-center py-8 font-medium ${textLabelClass}`}>Gelen fatura bulunamadı.</td></tr>
-                                        ) : paginatedList.map((inv, idx) => (
+                                        ) : paginatedList?.map((inv, idx) => (
                                             <tr key={idx} className={`h-[52px] transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50'}`}>
                                                 <td className="px-4 align-middle">
                                                     <div className={`font-semibold text-[13px] ${textValueClass}`}>{inv.supplier}</div>
@@ -381,7 +381,7 @@ export function InvoicesTab({
                                     <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
                                         {paginatedList.length === 0 ? (
                                             <tr><td colSpan={7} className={`text-center py-8 font-medium ${textLabelClass}`}>İrsaliye bulunamadı.</td></tr>
-                                        ) : paginatedList.map(irs => {
+                                        ) : paginatedList?.map(irs => {
                                             const isExpanded = expandedOrderId === irs.id;
                                             return (
                                                 <Fragment key={irs.id}>
@@ -460,7 +460,7 @@ export function InvoicesTab({
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800'}`}>
-                                                                            {(Array.isArray(irs.items) ? irs.items : []).map((item: any, idx: number) => (
+                                                                            {(Array.isArray(irs.items) ? irs.items : [])?.map((item: any, idx: number) => (
                                                                                 <tr key={idx}>
                                                                                     <td className={`py-2 ${textValueClass}`}>{item.name || item.Name || 'Bilinmeyen Ürün'}</td>
                                                                                     <td className={`py-2 text-center ${textValueClass}`}>{item.qty || item.Quantity || 0} {item.unit || item.UnitType || 'Adet'}</td>

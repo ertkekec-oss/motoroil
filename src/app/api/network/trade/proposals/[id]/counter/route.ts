@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getRequestContext } from '@/lib/api-context';
 import { CounterpartyWorkflow } from '@/services/network/tradeExecution/counterpartyWorkflow';
 
-export async function POST(req: any, { params }: { params: { id: string } }) {
+export async function POST(req: any, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     const { tenantId } = await getRequestContext(req);
     const { id } = params;
 

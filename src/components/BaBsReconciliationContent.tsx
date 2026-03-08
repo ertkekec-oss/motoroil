@@ -107,14 +107,14 @@ export default function BaBsReconciliationContent() {
                             onChange={(e) => setFilters(prev => ({ ...prev, month: Number(e.target.value) }))}
                             className="bg-transparent text-sm font-bold p-2 outline-none text-center appearance-auto"
                         >
-                            {months.map((m, i) => <option key={i} value={i + 1} className="bg-[#121212]">{m}</option>)}
+                            {months?.map((m, i) => <option key={i} value={i + 1} className="bg-[#121212]">{m}</option>)}
                         </select>
                         <select
                             value={filters.year}
                             onChange={(e) => setFilters(prev => ({ ...prev, year: Number(e.target.value) }))}
                             className="bg-transparent text-sm font-bold p-2 outline-none text-center appearance-auto"
                         >
-                            {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y} className="bg-[#121212]">{y}</option>)}
+                            {[2024, 2025, 2026, 2027]?.map(y => <option key={y} value={y} className="bg-[#121212]">{y}</option>)}
                         </select>
                         <div className="w-[1px] h-6 bg-slate-100 dark:bg-slate-800 mx-1"></div>
                         <div className="flex items-center px-2">

@@ -42,7 +42,7 @@ export default function CashflowForecastChart() {
     const { forecast, analysis, currentBalance, dailyBurnRate } = data;
 
     // Format data numbers
-    const formattedData = forecast.map((d: any) => ({
+    const formattedData = forecast?.map((d: any) => ({
         ...d,
         dateFormatted: new Date(d.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
         Balance: Number(Number(d.balance).toFixed(0)),

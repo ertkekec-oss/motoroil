@@ -34,17 +34,19 @@ export default async function SignatureEnvelopesPage({ searchParams }: { searchP
                         </h1>
                         <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>Tüm dijital sözleşme zarfları ve operasyon durumları.</p>
                     </div>
+                    <Link href="/signatures/new" style={{ padding: '10px 20px', background: '#3b82f6', color: 'white', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }}>
+                        + Yeni Zarf Gönder
+                    </Link>
                 </div>
 
                 <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
 
                     <div style={{ padding: '16px 24px', background: 'rgba(255,255,255,0.01)', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '16px', alignItems: 'center' }}>
                         <div style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Filtrele:</div>
-                        <form method="GET" style={{ margin: 0, padding: 0 }}>
+                        <form method="GET" style={{ margin: 0, padding: 0, display: 'flex', gap: '16px' }}>
                             <select
                                 name="category"
                                 defaultValue={category || ''}
-                                onChange={(e) => e.target.form?.submit()}
                                 style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)', borderRadius: '6px', fontSize: '12px', outline: 'none' }}>
                                 <option value="" style={{ color: 'black' }}>Tüm Kategoriler</option>
                                 <option value="CONTRACT" style={{ color: 'black' }}>Sözleşmeler (Contract)</option>
@@ -53,6 +55,9 @@ export default async function SignatureEnvelopesPage({ searchParams }: { searchP
                                 <option value="EMPLOYEE_DOCUMENT" style={{ color: 'black' }}>Özlük Evrakları</option>
                                 <option value="FORM" style={{ color: 'black' }}>Genel Formlar</option>
                             </select>
+                            <button type="submit" style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold' }} className="hover:bg-white/10 cursor-pointer">
+                                Uygula
+                            </button>
                         </form>
                     </div>
 

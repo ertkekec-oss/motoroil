@@ -46,9 +46,9 @@ export default async function PaymentsMonitorPage() {
         }
     });
 
-    const companyIds = Array.from(new Set(payments.map(p => p.order).flatMap(o => o ? [o.buyerCompanyId, o.sellerCompanyId] : [])));
+    const companyIds = Array.from(new Set(payments?.map(p => p.order).flatMap(o => o ? [o.buyerCompanyId, o.sellerCompanyId] : [])));
     const companies = await prisma.company.findMany({ where: { id: { in: companyIds } }, select: { id: true, name: true } });
-    const companyMap = new Map(companies.map(c => [c.id, c.name]));
+    const companyMap = new Map(companies?.map(c => [c.id, c.name]));
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -136,7 +136,7 @@ export default async function PaymentsMonitorPage() {
                                 {payments.length === 0 ? (
                                     <tr><td colSpan={11} className="px-3 py-8 text-center text-slate-400 font-medium">No payment records found.</td></tr>
                                 ) : (
-                                    payments.map(payment => {
+                                    payments?.map(payment => {
                                         const order = payment.order;
                                         const sellerEarned = Number(order.subtotalAmount) - Number(order.commissionAmount);
 

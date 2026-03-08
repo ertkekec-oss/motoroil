@@ -309,7 +309,7 @@ export default function BankOnboardingHub() {
                         <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Banka Seçin</h3>
                     </div>
                     <div className="p-2 max-h-[480px] overflow-y-auto">
-                        {bankList.map(bank => (
+                        {bankList?.map(bank => (
                             <button
                                 key={bank.id}
                                 onClick={() => {
@@ -347,7 +347,7 @@ export default function BankOnboardingHub() {
                                 {[
                                     { id: 'apply' as const, label: '📄 Başvuru & Doküman', step: '1' },
                                     { id: 'connect' as const, label: '🔑 Bağlantı Tanımla', step: '2' },
-                                ].map(tab => (
+                                ]?.map(tab => (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveSubTab(tab.id)}
@@ -389,7 +389,7 @@ export default function BankOnboardingHub() {
                                         <div>
                                             <h5 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Gerekli Belgeler</h5>
                                             <div className="flex flex-wrap gap-2">
-                                                {selectedBank.requiredDocs.map(doc => (
+                                                {selectedBank.requiredDocs?.map(doc => (
                                                     <span key={doc} className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400">
                                                         {doc.replace(/_/g, ' ')}
                                                     </span>
@@ -400,7 +400,7 @@ export default function BankOnboardingHub() {
                                         <div className="p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl">
                                             <h5 className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-2">Banka IT Notu</h5>
                                             <ul className="space-y-1">
-                                                {selectedBank.technicalAppendix.protocolNotes.map((note, i) => (
+                                                {selectedBank.technicalAppendix.protocolNotes?.map((note, i) => (
                                                     <li key={i} className="text-xs text-blue-600 dark:text-blue-300/70 flex items-start gap-2">
                                                         <span className="shrink-0 mt-0.5">•</span>
                                                         <span>{note}</span>
@@ -433,7 +433,7 @@ export default function BankOnboardingHub() {
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {selectedBank.onboardingFields.map(field => (
+                                            {selectedBank.onboardingFields?.map(field => (
                                                 <EnterpriseField
                                                     key={field.key}
                                                     label={`${field.label}${selectedBank.requiredCredentials.includes(field.key) ? ' *' : ''}`}

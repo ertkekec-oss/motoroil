@@ -146,7 +146,7 @@ export default function LandingPage() {
           dangerouslySetInnerHTML={{ __html: content.title || 'Frequently Asked Questions' }}
         ></h2>
         <div className="w-full max-w-4xl mx-auto text-left">
-          {(content.items || []).map((faq: any, i: number) => (
+          {(content.items || [])?.map((faq: any, i: number) => (
             <div key={i} className="" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', marginBottom: '16px' }}>
               <button
                 className="w-full text-left py-4 flex justify-between items-center text-lg font-bold hover:text-blue-600 transition"
@@ -233,7 +233,7 @@ export default function LandingPage() {
         return (
           <div className="m-logo-cloud" key={section.id} style={{ background: content.bg }}>
             <div className="m-logo-scroll">
-              {[...(content.logos || []), ...(content.logos || [])].map((logo: string, i: number) => (
+              {[...(content.logos || []), ...(content.logos || [])]?.map((logo: string, i: number) => (
                 <img key={i} src={logo} alt="Client Logo" />
               ))}
             </div>
@@ -249,7 +249,7 @@ export default function LandingPage() {
                 <p className="max-w-2xl mx-auto mt-4 text-slate-500">{content.desc}</p>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
-                {(content.items || []).map((item: any, i: number) => (
+                {(content.items || [])?.map((item: any, i: number) => (
                   <div key={i} className="m-feature-card">
                     <div className="text-4xl mb-4">{item.icon}</div>
                     <h3 className="text-xl font-bold mb-2">{item.title}</h3>
@@ -269,7 +269,7 @@ export default function LandingPage() {
                 <h2 className="mb-6" style={getStyle(content.titleSize, content.titleColor)}>{content.title}</h2>
                 <p className="text-lg text-slate-600 mb-8 leading-relaxed">{content.desc}</p>
                 <ul className="space-y-3">
-                  {(content.list || []).map((li: string, i: number) => (
+                  {(content.list || [])?.map((li: string, i: number) => (
                     <li key={i} className="flex items-center gap-3 font-medium text-slate-700">
                       <CheckIcon />
                       {li}
@@ -290,7 +290,7 @@ export default function LandingPage() {
               <h2 style={getStyle(content.titleSize, content.titleColor)}>{content.title}</h2>
             </div>
             <div className="m-container grid md:grid-cols-3 gap-6">
-              {(content.items || []).map((t: any, i: number) => (
+              {(content.items || [])?.map((t: any, i: number) => (
                 <div key={i} className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm relative">
                   <div className="text-yellow-400 text-xl mb-4">★★★★★</div>
                   <p className="text-slate-700 font-medium mb-6">"{t.quote}"</p>
@@ -354,7 +354,7 @@ export default function LandingPage() {
                 {(content.desc || content.subtitle) && <p className="max-w-2xl mx-auto mt-4 text-slate-500" dangerouslySetInnerHTML={{ __html: content.desc || content.subtitle }}></p>}
               </div>
               <div className="m-grid-container m-grid-3 px-4">
-                {(content.items || []).map((item: any, i: number) => (
+                {(content.items || [])?.map((item: any, i: number) => (
                   <div key={i} className="m-card-white overflow-hidden flex flex-col" style={{ padding: '0' }}>
                     {(item.imageUrl || item.imgUrl || item.image) && (
                       <div className="w-full h-48 overflow-hidden bg-slate-100">
@@ -384,7 +384,7 @@ export default function LandingPage() {
         return (
           <div style={{ padding: '30px 0', background: 'transparent', display: 'flex', justifyContent: 'center', width: '100%' }} key={section.id}>
             <div className="w-full max-w-4xl flex flex-wrap justify-center gap-x-12 gap-y-8 items-center px-6">
-              {(content.items || ['toast', 'bambooHR', 'SmartBug', 'CONAIR', 'dentsu', 'wistia', 'AVIDLY', 'NEW BREED+']).map((p: any, i: number) => (
+              {(content.items || ['toast', 'bambooHR', 'SmartBug', 'CONAIR', 'dentsu', 'wistia', 'AVIDLY', 'NEW BREED+'])?.map((p: any, i: number) => (
                 p.url ? (
                   <img key={i} src={p.url} alt={p.name} className="h-8 md:h-10 grayscale opacity-40 hover:opacity-100 transition-all object-contain" />
                 ) : (
@@ -414,7 +414,7 @@ export default function LandingPage() {
                       'You submit tickets and wait days for new metrics or ad-hoc reports.',
                       'Fragmented tools lead to silos, debates, and more questions.',
                       'Leaders miss opportunities because performance updates come too late.'
-                    ]).map((item: string, i: number) => (
+                    ])?.map((item: string, i: number) => (
                       <li key={i}><XIcon /> {item}</li>
                     ))}
                   </ul>
@@ -428,7 +428,7 @@ export default function LandingPage() {
                       'Self-serve dashboards & AI summaries give you answers instantly.',
                       'Unified datasets end "which number is right?" debates for good.',
                       'Real-time dashboards and automated reports keep leaders informed when it matters.'
-                    ]).map((item: string, i: number) => (
+                    ])?.map((item: string, i: number) => (
                       <li key={i}><CheckIcon /> {item}</li>
                     ))}
                   </ul>
@@ -458,7 +458,7 @@ export default function LandingPage() {
                   { stat: '↑ 55%', label: 'increase in sales YoY', logo: 'https://databox.com/wp-content/uploads/2023/04/first-response.png' },
                   { stat: '↓ 50%', label: 'decrease in overall reporting costs', logo: 'https://databox.com/wp-content/uploads/2023/04/market-launcher.png' },
                   { stat: '↓ 60%', label: 'reduction in time spent creating reports', logo: 'https://databox.com/wp-content/uploads/2023/04/hero-factory.png' }
-                ]).map((c: any, i: number) => (
+                ])?.map((c: any, i: number) => (
                   <div key={i} className="m-metric-card">
                     <div>
                       <div className="m-metric-stat">{c.stat}</div>
@@ -497,7 +497,7 @@ export default function LandingPage() {
               dangerouslySetInnerHTML={{ __html: content.desc || content.subtitle }}
             ></p>
             <div className="m-accordion-container" style={{ marginTop: '15px' }}>
-              {(content.items || []).map((role: any, idx: number) => (
+              {(content.items || [])?.map((role: any, idx: number) => (
                 <div
                   key={idx}
                   className={`m-role-card ${activeRole === idx ? 'active' : ''}`}
@@ -507,7 +507,7 @@ export default function LandingPage() {
                   <div className="m-role-content">
                     <p className="m-role-desc">{role.desc}</p>
                     <ul className="m-role-list">
-                      {(role.list || role.items || []).map((li: string, j: number) => (
+                      {(role.list || role.items || [])?.map((li: string, j: number) => (
                         <li key={j}>{li}</li>
                       ))}
                     </ul>
@@ -571,7 +571,7 @@ export default function LandingPage() {
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
                     )
                   }
-                ]).map((c: any, i: number) => (
+                ])?.map((c: any, i: number) => (
                   <div key={i} className="m-feature-block">
                     <div className="m-feature-icon">
                       {(c.icon && (typeof c.icon === 'string' && (c.icon.startsWith('http') || c.icon.startsWith('/') || c.icon.startsWith('data:')))) ? (
@@ -624,13 +624,13 @@ export default function LandingPage() {
                 { title: 'Free', price: '0', desc: 'For individuals exploring data.', list: ['3 Dashboards', '1 App connection', 'Daily updates'] },
                 { title: 'Starter', price: '47', desc: 'For small teams getting started.', list: ['Unlimited Dashboards', '5 App connections', 'Hourly updates', 'Priority support'] },
                 { title: 'Professional', price: '135', desc: 'For growing agencies and teams.', list: ['Everything in Starter', 'White-labeling', 'API Access', 'Custom domain'] }
-              ]).map((tier: any, i: number) => (
+              ])?.map((tier: any, i: number) => (
                 <div key={i} className={`m-card-white ${i === 1 ? 'border-blue-500 ring-4 ring-blue-50' : ''}`}>
                   <h3 className="text-xl font-black mb-2">{tier.title}</h3>
                   <div className="text-4xl font-black mb-4">${tier.price}<span className="text-sm text-slate-400 font-medium">/mo</span></div>
                   <p className="text-sm text-slate-500 mb-8">{tier.desc}</p>
                   <ul className="m-list mb-8">
-                    {(tier.list || []).map((li: string, j: number) => (
+                    {(tier.list || [])?.map((li: string, j: number) => (
                       <li key={j} className="text-sm"><CheckIcon /> {li}</li>
                     ))}
                   </ul>
@@ -728,7 +728,7 @@ export default function LandingPage() {
 
         {/* Main Navigation Links */}
         <div className="hidden md:flex gap-1 ml-12 h-full items-center">
-          {menuItems.map((item: any, i: number) => (
+          {menuItems?.map((item: any, i: number) => (
             <div key={i} className="m-nav-item h-full flex items-center">
               <Link href={item.link || '#'} className="m-nav-link text-slate-700 font-bold">
                 {item.label}
@@ -744,7 +744,7 @@ export default function LandingPage() {
                     {item.sidebar && item.sidebar.length > 0 && (
                       <div className="m-mega-sidebar">
                         <div className="m-mega-sidebar-title uppercase tracking-widest opacity-50 text-[10px] mb-4">Categories</div>
-                        {item.sidebar.map((sb: any, idx: number) => {
+                        {item.sidebar?.map((sb: any, idx: number) => {
                           const isLink = sb.link && sb.link !== '#';
                           const Element = isLink ? Link : 'div';
                           return (
@@ -763,7 +763,7 @@ export default function LandingPage() {
                     <div className="m-mega-content">
                       <div className="text-sm font-black text-slate-800 mb-6 uppercase tracking-wider">Explore Capabilities</div>
                       <div className="m-mega-grid">
-                        {(item.content || []).map((c: any, cIdx: number) => (
+                        {(item.content || [])?.map((c: any, cIdx: number) => (
                           <Link href={c.link || '#'} key={cIdx} className="m-mega-card">
                             <div className="m-mega-icon text-2xl flex items-center justify-center">
                               {c.icon && c.icon.length < 4 ? <span>{c.icon}</span> : (
@@ -852,18 +852,18 @@ export default function LandingPage() {
   return (
     <div className="m-container landing-page-root relative min-h-screen" style={{ width: '100%', display: 'block', overflowX: 'hidden' }}>
       {/* 0. Banner Logic: Ensure it's at the absolute top */}
-      {sections.filter((s: any) => s.type === 'BANNER').map((s: any) => renderSection(s))}
+      {sections.filter((s: any) => s.type === 'BANNER')?.map((s: any) => renderSection(s))}
 
       {/* Navigation */}
       {sections.some((s: any) => s.type === 'NAV')
-        ? sections.filter((s: any) => s.type === 'NAV').map((s: any) => renderSection(s))
+        ? sections.filter((s: any) => s.type === 'NAV')?.map((s: any) => renderSection(s))
         : renderNav()
       }
 
       {/* Main Content Sections */}
       {/* 1. Hero Logic: If custom HERO exists, show it. Otherwise show default HERO. */}
       {sections.some((s: any) => s.type === 'HERO')
-        ? sections.filter((s: any) => s.type === 'HERO').map((section: any) => renderSection(section))
+        ? sections.filter((s: any) => s.type === 'HERO')?.map((section: any) => renderSection(section))
         : (
           <header className="m-hero">
             <div className="m-hero-bg"></div>
@@ -897,7 +897,7 @@ export default function LandingPage() {
       {/* Global Footer (Dynamic Settings) */}
       {/* Footer */}
       {sections.some((s: any) => s.type === 'FOOTER')
-        ? sections.filter((s: any) => s.type === 'FOOTER').map((s: any) => renderSection(s))
+        ? sections.filter((s: any) => s.type === 'FOOTER')?.map((s: any) => renderSection(s))
         : (
           <footer className="m-footer-dark">
             <div className="m-footer-grid">
@@ -914,7 +914,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="flex gap-4 mb-12 opacity-60">
-                  {[1, 2, 3, 4, 5, 6].map(i => (
+                  {[1, 2, 3, 4, 5, 6]?.map(i => (
                     <div key={i} className="w-5 h-5 bg-white/20 rounded-full"></div>
                   ))}
                 </div>
@@ -924,7 +924,7 @@ export default function LandingPage() {
                 <div className="m-footer-col">
                   <h5>Hızlı Erişim</h5>
                   <ul>
-                    {footerMenuItems.map((item: any, i: number) => (
+                    {footerMenuItems?.map((item: any, i: number) => (
                       <li key={i}>
                         <Link href={item.link || '#'}>{item.label}</Link>
                       </li>

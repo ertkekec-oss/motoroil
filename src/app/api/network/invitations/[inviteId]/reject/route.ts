@@ -4,7 +4,8 @@ import { rejectConnectionInvite } from '@/services/network/engine/invitation';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request, { params }: { params: { inviteId: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ inviteId: string }> }) {
+    const params = await props.params;
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

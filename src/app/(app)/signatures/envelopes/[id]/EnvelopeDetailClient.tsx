@@ -3,9 +3,31 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-export default function EnvelopeDetailClient({ envelope }: { envelope: any }) {
+export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { envelope: any, currentUserEmail?: string }) {
     const [docUrl, setDocUrl] = useState('');
     const [loadingDoc, setLoadingDoc] = useState(false);
+    const [signing, setSigning] = useState(false);
+
+    const isMyTurn = envelope.recipients?.find((r: any) => r.email === currentUserEmail && ['PENDING', 'VIEWED'].includes(r.status));
+
+    const handleSign = async () => {
+        if (!confirm('Bu belgeyi dijital olarak imzalamayı onaylıyor musunuz?')) return;
+        setSigning(true);
+        try {
+            const res = await fetch(`/api/signatures/envelopes/${envelope.id}/sign`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Belge başarıyla imzalandı!');
+                window.location.reload();
+            } else {
+                alert(data.error || 'İmzalama başarısız oldu.');
+            }
+        } catch (e) {
+            alert('Bağlantı hatası.');
+        } finally {
+            setSigning(false);
+        }
+    };
 
     const handleViewDocument = async () => {
         if (docUrl) return; // already loaded
@@ -45,8 +67,20 @@ export default function EnvelopeDetailClient({ envelope }: { envelope: any }) {
         }
     };
 
-    const handleCancel = () => {
-        alert('Future-ready: İptal (Cancel) / Geri Çek Aksiyonu');
+    const handleCancel = async () => {
+        if (!confirm('Bu zarfı iptal etmek (geri çekmek) istediğinize emin misiniz?')) return;
+        try {
+            const res = await fetch(`/api/signatures/envelopes/${envelope.id}/cancel`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Zarf başarıyla iptal edildi.');
+                window.location.reload();
+            } else {
+                alert(data.error || 'İptal işlemi başarısız.');
+            }
+        } catch (e) {
+            alert('Ağ hatası oluştu, işlem yapılamadı.');
+        }
     }
 
     return (
@@ -74,6 +108,11 @@ export default function EnvelopeDetailClient({ envelope }: { envelope: any }) {
                     {['DRAFT', 'PENDING', 'IN_PROGRESS'].includes(envelope.status) && (
                         <button onClick={handleCancel} style={{ padding: '8px 16px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }} className="hover:bg-red-500/20">
                             İptal Et (Cancel)
+                        </button>
+                    )}
+                    {isMyTurn && (
+                        <button disabled={signing} onClick={handleSign} style={{ padding: '8px 16px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }} className="hover:bg-blue-500/20 disabled:opacity-50">
+                            <span>✍️</span> {signing ? 'İmzalanıyor...' : 'Belgeyi İmzala'}
                         </button>
                     )}
                     {envelope.status === 'COMPLETED' && envelope.signedDocumentKey && (

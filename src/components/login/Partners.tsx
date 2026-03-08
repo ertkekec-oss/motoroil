@@ -11,7 +11,7 @@ export default function Partners() {
                     Entegrasyonlar & Ortaklar
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-4">
-                    {PARTNERS.map(p => (
+                    {PARTNERS?.map(p => (
                         <div key={p}
                             className="px-4 py-2 rounded-xl border border-white/5 text-xs font-bold text-gray-500 hover:text-gray-300 hover:border-white/15 transition-all"
                             style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>

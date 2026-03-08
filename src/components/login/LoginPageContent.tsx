@@ -243,7 +243,7 @@ export default function LoginPageContent() {
                                 <span>Periodya Enterprise ERP</span>
                             </div>
                             <div className="flex flex-wrap items-center justify-center gap-4">
-                                {['KVKK', 'Gizlilik', 'Kullanım Koşulları', 'Destek'].map(l => (
+                                {['KVKK', 'Gizlilik', 'Kullanım Koşulları', 'Destek']?.map(l => (
                                     <a key={l} href="#" className="hover:text-gray-400 transition-colors">{l}</a>
                                 ))}
                             </div>

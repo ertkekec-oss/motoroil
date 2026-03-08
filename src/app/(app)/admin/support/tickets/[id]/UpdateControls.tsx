@@ -50,7 +50,7 @@ export default function UpdateControls({
                     onChange={(e) => handleUpdate({ assignedToUserId: e.target.value || null })}
                 >
                     <option value="">Atanmamış</option>
-                    {agents.map(a => (
+                    {agents?.map(a => (
                         <option key={a.id} value={a.id}>{a.name || a.email}</option>
                     ))}
                 </select>

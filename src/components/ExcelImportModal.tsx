@@ -54,7 +54,7 @@ export default function ExcelImportModal({ isOpen, onClose, type, onSuccess }: E
             // İlk satır başlık olduğu için ayırıyoruz
             if (jsonData.length > 1) {
                 const headers = jsonData[0] as string[];
-                const rows = jsonData.slice(1).map((row: any) => {
+                const rows = jsonData.slice(1)?.map((row: any) => {
                     const obj: any = {};
                     if (type === 'invoice') {
                         // Invoice mapping
@@ -165,15 +165,15 @@ export default function ExcelImportModal({ isOpen, onClose, type, onSuccess }: E
                                 <table style={{ width: '100%', fontSize: '12px', textAlign: 'left', borderCollapse: 'collapse' }}>
                                     <thead style={{ background: '#252525', color: '#aaa', position: 'sticky', top: 0 }}>
                                         <tr>
-                                            {Object.keys(previewData[0]).map((key) => (
+                                            {Object.keys(previewData[0])?.map((key) => (
                                                 <th key={key} style={{ padding: '8px', borderBottom: '1px solid #333' }}>{key}</th>
                                             ))}
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {previewData.map((row, idx) => (
+                                        {previewData?.map((row, idx) => (
                                             <tr key={idx} style={{ borderBottom: '1px solid #333' }}>
-                                                {Object.values(row).map((val: any, i) => (
+                                                {Object.values(row)?.map((val: any, i) => (
                                                     <td key={i} style={{ padding: '8px' }}>{val}</td>
                                                 ))}
                                             </tr>

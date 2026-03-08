@@ -4,7 +4,8 @@ import { suggestSuppliersForRFQ } from '@/services/network/recommendation/engine
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request, { params }: { params: { rfqId: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ rfqId: string }> }) {
+    const params = await props.params;
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

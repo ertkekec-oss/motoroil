@@ -149,7 +149,7 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {items.map((item: any, idx: number) => {
+                                {items?.map((item: any, idx: number) => {
                                     const lineTotal = Number(item.quantity) * Number(item.price);
                                     return (
                                         <tr key={idx}>

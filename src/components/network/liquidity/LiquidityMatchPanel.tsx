@@ -36,7 +36,7 @@ export function LiquidityMatchPanel() {
             </div>
 
             <div className="divide-y divide-gray-50 flex flex-col gap-2 p-4">
-                {matches.map(match => (
+                {matches?.map(match => (
                     <div key={match.id} className="p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200">
                         <div className="flex justify-between items-start">
                             <div className="flex flex-col">
@@ -56,7 +56,7 @@ export function LiquidityMatchPanel() {
 
                         {match.explainJson && match.explainJson.drivers && match.explainJson.drivers.length > 0 && (
                             <div className="mt-3 flex flex-wrap gap-2">
-                                {match.explainJson.drivers.map((driver: string, idx: number) => (
+                                {match.explainJson.drivers?.map((driver: string, idx: number) => (
                                     <span key={idx} className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded border border-green-100">{driver.replace(/_/g, ' ')}</span>
                                 ))}
                                 {match.explainJson.riskFlags?.map((flag: string, idx: number) => (

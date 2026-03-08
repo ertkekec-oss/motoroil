@@ -56,7 +56,7 @@ export default function AdminGrowthAuditTrail() {
                             </tr>
                         </thead>
                         <tbody className="divide-y text-sm">
-                            {logs.map(log => (
+                            {logs?.map(log => (
                                 <tr key={log.id} className="hover:bg-slate-50">
                                     <td className="p-4">
                                         <div className="px-2 py-1 bg-slate-100 text-slate-800 font-bold rounded text-[10px] uppercase w-max tracking-wide">

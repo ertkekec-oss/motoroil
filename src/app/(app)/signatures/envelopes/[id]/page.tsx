@@ -29,7 +29,7 @@ export default async function EnvelopeDetailPage({ params }: { params: { id: str
     return (
         <div className="flex flex-col flex-1" style={{ background: 'var(--bg-main)', color: 'var(--text-main)', minHeight: '100vh', padding: '40px' }}>
             <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
-                <EnvelopeDetailClient envelope={envelope} />
+                <EnvelopeDetailClient envelope={envelope} currentUserEmail={session.user?.email || ''} />
             </div>
         </div>
     );

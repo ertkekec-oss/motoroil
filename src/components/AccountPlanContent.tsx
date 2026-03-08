@@ -214,7 +214,7 @@ export default function AccountPlanContent() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredAccounts.map((acc) => {
+                                filteredAccounts?.map((acc) => {
                                     const depth = acc.code.split('.').length - 1;
                                     const isMain = depth === 0;
 

@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getRequestContext, apiError } from '@/lib/api-context';
 import { DisputeEvidenceService, AddEvidenceSchema } from '@/services/disputes';
 
-export async function POST(req: Request, { params }: { params: { disputeId: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ disputeId: string }> }) {
+    const params = await props.params;
     try {
         const { tenantId, userId } = await getRequestContext(req as any);
         const { disputeId } = params;

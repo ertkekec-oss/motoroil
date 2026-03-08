@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { generateTradeOpportunities } from '@/services/network/inventory/opportunityEngine';
-import { detectOverstockSignals } from '@/services/network/inventory/overstockDetection';
-import { detectStockoutSignals } from '@/services/network/inventory/stockoutDetection';
-import { detectDemandSignals } from '@/services/network/inventory/demandSignal';
+import { LiquidityEngine } from '@/services/network/liquidity/liquidityEngine';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,44 +13,64 @@ export async function GET(request: Request) {
         const tenantId = (session as any).tenantId;
         if (!tenantId) return NextResponse.json({ error: 'No tenant context' }, { status: 400 });
 
-        const profile = await prisma.networkCompanyProfile.findUnique({
-            where: { tenantId }
-        });
-
-        if (!profile) return NextResponse.json({ success: true, opportunities: [] });
-
         const { searchParams } = new URL(request.url);
         const refresh = searchParams.get('refresh') === 'true';
 
-        // Background Job Simulation: For real-time sync requests
+        // Integrate with the real Liquidity Engine
         if (refresh) {
-            // Signal recalculation before generating opps
             await Promise.all([
-                detectOverstockSignals(tenantId),
-                detectStockoutSignals(tenantId),
-                detectDemandSignals(tenantId)
+                LiquidityEngine.scanAndLogSupply(),
+                LiquidityEngine.scanAndLogDemand()
             ]);
-            await generateTradeOpportunities();
+            // Generate matches
+            await LiquidityEngine.processLiquidityMatches();
         }
 
-        // Return opportunities where user is BUYER or SUPPLIER
-        const opps = await prisma.networkTradeOpportunity.findMany({
+        // Return real liquidity matches for the current tenant
+        const matches = await prisma.networkLiquidityMatch.findMany({
             where: {
                 OR: [
-                    { buyerProfileId: profile.id },
-                    { supplierProfileId: profile.id }
-                ]
+                    { buyerTenantId: tenantId },
+                    { sellerTenantId: tenantId }
+                ],
+                status: 'CANDIDATE' // Only show new candidates
             },
             include: {
-                supplierProfile: { include: { trustScore: true } },
-                buyerProfile: { include: { trustScore: true } }
+                opportunity: true
             },
-            orderBy: { opportunityScore: 'desc' },
+            orderBy: { finalMatchScore: 'desc' },
             take: 20
         });
 
-        return NextResponse.json({ success: true, opportunities: opps });
+        // Resolve display names & map to dashboard expected shape
+        const tenantIdsToFetch = Array.from(new Set(matches.flatMap(m => [m.buyerTenantId, m.sellerTenantId])));
+        const identityMap = new Map();
+
+        if (tenantIdsToFetch.length > 0) {
+            const identities = await prisma.companyIdentity.findMany({
+                where: { tenantId: { in: tenantIdsToFetch } },
+                select: { tenantId: true, legalName: true }
+            });
+            identities.forEach(i => identityMap.set(i.tenantId, i.legalName));
+        }
+
+        const mappedOpps = matches.map(match => {
+            const isBuyer = match.buyerTenantId === tenantId;
+            const counterpartyId = isBuyer ? match.sellerTenantId : match.buyerTenantId;
+            return {
+                id: match.id, // Using Match ID for generating RFQs!
+                signalType: match.opportunity?.opportunityType === 'SUPPLY_SURPLUS' ? 'OVERSTOCK' : 'HIGH_DEMAND',
+                confidence: match.finalMatchScore,
+                categoryId: match.categoryId || 'GENERAL',
+                // Mocking the profile format the dashboard expects:
+                supplierProfile: isBuyer ? { id: counterpartyId, displayName: identityMap.get(counterpartyId) || 'Unknown Supplier' } : null,
+                buyerProfile: !isBuyer ? { id: counterpartyId, displayName: identityMap.get(counterpartyId) || 'Unknown Buyer' } : null,
+            };
+        });
+
+        return NextResponse.json({ success: true, opportunities: mappedOpps });
     } catch (error: any) {
+        console.error("[TradeOpportunities API Error]", error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

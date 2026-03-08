@@ -81,7 +81,7 @@ export default function PayoutsPage() {
             )}
 
             <div className="flex gap-2 mb-4">
-                {['ALL', 'REQUESTED', 'APPROVED', 'PROCESSING', 'PAID_INTERNAL', 'FAILED', 'REJECTED'].map(f => (
+                {['ALL', 'REQUESTED', 'APPROVED', 'PROCESSING', 'PAID_INTERNAL', 'FAILED', 'REJECTED']?.map(f => (
                     <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 text-[10px] border shadow-sm font-bold rounded uppercase ${filter === f ? 'bg-slate-900 text-white border-black' : 'bg-white text-slate-600 hover:bg-slate-50 border-slate-200'}`}>
                         {f === 'ALL' ? 'TÜMÜ' : f}
                     </button>
@@ -104,7 +104,7 @@ export default function PayoutsPage() {
                         {loading && reqs.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-slate-400 font-bold">Yükleniyor...</td></tr>}
                         {!loading && reqs.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-slate-400 font-bold">Kayıt Bulunamadı.</td></tr>}
 
-                        {reqs.map(r => (
+                        {reqs?.map(r => (
                             <tr key={r.id} className="hover:bg-slate-50 transition-colors">
                                 <td className="p-4">
                                     <div className="font-mono text-slate-800">{new Date(r.requestedAt).toLocaleString()}</div>

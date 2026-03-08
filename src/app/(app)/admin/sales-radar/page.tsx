@@ -44,7 +44,7 @@ export default function SalesRadarPage() {
             </div>
 
             <div style={{ display: 'grid', gap: '16px' }}>
-                {data.map(item => (
+                {data?.map(item => (
                     <div key={item.id} style={{
                         background: 'var(--bg-card)',
                         padding: '20px',

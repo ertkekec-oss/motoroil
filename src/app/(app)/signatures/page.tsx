@@ -39,9 +39,14 @@ export default async function SignaturesDashboardPage() {
                         </h1>
                         <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>Tüm dijital sözleşme ve mutabakat imza süreçleri.</p>
                     </div>
-                    <Link href="/signatures/envelopes" style={{ padding: '10px 20px', background: '#3b82f6', color: 'white', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }}>
-                        Zarflara Git
-                    </Link>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <Link href="/signatures/envelopes" style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--border-color)', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }}>
+                            Zarflara Git
+                        </Link>
+                        <Link href="/signatures/new" style={{ padding: '10px 20px', background: '#3b82f6', color: 'white', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }}>
+                            + Yeni Zarf Gönder
+                        </Link>
+                    </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '40px' }}>

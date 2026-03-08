@@ -28,7 +28,7 @@ export function ProductTable({
         if (selectedIds.length === products.length) {
             setSelectedIds([]);
         } else {
-            setSelectedIds(products.map(p => Number(p.id)));
+            setSelectedIds(products?.map(p => Number(p.id)));
         }
     };
 
@@ -74,7 +74,7 @@ export function ProductTable({
                     </tr>
                 </thead>
                 <tbody>
-                    {products.map(product => (
+                    {products?.map(product => (
                         <tr
                             key={product.id}
                             onClick={() => canEdit && onProductClick(product)}

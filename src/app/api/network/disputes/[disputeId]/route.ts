@@ -3,7 +3,8 @@ import { getRequestContext, apiError } from '@/lib/api-context';
 import { DisputeProjection, DisputeTimelineService } from '@/services/disputes';
 import prisma from '@/lib/prisma';
 
-export async function GET(req: Request, { params }: { params: { disputeId: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ disputeId: string }> }) {
+    const params = await props.params;
     try {
         const { tenantId } = await getRequestContext(req as any);
         const { disputeId } = params;

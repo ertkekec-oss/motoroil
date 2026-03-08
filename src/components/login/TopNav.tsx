@@ -39,7 +39,7 @@ export default function TopNav({ onDemoClick }: TopNavProps) {
 
                 {/* Desktop Links */}
                 <div className="flex items-center gap-1">
-                    {NAV_LINKS.map(link => (
+                    {NAV_LINKS?.map(link => (
                         <button
                             key={link.href}
                             onClick={() => scrollTo(link.href)}

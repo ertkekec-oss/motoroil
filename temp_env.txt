@@ -1,0 +1,26 @@
+model SignatureEnvelope {
+  id                String                  @id @default(cuid())
+  tenantId          String
+  companyId         String?
+  title             String
+  documentKey       String // e.g. tenants/{tenantId}/signatures/...
+  documentFileName  String
+  status            SignatureEnvelopeStatus @default(DRAFT)
+  provider          String? // internal, esign, etc.
+  createdByUserId   String?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  completedAt       DateTime?
+  signedDocumentKey String?
+  otpRequired       Boolean                 @default(false)
+  sequentialSigning Boolean                 @default(true)
+  documentCategory  DocumentCategory?
+
+  recipients  SignatureRecipient[]
+  sessions    SignatureSession[]
+  auditEvents SignatureAuditEvent[]
+
+  @@index([tenantId])
+  @@index([companyId])
+}
+

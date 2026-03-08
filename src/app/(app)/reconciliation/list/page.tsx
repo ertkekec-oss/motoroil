@@ -37,8 +37,8 @@ export default async function ReconciliationListPage({ searchParams }: { searchP
                         <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>Firmalara gönderilen tüm mutabakatların (BA/BS, Cari Hesap) güncel durumu.</p>
                     </div>
                     <div>
-                        <Link href="/accounting" style={{ padding: '10px 16px', borderRadius: '8px', background: '#3b82f6', color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }} className="hover:bg-blue-600">
-                            + Yeni Oluştur (Muhasebe)
+                        <Link href="/reconciliation/new" style={{ padding: '10px 16px', borderRadius: '8px', background: '#3b82f6', color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: 'bold' }} className="hover:bg-blue-600">
+                            + Yeni Oluştur
                         </Link>
                     </div>
                 </div>
@@ -51,7 +51,6 @@ export default async function ReconciliationListPage({ searchParams }: { searchP
                             <select
                                 name="category"
                                 defaultValue={category || ''}
-                                onChange={(e) => e.target.form?.submit()}
                                 style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)', borderRadius: '6px', fontSize: '12px' }}>
                                 <option value="" style={{ color: 'black' }}>Tüm Kategoriler</option>
                                 <option value="RECONCILIATION" style={{ color: 'black' }}>Mutabakatlar</option>

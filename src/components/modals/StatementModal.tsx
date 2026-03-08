@@ -44,7 +44,7 @@ function DetailedGroupRow({ groupDate, items }: { groupDate: string, items: any[
                     </div>
                 </td>
             </tr>
-            {open && items.map((t, idx) => (
+            {open && items?.map((t, idx) => (
                 <tr key={idx} style={{ background: '#fff' }}>
                     <td className="date-cell" style={{ paddingLeft: '32px' }}>{t.date}</td>
                     <td>
@@ -94,7 +94,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
 
             let totalProcessedDebt = 0;
             let totalProcessedCredit = 0;
-            const mapped = sorted.map(t => {
+            const mapped = sorted?.map(t => {
                 let debt = 0;
                 let credit = 0;
                 const tType = t?.type || '';
@@ -163,7 +163,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                 });
 
                 let summaryRb = 0;
-                const summarized = Object.values(groups).map(g => {
+                const summarized = Object.values(groups)?.map(g => {
                     summaryRb += (g.debt - g.credit);
                     return { ...g, balance: summaryRb };
                 });
@@ -302,7 +302,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                             </thead>
                             <tbody>
                                 {type === 'summary' ? (
-                                    processedTransactions.map((t: any, idx: number) => (
+                                    processedTransactions?.map((t: any, idx: number) => (
                                         <tr key={idx}>
                                             <td className="date-cell">{t.date}</td>
                                             <td>
@@ -316,7 +316,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                                     ))
                                 ) : (
                                     // Detailed view with grouped collapsible
-                                    Object.entries(groupedDates).map(([gDate, items], gIdx) => (
+                                    Object.entries(groupedDates)?.map(([gDate, items], gIdx) => (
                                         <DetailedGroupRow key={gIdx} groupDate={gDate} items={items as any[]} />
                                     ))
                                 )}

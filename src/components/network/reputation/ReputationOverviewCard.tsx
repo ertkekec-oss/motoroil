@@ -73,7 +73,7 @@ export function ReputationOverviewCard() {
                     <div className="mt-4">
                         <h4 className="text-xs font-semibold text-gray-600 mb-1">Pozitif Etkenler</h4>
                         <ul className="text-xs text-green-700 space-y-1 pl-4 list-disc">
-                            {stats.topPositives.map((p: string, i: number) => <li key={i}>{p}</li>)}
+                            {stats.topPositives?.map((p: string, i: number) => <li key={i}>{p}</li>)}
                         </ul>
                     </div>
                 )}
@@ -82,7 +82,7 @@ export function ReputationOverviewCard() {
                     <div className="mt-2">
                         <h4 className="text-xs font-semibold text-gray-600 mb-1">Dikkat Noktaları</h4>
                         <ul className="text-xs text-red-600 space-y-1 pl-4 list-disc">
-                            {stats.topNegatives.map((n: string, i: number) => <li key={i}>{n}</li>)}
+                            {stats.topNegatives?.map((n: string, i: number) => <li key={i}>{n}</li>)}
                         </ul>
                     </div>
                 )}

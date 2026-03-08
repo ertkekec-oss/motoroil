@@ -64,7 +64,7 @@ export default function AdminB2BPoliciesPage() {
 
             if (res.ok) {
                 // Update local state and exit edit mode
-                setPolicies(prev => prev.map(p =>
+                setPolicies(prev => prev?.map(p =>
                     p.tenantId === tenantId ? { ...p, dealerAuthMode: selectedMode, updatedAt: new Date().toISOString() } : p
                 ));
                 setEditingPolicy(null);
@@ -143,7 +143,7 @@ export default function AdminB2BPoliciesPage() {
                             <td colSpan={5} className="p-8 text-center text-sm text-slate-500 font-medium">Görüntülenecek politika kaydı bulunamadı.</td>
                         </tr>
                     ) : (
-                        policies.map((policy) => (
+                        policies?.map((policy) => (
                             <tr key={policy.tenantId} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                 <td className="p-4 align-middle">
                                     <div className="font-semibold text-slate-900 dark:text-white text-sm">{policy.tenantName}</div>

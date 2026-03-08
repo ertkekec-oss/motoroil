@@ -62,7 +62,7 @@ export default function IncomeStatementContent() {
 
         return (
             <div className="pl-8 text-xs text-slate-500 dark:text-slate-400 mb-2">
-                {items.map((item: any) => (
+                {items?.map((item: any) => (
                     <div key={item.code} className="flex justify-between py-0.5 hover:text-slate-900 dark:text-white transition-colors">
                         <span>{item.code} - {item.name}</span>
                         <span>{formatMoney(item.balance)}</span>

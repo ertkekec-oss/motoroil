@@ -22,7 +22,7 @@ export default function AdminTransactions() {
                             </div>
                         </div>
                         <div className="divide-y divide-slate-100">
-                            {[1, 2, 3, 4, 5].map((i) => (
+                            {[1, 2, 3, 4, 5]?.map((i) => (
                                 <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs uppercase">TN</div>

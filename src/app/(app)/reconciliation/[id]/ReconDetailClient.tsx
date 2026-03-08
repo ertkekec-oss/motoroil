@@ -6,6 +6,44 @@ export default function ReconDetailClient({ reconciliation: recon }: { reconcili
     const isDisputed = recon.status === 'DISPUTED';
     const isOk = recon.status === 'SIGNED';
 
+    const handleResend = async () => {
+        if (!confirm('Mutabakat davetini tekrar göndermek istiyor musunuz?')) return;
+        try {
+            const res = await fetch(`/api/reconciliation/${recon.id}/resend`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Davet başarıyla yeniden gönderildi.');
+                window.location.reload();
+            } else {
+                alert(data.error || 'Gönderim başarısız oldu.');
+            }
+        } catch (e) {
+            alert('Ağ hatası.');
+        }
+    };
+
+    const handleResolveDispute = async (disputeId: string) => {
+        const resolutionNote = prompt('Bu uyuşmazlığı çözümlemek için notunuz:');
+        if (resolutionNote === null) return; // user cancelled
+
+        try {
+            const res = await fetch(`/api/reconciliation/${recon.id}/disputes/${disputeId}/resolve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resolutionNote })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Uyuşmazlık çözüldü olarak işaretlendi.');
+                window.location.reload();
+            } else {
+                alert(data.error || 'İşlem başarısız.');
+            }
+        } catch (e) {
+            alert('Ağ hatası.');
+        }
+    };
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -29,7 +67,7 @@ export default function ReconDetailClient({ reconciliation: recon }: { reconcili
                         </div>
                     </div>
                     {['DRAFT', 'GENERATED', 'SENT', 'VIEWED'].includes(recon.status) && (
-                        <button style={{ padding: '8px 16px', background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }} className="hover:bg-white/10">
+                        <button onClick={handleResend} style={{ padding: '8px 16px', background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }} className="hover:bg-white/10">
                             Yeniden Davet Gönder
                         </button>
                     )}
@@ -86,8 +124,10 @@ export default function ReconDetailClient({ reconciliation: recon }: { reconcili
                                             </div>
                                         )}
                                         <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
-                                            <div style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: '#ef4444', color: 'white', fontWeight: 'bold' }}>{d.status}</div>
-                                            <button style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 'bold' }}>İtirazı İncele (Çözümle)</button>
+                                            <div style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: d.status === 'RESOLVED' ? '#10b981' : '#ef4444', color: 'white', fontWeight: 'bold' }}>{d.status}</div>
+                                            {d.status !== 'RESOLVED' && (
+                                                <button onClick={() => handleResolveDispute(d.id)} style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '4px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 'bold' }}>İtirazı İncele (Çözümle)</button>
+                                            )}
                                         </div>
                                     </div>
                                 ))}

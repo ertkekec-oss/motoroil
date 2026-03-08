@@ -121,7 +121,7 @@ export default async function ShipmentsMonitorPage() {
                                 {shipments.length === 0 ? (
                                     <tr><td colSpan={11} className="px-3 py-8 text-center text-slate-400 font-medium">No shipment records found.</td></tr>
                                 ) : (
-                                    shipments.map(shp => {
+                                    shipments?.map(shp => {
                                         const latestEventObj = shp.events[0];
                                         const inboxCount = shp._count.events;
 
