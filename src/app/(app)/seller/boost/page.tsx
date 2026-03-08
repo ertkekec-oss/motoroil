@@ -85,9 +85,11 @@ export default function BoostPage() {
                                 <p className="text-xs text-indigo-300">Yenilenme Tarihi: <span className="text-indigo-100 font-semibold">{formatDate(boostData.renewalDate)}</span></p>
                             </div>
 
-                            <button className="w-full bg-white dark:bg-[#0f172a] text-indigo-900 font-bold py-3 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm shadow-indigo-900/50 relative overflow-hidden group">
-                                <span className="relative z-10">Planı Değiştir (Yakında)</span>
-                            </button>
+                            <Link href="/settings">
+                                <button className="w-full bg-white dark:bg-[#0f172a] text-indigo-900 font-bold py-3 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm shadow-indigo-900/50 relative overflow-hidden group">
+                                    <span className="relative z-10">Planı Değiştir</span>
+                                </button>
+                            </Link>
                         </div>
                     </div>
 

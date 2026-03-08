@@ -84,7 +84,7 @@ export default async function AdminSignaturesProvidersPage() {
                     </div>
 
                     {/* eSign / DocuSign Mock */}
-                    <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', position: 'relative', display: 'flex', flexDirection: 'column', opacity: 0.6 }}>
+                    <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', position: 'relative', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', filter: 'grayscale(100%)' }}>🔵</div>
@@ -93,17 +93,17 @@ export default async function AdminSignaturesProvidersPage() {
                                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Gelişmiş Nitelikli İmza</div>
                                 </div>
                             </div>
-                            <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '800', background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
-                                YAKINDA
+                            <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '800', background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>
+                                ENTERPRISE
                             </div>
                         </div>
                         <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '24px', flex: 1 }}>
                             Global niteklikli ESIGN uyumu veya kurumsal 3. parti imzalayıcılara webhook fırlatan adaptör katmanı.
                         </p>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-                            <button disabled style={{ padding: '8px 16px', borderRadius: '8px', background: 'transparent', color: 'var(--text-muted)', fontSize: '12px', fontWeight: 'bold', border: '1px solid var(--border-color)', cursor: 'not-allowed' }}>
-                                Kurulum (Yakında)
-                            </button>
+                            <Link href="/support" style={{ padding: '8px 16px', borderRadius: '8px', background: '#3b82f6', color: 'white', fontSize: '12px', fontWeight: 'bold', border: 'none', cursor: 'pointer', textDecoration: 'none' }}>
+                                Kurumsal Talep
+                            </Link>
                         </div>
                     </div>
 

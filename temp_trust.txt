@@ -1,0 +1,17 @@
+model CompanyTrustProfile {
+  id                String    @id @default(cuid())
+  tenantId          String    @unique
+  companyIdentityId String?
+  identityScore     Float     @default(0)
+  tradeScore        Float     @default(0)
+  shippingScore     Float     @default(0)
+  paymentScore      Float     @default(0)
+  disputeScore      Float     @default(0)
+  overallScore      Float     @default(0)
+  trustLevel        String    @default("LOW")
+  lastCalculatedAt  DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  companyIdentity CompanyIdentity? @relation(fields: [companyIdentityId], references: [id])
+}
