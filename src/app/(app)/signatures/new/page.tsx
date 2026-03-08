@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function NewSignaturePage() {
+    const router = useRouter();
     const [title, setTitle] = useState('');
     const [file, setFile] = useState<File | null>(null);
     const [category, setCategory] = useState('CONTRACT');
@@ -71,7 +73,7 @@ export default function NewSignaturePage() {
             const data = await res.json();
             if (data.success) {
                 toast.success('Zarf başarıyla oluşturuldu ve hazırlandı!');
-                window.location.href = `/signatures/envelopes/${data.envelope.id}`;
+                router.push(`/signatures/envelopes/${data.envelope.id}`);
             } else {
                 toast.error(data.error || 'Zarf oluşturulamadı.');
             }

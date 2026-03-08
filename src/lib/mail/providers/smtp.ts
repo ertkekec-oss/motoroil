@@ -24,7 +24,7 @@ export class SmtpMailProvider implements MailProvider {
             // We removed the findFirst fallback because it was grabbing random companies' invalid smtp settings.
 
             let email = process.env.SMTP_EMAIL || 'info@periodya.com';
-            let password = process.env.SMTP_PASSWORD || 'ezgf kvdd mact qtcd';
+            let password = process.env.SMTP_PASSWORD || 'qrqp zjoi lmor uhsz';
             let senderName = 'Periodya B2B Network';
 
             if (settings && settings.value) {
@@ -82,7 +82,7 @@ export class SmtpMailProvider implements MailProvider {
                     console.warn(`[SMTP_MAIL_PROVIDER] Tenant SMTP failed for company ${payload.companyId}. Falling back to system default. Error: ${err.message}`);
 
                     const fallbackEmail = process.env.SMTP_EMAIL || 'info@periodya.com';
-                    const fallbackPassword = process.env.SMTP_PASSWORD || 'ezgf kvdd mact qtcd';
+                    const fallbackPassword = process.env.SMTP_PASSWORD || 'qrqp zjoi lmor uhsz';
 
                     const fallbackOptions: any = {
                         host: fallbackEmail.toLowerCase().includes('gmail.com') || fallbackEmail.toLowerCase().includes('periodya.com') ? 'smtp.gmail.com' : `smtp.${fallbackEmail.split('@')[1]}`,

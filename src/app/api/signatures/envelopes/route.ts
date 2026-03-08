@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
         const envelope = await prisma.signatureEnvelope.create({
             data: {
                 tenantId,
+                companyId: session.companyId || null,
                 title,
                 documentKey,
                 documentFileName: documentFileName || "belge.pdf",
