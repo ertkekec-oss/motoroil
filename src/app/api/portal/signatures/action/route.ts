@@ -7,13 +7,13 @@ import { embedFinalSignatureProof } from '@/services/signatures/signatureProofSe
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { token, action, otpVerifiedToken } = body;
+        const { token, action, otpVerifiedToken, message } = body;
 
         if (!token || typeof token !== 'string') {
             return NextResponse.json({ error: 'Token missing or invalid' }, { status: 400 });
         }
 
-        if (!['SIGNED', 'REJECTED'].includes(action)) {
+        if (!['SIGNED', 'REJECTED', 'REVISION_REQUESTED'].includes(action)) {
             return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
         }
 
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
         await prisma.signatureRecipient.update({
             where: { id: session.recipientId },
             data: {
-                status: action as 'SIGNED' | 'REJECTED',
+                status: action as 'SIGNED' | 'REJECTED' | 'REVISION_REQUESTED',
                 signedAt: new Date()
             }
         });
@@ -104,10 +104,13 @@ export async function POST(req: Request) {
 
         const allSigned = updatedRecipients.every(r => r.status === 'SIGNED');
         const anyRejected = updatedRecipients.some(r => r.status === 'REJECTED');
+        const anyRevision = updatedRecipients.some(r => r.status === 'REVISION_REQUESTED');
 
         let newEnvStatus = env.status;
         if (anyRejected) {
             newEnvStatus = 'REJECTED';
+        } else if (anyRevision) {
+            newEnvStatus = 'REVISION_REQUESTED';
         } else if (allSigned) {
             newEnvStatus = 'COMPLETED';
         } else {
@@ -125,13 +128,18 @@ export async function POST(req: Request) {
         }
 
         // 6. Audit Trail
+        const auditAction = action === 'SIGNED' ? 'RECIPIENT_SIGNED' : action === 'REJECTED' ? 'RECIPIENT_REJECTED' : 'RECIPIENT_REVISION_REQUESTED';
+
         await prisma.signatureAuditEvent.create({
             data: {
                 tenantId: env.tenantId,
                 envelopeId: env.id,
-                action: action === 'SIGNED' ? 'RECIPIENT_SIGNED' : 'RECIPIENT_REJECTED',
+                action: auditAction,
                 actorId: session.recipientId,
-                metaJson: buildPortalAuditPayload(action, security, { role: session.recipient.role }).metaJson as any
+                metaJson: {
+                    ...buildPortalAuditPayload(action, security, { role: session.recipient.role }).metaJson as any,
+                    ...(message ? { revisionMessage: message } : {})
+                }
             }
         });
 

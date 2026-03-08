@@ -10,7 +10,8 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
     const [docUrl, setDocUrl] = useState('');
     const [loadingDoc, setLoadingDoc] = useState(false);
     const [hasViewed, setHasViewed] = useState(false);
-    const [confirmModal, setConfirmModal] = useState<'SIGNED' | 'REJECTED' | null>(null);
+    const [confirmModal, setConfirmModal] = useState<'SIGNED' | 'REJECTED' | 'REVISION_REQUESTED' | null>(null);
+    const [revisionMessage, setRevisionMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
 
     // OTP State
@@ -44,19 +45,23 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
         if (token) fetchDoc();
     }, [token]);
 
-    const executeAction = async (action: 'SIGNED' | 'REJECTED') => {
+    const executeAction = async (action: 'SIGNED' | 'REJECTED' | 'REVISION_REQUESTED') => {
+        if (action === 'REVISION_REQUESTED' && !revisionMessage.trim()) {
+            toast.error('Lütfen revize talebinizi yazınız.');
+            return;
+        }
         setConfirmModal(null);
         setSubmitting(true);
         try {
             const res = await fetch('/api/portal/signatures/action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, action, otpVerifiedToken })
+                body: JSON.stringify({ token, action, otpVerifiedToken, message: action === 'REVISION_REQUESTED' ? revisionMessage : undefined })
             });
             const data = await res.json();
             if (data.success) {
                 setIsSuccess(true);
-                toast.success(action === 'SIGNED' ? 'Belge başarıyla imzalandı!' : 'Belge reddedildi.', { duration: 3000 });
+                toast.success(action === 'SIGNED' ? 'Belge başarıyla imzalandı!' : action === 'REJECTED' ? 'Belge reddedildi.' : 'Revize talebiniz iletildi.', { duration: 3000 });
                 setTimeout(() => {
                     router.refresh();
                 }, 1500);
@@ -252,18 +257,25 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
                         </button>
                     </div>
                 ) : (
-                    <div className="w-full flex justify-center gap-4">
+                    <div className="w-full flex justify-center gap-3">
                         <button
                             disabled={submitting || !hasViewed}
                             onClick={() => setConfirmModal('REJECTED')}
-                            className="bg-[#1e293b] hover:bg-slate-800 text-red-500 font-semibold py-3 px-8 border border-slate-600 rounded-xl shadow-md disabled:opacity-50 transition-colors"
+                            className="bg-[#1e293b] hover:bg-slate-800 text-red-500 font-semibold py-3 px-6 border border-slate-600 rounded-xl shadow-md disabled:opacity-50 transition-colors"
                         >
                             İptal / Reddet
                         </button>
                         <button
                             disabled={submitting || !hasViewed}
+                            onClick={() => setConfirmModal('REVISION_REQUESTED')}
+                            className="bg-[#1e293b] hover:bg-slate-800 text-amber-500 font-semibold py-3 px-6 border border-slate-600 rounded-xl shadow-md disabled:opacity-50 transition-colors"
+                        >
+                            Revize İste
+                        </button>
+                        <button
+                            disabled={submitting || !hasViewed}
                             onClick={() => setConfirmModal('SIGNED')}
-                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-12 rounded-xl shadow-md disabled:opacity-50 border border-blue-500 transition-colors"
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-10 rounded-xl shadow-md disabled:opacity-50 border border-blue-500 transition-colors"
                         >
                             {submitting ? 'İşleniyor...' : 'Kabul Et ve İmzala'}
                         </button>
@@ -271,24 +283,32 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
                 )}
             </div>
 
-            {/* Custom Enterprise Confirmation Modal */}
             {confirmModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-[#1e293b] border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-                        <div className={`p-6 text-center ${confirmModal === 'SIGNED' ? 'bg-blue-900/20' : 'bg-red-900/20'}`}>
-                            <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-inner mb-4 ${confirmModal === 'SIGNED' ? 'bg-blue-900/40 text-blue-400 border border-blue-800/50' : 'bg-red-900/40 text-red-400 border border-red-800/50'}`}>
-                                <span className="text-3xl">{confirmModal === 'SIGNED' ? '✍️' : '❌'}</span>
+                        <div className={`p-6 text-center ${confirmModal === 'SIGNED' ? 'bg-blue-900/20' : confirmModal === 'REJECTED' ? 'bg-red-900/20' : 'bg-amber-900/20'}`}>
+                            <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-inner mb-4 ${confirmModal === 'SIGNED' ? 'bg-blue-900/40 text-blue-400 border border-blue-800/50' : confirmModal === 'REJECTED' ? 'bg-red-900/40 text-red-400 border border-red-800/50' : 'bg-amber-900/40 text-amber-500 border border-amber-800/50'}`}>
+                                <span className="text-3xl">{confirmModal === 'SIGNED' ? '✍️' : confirmModal === 'REJECTED' ? '❌' : '📝'}</span>
                             </div>
                             <h3 className="text-xl font-black text-slate-100 mb-2">
-                                {confirmModal === 'SIGNED' ? 'Belgeyi İmzalıyorsunuz' : 'Belgeyi Reddediyorsunuz'}
+                                {confirmModal === 'SIGNED' ? 'Belgeyi İmzalıyorsunuz' : confirmModal === 'REJECTED' ? 'Belgeyi Reddediyorsunuz' : 'Revize İstiyorsunuz'}
                             </h3>
                             <p className="text-sm text-slate-400 font-medium tracking-tight">
                                 {confirmModal === 'SIGNED'
                                     ? 'Bu işlem yasal olarak bağlayıcıdır ve elektronik imzanız yerine geçer.'
-                                    : 'Reddedilen belgelerin imza zinciri tamamen iptal edilir.'}
+                                    : confirmModal === 'REJECTED' ? 'Reddedilen belgelerin imza zinciri tamamen iptal edilir.' : 'Belge üzerinde yapılmasını istediğiniz değişiklikleri aşağıda belirtebilirsiniz.'}
                             </p>
                         </div>
                         <div className="p-6 bg-[#0f172a] border-t border-slate-700">
+                            {confirmModal === 'REVISION_REQUESTED' && (
+                                <textarea
+                                    className="w-full bg-[#1e293b] border border-slate-600 rounded-lg p-3 text-sm text-slate-100 mb-4 focus:border-amber-500 focus:outline-none placeholder-slate-500"
+                                    rows={4}
+                                    placeholder="Lütfen revize talebinizi detaylıca yazınız..."
+                                    value={revisionMessage}
+                                    onChange={e => setRevisionMessage(e.target.value)}
+                                ></textarea>
+                            )}
                             <p className="text-slate-400 mb-6 text-sm text-center font-semibold">
                                 Devam etmek istediğinize emin misiniz?
                             </p>

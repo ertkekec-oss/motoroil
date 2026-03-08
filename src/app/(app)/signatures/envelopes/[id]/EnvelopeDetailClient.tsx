@@ -101,8 +101,8 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                 <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div>
                         <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>DURUM</div>
-                        <div style={{ fontSize: '18px', fontWeight: '900', color: envelope.status === 'COMPLETED' ? '#10b981' : envelope.status === 'REJECTED' ? '#ef4444' : '#f59e0b' }}>
-                            {envelope.status === 'COMPLETED' ? '🟢' : envelope.status === 'REJECTED' ? '🔴' : '🟡'} {envelope.status}
+                        <div style={{ fontSize: '18px', fontWeight: '900', color: envelope.status === 'COMPLETED' ? '#10b981' : envelope.status === 'REJECTED' ? '#ef4444' : envelope.status === 'REVISION_REQUESTED' ? '#f59e0b' : '#3b82f6' }}>
+                            {envelope.status === 'COMPLETED' ? '🟢' : envelope.status === 'REJECTED' ? '🔴' : envelope.status === 'REVISION_REQUESTED' ? '🟠' : '🔵'} {envelope.status}
                         </div>
                     </div>
                     {['DRAFT', 'PENDING', 'IN_PROGRESS'].includes(envelope.status) && (
@@ -113,6 +113,15 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                     {isMyTurn && (
                         <button disabled={signing} onClick={handleSign} style={{ padding: '8px 16px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }} className="hover:bg-blue-500/20 disabled:opacity-50">
                             <span>✍️</span> {signing ? 'İmzalanıyor...' : 'Belgeyi İmzala'}
+                        </button>
+                    )}
+                    {envelope.status === 'REVISION_REQUESTED' && (
+                        <button disabled={signing} onClick={async () => {
+                            setSigning(true);
+                            await fetch(`/api/signatures/envelopes/${envelope.id}/reject-revision`, { method: 'POST' });
+                            window.location.reload();
+                        }} style={{ padding: '8px 16px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }} className="hover:bg-amber-500/20 disabled:opacity-50">
+                            <span>↪️</span> {signing ? 'İşleniyor...' : 'Revizeyi Reddet ve İmzaya Çıkar'}
                         </button>
                     )}
                     {envelope.status === 'COMPLETED' && envelope.signedDocumentKey && (
@@ -127,6 +136,23 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
 
                 {/* Left Column - Recipients & Document */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+
+                    {/* Revision Requests Card */}
+                    {envelope.auditEvents.filter((a: any) => a.action === 'RECIPIENT_REVISION_REQUESTED').length > 0 && (
+                        <div style={{ background: 'rgba(245,158,11,0.05)', borderRadius: '20px', padding: '32px', border: '1px solid rgba(245,158,11,0.2)' }}>
+                            <h2 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '24px', letterSpacing: '0.5px', textTransform: 'uppercase', color: '#f59e0b' }}>Revize Talepleri</h2>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {envelope.auditEvents.filter((a: any) => a.action === 'RECIPIENT_REVISION_REQUESTED').map((a: any) => (
+                                    <div key={a.id} style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>{new Date(a.createdAt).toLocaleString()}</div>
+                                        <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-color)' }}>
+                                            {a.metaJson?.revisionMessage || 'Mesaj belirtilmemiş.'}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Recipients Card */}
                     <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '32px', border: '1px solid var(--border-color)', position: 'relative' }}>
@@ -144,7 +170,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                                        <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '800', background: r.status === 'SIGNED' ? 'rgba(16,185,129,0.1)' : r.status === 'REJECTED' ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.05)', color: r.status === 'SIGNED' ? '#10b981' : r.status === 'REJECTED' ? '#ef4444' : 'var(--text-muted)' }}>
+                                        <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '800', background: r.status === 'SIGNED' ? 'rgba(16,185,129,0.1)' : r.status === 'REJECTED' ? 'rgba(239,68,68,0.1)' : r.status === 'REVISION_REQUESTED' ? 'rgba(245,158,11,0.1)' : 'rgba(255,255,255,0.05)', color: r.status === 'SIGNED' ? '#10b981' : r.status === 'REJECTED' ? '#ef4444' : r.status === 'REVISION_REQUESTED' ? '#f59e0b' : 'var(--text-muted)' }}>
                                             {r.status}
                                         </div>
                                         {r.signedAt && <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(r.signedAt).toLocaleString()}</div>}

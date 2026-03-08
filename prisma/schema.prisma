@@ -5523,6 +5523,8 @@ enum SignatureEnvelopeStatus {
   REJECTED
   CANCELLED
   FAILED
+  REVISION_REQUESTED
+  REVISION_REJECTED
 }
 
 enum SignatureRecipientRole {
@@ -5536,6 +5538,7 @@ enum SignatureRecipientStatus {
   VIEWED
   SIGNED
   REJECTED
+  REVISION_REQUESTED
 }
 
 model SignatureEnvelope {

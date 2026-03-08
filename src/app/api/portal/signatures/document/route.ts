@@ -28,16 +28,18 @@ export async function GET(req: Request) {
 
         const env = session.envelope;
 
-        // Log document view to audit trail
-        await prisma.signatureAuditEvent.create({
-            data: {
-                tenantId: env.tenantId,
-                envelopeId: env.id,
-                action: 'SIGN_PORTAL_VIEWED',
-                actorId: session.recipientId,
-                ...buildPortalAuditPayload('SIGN_PORTAL_VIEWED', security) as any
-            }
-        });
+        // Log document view to audit trail ONLY on first view
+        if (!session.usedAt) {
+            await prisma.signatureAuditEvent.create({
+                data: {
+                    tenantId: env.tenantId,
+                    envelopeId: env.id,
+                    action: 'SIGN_PORTAL_VIEWED',
+                    actorId: session.recipientId,
+                    ...buildPortalAuditPayload('SIGN_PORTAL_VIEWED', security) as any
+                }
+            });
+        }
 
         // Update session usedAt and recipient status to VIEWED if it's PENDING
         if (!session.usedAt) {
