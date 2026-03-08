@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function NewReconciliationPage() {
-    const [accountId, setAccountId] = useState('demo-account-id');
+    const [accountId, setAccountId] = useState('');
+    const [customers, setCustomers] = useState<{ id: string, name: string }[]>([]);
     const [type, setType] = useState('CURRENT_ACCOUNT');
     const [periodEnd, setPeriodEnd] = useState('');
     const [totalDebit, setTotalDebit] = useState(0);
@@ -13,6 +14,15 @@ export default function NewReconciliationPage() {
     const [counterpartyEmail, setCounterpartyEmail] = useState('');
     const [counterpartyName, setCounterpartyName] = useState('');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        fetch('/api/customers').then(r => r.json()).then(data => {
+            if (data.success && data.customers?.length > 0) {
+                setCustomers(data.customers);
+                setAccountId(data.customers[0].id);
+            }
+        }).catch(err => console.error(err));
+    }, []);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -61,6 +71,18 @@ export default function NewReconciliationPage() {
                 </p>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px', background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '16px', marginBottom: '16px' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '8px' }}>İlgili Cari / Firma Seçimi</label>
+                            <select required value={accountId} onChange={e => setAccountId(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-main)', fontSize: '14px' }}>
+                                <option value="" disabled style={{ color: 'black' }}>Lütfen Cari Seçiniz...</option>
+                                {customers.map(c => (
+                                    <option key={c.id} value={c.id} style={{ color: 'black' }}>{c.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div>
