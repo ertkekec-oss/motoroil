@@ -28,7 +28,6 @@ export async function POST(req: NextRequest) {
                 documentCategory: category || "CONTRACT",
                 status: 'PENDING',
                 createdByUserId: userId,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
                 recipients: {
                     create: recipients.map((r: any, idx: number) => ({
                         email: r.email,
