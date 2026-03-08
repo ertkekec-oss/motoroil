@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
-import { getSignedDownloadUrl } from '@/lib/s3';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -36,14 +35,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             targetFileName = `signed_${envelope.documentFileName}`;
         }
 
-        const signedUrl = await getSignedDownloadUrl({
-            bucket: 'private',
-            key: targetKey,
-            expiresInSeconds: 300,
-            downloadFilename: targetFileName
-        });
+        const pdfUrl = `/api/signatures/envelopes/${envelope.id}/pdf?final=${requestFinal}`;
 
-        return NextResponse.json({ success: true, url: signedUrl });
+        return NextResponse.json({ success: true, url: pdfUrl });
     } catch (e: any) {
         console.error('[Internal Envelope Document Access Error]:', e);
         return NextResponse.json({ error: 'Server Error' }, { status: 500 });
