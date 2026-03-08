@@ -181,10 +181,11 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
             }
         }
     }, [showContent]);
-    const showSidebar = auth.isAuthenticated && !isAdminPage;
+    const isPortalPage = pathname?.startsWith('/portal');
+    const showSidebar = auth.isAuthenticated && !isAdminPage && !isPortalPage;
 
     // Handle Global Errors
-    if (hasCriticalError && !isAdminPage) {
+    if (hasCriticalError && !isAdminPage && !isPortalPage) {
         return <GlobalErrorScreen error={hasCriticalError} />;
     }
 
@@ -197,7 +198,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     }
 
     // APP LAYOUT WITH LOADING OVERLAY
-    if (!showContent && !isAdminPage) {
+    if (!showContent && !isAdminPage && !isPortalPage) {
         return <AppSkeleton />;
     }
 
@@ -235,7 +236,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 </main>
                 {showSidebar && <MobileNav />}
             </div>
-            {auth.isAuthenticated && <CommandPalette isAdmin={isAdminPage} />}
+            {auth.isAuthenticated && !isPortalPage && <CommandPalette isAdmin={isAdminPage} />}
         </div>
     );
 }

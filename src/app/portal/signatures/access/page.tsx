@@ -21,11 +21,11 @@ export default async function SignPortalPage({ searchParams }: { searchParams: {
 
     if (!session || session.revokedAt || session.expiresAt < new Date()) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="bg-white p-8 rounded-2xl shadow-sm text-center border">
-                    <div className="text-4xl mb-4 opacity-50">⚠️</div>
+            <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
+                <div className="bg-[#1e293b] text-slate-100 p-8 rounded-2xl shadow-xl text-center border border-slate-700">
+                    <div className="text-4xl mb-4 opacity-70">⚠️</div>
                     <h2 className="text-xl font-bold mb-2">Bağlantı Geçersiz</h2>
-                    <p className="text-gray-500">Bu imza veya onay bağlantısının süresi dolmuş, iptal edilmiş veya hatalı olabilir.</p>
+                    <p className="text-slate-400 font-medium">Bu imza veya onay bağlantısının süresi dolmuş, iptal edilmiş veya hatalı olabilir.</p>
                 </div>
             </div>
         );
@@ -34,14 +34,14 @@ export default async function SignPortalPage({ searchParams }: { searchParams: {
     const env = session.envelope;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl w-full">
+        <div className="min-h-screen bg-[#0f172a] p-4 sm:p-8 flex justify-center font-sans">
+            <div className="max-w-5xl w-full">
 
                 {/* Branding/Header */}
-                <div className="text-center mb-10">
-                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Güvenli Belge Onayı</h1>
-                    <p className="mt-2 text-sm text-gray-500">
-                        {env.title} ({env.documentFileName})
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-extrabold text-slate-100 tracking-tight uppercase">Güvenli Belge Onayı</h1>
+                    <p className="mt-2 text-sm text-slate-400 font-medium">
+                        {env.title} <span className="opacity-70">({env.documentFileName})</span>
                     </p>
                 </div>
 

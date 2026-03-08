@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSignedDownloadUrl } from '@/lib/s3';
+import { getSignedDownloadUrl, s3Client, getBucketName, sanitizeS3Key } from '@/lib/s3';
 import { applyPortalRateLimit, buildPortalAuditPayload } from '@/lib/portal-security';
+import { HeadObjectCommand } from "@aws-sdk/client-s3";
 
 export async function GET(req: Request) {
     try {
@@ -55,11 +56,23 @@ export async function GET(req: Request) {
             });
         }
 
+        let targetBucket: 'private' | 'public' = 'private';
+
+        try {
+            await s3Client.send(new HeadObjectCommand({
+                Bucket: getBucketName('private'),
+                Key: sanitizeS3Key(env.documentKey)
+            }));
+        } catch (e: any) {
+            targetBucket = 'public';
+        }
+
         // 5 minute short-lived token
         const signedUrl = await getSignedDownloadUrl({
-            bucket: 'private',
+            bucket: targetBucket,
             key: env.documentKey,
-            expiresInSeconds: 300
+            expiresInSeconds: 300,
+            downloadFilename: env.documentFileName
         });
 
         return NextResponse.json({

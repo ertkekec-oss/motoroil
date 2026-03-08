@@ -130,7 +130,7 @@ export async function POST(req: Request) {
                 envelopeId: env.id,
                 action: action === 'SIGNED' ? 'RECIPIENT_SIGNED' : 'RECIPIENT_REJECTED',
                 actorId: session.recipientId,
-                ...buildPortalAuditPayload(action, security, { role: session.recipient.role }) as any
+                metaJson: buildPortalAuditPayload(action, security, { role: session.recipient.role }).metaJson as any
             }
         });
 
@@ -147,7 +147,7 @@ export async function POST(req: Request) {
                     tenantId: env.tenantId,
                     envelopeId: env.id,
                     action: 'ENVELOPE_COMPLETED',
-                    ...buildPortalAuditPayload('ENVELOPE_COMPLETED', security) as any
+                    metaJson: buildPortalAuditPayload('ENVELOPE_COMPLETED', security).metaJson as any
                 }
             });
 

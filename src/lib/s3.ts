@@ -18,7 +18,7 @@ if (process.env.AWS_S3_ENDPOINT) {
     s3Config.forcePathStyle = true;
 }
 
-const s3Client = new S3Client(s3Config);
+export const s3Client = new S3Client(s3Config);
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET || "periodya-labels";
 
@@ -90,7 +90,7 @@ export function generateLabelStorageKey(
 const PUBLIC_BUCKET = process.env.S3_PUBLIC_BUCKET || "periodya-prod-public";
 const PRIVATE_BUCKET = process.env.S3_PRIVATE_BUCKET || "periodya-prod-private";
 
-function getBucketName(bucketType: 'public' | 'private'): string {
+export function getBucketName(bucketType: 'public' | 'private'): string {
     return bucketType === 'public' ? PUBLIC_BUCKET : PRIVATE_BUCKET;
 }
 
