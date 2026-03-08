@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default async function AdminTasksPage({ searchParams }: { searchParams: Promise<{ tenantId?: string, type?: string, status?: string }> }) {
     const session: any = await getSession();
-    if (!session || session.role !== "ADMIN") return notFound();
+    if (!session || (session.role !== "SUPER_ADMIN" && session.role !== "PLATFORM_ADMIN")) return notFound();
 
     const { tenantId, type, status } = await searchParams;
 
@@ -73,8 +73,8 @@ export default async function AdminTasksPage({ searchParams }: { searchParams: P
                                             <div className="text-xs font-bold bg-slate-100 px-2 py-0.5 rounded inline-block mb-1">{task.type}</div>
                                             <div>
                                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${task.priority === 'CRITICAL' ? 'bg-red-100 text-red-700' :
-                                                        task.priority === 'HIGH' ? 'bg-amber-100 text-amber-700' :
-                                                            'bg-blue-100 text-blue-700'
+                                                    task.priority === 'HIGH' ? 'bg-amber-100 text-amber-700' :
+                                                        'bg-blue-100 text-blue-700'
                                                     }`}>
                                                     {task.priority}
                                                 </span>
@@ -86,8 +86,8 @@ export default async function AdminTasksPage({ searchParams }: { searchParams: P
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex px-2 py-1 rounded text-xs font-bold ${task.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' :
-                                                    task.status === 'OPEN' ? 'bg-amber-100 text-amber-700' :
-                                                        'bg-slate-100 text-slate-700'
+                                                task.status === 'OPEN' ? 'bg-amber-100 text-amber-700' :
+                                                    'bg-slate-100 text-slate-700'
                                                 }`}>
                                                 {task.status}
                                             </span>

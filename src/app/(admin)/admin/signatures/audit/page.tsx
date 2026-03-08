@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function AdminSignaturesAuditPage() {
     const session = await getSession();
-    if (!session || (session.role !== 'SUPERADMIN' && session.role !== 'ADMIN')) {
+    if (!session || (session.role !== 'SUPER_ADMIN' && session.role !== 'PLATFORM_ADMIN')) {
         return notFound();
     }
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default async function AdminSignaturesPage() {
     const session = await getSession();
-    if (!session || session.role !== 'SUPERADMIN' && session.role !== 'ADMIN') { // check contextually correct role checks where applicable
+    if (!session || session.role !== 'SUPER_ADMIN' && session.role !== 'PLATFORM_ADMIN') { // check contextually correct role checks where applicable
         // Fallback to minimal page if it just requires session for now
     }
 
