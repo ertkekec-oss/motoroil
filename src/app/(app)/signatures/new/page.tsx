@@ -10,11 +10,12 @@ export default function NewSignaturePage() {
     const [title, setTitle] = useState('');
     const [file, setFile] = useState<File | null>(null);
     const [category, setCategory] = useState('CONTRACT');
-    const [recipients, setRecipients] = useState([{ name: '', email: '', role: 'SIGNER' }]);
+    const [otpRequired, setOtpRequired] = useState(false);
+    const [recipients, setRecipients] = useState([{ name: '', email: '', phone: '', role: 'SIGNER' }]);
     const [submitting, setSubmitting] = useState(false);
 
     const handleAddRecipient = () => {
-        setRecipients([...recipients, { name: '', email: '', role: 'SIGNER' }]);
+        setRecipients([...recipients, { name: '', email: '', phone: '', role: 'SIGNER' }]);
     };
 
     const handleRemoveRecipient = (index: number) => {
@@ -35,8 +36,8 @@ export default function NewSignaturePage() {
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        if (!title || !file || recipients.some(r => !r.name || !r.email)) {
-            toast.error('Lütfen tüm alanları doldurun ve yüklemek için bir PDF dosyası seçin.');
+        if (!title || !file || recipients.some(r => !r.name || !r.email || (otpRequired && !r.phone))) {
+            toast.error('Lütfen tüm alanları doldurun ve yüklemek için bir PDF dosyası seçin. (SMS onayında telefon zorunludur)');
             return;
         }
 
@@ -67,7 +68,8 @@ export default function NewSignaturePage() {
                     documentFileName: uploadData.fileName || file.name,
                     documentKey: uploadData.key,
                     category,
-                    recipients
+                    recipients,
+                    otpRequired
                 })
             });
             const data = await res.json();
@@ -122,6 +124,17 @@ export default function NewSignaturePage() {
                                     </select>
                                 </div>
                             </div>
+                            <div style={{ marginTop: '8px' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', color: 'var(--text-main)', width: 'fit-content' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={otpRequired}
+                                        onChange={e => setOtpRequired(e.target.checked)}
+                                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                    />
+                                    SMS ile Doğrula (İmzacılara OTP kodu gönderilir)
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -138,7 +151,7 @@ export default function NewSignaturePage() {
                                     <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px', marginTop: '6px' }}>
                                         {i + 1}
                                     </div>
-                                    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) 100px', gap: '12px' }}>
+                                    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: otpRequired ? 'minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 100px' : 'minmax(0,1fr) minmax(0,1fr) 100px', gap: '12px' }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>İmzacı Adı Soyadı</label>
                                             <input required value={r.name} onChange={e => handleChangeRecipient(i, 'name', e.target.value)} type="text" placeholder="Ahmet Yılmaz" style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-main)', fontSize: '13px' }} />
@@ -147,6 +160,12 @@ export default function NewSignaturePage() {
                                             <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>E-Posta Adresi</label>
                                             <input required value={r.email} onChange={e => handleChangeRecipient(i, 'email', e.target.value)} type="email" placeholder="ahmet@firma.com" style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-main)', fontSize: '13px' }} />
                                         </div>
+                                        {otpRequired && (
+                                            <div>
+                                                <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Cep Telefonu</label>
+                                                <input required value={r.phone || ''} onChange={e => handleChangeRecipient(i, 'phone', e.target.value)} type="tel" placeholder="905554443322" style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-main)', fontSize: '13px' }} />
+                                            </div>
+                                        )}
                                         <div>
                                             <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Rolü</label>
                                             <select value={r.role} onChange={e => handleChangeRecipient(i, 'role', e.target.value)} style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-main)', fontSize: '13px' }}>

@@ -169,6 +169,7 @@ export async function getSignedDownloadUrl(params: {
     key: string;
     expiresInSeconds?: number;
     downloadFilename?: string;
+    inline?: boolean;
 }) {
     const options: any = {
         Bucket: getBucketName(params.bucket),
@@ -176,7 +177,14 @@ export async function getSignedDownloadUrl(params: {
     };
 
     if (params.downloadFilename) {
-        options.ResponseContentDisposition = `attachment; filename="${params.downloadFilename}"`;
+        const disposition = params.inline ? 'inline' : 'attachment';
+        options.ResponseContentDisposition = `${disposition}; filename="${params.downloadFilename}"`;
+    } else if (params.inline) {
+        options.ResponseContentDisposition = 'inline';
+    }
+
+    if (params.inline) {
+        options.ResponseContentType = 'application/pdf';
     }
 
     const command = new GetObjectCommand(options);

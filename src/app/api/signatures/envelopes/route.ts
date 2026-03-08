@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         const userEmail = session.user?.email;
 
         const body = await req.json();
-        const { title, documentKey, documentFileName, recipients, category } = body;
+        const { title, documentKey, documentFileName, recipients, category, otpRequired } = body;
 
         if (!title || !documentKey || !recipients || recipients.length === 0) {
             return NextResponse.json({ error: "Missing required fields or recipients" }, { status: 400 });
@@ -30,9 +30,11 @@ export async function POST(req: NextRequest) {
                 documentCategory: category || "CONTRACT",
                 status: 'PENDING',
                 createdByUserId: userId,
+                otpRequired: otpRequired === true,
                 recipients: {
                     create: recipients.map((r: any, idx: number) => ({
                         email: r.email,
+                        phone: r.phone || null,
                         name: r.name,
                         role: r.role || 'SIGNER',
                         status: 'PENDING',

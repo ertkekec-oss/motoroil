@@ -72,7 +72,8 @@ export async function GET(req: Request) {
             bucket: targetBucket,
             key: env.documentKey,
             expiresInSeconds: 300,
-            downloadFilename: env.documentFileName
+            downloadFilename: env.documentFileName,
+            inline: true
         });
 
         return NextResponse.json({
