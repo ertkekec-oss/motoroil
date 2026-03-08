@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: https: blob:", // Allow images from any https source (e.g. Databox, user uploads)
               "font-src 'self' data: https://fonts.gstatic.com", // Allow Google Fonts files
               "connect-src 'self' https://api.nilvera.com https://apitest.nilvera.com https://elogo.com.tr https://*.vercel-insights.com",
-              "frame-ancestors 'none'",
+              "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
               "upgrade-insecure-requests"
@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'SAMEORIGIN'
           },
           {
             key: 'X-Content-Type-Options',
