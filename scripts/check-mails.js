@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
@@ -7,8 +7,7 @@ async function main() {
         orderBy: { createdAt: 'desc' },
         take: 10
     });
-    fs.writeFileSync('mails.json', JSON.stringify(logs, null, 2), 'utf8');
-    console.log("Written to mails.json");
+    fs.writeFileSync('mail_check.json', JSON.stringify(logs, null, 2), 'utf8');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

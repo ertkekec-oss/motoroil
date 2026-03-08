@@ -1,0 +1,54 @@
+{
+  "id": "cmmi9n8v4000e8ado1c9msmzo",
+  "envelopeId": "cmmi9n87q00098ado4pjfjo3f",
+  "recipientId": "cmmi9n87q000a8adomuwh8l8s",
+  "tokenHash": "48354e67e1ed6e008e7b8decaed127514a2f72bc7415ff7babf996f63b1ca1df",
+  "expiresAt": "2026-03-15T21:30:13.791Z",
+  "usedAt": "2026-03-08T21:36:20.657Z",
+  "revokedAt": null,
+  "createdAt": "2026-03-08T21:30:13.792Z",
+  "envelope": {
+    "id": "cmmi9n87q00098ado4pjfjo3f",
+    "tenantId": "cmmi7rnux00069mobu3uchs37",
+    "companyId": "cmmi7rnux00069mobu3uchs37",
+    "title": "sadas",
+    "documentKey": "tenants/cmmi7rnux00069mobu3uchs37/signatures/drafts/fbee54d3-4365-42f9-8698-676398a60491-GARANTI_Basvuru_Formu.pdf",
+    "documentFileName": "GARANTI_Basvuru_Formu.pdf",
+    "status": "COMPLETED",
+    "provider": null,
+    "createdByUserId": "cmmi7ro3d00089mob5qr8zc5z",
+    "createdAt": "2026-03-08T21:30:12.857Z",
+    "updatedAt": "2026-03-08T21:36:28.693Z",
+    "completedAt": "2026-03-08T21:36:28.692Z",
+    "signedDocumentKey": null,
+    "otpRequired": false,
+    "sequentialSigning": true,
+    "documentCategory": "CONTRACT",
+    "recipients": [
+      {
+        "id": "cmmi9n87q000a8adomuwh8l8s",
+        "envelopeId": "cmmi9n87q00098ado4pjfjo3f",
+        "name": "ertugrul kekeç",
+        "email": "ertkekec@gmail.com",
+        "phone": null,
+        "role": "SIGNER",
+        "orderIndex": 1,
+        "status": "SIGNED",
+        "signedAt": "2026-03-08T21:36:28.318Z",
+        "signerId": null
+      }
+    ]
+  },
+  "recipient": {
+    "id": "cmmi9n87q000a8adomuwh8l8s",
+    "envelopeId": "cmmi9n87q00098ado4pjfjo3f",
+    "name": "ertugrul kekeç",
+    "email": "ertkekec@gmail.com",
+    "phone": null,
+    "role": "SIGNER",
+    "orderIndex": 1,
+    "status": "SIGNED",
+    "signedAt": "2026-03-08T21:36:28.318Z",
+    "signerId": null
+  }
+}

@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import SignClient from './SignClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SignPortalPage({ searchParams }: { searchParams: { token?: string } }) {
     const { token } = await searchParams;
 
