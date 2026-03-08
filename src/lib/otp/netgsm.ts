@@ -57,11 +57,25 @@ export async function sendNetgsmOtp(config: OtpProviderConfigParams, phone: stri
         const textResponse = await response.text();
         const firstCode = textResponse.split(' ')[0];
 
+        // XML error parsing helper
+        let parsedErrorMsg = textResponse;
+        let parsedCode = '';
+        if (textResponse.includes('<error>')) {
+            const matchMsg = textResponse.match(/<error>(.*?)<\/error>/);
+            if (matchMsg && matchMsg[1]) {
+                parsedErrorMsg = matchMsg[1];
+            }
+            const matchCode = textResponse.match(/<code>(.*?)<\/code>/);
+            if (matchCode && matchCode[1]) {
+                parsedCode = matchCode[1];
+            }
+        }
+
         // Netgsm returns codes starting with 00 for success
         if (firstCode === '00' || textResponse.startsWith('00')) {
             return { success: true, raw: textResponse };
         } else {
-            return { success: false, error: `Netgsm API Error: ${textResponse}` };
+            return { success: false, error: parsedErrorMsg === textResponse ? `Netgsm API Error: ${textResponse}` : `Netgsm Hatası: ${parsedErrorMsg} ${parsedCode ? '(Kod: ' + parsedCode + ')' : ''}` };
         }
     } catch (error: any) {
         console.error('[NetGSM OTP Error]:', error);
