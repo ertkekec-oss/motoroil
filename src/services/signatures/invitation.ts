@@ -81,7 +81,10 @@ export async function sendSignatureInvitation(envelopeId: string) {
             });
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? 'https://periodya.com'
+            : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
+
         const portalLink = `${baseUrl}/portal/signatures/access?token=${tokenHash}`;
 
         // 2. Send Email

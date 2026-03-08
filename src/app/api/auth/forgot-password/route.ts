@@ -28,9 +28,9 @@ export async function POST(request: Request) {
 
         if (targetUser) {
             // Real Email Sending
-            const host = request.headers.get('host');
-            const protocol = host?.includes('localhost') ? 'http' : 'https';
-            const siteUrl = `${protocol}://${host}`;
+            const siteUrl = process.env.NODE_ENV === 'production'
+                ? 'https://periodya.com'
+                : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
 
             // Simple token: In a production app, use a real signed/stored token!
             const resetLink = `${siteUrl}/reset-password?id=${targetUser.id}&token=${targetUser.id}&type=${type}`;

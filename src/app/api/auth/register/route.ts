@@ -9,9 +9,9 @@ export async function POST(req: NextRequest) {
         const { name, phone, companyName, password } = body;
         const email = body.email?.toLowerCase().trim();
 
-        const host = req.headers.get('host');
-        const protocol = host?.includes('localhost') ? 'http' : 'https';
-        const siteUrl = `${protocol}://${host}`;
+        const siteUrl = process.env.NODE_ENV === 'production'
+            ? 'https://periodya.com'
+            : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
 
         if (!email || !password || !name || !companyName) {
             return NextResponse.json({ error: 'Eksik bilgiler var' }, { status: 400 });

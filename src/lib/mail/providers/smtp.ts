@@ -20,12 +20,8 @@ export class SmtpMailProvider implements MailProvider {
                 });
             }
 
-            if (!settings || !settings.value) {
-                // Fallback to first available SMTP settings in the database (acts as a global/system sender)
-                settings = await prisma.appSettings.findFirst({
-                    where: { key: 'smtp_settings' }
-                });
-            }
+            // Fallback is simply the ENV vars or hardcoded keys below.
+            // We removed the findFirst fallback because it was grabbing random companies' invalid smtp settings.
 
             let email = process.env.SMTP_EMAIL || 'info@periodya.com';
             let password = process.env.SMTP_PASSWORD || 'ezgf kvdd mact qtcd';
@@ -77,8 +73,36 @@ export class SmtpMailProvider implements MailProvider {
                 text: payload.text
             };
 
-            const info = await transporter.sendMail(mailOptions);
-            return { messageId: info.messageId };
+            try {
+                const info = await transporter.sendMail(mailOptions);
+                return { messageId: info.messageId };
+            } catch (err: any) {
+                // If custom tenant SMTP fails, attempt ultimate fallback to System ENV so critical emails aren't lost
+                if (payload.companyId && settings && email !== process.env.SMTP_EMAIL) {
+                    console.warn(`[SMTP_MAIL_PROVIDER] Tenant SMTP failed for company ${payload.companyId}. Falling back to system default. Error: ${err.message}`);
+
+                    const fallbackEmail = process.env.SMTP_EMAIL || 'info@periodya.com';
+                    const fallbackPassword = process.env.SMTP_PASSWORD || 'ezgf kvdd mact qtcd';
+
+                    const fallbackOptions: any = {
+                        host: fallbackEmail.toLowerCase().includes('gmail.com') || fallbackEmail.toLowerCase().includes('periodya.com') ? 'smtp.gmail.com' : `smtp.${fallbackEmail.split('@')[1]}`,
+                        port: 587,
+                        secure: false,
+                        auth: { user: fallbackEmail, pass: fallbackPassword.replace(/\s/g, '') },
+                        tls: { rejectUnauthorized: false }
+                    };
+
+                    const fallbackTransporter = nodemailer.createTransport(fallbackOptions);
+                    const fallbackMailOptions = {
+                        ...mailOptions,
+                        from: `"Periodya B2B Network" <${fallbackEmail}>`
+                    };
+
+                    const fallbackInfo = await fallbackTransporter.sendMail(fallbackMailOptions);
+                    return { messageId: fallbackInfo.messageId };
+                }
+                throw err;
+            }
         } catch (error: any) {
             console.error('[SMTP_MAIL_PROVIDER] Error:', error);
             return { error: error.message || 'E-posta gönderimi başarısız.' };
