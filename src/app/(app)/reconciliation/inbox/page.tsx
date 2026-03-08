@@ -14,7 +14,7 @@ export default async function ReconciliationInboxPage() {
         where: { email: userEmail },
         include: {
             reconciliation: {
-                include: { account: true, counterparties: true }
+                include: { customer: true, counterparties: true }
             }
         },
         orderBy: { reconciliation: { createdAt: 'desc' } }
@@ -73,16 +73,16 @@ export default async function ReconciliationInboxPage() {
                                                 {new Date(recon.periodEnd).toLocaleDateString('tr-TR', { month: 'short', year: 'numeric' })}
                                             </div>
                                             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                                {recon.reconciliationType}
+                                                {((recon.metaJson as any)?.type) || 'Mutabakat'}
                                             </div>
                                         </div>
 
                                         <div>
-                                            <div style={{ fontSize: '13px', fontWeight: 'bold', color: recon.balanceRaw > 0 ? '#ef4444' : '#10b981' }}>
-                                                {Math.abs(recon.balanceRaw)} {recon.currency}
+                                            <div style={{ fontSize: '13px', fontWeight: 'bold', color: Number(recon.balance) > 0 ? '#ef4444' : '#10b981' }}>
+                                                {Math.abs(Number(recon.balance))} {recon.currency}
                                             </div>
                                             <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                                {recon.balanceRaw > 0 ? 'Borçlu Görünüyorsunuz' : 'Alacaklı Görünüyorsunuz'}
+                                                {Number(recon.balance) > 0 ? 'Borçlu Görünüyorsunuz' : 'Alacaklı Görünüyorsunuz'}
                                             </div>
                                         </div>
 

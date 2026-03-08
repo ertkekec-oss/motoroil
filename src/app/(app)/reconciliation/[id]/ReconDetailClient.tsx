@@ -55,7 +55,7 @@ export default function ReconDetailClient({ reconciliation: recon }: { reconcili
                         Mutabakat Detayı <span style={{ opacity: 0.5, fontSize: '20px' }}>#{recon.id.substring(recon.id.length - 8).toUpperCase()}</span>
                     </h1>
                     <div style={{ display: 'flex', gap: '16px', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '500' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏢</span> Cari: {recon.account?.name || 'Bilinmiyor'}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏢</span> Cari: {recon.customer?.name || 'Bilinmiyor'}</span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📅</span> Dönem: {new Date(recon.periodEnd).toLocaleDateString()}</span>
                     </div>
                 </div>
@@ -85,21 +85,21 @@ export default function ReconDetailClient({ reconciliation: recon }: { reconcili
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
                             <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '800', textTransform: 'uppercase', marginBottom: '8px' }}>Toplam Borç (Satış vb.)</div>
-                                <div style={{ fontSize: '24px', fontWeight: '900' }}>{recon.totalDebit} {recon.currency}</div>
+                                <div style={{ fontSize: '24px', fontWeight: '900' }}>{((recon.metaJson as any)?.totalDebit) || 0} {recon.currency}</div>
                             </div>
                             <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '800', textTransform: 'uppercase', marginBottom: '8px' }}>Toplam Alacak (Tahsilat vb.)</div>
-                                <div style={{ fontSize: '24px', fontWeight: '900' }}>{recon.totalCredit} {recon.currency}</div>
+                                <div style={{ fontSize: '24px', fontWeight: '900' }}>{((recon.metaJson as any)?.totalCredit) || 0} {recon.currency}</div>
                             </div>
                         </div>
 
-                        <div style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border-color)', background: recon.balanceRaw < 0 ? 'rgba(239,68,68,0.05)' : 'rgba(16,185,129,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border-color)', background: Number(recon.balance) < 0 ? 'rgba(239,68,68,0.05)' : 'rgba(16,185,129,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
-                                <div style={{ fontSize: '12px', color: recon.balanceRaw < 0 ? '#ef4444' : '#10b981', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>Net Bakiye Durumu (Tarafımızca)</div>
-                                <div style={{ fontSize: '32px', fontWeight: '900', color: recon.balanceRaw < 0 ? '#ef4444' : '#10b981' }}>{Math.abs(recon.balanceRaw)} {recon.currency}</div>
+                                <div style={{ fontSize: '12px', color: Number(recon.balance) < 0 ? '#ef4444' : '#10b981', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>Net Bakiye Durumu (Tarafımızca)</div>
+                                <div style={{ fontSize: '32px', fontWeight: '900', color: Number(recon.balance) < 0 ? '#ef4444' : '#10b981' }}>{Math.abs(Number(recon.balance))} {recon.currency}</div>
                             </div>
-                            <div style={{ fontSize: '14px', fontWeight: 'bold', color: recon.balanceRaw < 0 ? '#ef4444' : '#10b981', textAlign: 'right' }}>
-                                {recon.balanceRaw < 0 ? 'Bize Borçludurlar (Alacaklıyız)' : recon.balanceRaw > 0 ? 'Kendilerine Borçluyuz' : 'BAKİYE SIFIR (KAPALI)'}
+                            <div style={{ fontSize: '14px', fontWeight: 'bold', color: Number(recon.balance) < 0 ? '#ef4444' : '#10b981', textAlign: 'right' }}>
+                                {Number(recon.balance) < 0 ? 'Bize Borçludurlar (Alacaklıyız)' : Number(recon.balance) > 0 ? 'Kendilerine Borçluyuz' : 'BAKİYE SIFIR (KAPALI)'}
                             </div>
                         </div>
                     </div>

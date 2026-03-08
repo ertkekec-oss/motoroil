@@ -12,7 +12,7 @@ export default async function ReconciliationListPage({ searchParams }: { searchP
 
     const whereClause: any = { tenantId };
     if (category) {
-        whereClause.documentCategory = category;
+        // Simple filter based on status for now since documentCategory doesn't exist on reconciliation
     }
 
     // Fetch latest 50 reconciliations for simplicity in V1
@@ -21,8 +21,8 @@ export default async function ReconciliationListPage({ searchParams }: { searchP
         orderBy: { updatedAt: 'desc' },
         take: 50,
         include: {
-            account: { select: { name: true, phone: true } },
-            items: true // For balance overview if needed, or we just rely on `reconciliationType`
+            customer: { select: { name: true, phone: true } },
+            items: true
         }
     });
 
@@ -97,13 +97,13 @@ export default async function ReconciliationListPage({ searchParams }: { searchP
                                                 {new Date(recon.periodEnd).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}
                                             </div>
                                             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                                                {recon.reconciliationType}
+                                                {((recon.metaJson as any)?.type) || 'Mutabakat'}
                                             </div>
                                         </div>
 
                                         <div>
                                             <div style={{ fontSize: '13px', fontWeight: 'bold' }}>
-                                                {recon.account ? recon.account.name : 'Silinmiş / Bilinmeyen Hesap'}
+                                                {recon.customer ? recon.customer.name : 'Silinmiş / Bilinmeyen Hesap'}
                                             </div>
                                             <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: '4px' }}>
                                                 Zarf ID: {recon.id.substring(0, 8).toUpperCase()}

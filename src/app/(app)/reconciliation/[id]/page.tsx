@@ -14,7 +14,7 @@ export default async function ReconciliationDetailPage({ params }: { params: { i
     const recon = await prisma.reconciliation.findUnique({
         where: { id },
         include: {
-            account: true,
+            customer: true,
             items: true,
             counterparties: true,
             disputes: {
