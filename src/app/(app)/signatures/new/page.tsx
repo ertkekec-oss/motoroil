@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function NewSignaturePage() {
     const [title, setTitle] = useState('');
@@ -33,7 +34,8 @@ export default function NewSignaturePage() {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         if (!title || !file || recipients.some(r => !r.name || !r.email)) {
-            return alert('Lütfen tüm alanları doldurun ve yüklemek için bir PDF dosyası seçin.');
+            toast.error('Lütfen tüm alanları doldurun ve yüklemek için bir PDF dosyası seçin.');
+            return;
         }
 
         setSubmitting(true);
@@ -49,7 +51,7 @@ export default function NewSignaturePage() {
             const uploadData = await uploadRes.json();
 
             if (!uploadRes.ok || !uploadData.ok) {
-                alert(uploadData.error || 'Dosya yükleme başarısız oldu.');
+                toast.error(uploadData.error || 'Dosya yükleme başarısız oldu.');
                 setSubmitting(false);
                 return;
             }
@@ -68,14 +70,14 @@ export default function NewSignaturePage() {
             });
             const data = await res.json();
             if (data.success) {
-                alert('Zarf başarıyla oluşturuldu ve hazırlandı!');
+                toast.success('Zarf başarıyla oluşturuldu ve hazırlandı!');
                 window.location.href = `/signatures/envelopes/${data.envelope.id}`;
             } else {
-                alert(data.error || 'Zarf oluşturulamadı.');
+                toast.error(data.error || 'Zarf oluşturulamadı.');
             }
         } catch (error) {
             console.error(error);
-            alert('Bağlantı hatası.');
+            toast.error('Bağlantı hatası.');
         } finally {
             setSubmitting(false);
         }
