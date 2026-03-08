@@ -1,0 +1,56 @@
+[
+  {
+    "id": "cmmiadjem0006fi7y4vd8kkaw",
+    "envelopeId": "cmmiadi950001fi7yikxe5rdy",
+    "recipientId": "cmmiadi950002fi7yz7wshrbg",
+    "tokenHash": "9ce9073ae0487deead0950c7fb4e3acfaad19c7546d6c256807c44e0e8ba390f",
+    "expiresAt": "2026-03-15T21:50:40.509Z",
+    "usedAt": "2026-03-08T21:50:55.357Z",
+    "revokedAt": null,
+    "createdAt": "2026-03-08T21:50:40.510Z",
+    "envelope": {
+      "id": "cmmiadi950001fi7yikxe5rdy",
+      "tenantId": "cmmi7rnux00069mobu3uchs37",
+      "companyId": "cmmi7rnux00069mobu3uchs37",
+      "title": "sadadas",
+      "documentKey": "tenants/cmmi7rnux00069mobu3uchs37/signatures/drafts/9583331b-c690-4f11-bc64-3835ae42109b-HALKBANK_Entegrasyon_Formu.pdf",
+      "documentFileName": "HALKBANK_Entegrasyon_Formu.pdf",
+      "status": "COMPLETED",
+      "provider": null,
+      "createdByUserId": "cmmi7ro3d00089mob5qr8zc5z",
+      "createdAt": "2026-03-08T21:50:38.925Z",
+      "updatedAt": "2026-03-08T21:51:07.377Z",
+      "completedAt": "2026-03-08T21:51:07.376Z",
+      "signedDocumentKey": null,
+      "otpRequired": false,
+      "sequentialSigning": true,
+      "documentCategory": "CONTRACT",
+      "recipients": [
+        {
+          "id": "cmmiadi950002fi7yz7wshrbg",
+          "envelopeId": "cmmiadi950001fi7yikxe5rdy",
+          "name": "ertugrul kekeç",
+          "email": "oilshoptr@gmail.com",
+          "phone": null,
+          "role": "APPROVER",
+          "orderIndex": 1,
+          "status": "SIGNED",
+          "signedAt": "2026-03-08T21:51:07.004Z",
+          "signerId": null
+        }
+      ]
+    },
+    "recipient": {
+      "id": "cmmiadi950002fi7yz7wshrbg",
+      "envelopeId": "cmmiadi950001fi7yikxe5rdy",
+      "name": "ertugrul kekeç",
+      "email": "oilshoptr@gmail.com",
+      "phone": null,
+      "role": "APPROVER",
+      "orderIndex": 1,
+      "status": "SIGNED",
+      "signedAt": "2026-03-08T21:51:07.004Z",
+      "signerId": null
+    }
+  }
+]

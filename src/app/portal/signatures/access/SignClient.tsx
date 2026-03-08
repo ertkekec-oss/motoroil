@@ -11,6 +11,7 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
     const [loadingDoc, setLoadingDoc] = useState(false);
     const [hasViewed, setHasViewed] = useState(false);
     const [confirmModal, setConfirmModal] = useState<'SIGNED' | 'REJECTED' | null>(null);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     // OTP State
     const [otpStep, setOtpStep] = useState(envelope.otpRequired ? 'PHONE' : 'VERIFIED'); // 'PHONE' -> 'CODE' -> 'VERIFIED'
@@ -54,6 +55,7 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
             });
             const data = await res.json();
             if (data.success) {
+                setIsSuccess(true);
                 toast.success(action === 'SIGNED' ? 'Belge başarıyla imzalandı!' : 'Belge reddedildi.', { duration: 3000 });
                 setTimeout(() => {
                     router.refresh();
@@ -207,6 +209,10 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
                 ) : serialWait ? (
                     <div className="text-amber-600 font-bold p-4 bg-amber-50 shadow-sm border border-amber-200 rounded-xl w-full">
                         ⏳ Sıralı imza zincirinde bulunuyorsunuz. Sizden önceki imzacılar işlemlerini tamamlamadan onay veremezsiniz. Lütfen bekleyiniz.
+                    </div>
+                ) : isSuccess ? (
+                    <div className="text-blue-600 font-bold p-4 bg-blue-50 shadow-sm border border-blue-200 rounded-xl w-full animate-pulse">
+                        İşleminiz kaydediliyor, sayfa yenileniyor...
                     </div>
                 ) : otpStep === 'PHONE' ? (
                     <div className="w-full flex flex-col items-center gap-4 max-w-sm mx-auto p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
