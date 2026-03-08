@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import CookieConsent from "@/components/CookieConsent";
+import { Toaster } from "sonner";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body suppressHydrationWarning={true}>
         <Providers>{children}</Providers>
         <CookieConsent />
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

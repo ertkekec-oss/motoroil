@@ -111,6 +111,7 @@ export async function middleware(request: NextRequest) {
     // 4. Auth Related Paths & Public API - Allowed
     const publicPaths = [
         '/', '/login', '/register', '/reset-password',
+        '/portal/login', '/portal/signatures',
         '/api/auth', '/api/public', '/api/network',
         '/api/admin/marketplace/queue/health',
         '/pdks', '/api/v1/pdks/display',

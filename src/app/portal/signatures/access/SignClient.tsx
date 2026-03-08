@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function SignClient({ token, envelope, recipient, allRecipients }: { token: string; envelope: any; recipient: any; allRecipients: any[] }) {
     const [submitting, setSubmitting] = useState(false);
@@ -42,8 +43,6 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
     }, [token]);
 
     const handleAction = async (action: 'SIGNED' | 'REJECTED') => {
-        if (!confirm(`Belgeyi ${action === 'SIGNED' ? 'imzalamak (onaylamak)' : 'reddetmek'} istediğinize emin misiniz?`)) return;
-
         setSubmitting(true);
         try {
             const res = await fetch('/api/portal/signatures/action', {
@@ -53,10 +52,12 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
             });
             const data = await res.json();
             if (data.success) {
-                alert(`İşlem başarıyla alındı. Yeni Zarf Durumu: ${data.newStatus}`);
-                router.refresh();
+                toast.success(action === 'SIGNED' ? 'Belge başarıyla imzalandı!' : 'Belge reddedildi.', { duration: 3000 });
+                setTimeout(() => {
+                    router.refresh();
+                }, 1500);
             } else {
-                setShowError(data.error || 'Bilinmeyen bir hata oluştu');
+                toast.error(data.error || 'Bilinmeyen bir hata oluştu');
             }
         } catch (error) {
             setShowError('Sunucu bağlantı hatası');
