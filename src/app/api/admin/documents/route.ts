@@ -36,31 +36,44 @@ export async function POST(req: Request) {
 
         const formData = await req.formData();
         const fileEntry = formData.get('file');
-        const documentNo = formData.get('documentNo') as string;
+        const textContent = formData.get('textContent') as string;
+        let documentNo = formData.get('documentNo') as string;
         const title = formData.get('title') as string;
         const category = formData.get('category') as any;
         const targetModule = formData.get('targetModule') as any;
         const approvalMethod = formData.get('approvalMethod') as any;
 
-        if (!documentNo || !title || !(fileEntry instanceof File)) {
-            return NextResponse.json({ error: 'Missing required fields or file' }, { status: 400 });
+        if (!title || (!fileEntry && !textContent)) {
+            return NextResponse.json({ error: 'Title and either a PDF File or Text Content are required' }, { status: 400 });
         }
 
-        if (fileEntry.type !== 'application/pdf') {
-            return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 });
+        // Auto Generate Document No if empty
+        if (!documentNo || documentNo.trim() === '') {
+            const prefix = category === 'CONTRACT' ? 'SOZ' : category === 'FORM' ? 'FRM' : category === 'POLICY' ? 'POL' : 'KLV';
+            const randomCode = Math.floor(1000 + Math.random() * 9000);
+            documentNo = `${prefix}-${targetModule.substring(0, 3).toUpperCase()}-${randomCode}`;
         }
 
-        let cleanName = (fileEntry.name || 'document.pdf').replace(/[^a-zA-Z0-9.\-_]/g, '');
-        const s3Key = `platform-documents/${randomUUID()}-${cleanName}`;
-        const buffer = Buffer.from(await fileEntry.arrayBuffer());
+        let s3Key = null;
+        let contentTypeObj: 'PDF' | 'TEXT' = 'TEXT';
 
-        await uploadToS3({
-            bucket: 'public', // Platform documents are usually public for reading
-            key: s3Key,
-            body: buffer,
-            contentType: fileEntry.type,
-            cacheControl: "public, max-age=31536000"
-        });
+        if (fileEntry instanceof File) {
+            if (fileEntry.type !== 'application/pdf') {
+                return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 });
+            }
+            let cleanName = (fileEntry.name || 'document.pdf').replace(/[^a-zA-Z0-9.\-_]/g, '');
+            s3Key = `platform-documents/${randomUUID()}-${cleanName}`;
+            const buffer = Buffer.from(await fileEntry.arrayBuffer());
+
+            await uploadToS3({
+                bucket: 'public',
+                key: s3Key,
+                body: buffer,
+                contentType: fileEntry.type,
+                cacheControl: "public, max-age=31536000"
+            });
+            contentTypeObj = 'PDF';
+        }
 
         const doc = await prisma.platformDocument.create({
             data: {
@@ -69,7 +82,9 @@ export async function POST(req: Request) {
                 category,
                 targetModule,
                 approvalMethod,
+                contentType: contentTypeObj,
                 fileKey: s3Key,
+                textContent: textContent || null,
                 version: 1,
             }
         });

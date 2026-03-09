@@ -14,6 +14,7 @@ import { GrowthBanner } from "../components/GrowthBanner";
 import GlobalErrorScreen from "../components/GlobalErrorScreen";
 import AppSkeleton from "../components/AppSkeleton";
 import CommandPalette from "../components/CommandPalette";
+import { PlatformDocumentGate } from "../components/PlatformDocumentGate";
 
 const permMap: Record<string, { perm?: string, feature?: string }> = {
     '/': { perm: 'pos_access' },
@@ -231,7 +232,13 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                     }}
                 >
                     {showSidebar && <GrowthBanner />}
-                    {children}
+                    {auth.isAuthenticated && !isAdminPage && !isPortalPage ? (
+                        <PlatformDocumentGate module="GENERAL">
+                            {children}
+                        </PlatformDocumentGate>
+                    ) : (
+                        children
+                    )}
 
                 </main>
                 {showSidebar && <MobileNav />}

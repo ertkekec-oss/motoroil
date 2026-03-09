@@ -8337,15 +8337,28 @@ enum PlatformDocumentCategory {
 
 enum PlatformDocumentTargetModule {
   GENERAL
+  SIGNUP
   BANK_INTEGRATION
   B2B_MARKETPLACE
   FIELD_SALES
   E_INVOICE
+  E_ARCHIVE
+  HUMAN_RESOURCES
+  INVENTORY_MANAGEMENT
+  POS_TERMINAL
+  CRM
+  ERP_INTEGRATION
+  PAYMENTS
 }
 
 enum PlatformDocumentApprovalMethod {
   CHECKBOX
   OTP
+}
+
+enum PlatformDocumentContentType {
+  PDF
+  TEXT
 }
 
 model PlatformDocument {
@@ -8355,8 +8368,10 @@ model PlatformDocument {
   category         PlatformDocumentCategory       @default(CONTRACT)
   targetModule     PlatformDocumentTargetModule   @default(GENERAL)
   approvalMethod   PlatformDocumentApprovalMethod @default(CHECKBOX)
+  contentType      PlatformDocumentContentType    @default(PDF)
   
-  fileKey          String
+  fileKey          String?
+  textContent      String?                        @db.Text
   version          Int                            @default(1)
   
   isActive         Boolean                        @default(true)

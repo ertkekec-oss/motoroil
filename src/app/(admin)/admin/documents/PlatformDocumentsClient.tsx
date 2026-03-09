@@ -11,7 +11,9 @@ interface DocumentData {
     category: string;
     targetModule: string;
     approvalMethod: string;
-    fileKey: string;
+    fileKey: string | null;
+    textContent: string | null;
+    contentType: 'PDF' | 'TEXT';
     version: number;
     isActive: boolean;
     createdAt: string;
@@ -33,6 +35,7 @@ export default function PlatformDocumentsClient() {
     const [targetModule, setTargetModule] = useState("GENERAL");
     const [approvalMethod, setApprovalMethod] = useState("CHECKBOX");
     const [file, setFile] = useState<File | null>(null);
+    const [textContent, setTextContent] = useState("");
     const [isActive, setIsActive] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
@@ -68,6 +71,7 @@ export default function PlatformDocumentsClient() {
             formData.append("targetModule", targetModule);
             formData.append("approvalMethod", approvalMethod);
             formData.append("isActive", String(isActive));
+            formData.append("textContent", textContent);
 
             if (file) {
                 formData.append("file", file);
@@ -110,6 +114,7 @@ export default function PlatformDocumentsClient() {
         setTargetModule(d.targetModule);
         setApprovalMethod(d.approvalMethod);
         setIsActive(d.isActive);
+        setTextContent(d.textContent || "");
         setFile(null);
         setShowForm(true);
     };
@@ -121,6 +126,7 @@ export default function PlatformDocumentsClient() {
         setTargetModule("GENERAL");
         setApprovalMethod("CHECKBOX");
         setIsActive(true);
+        setTextContent("");
         setFile(null);
         setEditingDoc(null);
         setShowForm(false);
@@ -152,11 +158,10 @@ export default function PlatformDocumentsClient() {
                             <div>
                                 <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">Döküman No / Kodu</label>
                                 <input
-                                    required
                                     type="text"
                                     value={documentNo}
                                     onChange={(e) => setDocumentNo(e.target.value)}
-                                    placeholder="Örn: FRM-B2B-01"
+                                    placeholder="Opsiyonel (Boş bırakılırsa otomatik üretilir)"
                                     className="w-full bg-[#0f172a] border border-slate-600 rounded-lg p-2.5 text-sm text-slate-100 focus:border-blue-500 focus:outline-none placeholder-slate-600"
                                 />
                             </div>
@@ -192,10 +197,18 @@ export default function PlatformDocumentsClient() {
                                     className="w-full bg-[#0f172a] border border-slate-600 rounded-lg p-2.5 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
                                 >
                                     <option value="GENERAL">Genel Sistem / Kayıt Aşaması</option>
+                                    <option value="SIGNUP">Yeni Üyelik (Signup) Formu</option>
                                     <option value="BANK_INTEGRATION">Banka Entegrasyon Geçidi</option>
                                     <option value="B2B_MARKETPLACE">B2B Pazaryeri (Ticaret Formu)</option>
                                     <option value="FIELD_SALES">Saha Satış Modülü</option>
                                     <option value="E_INVOICE">E-Fatura / E-Defter</option>
+                                    <option value="E_ARCHIVE">E-Arşiv</option>
+                                    <option value="HUMAN_RESOURCES">İnsan Kaynakları / Özlük</option>
+                                    <option value="INVENTORY_MANAGEMENT">Envanter Yönetimi</option>
+                                    <option value="POS_TERMINAL">POS Terminal / Kasa</option>
+                                    <option value="CRM">CRM / Müşteri Yönetimi</option>
+                                    <option value="ERP_INTEGRATION">ERP Entegrasyonu</option>
+                                    <option value="PAYMENTS">Ödemeler ve Tahsilat</option>
                                 </select>
                             </div>
                             <div>
@@ -222,15 +235,22 @@ export default function PlatformDocumentsClient() {
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">
-                                    {editingDoc ? 'Yeni Versiyon PDF Yükle (İsteğe Bağlı)' : 'PDF Dosyası'}
+                                    {editingDoc ? 'Yeni Versiyon PDF Yükle (İsteğe Bağlı)' : 'PDF Dosyası Yükle (Veya Alttaki Metin Editörünü Kullan)'}
                                 </label>
                                 <input
                                     type="file"
                                     accept=".pdf"
-                                    required={!editingDoc}
                                     onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                    className="w-full bg-[#0f172a] border border-slate-600 rounded-lg p-2 text-sm text-slate-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-200 hover:file:bg-slate-600 cursor-pointer"
+                                    className="w-full bg-[#0f172a] border border-slate-600 rounded-lg p-2 text-sm text-slate-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-200 hover:file:bg-slate-600 cursor-pointer mb-2"
                                 />
+                                <div className="text-center text-xs text-slate-500 my-2">— VEYA —</div>
+                                <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">Sözleşme / Form Metni (PDF yüklenmezse bu kullanılır)</label>
+                                <textarea
+                                    className="w-full h-32 bg-[#0f172a] border border-slate-600 rounded-lg p-2.5 text-sm text-slate-100 focus:border-blue-500 focus:outline-none placeholder-slate-600"
+                                    placeholder="Eğer PDF yüklüyorsanız burayı boş bırakabilirsiniz..."
+                                    value={textContent}
+                                    onChange={e => setTextContent(e.target.value)}
+                                ></textarea>
                                 {editingDoc && file && (
                                     <p className="mt-2 text-xs text-amber-500 font-semibold">
                                         ⚠️ Yeni bir PDF yüklemeniz halinde, bu dökümanın versiyonu (v{editingDoc.version + 1}) olarak güncellenecek ve tüm firmaların yeniden imzalaması gerekecektir.
@@ -329,7 +349,12 @@ export default function PlatformDocumentsClient() {
                                                 <button
                                                     onClick={() => {
                                                         const link = document.createElement("a");
-                                                        link.href = `https://cdn.periodya.com/${d.fileKey}`; // Or fallback to our secure fetcher logic
+                                                        if (d.contentType === 'PDF' && d.fileKey) {
+                                                            link.href = `/api/admin/documents/${d.id}/download`;
+                                                        } else {
+                                                            toast.info("Bu belge metin tabanlı (PDF değil). İndirme işlevi yakında eklenecek.");
+                                                            return;
+                                                        }
                                                         link.target = "_blank";
                                                         link.rel = "noopener noreferrer";
                                                         document.body.appendChild(link);

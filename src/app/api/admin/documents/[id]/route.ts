@@ -53,9 +53,14 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         const existingDoc = await prisma.platformDocument.findUnique({ where: { id } });
         if (!existingDoc) return NextResponse.json({ error: 'Doc not found' }, { status: 404 });
 
+        const textContent = formData.get('textContent') as string;
         let fileKey = existingDoc.fileKey;
+        let textContentValue = existingDoc.textContent;
+        let contentTypeObj: 'PDF' | 'TEXT' = existingDoc.contentType as 'PDF' | 'TEXT';
         let version = existingDoc.version;
         let revisedAt = existingDoc.revisedAt;
+
+        let isRevised = false;
 
         if (fileEntry instanceof File && fileEntry.size > 0) {
             if (fileEntry.type !== 'application/pdf') {
@@ -73,7 +78,16 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
                 cacheControl: "public, max-age=31536000"
             });
             fileKey = s3Key;
-            version += 1; // Increment version due to new file
+            contentTypeObj = 'PDF';
+            isRevised = true;
+        } else if (textContent && textContent !== existingDoc.textContent) {
+            textContentValue = textContent;
+            contentTypeObj = 'TEXT';
+            isRevised = true;
+        }
+
+        if (isRevised) {
+            version += 1;
             revisedAt = new Date();
         }
 
@@ -87,6 +101,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
                 approvalMethod,
                 isActive,
                 fileKey,
+                textContent: textContentValue,
+                contentType: contentTypeObj,
                 version,
                 revisedAt
             }
