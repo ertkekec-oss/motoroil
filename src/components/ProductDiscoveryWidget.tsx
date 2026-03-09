@@ -51,43 +51,7 @@ export default function ProductDiscoveryWidget() {
         return null;
     }
 
-    const steps: DiscoveryStep[] = [
-        {
-            id: "firstInvoice",
-            title: "İlk Faturayı Oluştur",
-            desc: "Satış faturası keserek başlayın.",
-            completed: progressData.firstInvoice,
-            href: "/sales/invoices/new"
-        },
-        {
-            id: "firstCustomer",
-            title: "İlk Müşteriyi Ekle",
-            desc: "Cari kart oluşturun.",
-            completed: progressData.firstCustomer,
-            href: "/customers"
-        },
-        {
-            id: "inventoryViewed",
-            title: "Stok Yönetimini Keşfet",
-            desc: "Envanter modülüne göz atın.",
-            completed: progressData.inventoryViewed,
-            href: "/inventory"
-        },
-        {
-            id: "salesXViewed",
-            title: "SalesX Saha Modülü",
-            desc: "Saha satışını keşfedin.",
-            completed: progressData.salesXViewed,
-            href: "/field-sales"
-        },
-        {
-            id: "b2bHubViewed",
-            title: "B2B Hub Bağlantısı",
-            desc: "Bayi ağına katılın.",
-            completed: progressData.b2bHubViewed,
-            href: "/dealer-network/dealers"
-        }
-    ];
+    const steps: DiscoveryStep[] = progressData.steps || [];
 
     const { completedPct } = progressData;
 

@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic';
 
 
 import { authorize, verifyWriteAccess } from '@/lib/auth';
+import { Prisma } from '@prisma/client';
+import { trackOnboardingStep } from '@/lib/onboarding';
 import { logActivity } from '@/lib/audit';
 
 export async function GET(request: Request) {
@@ -100,7 +102,7 @@ export async function GET(request: Request) {
 }
 
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
     const { user } = auth;
@@ -109,7 +111,7 @@ export async function POST(request: Request) {
     if (!writeCheck.authorized) return writeCheck.response;
 
     try {
-        const body = await request.json();
+        const body = await req.json();
         const { name, phone, email: rawEmail, address, city, district, taxNumber, taxOffice, categoryId, contactPerson, iban, branch, supplierClass, customerClass, referredByCode, companyId: explicitCompanyId } = body;
 
         // Boş string email'i null'a çevir — yoksa unique constraint (email, companyId) çakışır
@@ -231,11 +233,14 @@ export async function POST(request: Request) {
             entityId: result.id,
             after: result,
             details: `${result.name} isimli müşteri oluşturuldu.`,
-            userAgent: request.headers.get('user-agent') || undefined,
-            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
+            userAgent: req.headers.get('user-agent') || undefined,
+            ipAddress: req.headers.get('x-forwarded-for') || '0.0.0.0'
         });
 
-        return NextResponse.json({ success: true, customer: result });
+        // Trigger onboarding tracking asynchronously without blocking the request
+        trackOnboardingStep(user.tenantId, 'firstCustomer');
+
+        return NextResponse.json({ success: true, customer: result }, { status: 201 });
     } catch (error: any) {
         // Unique constraint hatası için anlaşılır mesaj
         if (error.code === 'P2002' && error.meta?.target?.includes('email')) {

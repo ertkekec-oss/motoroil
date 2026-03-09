@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { getSession, hasPermission } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
 import { NilveraService } from '@/lib/nilvera';
+import { trackOnboardingStep } from '@/lib/onboarding';
 import { NilveraInvoiceService } from '@/services/nilveraService';
 import crypto from 'crypto';
 import axios from 'axios';
@@ -606,6 +607,10 @@ export async function POST(request: Request) {
 
             return invoice;
         });
+
+        trackOnboardingStep((session as any).tenantId, 'firstInvoice');
+        // We also trigger firstOrder here since some flows consider them equivalent 
+        trackOnboardingStep((session as any).tenantId, 'firstOrder');
 
         return NextResponse.json({ success: true, invoice: createResult });
 

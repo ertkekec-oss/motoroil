@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession, hasPermission } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
+import { trackOnboardingStep } from '@/lib/onboarding';
 
 export const dynamic = 'force-dynamic';
 
@@ -263,6 +264,8 @@ export async function POST(request: Request) {
 
             return mainProduct;
         });
+
+        trackOnboardingStep((session as any).tenantId, 'firstProduct');
 
         return NextResponse.json({ success: true, product });
     } catch (error: any) {
