@@ -35,6 +35,8 @@ model Tenant {
   networkShipments     NetworkShipment[]
   escrowAccount        NetworkEscrowAccount?
   networkDisputes      NetworkDispute[]
+  tenantCredits        TenantCredit?
+  paymentTransactions  PaymentTransaction[]
 }
 
 model Company {
@@ -8438,4 +8440,62 @@ model TenantDocumentApproval {
   @@index([tenantId])
   @@index([documentId])
   @@index([approvedByUserId])
+}
+
+model PaymentGateway {
+  id              String   @id @default(cuid())
+  provider        String   @unique // 'IYZICO', 'PAYTR', 'PAYNET'
+  isActive        Boolean  @default(false)
+  isTestMode      Boolean  @default(true)
+  apiKey          String?
+  apiSecret       String?
+  merchantId      String?
+  supportedTypes  String[] // e.g. ["SAAS", "SMS", "EINVOICE"]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BillingProduct {
+  id            String   @id @default(cuid())
+  type          String   // 'SAAS', 'SMS', 'EINVOICE'
+  name          String
+  description   String?
+  price         Decimal  @db.Decimal(10, 2)
+  currency      String   @default("TRY")
+  creditAmount  Int      @default(0) // How much credit this product gives (e.g. 500 SMS)
+  planId        String?  // If type is SAAS, which Plan does this correspond to
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TenantCredit {
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  smsCredits      Int      @default(0)
+  smsUsed         Int      @default(0)
+  einvoiceCredits Int      @default(0)
+  einvoiceUsed    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model PaymentTransaction {
+  id               String   @id @default(cuid())
+  tenantId         String
+  gatewayProvider  String
+  productType      String
+  productId        String
+  amount           Decimal  @db.Decimal(10, 2)
+  currency         String   @default("TRY")
+  status           String   @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  externalReference String? // order token or callback reference
+  errorMessage     String?
+  rawResponse      Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  tenant           Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }

@@ -1,209 +1,108 @@
-import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import ForceReleaseButton from "./ForceReleaseButton";
+"use client";
 
-function formatDateTR(d: Date | null | undefined) {
-    if (!d) return "-";
-    try {
-        return new Intl.DateTimeFormat("tr-TR", {
-            dateStyle: "medium",
-            timeStyle: "short",
-            timeZone: "Europe/Istanbul",
-        }).format(d);
-    } catch {
-        return d.toISOString() ?? "-";
-    }
-}
+import React, { useState, useEffect } from 'react';
+import { EnterprisePageShell, EnterpriseCard } from "@/components/ui/enterprise";
 
-function formatMoney(amount: any, currency: string) {
-    const n = typeof amount === "number" ? amount : Number(amount?.toString?.() ?? 0);
-    try {
-        return new Intl.NumberFormat("tr-TR", {
-            style: "currency",
-            currency: currency || "TRY",
-            maximumFractionDigits: 2,
-        }).format(n);
-    } catch {
-        return `${n.toFixed(2)} ${currency || "TRY"}`;
-    }
-}
+export default function PaymentsMonitoringPage() {
+    const [transactions, setTransactions] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-export default async function PaymentsMonitorPage() {
-    const session: any = await getSession();
-    const user = session?.user || session;
+    useEffect(() => {
+        fetchTransactions();
+    }, []);
 
-    if (!user || (user.role !== "SUPER_ADMIN" && user.role !== "admin")) {
-        redirect("/403");
-    }
-
-    // Data Source
-    const payments = await prisma.networkPayment.findMany({
-        orderBy: { createdAt: 'desc' },
-        take: 100,
-        include: {
-            order: true
+    const fetchTransactions = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch('/api/admin/payments');
+            const data = await res.json();
+            if (data.success) {
+                setTransactions(data.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch transactions', error);
+        } finally {
+            setLoading(false);
         }
-    });
-
-    const companyIds = Array.from(new Set(payments?.map(p => p.order).flatMap(o => o ? [o.buyerCompanyId, o.sellerCompanyId] : [])));
-    const companies = await prisma.company.findMany({ where: { id: { in: companyIds } }, select: { id: true, name: true } });
-    const companyMap = new Map(companies?.map(c => [c.id, c.name]));
-
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
-    // KPIs
-    const totalPendingAgg = await prisma.networkPayment.aggregate({
-        _sum: { amount: true },
-        where: {
-            mode: 'ESCROW',
-            status: 'PAID',
-            payoutStatus: { not: 'RELEASED' }
-        }
-    });
-    const totalPendingEscrow = Number(totalPendingAgg._sum.amount || 0);
-
-    const failedCount = await prisma.networkPayment.count({
-        where: { payoutStatus: 'FAILED' }
-    });
-
-    const releasedTodayAgg = await prisma.networkPayment.aggregate({
-        _sum: { amount: true },
-        where: {
-            payoutStatus: 'RELEASED',
-            releasedAt: { gte: startOfToday }
-        }
-    });
-    const releasedToday = Number(releasedTodayAgg._sum.amount || 0);
-
-    const commissionTodayAgg = await prisma.platformCommissionLedger.aggregate({
-        _sum: { amount: true },
-        where: {
-            createdAt: { gte: startOfToday }
-        }
-    });
-    const commissionToday = Number(commissionTodayAgg._sum.amount || 0);
+    };
 
     return (
-        <div className="min-h-screen bg-[#F6F7F9] text-slate-800 p-4 font-sans focus:outline-none">
-            <div className="max-w-[1600px] mx-auto space-y-4">
-                <div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900">Payments & Escrow Control Desk</h1>
-                    <p className="text-xs text-slate-500 font-mono mt-0.5">Finance Audit, Ledger Reconciliation & Force Actions</p>
-                </div>
-
-                {/* Top Summary Bar - KPI Blocks (No Shadows, Strict Borders) */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white border border-slate-200 rounded-md p-4 flex flex-col justify-center">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wide mb-1">Total Pending Escrow</span>
-                        <span className="text-xl font-bold text-slate-900 font-mono">{formatMoney(totalPendingEscrow, "TRY")}</span>
-                    </div>
-                    <div className="bg-white border border-slate-200 rounded-md p-4 flex flex-col justify-center">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wide mb-1">Failed Payout Count</span>
-                        <span className={`text-xl font-bold font-mono ${failedCount > 0 ? 'text-red-600' : 'text-slate-900'}`}>{failedCount}</span>
-                    </div>
-                    <div className="bg-white border border-slate-200 rounded-md p-4 flex flex-col justify-center">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wide mb-1">Released Today</span>
-                        <span className="text-xl font-bold text-emerald-600 font-mono">{formatMoney(releasedToday, "TRY")}</span>
-                    </div>
-                    <div className="bg-white border border-slate-200 rounded-md p-4 flex flex-col justify-center">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wide mb-1">Platform Comm. Today</span>
-                        <span className="text-xl font-bold text-slate-900 font-mono">{formatMoney(commissionToday, "TRY")}</span>
-                    </div>
-                </div>
-
-                {/* Main Table Wrapper */}
-                <div className="bg-white border border-slate-200 rounded-md overflow-hidden flex flex-col h-[calc(100vh-250px)]">
-                    <div className="overflow-auto flex-1 relative">
-                        <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-[#F6F7F9] text-slate-600 sticky top-0 z-10 border-b border-slate-300">
+        <EnterprisePageShell
+            title="Ödeme & İşlem İzleme"
+            description="Tüm platformdaki anlık ödeme hareketleri, satın almalar ve webhook statüleri."
+        >
+            <EnterpriseCard className="p-0 overflow-hidden">
+                {loading ? (
+                    <div className="p-8 text-center text-slate-500">Yükleniyor...</div>
+                ) : (
+                    <div className="overflow-x-auto w-full">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-white/10">
                                 <tr>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 w-24">Order ID</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 w-40 truncate">Buyer Company</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 w-40 truncate">Seller Company</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 text-right w-28">Total Amount</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 text-center w-24">Provider</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 text-center w-28">P. Status</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 text-center w-28">Escrow Status</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 w-36">Released At</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 text-right w-28">Seller Earned</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] border-r border-slate-200 text-right w-28">Platform Comm.</th>
-                                    <th className="px-3 py-2.5 font-bold uppercase tracking-wide text-[10px] w-28 text-center bg-[#F6F7F9]">Actions</th>
+                                    <th className="p-4">Tenant (Müşteri)</th>
+                                    <th className="p-4">Ürün Tipi / Gateway</th>
+                                    <th className="p-4">Tutar</th>
+                                    <th className="p-4">Durum</th>
+                                    <th className="p-4">Sipariş No (Ref)</th>
+                                    <th className="p-4 text-right">Tarih</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200">
-                                {payments.length === 0 ? (
-                                    <tr><td colSpan={11} className="px-3 py-8 text-center text-slate-400 font-medium">No payment records found.</td></tr>
-                                ) : (
-                                    payments?.map(payment => {
-                                        const order = payment.order;
-                                        const sellerEarned = Number(order.subtotalAmount) - Number(order.commissionAmount);
-
-                                        const paymentStatusColor =
-                                            payment.status === 'PAID' ? 'border-emerald-200 text-emerald-700 bg-emerald-50' :
-                                                payment.status === 'FAILED' ? 'border-amber-200 text-amber-700 bg-amber-50' :
-                                                    'border-slate-200 text-slate-700 bg-slate-50';
-
-                                        const escrowStatusColor =
-                                            payment.payoutStatus === 'RELEASED' ? 'border-emerald-200 text-emerald-700 bg-emerald-50' :
-                                                payment.payoutStatus === 'FAILED' ? 'border-amber-200 text-amber-700 bg-amber-50' :
-                                                    'border-slate-200 text-slate-700 bg-slate-50';
-
-                                        return (
-                                            <tr key={payment.id} className="hover:bg-slate-50 transition-colors">
-                                                <td className="px-3 py-2 border-r border-slate-200 font-mono text-slate-600 truncate text-[11px] font-semibold">
-                                                    #{payment.networkOrderId.slice(-8).toUpperCase()}
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 font-medium text-slate-800 truncate" title={companyMap.get(order.buyerCompanyId) || order.buyerCompanyId}>
-                                                    {companyMap.get(order.buyerCompanyId) || order.buyerCompanyId}
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 font-medium text-slate-800 truncate" title={companyMap.get(order.sellerCompanyId) || order.sellerCompanyId}>
-                                                    {companyMap.get(order.sellerCompanyId) || order.sellerCompanyId}
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 font-mono font-bold text-slate-900 text-right">
-                                                    {formatMoney(order.totalAmount, order.currency)}
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 text-center text-slate-600 text-xs">
-                                                    {payment.provider} <span className="text-[10px] text-slate-400">({payment.mode})</span>
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 text-center">
-                                                    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold border tracking-wide uppercase ${paymentStatusColor}`}>
-                                                        {payment.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 text-center">
-                                                    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold border tracking-wide uppercase ${escrowStatusColor}`}>
-                                                        {payment.payoutStatus || 'N/A'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 font-mono text-slate-500 text-[11px]">
-                                                    {formatDateTR(payment.releasedAt)}
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 font-mono font-semibold text-emerald-700 text-right">
-                                                    {formatMoney(sellerEarned, order.currency)}
-                                                </td>
-                                                <td className="px-3 py-2 border-r border-slate-200 font-mono font-semibold text-slate-900 text-right">
-                                                    {formatMoney(order.commissionAmount, order.currency)}
-                                                </td>
-                                                <td className="px-3 py-2 text-center align-middle">
-                                                    {payment.payoutStatus === 'FAILED' ? (
-                                                        <ForceReleaseButton orderId={payment.networkOrderId} />
-                                                    ) : payment.payoutStatus === 'RELEASED' ? (
-                                                        <span className="text-slate-300 text-[10px] uppercase font-bold tracking-wider">-</span>
-                                                    ) : (
-                                                        <span className="text-slate-400 text-[10px] uppercase font-semibold">PENDING</span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                {transactions.length > 0 ? transactions.map(trx => (
+                                    <tr key={trx.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+                                        <td className="p-4 align-middle">
+                                            <div className="font-bold text-[13px] text-slate-900 dark:text-white truncate max-w-[200px]">
+                                                {trx.tenant?.name || 'Bilinmeyen'}
+                                            </div>
+                                            <div className="text-[11px] text-slate-500 font-medium truncate max-w-[200px]">
+                                                {trx.tenant?.ownerEmail || trx.tenantId}
+                                            </div>
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            <div className="flex flex-col items-start gap-1.5">
+                                                <span className="px-2 py-0.5 rounded-[6px] text-[11px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                                    {trx.productType}
+                                                </span>
+                                                <span className="text-[11px] font-semibold text-slate-500">
+                                                    {trx.gatewayProvider}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            <div className="font-black text-[14px]">
+                                                {parseFloat(trx.amount).toLocaleString('tr-TR', { style: 'currency', currency: trx.currency })}
+                                            </div>
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            <div className={`inline-flex px-2.5 py-1 rounded-[6px] text-[11px] font-bold uppercase tracking-wider border
+                                                ${trx.status === 'PAID' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                                    trx.status === 'FAILED' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                                                        'bg-amber-50 text-amber-700 border-amber-200'}
+                                            `}>
+                                                {trx.status}
+                                            </div>
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            <code className="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-mono truncate max-w-[120px] block" title={trx.externalReference}>
+                                                {trx.externalReference || '-'}
+                                            </code>
+                                        </td>
+                                        <td className="p-4 text-right align-middle text-[12px] font-medium text-slate-500">
+                                            {new Date(trx.createdAt).toLocaleString('tr-TR')}
+                                        </td>
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan={6} className="p-12 text-center text-slate-500 text-[14px]">
+                                            Sistemde henüz işlem bulunmamaktadır.
+                                        </td>
+                                    </tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
+                )}
+            </EnterpriseCard>
+        </EnterprisePageShell>
     );
 }

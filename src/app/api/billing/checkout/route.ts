@@ -1,110 +1,87 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { getRequestContext } from '@/lib/api-context';
-import { iyzico } from '@/lib/iyzico';
-
-export const dynamic = 'force-dynamic';
-
-export async function GET() {
-    return NextResponse.json({ message: 'Upgrade API is alive' });
-}
-
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
     try {
-        const ctx = await getRequestContext(req);
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
 
-        // PLATFORM_ADMIN check
-        if (ctx.tenantId === 'PLATFORM_ADMIN') {
-            return NextResponse.json({
-                error: 'Sistem yöneticileri plan yükseltmesi yapamaz. Lütfen bir müşteri hesabı ile test edin.'
-            }, { status: 403 });
+        const user = (auth as any).user;
+        const tenantId = user.impersonateTenantId || user.tenantId;
+
+        const body = await request.json();
+        const { cart } = body; // Array of product ids
+
+        if (!cart || !Array.isArray(cart) || cart.length === 0) {
+            return NextResponse.json({ error: 'Sepet boş' }, { status: 400 });
         }
 
-        const body = await req.json().catch(() => ({}));
-        const { planId } = body;
-
-        if (!planId) {
-            return NextResponse.json({ error: 'Plan ID zorunludur.' }, { status: 400 });
-        }
-
-        // 1. Planı ve Detayları Getir
-        const [plan, tenant, user] = await Promise.all([
-            prisma.plan.findUnique({ where: { id: planId } }),
-            prisma.tenant.findUnique({
-                where: { id: ctx.tenantId },
-                include: { companies: { take: 1 } }
-            }),
-            prisma.user.findUnique({ where: { id: ctx.userId } })
-        ]);
-
-        if (!plan) {
-            return NextResponse.json({ error: 'Seçilen paket bulunamadı.' }, { status: 404 });
-        }
-
-        if (!plan.iyzicoPlanCode) {
-            return NextResponse.json({
-                error: 'Bu paket şu anda ödemeye açık değil (Iyzico yapılandırması eksik).'
-            }, { status: 400 });
-        }
-
-        if (!tenant || !user) {
-            return NextResponse.json({ error: 'Hesap veya kullanıcı bilgileri bulunamadı.' }, { status: 404 });
-        }
-
-        const company = tenant.companies[0] || { name: tenant.name, address: 'Merkez', city: 'Istanbul' };
-
-        // Name/Surname Split
-        const nameParts = (user.name || 'Müşteri').trim().split(' ');
-        const name = nameParts[0];
-        const surname = nameParts.length > 1 ? nameParts.slice(1).join(' ') : name;
-
-        // 2. Iyzico Checkout Formunu Başlat
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://periodya.com';
-        const callbackUrl = `${baseUrl}/api/webhooks/iyzico/callback`;
-
-        const checkoutData = {
-            locale: 'tr',
-            conversationId: `sub_${ctx.tenantId}_${Date.now()}`,
-            callbackUrl: callbackUrl,
-            pricingPlanCode: plan.iyzicoPlanCode,
-            subscriptionAddress: {
-                contactName: user.name || 'Müşteri',
-                city: company.city || 'Istanbul',
-                country: 'Turkey',
-                address: company.address || 'Merkez'
-            },
-            customer: {
-                name: name,
-                surname: surname,
-                email: user.email,
-                gsmNumber: '+905000000000',
-                identityNumber: '11111111111',
-                billingAddress: {
-                    contactName: user.name || 'Müşteri',
-                    city: company.city || 'Istanbul',
-                    country: 'Turkey',
-                    address: company.address || 'Merkez'
-                }
+        const products = await prisma.billingProduct.findMany({
+            where: {
+                id: { in: cart },
+                isActive: true
             }
-        };
+        });
 
-        const result = await iyzico.initializeSubscriptionCheckout(checkoutData as any);
-
-        if (result.status !== 'success') {
-            return NextResponse.json({
-                error: result.errorMessage || 'Iyzico başlatılamadı.'
-            }, { status: 500 });
+        if (products.length !== cart.length) {
+            return NextResponse.json({ error: 'Bazı ürünler bulunamadı veya pasif' }, { status: 400 });
         }
+
+        // Determine types in cart
+        const productTypes = [...new Set(products.map(p => p.type))];
+
+        // Find a gateway that supports all these types, or at least active
+        const activeGateways = await prisma.paymentGateway.findMany({
+            where: { isActive: true }
+        });
+
+        if (activeGateways.length === 0) {
+            return NextResponse.json({ error: 'Sistemde aktif ödeme altyapısı bulunmuyor' }, { status: 500 });
+        }
+
+        // For simplicity, select the first gateway that supports all types, or fallback to the first active one.
+        let selectedGateway = activeGateways.find(gw =>
+            productTypes.every(pt => gw.supportedTypes.includes(pt))
+        );
+
+        if (!selectedGateway) {
+            selectedGateway = activeGateways[0]; // fallback
+        }
+
+        // Generate a synthetic order reference
+        const checkoutToken = `CHK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        // Create transactions in PENDING state
+        const transactions = await Promise.all(products.map(p => {
+            return prisma.paymentTransaction.create({
+                data: {
+                    tenantId,
+                    gatewayProvider: selectedGateway.provider,
+                    productType: p.type,
+                    productId: p.id,
+                    amount: p.price,
+                    currency: p.currency,
+                    status: 'PENDING',
+                    externalReference: checkoutToken
+                }
+            });
+        }));
+
+        // In a real scenario, we would call the provider API to get a checkout page URL.
+        // For Periodya Billing Simulation, we'll return a simulated URL.
+        const checkoutUrl = `/billing/checkout?token=${checkoutToken}&gateway=${selectedGateway.provider}`;
 
         return NextResponse.json({
             success: true,
-            checkoutFormContent: result.checkoutFormContent,
-            token: result.token
+            checkoutToken,
+            checkoutUrl,
+            gateway: selectedGateway.provider,
+            transactions
         });
 
     } catch (error: any) {
-        console.error("Upgrade API Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('Checkout error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
