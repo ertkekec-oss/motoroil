@@ -46,7 +46,18 @@ export async function GET(request: Request) {
         // Trigger simulation if dashboard empty (strictly for Periodya initialization)
         if (insights.length === 0 && forecasts.length === 0) {
             await RevenueIntelligenceEngine.runEngineForTenant(tenantId, companyId);
-            return NextResponse.redirect(new URL(request.url));
+
+            // Re-fetch after generation instead of redirecting (since it's a client fetch)
+            const newInsights = await prisma.revenueInsight.findMany({ where: { companyId }, orderBy: { createdAt: 'desc' }, take: 5 });
+            const newForecasts = await prisma.salesForecast.findMany({ where: { companyId }, orderBy: { expectedSales: 'desc' } });
+            const newRisks = await prisma.salesRiskAlert.findMany({ where: { companyId }, orderBy: { createdAt: 'desc' }, take: 3 });
+            const newOpportunities = await prisma.salesOpportunity.findMany({ where: { companyId }, orderBy: { potentialValue: 'desc' }, take: 3 });
+            const newPerformanceScores = await prisma.salesPerformanceScore.findMany({ where: { companyId }, include: { staff: true }, orderBy: { totalScore: 'desc' }, take: 5 });
+
+            return NextResponse.json({
+                success: true,
+                data: { insights: newInsights, forecasts: newForecasts, risks: newRisks, opportunities: newOpportunities, performanceScores: newPerformanceScores }
+            });
         }
 
         return NextResponse.json({

@@ -107,7 +107,7 @@ export default function StaffPerformanceDashboard() {
                         <div className="flex items-center justify-between p-4 bg-slate-900 text-white rounded-xl">
                             <div>
                                 <p className="text-xs text-slate-400 uppercase font-bold tracking-widest">Global Sıra</p>
-                                <p className="text-3xl font-black mt-1">#{displayData.leaderboard.rank}</p>
+                                <p className="text-3xl font-black mt-1">#{displayData.leaderboard.rankGlobal || displayData.leaderboard.rank}</p>
                             </div>
                             <Trophy className="w-12 h-12 text-amber-400" />
                         </div>

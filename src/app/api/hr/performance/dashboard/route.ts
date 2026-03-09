@@ -8,28 +8,36 @@ export async function GET(request: Request) {
         if (!auth.authorized) return auth.response;
 
         const user = (auth as any).user;
-        const staffId = user.id; // Or how staff is mapped in Periodya
+        const staffId = user.id;
+        const tenantId = user.impersonateTenantId || user.tenantId;
+        const companyId = user.companyId || user.impersonateCompanyId;
 
-        // Simply call our new engine
-        const data = await SalesPerformanceEngine.getDashboardData(staffId);
+        let data = await SalesPerformanceEngine.getDashboardData(staffId);
 
-        // Map into standard UI structure
+        // Bootstrap for missing matrix configurations
+        if (data.assignments.length === 0) {
+            await SalesPerformanceEngine.bootstrapMatrixForStaff(tenantId, companyId, staffId);
+            data = await SalesPerformanceEngine.getDashboardData(staffId);
+        }
+
+        const formatCurr = (val: any) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(val));
+
         return NextResponse.json({
             success: true,
             data: {
                 assignments: data.assignments,
                 achievements: data.badges.map(b => b.badgeType),
-                leaderboard: data.leaderboard || { rank: '-', scoreValue: 0 },
+                leaderboard: data.leaderboard || { rankGlobal: '-', scoreValue: 0 },
                 stats: {
-                    target: '1.000.000,00 ₺',
-                    actual: '1.150.000,00 ₺',
-                    achievement: '%115',
-                    bonus: '45.000,00 ₺'
+                    target: formatCurr(data.stats.totalTarget),
+                    actual: formatCurr(data.stats.totalActual),
+                    achievement: `%${data.stats.achievementRatio.toFixed(1)}`,
+                    bonus: formatCurr(data.stats.totalBonus)
                 },
                 aiSuggested: {
-                    safe: '1.200.000 ₺',
-                    balanced: '1.450.000 ₺',
-                    aggressive: '1.800.000 ₺'
+                    safe: formatCurr(Number(data.stats.totalTarget) * 1.05),
+                    balanced: formatCurr(Number(data.stats.totalTarget) * 1.12),
+                    aggressive: formatCurr(Number(data.stats.totalTarget) * 1.25)
                 }
             }
         });
