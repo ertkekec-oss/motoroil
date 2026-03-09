@@ -8917,10 +8917,10 @@ model SupportTicket {
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
   resolvedAt       DateTime?
-  closedAt         DateTime?
-  
   comments         SupportTicketComment[]
   attachments      SupportTicketAttachment[]
+  tags             SupportTicketTagMap[]
+  slaTracking      SupportSLATracking?
   
   @@index([tenantId])
   @@index([status])
@@ -9096,4 +9096,58 @@ model RunbookAction {
   runbook     PlatformRunbook   @relation(fields: [runbookId], references: [id], onDelete: Cascade)
 
   @@index([runbookId])
+}
+
+enum SupportSLAStatus {
+  ACTIVE
+  BREACHED
+  RESOLVED
+}
+
+model SupportTicketTag {
+  id        String   @id @default(cuid())
+  tenantId  String?
+  name      String
+  slug      String
+  color     String?
+  createdAt DateTime @default(now())
+
+  maps      SupportTicketTagMap[]
+
+  @@unique([tenantId, slug])
+}
+
+model SupportTicketTagMap {
+  id        String   @id @default(cuid())
+  ticketId  String
+  tagId     String
+
+  ticket    SupportTicket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  tag       SupportTicketTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([ticketId, tagId])
+}
+
+model SupportSLA {
+  id                   String                @id @default(cuid())
+  tenantId             String?
+  priority             SupportTicketPriority
+  firstResponseMinutes Int
+  resolutionMinutes    Int
+  createdAt            DateTime              @default(now())
+
+  @@unique([tenantId, priority])
+}
+
+model SupportSLATracking {
+  id                    String                @id @default(cuid())
+  ticketId              String                @unique
+  priority              SupportTicketPriority
+  firstResponseDeadline DateTime
+  resolutionDeadline    DateTime
+  status                SupportSLAStatus      @default(ACTIVE)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  ticket                SupportTicket         @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 }

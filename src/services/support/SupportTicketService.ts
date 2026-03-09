@@ -9,6 +9,8 @@ import {
     SupportTicketAttachment
 } from '@prisma/client';
 import { PlatformDoctorService } from '../infrastructure/PlatformDoctorService';
+import { SupportRoutingService } from './SupportRoutingService';
+import { SupportSLAService } from './SupportSLAService';
 
 export class SupportTicketService {
     /**
@@ -34,20 +36,35 @@ export class SupportTicketService {
             platformDoctor: enrichment
         };
 
-        return prisma.supportTicket.create({
+        // Auto-Detection overrides if user didn't specify or we augment it
+        const finalCategory = params.category || SupportRoutingService.detectCategory(params.subject, params.description);
+        const finalPriority = params.priority || SupportRoutingService.detectPriority(params.subject, params.description);
+
+        const ticket = await prisma.supportTicket.create({
             data: {
                 tenantId: params.tenantId,
                 createdByUserId: params.createdByUserId,
                 subject: params.subject,
                 description: params.description,
-                category: params.category,
-                priority: params.priority || 'NORMAL',
+                category: finalCategory,
+                priority: finalPriority,
                 currentPage: params.currentPage,
                 browserInfo: params.browserInfo,
                 metadataJson: augmentedMetadata,
                 status: 'OPEN'
             }
         });
+
+        // 1. Post-creation Async Hook: Apply Tags
+        await SupportRoutingService.applyTags(ticket.id, ticket.tenantId, ticket.subject, ticket.description);
+
+        // 2. Post-creation Async Hook: Auto Route
+        await SupportRoutingService.assignTicket(ticket.id, ticket.category);
+
+        // 3. Bind SLA Tracking Engine
+        await SupportSLAService.applySLA(ticket);
+
+        return ticket;
     }
 
     /**
@@ -83,8 +100,11 @@ export class SupportTicketService {
 
         if (newStatus === 'RESOLVED' && ticket.status !== 'RESOLVED') {
             updates.resolvedAt = new Date();
+            // Free SLAs
+            await SupportSLAService.resolveSLA(ticketId);
         } else if (newStatus === 'CLOSED' && ticket.status !== 'CLOSED') {
             updates.closedAt = new Date();
+            await SupportSLAService.resolveSLA(ticketId);
         } else if (newStatus !== 'RESOLVED' && newStatus !== 'CLOSED') {
             updates.resolvedAt = null;
         }

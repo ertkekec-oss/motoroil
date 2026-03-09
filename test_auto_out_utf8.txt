@@ -1,0 +1,108 @@
+﻿[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+--- STARTING SUPPORT AUTOMATION ENGINE SMOKE TEST ---
+
+[1/5] Testing Manual Category & Priority Detection Rules...
+- Detected Category: EINVOICE (Expected: EINVOICE)
+- Detected Priority: CRITICAL (Expected: CRITICAL)
+
+[2/5] Creating Ticket & Triggering Automated Hooks...
+node.exe : ÔØî Automation Tes
+t FAILED: PrismaClientValidat
+ionError: 
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (ÔØî Aut  
+  omation ...lidationError   
+ : :String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Invalid `prisma.supportTicket
+Tag.upsert()` invocation in
+C:\Users\ertke\OneDrive\Masa├
+╝st├╝\periodya\muhasebeapp\mo
+toroil\src\services\support\S
+upportRoutingService.ts:74:55
+
+  71 
+  72 // System-wide Global Ta
+gs via tenantId=null
+  73 for (const slug of tagSl
+ugsToApply) {
+ÔåÆ 74     const tag = await 
+prisma.supportTicketTag.upser
+t({
+           where: {
+             tenantId_slug: {
+               slug: "invento
+ry",
+         +     tenantId: Stri
+ng
+             }
+           },
+           update: {},
+           create: {
+             tenantId: null,
+             name: "Inventory
+",
+             slug: "inventory
+",
+             color: "blue"
+           }
+         })
+
+Argument `tenantId` must not 
+be null.
+    at wn (C:\Users\ertke\One
+Drive\Masa├╝st├╝\periodya\muh
+asebeapp\motoroil\node_module
+s\@prisma\client\runtime\libr
+ary.js:29:1363)
+    at $n.handleRequestError 
+(C:\Users\ertke\OneDrive\Masa
+├╝st├╝\periodya\muhasebeapp\m
+otoroil\node_modules\@prisma\
+client\runtime\library.js:121
+:6958)
+    at $n.handleAndLogRequest
+Error (C:\Users\ertke\OneDriv
+e\Masa├╝st├╝\periodya\muhaseb
+eapp\motoroil\node_modules\@p
+risma\client\runtime\library.
+js:121:6623)
+    at $n.request (C:\Users\e
+rtke\OneDrive\Masa├╝st├╝\peri
+odya\muhasebeapp\motoroil\nod
+e_modules\@prisma\client\runt
+ime\library.js:121:6307)
+    at async l (C:\Users\ertk
+e\OneDrive\Masa├╝st├╝\periody
+a\muhasebeapp\motoroil\node_m
+odules\@prisma\client\runtime
+\library.js:130:9633)
+    at async Function.applyTa
+gs (C:\Users\ertke\OneDrive\M
+asa├╝st├╝\periodya\muhasebeap
+p\motoroil\src\services\suppo
+rt\SupportRoutingService.ts:7
+4:25)
+    at async Function.createT
+icket (C:\Users\ertke\OneDriv
+e\Masa├╝st├╝\periodya\muhaseb
+eapp\motoroil\src\services\su
+pport\SupportTicketService.ts
+:59:9)
+    at async main (C:\Users\e
+rtke\OneDrive\Masa├╝st├╝\peri
+odya\muhasebeapp\motoroil\scr
+ipts\test_support_automation_
+engine.ts:31:24) {
+  clientVersion: '5.22.0'
+}
