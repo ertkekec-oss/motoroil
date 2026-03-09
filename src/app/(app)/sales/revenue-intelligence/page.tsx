@@ -26,10 +26,10 @@ export default function RevenueIntelligenceDashboard() {
 
     if (loading) return <div className="p-16 text-center text-slate-500 font-medium">✨ AI Satış Analiz Motoru Çalışıyor...</div>;
 
-    if (!data || data.forecasts.length === 0) {
+    if (!data) {
         return (
             <EnterprisePageShell title="Revenue Intelligence" description="Sales Forecast + Performance Coaching Motoru">
-                <div className="p-16 text-center text-slate-500 font-medium">Veri bulunamadı. Lütfen sayfayı yenileyin.</div>
+                <div className="p-16 text-center text-slate-500 font-medium">Satış tahmini veya AI analizi için yeterli geçmiş veri bulunamadı.</div>
             </EnterprisePageShell>
         );
     }

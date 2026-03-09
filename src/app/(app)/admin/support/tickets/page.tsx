@@ -45,11 +45,13 @@ export default async function AdminTicketsPage({
         where: {
             ...(status ? { status: status as any } : {}),
             ...(tenantId ? { tenantId: tenantId } : {}),
-            ...(assignedTo ? { assignedToUserId: assignedTo === 'none' ? null : assignedTo } : {}),
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
         include: {
-            relatedHelpTopic: true,
+            messages: {
+                take: 1,
+                orderBy: { createdAt: 'asc' }
+            }
         }
     });
 
@@ -91,41 +93,34 @@ export default async function AdminTicketsPage({
                                     <tr key={ticket.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group cursor-pointer">
                                         <td className="px-6 py-4">
                                             <div className="text-sm font-bold text-slate-900 mb-1">{ticket.tenantId}</div>
-                                            <div className="text-[10px] text-slate-500 uppercase tracking-tighter">{ticket.requesterUserId}</div>
+                                            <div className="text-[10px] text-slate-500 uppercase tracking-tighter">{ticket.createdByUserId?.substring(0, 10) || 'SYSTEM'}</div>
                                         </td>
                                         <td className="px-6 py-4 min-w-[300px]">
                                             <Link href={`/admin/support/tickets/${ticket.id}`} className="block">
                                                 <div className="font-bold text-slate-800 group-hover:text-orange-600 transition-colors mb-1">
-                                                    #{ticket.ticketNumber} - {ticket.subject}
+                                                    #{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message.substring(0, 30).replace(/\*\*/g, '') || ticket.type}
                                                 </div>
                                                 <p className="text-xs text-slate-500 truncate max-w-md">
-                                                    {ticket.description}
+                                                    {ticket.messages[0]?.message.substring(0, 80).replace(/\*\*/g, '') || "Detay bulunamadı."}
                                                 </p>
                                             </Link>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-xs text-slate-700 font-medium mb-1">{ticket.category}</div>
+                                            <div className="text-xs text-slate-700 font-medium mb-1">{ticket.type}</div>
                                             <div className={`text-[10px] ${PRIORITY_STYLES[ticket.priority] || 'text-slate-400'}`}>
                                                 {ticket.priority.replace('P', 'Önem ')}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            {ticket.assignedToUserId ? (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[8px] text-white">S</span>
-                                                    <span className="text-xs text-orange-400 font-medium">{ticket.assignedToUserId.substring(0, 10)}...</span>
-                                                </div>
-                                            ) : (
-                                                <span className="text-xs text-gray-600 italic">Atanmamış</span>
-                                            )}
+                                            <span className="text-xs text-gray-600 italic">Destek Ekibi</span>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded border ${STATUS_COLORS[ticket.status]}`}>
-                                                {STATUS_LABELS[ticket.status]}
+                                            <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded border ${STATUS_COLORS[ticket.status] || STATUS_COLORS.NEW}`}>
+                                                {STATUS_LABELS[ticket.status] || ticket.status}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right text-[10px] text-gray-500 font-mono">
-                                            {new Date(ticket.updatedAt).toLocaleString('tr-TR')}
+                                            {new Date(ticket.createdAt).toLocaleString('tr-TR')}
                                         </td>
                                     </tr>
                                 ))}

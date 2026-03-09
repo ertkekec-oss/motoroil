@@ -25,20 +25,7 @@ const STATUS_COLORS: Record<string, string> = {
     CLOSED: 'bg-slate-50 text-slate-700 border-slate-200',
 };
 
-function AttachmentLink({ attachment }: { attachment: any }) {
-    return (
-        <a
-            href={`/api/support/attachments/${attachment.id}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 hover:text-orange-600 hover:bg-slate-100 transition-all font-medium"
-        >
-            <span>📎</span>
-            <span className="truncate max-w-[120px]">{attachment.fileName}</span>
-            <span className="text-[10px] text-slate-400">({(attachment.size / 1024).toFixed(0)} KB)</span>
-        </a>
-    );
-}
+// Remove AttachmentLink since no longer in schema
 
 export default async function AdminTicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -52,11 +39,7 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
         where: { id },
         include: {
             messages: {
-                orderBy: { createdAt: 'asc' },
-                include: { attachments: true }
-            },
-            attachments: {
-                where: { messageId: null }
+                orderBy: { createdAt: 'asc' }
             },
             relatedHelpTopic: true
         }
@@ -77,7 +60,6 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
     });
 
     const { messages } = ticket;
-    const metadataJson = ticket.metadataJson as any || {};
 
     return (
         <div className="p-6 md:p-8 max-w-7xl mx-auto font-sans flex flex-col lg:flex-row gap-8 h-[calc(100vh-100px)]">
@@ -88,7 +70,7 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                         ← Inbox'a Dön
                     </Link>
                     <div className="flex items-center gap-3 mb-2">
-                        <h1 className="text-2xl font-black text-slate-900 truncate">#{ticket.ticketNumber} - {ticket.subject}</h1>
+                        <h1 className="text-2xl font-black text-slate-900 truncate">#{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message.substring(0, 30).replace(/\*\*/g, '').split('\n')[0] || ticket.type}</h1>
                     </div>
                 </div>
 
@@ -97,55 +79,39 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                     <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
                         <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
                             <div className="font-bold text-slate-900 flex items-center gap-2">
-                                <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs text-bold">M</span>
-                                {ticket.requesterUserId} (Müşteri)
+                                <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">M</span>
+                                {ticket.createdByUserId || 'Bilinmiyor'} (Müşteri)
                             </div>
                             <div className="text-xs text-slate-400">{new Date(ticket.createdAt).toLocaleString('tr-TR')}</div>
                         </div>
                         <div className="text-slate-700 whitespace-pre-wrap text-sm leading-relaxed mb-4">
-                            {ticket.description}
+                            {ticket.messages[0]?.message || 'Açıklama bulunamadı.'}
                         </div>
-                        {ticket.attachments && (ticket.attachments as any).length > 0 && (
-                            <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
-                                {(ticket.attachments as any)?.map((att: any) => (
-                                    <AttachmentLink key={att.id} attachment={att} />
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     {/* Messages */}
-                    {messages?.map((msg) => {
-                        const isSystem = msg.authorType === 'SYSTEM';
-                        const isAdmin = msg.authorType === 'ADMIN';
-                        const isCustomer = msg.authorType === 'CUSTOMER';
-                        const isInternal = msg.isInternal;
+                    {messages?.slice(1).map((msg) => {
+                        const isSystem = msg.senderRole === 'SYSTEM' as any;
+                        const isAdmin = msg.senderRole === 'PLATFORM' as any || msg.senderRole === 'ARBITRATOR' as any;
+                        const isCustomer = msg.senderRole === 'BUYER' || msg.senderRole === 'SELLER';
 
                         return (
-                            <div key={msg.id} className={`p-6 rounded-2xl shadow-sm w-full border ${isInternal ? 'bg-amber-50 border-amber-500/30' : isSystem ? 'bg-slate-50 border-slate-200' : isAdmin ? 'bg-orange-50/50 border-orange-200' : 'bg-white border-slate-200'}`}>
-                                <div className={`flex items-center justify-between mb-4 border-b pb-4 ${isInternal ? 'border-amber-500/20' : isAdmin ? 'border-orange-500/10' : 'border-slate-100'}`}>
+                            <div key={msg.id} className={`p-6 rounded-2xl shadow-sm w-full border ${isSystem ? 'bg-slate-50 border-slate-200' : isAdmin ? 'bg-orange-50/50 border-orange-200' : 'bg-white border-slate-200'}`}>
+                                <div className={`flex items-center justify-between mb-4 border-b pb-4 ${isAdmin ? 'border-orange-500/10' : 'border-slate-100'}`}>
                                     <div className="font-bold text-slate-900 flex items-center gap-2">
                                         {isCustomer && <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">M</span>}
                                         {isAdmin && <span className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold">A</span>}
                                         {isSystem && <span className="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-bold">S</span>}
 
-                                        <span className={isInternal ? 'text-amber-700' : isAdmin ? 'text-orange-600' : 'text-slate-900'}>
-                                            {isCustomer ? 'Müşteri' : isAdmin ? `Destek: ${msg.authorId}` : 'Sistem Botu'}
-                                            {isInternal && ' [İÇ NOT]'}
+                                        <span className={isAdmin ? 'text-orange-600' : 'text-slate-900'}>
+                                            {isCustomer ? 'Müşteri' : isAdmin ? `Destek: ${msg.senderTenantId}` : 'Sistem Botu'}
                                         </span>
                                     </div>
                                     <div className="text-xs text-slate-400">{new Date(msg.createdAt).toLocaleString('tr-TR')}</div>
                                 </div>
-                                <div className={`${isInternal ? 'text-amber-900' : 'text-slate-700'} whitespace-pre-wrap text-sm leading-relaxed mb-4`}>
-                                    {msg.body}
+                                <div className={`text-slate-700 whitespace-pre-wrap text-sm leading-relaxed mb-4`}>
+                                    {msg.message}
                                 </div>
-                                {msg.attachments && (msg.attachments as any).length > 0 && (
-                                    <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
-                                        {(msg.attachments as any)?.map((att: any) => (
-                                            <AttachmentLink key={att.id} attachment={att} />
-                                        ))}
-                                    </div>
-                                )}
                             </div>
                         );
                     })}
@@ -164,7 +130,6 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                     <div className="space-y-4">
                         <UpdateControls
                             ticketId={ticket.id}
-                            assignedToUserId={ticket.assignedToUserId}
                             priority={ticket.priority}
                             agents={agents}
                             STATUS_COLORS={STATUS_COLORS}
@@ -184,22 +149,8 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                         </div>
                         <div>
                             <span className="text-xs text-slate-500 block mb-1">User ID (Talep Eden)</span>
-                            <span className="text-sm font-mono text-blue-600 break-all">{ticket.requesterUserId}</span>
+                            <span className="text-sm font-mono text-blue-600 break-all">{ticket.createdByUserId}</span>
                         </div>
-                        {metadataJson.url && (
-                            <div>
-                                <span className="text-xs text-slate-500 block mb-1">Oluşturulan Sayfa</span>
-                                <a href={metadataJson.url} target="_blank" rel="noopener noreferrer" className="text-sm text-orange-600 font-bold hover:underline break-all">
-                                    {metadataJson.url}
-                                </a>
-                            </div>
-                        )}
-                        {metadataJson.userAgent && (
-                            <div>
-                                <span className="text-xs text-slate-500 block mb-1">Tarayıcı Bilgisi</span>
-                                <span className="text-[10px] font-mono text-slate-400 break-words leading-tight block">{metadataJson.userAgent}</span>
-                            </div>
-                        )}
                         {ticket.relatedHelpTopic && (
                             <div className="pt-4 mt-4 border-t border-slate-100">
                                 <span className="text-xs text-slate-500 block mb-1">İlgili Yardım Dokümanı</span>

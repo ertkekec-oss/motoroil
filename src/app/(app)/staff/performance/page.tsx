@@ -23,20 +23,22 @@ export default function StaffPerformanceDashboard() {
 
     if (loading) return <div className="p-10 text-center text-slate-500 font-medium">Performans verileri yükleniyor...</div>;
 
-    // Fallback static structure if no real assignments
-    const fallbackData = {
-        stats: {
-            target: "1.000.000,00 ₺",
-            actual: "1.150.000,00 ₺",
-            achievement: "%115",
-            bonus: "45.000,00 ₺"
-        },
-        leaderboard: { rank: 2, totalScores: 7800 },
-        achievements: ["FIRST_SALE", "CONSISTENCY", "TARGET_CRUSHER"],
-        aiSuggested: { safe: "1.200.000 ₺", balanced: "1.450.000 ₺", aggressive: "1.800.000 ₺" }
-    };
+    if (!data || !data.assignments || data.assignments.length === 0) {
+        return (
+            <EnterprisePageShell
+                title="Sales Performance Engine"
+                description="Dönemsel hedefleriniz, bonus kazanımınız ve gamification durumunuz."
+            >
+                <div className="flex flex-col items-center justify-center p-20 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm text-center">
+                    <Target className="w-16 h-16 text-slate-300 dark:text-slate-600 mb-6" />
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Henüz Bir Hedef Atanmamış</h3>
+                    <p className="text-slate-500 font-medium max-w-sm">Yöneticiniz tarafından size tanımlanmış aktif bir büyüme hedefi veya performans matrisi bulunmuyor.</p>
+                </div>
+            </EnterprisePageShell>
+        );
+    }
 
-    const displayData = data && data.assignments.length > 0 ? data : fallbackData;
+    const displayData = data;
 
     return (
         <EnterprisePageShell

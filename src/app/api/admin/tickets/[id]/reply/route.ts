@@ -30,19 +30,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const message = await prisma.ticketMessage.create({
             data: {
                 ticketId,
-                body,
-                authorType: 'ADMIN',
-                authorId: session.id || 'admin',
-                isInternal: Boolean(isInternal),
-                attachments: attachments ? {
-                    create: attachments.map((att: any) => ({
-                        fileKey: att.fileKey,
-                        fileName: att.fileName,
-                        mimeType: att.mimeType,
-                        size: att.size,
-                        ticketId: ticketId
-                    }))
-                } : undefined
+                message: body,
+                redactedMessage: body,
+                senderRole: "PLATFORM", // or SYSTEM / ARBITRATOR based on context
+                senderTenantId: "PLATFORM_ADMIN",
             }
         });
 
@@ -55,17 +46,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             newStatus = 'WAITING_CUSTOMER';
 
             // IF it is an external message, alert the user via Email (Fire & Forget)
-            prisma.user.findUnique({ where: { id: ticket.requesterUserId } }).then((user) => {
-                if (user && user.email) {
-                    sendMail({
-                        to: user.email,
-                        subject: `[Periodya Destek] Talebinize Yanıt Verildi (#${ticket.ticketNumber})`,
-                        html: `
-                            <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; color: #333; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
-                                <h2 style="color: #FF5500;">Destek Talebinize Yanıt Verildi</h2>
-                                <p>Merhaba ${user.name || 'Değerli Kullanıcımız'},</p>
-                                <p><strong>#${ticket.ticketNumber}</strong> numaralı destek talebinize ("${ticket.subject}") destek ekibimiz tarafından bir yanıt eklendi.</p>
-                                <div style="background: #fdfdfd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FF5500;">
+            if (ticket.createdByUserId) {
+                prisma.user.findUnique({ where: { id: ticket.createdByUserId } }).then((user) => {
+                    if (user && user.email) {
+                        sendMail({
+                            to: user.email,
+                            subject: `[Periodya Destek] Talebinize Yanıt Verildi (#${ticket.id.substring(ticket.id.length - 6).toUpperCase()})`,
+                            html: `
+                                <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; color: #333; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
+                                    <h2 style="color: #FF5500;">Destek Talebinize Yanıt Verildi</h2>
+                                    <p>Merhaba ${user.name || 'Değerli Kullanıcımız'},</p>
+                                    <p><strong>#${ticket.id.substring(ticket.id.length - 6).toUpperCase()}</strong> numaralı destek talebinize destek ekibimiz tarafından bir yanıt eklendi.</p>
+                                    <div style="background: #fdfdfd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FF5500;">
                                     <p style="white-space: pre-wrap; font-size: 14px;">${body}</p>
                                 </div>
                                 <p>Talebe yanıt vermek veya detayları görüntülemek için aşağıdaki bağlantıya tıklayabilirsiniz:</p>
@@ -75,9 +67,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
                                 </div>
                             </div>
                         `
-                    }).catch(err => console.error("Admin Reply Error:", err));
-                }
-            });
+                        }).catch(err => console.error("Admin Reply Error:", err));
+                    }
+                });
+            }
         }
 
         if (newStatus !== ticket.status) {

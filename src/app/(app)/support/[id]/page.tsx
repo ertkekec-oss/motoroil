@@ -24,20 +24,7 @@ const STATUS_COLORS: Record<string, string> = {
     CLOSED: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
 };
 
-function AttachmentLink({ attachment }: { attachment: any }) {
-    return (
-        <a
-            href={`/api/support/attachments/${attachment.id}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-all font-medium"
-        >
-            <span>📎</span>
-            <span className="truncate max-w-[120px]">{attachment.fileName}</span>
-            <span className="text-[10px] text-gray-600">({(attachment.size / 1024).toFixed(0)} KB)</span>
-        </a>
-    );
-}
+// Removed AttachmentLink due to schema change
 
 export default async function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -48,11 +35,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
         where: { id },
         include: {
             messages: {
-                orderBy: { createdAt: 'asc' },
-                include: { attachments: true }
-            },
-            attachments: {
-                where: { messageId: null }
+                orderBy: { createdAt: 'asc' }
             },
             relatedHelpTopic: true
         }
@@ -62,7 +45,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
         notFound();
     }
 
-    if (session.role === 'USER' && ticket.requesterUserId !== session.id) {
+    if (session.role === 'USER' && ticket.createdByUserId !== session.id) {
         notFound();
     }
 
@@ -78,12 +61,12 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-2xl font-black text-white">#{ticket.ticketNumber} - {ticket.subject}</h1>
+                            <h1 className="text-2xl font-black text-white">#{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message.substring(0, 30).split('\n')[0].replace(/\*\*/g, '') || ticket.type}</h1>
                             <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border ${STATUS_COLORS[ticket.status]}`}>
                                 {STATUS_LABELS[ticket.status]}
                             </span>
                         </div>
-                        <p className="text-sm text-gray-500">Oluşturulma: {new Date(ticket.createdAt).toLocaleString('tr-TR')} • Kategori: {ticket.category}</p>
+                        <p className="text-sm text-gray-500">Oluşturulma: {new Date(ticket.createdAt).toLocaleString('tr-TR')} • Kategori: {ticket.type}</p>
                     </div>
                 </div>
             </div>
@@ -100,24 +83,15 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                         <div className="text-xs text-gray-500">{new Date(ticket.createdAt).toLocaleString('tr-TR')}</div>
                     </div>
                     <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed mb-4">
-                        {ticket.description}
+                        {ticket.messages[0]?.message || 'Açıklama bulunamadı.'}
                     </div>
-                    {ticket.attachments && ticket.attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-                            {ticket.attachments.map(att => (
-                                <AttachmentLink key={att.id} attachment={att} />
-                            ))}
-                        </div>
-                    )}
                 </div>
 
                 {/* Messages */}
-                {messages.map((msg) => {
-                    if (msg.isInternal) return null;
-
-                    const isSystem = msg.authorType === 'SYSTEM';
-                    const isAdmin = msg.authorType === 'ADMIN';
-                    const isMe = msg.authorType === 'CUSTOMER';
+                {messages.slice(1).map((msg) => {
+                    const isSystem = msg.senderRole === 'SYSTEM' as any;
+                    const isAdmin = msg.senderRole === 'PLATFORM' as any || msg.senderRole === 'ARBITRATOR' as any;
+                    const isMe = msg.senderRole === 'BUYER' || msg.senderRole === 'SELLER';
 
                     return (
                         <div key={msg.id} className={`p-6 rounded-2xl shadow-sm w-full border ${isSystem ? 'bg-blue-900/10 border-blue-500/20' : isAdmin ? 'bg-orange-900/10 border-orange-500/20' : 'bg-[#0f111a] border-white/5'}`}>
@@ -134,15 +108,8 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                                 <div className="text-xs text-gray-500">{new Date(msg.createdAt).toLocaleString('tr-TR')}</div>
                             </div>
                             <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed mb-4">
-                                {msg.body}
+                                {msg.message}
                             </div>
-                            {msg.attachments && msg.attachments.length > 0 && (
-                                <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-                                    {msg.attachments.map(att => (
-                                        <AttachmentLink key={att.id} attachment={att} />
-                                    ))}
-                                </div>
-                            )}
                         </div>
                     );
                 })}

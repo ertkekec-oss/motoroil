@@ -773,6 +773,40 @@ export default function StaffManagementContent() {
     };
 
     const handleSaveTarget = async () => {
+        if (newTarget.type === 'MATRIX') {
+            if (!newTarget.staffId || !newTarget.targetValue || !newTarget.bonusAmount) {
+                showError('Hata', 'Lütfen personel, yıllık şirket hedefi ve bonus havuzu alanlarını doldurun.');
+                return;
+            }
+            setIsProcessing(true);
+            try {
+                const res = await fetch('/api/hr/performance/matrix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        year: Number((newTarget as any).matrixYear) || new Date().getFullYear(),
+                        totalTarget: parseFloat(newTarget.targetValue),
+                        bonusPool: parseFloat(newTarget.bonusAmount),
+                        staffIds: [newTarget.staffId]
+                    })
+                });
+                if (res.ok) {
+                    await fetchTargets();
+                    setShowTargetModal(false);
+                    setNewTarget({ staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: '', commissionRate: '', bonusAmount: '' });
+                    showSuccess("Matrix Tanımlandı", "Yıllık hedefleme Q1-Q4 çeyreklerine eşit ağırlıkta dağıtıldı.");
+                } else {
+                    const data = await res.json();
+                    showError("İşlem Başarısız", data.error || "Hata oluştu.");
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setIsProcessing(false);
+            }
+            return;
+        }
+
         if (!newTarget.staffId || !newTarget.targetValue || !newTarget.startDate || !newTarget.endDate) {
             showError('Hata', 'Lütfen tüm alanları doldurun.');
             return;
@@ -2699,6 +2733,7 @@ export default function StaffManagementContent() {
                                     >
                                         <option value="TURNOVER">💰 Ciro Hedefi</option>
                                         <option value="VISIT">📍 Ziyaret Hedefi</option>
+                                        <option value="MATRIX">🎯 Matrix (Yıllık Hedef Modeli)</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -2706,18 +2741,20 @@ export default function StaffManagementContent() {
                                     <input
                                         type="text"
                                         className="w-full h-11 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-500 dark:text-slate-400 outline-none shadow-sm"
-                                        value="Aylık (Varsayılan)"
+                                        value={newTarget.type === 'MATRIX' ? 'Yıllık (Q1-Q4 Dağılımlı)' : 'Aylık (Varsayılan)'}
                                         disabled
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Hedef Değeri ({newTarget.type === 'TURNOVER' ? 'TL' : 'Adet'})</label>
+                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">
+                                    {newTarget.type === 'MATRIX' ? 'Şirket Genel Yıllık Satış Hedefi (TL)' : `Hedef Değeri (${newTarget.type === 'TURNOVER' ? 'TL' : 'Adet'})`}
+                                </label>
                                 <input
                                     type="number"
                                     className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
-                                    placeholder={newTarget.type === 'TURNOVER' ? "50000" : "100"}
+                                    placeholder={newTarget.type === 'MATRIX' ? "4000000" : (newTarget.type === 'TURNOVER' ? "50000" : "100")}
                                     value={newTarget.targetValue}
                                     onChange={(e) => setNewTarget({ ...newTarget, targetValue: e.target.value })}
                                 />
@@ -2749,26 +2786,53 @@ export default function StaffManagementContent() {
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Başlangıç</label>
-                                    <input
-                                        type="date"
-                                        className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
-                                        value={newTarget.startDate}
-                                        onChange={(e) => setNewTarget({ ...newTarget, startDate: e.target.value })}
-                                    />
+                            {newTarget.type === 'MATRIX' && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Performans Yılı</label>
+                                        <input
+                                            type="number"
+                                            className="w-full h-11 bg-indigo-50 border border-indigo-200 rounded-xl px-4 text-[13px] font-semibold text-indigo-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none shadow-sm"
+                                            placeholder="2026"
+                                            value={(newTarget as any).matrixYear || new Date().getFullYear()}
+                                            onChange={(e) => setNewTarget({ ...newTarget, matrixYear: e.target.value } as any)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Yıllık Bonus Bütçesi (Q1-Q4)</label>
+                                        <input
+                                            type="number"
+                                            className="w-full h-11 bg-emerald-50 border border-emerald-200 rounded-xl px-4 text-[13px] font-semibold text-emerald-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none shadow-sm"
+                                            placeholder="160000"
+                                            value={newTarget.bonusAmount}
+                                            onChange={(e) => setNewTarget({ ...newTarget, bonusAmount: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Bitiş</label>
-                                    <input
-                                        type="date"
-                                        className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
-                                        value={newTarget.endDate}
-                                        onChange={(e) => setNewTarget({ ...newTarget, endDate: e.target.value })}
-                                    />
+                            )}
+
+                            {newTarget.type !== 'MATRIX' && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Başlangıç</label>
+                                        <input
+                                            type="date"
+                                            className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
+                                            value={newTarget.startDate}
+                                            onChange={(e) => setNewTarget({ ...newTarget, startDate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Bitiş</label>
+                                        <input
+                                            type="date"
+                                            className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
+                                            value={newTarget.endDate}
+                                            onChange={(e) => setNewTarget({ ...newTarget, endDate: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             <button
                                 onClick={handleSaveTarget}

@@ -75,14 +75,26 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const { type, message, relatedEntityType, relatedEntityId } = body;
 
-        if (!type || !message) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        // Support both Frontend form and old API
+        const type = body.type || body.category || "GENERAL";
+        const messageRaw = body.message || `**${body.subject}**\n\n${body.description}`;
+        const relatedEntityType = body.relatedEntityType || (body.relatedHelpTopicId ? "HELP_ARTICLE" : null);
+        const relatedEntityId = body.relatedEntityId || body.relatedHelpTopicId || null;
+        const reqPriority = body.priority || "MEDIUM";
+
+        // Map P1_URGENT / P2_HIGH to Prisma ENUM
+        let priority = "MEDIUM";
+        if (reqPriority.includes("P1") || reqPriority === "CRITICAL") priority = "CRITICAL";
+        else if (reqPriority.includes("P2") || reqPriority === "HIGH") priority = "HIGH";
+        else if (reqPriority.includes("P4") || reqPriority === "LOW") priority = "LOW";
+
+        if (!type || !messageRaw || messageRaw.trim() === "") {
+            return NextResponse.json({ error: "Eksik bilgi: Lütfen tüm zorunlu alanları doldurun." }, { status: 400 });
         }
 
-        // PII Redaction Simulation (G1 rules)
-        const redactedMessage = message.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[EMAIL_REDACTED]")
+        // PII Redaction
+        const redactedMessage = messageRaw.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[EMAIL_REDACTED]")
             .replace(/\+?90\s*\(?\d{3}\)?\s*\d{3}\s*\d{2}\s*\d{2}/g, "[PHONE_REDACTED]");
 
         const ticket = await prisma.ticket.create({
@@ -90,15 +102,15 @@ export async function POST(req: NextRequest) {
                 tenantId: auth.user.companyId,
                 type,
                 status: "OPEN",
-                priority: "MEDIUM",
+                priority: priority as any,
                 createdByUserId: auth.user.id,
                 relatedEntityType: relatedEntityType || null,
                 relatedEntityId: relatedEntityId || null,
                 messages: {
                     create: {
-                        message,
+                        message: messageRaw,
                         redactedMessage,
-                        senderRole: "BUYER", // or SELLER based on context, here we assume tenant is creating
+                        senderRole: "BUYER",
                         senderTenantId: auth.user.companyId
                     }
                 }

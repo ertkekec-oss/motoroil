@@ -24,7 +24,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
         // User can only reply to their own tenant's ticket
         if (session.role === 'USER') {
-            if (ticket.tenantId !== session.tenantId || ticket.requesterUserId !== session.id) {
+            if (ticket.tenantId !== session.tenantId || ticket.createdByUserId !== session.id) {
                 return NextResponse.json({ error: 'Erişim reddedildi' }, { status: 403 });
             }
         } else if (session.role === 'TENANT_ADMIN') {
@@ -43,18 +43,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const message = await prisma.ticketMessage.create({
             data: {
                 ticketId,
-                body,
-                authorType: isAdminReplying ? 'ADMIN' : 'CUSTOMER',
-                authorId: session.id || 'unknown',
-                attachments: attachments ? {
-                    create: attachments.map((att: any) => ({
-                        fileKey: att.fileKey,
-                        fileName: att.fileName,
-                        mimeType: att.mimeType,
-                        size: att.size,
-                        ticketId: ticketId
-                    }))
-                } : undefined
+                message: body,
+                redactedMessage: body,
+                senderRole: isAdminReplying ? 'PLATFORM' : 'BUYER',
+                senderTenantId: isAdminReplying ? 'PLATFORM_ADMIN' : session.tenantId || "UNKNOWN"
             }
         });
 
@@ -76,10 +68,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
                 try {
                     await sendMail({
                         to: supportEmail,
-                        subject: `[Destek Sistemi] Yeni Yanıt Geldi (#${ticket.ticketNumber})`,
+                        subject: `[Destek Sistemi] Yeni Yanıt Geldi (#${ticket.id.substring(ticket.id.length - 6).toUpperCase()})`,
                         html: `
                             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; background: #fafafa;">
-                                <h3 style="color: #ff5500;">Bilete Yeni Yanıt: <strong>#${ticket.ticketNumber}</strong></h3>
+                                <h3 style="color: #ff5500;">Bilete Yeni Yanıt: <strong>#${ticket.id.substring(ticket.id.length - 6).toUpperCase()}</strong></h3>
                                 <p><strong>Tenant:</strong> ${ticket.tenantId}</p>
                                 <p><strong>Gönderen:</strong> ${userName}</p>
                                 <div style="background: white; padding: 15px; border-left: 3px solid #ccc; margin: 15px 0;">

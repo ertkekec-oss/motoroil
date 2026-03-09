@@ -34,11 +34,11 @@ export default function FieldMobileIntelligence() {
         );
     }
 
-    if (!data || data.visits.length === 0) {
+    if (!data) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950 p-6">
                 <ShieldCheck className="w-16 h-16 text-slate-400 mb-6" />
-                <h2 className="text-xl font-black text-slate-800 dark:text-white">SalesX Hazırlanıyor</h2>
+                <h2 className="text-xl font-black text-slate-800 dark:text-white">SalesX Zeka Motoru</h2>
                 <p className="text-slate-500 font-medium">Satış rotanız analiz ediliyor, lütfen sayfayı yenileyiniz.</p>
             </div>
         );
@@ -100,7 +100,9 @@ export default function FieldMobileIntelligence() {
                     )}
 
                     <div className="space-y-3">
-                        {data.visits.map((sv: any, idx: number) => (
+                        {data.visits.length === 0 ? (
+                            <div className="p-4 text-center text-slate-500 text-sm">Bugün için akıllı öneri bulunmuyor.</div>
+                        ) : data.visits.map((sv: any, idx: number) => (
                             <div key={sv.id} className="relative p-4 pl-10 border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 flex flex-col gap-2 shadow-sm">
                                 {/* Route Timeline Line */}
                                 <div className="absolute left-4 top-5 w-5 h-5 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-[10px] font-black text-indigo-700 dark:text-indigo-400">
@@ -110,9 +112,9 @@ export default function FieldMobileIntelligence() {
 
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <p className="text-sm font-bold text-slate-900 dark:text-white pr-2">{sv.customer.name}</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white pr-2">{sv.customer?.name || 'Müşteri'}</p>
                                         <p className="text-xs text-slate-500 flex gap-2 mt-1">
-                                            <span>📍 {sv.customer.city || 'Belirtilmedi'}</span>
+                                            <span>📍 {sv.customer?.city || 'Belirtilmedi'}</span>
                                             <span className="font-medium text-emerald-600">Skor: {sv.priorityScore}/100</span>
                                         </p>
                                     </div>

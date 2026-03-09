@@ -42,21 +42,6 @@ export async function GET(request: Request) {
             take: 1
         });
 
-        // If no data exists, run Engine once for setup simulation
-        if (insights.length === 0 && opportunities.length === 0) {
-            await SalesXIntelligenceEngine.runEngineForSalesX(tenantId, companyId);
-
-            const newInsights = await prisma.salesXInsight.findMany({ where: { companyId }, orderBy: { createdAt: 'desc' }, take: 10 });
-            const newOpportunities = await prisma.salesXOpportunity.findMany({ where: { companyId, status: 'OPEN' }, include: { customer: true }, orderBy: { priorityScore: 'desc' } });
-            const newVisits = await prisma.predictiveVisit.findMany({ where: { companyId, status: 'SUGGESTED' }, include: { customer: true }, orderBy: { priorityScore: 'desc' } });
-            const newRouteSuggestions = await prisma.routeSuggestion.findMany({ where: { companyId, status: 'PENDING' }, orderBy: { createdAt: 'desc' }, take: 1 });
-
-            return NextResponse.json({
-                success: true,
-                data: { insights: newInsights, opportunities: newOpportunities, visits: newVisits, route: newRouteSuggestions[0] || null }
-            });
-        }
-
         return NextResponse.json({
             success: true,
             data: {

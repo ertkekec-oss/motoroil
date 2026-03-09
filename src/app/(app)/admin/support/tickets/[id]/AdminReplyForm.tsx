@@ -7,53 +7,13 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
     const [body, setBody] = useState('');
     const [isInternal, setIsInternal] = useState(false);
     const [statusChange, setStatusChange] = useState('');
-    const [files, setFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const router = useRouter();
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFiles = e.target.files;
-        if (!selectedFiles) return;
-
-        setUploading(true);
-        setError('');
-        const newFiles = [...files];
-
-        for (let i = 0; i < selectedFiles.length; i++) {
-            const file = selectedFiles[i];
-            try {
-                const res = await fetch('/api/support/attachments/upload-url', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileName: file.name, contentType: file.type })
-                });
-                const { uploadUrl, fileKey } = await res.json();
-
-                await fetch(uploadUrl, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': file.type },
-                    body: file
-                });
-
-                newFiles.push({
-                    fileName: file.name,
-                    fileKey: fileKey,
-                    mimeType: file.type,
-                    size: file.size
-                });
-            } catch (err) {
-                setError('Bazı dosyalar yüklenemedi.');
-            }
-        }
-        setFiles(newFiles);
-        setUploading(false);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!body.trim() && files.length === 0) return;
+        if (!body.trim()) return;
         setLoading(true);
         setError('');
 
@@ -61,7 +21,7 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
             const res = await fetch(`/api/admin/tickets/${ticketId}/reply`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ body, isInternal, statusChange, attachments: files })
+                body: JSON.stringify({ body, isInternal, statusChange })
             });
 
             if (!res.ok) {
@@ -70,7 +30,6 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
             }
 
             setBody('');
-            setFiles([]);
             setIsInternal(false);
             setStatusChange('');
             router.refresh();
@@ -130,36 +89,18 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
                 </div>
             </div>
 
-            {files.length > 0 && (
-                <div className="flex flex-wrap gap-2 px-2">
-                    {files?.map((f, i) => (
-                        <div key={i} className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs text-slate-600 flex items-center gap-2 font-medium">
-                            <span className="truncate max-w-[150px]">{f.fileName}</span>
-                            <button type="button" onClick={() => setFiles(files.filter((_, idx) => idx !== i))} className="text-rose-500 hover:text-rose-600 font-bold">×</button>
-                        </div>
-                    ))}
-                </div>
-            )}
-
             <textarea
                 value={body}
                 onChange={e => setBody(e.target.value)}
                 placeholder={isInternal ? "Ekip için iç notunuzu yazın. Müşteri görmeyecek..." : "Müşteriye yanıtınızı buraya yazın..."}
                 rows={5}
-                required={files.length === 0}
+                required
                 className={`w-full bg-slate-50 border p-4 rounded-xl text-slate-900 text-sm outline-none transition-colors placeholder:text-slate-400 resize-y ${isInternal ? 'border-amber-500/30 focus:border-amber-500/60 bg-amber-50/50' : 'border-slate-200 focus:border-orange-500/50'}`}
             />
-            <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                    <label className="cursor-pointer px-4 py-2 bg-white hover:bg-slate-50 text-slate-500 text-xs font-bold rounded-xl border border-slate-200 transition-all flex items-center gap-2 shadow-sm">
-                        <span>📎 Ek Ekle</span>
-                        <input type="file" multiple className="hidden" onChange={handleFileChange} disabled={uploading} />
-                    </label>
-                    {uploading && <span className="text-[10px] text-orange-600 animate-pulse font-bold">Yükleniyor...</span>}
-                </div>
+            <div className="flex justify-end items-center">
                 <button
                     type="submit"
-                    disabled={loading || uploading || (!body.trim() && files.length === 0)}
+                    disabled={loading || !body.trim()}
                     className={`px-6 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-sm disabled:opacity-50 ${isInternal ? 'bg-yellow-600 hover:bg-yellow-500 shadow-yellow-500/20' : 'bg-orange-600 hover:bg-orange-500 '}`}
                 >
                     {loading ? 'Gönderiliyor...' : isInternal ? 'İç Not Ekle' : 'Müşteriye Gönder'}

@@ -11,11 +11,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     try {
         const body = await req.json();
-        const { assignedToUserId, tags, status, priority } = body;
-
+        const { status, priority } = body;
         const updateData: any = {};
-        if (assignedToUserId !== undefined) updateData.assignedToUserId = assignedToUserId;
-        if (tags !== undefined) updateData.tags = tags;
         if (status !== undefined) updateData.status = status;
         if (priority !== undefined) updateData.priority = priority;
 
@@ -24,18 +21,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             data: updateData
         });
 
-        // Add a system message about the change
-        if (assignedToUserId) {
-            await prisma.ticketMessage.create({
-                data: {
-                    ticketId: id,
-                    authorType: 'SYSTEM',
-                    authorId: 'SYSTEM',
-                    body: `Bu talep şuraya atandı: ${assignedToUserId}`,
-                    isInternal: true // Assignment change is internal info
-                }
-            });
-        }
+        // Note: system messages for updates can be added here if needed, but we removed assignment tracking.
 
         return NextResponse.json({ success: true, ticket });
     } catch (error: any) {
