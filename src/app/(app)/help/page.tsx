@@ -23,30 +23,37 @@ export default async function KnowledgeHubPage() {
 
     const tenantFilter = { OR: [{ tenantId: session.tenantId }, { tenantId: null }] };
 
-    // Parallel fetch required data for the Hub
-    const [categories, popularArticles, recentArticles] = await Promise.all([
-        prisma.helpCategory.findMany({
-            orderBy: { order: 'asc' },
-            take: 24, // scalable up to 24 categories
-            include: {
-                _count: {
-                    select: { topics: true }
+    let categories = [], popularArticles = [], recentArticles = [];
+    try {
+        const results = await Promise.all([
+            prisma.helpCategory.findMany({
+                orderBy: { order: 'asc' },
+                take: 24, // scalable up to 24 categories
+                include: {
+                    _count: {
+                        select: { articles: true } // Changed topics to articles just in case
+                    }
                 }
-            }
-        }),
-        prisma.helpArticle.findMany({
-            where: { status: 'PUBLISHED', ...tenantFilter },
-            orderBy: { viewCount: 'desc' },
-            take: 6,
-            include: { category: { select: { name: true } } }
-        }),
-        prisma.helpArticle.findMany({
-            where: { status: 'PUBLISHED', ...tenantFilter },
-            orderBy: { updatedAt: 'desc' },
-            take: 6,
-            include: { category: { select: { name: true } } }
-        })
-    ]);
+            }),
+            prisma.helpArticle.findMany({
+                where: { status: 'PUBLISHED', ...tenantFilter },
+                orderBy: { viewCount: 'desc' },
+                take: 6,
+                include: { category: { select: { name: true } } }
+            }),
+            prisma.helpArticle.findMany({
+                where: { status: 'PUBLISHED', ...tenantFilter },
+                orderBy: { updatedAt: 'desc' },
+                take: 6,
+                include: { category: { select: { name: true } } }
+            })
+        ]);
+        categories = results[0];
+        popularArticles = results[1];
+        recentArticles = results[2];
+    } catch (err: any) {
+        return <div className="p-10 text-red-500 font-bold">SERVER SIDE DB CRASH IN HELP PAGE: {err.message}</div>;
+    }
 
     const popularTopics = [
         'ERP', 'Finans', 'Envanter', 'SalesX', 'B2B Hub',
@@ -109,7 +116,7 @@ export default async function KnowledgeHubPage() {
                                             </div>
                                             <div>
                                                 <h5 className="font-semibold text-slate-900 dark:text-slate-100 text-base">{cat.name}</h5>
-                                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{cat._count.topics} Makale</p>
+                                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{cat._count?.articles || 0} Makale</p>
                                             </div>
                                         </div>
                                         {cat.description && (
