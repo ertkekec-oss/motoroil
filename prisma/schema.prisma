@@ -2414,14 +2414,64 @@ model Expense {
 }
 
 model HelpCategory {
-  id          String      @id @default(cuid())
+  id          String        @id @default(cuid())
+  tenantId    String?
   name        String
-  slug        String      @unique
+  slug        String        @unique
   description String?
-  order       Int         @default(0)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  icon        String?
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
   topics      HelpTopic[]
+  articles    HelpArticle[]
+
+  @@index([tenantId])
+}
+
+enum HelpArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model HelpArticle {
+  id           String            @id @default(cuid())
+  categoryId   String
+  title        String
+  slug         String            @unique
+  summary      String?
+  content      String
+  tags         String[]
+  status       HelpArticleStatus @default(DRAFT)
+  viewCount    Int               @default(0)
+  helpfulCount Int               @default(0)
+  tenantId     String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  
+  category     HelpCategory      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  searchIndex  HelpSearchIndex?
+  
+  @@index([tenantId])
+  @@index([categoryId])
+}
+
+model HelpTag {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+}
+
+model HelpSearchIndex {
+  id            String      @id @default(cuid())
+  articleId     String      @unique
+  titleVector   String?
+  contentVector String?
+  tags          String[]
+  
+  article       HelpArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
 }
 
 model HelpTopic {
