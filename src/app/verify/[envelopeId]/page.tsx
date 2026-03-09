@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
 
 export default async function VerifyDocumentPage({ params }: { params: Promise<{ envelopeId: string }> }) {
     const { envelopeId } = await params;
@@ -49,7 +48,7 @@ export default async function VerifyDocumentPage({ params }: { params: Promise<{
                     <div className="flex justify-between items-center pb-4 border-b border-slate-700">
                         <span className="text-sm font-medium text-slate-400">Oluşturulma Tarihi</span>
                         <span className="text-base font-medium text-white">
-                            {format(new Date(envelope.createdAt), 'dd MMM yyyy HH:mm', { locale: tr })}
+                            {format(new Date(envelope.createdAt), 'dd MMM yyyy HH:mm')}
                         </span>
                     </div>
                     <div className="flex justify-between items-center">

@@ -145,8 +145,8 @@ export async function POST(req: Request) {
 
         if (newEnvStatus === 'COMPLETED') {
             // Embed Final Signature Proof (Audit Certificate) Page to PDF
-            // This runs in background/async and updates signedDocumentKey
-            embedFinalSignatureProof(env.id).catch(e => console.error("Proof embedding error:", e));
+            // Await execution so Vercel doesn't kill the lambda prematurely
+            await embedFinalSignatureProof(env.id).catch(e => console.error("Proof embedding error:", e));
 
             await prisma.signatureAuditEvent.create({
                 data: {
