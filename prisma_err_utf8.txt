@@ -1,0 +1,51 @@
+﻿node.exe : [1m[31mError: [
+39m[22m[31m[1mPrisma schem
+a validation[22m[39m - (get
+-dmmf wasm)
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: ([1m[3  
+  1mError:...(get-dmmf was   
+ m):String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Error code: P1012
+[31m[1m[1;91merror[0m: [
+1mError validating field `art
+icle` in model `HelpRecommend
+ation`: The relation field `a
+rticle` on model `HelpRecomme
+ndation` is missing an opposi
+te relation field on the mode
+l `HelpArticle`. Either run `
+prisma format` or add it manu
+ally.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:9002[0m
+[1;94m   | [0m
+[1;94m9001 | [0m  conversat
+ion   HelpConversation @relat
+ion(fields: [conversationId],
+ references: [id], onDelete: 
+Cascade)
+[1;94m9002 | [0m  [1;91mar
+ticle        HelpArticle     
+ @relation(fields: [articleId
+], references: [id], onDelete
+: Cascade)[0m
+[1;94m9003 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 1[22
+m[39m
+[Context: getDmmf]
+
+Prisma CLI Version : 5.22.0

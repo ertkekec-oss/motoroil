@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { authorize } from '@/lib/auth';
 import { SupportTicketService } from '@/services/support/SupportTicketService';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const auth = await authorize();
     if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const tenantId = auth.user?.tenantId;
-    const ticketId = params.id;
+    const { id: ticketId } = await params;
 
     try {
         const ticket = await SupportTicketService.getTicketById(ticketId);
@@ -28,13 +28,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 }
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const auth = await authorize();
     if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const tenantId = auth.user?.tenantId;
     const userId = auth.user?.id;
-    const ticketId = params.id;
+    const { id: ticketId } = await params;
 
     try {
         const ticket = await SupportTicketService.getTicketById(ticketId);

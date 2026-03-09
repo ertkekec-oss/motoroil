@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { authorize } from '@/lib/auth';
 import { SupportTicketService } from '@/services/support/SupportTicketService';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const auth = await authorize();
     if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -13,7 +13,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     try {
         const body = await req.json();
         const { action, status, message, assignedToUserId } = body;
