@@ -12,6 +12,7 @@ export default function DealersPage() {
     const [inviteEmail, setInviteEmail] = useState("");
     const [selectedCustomerId, setSelectedCustomerId] = useState("");
     const [customers, setCustomers] = useState<any[]>([]);
+    const [isInviting, setIsInviting] = useState(false);
 
     // Credit Limit Drawer State
     const [selectedDealer, setSelectedDealer] = useState<any>(null);
@@ -29,7 +30,8 @@ export default function DealersPage() {
         fetch("/api/customers?limit=100") // Fetch enough customers for the dropdown
             .then(res => res.json())
             .then(data => {
-                if (data.data) setCustomers(data.data);
+                if (data.customers) setCustomers(data.customers);
+                else if (data.data) setCustomers(data.data);
                 else if (Array.isArray(data)) setCustomers(data);
             })
             .catch(err => console.error(err));
@@ -45,6 +47,7 @@ export default function DealersPage() {
             return;
         }
 
+        setIsInviting(true);
         try {
             const res = await fetch("/api/dealer-network/dealers/invite", {
                 method: "POST",
@@ -61,6 +64,8 @@ export default function DealersPage() {
             toast.success("Davetiye başarıyla gönderildi.");
         } catch (error: any) {
             toast.error(error.message || "Davetiye gönderilemedi.");
+        } finally {
+            setIsInviting(false);
         }
     };
 
@@ -200,7 +205,9 @@ export default function DealersPage() {
                         </div>
                         <div className="bg-slate-50 dark:bg-[#1e293b] p-6 flex justify-end gap-3 rounded-b-xl border-t border-slate-100 dark:border-white/5">
                             <button onClick={() => setIsInviteModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg hover:bg-slate-50">İptal</button>
-                            <button onClick={handleInvite} className="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800">Davet Gönder</button>
+                            <button onClick={handleInvite} disabled={isInviting} className="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 disabled:opacity-50 flex items-center gap-2">
+                                {isInviting ? "Gönderiliyor..." : "Davet Gönder"}
+                            </button>
                         </div>
                     </div>
                 </div>

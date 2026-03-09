@@ -41,7 +41,8 @@ export async function POST(req: Request) {
         console.log(`[Invite] Inviting ${targetEmail} for tenant ${tenantId} by ${user.id}${customerId ? ` (Customer ID: ${customerId})` : ''}`);
 
         // ACTUALLY SEND THE EMAIL
-        const inviteLink = `https://www.periodya.com/register?invite=${tenantId}`;
+        const baseUrl = process.env.NODE_ENV === 'production' ? 'https://www.periodya.com' : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
+        const inviteLink = `${baseUrl}/network/invite/${tenantId}`;
         const mailRes = await sendMail({
             to: targetEmail,
             subject: 'Periodya B2B Ağına Davet Edildiniz',
