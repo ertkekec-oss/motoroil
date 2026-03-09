@@ -20,6 +20,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import NotificationCenter from "@/components/NotificationCenter";
 import ChatWidget from "@/components/ChatWidget";
 import SalesMonitor from "@/components/SalesMonitor";
+import ProductDiscoveryWidget from "@/components/ProductDiscoveryWidget";
 
 const formatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0 });
 const pFormatter = new Intl.NumberFormat('tr-TR', { style: 'percent', minimumFractionDigits: 1 });
@@ -550,6 +551,13 @@ export default function ClientDashboard() {
                             </>
                         );
                     })()}
+
+                    {/* PRODUCT DISCOVERY ONBOARDING (Runs After Setup) */}
+                    {!setupNeeded && !loading && mounted && (
+                        <div className="animate-in fade-in zoom-in-95 duration-500">
+                            <ProductDiscoveryWidget />
+                        </div>
+                    )}
 
                     {/* WIDGET GRID */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">

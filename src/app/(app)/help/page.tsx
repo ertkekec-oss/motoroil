@@ -2,6 +2,7 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
+import HelpSearch from '@/components/HelpSearch';
 
 export const metadata = {
     title: 'Yardım Merkezi - Periodya',
@@ -31,10 +32,12 @@ export default async function HelpCenterPage() {
 
     return (
         <div className="p-6 md:p-8 max-w-6xl mx-auto font-sans">
-            <div className="mb-10 text-center">
+            <div className="mb-10 text-center relative z-20">
                 <h1 className="text-4xl font-black text-white mb-4">Nasıl yardımcı olabiliriz?</h1>
                 <p className="text-gray-400">Sistem kullanımı ve sıkça sorulan sorular için detaylı rehber.</p>
             </div>
+
+            <HelpSearch />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categories.map(cat => (

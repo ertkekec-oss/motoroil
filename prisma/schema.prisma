@@ -8780,3 +8780,37 @@ model RouteSuggestion {
   company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   staff            Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
 }
+
+// --- AUTONOMOUS SUPPORT PLATFORM ---
+
+model ProductOnboardingProgress {
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  firstInvoice    Boolean  @default(false)
+  firstCustomer   Boolean  @default(false)
+  inventoryViewed Boolean  @default(false)
+  salesXViewed    Boolean  @default(false)
+  b2bHubViewed    Boolean  @default(false)
+  completedPct    Int      @default(0)
+  dismissed       Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+model PlatformDiagnosticEvent {
+  id            String   @id @default(cuid())
+  tenantId      String
+  component     String   // e.g. "EFATURA_NILVERA", "PAYTR_GATEWAY", "SYNC_ENGINE"
+  level         String   // "WARNING", "ERROR", "CRITICAL"
+  message       String
+  details       Json?
+  status        String   @default("OPEN") // "OPEN", "AUTO_FIXED", "MANUAL_FIX_REQUIRED", "IGNORED"
+  autoFixAction String?  // "cache_reset", "reconnect"
+  resolvedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([tenantId, status])
+  @@index([component, status])
+}

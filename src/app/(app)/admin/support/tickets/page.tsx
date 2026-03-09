@@ -146,6 +146,6 @@ export default async function AdminTicketsPage({
                 </div>
             </div>
         </div>
-        </div >
     );
 }
+

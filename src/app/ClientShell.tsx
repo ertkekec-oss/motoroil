@@ -14,6 +14,7 @@ import { GrowthBanner } from "../components/GrowthBanner";
 import GlobalErrorScreen from "../components/GlobalErrorScreen";
 import AppSkeleton from "../components/AppSkeleton";
 import CommandPalette from "../components/CommandPalette";
+import ContextualHelpWidget from "../components/ContextualHelpWidget";
 import { PlatformDocumentGate } from "../components/PlatformDocumentGate";
 
 const permMap: Record<string, { perm?: string, feature?: string }> = {
@@ -244,6 +245,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 {showSidebar && <MobileNav />}
             </div>
             {auth.isAuthenticated && !isPortalPage && <CommandPalette isAdmin={isAdminPage} />}
+            {auth.isAuthenticated && !isPortalPage && <ContextualHelpWidget />}
         </div>
     );
 }
