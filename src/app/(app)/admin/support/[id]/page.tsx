@@ -1,5 +1,5 @@
 import { getSession } from '@/lib/auth';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { EnterprisePageShell, EnterpriseCard } from '@/components/ui/enterprise';
@@ -32,12 +32,7 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
     });
 
     if (!ticket) {
-        return (
-            <div className="p-10 text-center flex flex-col items-center justify-center min-h-[50vh]">
-                <h2 className="text-xl font-bold mb-2">Talep Bulunamadı</h2>
-                <Link href="/admin/support" className="px-4 py-2 bg-slate-900 text-white rounded-lg">Geri Dön</Link>
-            </div>
-        );
+        notFound();
     }
 
     // Role Guard

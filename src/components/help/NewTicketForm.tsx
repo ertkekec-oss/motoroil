@@ -41,7 +41,7 @@ export function NewTicketForm() {
 
             if (res.ok) {
                 const data = await res.json();
-                router.push(`/help/tickets/${data.id}`);
+                router.push(`/help/tickets/${data.ticket.id}`);
             } else {
                 alert('Bir hata oluştu. Lütfen tekrar deneyin.');
             }

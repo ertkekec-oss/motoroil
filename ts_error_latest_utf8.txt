@@ -1,0 +1,25 @@
+﻿.next/dev/types/validator.ts(2294,39): error TS2307: Cannot find module '../../../src/app/portal/dashboard/page.js' or its corresponding type declarations.
+.next/dev/types/validator.ts(7770,39): error TS2307: Cannot find module '../../../src/app/portal/layout.js' or its corresponding type declarations.
+.next/types/validator.ts(1223,39): error TS2307: Cannot find module '../../src/app/(app)/field-sales/intelligence/page.js' or its corresponding type declarations.
+.next/types/validator.ts(6840,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/payments/webhooks/[provider]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/payments/webhooks/[provider]">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: Request, { params }: { params: { provider: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | NextResponse<{ success: boolean; processed: any; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ provider: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ provider: string; }>; }' is not assignable to type '{ params: { provider: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'provider' is missing in type 'Promise<{ provider: string; }>' but required in type '{ provider: string; }'.
+scripts/test-aws-url.ts(2,38): error TS2307: Cannot find module './src/lib/s3' or its corresponding type declarations.
+src/app/(app)/billing/page.tsx(143,70): error TS2322: Type '{ title: string; description: string; }' is not assignable to type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+  Property 'description' does not exist on type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+src/app/(app)/billing/page.tsx(150,88): error TS2322: Type '{ title: string; description: string; }' is not assignable to type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+  Property 'description' does not exist on type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+src/app/(app)/billing/page.tsx(157,80): error TS2322: Type '{ title: string; description: string; }' is not assignable to type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+  Property 'description' does not exist on type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+src/app/(app)/campaigns/loyalty/page.tsx(7,31): error TS2307: Cannot find module '@/contexts/FinancialsContext' or its corresponding type declarations.
+src/app/api/admin/documents/[id]/download/route.ts(57,33): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
+src/app/api/portal/signatures/document/pdf/route.ts(73,33): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
+src/app/api/signatures/envelopes/[id]/pdf/route.ts(74,33): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
+src/lib/otp/netgsm.ts(79,56): error TS2353: Object literal may only specify known properties, and 'jobId' does not exist in type '{ success: boolean; error?: string; raw?: any; }'.
