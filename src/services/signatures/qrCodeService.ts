@@ -32,7 +32,7 @@ export async function embedVerificationQRCode(envelopeId: string, documentKey: s
         // 2. Generate QR Code image (DataURL or Buffer)
         const verifyUrl = `https://periodya.com/verify/${envelopeId}`;
         const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl, {
-            errorCorrectionLevel: 'H',
+            errorCorrectionLevel: 'M', // Less dense, much easier to scan at small sizes
             margin: 1,
             color: {
                 dark: '#0f172a',
@@ -55,8 +55,8 @@ export async function embedVerificationQRCode(envelopeId: string, documentKey: s
         const { width, height } = firstPage.getSize();
 
         // Standard QR size
-        const qrDims = qrImage.scale(0.3); // Scale down
-        const qrSize = 75; // 75x75 points
+        const qrDims = qrImage.scale(0.5); // Provide more scaling info if needed
+        const qrSize = 100; // Increased size for better scannability
 
         // Draw the QR Code at the bottom left with a small margin
         firstPage.drawImage(qrImage, {
@@ -67,14 +67,22 @@ export async function embedVerificationQRCode(envelopeId: string, documentKey: s
         });
 
         // Add a small text below or above the QR code
-        // Load a standard font
-        // Constrained layout for text
         firstPage.drawText('Periodya E-Imza', {
             x: 20,
             y: 10,
-            size: 8,
+            size: 9,
             color: rgb(0.2, 0.2, 0.2)
         });
+
+        // Add visual stamp to ALL pages
+        for (const page of pages) {
+            page.drawText(`E-IMZALI BELGE (ID: ${envelopeId})`, {
+                x: page.getWidth() - 200,
+                y: 15,
+                size: 9,
+                color: rgb(0.1, 0.5, 0.1) // Emerald green
+            });
+        }
 
         const modifiedPdfBytes = await pdfDoc.save();
 

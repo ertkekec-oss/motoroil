@@ -31,13 +31,17 @@ export async function GET(req: Request) {
 
         const env = session.envelope;
 
-        // Same fallback logic as before
+        let targetKey = env.documentKey;
+        if (env.status === 'COMPLETED' && env.signedDocumentKey) {
+            targetKey = env.signedDocumentKey;
+        }
+
         let targetBucket: 'private' | 'public' = 'private';
 
         try {
             await s3Client.send(new HeadObjectCommand({
                 Bucket: getBucketName('private'),
-                Key: sanitizeS3Key(env.documentKey)
+                Key: sanitizeS3Key(targetKey)
             }));
         } catch (e: any) {
             targetBucket = 'public';
@@ -46,7 +50,7 @@ export async function GET(req: Request) {
         // Fetch the object stream from S3
         const command = new GetObjectCommand({
             Bucket: getBucketName(targetBucket),
-            Key: sanitizeS3Key(env.documentKey)
+            Key: sanitizeS3Key(targetKey)
         });
 
         const s3Response = await s3Client.send(command);
@@ -58,9 +62,11 @@ export async function GET(req: Request) {
         // Convert the S3 payload into a byte array
         const byteArray = await s3Response.Body.transformToByteArray();
 
+        const fileName = (env.status === 'COMPLETED' && env.signedDocumentKey) ? `signed_${env.documentFileName}` : env.documentFileName;
+
         const headers = new Headers();
         headers.set('Content-Type', 'application/pdf');
-        headers.set('Content-Disposition', `inline; filename="${env.documentFileName}"`);
+        headers.set('Content-Disposition', `inline; filename="${fileName}"`);
         headers.set('Cache-Control', 'private, max-age=3600');
 
         // Return byte array directly
