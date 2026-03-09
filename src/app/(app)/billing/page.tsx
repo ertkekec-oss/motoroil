@@ -52,7 +52,6 @@ export default function TenantBillingPage() {
 
             if (data.success && data.checkoutUrl) {
                 // Navigate to the simulated gateway URL or integrate gateway script
-                alert('Ödeme işlemi başlatılıyor... Gateway: ' + data.gateway + '\nSipariş No: ' + data.checkoutToken);
                 window.location.href = data.checkoutUrl;
             } else {
                 alert('Checkout hatası: ' + data.error);
