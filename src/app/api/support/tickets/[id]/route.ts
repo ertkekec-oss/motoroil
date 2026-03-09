@@ -1,107 +1,69 @@
-import { NextRequest, NextResponse } from "next/server";
-import { authorize } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { NextResponse } from 'next/server';
+import { authorize } from '@/lib/auth';
+import { SupportTicketService } from '@/services/support/SupportTicketService';
 
-export async function GET(
-    req: NextRequest,
-    { params }: any
-) {
+export async function GET(req: Request, { params }: { params: { id: string } }) {
     const auth = await authorize();
-    if (!auth.authorized || !auth.user?.companyId || !auth.user?.tenantId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const tenantId = auth.user?.tenantId;
+    const ticketId = params.id;
 
     try {
-        const ticket = await prisma.ticket.findFirst({
-            where: {
-                id: params.id,
-                tenantId: auth.user.companyId
-            },
-            include: {
-                messages: { orderBy: { createdAt: "asc" } },
-                tenant: { select: { name: true } }
-            }
-        });
+        const ticket = await SupportTicketService.getTicketById(ticketId);
 
         if (!ticket) {
-            return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
+            return NextResponse.json({ error: 'Ticket not found.' }, { status: 404 });
         }
 
-        return NextResponse.json({
-            id: ticket.id,
-            status: ticket.status,
-            type: ticket.type,
-            priority: ticket.priority,
-            createdAt: ticket.createdAt,
-            messages: ticket.messages.map(m => ({
-                id: m.id,
-                message: m.redactedMessage || m.message,
-                createdAt: m.createdAt,
-                senderRole: m.senderRole,
-                isMe: m.senderTenantId === auth.user?.companyId
-            }))
-        });
-    } catch (e: any) {
-        console.error("Ticket Details Error:", e);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        // Tenant Isolation Guard
+        if (ticket.tenantId !== tenantId) {
+            return NextResponse.json({ error: 'Forbidden. Cross-tenant access denied.' }, { status: 403 });
+        }
+
+        return NextResponse.json({ success: true, ticket });
+    } catch (error: any) {
+        console.error('Fetch Ticket Details Error:', error);
+        return NextResponse.json({ error: 'Failed to fetch ticket.' }, { status: 500 });
     }
 }
 
-export async function POST(
-    req: NextRequest,
-    { params }: any
-) {
+export async function POST(req: Request, { params }: { params: { id: string } }) {
     const auth = await authorize();
-    if (!auth.authorized || !auth.user?.companyId || !auth.user?.tenantId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const tenantId = auth.user?.tenantId;
+    const userId = auth.user?.id;
+    const ticketId = params.id;
 
     try {
-        const { message } = await req.json();
-
-        if (!message) {
-            return NextResponse.json({ error: "Message is required" }, { status: 400 });
-        }
-
-        // PII
-        const redactedMessage = message.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[EMAIL_REDACTED]")
-            .replace(/\+?90\s*\(?\d{3}\)?\s*\d{3}\s*\d{2}\s*\d{2}/g, "[PHONE_REDACTED]");
-
-        // Ensure ticket belongs to company and is open
-        const ticket = await prisma.ticket.findFirst({
-            where: {
-                id: params.id,
-                tenantId: auth.user.companyId
-            }
-        });
+        const ticket = await SupportTicketService.getTicketById(ticketId);
 
         if (!ticket) {
-            return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
+            return NextResponse.json({ error: 'Ticket not found.' }, { status: 404 });
         }
 
-        if (ticket.status !== "OPEN" && ticket.status !== "IN_PROGRESS") {
-            return NextResponse.json({ error: "Cannot add messages to closed tickets" }, { status: 400 });
+        // Tenant Isolation Guard
+        if (ticket.tenantId !== tenantId) {
+            return NextResponse.json({ error: 'Forbidden. Cross-tenant access denied.' }, { status: 403 });
         }
 
-        const newMessage = await prisma.ticketMessage.create({
-            data: {
-                ticketId: ticket.id,
-                message,
-                redactedMessage,
-                senderRole: "BUYER",
-                senderTenantId: auth.user.companyId
-            }
+        if (ticket.status === 'CLOSED') {
+            return NextResponse.json({ error: 'Cannot comment on a closed ticket.' }, { status: 400 });
+        }
+
+        const { message } = await req.json();
+
+        const comment = await SupportTicketService.addComment({
+            ticketId,
+            userId,
+            message,
+            authorType: 'USER'
         });
 
-        return NextResponse.json({
-            id: newMessage.id,
-            message: newMessage.redactedMessage,
-            createdAt: newMessage.createdAt,
-            senderRole: newMessage.senderRole,
-            isMe: true
-        }, { status: 201 });
-    } catch (e: any) {
-        console.error("Ticket Details POST Error:", e);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ success: true, comment });
+    } catch (error: any) {
+        console.error('Comment on Ticket Error:', error);
+        return NextResponse.json({ error: 'Failed to add comment.' }, { status: 500 });
     }
 }

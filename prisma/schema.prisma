@@ -8864,3 +8864,95 @@ model PlatformDiagnosticEvent {
   @@index([tenantId, status])
   @@index([component, status])
 }
+
+enum SupportTicketCategory {
+  ERP
+  FINANCE
+  INVENTORY
+  SALESX
+  B2B_HUB
+  INTEGRATION
+  EINVOICE
+  SHIPPING
+  BILLING
+  ACCOUNT
+  OTHER
+}
+
+enum SupportTicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_USER
+  RESOLVED
+  CLOSED
+}
+
+enum SupportTicketAuthorType {
+  USER
+  ADMIN
+  SYSTEM
+}
+
+model SupportTicket {
+  id               String                @id @default(cuid())
+  tenantId         String
+  createdByUserId  String
+  assignedToUserId String?
+  category         SupportTicketCategory
+  priority         SupportTicketPriority @default(NORMAL)
+  status           SupportTicketStatus   @default(OPEN)
+  subject          String
+  description      String                @db.Text
+  currentPage      String?
+  browserInfo      String?
+  metadataJson     Json?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  resolvedAt       DateTime?
+  closedAt         DateTime?
+  
+  comments         SupportTicketComment[]
+  attachments      SupportTicketAttachment[]
+  
+  @@index([tenantId])
+  @@index([status])
+  @@index([createdByUserId])
+  @@index([assignedToUserId])
+}
+
+model SupportTicketComment {
+  id          String                  @id @default(cuid())
+  ticketId    String
+  userId      String
+  authorType  SupportTicketAuthorType @default(USER)
+  message     String                  @db.Text
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  
+  ticket      SupportTicket           @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  @@index([ticketId])
+  @@index([userId])
+}
+
+model SupportTicketAttachment {
+  id               String        @id @default(cuid())
+  ticketId         String
+  uploadedByUserId String
+  fileName         String
+  fileUrl          String        @db.Text
+  mimeType         String?
+  size             Int?
+  createdAt        DateTime      @default(now())
+  
+  ticket           SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  @@index([ticketId])
+}
