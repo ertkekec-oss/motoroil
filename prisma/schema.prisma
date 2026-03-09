@@ -51,6 +51,10 @@ model Company {
   createdAt             DateTime                       @default(now())
   updatedAt             DateTime                       @updatedAt
   status                CompanyStatus                  @default(ACTIVE)
+  revenueInsights       RevenueInsight[]
+  salesForecasts        SalesForecast[]
+  salesOpportunities    SalesOpportunity[]
+  salesRiskAlerts       SalesRiskAlert[]
   targetPlans           TargetPlan[]
   taxNumber             String
   type                  CompanyType                    @default(BUYER)
@@ -1175,6 +1179,7 @@ model Staff {
   status              String?                   @default("Boşta")
   currentJob          String?
   permissions         String[]                  @default([])
+  salesPerformanceScores SalesPerformanceScore[]
   targetAssignments   TargetAssignment[]
   achievementBadges   AchievementBadge[]
   leaderboardScores   LeaderboardScore[]
@@ -8615,4 +8620,83 @@ model AITargetSuggestion {
   updatedAt        DateTime          @updatedAt
 
   plan             TargetPlan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+
+model RevenueInsight {
+  id               String            @id @default(cuid())
+  tenantId         String
+  companyId        String
+  type             String            // INFO, WARNING, OPPORTUNITY, RECOMMENDATION
+  title            String
+  description      String
+  category         String            // RISK, COACHING, PERFORMANCE
+  referenceId      String?           
+  isRead           Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model SalesForecast {
+  id               String            @id @default(cuid())
+  tenantId         String
+  companyId        String
+  periodType       String            // NEXT_MONTH, NEXT_QUARTER, YEAR
+  targetPeriod     String
+  expectedSales    Decimal           @db.Decimal(12, 2)
+  confidenceScore  Int               // e.g. 78 for 78%
+  factors          Json?             // { seasonality, growthRate, categoryTrend }
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model SalesPerformanceScore {
+  id               String            @id @default(cuid())
+  tenantId         String
+  companyId        String
+  staffId          String
+  period           String            // e.g. 2026-Q1
+  totalScore       Int               // 0-100
+  achievementScore Int               @default(0)
+  growthScore      Int               @default(0)
+  consistencyScore Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  staff            Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
+}
+
+model SalesOpportunity {
+  id               String            @id @default(cuid())
+  tenantId         String
+  companyId        String
+  opportunityType  String            // UPSELL, REACTIVATION, CATEGORY_EXPANSION
+  title            String
+  description      String
+  potentialValue   Decimal           @db.Decimal(12, 2)
+  status           String            @default("OPEN")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model SalesRiskAlert {
+  id               String            @id @default(cuid())
+  tenantId         String
+  companyId        String
+  riskLevel        String            // LOW, MEDIUM, HIGH
+  title            String
+  description      String
+  metric           String
+  currentValue     String
+  threshold        String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
