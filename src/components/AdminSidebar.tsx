@@ -92,9 +92,9 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                 {isSuper && (
                     <NavGroup title="TİCKET & KÜTÜPHANE" icon={Inbox} groupKey="ticket_main">
                         <NavItem href="/admin/support/tickets" icon={Inbox} label="Destek Biletleri" />
-                        <NavItem href="/admin/help/categories" icon={DatabaseZap} label="Yardım Kategorileri" />
-                        <NavItem href="/admin/help/articles" icon={FileText} label="Makale Kütüphanesi" />
+                        <NavItem href="/admin/help/knowledge-base" icon={FileText} label="Bilgi Bankası (Hub)" />
                         <NavItem href="/admin/settings/onboarding" icon={LayoutDashboard} label="Onboarding Akışı" />
+                        <NavItem href="/admin/support/doctor" icon={Activity} label="Platform Doctor" />
                     </NavGroup>
                 )}
             </div>
