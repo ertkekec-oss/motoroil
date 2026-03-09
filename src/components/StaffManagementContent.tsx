@@ -12,7 +12,7 @@ import { useFinancials } from '@/contexts/FinancialContext';
 
 
 export default function StaffManagementContent() {
-    const [activeTab, setActiveTab] = useState('overview'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
+    const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
 
     const { staff, currentUser, hasPermission, addNotification, refreshStaff, branches } = useApp();
     const { addFinancialTransaction, kasalar, setKasalar } = useFinancials();
@@ -23,6 +23,7 @@ export default function StaffManagementContent() {
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [showPermissionModal, setShowPermissionModal] = useState(false);
     const [showAddStaffModal, setShowAddStaffModal] = useState(false);
+    const [addStaffStep, setAddStaffStep] = useState(1);
     const [showEditStaffModal, setShowEditStaffModal] = useState(false);
     const [taskContent, setTaskContent] = useState('');
     const [taskPriority, setTaskPriority] = useState('normal');
@@ -818,114 +819,115 @@ export default function StaffManagementContent() {
             `}</style>
 
             {/* --- HEADER (HERO STRATEJİ BANDI) --- */}
-            <div className="bg-gradient-to-r from-slate-900 to-[#111C33] p-8 rounded-[24px] mb-8 relative overflow-hidden shadow-md">
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 relative z-10 w-full">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-[28px] font-bold text-white tracking-tight">Ekip & Yetki Yönetimi</h1>
-                            <div className="group relative inline-flex items-center justify-center">
-                                <span className="flex items-center justify-center w-[18px] h-[18px] rounded-full border border-slate-500 text-slate-400 cursor-help group-hover:bg-slate-700 group-hover:text-white transition-all text-[11px] font-bold">?</span>
-                                <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[280px] p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[14px] shadow-lg text-slate-700 dark:text-slate-300 text-[12px] z-50 whitespace-normal normal-case">
-                                    <div className="font-bold text-slate-900 dark:text-white mb-1">Bu sayfa ne işe yarar?</div>
-                                    Sisteme kayıtlı tüm personelin yetki, izin, vardiya ve performans verilerinin yönetildiği ana merkezdir.
-                                </div>
-                            </div>
-                            <div className="group relative inline-flex items-center justify-center ml-1">
-                                <span className="flex items-center justify-center w-[18px] h-[18px] rounded-full border border-slate-500 text-slate-400 cursor-help group-hover:bg-slate-700 group-hover:text-white transition-all text-[11px] font-bold">?</span>
-                                <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[280px] p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[14px] shadow-lg text-slate-700 dark:text-slate-300 text-[12px] z-50 whitespace-normal normal-case">
-                                    <div className="font-bold text-slate-900 dark:text-white mb-1">Rol & İzin Mantığı</div>
-                                    Roller yetkileri belirler. İzinler sadece seçili personele atanabilen görev sınırlarıdır.
-                                </div>
-                            </div>
-                            <div className="group relative inline-flex items-center justify-center ml-1">
-                                <span className="flex items-center justify-center w-[18px] h-[18px] rounded-full border border-slate-500 text-slate-400 cursor-help group-hover:bg-slate-700 group-hover:text-white transition-all text-[11px] font-bold">?</span>
-                                <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[280px] p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[14px] shadow-lg text-slate-700 dark:text-slate-300 text-[12px] z-50 whitespace-normal normal-case">
-                                    <div className="font-bold text-slate-900 dark:text-white mb-1">PDKS/Puantaj Farkı</div>
-                                    PDKS günlük "Turnike / Giriş" izidir. Puantaj ise "Ay sonu hakediş karşılığı" gün özetidir.
-                                </div>
+            {/* --- HR COMMAND CENTER (STICKY) --- */}
+            <div className="sticky top-0 z-40 bg-slate-50/95 dark:bg-[#0f172a]/95 backdrop-blur-md pb-4 pt-4 mb-6 border-b border-slate-200 dark:border-white/5 space-y-4">
+
+                {/* TOP ACTIONS & COMPACT METRICS */}
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                    {/* Compact Metrics */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                            <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-[14px]">👥</div>
+                            <div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Toplam Personel</div>
+                                <div className="text-[16px] font-black leading-none text-slate-900 dark:text-white mt-0.5">{staff.length}</div>
                             </div>
                         </div>
-                        <div className="text-[14px] text-slate-400 mt-1 font-medium">
-                            Organizasyon yapısı ve personel operasyon kontrolü
+
+                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-[14px]">✨</div>
+                            <div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aktif Personel</div>
+                                <div className="text-[16px] font-black leading-none text-emerald-600 dark:text-emerald-400 mt-0.5">{staff.filter(s => s.status === 'Müsait' || s.status === 'Aktif' || s.status === 'Boşta' || !s.status).length}</div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                            <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">⚡</div>
+                            <div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Devam Eden İş</div>
+                                <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{staff.filter(s => s.currentJob).length}</div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-[14px]">🎯</div>
+                            <div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Açık Hedef</div>
+                                <div className="text-[16px] font-black leading-none text-indigo-600 dark:text-indigo-400 mt-0.5">{targets.filter(t => t.status !== 'Tamamlandı').length}</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-3 min-w-[200px]">
+                    {/* Quick Actions */}
+                    <div className="flex items-center gap-2">
                         {hasPermission('create_staff') && (
-                            <button onClick={() => setShowAddStaffModal(true)} className="h-[44px] px-6 bg-blue-600 hover:bg-blue-700 !text-white rounded-[14px] font-semibold text-[14px] flex items-center justify-center gap-2 transition-all shadow-sm">
-                                <span className="text-[18px]">+</span> Yeni Personel
+                            <button onClick={() => setShowAddStaffModal(true)} className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm">
+                                <span>+</span> Yeni Personel
                             </button>
                         )}
-                        <div className="text-[12px] text-slate-400 font-semibold uppercase tracking-widest mt-1">
-                            Aktif: <span className="text-white">{staff.length}</span> • İzinli: <span className="text-white">{leaves.filter(l => l.status === 'Onaylandı' && new Date(l.startDate) <= new Date() && new Date(l.endDate) >= new Date()).length || 0}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* --- DASHBOARD QUICK ACTIONS --- */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-
-            </div>
-
-            {/* --- TOOLBAR (STICKY TABS & GLOBAL SEARCH) --- */}
-            <div className="sticky top-0 z-40 bg-white dark:bg-[#0f172a]/95 backdrop-blur-md flex flex-col md:flex-row items-end justify-between border-b border-slate-200 dark:border-white/5 mb-6 w-full pt-4">
-                <div className="flex w-full md:w-max whitespace-nowrap overflow-x-auto h-[52px] items-end gap-8 px-2 custom-scroll select-none">
-                    {[
-                        { id: 'overview', label: 'Genel Bakış' },
-                        { id: 'list', label: 'Personel Listesi' },
-                        { id: 'tasks', label: 'Görevler' },
-                        { id: 'performance', label: 'Hedefler' },
-                        { id: 'files', label: 'Dosyalar' },
-                        { id: 'roles', label: 'Roller & İzinler' },
-                        { id: 'shifts', label: 'Vardiya' },
-                        { id: 'leaves', label: 'İzinler' },
-                        { id: 'attendance', label: 'PDKS' },
-                        { id: 'puantaj', label: 'Puantaj' },
-                        { id: 'payroll', label: 'Bordro' }
-                    ]?.map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={activeTab === tab.id
-                                ? "h-full px-1 py-0 text-[14px] font-bold text-blue-600 border-b-[3px] border-blue-600 transition-all flex items-center justify-center uppercase tracking-wider"
-                                : "h-full px-1 py-0 text-[14px] font-semibold text-slate-500 hover:text-slate-800 hover:border-slate-300 border-b-[3px] border-transparent transition-all flex items-center justify-center uppercase tracking-wider"}
-                        >
-                            {tab.label}
+                        <button onClick={() => setShowTaskModal(true)} className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm">
+                            Görev Ata
                         </button>
-                    ))}
+                        <button className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex">
+                            Dışa Aktar
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-3 pb-2.5 w-full md:w-auto px-2 mt-4 md:mt-0">
-                    <div className="relative min-w-[280px]">
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                            {/* Search Icon */}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-                        </span>
-                        <input
-                            type="text"
-                            placeholder="Personel veya rol ara..."
-                            className="w-full bg-slate-50 border border-slate-200 dark:border-white/5 rounded-[12px] h-[40px] pl-10 pr-4 text-[13px] text-slate-900 dark:text-white font-semibold outline-none focus:border-blue-500 focus:bg-white dark:bg-[#0f172a] transition-all placeholder:font-medium placeholder:text-slate-400"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                {/* GROUPED NAVIGATION & FILTERS */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2">
+                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                        {[
+                            { group: 'PERSONEL', items: [{ id: 'list', label: 'Personel Listesi' }, { id: 'roles', label: 'Roller & Yetkiler' }] },
+                            { group: 'OPERASYON', items: [{ id: 'tasks', label: 'Görevler' }, { id: 'performance', label: 'Hedefler' }] },
+                            { group: 'ZAMAN', items: [{ id: 'shifts', label: 'Vardiya' }, { id: 'leaves', label: 'İzinler' }, { id: 'attendance', label: 'PDKS' }, { id: 'puantaj', label: 'Puantaj' }] },
+                            { group: 'FİNANS', items: [{ id: 'payroll', label: 'Bordro' }] },
+                            { group: 'DOSYALAR', items: [{ id: 'files', label: 'Personel Dosyaları' }] },
+                        ].map((grp, i) => (
+                            <div key={grp.group} className="flex items-center gap-3">
+                                {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
+                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                    {grp.items.map(tab => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => setActiveTab(tab.id)}
+                                            className={activeTab === tab.id
+                                                ? "px-3 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-600 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-[6px] transition-all"
+                                                : "px-3 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                    <button className="h-[40px] px-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[12px] text-[13px] hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 whitespace-nowrap shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-                        Filtrele
-                    </button>
-                    <select
-                        className="h-[40px] px-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[12px] text-[13px] outline-none focus:border-blue-500 shadow-sm transition-colors"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    >
-                        <option value="">Tüm Departmanlar</option>
-                        <option value="Yönetici">Yönetici</option>
-                        <option value="Saha Satış">Saha Satış</option>
-                        <option value="Merkez">Merkez / Ofis</option>
-                    </select>
-                    <button className="h-[40px] px-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[12px] text-[13px] hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 whitespace-nowrap shadow-sm">
-                        Dışa Aktar
-                    </button>
+
+                    {/* Quick Search & Filters for List */}
+                    <div className="flex items-center gap-2">
+                        <div className="relative w-full lg:w-[220px]">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                            </span>
+                            <input
+                                type="text"
+                                placeholder="Personel ara..."
+                                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-[8px] h-[36px] pl-9 pr-3 text-[12px] font-semibold outline-none focus:border-blue-500 shadow-sm transition-all text-slate-900 dark:text-white"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <select
+                            className="h-[36px] px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold rounded-[8px] text-[12px] outline-none focus:border-blue-500 shadow-sm transition-colors w-[130px]"
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        >
+                            <option value="">Tüm Dept.</option>
+                            <option value="Yönetici">Yönetici</option>
+                            <option value="Saha Satış">Saha Satış</option>
+                            <option value="Merkez">Merkez</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -957,85 +959,85 @@ export default function StaffManagementContent() {
 
             {/* --- LIST TAB (OPERASYON TABLOSU) --- */}
             {activeTab === 'list' && (
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden flex flex-col">
+                    <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
+                            <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-20">
                                 <tr>
-                                    <th className="p-4 pl-6 font-bold w-[40px]"><input type="checkbox" className="w-4 h-4 rounded appearance-none border border-slate-300 dark:border-white/10 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer" /></th>
-                                    <th className="p-4 font-bold">Personel</th>
-                                    <th className="p-4 font-bold">Rol & Şube</th>
-                                    <th className="p-4 font-bold">Durum</th>
-                                    <th className="p-4 font-bold">Bugün (Vardiya/İzin)</th>
-                                    <th className="p-4 font-bold">PDKS</th>
-                                    <th className="p-4 pr-6 font-bold text-right">İşlem</th>
+                                    <th className="px-4 py-3 pl-6 font-bold w-[40px] border-b border-slate-200 dark:border-white/5"><input type="checkbox" className="w-4 h-4 rounded appearance-none border border-slate-300 dark:border-white/10 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer" /></th>
+                                    <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">Personel</th>
+                                    <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">Rol & Şube</th>
+                                    <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">Durum</th>
+                                    <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">Bugün (Vardiya/İzin)</th>
+                                    <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">PDKS</th>
+                                    <th className="px-4 py-3 pr-6 font-bold text-right border-b border-slate-200 dark:border-white/5">İşlem</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {filteredStaff.length > 0 ? filteredStaff?.map(person => {
                                     const activeAtt = attendance.find(a => a.staffId === person.id && !a.checkOut);
                                     const isAvailable = person.status === 'Müsait' || person.status === 'Boşta' || !person.status;
                                     const personTargets = targets.filter(t => t.staffId === person.id);
 
                                     return (
-                                        <tr key={person.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/80 transition-colors h-[56px] group">
-                                            <td className="p-4 pl-6 align-middle"><input type="checkbox" className="w-4 h-4 rounded appearance-none border border-slate-300 dark:border-white/10 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer opacity-50 group-hover:opacity-100" /></td>
-                                            <td className="p-4 align-middle">
+                                        <tr key={person.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group">
+                                            <td className="px-4 py-2 pl-6 align-middle"><input type="checkbox" className="w-4 h-4 rounded appearance-none border border-slate-300 dark:border-white/10 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer opacity-50 group-hover:opacity-100" /></td>
+                                            <td className="px-4 py-2 align-middle">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#334155]/50 border border-slate-200 dark:border-white/5 flex items-center justify-center text-[13px] font-black text-slate-600 dark:text-slate-400">
+                                                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#334155]/50 border border-slate-200 dark:border-white/5 flex items-center justify-center text-[12px] font-black text-slate-600 dark:text-slate-400">
                                                         {person.name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <div className="text-[14px] font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{person.name}</div>
+                                                        <div className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{person.name}</div>
                                                         <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{person.email || '-'}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-middle">
-                                                <div className="flex flex-col gap-1.5 items-start">
-                                                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-[#334155]/50 text-[11px] font-semibold tracking-wider text-slate-600 dark:text-slate-400 uppercase border border-slate-200 dark:border-white/5 whitespace-nowrap">{person.role}</span>
-                                                    <span className="text-[11px] font-medium tracking-wider text-slate-400 uppercase whitespace-nowrap">{person.branch}</span>
+                                            <td className="px-4 py-2 align-middle">
+                                                <div className="flex flex-col gap-1 items-start">
+                                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#334155]/50 text-[10px] font-bold tracking-wider text-slate-600 dark:text-slate-400 uppercase border border-slate-200 dark:border-white/5 whitespace-nowrap">{person.role}</span>
+                                                    <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase whitespace-nowrap">{person.branch}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-middle">
-                                                <div className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isAvailable ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${isAvailable ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+                                            <td className="px-4 py-2 align-middle">
+                                                <div className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${isAvailable ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}>
+                                                    <div className={`w-1 h-1 rounded-full mr-1.5 ${isAvailable ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
                                                     {person.status || 'Aktif'}
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-middle">
-                                                <div className="flex flex-col gap-2">
+                                            <td className="px-4 py-2 align-middle">
+                                                <div className="flex flex-col gap-1.5">
                                                     {person.currentJob ? (
-                                                        <span className="text-[12px] font-semibold text-amber-700 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-500/20 flex items-center gap-1.5 whitespace-nowrap w-max">
+                                                        <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-500/20 flex items-center gap-1.5 whitespace-nowrap w-max">
                                                             <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-500"></span> İş: {person.currentJob.substring(0, 20)}{person.currentJob.length > 20 ? '...' : ''}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-[12px] font-medium text-slate-500 dark:text-slate-400">Normal Mesai</span>
+                                                        <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Normal Mesai</span>
                                                     )}
 
                                                     {personTargets.length > 0 && (
-                                                        <span className="text-[11px] font-bold text-blue-700 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-500/20 flex items-center gap-1 w-max">
-                                                            🎯 {personTargets.length} Açık Hedef
+                                                        <span className="text-[10px] font-bold text-blue-700 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-500/20 flex items-center gap-1 w-max">
+                                                            🎯 {personTargets.length}Açık Hedef
                                                         </span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-4 py-2 align-middle">
                                                 <button
                                                     onClick={() => handleProcessAttendance(person.id.toString(), activeAtt ? 'CHECK_OUT' : 'CHECK_IN')}
                                                     disabled={isProcessing}
-                                                    className={`px-3 py-1.5 rounded-[10px] text-[11px] font-bold transition-all border whitespace-nowrap ${activeAtt
+                                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border whitespace-nowrap ${activeAtt
                                                         ? 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'
-                                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
+                                                        : 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1e293b]'}`}
                                                 >
-                                                    {activeAtt ? '🏁 ÇIKIŞ YAP' : '🚀 GİRİŞ YAP'}
+                                                    {activeAtt ? '🏁 ÇIKIŞ' : '🚀 GİRİŞ'}
                                                 </button>
                                             </td>
-                                            <td className="p-4 pr-6 align-middle text-right">
+                                            <td className="px-4 py-2 pr-6 align-middle text-right">
                                                 <div className="flex items-center justify-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => { setEditStaff(person); setShowEditStaffModal(true); }} className="w-8 h-8 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-blue-50 border hover:border-blue-200 border-transparent hover:text-blue-600 transition-all flex items-center justify-center font-bold" title="Düzenle">✏️</button>
-                                                    <button onClick={() => { setSelectedStaff(person); setShowTaskModal(true); }} className="w-8 h-8 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-amber-50 border hover:border-amber-200 border-transparent hover:text-amber-600 transition-all flex items-center justify-center font-bold" title="Görev Ata">⚡</button>
-                                                    <button onClick={() => { setSelectedStaff(person); setShowPermissionModal(true); }} className="w-8 h-8 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-emerald-50 border hover:border-emerald-200 border-transparent hover:text-emerald-600 transition-all flex items-center justify-center font-bold" title="Yetkiler">🛡️</button>
+                                                    <button onClick={() => { setEditStaff(person); setShowEditStaffModal(true); }} className="w-7 h-7 rounded-md text-slate-500 dark:text-slate-400 hover:bg-blue-50 border hover:border-blue-200 border-transparent hover:text-blue-600 transition-all flex items-center justify-center font-bold" title="Düzenle">✏️</button>
+                                                    <button onClick={() => { setSelectedStaff(person); setShowTaskModal(true); }} className="w-7 h-7 rounded-md text-slate-500 dark:text-slate-400 hover:bg-amber-50 border hover:border-amber-200 border-transparent hover:text-amber-600 transition-all flex items-center justify-center font-bold" title="Görev Ata">⚡</button>
+                                                    <button onClick={() => { setSelectedStaff(person); setShowPermissionModal(true); }} className="w-7 h-7 rounded-md text-slate-500 dark:text-slate-400 hover:bg-emerald-50 border hover:border-emerald-200 border-transparent hover:text-emerald-600 transition-all flex items-center justify-center font-bold" title="Yetkiler">🛡️</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1884,197 +1886,280 @@ export default function StaffManagementContent() {
                 </div>
             )}
 
-            {/* 3. ADD STAFF MODAL */}
+            {/* 3. ADD STAFF MODAL WIZARD */}
             {showAddStaffModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
                         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-white dark:bg-[#0f172a] shrink-0">
                             <h2 className="text-[18px] font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                <span>🆕</span> Yeni Personel Kaydı & Özlük Girişi
+                                <span>🚀</span> Yeni Personel Onay & Giriş Sihirbazı
                             </h2>
-                            <button onClick={() => setShowAddStaffModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:bg-[#334155]/50 text-slate-500 hover:text-slate-800 dark:text-slate-200 transition-colors">✕</button>
+                            <button
+                                onClick={() => {
+                                    setShowAddStaffModal(false);
+                                    setAddStaffStep(1);
+                                }}
+                                className="w-8 h-8 flex items-center justify-center rounded-[10px] hover:bg-slate-100 dark:hover:bg-[#334155]/50 text-slate-500 hover:text-slate-800 dark:text-slate-200 transition-colors"
+                            >
+                                ✕
+                            </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8 bg-slate-50 dark:bg-[#1e293b]/50">
-                            <div className="space-y-8">
-                                {/* Temel Bilgiler */}
-                                <section className="space-y-4">
-                                    <h3 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-2">Temel Bilgiler</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Ad Soyad</label>
-                                            <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="Tam İsim" value={newStaff.name} onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Kullanıcı Adı</label>
-                                            <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="ali_yilmaz" value={newStaff.username} onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Şifre</label>
-                                            <input type="password" name="password" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="••••••••" value={newStaff.password} onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">E-Posta</label>
-                                            <input type="email" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="ornek@sirket.com" value={newStaff.email} onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Telefon</label>
-                                            <input type="tel" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="05xxxxxxxxx" value={newStaff.phone} onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })} />
-                                        </div>
-                                    </div>
-                                </section>
+                        {/* WIZARD PROGRESS BAR */}
+                        <div className="bg-slate-50 dark:bg-[#1e293b] px-8 py-5 border-b border-slate-100 dark:border-white/5 shrink-0 flex items-center justify-center">
+                            <div className="flex items-center w-full max-w-2xl justify-between relative">
+                                <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-200 dark:bg-slate-700 -z-10 -translate-y-1/2 rounded-full"></div>
+                                <div className="absolute top-1/2 left-0 h-[2px] bg-blue-600 -z-10 -translate-y-1/2 transition-all duration-300 rounded-full" style={{ width: `${((addStaffStep - 1) / 3) * 100}%` }}></div>
 
-                                {/* Özlük Detayları */}
-                                <section className="space-y-4">
-                                    <h3 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-2">Özlük Bilgileri</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Doğum Tarihi</label>
-                                            <input type="date" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all cursor-pointer" value={newStaff.birthDate} onChange={(e) => setNewStaff({ ...newStaff, birthDate: e.target.value })} />
+                                {[
+                                    { step: 1, label: 'KİMLİK' },
+                                    { step: 2, label: 'KADRO' },
+                                    { step: 3, label: 'ÖZLÜK' },
+                                    { step: 4, label: 'YETKİ' }
+                                ]?.map((s) => (
+                                    <div key={s.step} className="flex flex-col items-center gap-2">
+                                        <div
+                                            className={`w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-black transition-all shadow-sm
+                                                ${addStaffStep >= s.step
+                                                    ? 'bg-blue-600 text-white ring-4 ring-blue-600/20'
+                                                    : 'bg-white dark:bg-[#0f172a] border-2 border-slate-200 dark:border-slate-700 text-slate-400'
+                                                }`}
+                                        >
+                                            {addStaffStep > s.step ? '✓' : s.step}
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Medeni Durum</label>
-                                            <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.maritalStatus} onChange={(e) => setNewStaff({ ...newStaff, maritalStatus: e.target.value })}>
-                                                <option value="">Seçiniz</option>
-                                                <option value="Bekar">Bekar</option>
-                                                <option value="Evli">Evli</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Kan Grubu</label>
-                                            <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.bloodType} onChange={(e) => setNewStaff({ ...newStaff, bloodType: e.target.value })}>
-                                                <option value="">Seçiniz</option>
-                                                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-']?.map(t => <option key={t} value={t}>{t}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Askerlik Durumu</label>
-                                            <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.militaryStatus} onChange={(e) => setNewStaff({ ...newStaff, militaryStatus: e.target.value })}>
-                                                <option value="">Seçiniz</option>
-                                                <option value="Yapıldı">Yapıldı</option>
-                                                <option value="Muaf">Muaf</option>
-                                                <option value="Tecilli">Tecilli</option>
-                                            </select>
-                                        </div>
+                                        <span className={`text-[10px] font-bold tracking-widest uppercase transition-colors ${addStaffStep >= s.step ? 'text-blue-600' : 'text-slate-400'}`}>
+                                            {s.label}
+                                        </span>
                                     </div>
+                                ))}
+                            </div>
+                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Eğitim Durumu</label>
-                                            <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.educationLevel} onChange={(e) => setNewStaff({ ...newStaff, educationLevel: e.target.value })}>
-                                                <option value="">Seçiniz</option>
-                                                <option value="İlkokul">İlkokul</option>
-                                                <option value="Ortaokul">Ortaokul</option>
-                                                <option value="Lise">Lise</option>
-                                                <option value="Önlisans">Önlisans</option>
-                                                <option value="Lisans">Lisans</option>
-                                                <option value="Yüksek Lisans">Yüksek Lisans</option>
-                                            </select>
+                        <div className="flex-1 overflow-y-auto p-8 bg-slate-50/50 dark:bg-[#0f172a]/50">
+                            <div className="max-w-3xl mx-auto">
+                                {/* STEP 1: KIMLIK & TEMEL ILETISIM */}
+                                {addStaffStep === 1 && (
+                                    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                                        <div className="mb-6">
+                                            <h3 className="text-[18px] font-black text-slate-900 dark:text-white">Kimlik & Erişim Bilgileri</h3>
+                                            <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Personelin sisteme giriş yapabilmesi için gerekli temel bilgilerini eksiksiz doldurunuz.</p>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Ehliyet Durumu</label>
-                                            <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.hasDriverLicense ? "Evet" : "Hayır"} onChange={(e) => setNewStaff({ ...newStaff, hasDriverLicense: e.target.value === "Evet" })}>
-                                                <option value="Hayır">Yok</option>
-                                                <option value="Evet">Var</option>
-                                            </select>
-                                        </div>
-                                        <div className="col-span-2 space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Referans</label>
-                                            <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="İsim / Telefon / Not" value={newStaff.reference} onChange={(e) => setNewStaff({ ...newStaff, reference: e.target.value })} />
-                                        </div>
-                                    </div>
-                                </section>
 
-                                {/* Adres & Yakın Bilgisi */}
-                                <section className="space-y-4">
-                                    <h3 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-2">Adres & İletişim Detayları</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">İl</label>
-                                            <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="İstanbul" value={newStaff.city} onChange={(e) => setNewStaff({ ...newStaff, city: e.target.value })} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">İlçe</label>
-                                            <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="Üsküdar" value={newStaff.district} onChange={(e) => setNewStaff({ ...newStaff, district: e.target.value })} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Acil Durum Yakını</label>
-                                            <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="Ahmet Yılmaz - 0532..." value={newStaff.relativeName} onChange={(e) => setNewStaff({ ...newStaff, relativeName: e.target.value })} />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Ad Soyad (Kimlikteki Gibi) *</label>
+                                                <input type="text" className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="Tam İsim..." value={newStaff.name} onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Sistem Kullanıcı Adı *</label>
+                                                <input type="text" className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="orn_isim.soyisim" value={newStaff.username} onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Kurumsal E-Posta *</label>
+                                                <input type="email" className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="isim@sirket.com" value={newStaff.email} onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Mobil Telefon *</label>
+                                                <input type="tel" className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="05XX XXX XX XX" value={newStaff.phone} onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })} />
+                                            </div>
+                                            <div className="space-y-2 col-span-full">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Giriş Şifresi *</label>
+                                                <input type="password" name="password" className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="Geçici şifre belirleyin..." value={newStaff.password} onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })} />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Tam Adres</label>
-                                        <textarea className="w-full h-20 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl p-3 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all resize-none" placeholder="Mahalle, sokak, no..." value={newStaff.address} onChange={(e) => setNewStaff({ ...newStaff, address: e.target.value })} />
-                                    </div>
-                                </section>
+                                )}
 
-                                {/* İş Bilgileri */}
-                                <section className="space-y-4 pb-4">
-                                    <h3 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-2">İş & Finansal Bilgiler</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
-                                            <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.role} onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}>
-                                                <option value="">Rol Seçiniz</option>
-                                                <option value="Yönetici">👑 Yönetici</option>
-                                                <option value="Şube Müdürü">🏢 Şube Müdürü</option>
-                                                <option value="Muhasebe">💰 Muhasebe</option>
-                                                <option value="Mali Müşavir">💼 Mali Müşavir</option>
-                                                <option value="İnsan Kaynakları">👥 İnsan Kaynakları</option>
-                                                <option value="Servis Personeli">🔧 Servis Personeli</option>
-                                                <option value="Satış Temsilcisi">🤝 Satış Temsilcisi</option>
-                                                <option value="Saha Satış">🚚 Saha Satış</option>
-                                                <option value="Personel">👤 Personel</option>
-                                            </select>
+                                {/* STEP 2: ORGANIZASYON & FINANS */}
+                                {addStaffStep === 2 && (
+                                    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                                        <div className="mb-6">
+                                            <h3 className="text-[18px] font-black text-slate-900 dark:text-white">Kadro & Pozisyon Ataması</h3>
+                                            <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Personelin şirketteki resmi şubesini, unvanını ve maaş bilgilerini tanımlayın.</p>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Şube</label>
-                                            <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.branch} onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}>
-                                                <option value="">Şube Seçiniz</option>
-                                                {branches?.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Net Maaş (TL)</label>
-                                            <input type="number" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" placeholder="17002" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
+
+                                        <div className="grid grid-cols-1 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Bağlı Olduğu Şube / Lokasyon *</label>
+                                                <select className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.branch} onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}>
+                                                    <option value="">Merkez veya Şube Seçiniz</option>
+                                                    {branches?.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Departman & Yönetim Rolü *</label>
+                                                <select className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.role} onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}>
+                                                    <option value="">Organizasyon Şeması Rolü Seçiniz</option>
+                                                    <option value="Yönetici">👑 Yönetici (Üst Yönetim)</option>
+                                                    <option value="Şube Müdürü">🏢 Şube Müdürü / Yöneticisi</option>
+                                                    <option value="Muhasebe">💰 Finans & Muhasebe Uzmanı</option>
+                                                    <option value="İnsan Kaynakları">👥 İnsan Kaynakları Uzmanı</option>
+                                                    <option value="Servis Personeli">🔧 Servis & Teknik Personel</option>
+                                                    <option value="Satış Temsilcisi">🤝 Satış Temsilcisi (Ofis)</option>
+                                                    <option value="Saha Satış">🚚 Saha Satış Uzmanı</option>
+                                                    <option value="Personel">👤 Genel Personel</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="bg-slate-50 dark:bg-[#1e293b] p-5 rounded-[16px] border border-slate-100 dark:border-white/5 space-y-4">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xl">💵</span>
+                                                    <h4 className="text-[13px] font-black text-slate-900 dark:text-white">Aylık Net Sabit Ücret</h4>
+                                                </div>
+                                                <div className="relative">
+                                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₺</span>
+                                                    <input type="number" className="w-full h-14 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] pl-10 pr-4 text-[20px] font-black text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 shadow-sm transition-all text-right" placeholder="17.002,00" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                )}
 
-                                    {/* Müşteri Kategori Erişimi */}
-                                    <div className="p-5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm space-y-3">
-                                        <div className="flex justify-between items-center">
-                                            <label className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Müşteri Kategori Erişimi (Kısıtlama)</label>
-                                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Boş bırakılırsa tümünü görür</span>
+                                {/* STEP 3: ÖZLÜK & HR DETAYLARI */}
+                                {addStaffStep === 3 && (
+                                    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                                        <div className="flex justify-between items-end mb-6">
+                                            <div>
+                                                <h3 className="text-[18px] font-black text-slate-900 dark:text-white">Özlük Dosyası Ön Kayıt</h3>
+                                                <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Acil durum iletişimi ve yasal evrak altyapısı için gerekli detaylar. <br />Bu adımı daha sonra Özlük Dosyası içerisinden güncelleyebilirsiniz.</p>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-wrap gap-2 pt-1">
-                                            {customerCategories?.map(cat => {
-                                                const isActive = newStaff.assignedCategoryIds.includes(cat.id);
-                                                return (
-                                                    <button
-                                                        key={cat.id}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            const newIds = isActive
-                                                                ? newStaff.assignedCategoryIds.filter(id => id !== cat.id)
-                                                                : [...newStaff.assignedCategoryIds, cat.id];
-                                                            setNewStaff({ ...newStaff, assignedCategoryIds: newIds });
-                                                        }}
-                                                        className={`h-8 px-3 rounded-lg text-[11px] font-bold uppercase transition-all border shadow-sm ${isActive
-                                                            ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                                            }`}
-                                                    >
-                                                        {cat.name}
-                                                    </button>
-                                                )
-                                            })}
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Doğum Tarihi</label>
+                                                <input type="date" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 shadow-sm" value={newStaff.birthDate} onChange={(e) => setNewStaff({ ...newStaff, birthDate: e.target.value })} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Kan Grubu</label>
+                                                <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 shadow-sm" value={newStaff.bloodType} onChange={(e) => setNewStaff({ ...newStaff, bloodType: e.target.value })}>
+                                                    <option value="">İsteğe Bağlı</option>
+                                                    {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-']?.map(t => <option key={t} value={t}>{t}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="col-span-full space-y-2 mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
+                                                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Açık İkamet Adresi</label>
+                                                <div className="grid grid-cols-2 gap-3 mb-2">
+                                                    <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none shadow-sm" placeholder="İl" value={newStaff.city} onChange={(e) => setNewStaff({ ...newStaff, city: e.target.value })} />
+                                                    <input type="text" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none shadow-sm" placeholder="İlçe" value={newStaff.district} onChange={(e) => setNewStaff({ ...newStaff, district: e.target.value })} />
+                                                </div>
+                                                <textarea className="w-full h-20 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl p-3 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 shadow-sm resize-none" placeholder="Mahalle, sokak, no, daire..." value={newStaff.address} onChange={(e) => setNewStaff({ ...newStaff, address: e.target.value })} />
+                                            </div>
+                                            <div className="col-span-full space-y-2 p-4 bg-amber-50 rounded-[12px] border border-amber-200 mt-2">
+                                                <h4 className="text-[12px] font-black text-amber-700 uppercase tracking-widest flex items-center gap-2 mb-2">
+                                                    <span>🚨</span> Acil Durum İletişimi
+                                                </h4>
+                                                <input type="text" className="w-full h-11 bg-white border border-amber-300 rounded-xl px-4 text-[13px] font-semibold text-slate-900 outline-none focus:border-amber-500 shadow-sm" placeholder="Yakınının Adı Soyadı ve Telefonu..." value={newStaff.relativeName} onChange={(e) => setNewStaff({ ...newStaff, relativeName: e.target.value })} />
+                                            </div>
                                         </div>
                                     </div>
-                                </section>
+                                )}
 
-                                <button onClick={handleSaveStaff} disabled={isProcessing} className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold tracking-widest shadow-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                                    {isProcessing ? 'KAYDEDİLİYOR...' : '💾 PERSONELİ KAYDET VE ÖZLÜK DOSYASI OLUŞTUR'}
-                                </button>
+                                {/* STEP 4: YETKİ & BİTİR */}
+                                {addStaffStep === 4 && (
+                                    <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                                        <div className="mb-6">
+                                            <h3 className="text-[18px] font-black text-slate-900 dark:text-white">Veri Kapsamı & Kayıt (Scoping)</h3>
+                                            <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Multi-tenant izolasyonu gereği, sadece erişilmesi gereken müşteri gruplarını seçin. Boş bırakırsanız tüm platform datasına erişir (Riskli).</p>
+                                        </div>
+
+                                        <div className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[16px] p-6 shadow-sm space-y-5">
+                                            <div className="flex items-start gap-3 border-b border-slate-200 dark:border-white/5 pb-4">
+                                                <div className="w-8 h-8 rounded-[8px] bg-blue-100 flex items-center justify-center text-blue-600 text-lg shrink-0">🛡️</div>
+                                                <div>
+                                                    <h4 className="text-[14px] font-black text-slate-900 dark:text-white">Müşteri Kategori İzolasyonu</h4>
+                                                    <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                                                        Seçtiğiniz kategoriler dışındaki müşterilerin cari özetleri, faturaları veya görevleri bu personelden <strong>Sıfır Güven (Zero-Trust)</strong> mimarisi ile gizlenir.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-3">ERİŞİME İZİN VERİLEN KATEGORİLER</label>
+                                                <div className="flex flex-wrap gap-2.5">
+                                                    {customerCategories?.map(cat => {
+                                                        const isActive = newStaff.assignedCategoryIds.includes(cat.id);
+                                                        return (
+                                                            <button
+                                                                key={cat.id}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const newIds = isActive
+                                                                        ? newStaff.assignedCategoryIds.filter(id => id !== cat.id)
+                                                                        : [...newStaff.assignedCategoryIds, cat.id];
+                                                                    setNewStaff({ ...newStaff, assignedCategoryIds: newIds });
+                                                                }}
+                                                                className={`h-10 px-4 rounded-[10px] text-[12px] font-black uppercase transition-all border shadow-sm ${isActive
+                                                                    ? 'bg-blue-600 text-white border-blue-700 ring-2 ring-blue-600/30'
+                                                                    : 'bg-white dark:bg-[#0f172a] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50'
+                                                                    }`}
+                                                            >
+                                                                {isActive && <span className="mr-1.5 opacity-80">✓</span>}
+                                                                {cat.name}
+                                                            </button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-[12px] mt-8 flex flex-col items-center text-center gap-2">
+                                            <span className="text-3xl">🎉</span>
+                                            <h4 className="text-[14px] font-black text-emerald-800">Her Şey Hazır!</h4>
+                                            <p className="text-[12px] text-emerald-600 font-medium">Bu personeli sisteme kaydetmek için aşağıdaki butona tıklayın.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* WIZARD ACTIONS */}
+                        <div className="p-6 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] shrink-0 flex items-center justify-between">
+                            <button
+                                onClick={() => addStaffStep > 1 ? setAddStaffStep(addStaffStep - 1) : setShowAddStaffModal(false)}
+                                className="h-12 px-6 rounded-[12px] font-bold text-[13px] tracking-wide text-slate-500 hover:bg-slate-100 dark:hover:bg-[#1e293b] transition-all"
+                            >
+                                {addStaffStep > 1 ? 'GERİ DÖN' : 'İPTAL ET'}
+                            </button>
+
+                            <div className="flex gap-3">
+                                {addStaffStep === 3 && (
+                                    <button
+                                        onClick={() => setAddStaffStep(4)}
+                                        className="h-12 px-5 rounded-[12px] border-2 border-slate-200 dark:border-white/10 font-bold text-[13px] tracking-wide text-slate-600 hover:bg-slate-50 transition-all font-semibold"
+                                    >
+                                        BU ADIMI ATLA
+                                    </button>
+                                )}
+
+                                {addStaffStep < 4 ? (
+                                    <button
+                                        onClick={() => {
+                                            if (addStaffStep === 1 && (!newStaff.name || !newStaff.username || !newStaff.password || !newStaff.email)) {
+                                                alert("Lütfen zorunlu alanları doldurun.");
+                                                return;
+                                            }
+                                            if (addStaffStep === 2 && (!newStaff.role || !newStaff.branch)) {
+                                                alert("Lütfen zorunlu alanları doldurun.");
+                                                return;
+                                            }
+                                            setAddStaffStep(addStaffStep + 1);
+                                        }}
+                                        className="h-12 px-8 rounded-[12px] bg-slate-900 dark:bg-slate-100 hover:bg-black dark:hover:bg-white text-white dark:text-black font-black text-[13px] tracking-wide transition-all shadow-md flex items-center gap-2"
+                                    >
+                                        SONRAKİ ADIM <span className="text-lg">→</span>
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleSaveStaff}
+                                        disabled={isProcessing}
+                                        className="h-12 px-10 rounded-[12px] bg-blue-600 hover:bg-blue-700 text-white font-black text-[13px] tracking-widest uppercase transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 flex items-center gap-2 relative overflow-hidden group"
+                                    >
+                                        <div className="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-500"></div>
+                                        {isProcessing ? 'KAYDEDİLİYOR...' : '💾 PERSONELİ SİSTEME EKLE'}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
