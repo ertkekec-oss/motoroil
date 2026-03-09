@@ -112,10 +112,11 @@ export default function GatewaysPage() {
         <EnterprisePageShell
             title="Ödeme Altyapıları (Gateways)"
             description="Tüm ödeme servis sağlayıcıları, aktif/pasif modları ve destekledikleri faturalandırma tipleri."
-            action={{
-                label: "+ Yeni Gateway Ekle",
-                onClick: openNew
-            }}
+            actions={
+                <button onClick={openNew} className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
+                    + Yeni Gateway Ekle
+                </button>
+            }
         >
             <div className="space-y-6">
                 {loading ? (
