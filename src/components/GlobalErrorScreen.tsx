@@ -96,13 +96,14 @@ export default function GlobalErrorScreen({ error, reset }: GlobalErrorProps) {
                 </button>
             </div>
 
-            <style jsx>{`
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @keyframes pulse {
                     0% { opacity: 1; transform: scale(1); }
                     50% { opacity: 0.7; transform: scale(0.95); }
                     100% { opacity: 1; transform: scale(1); }
                 }
-            `}</style>
+            ` }} />
         </div>
     );
 }

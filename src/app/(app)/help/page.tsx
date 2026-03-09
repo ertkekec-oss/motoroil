@@ -244,16 +244,8 @@ export default async function KnowledgeHubPage() {
                                 </EnterpriseCard>
                             </Link>
 
-                            <div
-                                className="group cursor-pointer"
-                                onClick={() => {
-                                    // Hack to open AI panel from sidebar click via window event or direct focus if wanted
-                                    // As a structural representation:
-                                    const aiBtn = document.querySelector('button.fixed.bottom-6') as HTMLButtonElement;
-                                    if (aiBtn) aiBtn.click();
-                                }}
-                            >
-                                <EnterpriseCard className="p-4! bg-slate-900 dark:bg-slate-100 border-transparent hover:opacity-95 transition-opacity flex items-center gap-4">
+                            <div className="group cursor-pointer hover:opacity-95 transition-opacity">
+                                <EnterpriseCard className="p-4! bg-slate-900 dark:bg-slate-100 border-transparent flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-lg bg-white/10 dark:bg-black/10 flex items-center justify-center text-white dark:text-slate-900">
                                         <Sparkles className="w-5 h-5" />
                                     </div>
