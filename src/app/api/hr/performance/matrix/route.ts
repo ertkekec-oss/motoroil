@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const session = await getSession();
     if (!session?.tenantId) return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
 
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'TENANT_ADMIN' && session.role !== 'HR_MANAGER') {
+    if (session.role !== 'SUPER_ADMIN' && session.role !== 'PLATFORM_ADMIN' && session.role !== 'TENANT_ADMIN' && session.role !== 'ADMIN' && session.role !== 'HR_MANAGER') {
         return NextResponse.json({ error: 'Yetkisiz eylem. Sadece yöneticiler matrix tanımı yapabilir.' }, { status: 403 });
     }
 

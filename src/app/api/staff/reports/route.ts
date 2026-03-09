@@ -25,8 +25,9 @@ export async function GET(req: NextRequest) {
         const staffUser = await (prisma as any).staff.findFirst({
             where: {
                 OR: [
-                    { email: session.email },
-                    { username: session.username || session.email }
+                    { email: session.email || 'non_existent_email' },
+                    { username: session.username || session.email || 'non_existent_username' },
+                    { id: session.id }
                 ]
             }
         });

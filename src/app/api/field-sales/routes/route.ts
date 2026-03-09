@@ -38,11 +38,13 @@ export async function GET(req: NextRequest) {
 
         if (mine === 'true') {
             // Find staff record for current user
+            const userObj = session.user || session;
             const staffUser = await (prisma as any).staff.findFirst({
                 where: {
                     OR: [
-                        { email: session.user?.email },
-                        { username: session.user?.username || session.user?.email }
+                        { email: userObj.email || 'non_existent_email' },
+                        { username: userObj.username || userObj.email || 'non_existent_username' },
+                        { id: userObj.id }
                     ]
                 }
             });

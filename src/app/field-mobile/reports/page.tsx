@@ -15,12 +15,16 @@ export default function MobileReportsPage() {
         setLoading(true);
         try {
             const res = await fetch(`/api/staff/reports?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`);
+            const data = await res.json();
+
             if (res.ok) {
-                const data = await res.json();
                 setReport(data);
+            } else {
+                setReport({ error: data.error || 'Bilinmeyen bir hata oluştu.' });
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
+            setReport({ error: err.message || 'Bağlantı hatası' });
         } finally {
             setLoading(false);
         }
@@ -58,7 +62,12 @@ export default function MobileReportsPage() {
 
             {loading ? (
                 <div className="text-center py-12 opacity-50">Hesaplanıyor...</div>
-            ) : report ? (
+            ) : report?.error ? (
+                <div className="text-center py-12 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <div className="text-red-400 font-bold mb-2">Hata Oluştu</div>
+                    <div className="text-sm opacity-80 text-red-300">{report.error === 'Staff not found' ? 'Personel hesabınız bulunamadı.' : report.error}</div>
+                </div>
+            ) : report?.summary ? (
                 <div className="space-y-6">
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 gap-4">
