@@ -75,25 +75,12 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                 </div>
 
                 <div className="flex-1 overflow-y-auto space-y-6 pr-4 pb-4 custom-scrollbar">
-                    {/* Original Request */}
-                    <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
-                        <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
-                            <div className="font-bold text-slate-900 flex items-center gap-2">
-                                <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">M</span>
-                                {ticket.createdByUserId || 'Bilinmiyor'} (Müşteri)
-                            </div>
-                            <div className="text-xs text-slate-400">{new Date(ticket.createdAt).toLocaleString('tr-TR')}</div>
-                        </div>
-                        <div className="text-slate-700 whitespace-pre-wrap text-sm leading-relaxed mb-4">
-                            {ticket.messages[0]?.message || 'Açıklama bulunamadı.'}
-                        </div>
-                    </div>
-
                     {/* Messages */}
-                    {messages?.slice(1).map((msg) => {
+                    {messages?.map((msg, index) => {
                         const isSystem = msg.senderRole === 'SYSTEM' as any;
                         const isAdmin = msg.senderRole === 'PLATFORM' as any || msg.senderRole === 'ARBITRATOR' as any;
                         const isCustomer = msg.senderRole === 'BUYER' || msg.senderRole === 'SELLER';
+                        const isFirstMessage = index === 0;
 
                         return (
                             <div key={msg.id} className={`p-6 rounded-2xl shadow-sm w-full border ${isSystem ? 'bg-slate-50 border-slate-200' : isAdmin ? 'bg-orange-50/50 border-orange-200' : 'bg-white border-slate-200'}`}>
@@ -104,7 +91,7 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                                         {isSystem && <span className="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-bold">S</span>}
 
                                         <span className={isAdmin ? 'text-orange-600' : 'text-slate-900'}>
-                                            {isCustomer ? 'Müşteri' : isAdmin ? `Destek: ${msg.senderTenantId}` : 'Sistem Botu'}
+                                            {isCustomer ? `${isFirstMessage ? ticket.createdByUserId || 'Bilinmiyor' : 'Müşteri'}` : isAdmin ? `Destek: ${msg.senderTenantId}` : 'Sistem Botu'}
                                         </span>
                                     </div>
                                     <div className="text-xs text-slate-400">{new Date(msg.createdAt).toLocaleString('tr-TR')}</div>
