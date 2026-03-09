@@ -1,0 +1,25 @@
+
+Invalid `prisma.signatureEnvelope.findUnique()` invocation in
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\testpr3.ts:5:50
+
+  2 import fs from 'fs';
+  3 async function run() {
+  4     try {
+→ 5         const e = await prisma.signatureEnvelope.findUnique({
+              where: {
+                id: "cmmihh47f00063u5mbrfu1acb"
+              },
+              include: {
+                recipients: {
+                  orderBy: {
+                    orderIndex: "asc"
+                  }
+                },
+                company: true,
+                ~~~~~~~
+            ?   sessions?: true,
+            ?   auditEvents?: true
+              }
+            })
+
+Unknown field `company` for include statement on model `SignatureEnvelope`. Available options are marked with ?.

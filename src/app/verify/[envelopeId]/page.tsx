@@ -10,14 +10,18 @@ export default async function VerifyDocumentPage({ params }: { params: Promise<{
         include: {
             recipients: {
                 orderBy: { orderIndex: 'asc' }
-            },
-            company: true
+            }
         }
     });
 
     if (!envelope) {
         return notFound();
     }
+
+    const company = envelope.companyId ? await prisma.company.findUnique({
+        where: { id: envelope.companyId }
+    }) : null;
+
 
     return (
         <div className="min-h-screen bg-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
@@ -43,7 +47,7 @@ export default async function VerifyDocumentPage({ params }: { params: Promise<{
                     </div>
                     <div className="flex justify-between items-center pb-4 border-b border-slate-700">
                         <span className="text-sm font-medium text-slate-400">Oluşturan Şirket</span>
-                        <span className="text-base font-medium text-white">{envelope.company?.name || 'Periodya Network'}</span>
+                        <span className="text-base font-medium text-white">{company?.name || 'Periodya Network'}</span>
                     </div>
                     <div className="flex justify-between items-center pb-4 border-b border-slate-700">
                         <span className="text-sm font-medium text-slate-400">Oluşturulma Tarihi</span>
