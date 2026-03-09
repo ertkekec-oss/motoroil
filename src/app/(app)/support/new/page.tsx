@@ -45,8 +45,8 @@ export default function NewTicketPage() {
                 throw new Error(data.error || 'İşlem başarısız');
             }
 
-            const { ticket } = await res.json();
-            router.push(`/support/${ticket.id}`);
+            const ticketData = await res.json();
+            router.push(`/support/${ticketData.id || ticketData.ticket?.id}`);
             router.refresh();
         } catch (err: any) {
             setError(err.message);
