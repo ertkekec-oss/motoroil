@@ -8,6 +8,7 @@ import {
     SupportTicketComment,
     SupportTicketAttachment
 } from '@prisma/client';
+import { PlatformDoctorService } from '../infrastructure/PlatformDoctorService';
 
 export class SupportTicketService {
     /**
@@ -24,6 +25,15 @@ export class SupportTicketService {
         browserInfo?: string;
         metadataJson?: any;
     }): Promise<SupportTicket> {
+
+        // Auto-Enrich details from Platform Doctor
+        const enrichment = await PlatformDoctorService.enrichSupportTicket(params.tenantId);
+
+        const augmentedMetadata = {
+            ...(params.metadataJson || {}),
+            platformDoctor: enrichment
+        };
+
         return prisma.supportTicket.create({
             data: {
                 tenantId: params.tenantId,
@@ -34,7 +44,7 @@ export class SupportTicketService {
                 priority: params.priority || 'NORMAL',
                 currentPage: params.currentPage,
                 browserInfo: params.browserInfo,
-                metadataJson: params.metadataJson,
+                metadataJson: augmentedMetadata,
                 status: 'OPEN'
             }
         });

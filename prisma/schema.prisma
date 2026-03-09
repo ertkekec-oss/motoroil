@@ -9005,3 +9005,95 @@ model HelpRecommendation {
   @@index([conversationId])
   @@index([articleId])
 }
+
+enum PlatformHealthStatus {
+  OK
+  WARNING
+  ERROR
+}
+
+enum PlatformIncidentType {
+  INTEGRATION_FAILURE
+  API_ERROR
+  PAYMENT_FAILURE
+  EINVOICE_FAILURE
+  SMS_FAILURE
+  SYNC_FAILURE
+  IMPORT_FAILURE
+  WORKER_FAILURE
+}
+
+enum PlatformIncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum PlatformIncidentStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  AUTO_RESOLVED
+}
+
+enum RunbookActionType {
+  RETRY_JOB
+  RESET_WEBHOOK
+  RESTART_WORKER
+  REFRESH_TOKEN
+  RECONNECT_API
+  CLEAR_CACHE
+}
+
+model PlatformHealthCheck {
+  id           String               @id @default(cuid())
+  service      String
+  status       PlatformHealthStatus @default(OK)
+  message      String?              @db.Text
+  metadataJson Json?
+  checkedAt    DateTime             @default(now())
+
+  @@index([service])
+  @@index([status])
+}
+
+model PlatformIncident {
+  id          String                   @id @default(cuid())
+  tenantId    String?                  // System-wide incidents may have null tenantId
+  type        PlatformIncidentType
+  severity    PlatformIncidentSeverity
+  title       String
+  description String                   @db.Text
+  status      PlatformIncidentStatus   @default(OPEN)
+  createdAt   DateTime                 @default(now())
+  resolvedAt  DateTime?
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([status])
+}
+
+model PlatformRunbook {
+  id               String               @id @default(cuid())
+  incidentType     PlatformIncidentType
+  title            String
+  description      String               @db.Text
+  autoFixAvailable Boolean              @default(false)
+  createdAt        DateTime             @default(now())
+
+  actions          RunbookAction[]
+
+  @@index([incidentType])
+}
+
+model RunbookAction {
+  id          String            @id @default(cuid())
+  runbookId   String
+  actionType  RunbookActionType
+  configJson  Json?
+
+  runbook     PlatformRunbook   @relation(fields: [runbookId], references: [id], onDelete: Cascade)
+
+  @@index([runbookId])
+}
