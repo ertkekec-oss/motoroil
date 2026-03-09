@@ -8,7 +8,7 @@ export async function GET(request: Request) {
         if (!auth.authorized) return auth.response;
 
         const user = (auth as any).user;
-        if (user.role !== 'SUPER_ADMIN') {
+        if (user.role !== 'SUPER_ADMIN' && user.role !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
         }
 
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         if (!auth.authorized) return auth.response;
 
         const user = (auth as any).user;
-        if (user.role !== 'SUPER_ADMIN') {
+        if (user.role !== 'SUPER_ADMIN' && user.role !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
         }
 
@@ -69,7 +69,7 @@ export async function PUT(request: Request) {
         if (!auth.authorized) return auth.response;
 
         const user = (auth as any).user;
-        if (user.role !== 'SUPER_ADMIN') {
+        if (user.role !== 'SUPER_ADMIN' && user.role !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
         }
 
@@ -103,7 +103,7 @@ export async function DELETE(request: Request) {
         if (!auth.authorized) return auth.response;
 
         const user = (auth as any).user;
-        if (user.role !== 'SUPER_ADMIN') {
+        if (user.role !== 'SUPER_ADMIN' && user.role !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
         }
 
