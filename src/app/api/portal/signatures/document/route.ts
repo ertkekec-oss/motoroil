@@ -56,7 +56,7 @@ export async function GET(req: Request) {
             });
         }
 
-        const pdfUrl = `/api/portal/signatures/document/pdf?token=${token}`;
+        const pdfUrl = `/api/portal/signatures/document/pdf?token=${token}&t=${Date.now()}`;
 
         return NextResponse.json({
             success: true,

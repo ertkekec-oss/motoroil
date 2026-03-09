@@ -63,7 +63,7 @@ export default function SignClient({ token, envelope, recipient, allRecipients }
                 setIsSuccess(true);
                 toast.success(action === 'SIGNED' ? 'Belge başarıyla imzalandı!' : action === 'REJECTED' ? 'Belge reddedildi.' : 'Revize talebiniz iletildi.', { duration: 3000 });
                 setTimeout(() => {
-                    router.refresh();
+                    window.location.reload();
                 }, 1500);
             } else {
                 toast.error(data.error || 'Bilinmeyen bir hata oluştu');

@@ -69,7 +69,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         const headers = new Headers();
         headers.set('Content-Type', 'application/pdf');
         headers.set('Content-Disposition', `inline; filename="${targetFileName}"`);
-        headers.set('Cache-Control', 'private, max-age=3600');
+        headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
         return new NextResponse(byteArray, {
             status: 200,

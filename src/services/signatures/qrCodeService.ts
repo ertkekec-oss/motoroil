@@ -58,6 +58,15 @@ export async function embedVerificationQRCode(envelopeId: string, documentKey: s
         const qrDims = qrImage.scale(0.5); // Provide more scaling info if needed
         const qrSize = 100; // Increased size for better scannability
 
+        // Draw white background block behind QR code to prevent overlap errors
+        firstPage.drawRectangle({
+            x: 15,
+            y: 5,
+            width: qrSize + 10,
+            height: qrSize + 25,
+            color: rgb(1, 1, 1),
+        });
+
         // Draw the QR Code at the bottom left with a small margin
         firstPage.drawImage(qrImage, {
             x: 20,

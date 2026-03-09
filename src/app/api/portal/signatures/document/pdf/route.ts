@@ -67,7 +67,7 @@ export async function GET(req: Request) {
         const headers = new Headers();
         headers.set('Content-Type', 'application/pdf');
         headers.set('Content-Disposition', `inline; filename="${fileName}"`);
-        headers.set('Cache-Control', 'private, max-age=3600');
+        headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
         // Return byte array directly
         return new NextResponse(byteArray, {
