@@ -143,7 +143,6 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
 
                     {isSuper && (
                         <NavGroup title="System & Infrastructure" icon={HardDrive} groupKey="system">
-                            <NavItem href="/admin/ops/gateways" icon={Server} label="Aracı Kurumlar (Gateway)" />
                             <NavItem href="/admin/ops/fintech" icon={DatabaseZap} label="Fintech Routing" />
                             <NavItem href="/admin/ops/limits" icon={Activity} label="API Limitleri" />
                             <NavItem href="/admin/ops/providers" icon={Server} label="Platform Altyapısı" />
@@ -160,6 +159,22 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                     </NavGroup>
                 )}
             </div>
+
+            {/* ÖDEME VE KREDİ ALTYAPISI (BILLING & INTEGRATIONS) */}
+            {isSuper && (
+                <div className="space-y-1 mb-6">
+                    <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
+                        ÖDEME & KREDİ ALTYAPISI
+                    </div>
+
+                    <NavGroup title="Billing & Entegrasyon" icon={CreditCard} groupKey="billing_admin">
+                        <NavItem href="/admin/plans" icon={DatabaseZap} label="SaaS, SMS & E-Fatura Planları" />
+                        <NavItem href="/admin/ops/gateways" icon={Server} label="Ödeme Entegrasyonları (Gateways)" />
+                        <NavItem href="/admin/billing/credits" icon={Percent} label="Kontör & Bakiye Yönetimi" />
+                        <NavItem href="/admin/billing/invoices" icon={FileText} label="Platform Faturaları" />
+                    </NavGroup>
+                </div>
+            )}
 
             {/* SÜREÇ YÖNETİMİ */}
             {isSuper && (
