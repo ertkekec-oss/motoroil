@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -61,7 +61,8 @@ export default function Sidebar() {
             'signatures-parent': ['/signatures', '/signatures/envelopes', '/signatures/new', '/signatures/templates', '/signatures/inbox', '/signatures/completed'],
             'reconciliation-parent': ['/reconciliation', '/reconciliation/list', '/reconciliation/new', '/reconciliation/disputes'],
             'field-sales-parent': ['/field-sales', '/field-sales/admin/routes', '/field-sales/admin/live'],
-            'reports-parent': ['/reports', '/reports/ceo', '/reports/daily', '/reports/suppliers']
+            'reports-parent': ['/reports', '/reports/ceo', '/reports/daily', '/reports/suppliers'],
+            'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics']
         };
 
         setOpenSections(prev => {
@@ -109,6 +110,7 @@ export default function Sidebar() {
             '/inventory': { perm: 'inventory_view', feature: 'inventory' },
             '/service': { perm: 'service_view', feature: 'service_desk' },
             '/sales': { perm: 'sales_archive', feature: 'sales' },
+            '/campaigns': { perm: 'settings_manage', feature: 'sales' },
             '/field-sales': { perm: 'field_sales_access', feature: 'field_sales' },
             '/field-sales/admin/live': { perm: 'field_sales_admin', feature: 'field_sales' },
             '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'field_sales' },
@@ -259,6 +261,19 @@ export default function Sidebar() {
                     },
                     { name: 'PDKS', href: '/staff/pdks', icon: Clock },
                     { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
+                    {
+                        name: 'Kampanya Engine',
+                        icon: Gift,
+                        isParent: true,
+                        id: 'campaigns-parent',
+                        subItems: [
+                            { name: 'Dashboard', href: '/campaigns' },
+                            { name: 'Yeni Kurgu', href: '/campaigns/create' },
+                            { name: 'Aktif Kampanyalar', href: '/campaigns/active' },
+                            { name: 'Planlı Kampanyalar', href: '/campaigns/scheduled' },
+                            { name: 'Performans', href: '/campaigns/analytics' },
+                        ]
+                    },
                 ]
             },
 

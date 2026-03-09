@@ -1444,6 +1444,21 @@ model SecurityEvent {
   @@index([branch])
 }
 
+enum CampaignChannel {
+  POS
+  SALES_REP
+  B2B
+  HUB
+  MANUAL
+  GLOBAL
+}
+
+enum CampaignStackingRule {
+  EXCLUSIVE
+  STACKABLE
+  PRIORITY_ONLY
+}
+
 model Campaign {
   id                        String    @id @default(cuid())
   name                      String
@@ -1462,9 +1477,30 @@ model Campaign {
   targetCustomerCategoryIds String[]  @default([])
   company                   Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
+  // Campaign Engine V2 Fields
+  tenantId          String?
+  campaignType      String?
+  status            String    @default("ACTIVE")
+  channels          CampaignChannel[] @default([])
+  priority          Int       @default(0)
+  stackingRule      CampaignStackingRule @default(STACKABLE)
+  validFrom         DateTime?
+  validUntil        DateTime?
+  
+  // Conditions
+  minOrderAmount    Float?
+  minQuantity       Int?
+  productIds        String[]  @default([])
+  categoryIds       String[]  @default([])
+  customerSegment   String?
+  salesRepId        String?
+  regionId          String?
+  hubVisibility     String?
+
   @@index([companyId])
   @@index([type])
   @@index([isActive])
+  @@index([tenantId])
 }
 
 model Coupon {
