@@ -722,50 +722,37 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </Link>
                 </div>
 
-                {/* ENTERPRISE TABS */}
-                <div style={{ display: 'flex', gap: '32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', overflowX: 'auto', paddingBottom: '0' }}>
-                    {[
-                        { id: 'all', label: 'Tüm Hareketler' },
-                        { id: 'sales', label: 'Satışlar & Faturalar' },
-                        { id: 'payments', label: 'Finansal İşlemler' },
-                        { id: 'documents', label: 'Dosyalar & Evraklar' },
-                        { id: 'services', label: 'Servis Geçmişi' },
-                        { id: 'warranties', label: 'Garantiler' },
-                        { id: 'checks', label: 'Çek & Senetler' },
-                        { id: 'reconciliations', label: 'Mutabakatlar' }
-                    ].map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => {
-                                setActiveTab(tab.id as any);
-                                if (tab.id === 'documents') fetchDocuments();
-                                if (tab.id === 'services') fetchServices();
-                            }}
-                            style={{
-                                padding: '16px 4px',
-                                border: 'none',
-                                background: 'transparent',
-                                color: activeTab === tab.id ? '#3b82f6' : 'var(--text-muted, #64748b)',
-                                fontWeight: activeTab === tab.id ? '800' : '600',
-                                fontSize: '13px',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
-                                position: 'relative',
-                                whiteSpace: 'nowrap',
-                                transition: 'color 0.2s'
-                            }}
-                            className={activeTab !== tab.id ? "hover:text-white" : ""}
-                        >
-                            {tab.label}
-                            {activeTab === tab.id && (
-                                <div style={{ position: 'absolute', bottom: '-1px', left: 0, right: 0, height: '2px', background: '#3b82f6', borderRadius: '4px 4px 0 0' }}></div>
-                            )}
-                        </button>
-                    ))}
+                {/* GROUPED NAVIGATION & FILTERS (HR MODULE STYLE) */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2">
+                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                        {[
+                            { group: 'HAREKETLER', items: [{ id: 'all', label: 'Tüm Hareketler' }, { id: 'sales', label: 'Satışlar & Faturalar' }, { id: 'payments', label: 'Finansal İşlemler' }] },
+                            { group: 'EVRAKLAR', items: [{ id: 'documents', label: 'Dosyalar & Evraklar' }, { id: 'warranties', label: 'Garantiler' }] },
+                            { group: 'SERVİS', items: [{ id: 'services', label: 'Servis Geçmişi' }] },
+                            { group: 'FİNANS', items: [{ id: 'checks', label: 'Çek & Senetler' }, { id: 'reconciliations', label: 'Mutabakatlar' }] },
+                        ].map((grp, i) => (
+                            <div key={grp.group} className="flex items-center gap-3">
+                                {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
+                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                    {grp.items.map(tab => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => {
+                                                setActiveTab(tab.id as any);
+                                                if (tab.id === 'documents') fetchDocuments();
+                                                if (tab.id === 'services') fetchServices();
+                                            }}
+                                            className={activeTab === tab.id
+                                                ? "px-3 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px] transition-all"
+                                                : "px-3 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* CONTENT AREA */}
