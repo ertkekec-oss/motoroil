@@ -6,15 +6,18 @@ export const EnterpriseCard = ({
     children,
     className = '',
     noPadding = false,
-    borderLeftColor = ''
+    borderLeftColor = '',
+    onClick
 }: {
     children?: React.ReactNode;
     className?: string;
     noPadding?: boolean;
     borderLeftColor?: string;
+    onClick?: React.MouseEventHandler<HTMLDivElement>;
 }) => {
     return (
         <div
+            onClick={onClick}
             className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm ${noPadding ? '' : 'p-6'} ${className}`}
             style={borderLeftColor ? { borderLeft: `4px solid ${borderLeftColor}` } : {}}
         >
