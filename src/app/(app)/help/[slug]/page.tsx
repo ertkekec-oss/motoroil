@@ -6,7 +6,16 @@ import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const topic = await prisma.helpTopic.findUnique({ where: { slug } });
+    const decodedSlug = decodeURIComponent(slug);
+    const topic = await prisma.helpTopic.findFirst({
+        where: {
+            OR: [
+                { slug: slug },
+                { slug: decodedSlug },
+                { slug: encodeURIComponent(slug) }
+            ]
+        }
+    });
     return { title: topic?.title ? `${topic.title} - Yardım` : 'Yardım Detayı' };
 }
 
@@ -17,8 +26,16 @@ export default async function HelpTopicPage({ params }: { params: Promise<{ slug
         redirect('/login');
     }
 
-    const topic = await prisma.helpTopic.findUnique({
-        where: { slug },
+    const decodedSlug = decodeURIComponent(slug);
+
+    const topic = await prisma.helpTopic.findFirst({
+        where: {
+            OR: [
+                { slug: slug },
+                { slug: decodedSlug },
+                { slug: encodeURIComponent(slug) }
+            ]
+        },
         include: { category: true }
     });
 

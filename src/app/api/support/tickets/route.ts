@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
 
         // Support both Frontend form and old API
         const type = body.type || body.category || "GENERAL";
-        const messageRaw = body.message || `**${body.subject}**\n\n${body.description}`;
+        const bodyMessage = body.message || body.description || "Genel Talep";
+        const messageRaw = `**${body.subject || 'Konu Yok'}**\n\n${bodyMessage}`;
         const relatedEntityType = body.relatedEntityType || (body.relatedHelpTopicId ? "HELP_ARTICLE" : null);
         const relatedEntityId = body.relatedEntityId || body.relatedHelpTopicId || null;
         const reqPriority = body.priority || "MEDIUM";
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
         else if (reqPriority.includes("P4") || reqPriority === "LOW") priority = "LOW";
 
         if (!type || !messageRaw || messageRaw.trim() === "") {
-            return NextResponse.json({ error: "Eksik bilgi: Lütfen tüm zorunlu alanları doldurun." }, { status: 400 });
+            return NextResponse.json({ error: "Lütfen tüm zorunlu alanları doldurun." }, { status: 400 });
         }
 
         // PII Redaction
