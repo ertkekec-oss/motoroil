@@ -1107,7 +1107,6 @@ export default function SettingsPage() {
                         { id: 'services', label: 'Servis Ücretleri', icon: <Wrench className="w-5 h-5 text-violet-500" /> },
                         { id: 'taxes', label: 'KDV & Vergiler', icon: <Coins className="w-5 h-5 text-yellow-500" /> },
                         { id: 'expenses', label: 'Satış Giderleri', icon: <CreditCard className="w-5 h-5 text-blue-500" /> },
-                        { id: 'campaigns', label: 'Kampanya & Puan', icon: <Gift className="w-5 h-5 text-pink-500" /> },
                         { id: 'definitions', label: 'Tanımlar & Liste', icon: <BookOpen className="w-5 h-5 text-teal-500" /> },
                         { id: 'notifications', label: 'Bildirim Ayarları', icon: <Bell className="w-5 h-5 text-orange-500" /> },
                         { id: 'backup', label: 'Bulut Yedekleme', icon: <Cloud className="w-5 h-5 text-sky-400" /> },
@@ -1193,8 +1192,6 @@ export default function SettingsPage() {
 
                 {/* 7. ACTIVITY LOGS */}
                 {activeTab === 'logs' && <AuditLogsPanel {...sharedProps} />}
-                {/* 10. KAMPANYALAR & PUAN - REDESIGNED */}
-                {activeTab === 'campaigns' && <CampaignPointsPanel {...sharedProps} />}
 
                 {/* 5. SİSTEM SIFIRLAMA (DANGER ZONE) */}
                 {activeTab === 'reset' && <SystemResetPanel {...sharedProps} />}

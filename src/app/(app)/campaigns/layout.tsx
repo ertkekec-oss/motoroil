@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Gift, CalendarClock, History, Target, BarChart2 } from "lucide-react";
+import { Gift, CalendarClock, History, Target, BarChart2, Diamond } from "lucide-react";
 
 export default function CampaignsLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -10,6 +10,7 @@ export default function CampaignsLayout({ children }: { children: React.ReactNod
     const tabs = [
         { href: '/campaigns', label: 'Özet (Dashboard)', icon: Target },
         { href: '/campaigns/active', label: 'Aktif Kampanyalar', icon: Gift },
+        { href: '/campaigns/loyalty', label: 'Sadakat & Referans Sistemi', icon: Diamond },
         { href: '/campaigns/scheduled', label: 'Planlı Kampanyalar', icon: CalendarClock },
         { href: '/campaigns/history', label: 'Geçmiş Kurgular', icon: History },
         { href: '/campaigns/analytics', label: 'Performans & ROI', icon: BarChart2 }
