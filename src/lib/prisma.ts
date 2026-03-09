@@ -261,7 +261,7 @@ const prismaClientSingleton = () => {
 
                         // Mutation Protection for creation
                         if (['create', 'createMany', 'upsert'].includes(operation)) {
-                            const bypass = ['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt', 'fileblob', 'documenttemplate', 'templateversion', 'document', 'documentversion', 'envelope', 'recipient', 'signingsession', 'signatureproviderconfig', 'webhookinbox', 'auditevent', 'hashledger'];
+                            const bypass = ['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt', 'fileblob', 'documenttemplate', 'templateversion', 'document', 'documentversion', 'envelope', 'recipient', 'signingsession', 'signatureproviderconfig', 'webhookinbox', 'auditevent', 'hashledger', 'stock', 'journalitem', 'installment', 'variantattributevalue', 'productvariantvalue'];
                             if (!bypass.includes(modelName)) {
                                 const data = operation === 'upsert' ? (newArgs as any).create : (newArgs as any).data;
                                 if (data && !isPlatformAdmin) {
