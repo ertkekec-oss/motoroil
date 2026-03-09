@@ -9,7 +9,8 @@ import {
     EnterpriseButton,
     EnterpriseEmptyState,
     EnterpriseSelect,
-    EnterpriseSwitch
+    EnterpriseSwitch,
+    EnterpriseField
 } from "@/components/ui/enterprise";
 import { Server, Settings, Plus, Key, Link2, CreditCard, Trash2, Edit2, ShieldCheck, Activity } from 'lucide-react';
 
