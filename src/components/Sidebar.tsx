@@ -60,9 +60,11 @@ export default function Sidebar() {
             'customers-parent': ['/customers', '/suppliers'],
             'signatures-parent': ['/signatures', '/signatures/envelopes', '/signatures/new', '/signatures/templates', '/signatures/inbox', '/signatures/completed'],
             'reconciliation-parent': ['/reconciliation', '/reconciliation/list', '/reconciliation/new', '/reconciliation/disputes'],
-            'field-sales-parent': ['/field-sales', '/field-sales/admin/routes', '/field-sales/admin/live'],
+            'field-sales-parent': ['/field-sales', '/field-sales/admin/routes', '/field-sales/admin/live', '/field-sales/intelligence'],
             'reports-parent': ['/reports', '/reports/ceo', '/reports/daily', '/reports/suppliers'],
-            'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics']
+            'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
+            'sales-parent': ['/sales', '/sales/revenue-intelligence'],
+            'staff-parent': ['/staff', '/staff/performance']
         };
 
         setOpenSections(prev => {
@@ -110,8 +112,10 @@ export default function Sidebar() {
             '/inventory': { perm: 'inventory_view', feature: 'inventory' },
             '/service': { perm: 'service_view', feature: 'service_desk' },
             '/sales': { perm: 'sales_archive', feature: 'sales' },
+            '/sales/revenue-intelligence': { perm: 'sales_archive', feature: 'sales' },
             '/campaigns': { perm: 'settings_manage', feature: 'sales' },
             '/field-sales': { perm: 'field_sales_access', feature: 'field_sales' },
+            '/field-sales/intelligence': { perm: 'field_sales_access', feature: 'field_sales' },
             '/field-sales/admin/live': { perm: 'field_sales_admin', feature: 'field_sales' },
             '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'field_sales' },
             '/quotes': { perm: 'offer_create', feature: 'quotes' },
@@ -124,6 +128,7 @@ export default function Sidebar() {
             '/settings': { perm: 'settings_manage' },
             '/settings/pricing': { perm: 'settings_manage' },
             '/staff': { perm: 'staff_manage', feature: 'team_management' },
+            '/staff/performance': { perm: 'staff_manage', feature: 'team_management' },
             '/advisor': { perm: 'finance_view', feature: 'accountant' },
             '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
             '/staff/pdks': { perm: 'staff_manage' },
@@ -234,7 +239,16 @@ export default function Sidebar() {
                         ]
                     },
                     { name: 'Finansal Yönetim', href: '/accounting', icon: Landmark },
-                    { name: 'Satış Yönetimi', href: '/sales', icon: Receipt },
+                    {
+                        name: 'Satış Yönetimi',
+                        icon: Receipt,
+                        isParent: true,
+                        id: 'sales-parent',
+                        subItems: [
+                            { name: 'Tüm Satışlar', href: '/sales' },
+                            { name: 'Revenue Intelligence', href: '/sales/revenue-intelligence' },
+                        ]
+                    },
                     {
                         name: 'Cariler',
                         icon: Users,
@@ -256,11 +270,21 @@ export default function Sidebar() {
                         subItems: [
                             { name: 'Saha Yönetimi', href: '/field-sales/admin/routes' },
                             { name: 'Rota & Müşteri', href: '/field-sales' },
+                            { name: 'AI Zeka & Rota', href: '/field-sales/intelligence' },
                             { name: 'Canlı Takip', href: '/field-sales/admin/live' },
                         ]
                     },
                     { name: 'PDKS', href: '/staff/pdks', icon: Clock },
-                    { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
+                    {
+                        name: 'İnsan Kaynakları',
+                        icon: Users,
+                        isParent: true,
+                        id: 'staff-parent',
+                        subItems: [
+                            { name: 'Personeller', href: '/staff' },
+                            { name: 'Performans & Hedef', href: '/staff/performance' },
+                        ]
+                    },
                     {
                         name: 'Kampanya Engine',
                         icon: Gift,
