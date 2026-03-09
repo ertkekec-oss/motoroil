@@ -9,7 +9,23 @@ export async function GET(request: Request) {
         const activeOnly = searchParams.get('activeOnly') !== 'false';
 
         // Hem admin hem normal kullanıcılar görebilir (satın alma ekranı için admin şart değil).
-        // Eğer type verilmişse sadece o tipi döndür (SAAS, SMS, EINVOICE)
+        // Eğer veritabanı boşsa (ilk kurulum), varsayılan paketleri otomatik oluştur (Auto-Seed)
+        const count = await prisma.billingProduct.count();
+        if (count === 0) {
+            await prisma.billingProduct.createMany({
+                data: [
+                    { type: 'SAAS', name: 'Ücretsiz Plan (Starter)', price: 0, currency: 'TRY', description: 'Temel düzeyde Periodya kullanım imkanı sunar.', creditAmount: 0 },
+                    { type: 'SAAS', name: 'Profesyonel Plan', price: 999, currency: 'TRY', description: 'Genişletilmiş operasyon ve yüksek kullanıcı portföyü limitleri.', creditAmount: 0 },
+                    { type: 'SAAS', name: 'Enterprise Pro', price: 2999, currency: 'TRY', description: 'Sınırsız operasyon altyapısı ve platform düzeyinde atanmış teknik destek.', creditAmount: 0 },
+
+                    { type: 'SMS', name: '1.000 SMS Paketi', price: 150, currency: 'TRY', description: 'Toplu ürün bildirimleri ve pazarlama için avantajlı başlangıç paketi.', creditAmount: 1000 },
+                    { type: 'SMS', name: '10.000 SMS Paketi', price: 1200, currency: 'TRY', description: 'Geniş hacimli kampanya SMS işlemleri için büyük ölçekli paket.', creditAmount: 10000 },
+
+                    { type: 'EINVOICE', name: '1.000 E-Fatura Kontörü', price: 250, currency: 'TRY', description: 'Muhasebe entegrasyonlarınız için yeterli başlangıç limiti.', creditAmount: 1000 },
+                    { type: 'EINVOICE', name: '10.000 E-Fatura Kontörü', price: 1800, currency: 'TRY', description: 'Hızlı tüketim ve yüksek hacimli B2B kurumsal işlemler için.', creditAmount: 10000 }
+                ]
+            });
+        }
 
         const where: any = {};
         if (type) where.type = type;
