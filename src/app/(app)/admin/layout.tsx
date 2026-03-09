@@ -22,7 +22,7 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex font-inter">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] flex font-inter">
             {/* Sidebar */}
             <aside className="w-64 bg-slate-900 text-white flex flex-col fixed h-full z-10">
                 <div className="p-6 border-b border-slate-700">

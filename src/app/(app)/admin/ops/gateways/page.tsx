@@ -192,7 +192,7 @@ export default function GatewaysPage() {
                                                         {['SAAS', 'SMS', 'EINVOICE'].map(typ => (
                                                             <div
                                                                 key={typ}
-                                                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${gw.supportedTypes.includes(typ) ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-400 opacity-50'}`}
+                                                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${(gw.supportedTypes || []).includes(typ) ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-400 opacity-50'}`}
                                                             >
                                                                 {typ === 'SAAS' && 'SaaS Abonelikleri'}
                                                                 {typ === 'SMS' && 'SMS Paketleri'}
@@ -206,7 +206,7 @@ export default function GatewaysPage() {
                                                     <div className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-lg p-3 border border-slate-100 dark:border-slate-700/50">
                                                         <div className="text-[10px] font-bold text-slate-500 uppercase">API Key (Masked)</div>
                                                         <div className="text-sm font-mono mt-0.5 text-slate-700 dark:text-slate-300">
-                                                            {gw.apiKey ? `****${gw.apiKey.slice(-5)}` : 'Girilmedi'}
+                                                            {gw.apiKey ? `****${String(gw.apiKey).slice(-5)}` : 'Girilmedi'}
                                                         </div>
                                                     </div>
                                                 </div>
