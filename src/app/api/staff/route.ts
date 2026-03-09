@@ -45,6 +45,7 @@ export async function GET(req: Request) {
                 branch: true,
                 type: true,
                 status: true,
+                currentJob: true,
                 permissions: true,
                 performance: true,
                 lastActive: true,
@@ -235,7 +236,7 @@ export async function PUT(req: Request) {
             birthDate, maritalStatus, bloodType, militaryStatus, reference,
             hasDriverLicense, educationLevel, city, district, relativeName,
             relativePhone, healthReport, certificate, notes, address, permissions,
-            assignedCategoryIds
+            assignedCategoryIds, status, currentJob
         } = body;
 
         if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
@@ -247,6 +248,8 @@ export async function PUT(req: Request) {
             relativePhone, healthReport, certificate, notes, address,
             permissions,
             assignedCategoryIds,
+            status,
+            currentJob,
             hasDriverLicense: hasDriverLicense !== undefined ? !!hasDriverLicense : undefined
         };
 

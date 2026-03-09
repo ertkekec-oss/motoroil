@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
+
+
+import HrOverviewTab from '@/app/(app)/staff/_components/HrOverviewTab';
+import HrTasksTab from '@/app/(app)/staff/_components/HrTasksTab';
+import HrFilesTab from '@/app/(app)/staff/_components/HrFilesTab';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 
 
 export default function StaffManagementContent() {
-    const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
+    const [activeTab, setActiveTab] = useState('overview'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
+
     const { staff, currentUser, hasPermission, addNotification, refreshStaff, branches } = useApp();
     const { addFinancialTransaction, kasalar, setKasalar } = useFinancials();
     const { showSuccess, showConfirm, showError } = useModal();
@@ -862,72 +868,16 @@ export default function StaffManagementContent() {
 
             </div>
 
-            {/* --- STATS OVERVIEW (KPI KARTLARI) --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                {/* 1. Toplam Ekip */}
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-5 relative group flex flex-col justify-between">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="text-slate-500 dark:text-slate-400 text-[12px] font-bold uppercase tracking-widest">Toplam Ekip</div>
-                        <div className="group/tt relative inline-flex items-center justify-center">
-                            <span className="w-[18px] h-[18px] rounded-full border border-slate-300 dark:border-white/10 text-slate-400 flex items-center justify-center cursor-help text-[11px] font-bold">?</span>
-                            <div className="opacity-0 invisible group-hover/tt:opacity-100 group-hover/tt:visible absolute bottom-full right-0 mb-2 w-[240px] p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-lg text-slate-700 dark:text-slate-300 text-[12px] z-50 text-left">
-                                Firmaya kayıtlı ve pasife alınmamış toplam personel sayısı.
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-[32px] font-black text-slate-900 dark:text-white leading-none">{staff.length} <span className="text-[14px] font-semibold text-slate-500 dark:text-slate-400 ml-1">Kişi</span></div>
-                </div>
-
-                {/* 2. Müsait Personel (Emerald Vurgu) */}
-                <div className="bg-white dark:bg-[#0f172a] border border-emerald-100 rounded-[16px] shadow-sm p-5 relative group flex flex-col justify-between">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="text-emerald-700 text-[12px] font-bold uppercase tracking-widest flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Müsait Personel</div>
-                        <div className="group/tt relative inline-flex items-center justify-center">
-                            <span className="w-[18px] h-[18px] rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center cursor-help text-[11px] font-bold">?</span>
-                            <div className="opacity-0 invisible group-hover/tt:opacity-100 group-hover/tt:visible absolute bottom-full right-0 mb-2 w-[240px] p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-lg text-slate-700 dark:text-slate-300 text-[12px] z-50 text-left">
-                                Anlık olarak herhangi bir "Meşgul" ataması veya aktif izni olmayan kişiler.
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-[32px] font-black text-emerald-600 leading-none">{staff.filter(s => s.status === 'Müsait' || s.status === 'Boşta' || !s.status).length}</div>
-                </div>
-
-                {/* 3. Devam Eden İş (Amber Vurgu) */}
-                <div className="bg-white dark:bg-[#0f172a] border border-amber-100 rounded-[16px] shadow-sm p-5 relative group flex flex-col justify-between">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="text-amber-700 text-[12px] font-bold uppercase tracking-widest flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500"></div> Devam Eden İŞ</div>
-                        <div className="group/tt relative inline-flex items-center justify-center">
-                            <span className="w-[18px] h-[18px] rounded-full border border-amber-200 text-amber-500 flex items-center justify-center cursor-help text-[11px] font-bold">?</span>
-                            <div className="opacity-0 invisible group-hover/tt:opacity-100 group-hover/tt:visible absolute bottom-full right-0 mb-2 w-[240px] p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-lg text-slate-700 dark:text-slate-300 text-[12px] z-50 text-left">
-                                Şu an bir satış, servis işlemi veya atanmış görevi yürüten personel.
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-[32px] font-black text-amber-600 leading-none">{staff.filter(s => s.status === 'Meşgul').length}</div>
-                </div>
-
-                {/* 4. Ekip Verimliliği (Blue Vurgu) */}
-                <div className="bg-white dark:bg-[#0f172a] border border-blue-100 rounded-[16px] shadow-sm p-5 relative group flex flex-col justify-between">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="text-blue-700 text-[12px] font-bold uppercase tracking-widest flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600"></div> Ekip Verimliliği</div>
-                        <div className="group/tt relative inline-flex items-center justify-center">
-                            <span className="w-[18px] h-[18px] rounded-full border border-blue-200 text-blue-500 flex items-center justify-center cursor-help text-[11px] font-bold">?</span>
-                            <div className="opacity-0 invisible group-hover/tt:opacity-100 group-hover/tt:visible absolute bottom-full right-0 mb-2 w-[240px] p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-lg text-slate-700 dark:text-slate-300 text-[12px] z-50 text-left">
-                                Son 30 günlük tamamlanan görev / hedef ciro başarı ortalaması.
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-[32px] font-black text-blue-600 leading-none">%94</div>
-                </div>
-            </div>
-
             {/* --- TOOLBAR (STICKY TABS & GLOBAL SEARCH) --- */}
             <div className="sticky top-0 z-40 bg-white dark:bg-[#0f172a]/95 backdrop-blur-md flex flex-col md:flex-row items-end justify-between border-b border-slate-200 dark:border-white/5 mb-6 w-full pt-4">
                 <div className="flex w-full md:w-max whitespace-nowrap overflow-x-auto h-[52px] items-end gap-8 px-2 custom-scroll select-none">
                     {[
+                        { id: 'overview', label: 'Genel Bakış' },
                         { id: 'list', label: 'Personel Listesi' },
+                        { id: 'tasks', label: 'Görevler' },
+                        { id: 'performance', label: 'Hedefler' },
+                        { id: 'files', label: 'Dosyalar' },
                         { id: 'roles', label: 'Roller & İzinler' },
-                        { id: 'performance', label: 'Performans' },
                         { id: 'shifts', label: 'Vardiya' },
                         { id: 'leaves', label: 'İzinler' },
                         { id: 'attendance', label: 'PDKS' },
@@ -964,11 +914,46 @@ export default function StaffManagementContent() {
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
                         Filtrele
                     </button>
+                    <select
+                        className="h-[40px] px-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[12px] text-[13px] outline-none focus:border-blue-500 shadow-sm transition-colors"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    >
+                        <option value="">Tüm Departmanlar</option>
+                        <option value="Yönetici">Yönetici</option>
+                        <option value="Saha Satış">Saha Satış</option>
+                        <option value="Merkez">Merkez / Ofis</option>
+                    </select>
                     <button className="h-[40px] px-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[12px] text-[13px] hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 whitespace-nowrap shadow-sm">
                         Dışa Aktar
                     </button>
                 </div>
             </div>
+
+            {/* --- V2 TABS (OVERVIEW, TASKS, FILES) --- */}
+            {activeTab === 'overview' && (
+                <HrOverviewTab
+                    staff={staff}
+                    targets={targets}
+                    setShowAddStaffModal={setShowAddStaffModal}
+                    setShowTaskModal={setShowTaskModal}
+                    setSelectedStaff={setSelectedStaff}
+                />
+            )}
+
+            {activeTab === 'tasks' && (
+                <HrTasksTab
+                    staff={staff}
+                    setSelectedStaff={setSelectedStaff}
+                    setShowTaskModal={setShowTaskModal}
+                />
+            )}
+
+            {activeTab === 'files' && (
+                <HrFilesTab
+                    staff={staff}
+                    setSelectedStaff={setSelectedStaff}
+                />
+            )}
 
             {/* --- LIST TAB (OPERASYON TABLOSU) --- */}
             {activeTab === 'list' && (
@@ -990,6 +975,7 @@ export default function StaffManagementContent() {
                                 {filteredStaff.length > 0 ? filteredStaff?.map(person => {
                                     const activeAtt = attendance.find(a => a.staffId === person.id && !a.checkOut);
                                     const isAvailable = person.status === 'Müsait' || person.status === 'Boşta' || !person.status;
+                                    const personTargets = targets.filter(t => t.staffId === person.id);
 
                                     return (
                                         <tr key={person.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/80 transition-colors h-[56px] group">
@@ -1018,13 +1004,19 @@ export default function StaffManagementContent() {
                                                 </div>
                                             </td>
                                             <td className="p-4 align-middle">
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex flex-col gap-2">
                                                     {person.currentJob ? (
-                                                        <span className="text-[12px] font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1.5 whitespace-nowrap">
-                                                            <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-500"></span> Meşgul: {person.currentJob.substring(0, 15)}...
+                                                        <span className="text-[12px] font-semibold text-amber-700 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-500/20 flex items-center gap-1.5 whitespace-nowrap w-max">
+                                                            <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-500"></span> İş: {person.currentJob.substring(0, 20)}{person.currentJob.length > 20 ? '...' : ''}
                                                         </span>
                                                     ) : (
                                                         <span className="text-[12px] font-medium text-slate-500 dark:text-slate-400">Normal Mesai</span>
+                                                    )}
+
+                                                    {personTargets.length > 0 && (
+                                                        <span className="text-[11px] font-bold text-blue-700 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-500/20 flex items-center gap-1 w-max">
+                                                            🎯 {personTargets.length} Açık Hedef
+                                                        </span>
                                                     )}
                                                 </div>
                                             </td>

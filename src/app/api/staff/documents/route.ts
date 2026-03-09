@@ -1,18 +1,31 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export async function GET(request: Request) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
         const { searchParams } = new URL(request.url);
         const staffId = searchParams.get('staffId');
 
-        if (!staffId) {
-            return NextResponse.json({ error: 'Staff ID is required' }, { status: 400 });
+        const user = (auth as any).user;
+        const tenantId = user.impersonateTenantId || user.tenantId;
+        const isPlatformAdmin = user.role === 'SUPER_ADMIN' || tenantId === 'PLATFORM_ADMIN';
+
+        const where: any = {};
+        if (staffId) where.staffId = staffId;
+
+        if (!isPlatformAdmin) {
+            where.staff = {
+                tenantId: tenantId
+            };
         }
 
         const documents = await prisma.staffDocument.findMany({
-            where: { staffId },
+            where,
             orderBy: { uploadedAt: 'desc' },
             select: {
                 id: true,
@@ -21,7 +34,13 @@ export async function GET(request: Request) {
                 fileType: true,
                 fileSize: true,
                 uploadedAt: true,
-                fileData: true
+                fileData: true,
+                staff: {
+                    select: {
+                        name: true,
+                        role: true
+                    }
+                }
             }
         });
 
