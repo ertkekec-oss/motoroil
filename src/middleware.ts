@@ -41,7 +41,10 @@ export async function middleware(request: NextRequest) {
     }
 
     // 2. ADMIN GUARD (CRITICAL: MUST BE BEFORE NETWORK GUARD)
-    if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    const isAdminPath = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
+    const isBillingProductGet = pathname === '/api/admin/billing-products' && request.method === 'GET';
+
+    if (isAdminPath && !isBillingProductGet) {
         const sessionToken = request.cookies.get('session')?.value;
 
         if (!sessionToken) {
