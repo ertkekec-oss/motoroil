@@ -12,8 +12,8 @@ export const metadata = {
     title: 'Bilgi Merkezi - Periodya Enterprise',
 };
 
-// NextJS auto revalidate for high traffic knowledge base
-export const revalidate = 60; // cached for 60 seconds
+// NextJS config logic removed to avoid dynamic request collisions with revalidate
+// export const revalidate = 60; 
 
 export default async function KnowledgeHubPage() {
     const session = await getSession();
@@ -108,18 +108,18 @@ export default async function KnowledgeHubPage() {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {categories.map(cat => (
-                                <Link href={`/help/articles?category=${cat.id}`} key={cat.id}>
+                                <Link href={`/help/articles?category=${cat?.id}`} key={cat?.id}>
                                     <EnterpriseCard className="h-full flex flex-col hover:border-blue-200 dark:hover:border-blue-900/50 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors cursor-pointer p-5!">
                                         <div className="flex items-center gap-3 mb-3">
                                             <div className="w-10 h-10 rounded-lg shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl">
-                                                {cat.icon || '📁'}
+                                                {cat?.icon || '📁'}
                                             </div>
                                             <div>
-                                                <h5 className="font-semibold text-slate-900 dark:text-slate-100 text-base">{cat.name}</h5>
-                                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{cat._count?.articles || 0} Makale</p>
+                                                <h5 className="font-semibold text-slate-900 dark:text-slate-100 text-base">{cat?.name}</h5>
+                                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{cat?._count?.articles || 0} Makale</p>
                                             </div>
                                         </div>
-                                        {cat.description && (
+                                        {cat?.description && (
                                             <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-auto">
                                                 {cat.description}
                                             </p>
@@ -139,31 +139,31 @@ export default async function KnowledgeHubPage() {
                         {/* 4) POPULAR ARTICLES */}
                         <section>
                             <EnterpriseSectionHeader title="En Çok Okunanlar" subtitle="Kullanıcıların platformda en çok faydalandığı makaleler." />
-                            {popularArticles.length === 0 ? (
+                            {!popularArticles || popularArticles.length === 0 ? (
                                 <EnterpriseEmptyState title="Makale Bulunamadı" description="Sistemde popüler makale bulunmuyor." icon="📖" />
                             ) : (
                                 <div className="space-y-3">
                                     {popularArticles.map(article => (
-                                        <Link href={`/help/articles/${article.slug}`} key={article.id} className="block group">
+                                        <Link href={`/help/articles/${article?.slug}`} key={article?.id} className="block group">
                                             <EnterpriseCard className="p-4! group-hover:bg-slate-50 dark:group-hover:bg-slate-900/50 transition-colors rounded-xl border-slate-200 dark:border-slate-800">
                                                 <div className="flex justify-between items-start gap-4">
                                                     <div className="flex-1">
                                                         <h4 className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-base mb-1">
-                                                            {article.title}
+                                                            {article?.title}
                                                         </h4>
                                                         <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
-                                                            {article.category && (
+                                                            {article?.category?.name && (
                                                                 <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest text-slate-600 dark:text-slate-400">
                                                                     {article.category.name}
                                                                 </span>
                                                             )}
                                                             <span>•</span>
-                                                            <span>{article.updatedAt.toLocaleDateString('tr-TR')} Tarihinde Güncellendi</span>
+                                                            <span>Yakın zamanda güncellendi</span>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center text-xs text-slate-400 font-medium whitespace-nowrap">
                                                         <Book className="w-3.5 h-3.5 mr-1" />
-                                                        {article.viewCount} Okunma
+                                                        {article?.viewCount || 0} Okunma
                                                     </div>
                                                 </div>
                                             </EnterpriseCard>
@@ -177,16 +177,16 @@ export default async function KnowledgeHubPage() {
                         <section>
                             <EnterpriseSectionHeader title="Son Eklenenler & Güncellemeler" subtitle="Periodya'daki en yeni özelliklerin dökümantasyonu." />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {recentArticles.map(article => (
-                                    <Link href={`/help/articles/${article.slug}`} key={article.id} className="block h-full">
+                                {recentArticles?.map(article => (
+                                    <Link href={`/help/articles/${article?.slug}`} key={article?.id} className="block h-full">
                                         <EnterpriseCard className="h-full p-4! hover:border-slate-300 dark:hover:border-slate-700 transition-colors flex flex-col">
-                                            {article.category && (
+                                            {article?.category?.name && (
                                                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
                                                     {article.category.name}
                                                 </span>
                                             )}
                                             <h4 className="font-medium text-slate-900 dark:text-slate-100 text-sm mb-3 line-clamp-2">
-                                                {article.title}
+                                                {article?.title}
                                             </h4>
                                             <div className="mt-auto flex items-center justify-between text-xs text-slate-500 group-hover:text-blue-600 transition-colors">
                                                 <span>Makaleyi İncele</span>
