@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader, EnterpriseInput } from "@/components/ui/enterprise";
+import {
+    EnterprisePageShell,
+    EnterpriseCard,
+    EnterpriseSectionHeader,
+    EnterpriseInput,
+    EnterpriseButton,
+    EnterpriseEmptyState,
+    EnterpriseSelect,
+    EnterpriseSwitch
+} from "@/components/ui/enterprise";
+import { Server, Settings, Plus, Key, Link2, CreditCard, Trash2, Edit2, ShieldCheck, Activity } from 'lucide-react';
 
 export default function GatewaysPage() {
     const [gateways, setGateways] = useState<any[]>([]);
@@ -62,7 +72,7 @@ export default function GatewaysPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm('Emin misiniz?')) return;
+        if (!window.confirm('Bu ağ geçidini kalıcı olarak silmek istediğinize emin misiniz? (Ödemeler durabilir)')) return;
         try {
             await fetch(`/api/admin/gateways?id=${id}`, { method: 'DELETE' });
             fetchGateways();
@@ -110,141 +120,178 @@ export default function GatewaysPage() {
 
     return (
         <EnterprisePageShell
-            title="Ödeme Altyapıları (Gateways)"
-            description="Tüm ödeme servis sağlayıcıları, aktif/pasif modları ve destekledikleri faturalandırma tipleri."
+            title="Ödeme & Gateway Altyapıları"
+            description="Tüm ödeme servis sağlayıcıları (PSP), komisyon oranları ve API entegrasyon ayarları."
             actions={
-                <button onClick={openNew} className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
-                    + Yeni Gateway Ekle
-                </button>
+                <EnterpriseButton onClick={openNew} variant="primary">
+                    <Plus className="w-4 h-4" /> Yeni Gateway Ekle
+                </EnterpriseButton>
             }
         >
             <div className="space-y-6">
                 {loading ? (
-                    <div className="p-8 text-center text-slate-500">Yükleniyor...</div>
+                    <div className="py-20 flex justify-center text-slate-400">Yükleniyor...</div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {gateways.map(gw => (
-                            <EnterpriseCard key={gw.id} className="p-6 relative group border-t-4 data-[active=true]:border-emerald-500 data-[active=false]:border-slate-300" data-active={gw.isActive}>
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider">{gw.provider}</h3>
-                                        <div className="flex gap-2 mt-2">
-                                            {gw.isActive ? (
-                                                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-bold">AKTİF</span>
-                                            ) : (
-                                                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[11px] font-bold">PASİF</span>
-                                            )}
-                                            {gw.isTestMode && (
-                                                <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[11px] font-bold">TEST MODU</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => openEdit(gw)} className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold text-[12px] rounded-lg">Düzenle</button>
-                                        <button onClick={() => handleDelete(gw.id)} className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[12px] rounded-lg">Sil</button>
-                                    </div>
-                                </div>
-
-                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl space-y-3 border border-slate-100 dark:border-white/5">
-                                    <div>
-                                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Desteklenen İşlemler</div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {['SAAS', 'SMS', 'EINVOICE'].map(typ => (
-                                                <div key={typ} className={`px-2.5 py-1 rounded-[6px] text-[12px] font-bold border transition-colors ${gw.supportedTypes.includes(typ) ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-400 opacity-50'}`}>
-                                                    {typ === 'SAAS' && 'SaaS Planları'}
-                                                    {typ === 'SMS' && 'SMS Paketleri'}
-                                                    {typ === 'EINVOICE' && 'E-Fatura Kontörü'}
+                    <>
+                        {gateways.length === 0 ? (
+                            <EnterpriseEmptyState
+                                icon={<Server />}
+                                title="Hiçbir Gateway Yapılandırılmadı"
+                                description="SaaS ödemeleri veya kontör satışları için sisteminize en az bir ödeme sağlayıcısı (Iyzico, PayTR vb.) eklemeniz gerekmektedir."
+                                action={
+                                    <EnterpriseButton onClick={openNew} variant="primary">
+                                        <Plus className="w-4 h-4" /> İlk Sağlayıcıyı Kur
+                                    </EnterpriseButton>
+                                }
+                            />
+                        ) : (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {gateways.map(gw => (
+                                    <EnterpriseCard
+                                        key={gw.id}
+                                        className="relative group transition-all hover:shadow-md"
+                                        borderLeftColor={gw.isActive ? '#10b981' : '#cbd5e1'}
+                                        noPadding={true}
+                                    >
+                                        <div className="p-6">
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${gw.isActive ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}>
+                                                        <CreditCard className="w-6 h-6" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight">{gw.provider}</h3>
+                                                        <div className="flex gap-2 mt-1">
+                                                            {gw.isActive ? (
+                                                                <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                                                                    <Activity className="w-3 h-3" /> CANLI
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">PASİF</span>
+                                                            )}
+                                                            {gw.isTestMode && (
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full">SANDBOX</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </EnterpriseCard>
-                        ))}
+                                                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={() => openEdit(gw)} className="w-8 h-8 flex items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg transition-colors">
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(gw.id)} className="w-8 h-8 flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                        {gateways.length === 0 && (
-                            <div className="col-span-1 lg:col-span-2 p-12 text-center text-slate-500 bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-white/5">
-                                Kayıtlı ödeme altyapısı bulunmuyor. Yeni Gateway ekleyin.
+                                            <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                <div>
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Link2 className="w-3 h-3" /> Desteklenen Akışlar</div>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {['SAAS', 'SMS', 'EINVOICE'].map(typ => (
+                                                            <div
+                                                                key={typ}
+                                                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${gw.supportedTypes.includes(typ) ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-400 opacity-50'}`}
+                                                            >
+                                                                {typ === 'SAAS' && 'SaaS Abonelikleri'}
+                                                                {typ === 'SMS' && 'SMS Paketleri'}
+                                                                {typ === 'EINVOICE' && 'E-Fatura Kontör'}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-3 pt-3">
+                                                    <div className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-lg p-3 border border-slate-100 dark:border-slate-700/50">
+                                                        <div className="text-[10px] font-bold text-slate-500 uppercase">API Key (Masked)</div>
+                                                        <div className="text-sm font-mono mt-0.5 text-slate-700 dark:text-slate-300">
+                                                            {gw.apiKey ? `****${gw.apiKey.slice(-5)}` : 'Girilmedi'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </EnterpriseCard>
+                                ))}
                             </div>
                         )}
-                    </div>
+                    </>
                 )}
             </div>
 
             {/* Modal */}
             {modalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
-                        <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                                {editingId ? 'Gateway Düzenle' : 'Yeni Gateway Ekle'}
-                            </h3>
-                            <button onClick={() => setModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500">✕</button>
+                    <div className="bg-white dark:bg-slate-900 rounded-[24px] shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Settings className="w-5 h-5 text-blue-600" />
+                                    {editingId ? 'Entegrasyonu Düzenle' : 'Yeni Entegrasyon Kur'}
+                                </h3>
+                                <p className="text-sm text-slate-500 mt-1">Ödeme altyapısı sağlayıcısının API anahtarlarını girin.</p>
+                            </div>
+                            <button onClick={() => setModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors">✕</button>
                         </div>
 
-                        <div className="p-6 overflow-y-auto custom-scroll space-y-6">
-                            <div>
-                                <label className="block text-[12px] font-bold text-slate-500 uppercase mb-2">Sağlayıcı (Provider)</label>
-                                <select
-                                    className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 font-bold outline-none focus:border-blue-500 transition-colors"
+                        <div className="p-8 overflow-y-auto custom-scroll space-y-8 bg-slate-50/50 dark:bg-slate-900/50">
+
+                            <EnterpriseField label="Ağ Geçidi (Provider)">
+                                <EnterpriseSelect
                                     value={form.provider}
                                     onChange={e => setForm({ ...form, provider: e.target.value })}
                                 >
-                                    <option value="IYZICO">IYZICO</option>
-                                    <option value="PAYTR">PAYTR</option>
-                                    <option value="PAYNET">PAYNET</option>
-                                </select>
+                                    <option value="IYZICO">Iyzico Ödeme Sistemleri</option>
+                                    <option value="PAYTR">PayTR Sanal POS</option>
+                                    <option value="PAYNET">Paynet B2B POS</option>
+                                </EnterpriseSelect>
+                            </EnterpriseField>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <EnterpriseSwitch
+                                    label="Aktif Sistem Olarak Kullan"
+                                    description="Seçilen ödeme senaryolarında bu sağlayıcı kullanılacak."
+                                    checked={form.isActive}
+                                    onChange={e => setForm({ ...form, isActive: e.target.checked })}
+                                />
+                                <EnterpriseSwitch
+                                    label="Test Ortamı (Sandbox)"
+                                    description="Gerçek para çekilmez, test kartları ile çalışır."
+                                    checked={form.isTestMode}
+                                    onChange={e => setForm({ ...form, isTestMode: e.target.checked })}
+                                />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <label className="flex items-center gap-3 p-4 border border-slate-200 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                        checked={form.isActive}
-                                        onChange={e => setForm({ ...form, isActive: e.target.checked })}
-                                    />
-                                    <div>
-                                        <div className="font-bold text-[14px]">Aktif Kullanım</div>
-                                        <div className="text-[11px] text-slate-500 font-medium">Bu gateway ile ödeme alınsın mı?</div>
-                                    </div>
-                                </label>
-
-                                <label className="flex items-center gap-3 p-4 border border-slate-200 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
-                                        checked={form.isTestMode}
-                                        onChange={e => setForm({ ...form, isTestMode: e.target.checked })}
-                                    />
-                                    <div>
-                                        <div className="font-bold text-[14px]">Test Modu</div>
-                                        <div className="text-[11px] text-slate-500 font-medium">Live ortam yerine sandbox kullanılır.</div>
-                                    </div>
-                                </label>
+                            <div className="space-y-4">
+                                <EnterpriseSectionHeader
+                                    title="API Kimlik Bilgileri"
+                                    subtitle="Sağlayıcı panelinden aldığınız entegrasyon anahtarları."
+                                    icon={<Key className="w-5 h-5 text-slate-600" />}
+                                />
+                                <EnterpriseInput value={form.apiKey} onChange={e => setForm({ ...form, apiKey: e.target.value })} placeholder="API Key" label="API KEY PÜBLİK ANAHTAR" />
+                                <EnterpriseInput value={form.apiSecret} onChange={e => setForm({ ...form, apiSecret: e.target.value })} placeholder="••••••••••••••••" type="password" label="API SECRET (GİZLİ ANAHTAR)" />
+                                <EnterpriseInput value={form.merchantId} onChange={e => setForm({ ...form, merchantId: e.target.value })} placeholder="Merchant ID" label="MERCHANT ID (MAĞAZA NO - GEREKLİYSE)" />
                             </div>
 
-                            <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-white/5">
-                                <EnterpriseSectionHeader title="Kimlik Bilgileri (API)" description="Ödeme kuruluşunun size sağladığı anahtarlar." />
-                                <EnterpriseInput value={form.apiKey} onChange={e => setForm({ ...form, apiKey: e.target.value })} placeholder="API Key" />
-                                <EnterpriseInput value={form.apiSecret} onChange={e => setForm({ ...form, apiSecret: e.target.value })} placeholder="API Secret" type="password" />
-                                <EnterpriseInput value={form.merchantId} onChange={e => setForm({ ...form, merchantId: e.target.value })} placeholder="Merchant ID (Gerekliyse)" />
-                            </div>
-
-                            <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-white/5">
-                                <EnterpriseSectionHeader title="Desteklenen Ürünler" description="Bu ağ geçidinin hangi ürün tiplerinde ödeme almasını istiyorsunuz?" />
+                            <div className="space-y-4">
+                                <EnterpriseSectionHeader
+                                    title="Trafik Yönlendirmesi"
+                                    subtitle="Bu ödeme altyapısı hangi hizmetlerin tahsilatında tetiklenecek?"
+                                    icon={<ShieldCheck className="w-5 h-5 text-slate-600" />}
+                                />
 
                                 <div className="flex flex-col gap-3">
                                     {['SAAS', 'SMS', 'EINVOICE'].map(typ => (
-                                        <label key={typ} className="flex items-center justify-between p-3 border border-slate-200 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                                            <div className="font-bold text-[13px]">
-                                                {typ === 'SAAS' && 'SaaS Platform Planları'}
-                                                {typ === 'SMS' && 'SMS Hizmet Paketleri'}
-                                                {typ === 'EINVOICE' && 'E-Fatura Mühür Kontörü'}
+                                        <label key={typ} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:bg-white transition-colors ${form.supportedTypes.includes(typ) ? 'border-blue-500 bg-blue-50/30' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'}`}>
+                                            <div className="font-semibold text-sm text-slate-900 dark:text-white">
+                                                {typ === 'SAAS' && 'SaaS Platform Planları & Abonelikleri'}
+                                                {typ === 'SMS' && 'SMS Hizmet Paketleri Alımları'}
+                                                {typ === 'EINVOICE' && 'E-Fatura Mühür Kontörü Yüklemeleri'}
                                             </div>
                                             <input
                                                 type="checkbox"
-                                                className="w-5 h-5 rounded border-slate-300 text-blue-600"
+                                                className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-colors"
                                                 checked={form.supportedTypes.includes(typ)}
                                                 onChange={() => toggleSupportedType(typ)}
                                             />
@@ -255,9 +302,9 @@ export default function GatewaysPage() {
 
                         </div>
 
-                        <div className="p-6 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 rounded-b-[24px]">
-                            <button onClick={() => setModalOpen(false)} className="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-200/50 transition-colors">İptal</button>
-                            <button onClick={handleSave} className="px-5 py-2.5 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-md">Kaydet & Uygula</button>
+                        <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end gap-3 shrink-0">
+                            <EnterpriseButton onClick={() => setModalOpen(false)} variant="secondary">İptal Et</EnterpriseButton>
+                            <EnterpriseButton onClick={handleSave} variant="primary">Kimlikleri Teyit Et ve Uygula</EnterpriseButton>
                         </div>
                     </div>
                 </div>
