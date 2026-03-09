@@ -5,175 +5,260 @@ import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import HelpSearch from '@/components/HelpSearch';
 import { AIAssistantPanel } from '@/components/help/AIAssistantPanel';
-import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader, EnterpriseButton } from '@/components/ui/enterprise';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader, EnterpriseEmptyState } from '@/components/ui/enterprise';
+import { Book, ChevronRight, FileText, LifeBuoy, Inbox, Sparkles } from 'lucide-react';
 
 export const metadata = {
-    title: 'Support Hub - Periodya Enterprise',
+    title: 'Bilgi Merkezi - Periodya Enterprise',
 };
 
-export default async function HelpCenterPage() {
+// NextJS auto revalidate for high traffic knowledge base
+export const revalidate = 60; // cached for 60 seconds
+
+export default async function KnowledgeHubPage() {
     const session = await getSession();
     if (!session?.tenantId) {
         redirect('/login');
     }
 
-    // Parallel fetch initial required data
-    const [categories, recentTickets, recommendedArticles] = await Promise.all([
+    const tenantFilter = { OR: [{ tenantId: session.tenantId }, { tenantId: null }] };
+
+    // Parallel fetch required data for the Hub
+    const [categories, popularArticles, recentArticles] = await Promise.all([
         prisma.helpCategory.findMany({
             orderBy: { order: 'asc' },
-            take: 10,
+            take: 24, // scalable up to 24 categories
             include: {
                 _count: {
                     select: { topics: true }
                 }
             }
         }),
-        prisma.supportTicket.findMany({
-            where: { tenantId: session.tenantId, createdByUserId: session.id },
-            orderBy: { createdAt: 'desc' },
-            take: 3,
-            select: { id: true, subject: true, status: true, priority: true, createdAt: true }
+        prisma.helpArticle.findMany({
+            where: { status: 'PUBLISHED', ...tenantFilter },
+            orderBy: { viewCount: 'desc' },
+            take: 6,
+            include: { category: { select: { name: true } } }
         }),
         prisma.helpArticle.findMany({
-            where: { status: 'PUBLISHED', OR: [{ tenantId: session.tenantId }, { tenantId: null }] },
-            orderBy: { viewCount: 'desc' },
-            take: 3
+            where: { status: 'PUBLISHED', ...tenantFilter },
+            orderBy: { updatedAt: 'desc' },
+            take: 6,
+            include: { category: { select: { name: true } } }
         })
     ]);
+
+    const popularTopics = [
+        'ERP', 'Finans', 'Envanter', 'SalesX', 'B2B Hub',
+        'Entegrasyonlar', 'E-Fatura', 'Kargo', 'API', 'İçe Aktarma', 'Abonelik'
+    ];
 
     return (
         <EnterprisePageShell className="bg-slate-50 dark:bg-slate-950 min-h-screen">
 
-            {/* AI Floating Panel */}
             <AIAssistantPanel />
 
-            {/* A) Hero Search Area */}
-            <div className="flex flex-col items-center justify-center text-center py-12 px-4">
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-3">
+            {/* 1) HERO SEARCH */}
+            <div className="flex flex-col items-center justify-center text-center py-16 px-4">
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
                     Nasıl yardımcı olabiliriz?
                 </h1>
-                <p className="text-base text-slate-500 dark:text-slate-400 mb-8 max-w-xl">
-                    Konu arayın, AI asistandan anında yardım alın veya teknik ekibimizle iletişime geçmek için destek talebi oluşturun.
+                <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-2xl">
+                    Konu arayın, AI asistandan yardım alın veya destek talebi oluşturun.
                 </p>
 
-                <div className="w-full max-w-2xl relative">
+                <div className="w-full max-w-3xl relative z-20">
                     <HelpSearch />
+                </div>
+
+                {/* 2) POPULAR TOPICS CHIPS */}
+                <div className="mt-8">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Hızlı Konular</p>
+                    <div className="flex flex-wrap justify-center gap-2 max-w-3xl">
+                        {popularTopics.map(topic => (
+                            <Link
+                                href={`/help/articles?q=${encodeURIComponent(topic)}`}
+                                key={topic}
+                                className="px-4 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                            >
+                                {topic}
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            <div className="max-w-[1080px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+            <div className="max-w-7xl mx-auto space-y-16 pb-20">
 
-                {/* Left Column (Main Content) */}
-                <div className="lg:col-span-2 space-y-8">
-
-                    {/* B) Suggested Help */}
-                    <section>
-                        <EnterpriseSectionHeader title="Önerilen Çözümler" subtitle="Sizin için en çok aranan ve faydalı bulunan makaleler." />
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            {recommendedArticles.map(article => (
-                                <Link href={`/help/articles/${article.slug}`} key={article.id}>
-                                    <EnterpriseCard className="hover:border-slate-300 dark:hover:border-slate-700 transition-colors cursor-pointer h-full flex flex-col justify-between">
-                                        <div>
-                                            <h4 className="font-semibold text-slate-800 dark:text-slate-100 mb-2 truncate">{article.title}</h4>
-                                            <p className="text-xs text-slate-500 line-clamp-2">{article.summary || 'Makale detayını görüntülemek için tıklayın.'}</p>
-                                        </div>
-                                        <div className="mt-4 text-[10px] uppercase font-bold text-slate-400 tracking-wider flex justify-between items-center">
-                                            <span>Makaleyi Oku →</span>
-                                            {article.viewCount > 0 && <span>{article.viewCount} Görüntülenme</span>}
-                                        </div>
-                                    </EnterpriseCard>
-                                </Link>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* C) Knowledge Base Categories */}
-                    <section>
-                        <EnterpriseSectionHeader title="Bilgi Bankası Kategorileri" subtitle="Modül veya özellik bazında dökümantasyona göz atın." />
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {/* 3) CATEGORY GRID */}
+                <section>
+                    <EnterpriseSectionHeader
+                        title="Bilgi Bankası Kategorileri"
+                        subtitle="Tüm Periodya platform özelliklerinin dökümantasyonunu keşfedin. (1000+ Makale)"
+                    />
+                    {categories.length === 0 ? (
+                        <EnterpriseEmptyState title="Kategori Bulunamadı" description="Sistemde yayınlanan bilgi bankası kategorisi yoktur." icon="📂" />
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {categories.map(cat => (
                                 <Link href={`/help/articles?category=${cat.id}`} key={cat.id}>
-                                    <EnterpriseCard className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors cursor-pointer p-4!">
-                                        <div className="w-8 h-8 rounded shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg">
-                                            {cat.icon || '📁'}
+                                    <EnterpriseCard className="h-full flex flex-col hover:border-blue-200 dark:hover:border-blue-900/50 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors cursor-pointer p-5!">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-10 h-10 rounded-lg shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl">
+                                                {cat.icon || '📁'}
+                                            </div>
+                                            <div>
+                                                <h5 className="font-semibold text-slate-900 dark:text-slate-100 text-base">{cat.name}</h5>
+                                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{cat._count.topics} Makale</p>
+                                            </div>
                                         </div>
-                                        <div className="overflow-hidden">
-                                            <h5 className="font-semibold text-slate-800 dark:text-slate-200 text-sm truncate">{cat.name}</h5>
-                                            <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{cat._count.topics} Mdkale</p>
-                                        </div>
+                                        {cat.description && (
+                                            <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-auto">
+                                                {cat.description}
+                                            </p>
+                                        )}
                                     </EnterpriseCard>
                                 </Link>
                             ))}
                         </div>
-                    </section>
+                    )}
+                </section>
 
-                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {/* Right Column (Sidebar) */}
-                <div className="space-y-8">
+                    {/* Main Feed: Articles */}
+                    <div className="lg:col-span-2 space-y-12">
 
-                    {/* E) Quick Support Actions */}
-                    <section>
-                        <EnterpriseSectionHeader title="Hızlı İşlemler" />
-                        <EnterpriseCard noPadding className="divide-y divide-slate-100 dark:divide-slate-800">
-                            <Link href="/help/tickets/new" className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                                <div className="flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold text-xs shrink-0">+</span>
-                                    <span className="font-medium text-sm text-slate-800 dark:text-slate-200">Destek Talebi Oluştur</span>
+                        {/* 4) POPULAR ARTICLES */}
+                        <section>
+                            <EnterpriseSectionHeader title="En Çok Okunanlar" subtitle="Kullanıcıların platformda en çok faydalandığı makaleler." />
+                            {popularArticles.length === 0 ? (
+                                <EnterpriseEmptyState title="Makale Bulunamadı" description="Sistemde popüler makale bulunmuyor." icon="📖" />
+                            ) : (
+                                <div className="space-y-3">
+                                    {popularArticles.map(article => (
+                                        <Link href={`/help/articles/${article.slug}`} key={article.id} className="block group">
+                                            <EnterpriseCard className="p-4! group-hover:bg-slate-50 dark:group-hover:bg-slate-900/50 transition-colors rounded-xl border-slate-200 dark:border-slate-800">
+                                                <div className="flex justify-between items-start gap-4">
+                                                    <div className="flex-1">
+                                                        <h4 className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-base mb-1">
+                                                            {article.title}
+                                                        </h4>
+                                                        <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
+                                                            {article.category && (
+                                                                <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest text-slate-600 dark:text-slate-400">
+                                                                    {article.category.name}
+                                                                </span>
+                                                            )}
+                                                            <span>•</span>
+                                                            <span>{article.updatedAt.toLocaleDateString('tr-TR')} Tarihinde Güncellendi</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center text-xs text-slate-400 font-medium whitespace-nowrap">
+                                                        <Book className="w-3.5 h-3.5 mr-1" />
+                                                        {article.viewCount} Okunma
+                                                    </div>
+                                                </div>
+                                            </EnterpriseCard>
+                                        </Link>
+                                    ))}
                                 </div>
-                                <span className="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
-                            </Link>
-                            <Link href="/help/tickets" className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                                <div className="flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs shrink-0">B</span>
-                                    <span className="font-medium text-sm text-slate-800 dark:text-slate-200">Biletlerim & Taleplerim</span>
-                                </div>
-                                <span className="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
-                            </Link>
-                            <Link href="/help/articles" className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                                <div className="flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs shrink-0">D</span>
-                                    <span className="font-medium text-sm text-slate-800 dark:text-slate-200">Tüm Makaleler</span>
-                                </div>
-                                <span className="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
-                            </Link>
-                        </EnterpriseCard>
-                    </section>
+                            )}
+                        </section>
 
-                    {/* D) Recent Tickets */}
-                    <section>
-                        <EnterpriseSectionHeader title="Açık Talepleriniz" subtitle="Son oluşturduğunuz biletler." />
-                        {recentTickets.length === 0 ? (
-                            <div className="p-6 border border-slate-200 dark:border-slate-800 border-dashed rounded-xl text-center">
-                                <p className="text-sm text-slate-500">Şu anda açık bir destek talebiniz bulunmuyor.</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {recentTickets.map(ticket => (
-                                    <Link href={`/help/tickets/${ticket.id}`} key={ticket.id} className="block">
-                                        <EnterpriseCard className="p-4! hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer flex flex-col gap-3">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <h5 className="font-medium text-sm text-slate-800 dark:text-slate-200 truncate">{ticket.subject}</h5>
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider shrink-0 ${ticket.status === 'OPEN' ? 'bg-blue-100 text-blue-700' : ticket.status === 'IN_PROGRESS' || ticket.status === 'WAITING_USER' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
-                                                    {ticket.status}
+                        {/* 5) RECENT ARTICLES */}
+                        <section>
+                            <EnterpriseSectionHeader title="Son Eklenenler & Güncellemeler" subtitle="Periodya'daki en yeni özelliklerin dökümantasyonu." />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {recentArticles.map(article => (
+                                    <Link href={`/help/articles/${article.slug}`} key={article.id} className="block h-full">
+                                        <EnterpriseCard className="h-full p-4! hover:border-slate-300 dark:hover:border-slate-700 transition-colors flex flex-col">
+                                            {article.category && (
+                                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                                                    {article.category.name}
                                                 </span>
-                                            </div>
-                                            <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium tracking-wide">
-                                                <span className={`${ticket.priority === 'CRITICAL' ? 'text-rose-600' : ticket.priority === 'HIGH' ? 'text-orange-500' : ''}`}>
-                                                    Öncelik: {ticket.priority}
-                                                </span>
-                                                <span>{ticket.createdAt.toLocaleDateString('tr-TR')}</span>
+                                            )}
+                                            <h4 className="font-medium text-slate-900 dark:text-slate-100 text-sm mb-3 line-clamp-2">
+                                                {article.title}
+                                            </h4>
+                                            <div className="mt-auto flex items-center justify-between text-xs text-slate-500 group-hover:text-blue-600 transition-colors">
+                                                <span>Makaleyi İncele</span>
+                                                <ChevronRight className="w-4 h-4" />
                                             </div>
                                         </EnterpriseCard>
                                     </Link>
                                 ))}
-                                <Link href="/help/tickets" className="block text-center text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 mt-4 leading-none py-2">
-                                    Tümünü Gör
-                                </Link>
                             </div>
-                        )}
-                    </section>
+                        </section>
 
+                    </div>
+
+                    {/* 6) HELP ACTIONS (Right Sidebar) */}
+                    <div className="space-y-6">
+                        <EnterpriseSectionHeader title="Otonom Destek Merkezi" />
+
+                        <div className="grid grid-cols-1 gap-3">
+                            <Link href="/help/tickets/new" className="group">
+                                <EnterpriseCard className="p-4! border-blue-200 dark:border-blue-900/50 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                        <LifeBuoy className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Destek Talebi Oluştur</h4>
+                                        <p className="text-xs text-slate-500">Ekibimizle direkt iletişime geçin.</p>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                                </EnterpriseCard>
+                            </Link>
+
+                            <Link href="/help/tickets" className="group">
+                                <EnterpriseCard className="p-4! hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+                                        <Inbox className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Taleplerim & Geçmiş</h4>
+                                        <p className="text-xs text-slate-500">Aktif ve çözülmüş biletleriniz.</p>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                                </EnterpriseCard>
+                            </Link>
+
+                            <Link href="/help/articles" className="group">
+                                <EnterpriseCard className="p-4! hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+                                        <FileText className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Tüm Kütüphane</h4>
+                                        <p className="text-xs text-slate-500">Bilgi bankasının tamamı.</p>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                                </EnterpriseCard>
+                            </Link>
+
+                            <div
+                                className="group cursor-pointer"
+                                onClick={() => {
+                                    // Hack to open AI panel from sidebar click via window event or direct focus if wanted
+                                    // As a structural representation:
+                                    const aiBtn = document.querySelector('button.fixed.bottom-6') as HTMLButtonElement;
+                                    if (aiBtn) aiBtn.click();
+                                }}
+                            >
+                                <EnterpriseCard className="p-4! bg-slate-900 dark:bg-slate-100 border-transparent hover:opacity-95 transition-opacity flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-lg bg-white/10 dark:bg-black/10 flex items-center justify-center text-white dark:text-slate-900">
+                                        <Sparkles className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="text-sm font-semibold text-white dark:text-slate-900">AI Asistanı Başlat</h4>
+                                        <p className="text-xs text-slate-400 dark:text-slate-500">Saniyeler içinde çözüm bulun.</p>
+                                    </div>
+                                </EnterpriseCard>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </EnterprisePageShell>
