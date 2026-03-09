@@ -598,6 +598,8 @@ model Customer {
   isPortalActive     Boolean                      @default(false)
   lastPortalLogin    DateTime?
   portalPassword     String?
+  salesXOpportunities SalesXOpportunity[]
+  predictiveVisits    PredictiveVisit[]
   assignedStaffId    String?
   lat                Float?
   lng                Float?
@@ -1233,6 +1235,9 @@ model Staff {
   documents           StaffDocument[]
   employeeDocuments   EmployeeDocument[]
   targets             StaffTarget[]
+  salesXInsights      SalesXInsight[]
+  predictiveVisits    PredictiveVisit[]
+  routeSuggestions    RouteSuggestion[]
 
   @@index([tenantId])
   @@index([companyId])
