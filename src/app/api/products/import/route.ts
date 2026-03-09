@@ -72,7 +72,7 @@ export async function POST(req: Request) {
                             purchaseVat: p.purchaseVat,
                             purchaseVatIncluded: p.purchaseVatIncluded,
                             stock: p.stock, // Update total stock? Or complex stock logic? User just wants to overwrite.
-                            supplier: p.supplier
+                            supplierName: p.supplier
                         }
                     });
 
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
                             purchaseVat: p.purchaseVat,
                             purchaseVatIncluded: p.purchaseVatIncluded,
                             stock: p.stock,
-                            supplier: p.supplier,
+                            supplierName: p.supplier,
                             branch: 'Merkez', // Main branch ref
                             stocks: {
                                 create: {
