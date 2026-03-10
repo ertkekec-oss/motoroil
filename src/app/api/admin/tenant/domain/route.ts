@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // Required Vercel API credentials (store these in your environment variables)
 const VERCEL_API_TOKEN = process.env.VERCEL_API_TOKEN;

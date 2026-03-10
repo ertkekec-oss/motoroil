@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export async function getTenantFromDomain() {
     const headersList = headers();
