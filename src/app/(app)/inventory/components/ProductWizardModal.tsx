@@ -168,7 +168,7 @@ export default function ProductWizardModal({
                         />
                     )}
                     {currentStep === 5 && (
-                        <StepConnectedProducts data={data} onChange={onChange} setCurrentStep={setCurrentStep} />
+                        <StepConnectedProducts mode={mode} data={data} onChange={onChange} setCurrentStep={setCurrentStep} />
                     )}
                 </div>
 
@@ -718,7 +718,7 @@ function StepVariantsPriceLists({
     );
 }
 
-function StepConnectedProducts({ data, onChange, setCurrentStep }: any) {
+function StepConnectedProducts({ mode, data, onChange, setCurrentStep }: any) {
 
     const isMissingPrimary = !data.name || !data.category || !data.code || !data.price;
 
