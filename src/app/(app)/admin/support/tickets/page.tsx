@@ -10,26 +10,26 @@ export const metadata = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-    NEW: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 border border-blue-200 dark:border-blue-800',
+    OPEN: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 border border-blue-200 dark:border-blue-800',
     IN_PROGRESS: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800',
-    WAITING_CUSTOMER: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400 border border-purple-200 dark:border-purple-800',
+    WAITING_USER: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400 border border-purple-200 dark:border-purple-800',
     RESOLVED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800',
     CLOSED: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700',
 };
 
 const STATUS_LABELS: Record<string, string> = {
-    NEW: 'Yeni',
+    OPEN: 'Yeni',
     IN_PROGRESS: 'İşlemde',
-    WAITING_CUSTOMER: 'Yanıt Bekliyor',
+    WAITING_USER: 'Müşteri Bekleniyor',
     RESOLVED: 'Çözümlü',
     CLOSED: 'Kapalı',
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
-    P1_URGENT: 'text-rose-600 dark:text-rose-400 font-bold',
-    P2_HIGH: 'text-orange-600 dark:text-orange-400 font-semibold',
-    P3_NORMAL: 'text-slate-500 dark:text-slate-400',
-    P4_LOW: 'text-slate-400 dark:text-slate-500',
+    CRITICAL: 'text-rose-600 dark:text-rose-400 font-bold',
+    HIGH: 'text-orange-600 dark:text-orange-400 font-semibold',
+    NORMAL: 'text-slate-500 dark:text-slate-400',
+    LOW: 'text-slate-400 dark:text-slate-500',
 };
 
 export default async function AdminTicketsPage({
@@ -43,14 +43,14 @@ export default async function AdminTicketsPage({
         redirect('/login');
     }
 
-    const tickets = await prisma.ticket.findMany({
+    const tickets = await prisma.supportTicket.findMany({
         where: {
             ...(status ? { status: status as any } : {}),
             ...(tenantId ? { tenantId: tenantId } : {}),
         },
         orderBy: { createdAt: 'desc' },
         include: {
-            messages: {
+            comments: {
                 take: 1,
                 orderBy: { createdAt: 'asc' }
             }
@@ -59,9 +59,9 @@ export default async function AdminTicketsPage({
 
     const metrics = {
         total: tickets.length,
-        new: tickets.filter(t => t.status === 'NEW').length,
+        new: tickets.filter(t => t.status === 'OPEN').length,
         inProgress: tickets.filter(t => t.status === 'IN_PROGRESS').length,
-        waiting: tickets.filter(t => t.status === 'WAITING_CUSTOMER').length,
+        waiting: tickets.filter(t => t.status === 'WAITING_USER').length,
         resolved: tickets.filter(t => t.status === 'RESOLVED' || t.status === 'CLOSED').length
     };
 
@@ -121,14 +121,14 @@ export default async function AdminTicketsPage({
                             group: 'GENEL', 
                             items: [
                                 { id: '', label: `Hepsi (${metrics.total})` },
-                                { id: 'NEW', label: 'Yeni Gelenler' }
+                                { id: 'OPEN', label: 'Yeni Gelenler' }
                             ] 
                         },
                         { 
                             group: 'SÜREÇ', 
                             items: [
                                 { id: 'IN_PROGRESS', label: 'İşlemde Olanlar' }, 
-                                { id: 'WAITING_CUSTOMER', label: 'Yanıt Bekleyenler' },
+                                { id: 'WAITING_USER', label: 'Yanıt Bekleyenler' },
                                 { id: 'RESOLVED', label: 'Çözümlenenler' }
                             ] 
                         },
@@ -178,23 +178,23 @@ export default async function AdminTicketsPage({
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 min-w-[300px] max-w-md">
-                                        <Link href={`/admin/support/tickets/${ticket.id}`} className="block">
+                                        <Link href={`/admin/support/${ticket.id}`} className="block">
                                             <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-1 truncate">
-                                                #{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message ? ticket.messages[0].message.substring(0, 40).replace(/\*\*/g, '') : ticket.type}
+                                                #{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.subject}
                                             </div>
                                             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                                                {ticket.messages[0]?.message ? ticket.messages[0].message.substring(0, 80).replace(/\*\*/g, '') : "Detay bulunamadı."}
+                                                {ticket.description ? ticket.description.substring(0, 80) : "Detay bulunamadı."}
                                             </p>
                                         </Link>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="text-xs text-slate-900 dark:text-slate-200 font-medium mb-1">{ticket.type}</div>
+                                        <div className="text-xs text-slate-900 dark:text-slate-200 font-medium mb-1">{ticket.category.replace('_', ' ')}</div>
                                         <div className={`text-[10px] uppercase tracking-wider ${PRIORITY_STYLES[ticket.priority] || 'text-slate-400'}`}>
-                                            {ticket.priority.replace('P', 'Önem ')}
+                                            {ticket.priority}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md ${STATUS_COLORS[ticket.status] || STATUS_COLORS.NEW}`}>
+                                        <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md ${STATUS_COLORS[ticket.status] || STATUS_COLORS.OPEN}`}>
                                             {STATUS_LABELS[ticket.status] || ticket.status}
                                         </span>
                                     </td>
