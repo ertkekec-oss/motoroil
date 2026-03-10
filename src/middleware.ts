@@ -125,8 +125,6 @@ export async function middleware(request: NextRequest) {
     const isApiOrAdmin = pathname.startsWith('/api/') || pathname.startsWith('/admin/');
     const isB2BPortalRequest = (isB2BSubdomain && !isApiOrAdmin) || pathname.startsWith(base);
 
-    let finalResponse: NextResponse | null = null;
-
     // 3. NETWORK B2B PORTAL GUARD (Dealer Auth)
     if (isB2BPortalRequest) {
         // Evaluate effective pathname for internal guard checks
@@ -162,8 +160,10 @@ export async function middleware(request: NextRequest) {
         }
 
         if (isB2BSubdomain) {
-            finalResponse = NextResponse.rewrite(new URL(effectivePathname, request.url));
+            return NextResponse.rewrite(new URL(effectivePathname, request.url));
         }
+        
+        return NextResponse.next();
     }
 
     // 4. Auth Related Paths & Public API - Allowed
@@ -181,12 +181,12 @@ export async function middleware(request: NextRequest) {
     const effectivePublicPath = isB2BSubdomain ? (pathname === '/login' ? '/network/login' : pathname) : pathname;
 
     if (publicPaths.some(path => effectivePublicPath === path || effectivePublicPath.startsWith(path + '/'))) {
-        return finalResponse || NextResponse.next();
+        return NextResponse.next();
     }
 
     // Special case: Allow public invoice PDF downloads for sharing
     if (pathname === '/api/sales/invoices' && request.nextUrl.searchParams.get('action') === 'get-pdf') {
-        return finalResponse || NextResponse.next();
+        return NextResponse.next();
     }
 
     // 5. GLOBAL SESSION GUARD (Protected Paths)
@@ -201,7 +201,7 @@ export async function middleware(request: NextRequest) {
 
     try {
         await jwtVerify(sessionToken, getJWTAscii());
-        return finalResponse || NextResponse.next();
+        return NextResponse.next();
     } catch (err) {
         console.error('Middleware global session error:', err);
         const response = pathname.startsWith('/api')
