@@ -37,7 +37,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Sayfa yüklendiğinde localStorage'dan kullanıcıyı kontrol et
     useEffect(() => {
         const checkAuth = async () => {
-            if (pathname.startsWith('/reset-password')) {
+            const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+            // Determine if the current domain is a primary app domain or a B2B/custom subdomain
+            const isPrimaryDomain = 
+                hostname === 'periodya.com' || 
+                hostname === 'www.periodya.com' ||
+                hostname === 'localhost' ||
+                hostname === 'vercel.app' ||
+                hostname.includes('vercel.app');
+
+            const isB2BSubdomain = 
+                hostname === 'b2b.periodya.com' || 
+                hostname.startsWith('b2b.localhost') || 
+                !isPrimaryDomain;
+
+            // B2B and Portal use their own auth context, skip global auth check & redirects
+            if (pathname.startsWith('/reset-password') || isB2BSubdomain || pathname.startsWith('/network') || pathname.startsWith('/portal')) {
                 setIsLoading(false);
                 return;
             }
