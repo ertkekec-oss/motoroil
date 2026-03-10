@@ -16,7 +16,7 @@ export async function setDealerSessionCookie(token: string) {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        path: portalBasePath(),
+        path: "/",
         maxAge: 60 * 60 * 24 * 30,
     })
 }
@@ -27,7 +27,7 @@ export async function clearDealerSessionCookie() {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        path: portalBasePath(),
+        path: "/",
         maxAge: 0,
     })
 }
@@ -38,7 +38,7 @@ export async function setActiveMembershipCookie(membershipId: string) {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        path: portalBasePath(),
+        path: "/",
         maxAge: 60 * 60 * 24 * 30,
     })
 }
@@ -49,7 +49,7 @@ export async function clearActiveMembershipCookie() {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        path: portalBasePath(),
+        path: "/",
         maxAge: 0,
     })
 }
