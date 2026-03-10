@@ -19,30 +19,50 @@ export async function POST(req: Request) {
     try {
         const result = await prisma.$transaction(async (tx) => {
             // 1. Fetch & validate invite
-            const invite = await tx.dealerInvite.findUnique({
-                where: { tokenHash },
-                select: {
-                    id: true,
-                    status: true,
-                    expiresAt: true,
-                    supplierTenantId: true,
-                    dealerCompanyId: true,
-                    issuedToPhoneE164: true,
-                    maxRedemptions: true,
-                    redemptionCount: true,
-                },
-            })
+            let supplierTenantId: string | null = null;
+            let dealerCompanyId: string | null = null;
+            let inviteId: string | null = null;
 
-            if (!invite) throw new RedeemError(404, "INVITE_NOT_FOUND")
-            if (invite.status !== "ISSUED") throw new RedeemError(409, "INVITE_NOT_ACTIVE")
-            if (invite.expiresAt.getTime() < Date.now()) throw new RedeemError(410, "INVITE_EXPIRED")
-            if (invite.redemptionCount >= invite.maxRedemptions) throw new RedeemError(409, "INVITE_ALREADY_REDEEMED")
-            if (invite.issuedToPhoneE164 && invite.issuedToPhoneE164 !== phoneE164) {
-                throw new RedeemError(403, "PHONE_MISMATCH")
+            // Direct Tenant generic invite
+            if (String(body.token).length === 25 && String(body.token).startsWith("c")) {
+                const tenantCompany = await tx.company.findUnique({
+                    where: { id: String(body.token) },
+                    select: { id: true }
+                });
+                if (tenantCompany) {
+                    supplierTenantId = tenantCompany.id;
+                }
+            }
+
+            if (!supplierTenantId) {
+                const invite = await tx.dealerInvite.findUnique({
+                    where: { tokenHash },
+                    select: {
+                        id: true,
+                        status: true,
+                        expiresAt: true,
+                        supplierTenantId: true,
+                        dealerCompanyId: true,
+                        issuedToPhoneE164: true,
+                        maxRedemptions: true,
+                        redemptionCount: true,
+                    },
+                })
+
+                if (!invite) throw new RedeemError(404, "INVITE_NOT_FOUND")
+                if (invite.status !== "ISSUED") throw new RedeemError(409, "INVITE_NOT_ACTIVE")
+                if (invite.expiresAt.getTime() < Date.now()) throw new RedeemError(410, "INVITE_EXPIRED")
+                if (invite.redemptionCount >= invite.maxRedemptions) throw new RedeemError(409, "INVITE_ALREADY_REDEEMED")
+                if (invite.issuedToPhoneE164 && invite.issuedToPhoneE164 !== phoneE164) {
+                    throw new RedeemError(403, "PHONE_MISMATCH")
+                }
+                supplierTenantId = invite.supplierTenantId;
+                dealerCompanyId = invite.dealerCompanyId;
+                inviteId = invite.id;
             }
 
             const config = await tx.tenantPortalConfig.findUnique({
-                where: { tenantId: invite.supplierTenantId },
+                where: { tenantId: supplierTenantId },
                 select: { dealerAuthMode: true }
             })
             const authMode = config?.dealerAuthMode || "PASSWORD_ONLY"
@@ -55,8 +75,7 @@ export async function POST(req: Request) {
             }
 
             // 2. Resolve Company (reuse or create)
-            let dealerCompanyId = invite.dealerCompanyId
-
+            // dealerCompanyId is already propagated from the invite if available
             if (!dealerCompanyId) {
                 const existingCompany = taxNumber
                     ? await tx.dealerCompany.findFirst({ where: { taxNumber }, select: { id: true } })
@@ -108,7 +127,7 @@ export async function POST(req: Request) {
                 where: {
                     dealerUserId_tenantId: {
                         dealerUserId: dealerUserId,
-                        tenantId: invite.supplierTenantId,
+                        tenantId: supplierTenantId,
                     },
                 },
                 update: {
@@ -117,7 +136,7 @@ export async function POST(req: Request) {
                 },
                 create: {
                     dealerUserId: dealerUserId,
-                    tenantId: invite.supplierTenantId,
+                    tenantId: supplierTenantId,
                     dealerCompanyId,
                     status: "ACTIVE",
                 },
@@ -135,15 +154,17 @@ export async function POST(req: Request) {
             })
 
             // 5. Mark Invite as REDEEMED
-            await tx.dealerInvite.update({
-                where: { id: invite.id },
-                data: {
-                    status: "REDEEMED",
-                    redeemedAt: new Date(),
-                    redemptionCount: { increment: 1 },
-                    dealerCompanyId,
-                },
-            })
+            if (inviteId) {
+                await tx.dealerInvite.update({
+                    where: { id: inviteId },
+                    data: {
+                        status: "REDEEMED",
+                        redeemedAt: new Date(),
+                        redemptionCount: { increment: 1 },
+                        dealerCompanyId,
+                    },
+                })
+            }
 
             return { dealerUserId, dealerCompanyId, membershipId: membership.id }
         })
