@@ -364,6 +364,7 @@ model Product {
   otvType             String?                 @default("Ö.T.V yok")
   gtip                String?
   purchaseDiscount    Decimal?                @default(0) @db.Decimal(5, 2)
+  purchaseOtv         Decimal?                @default(0) @db.Decimal(10, 2)
   otvCode             String?                 @default("7")
   deletedAt           DateTime?
   createdAt           DateTime                @default(now())
@@ -375,6 +376,15 @@ model Product {
   purchaseCurrency    String                  @default("TRY")
   supplierName        String?
   unit                String?                 @default("Adet")
+
+  // NEW DYNAMIC FIELDS AWAITING MIGRATION (Phase 32)
+  countryCode         String?
+  invoiceTitle        String?
+  showDescriptionOnInvoice Boolean?           @default(false)
+  shelfLocation       String?
+  tags                String?                 @db.Text
+  gtin                String?
+
   b2bSuggestions      B2BSuggestion[]
   companyProductMaps  CompanyProductMap[]
   marketplaceMaps     MarketplaceProductMap[]

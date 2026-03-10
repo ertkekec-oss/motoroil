@@ -584,6 +584,16 @@ function InventoryContent() {
         "salesOiv",
         "salesOtv",
         "otvType",
+        "purchaseDiscount",
+        "purchaseOtv",
+        "gtip",
+        "gtin",
+        "countryCode",
+        "invoiceTitle",
+        "showDescriptionOnInvoice",
+        "shelfLocation",
+        "tags",
+        "unit"
       ];
       const updateData: any = {};
       validFields.forEach((field) => {
@@ -728,6 +738,13 @@ function InventoryContent() {
       salesOiv: 0,
       salesOtv: 0,
       otvType: "Ö.T.V yok",
+      purchaseDiscount: 0,
+      purchaseOtv: 0,
+      countryCode: "",
+      invoiceTitle: "",
+      showDescriptionOnInvoice: false,
+      shelfLocation: "",
+      tags: "",
       branch: activeBranchName || "Merkez",
       imageUrl: undefined,
       imageKey: undefined,
@@ -1304,25 +1321,30 @@ function InventoryContent() {
 
       {/* --- SEKMELER + STRATEJİK MOD SEÇİMİ --- */}
       {!isCounting ? (
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-6 z-20 relative border-b border-slate-200 dark:border-white/5 pb-0 w-full">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8 z-20 relative w-full">
           <div className="w-full flex-1 overflow-x-auto scrollbar-hide">
-            <div className="flex w-full xl:w-max gap-8 px-1 h-12 items-end">
-              {[
-                { id: 'all', label: 'Envanter Listesi' },
-                { id: 'focus', label: 'Focus Queue' },
-                { id: 'strategic', label: 'Stratejik Görünüm' },
-                { id: 'transfers', label: 'Transfer & Sevkiyat' },
-                { id: 'bulk-price', label: 'Fiyat Yönetimi' }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`h-full text-[14px] font-bold uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 border-b-[3px] pb-3 whitespace-nowrap
-                    ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-900 border-b-transparent hover:border-slate-300'}`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+             <div className="flex w-full xl:w-max whitespace-nowrap items-center gap-6 px-1 select-none pb-2">
+                {[
+                  { group: 'GÖRÜNÜM', items: [{ id: 'all', label: 'Envanter Listesi' }, { id: 'focus', label: 'Focus Queue' }, { id: 'strategic', label: 'Stratejik Görünüm' }] },
+                  { group: 'OPERASYON', items: [{ id: 'transfers', label: 'Transfer & Sevkiyat' }, { id: 'bulk-price', label: 'Fiyat Yönetimi' }] }
+                ].map((grp, i) => (
+                  <div key={grp.group} className="flex items-center gap-3">
+                    {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
+                    <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-[#0f172a]/60 p-1.5 rounded-xl border border-slate-200/50 dark:border-white/5 shadow-sm">
+                      {grp.items.map(tab => (
+                        <button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id)}
+                          className={activeTab === tab.id
+                            ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#1e293b] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[8px] transition-all tracking-wide"
+                            : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all rounded-[8px] tracking-wide"}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
 

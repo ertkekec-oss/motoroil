@@ -82,18 +82,18 @@ export default function ProductWizardModal({
                 <div className="px-8 py-4 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0f172a] shrink-0">
                     <div className="flex items-center w-full">
                         {[
-                            { step: 1, label: "Kimlik" },
-                            { step: 2, label: "Stok & Operasyon" },
-                            { step: 3, label: "Fiyat & Vergi" },
+                            { step: 1, label: "Ürün Kimliği" },
+                            { step: 2, label: "Fiyatlandırma" },
+                            { step: 3, label: "Diğer Bilgiler" },
                             { step: 4, label: "Varyant & Fiyatlar" },
-                            { step: 5, label: "Kontrol & Onay" },
+                            { step: 5, label: "Bağlı Ürünler" },
                         ].map((s, idx) => (
                             <React.Fragment key={s.step}>
                                 <div className="flex flex-col items-center gap-1 relative z-10">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${currentStep === s.step ? 'border-slate-900 bg-slate-900 text-white' : currentStep > s.step ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-200 bg-white text-slate-500'}`}>
                                         {currentStep > s.step ? "✓" : s.step}
                                     </div>
-                                    <span className={`text-[11px] font-semibold mt-1 hidden sm:block ${currentStep === s.step ? 'text-slate-900 underline underline-offset-4 decoration-slate-300' : currentStep > s.step ? 'text-emerald-600' : 'text-slate-500'}`}>
+                                    <span className={`text-[11px] font-semibold mt-1 hidden xl:block whitespace-nowrap ${currentStep === s.step ? 'text-slate-900 underline underline-offset-4 decoration-slate-300' : currentStep > s.step ? 'text-emerald-600' : 'text-slate-500'}`}>
                                         {s.label}
                                     </span>
                                 </div>
@@ -113,10 +113,10 @@ export default function ProductWizardModal({
                         <StepIdentity mode={mode} data={data} onChange={onChange} categories={categories} />
                     )}
                     {currentStep === 2 && (
-                        <StepStockOps mode={mode} data={data} onChange={onChange} />
+                        <StepPricingTax mode={mode} data={data} onChange={onChange} />
                     )}
                     {currentStep === 3 && (
-                        <StepPricingTax mode={mode} data={data} onChange={onChange} />
+                        <StepOtherInfo mode={mode} data={data} onChange={onChange} categories={categories} />
                     )}
                     {currentStep === 4 && (
                         <StepVariantsPriceLists
@@ -130,7 +130,7 @@ export default function ProductWizardModal({
                         />
                     )}
                     {currentStep === 5 && (
-                        <StepReviewConfirm mode={mode} data={data} onChange={onChange} setCurrentStep={setCurrentStep} priceLists={priceLists} productPrices={productPrices} />
+                        <StepConnectedProducts data={data} onChange={onChange} setCurrentStep={setCurrentStep} />
                     )}
                 </div>
 
@@ -190,98 +190,52 @@ function StepIdentity({ data, onChange, categories }: any) {
     return (
         <div className="animate-in fade-in duration-300 space-y-8">
             <div className="mb-2 border-b border-slate-200 dark:border-white/5 pb-2">
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white">Kimlik & Tanım</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Ürününüzün sistemde ve listelerde nasıl görüneceğini belirleyin.</p>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white">1. Aşama: Ürün Kimliği</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Lütfen sadece temel ürün kimliğini ve tipini belirleyin.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-6">
-                    <div className="flex justify-center mb-4">
-                        <ProductImageUpload
-                            productId={data.id}
-                            imageUrl={data.imageUrl}
-                            onImageUpload={({ imageUrl, imageKey }) => {
-                                onChange({ ...data, imageUrl, imageKey });
-                            }}
-                        />
-                    </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                         <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Adı <span className="text-red-500">*</span></label>
-                        <input type="text" value={data.name || ''} onChange={e => onChange({ ...data, name: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors placeholder:text-slate-400 text-sm" placeholder="Örn: Motul 7100 10w40" />
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Kategori <span className="text-red-500">*</span></label>
-                    <select value={data.category || ''} onChange={e => onChange({ ...data, category: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors bg-white dark:bg-[#0f172a] text-sm">
-                        <option value="" disabled>Kategori Seçin</option>
-                        {(categories.length > 0 ? categories : ["Motosiklet", "Otomobil", "Aksesuar", "Yedek Parça", "Genel"]).map((c: string) => (
-                            <option key={c} value={c}>{c}</option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Marka</label>
-                    <input type="text" value={data.brand || ''} onChange={e => onChange({ ...data, brand: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors placeholder:text-slate-400 text-sm" placeholder="Örn: Motul" />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">SKU / Stok Kodu <span className="text-red-500">*</span></label>
-                    <input type="text" value={data.code || ''} onChange={e => onChange({ ...data, code: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors placeholder:text-slate-400 text-sm" placeholder="Örn: OTO-001" />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Barkod</label>
-                    <input type="text" value={data.barcode || ''} onChange={e => onChange({ ...data, barcode: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors placeholder:text-slate-400 text-sm" placeholder="13 haneli EAN" />
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function StepStockOps({ data, onChange }: any) {
-    return (
-        <div className="animate-in fade-in duration-300 space-y-8">
-            <div className="mb-2 border-b border-slate-200 dark:border-white/5 pb-2">
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white">Stok & Operasyon</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Stok takibi, birim tipi ve şube ayarları.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Stok Miktarı</label>
-                            <input type="number" value={data.stock ?? 0} onChange={e => onChange({ ...data, stock: parseFloat(e.target.value) })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors text-sm" />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Satış Birimi</label>
-                            <select value={data.unit || 'Adet'} onChange={e => onChange({ ...data, unit: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors bg-white dark:bg-[#0f172a] text-sm">
-                                <option value="Adet">Adet</option>
-                                <option value="KG">Kilogram (KG)</option>
-                                <option value="Litre">Litre (L)</option>
-                                <option value="Metre">Metre (M)</option>
-                                <option value="Paket">Paket</option>
-                                <option value="Koli">Koli</option>
-                                <option value="Set">Set</option>
-                            </select>
-                        </div>
+                        <input type="text" value={data.name || ''} onChange={e => onChange({ ...data, name: e.target.value })} className="w-full h-12 px-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all placeholder:text-slate-400 text-[15px] font-medium shadow-sm hover:border-slate-400" placeholder="Örn: Profesyonel Hizmet veya Ürün Adı" />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Minimum Stok Uyarısı</label>
-                        <input type="number" value={data.minStock ?? 5} onChange={e => onChange({ ...data, minStock: parseFloat(e.target.value) })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors text-sm" placeholder="Kritik seviye bildirimleri için" />
-                    </div>
-                </div>
-                <div className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Durum</label>
-                        <select value={data.status || 'ok'} onChange={e => onChange({ ...data, status: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors bg-white dark:bg-[#0f172a] text-sm">
-                            <option value="ok">🟢 Aktif (Satışa Açık)</option>
-                            <option value="out">🔴 Pasif (Tükendi / Yok)</option>
-                            <option value="low">🟠 Düşük Stok Uyarısı</option>
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Tipi <span className="text-red-500">*</span></label>
+                        <select value={data.type || 'Stoklu Ürün'} onChange={e => onChange({ ...data, type: e.target.value })} className="w-full h-12 px-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all bg-white dark:bg-[#0f172a] text-[15px] font-medium shadow-sm hover:border-slate-400">
+                            <option value="Stoklu Ürün">Stoklu Ürün</option>
+                            <option value="Hizmet / Danışmanlık">Hizmet / Danışmanlık</option>
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Operasyonel Açıklama</label>
-                        <textarea rows={3} value={data.description || ''} onChange={e => onChange({ ...data, description: e.target.value })} className="w-full rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none transition-colors p-3 text-sm resize-none" placeholder="İç takip ve depo bilgilendirmesi..." />
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Satış Birimi</label>
+                        <select value={data.unit || 'Adet'} onChange={e => onChange({ ...data, unit: e.target.value })} className="w-full h-12 px-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all bg-white dark:bg-[#0f172a] text-[15px] font-medium shadow-sm hover:border-slate-400">
+                            <option value="Adet">Adet</option>
+                            <option value="KG">Kg</option>
+                            <option value="Gram">Gram</option>
+                            <option value="Litre">Litre</option>
+                            <option value="Metre">Metre</option>
+                            <option value="Paket">Paket</option>
+                            <option value="Koli">Koli</option>
+                            <option value="Set">Set</option>
+                            <option value="Takım">Takım</option>
+                            <option value="Saat">Saat</option>
+                            <option value="Ay">Ay</option>
+                            <option value="Yıl">Yıl</option>
+                        </select>
                     </div>
+                </div>
+                <div className="space-y-6 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 border-dashed">
+                    <div className="text-center space-y-2 mb-2">
+                        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Ürün Görseli</h4>
+                        <p className="text-xs text-slate-500">Katalog ve vitrinlerde gösterilecek ana görseli yükleyin.</p>
+                    </div>
+                    <ProductImageUpload
+                        productId={data.id}
+                        imageUrl={data.imageUrl}
+                        onImageUpload={({ imageUrl, imageKey }) => {
+                            onChange({ ...data, imageUrl, imageKey });
+                        }}
+                    />
                 </div>
             </div>
         </div>
@@ -292,101 +246,193 @@ function StepPricingTax({ data, onChange }: any) {
     return (
         <div className="animate-in fade-in duration-300 space-y-8">
             <div className="mb-2 border-b border-slate-200 dark:border-white/5 pb-2">
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white">Fiyat & Vergi</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Net alış/satış fiyatları ve vergi yükümlülükleri.</p>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white">2. Aşama: Fiyatlandırma</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Detaylı alış ve satış fiyatlarınızı, vergi oranlarınızı yapılandırın.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* ALIŞ */}
-                <div className="bg-slate-50 dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-white/5 space-y-5">
-                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide mb-4 flex items-center gap-2">🛒 Alış Fiyatlandırması</h4>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Alış Fiyatı (Net)</label>
-                            <div className="flex gap-2">
-                                <input type="number" value={data.buyPrice ?? 0} onChange={e => onChange({ ...data, buyPrice: parseFloat(e.target.value) })} className="flex-1 h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm" />
-                                <select value={data.purchaseCurrency || 'TRY'} onChange={e => onChange({ ...data, purchaseCurrency: e.target.value })} className="w-24 h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm">
-                                    <option value="TRY">TRY</option><option value="USD">USD</option><option value="EUR">EUR</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex gap-4 items-center">
-                            <div className="flex-1">
-                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">KDV Oranı</label>
-                                <select value={data.purchaseVat ?? 20} onChange={e => onChange({ ...data, purchaseVat: parseInt(e.target.value) })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm">
-                                    <option value="0">%0</option><option value="1">%1</option><option value="10">%10</option><option value="20">%20</option>
-                                </select>
-                            </div>
-                            <label className="flex items-center gap-2 mt-5 cursor-pointer">
-                                <input type="checkbox" checked={data.purchaseVatIncluded ?? true} onChange={e => onChange({ ...data, purchaseVatIncluded: e.target.checked })} className="w-4 h-4 text-slate-900 dark:text-white rounded border-slate-300 dark:border-white/10 focus:ring-slate-900" />
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">KDV Dahil</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                {/* SATIŞ */}
-                <div className="bg-slate-50 dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-white/5 space-y-5">
+                {/* SATIŞ FİYATI KARTI */}
+                <div className="bg-slate-50 dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-white/5 space-y-5">
                     <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide mb-4 flex items-center gap-2">💰 Satış Fiyatlandırması</h4>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Satış Fiyatı (Net)</label>
+                            <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Satış Fiyatı <span className="text-red-500">*</span></label>
                             <div className="flex gap-2">
-                                <input type="number" value={data.price ?? 0} onChange={e => onChange({ ...data, price: parseFloat(e.target.value) })} className="flex-1 h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm" />
-                                <select value={data.currency || 'TRY'} onChange={e => onChange({ ...data, currency: e.target.value })} className="w-24 h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm">
-                                    <option value="TRY">TRY</option><option value="USD">USD</option><option value="EUR">EUR</option>
+                                <input type="number" value={data.price ?? 0} onChange={e => onChange({ ...data, price: parseFloat(e.target.value) })} className="flex-1 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all shadow-sm hover:border-slate-400" />
+                                <select value={data.currency || 'TRY'} onChange={e => onChange({ ...data, currency: e.target.value })} className="w-24 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all shadow-sm font-semibold">
+                                    <option value="TRY">TRY</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
                                 </select>
                             </div>
                         </div>
-                        <div className="flex gap-4 items-center">
-                            <div className="flex-1">
-                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">KDV Oranı</label>
-                                <select value={data.salesVat ?? 20} onChange={e => onChange({ ...data, salesVat: parseInt(e.target.value) })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Satış KDV Oranı</label>
+                                <select value={data.salesVat ?? 20} onChange={e => onChange({ ...data, salesVat: parseInt(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm">
                                     <option value="0">%0</option><option value="1">%1</option><option value="10">%10</option><option value="20">%20</option>
                                 </select>
                             </div>
-                            <label className="flex items-center gap-2 mt-5 cursor-pointer">
-                                <input type="checkbox" checked={data.salesVatIncluded ?? true} onChange={e => onChange({ ...data, salesVatIncluded: e.target.checked })} className="w-4 h-4 text-slate-900 dark:text-white rounded border-slate-300 dark:border-white/10 focus:ring-slate-900" />
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">KDV Dahil</span>
-                            </label>
+                            <div className="space-y-1">
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">KDV Durumu</label>
+                                <select value={data.salesVatIncluded ? 'true' : 'false'} onChange={e => onChange({ ...data, salesVatIncluded: e.target.value === 'true' })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm">
+                                    <option value="false">KDV Hariç</option>
+                                    <option value="true">KDV Dahil</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">ÖİV Oranı (%)</label>
+                                <select value={data.salesOiv ?? 0} onChange={e => onChange({ ...data, salesOiv: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-slate-900 outline-none">
+                                    <option value="0">Ö.İ.V yok</option>
+                                    <option value="7.5">%7.5</option>
+                                    <option value="10">%10</option>
+                                    <option value="25">%25</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">ÖTV Tipi</label>
+                                <select value={data.otvType || 'Ö.T.V yok'} onChange={e => onChange({ ...data, otvType: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-slate-900 outline-none">
+                                    <option value="Ö.T.V yok">ÖTV Yok</option>
+                                    <option value="Yüzdesel">Yüzdesel ÖTV</option>
+                                    <option value="Birim Başına">Maktu ÖTV</option>
+                                </select>
+                            </div>
+                        </div>
+                        {data.otvType !== 'Ö.T.V yok' && (
+                            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                <label className="text-xs uppercase tracking-wide text-purple-600 dark:text-purple-400 font-bold mb-1 block">Satış ÖTV {data.otvType === 'Yüzdesel' ? 'Oranı (%)' : 'Tutarı'}</label>
+                                <input type="number" value={data.salesOtv ?? 0} onChange={e => onChange({ ...data, salesOtv: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border-2 border-purple-200 dark:border-purple-500/30 text-slate-900 dark:text-white focus:ring-0 focus:border-purple-500 outline-none shadow-sm transition-all bg-purple-50/30 dark:bg-purple-900/10" placeholder="0.00" />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* ALIŞ FİYATI KARTI */}
+                <div className="bg-slate-50 dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-white/5 space-y-5">
+                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide mb-4 flex items-center gap-2">🛒 Alış Fiyatlandırması</h4>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Alış Fiyatı <span className="text-red-500">*</span></label>
+                            <div className="flex gap-2">
+                                <input type="number" value={data.buyPrice ?? 0} onChange={e => onChange({ ...data, buyPrice: parseFloat(e.target.value) })} className="flex-1 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm hover:border-slate-400 transition-all" />
+                                <select value={data.purchaseCurrency || 'TRY'} onChange={e => onChange({ ...data, purchaseCurrency: e.target.value })} className="w-24 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm font-semibold transition-all">
+                                    <option value="TRY">TRY</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Alış KDV Oranı</label>
+                                <select value={data.purchaseVat ?? 20} onChange={e => onChange({ ...data, purchaseVat: parseInt(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 text-sm shadow-sm outline-none">
+                                    <option value="0">%0</option><option value="1">%1</option><option value="10">%10</option><option value="20">%20</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">KDV Durumu</label>
+                                <select value={data.purchaseVatIncluded ? 'true' : 'false'} onChange={e => onChange({ ...data, purchaseVatIncluded: e.target.value === 'true' })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 text-sm shadow-sm outline-none">
+                                    <option value="false">KDV Hariç</option>
+                                    <option value="true">KDV Dahil</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Alış İskontosu (%)</label>
+                                <input type="number" value={data.purchaseDiscount ?? 0} onChange={e => onChange({ ...data, purchaseDiscount: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm" placeholder="Örn: 15" />
+                            </div>
+                            <div>
+                                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Alış ÖTV Oranı (%)</label>
+                                <input type="number" value={data.purchaseOtv ?? 0} onChange={e => onChange({ ...data, purchaseOtv: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm" placeholder="Örn: 0" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
 
-            {/* EK VERGİ VE GÜMRÜK */}
-            <div className="border-t border-slate-200 dark:border-white/5 pt-6">
-                <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide mb-4">Ek Vergiler & Gümrük</h4>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">ÖTV Türü</label>
-                        <select value={data.otvType || 'Ö.T.V yok'} onChange={e => onChange({ ...data, otvType: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm">
-                            <option value="Ö.T.V yok">ÖTV Yok</option>
-                            <option value="Liste Fiyatından">Liste Fiyatından</option>
-                            <option value="Birim Başına">Birim Başına (Maktu)</option>
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">ÖTV Tutarı/Oranı</label>
-                        <input type="number" value={data.salesOtv ?? 0} onChange={e => onChange({ ...data, salesOtv: parseFloat(e.target.value) })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm" />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">ÖİV Tutarı</label>
-                        <input type="number" value={data.salesOiv ?? 0} onChange={e => onChange({ ...data, salesOiv: parseFloat(e.target.value) })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm" />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">GTİP Kodu</label>
-                        <input type="text" value={data.gtip || ''} onChange={e => onChange({ ...data, gtip: e.target.value })} className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 outline-none text-sm" placeholder="12.34.56.78.90" />
-                    </div>
+function StepOtherInfo({ data, onChange, categories }: any) {
+    return (
+        <div className="animate-in fade-in duration-300 space-y-8">
+            <div className="mb-2 border-b border-slate-200 dark:border-white/5 pb-2">
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white">3. Aşama: Diğer Bilgiler</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Stok kodu, fatura ayarları ve ürüne dair detaylar.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Kategori</label>
+                    <select value={data.category || ''} onChange={e => onChange({ ...data, category: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:bg-[#0f172a] shadow-sm">
+                        <option value="" disabled>Kategori Seçin</option>
+                        {(categories.length > 0 ? categories : ["Motosiklet", "Otomobil", "Aksesuar", "Yedek Parça", "Genel"]).map((c: string) => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Marka</label>
+                    <input type="text" value={data.brand || ''} onChange={e => onChange({ ...data, brand: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Kodu (SKU) <span className="text-red-500">*</span></label>
+                    <input type="text" value={data.code || ''} onChange={e => onChange({ ...data, code: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm font-mono text-sm" />
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">GTİP</label>
+                    <input type="text" value={data.gtip || ''} onChange={e => onChange({ ...data, gtip: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm font-mono text-sm" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">GTIN</label>
+                    <input type="text" value={data.gtin || ''} onChange={e => onChange({ ...data, gtin: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm font-mono text-sm" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ülke Kodu (Menşei)</label>
+                    <input type="text" value={data.countryCode || ''} onChange={e => onChange({ ...data, countryCode: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm uppercase font-mono text-sm" placeholder="TR" maxLength={2} />
                 </div>
             </div>
 
-            {(data.otvType !== 'Ö.T.V yok' || (data.gtip && data.gtip.length > 5)) && (
-                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700 flex items-start gap-3 mt-4">
-                    <span className="mt-0.5">⚠️</span>
-                    <p>Ek vergiler ve gümrük kodları e-Faturalarda otomatik olarak hesaplanıp eklenecektir. Doğru vergi oranlarını girdiğinizden emin olun.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-6 p-6 bg-slate-50 dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5">
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Fatura Başlığı (İsteğe Bağlı)</label>
+                        <p className="text-[11px] text-slate-500 mb-2">Fatura çıktısında farklı bir ürün adı kullanmak istiyorsanız doldurun. Boş bırakırsanız mevcut Ürün Adı kullanılacaktır.</p>
+                        <input type="text" value={data.invoiceTitle || ''} onChange={e => onChange({ ...data, invoiceTitle: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm placeholder:text-slate-400" placeholder="Faturada görünecek isim..." />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Açıklama</label>
+                        <p className="text-[11px] text-slate-500 mb-2">Bu ürün hakkında not. E-ticaret entegrasyonlarınızda da gösterilir.</p>
+                        <textarea rows={3} value={data.description || ''} onChange={e => onChange({ ...data, description: e.target.value })} className="w-full rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none p-4 resize-none shadow-sm" placeholder="Ürün detayları..." />
+                    </div>
+                    <label className="flex items-center gap-3 cursor-pointer p-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl hover:border-slate-300 transition-colors">
+                        <input type="checkbox" checked={data.showDescriptionOnInvoice ?? false} onChange={e => onChange({ ...data, showDescriptionOnInvoice: e.target.checked })} className="w-5 h-5 text-slate-900 dark:text-white rounded border-slate-300 focus:ring-slate-900" />
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Açıklama metnini faturada göster</span>
+                    </label>
                 </div>
-            )}
+
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
+                            <span>Barkod</span>
+                            <button type="button" onClick={() => onChange({ ...data, barcode: Math.floor(1000000000000 + Math.random() * 9000000000000).toString() })} className="text-[10px] bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-0.5 rounded-md font-bold transition-colors">BARKOD ÜRET</button>
+                        </label>
+                        <input type="text" value={data.barcode || ''} onChange={e => onChange({ ...data, barcode: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm font-mono text-sm" />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Raf Yeri</label>
+                        <input type="text" value={data.shelfLocation || ''} onChange={e => onChange({ ...data, shelfLocation: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm" placeholder="Örn: A-12-C" />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Kritik Stok Miktarı</label>
+                        <input type="number" value={data.minStock ?? 5} onChange={e => onChange({ ...data, minStock: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm" placeholder="Uyarı seviyesi" />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Etiketler (Muadil Kodları vs)</label>
+                        <input type="text" value={data.tags || ''} onChange={e => onChange({ ...data, tags: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm placeholder:text-slate-400" placeholder="Aralarına virgül koyarak yazın..." />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
@@ -534,104 +580,63 @@ function StepVariantsPriceLists({
     );
 }
 
-function StepReviewConfirm({ data, setCurrentStep, mode, priceLists, productPrices }: any) {
+function StepConnectedProducts({ data, onChange, setCurrentStep }: any) {
 
     const isMissingPrimary = !data.name || !data.category || !data.code || !data.price;
 
     return (
         <div className="animate-in fade-in duration-300 space-y-6">
+            <div className="mb-2 border-b border-slate-200 dark:border-white/5 pb-2">
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white">5. Aşama: Bağlı Ürünler & Onay</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Sistem entegrasyonlarını yapılandırın ve kaydetmeden önce son kontrolleri yapın.</p>
+            </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-slate-50 dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-slate-50 dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5">
                 <div>
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{data.name || "Ürün Adı Yok"}</h3>
                     <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-1 font-medium">
-                        <span>{data.category || "Genel"}</span> • <span>{data.brand || "Markasız"}</span>
+                        <span>{data.category || "Kategori Seçilmedi"}</span> • <span>{data.brand || "Markasız"}</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 mt-4 sm:mt-0">
-                    <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${data.status === 'out' ? 'bg-red-100 text-red-700' : data.status === 'low' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                        {data.status === 'out' ? 'Pasif/Yok' : 'Aktif'}
-                    </span>
                     <span className="px-3 py-1 rounded-md bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
-                        {data.code || "KOD YOK"}
+                        SKU: {data.code || "YOK"}
                     </span>
                 </div>
             </div>
 
             {isMissingPrimary && (
-                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700 font-medium flex items-center gap-2">
-                    ⚠️ Bazı temel bilgiler eksik görünüyor (Ürün Adı, Kategori veya Fiyat). İşleme devam edebilirsiniz ancak e-Fatura gibi entegrasyonlarda sorun çıkabilir.
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 font-medium flex items-center gap-3 shadow-sm">
+                    <span className="text-lg">⚠️</span>
+                    <p>Dikkat! Ürün Adı, Kategori, Stok Kodu (SKU) veya Fiyat gibi <b>zorunlu bazı alanlar boş bırakılmış</b>. İşleme devam edebilirsiniz ancak entegrasyonlarda ve satış raporlarında sorun yaşanabilir.</p>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-8 bg-blue-50/50 dark:bg-blue-900/10 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl text-center space-y-4">
+                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    🔗
+                </div>
+                <div>
+                    <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">E-Ticaret ve Bağlı Ürünler (Faz 32+)</h4>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                        Pazarama, Trendyol ve N11 gibi pazaryeri eşleştirmeleri ürün kaydedildikten sonra ana envanter ekranından veya direkt entegrasyon panelleri üzerinden yönetilebilecektir.
+                    </p>
+                </div>
+                <div className="pt-2">
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 text-xs font-bold rounded-lg mt-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                        YAKINDA AKTİF
+                    </span>
+                </div>
+            </div>
 
-                {/* Kimlik Özet */}
-                <div className="bg-white dark:bg-[#0f172a] rounded-xl border border-slate-200 dark:border-white/5 p-5 shadow-sm relative group overflow-hidden">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Kimlik & Tanım</h4>
-                        <button onClick={() => setCurrentStep(1)} className="text-xs font-semibold text-slate-500 opacity-0 group-hover:opacity-100 hover:text-slate-900 dark:text-white transition-all underline">Düzenle</button>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Ürün Adı</span><span className="font-semibold text-slate-900 dark:text-white">{data.name || "-"}</span></div>
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Kategori</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.category || "-"}</span></div>
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Marka</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.brand || "-"}</span></div>
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">SKU</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.code || "-"}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Barkod</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.barcode || "-"}</span></div>
+            <div className="border-t border-slate-200 dark:border-white/5 pt-6 mt-6">
+                <div className="bg-slate-50 dark:bg-[#1e293b] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between border border-slate-200 dark:border-white/5">
+                    <div>
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Her şey hazır mı?</h4>
+                        <p className="text-sm text-slate-500">Ürünü kaydettikten sonra dilediğiniz zaman düzenleyebilirsiniz.</p>
                     </div>
                 </div>
-
-                {/* Stok Özet */}
-                <div className="bg-white dark:bg-[#0f172a] rounded-xl border border-slate-200 dark:border-white/5 p-5 shadow-sm relative group overflow-hidden">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Stok & Operasyon</h4>
-                        <button onClick={() => setCurrentStep(2)} className="text-xs font-semibold text-slate-500 opacity-0 group-hover:opacity-100 hover:text-slate-900 dark:text-white transition-all underline">Düzenle</button>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Miktar</span><span className="font-semibold text-slate-900 dark:text-white">{data.stock ?? 0} {data.unit || 'Adet'}</span></div>
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Kritik Eşik</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.minStock ?? 5}</span></div>
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Durum</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.status === 'out' ? 'Pasif' : 'Aktif'}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Açıklama</span><span className="font-medium text-slate-700 dark:text-slate-300 truncate max-w-[150px]">{data.description || "-"}</span></div>
-                    </div>
-                </div>
-
-                {/* Fiyat Özet */}
-                <div className="bg-white dark:bg-[#0f172a] rounded-xl border border-slate-200 dark:border-white/5 p-5 shadow-sm relative group overflow-hidden">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Fiyat & Vergi</h4>
-                        <button onClick={() => setCurrentStep(3)} className="text-xs font-semibold text-slate-500 opacity-0 group-hover:opacity-100 hover:text-slate-900 dark:text-white transition-all underline">Düzenle</button>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Alış</span><span className="font-semibold text-slate-900 dark:text-white">{Number(data.buyPrice || 0).toLocaleString()} {data.purchaseCurrency || 'TRY'} (%{data.purchaseVat}) {data.purchaseVatIncluded ? 'Dahil' : 'Hariç'}</span></div>
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">Satış</span><span className="font-semibold text-slate-900 dark:text-white">{Number(data.price || 0).toLocaleString()} {data.currency || 'TRY'} (%{data.salesVat}) {data.salesVatIncluded ? 'Dahil' : 'Hariç'}</span></div>
-                        {data.otvType !== 'Ö.T.V yok' && <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">ÖTV</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.otvType} - {data.salesOtv}</span></div>}
-                        {data.salesOiv > 0 && <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2"><span className="text-slate-500 dark:text-slate-400">ÖİV</span><span className="font-semibold text-slate-700 dark:text-slate-300">{data.salesOiv}</span></div>}
-                        {data.gtip && <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">GTİP</span><span className="font-mono font-medium text-slate-700 dark:text-slate-300">{data.gtip}</span></div>}
-                    </div>
-                </div>
-
-                {/* Varyantlar */}
-                <div className="bg-white dark:bg-[#0f172a] rounded-xl border border-slate-200 dark:border-white/5 p-5 shadow-sm relative group overflow-hidden">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Varyant & Liste</h4>
-                        <button onClick={() => setCurrentStep(4)} className="text-xs font-semibold text-slate-500 opacity-0 group-hover:opacity-100 hover:text-slate-900 dark:text-white transition-all underline">Düzenle</button>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2">
-                            <span className="text-slate-500 dark:text-slate-400">Varyant Yapısı</span>
-                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${data.isParent || (data.variantsData && data.variantsData.length > 0) ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                                {data.isParent || (data.variantsData && data.variantsData.length > 0) ? 'AKTiF' : 'YOK'}
-                            </span>
-                        </div>
-                        {mode === "create" && Object.keys(productPrices).length > 0 && (
-                            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Ek Fiyat Listesi</span><span className="font-semibold text-slate-700 dark:text-slate-300">{Object.keys(productPrices).length} adet liste tanımlı</span></div>
-                        )}
-                        {mode === "edit" && (
-                            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400">Çoklu Fiyat Listesi</span><span className="font-semibold text-slate-700 dark:text-slate-300 text-right">Düzenlemek için <br />'Varyant & Fiyatlar' sekmesine gidin.</span></div>
-                        )}
-                    </div>
-                </div>
-
             </div>
         </div>
     );

@@ -117,7 +117,10 @@ export async function POST(request: Request) {
         const { name, code, barcode, brand, category, type, stock, price, buyPrice, supplier, branch,
             salesVat, salesVatIncluded, purchaseVat, purchaseVatIncluded,
             salesOiv, salesOtv, otvType, isParent, variantsData, unit,
-            currency, purchaseCurrency, imageUrl, imageKey } = body;
+            currency, purchaseCurrency, imageUrl, imageKey,
+            description, countryCode, invoiceTitle, showDescriptionOnInvoice, shelfLocation, tags, gtin,
+            purchaseDiscount, purchaseOtv
+        } = body;
 
         const targetBranch = branch || 'Merkez';
         const initialQty = parseFloat(stock) || 0;
@@ -148,9 +151,18 @@ export async function POST(request: Request) {
                     purchaseVatIncluded: purchaseVatIncluded !== undefined ? purchaseVatIncluded : true,
                     salesOiv: parseFloat(salesOiv) || 0,
                     salesOtv: parseFloat(salesOtv) || 0,
+                    purchaseDiscount: parseFloat(purchaseDiscount) || 0,
+                    purchaseOtv: parseFloat(purchaseOtv) || 0,
                     otvType: otvType || 'Ö.T.V yok',
                     imageUrl: imageUrl || undefined,
                     imageKey: imageKey || undefined,
+                    description: description || undefined,
+                    countryCode: countryCode || undefined,
+                    invoiceTitle: invoiceTitle || undefined,
+                    showDescriptionOnInvoice: showDescriptionOnInvoice || false,
+                    shelfLocation: shelfLocation || undefined,
+                    tags: tags || undefined,
+                    gtin: gtin || undefined,
                     isParent: isParent || false,
                     stocks: !isParent ? {
                         create: {
