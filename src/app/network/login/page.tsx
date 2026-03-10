@@ -46,7 +46,7 @@ export default function DealerNetworkLoginPage() {
             const data = await res.json();
 
             if (data.ok) {
-                setSuccess("Kimlik doğrulandı. İşlem merkezine yönlendiriliyorsunuz...");
+                setSuccess("Kimlik doğrulandı. Yönlendiriliyorsunuz...");
                 setTimeout(() => {
                     const isCustomSubdomain = window.location.hostname !== 'periodya.com' && window.location.hostname !== 'www.periodya.com' && !window.location.hostname.includes('localhost') || window.location.hostname.includes('b2b.localhost');
                     router.push(isCustomSubdomain ? '/dashboard' : '/network/dashboard');
@@ -70,115 +70,127 @@ export default function DealerNetworkLoginPage() {
     };
 
     return (
-        <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#f6f8fb] font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 items-stretch">
-            {/* SOL PANEL (Blue Gradient Background) - 40% */}
-            <div className="hidden md:flex flex-col w-[35%] lg:w-[40%] bg-gradient-to-b from-[#1a55a8] to-[#0a2f6b] p-12 lg:p-16 relative justify-center border-r border-[#144283] overflow-hidden">
-                {/* Abstract Background Elements mimicking the image */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-400/20 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute inset-x-0 bottom-0 h-1/2 opacity-30 bg-gradient-to-t from-white/10 to-transparent pointer-events-none" />
+        <div className="flex flex-col md:flex-row min-h-screen md:h-screen w-full bg-[#f4f6fa] font-sans text-slate-900 md:overflow-hidden items-stretch">
+            
+            {/* SOL PANEL (Blue Panel) - Takes full height, fixed width on desktop */}
+            <div className="flex-none w-full md:w-[40%] bg-gradient-to-br from-[#1753a8] to-[#0a2f6b] p-12 lg:p-20 relative flex flex-col justify-center border-r border-[#124283] overflow-hidden">
                 
-                {/* Network / Glow lines simulation via CSS */}
-                <div className="absolute bottom-[0%] left-[-20%] w-[140%] h-[60%] border-t-[2px] border-white/5 rounded-[100%] pointer-events-none transform rotate-12" />
-                <div className="absolute bottom-[5%] left-[-10%] w-[120%] h-[50%] border-t-[1px] border-white/10 rounded-[100%] pointer-events-none transform -rotate-6" />
-                <div className="absolute bottom-[15%] left-[-30%] w-[150%] h-[40%] border-t-[1px] border-white/5 rounded-[100%] pointer-events-none transform -rotate-2" />
+                {/* Subtle curve/mesh shapes for background */}
+                <div className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none opacity-20">
+                    <svg viewBox="0 0 800 600" preserveAspectRatio="none" className="w-full h-full">
+                        <path d="M0,400 Q200,300 400,450 T800,350 L800,600 L0,600 Z" fill="rgba(255,255,255,0.1)"></path>
+                        <path d="M0,500 Q250,400 500,500 T800,400 L800,600 L0,600 Z" fill="rgba(255,255,255,0.05)"></path>
+                    </svg>
+                </div>
+                {/* Extra intersecting curved lines */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
+                    <div className="absolute w-[150%] h-[150%] top-[-25%] left-[-25%] border-[1px] border-white rounded-[50%]" />
+                    <div className="absolute w-[120%] h-[120%] top-[10%] left-[-10%] border-[1px] border-white rounded-[50%]" />
+                </div>
 
-                <div className="relative z-10 max-w-[340px]">
-                    <h1 className="text-3xl lg:text-4xl font-semibold text-white tracking-tight leading-snug mb-10">
+                <div className="relative z-10 w-full max-w-[360px] mx-auto">
+                    <h1 className="text-[34px] lg:text-[40px] font-semibold text-white tracking-tight leading-[1.2] mb-12">
                         Kurumsal<br/>Ticaret Altyapısı
                     </h1>
                     
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-6 h-6 rounded-full bg-transparent border border-white/40 flex items-center justify-center shrink-0">
+                            <div className="w-[22px] h-[22px] rounded-full border border-white/50 flex items-center justify-center shrink-0">
                                 <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
-                            <h3 className="font-medium text-[16px] text-white/95">Güvenli şirket ağı</h3>
+                            <h3 className="font-medium text-[16px] text-white">Güvenli şirket ağı</h3>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <div className="w-6 h-6 rounded-full bg-transparent border border-white/40 flex items-center justify-center shrink-0">
+                            <div className="w-[22px] h-[22px] rounded-full border border-white/50 flex items-center justify-center shrink-0">
                                 <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
-                            <h3 className="font-medium text-[16px] text-white/95">Akıllı ticaret eşleşmesi</h3>
+                            <h3 className="font-medium text-[16px] text-white">Akıllı ticaret eşleşmesi</h3>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <div className="w-6 h-6 rounded-full bg-transparent border border-white/40 flex items-center justify-center shrink-0">
+                            <div className="w-[22px] h-[22px] rounded-full border border-white/50 flex items-center justify-center shrink-0">
                                 <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
-                            <h3 className="font-medium text-[16px] text-white/95">Kurumsal işlem altyapısı</h3>
+                            <h3 className="font-medium text-[16px] text-white">Kurumsal işlem altyapısı</h3>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* SAĞ PANEL (Login Form) - 60% */}
-            <div className="flex-1 flex flex-col justify-center items-center p-6 relative">
+            {/* SAĞ PANEL (Login Area) */}
+            <div className="flex-1 relative flex flex-col justify-center items-center p-6 min-h-[600px] overflow-y-auto">
                 
-                {/* Subtle Dot Pattern */}
+                {/* Dot Pattern Full Background */}
                 <div 
-                    className="absolute inset-0 opacity-[0.4] pointer-events-none" 
-                    style={{ backgroundImage: "radial-gradient(#cbd5e1 1.2px, transparent 1.2px)", backgroundSize: "24px 24px" }} 
+                    className="absolute inset-0 opacity-[0.5] pointer-events-none" 
+                    style={{ backgroundImage: "radial-gradient(#d1d5db 1.2px, transparent 1.2px)", backgroundSize: "24px 24px" }} 
                 />
 
-                {/* Logo Top Center */}
-                <div className="relative z-10 mb-8 mt-[-20px] bg-white/50 px-6 py-2 rounded-xl backdrop-blur-md border border-white/20">
-                    <img 
-                        src="/periodya-enterprise-logo.png" 
-                        alt="Periodya Enterprise" 
-                        className="h-7 sm:h-8 w-auto mix-blend-multiply" 
-                    />
-                </div>
-
-                {/* Login Card */}
-                <div className="w-full max-w-[420px] bg-white rounded-[24px] shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-white/50 p-8 sm:p-10 relative z-10">
+                <div className="w-full max-w-[420px] relative z-10 flex flex-col items-center">
                     
-                    {/* Header Details */}
-                    <div className="flex flex-col items-center text-center mb-8">
-                        <div className="w-[60px] h-[60px] rounded-[18px] bg-gradient-to-br from-[#2a68c4] to-[#124290] flex items-center justify-center mb-5 shadow-[0_8px_16px_rgba(42,104,196,0.3)] border border-[#3a78eb] relative">
-                             {/* Glimmer effect inside shield box */}
-                             <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 rounded-[18px] opacity-50" />
-                            <ShieldCheck className="w-8 h-8 text-white relative z-10" strokeWidth={1.5} />
+                    {/* Simulated Logo (To avoid broken image link) */}
+                    <div className="mb-10 flex items-center gap-3 select-none">
+                        {/* Logo Icon */}
+                        <div className="w-[42px] h-[42px] bg-[#1a55a8] rounded-[10px] flex items-center justify-center shadow-md">
+                            <div className="w-6 h-6 border-[2px] border-white/90 rounded-[4px] relative flex items-center justify-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                </svg>
+                            </div>
                         </div>
-                        <h2 className="text-[22px] font-semibold text-slate-800 tracking-tight mb-1.5">
-                            İşlem Merkezi
-                        </h2>
-                        <p className="text-[14px] text-slate-500 font-medium tracking-wide">
-                            Kurumsal ticaret ağına güvenli erişim
-                        </p>
+                        {/* Logo Text */}
+                        <div className="flex flex-col justify-center">
+                            <span className="text-[22px] font-black text-[#14234b] tracking-tight leading-none uppercase">Periodya</span>
+                            <span className="text-[11px] font-bold text-[#2a68c4] tracking-[0.2em] leading-tight">ENTERPRISE</span>
+                        </div>
                     </div>
 
-                    {/* Alerts (Error/Success rendering above the inner grey box if needed) */}
-                    {error && (
-                        <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200/60 flex items-start gap-3">
-                            <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center">
-                                <span className="text-rose-600 text-[11px] font-bold">!</span>
+                    {/* Main Login Card */}
+                    <div className="w-full bg-white rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.06)] p-10 sm:p-12 border border-black/[0.03]">
+                        
+                        {/* Header Details */}
+                        <div className="flex flex-col items-center text-center mb-8">
+                            <div className="w-14 h-14 rounded-[14px] bg-[#1a55a8] flex items-center justify-center mb-5 shadow-[0_8px_16px_rgba(26,85,168,0.25)]">
+                                <ShieldCheck className="w-[26px] h-[26px] text-white" strokeWidth={1.5} />
                             </div>
-                            <p className="text-[13px] text-rose-700 leading-relaxed font-medium">
-                                {error}
+                            <h2 className="text-[22px] font-semibold text-slate-900 tracking-tight mb-1.5">
+                                İşlem Merkezi
+                            </h2>
+                            <p className="text-[14px] text-slate-500 font-medium">
+                                Kurumsal ticaret ağına güvenli erişim
                             </p>
                         </div>
-                    )}
 
-                    {success && (
-                        <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-start gap-3">
-                            <ShieldCheck className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
-                            <p className="text-[13px] text-emerald-700 leading-relaxed font-medium">
-                                {success}
-                            </p>
-                        </div>
-                    )}
+                        {/* Alerts */}
+                        {error && (
+                            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200/60 flex items-start gap-3">
+                                <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center">
+                                    <span className="text-rose-600 text-[11px] font-bold">!</span>
+                                </div>
+                                <p className="text-[13px] text-rose-700 leading-relaxed font-medium">
+                                    {error}
+                                </p>
+                            </div>
+                        )}
 
-                    {/* Inner Grey Form Box container as in image */}
-                    <div className="bg-[#f8f9fb] rounded-[20px] p-6 sm:p-7 border border-slate-100/80">
-                        <form onSubmit={handleLogin} className="space-y-4">
+                        {success && (
+                            <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-start gap-3">
+                                <ShieldCheck className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
+                                <p className="text-[13px] text-emerald-700 leading-relaxed font-medium">
+                                    {success}
+                                </p>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleLogin} className="space-y-5">
                             
                             {/* Email Input */}
-                            <div className="space-y-1.5">
-                                <label className="text-[12px] font-bold text-slate-800 tracking-wide" htmlFor="email">E-Posta Adresi</label>
+                            <div className="space-y-2">
+                                <label className="text-[13px] font-bold text-slate-800 tracking-wide" htmlFor="email">E-Posta Adresi</label>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <Mail className="h-[18px] w-[18px] text-slate-400 group-focus-within:text-[#2a68c4] transition-colors" strokeWidth={2} />
+                                        <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-[#1a55a8] transition-colors" strokeWidth={1.5} />
                                     </div>
                                     <input
                                         id="email"
@@ -186,7 +198,7 @@ export default function DealerNetworkLoginPage() {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full bg-transparent border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2a68c4] focus:ring-1 focus:ring-[#2a68c4] transition-all"
+                                        className="w-full bg-[#f8f9fb] border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1a55a8] focus:ring-1 focus:ring-[#1a55a8] transition-all"
                                         placeholder="ornek@sirket.com"
                                         disabled={loading}
                                     />
@@ -194,16 +206,16 @@ export default function DealerNetworkLoginPage() {
                             </div>
 
                             {/* Password Input */}
-                            <div className="space-y-1.5 pt-2">
+                            <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <label className="text-[12px] font-bold text-slate-800 tracking-wide" htmlFor="password">Şifre</label>
-                                    <a href="#" className="text-[12px] text-[#2a68c4] font-medium hover:text-[#124290] transition-colors">
+                                    <label className="text-[13px] font-bold text-slate-800 tracking-wide" htmlFor="password">Şifre</label>
+                                    <a href="#" className="text-[12px] text-[#1a55a8] font-medium hover:text-[#0a2f6b] transition-colors">
                                         Şifremi unuttum
                                     </a>
                                 </div>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <Lock className="h-[18px] w-[18px] text-slate-400 group-focus-within:text-[#2a68c4] transition-colors" strokeWidth={2} />
+                                        <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-[#1a55a8] transition-colors" strokeWidth={1.5} />
                                     </div>
                                     <input
                                         id="password"
@@ -211,34 +223,35 @@ export default function DealerNetworkLoginPage() {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full bg-transparent border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2a68c4] focus:ring-1 focus:ring-[#2a68c4] transition-all tracking-wide"
+                                        className="w-full bg-[#f8f9fb] border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1a55a8] focus:ring-1 focus:ring-[#1a55a8] transition-all tracking-wide"
                                         placeholder="••••••••"
                                         disabled={loading}
                                     />
                                 </div>
                             </div>
 
+                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={loading || !tenantId}
-                                className="w-full h-[48px] bg-[#316ec5] hover:bg-[#124290] text-white font-medium text-[14px] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6 flex items-center justify-center gap-2 shadow-md focus:ring-2 focus:ring-[#2a68c4] focus:ring-offset-2 active:scale-[0.98]"
+                                className="w-full h-[52px] bg-[#1a55a8] hover:bg-[#124290] text-white font-medium text-[15px] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2 active:scale-[0.98] shadow-sm"
                             >
                                 {loading ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                        <Loader2 className="w-5 h-5 animate-spin text-white" />
                                         <span>Giriş Yapılıyor...</span>
                                     </>
                                 ) : (
                                     <>
                                         <span>Sisteme Giriş Yap</span>
-                                        <ArrowRight className="w-4 h-4 ml-1" strokeWidth={2.5} />
+                                        <ArrowRight className="w-4 h-4 ml-1" strokeWidth={2} />
                                     </>
                                 )}
                             </button>
-
-                            {/* Footer Badge inside inner box */}
+                            
+                            {/* Footer Badge inside card */}
                             <div className="pt-4 flex items-center justify-center gap-2">
-                                <div className="w-[18px] h-[18px] rounded-full bg-[#316ec5] flex items-center justify-center">
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#1b93f1] flex items-center justify-center shadow-sm">
                                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                                 </div>
                                 <span className="text-[13px] font-medium text-slate-600">Kurumsal B2B</span>
