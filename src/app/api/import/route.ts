@@ -194,6 +194,9 @@ export async function POST(request: Request) {
             } else {
                 throw new Error("Geçersiz aktarım tipi.");
             }
+        }, {
+            timeout: 120000, // 2 minutes timeout to allow large data imports
+            maxWait: 20000,
         });
 
         return NextResponse.json({
