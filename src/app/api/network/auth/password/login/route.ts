@@ -29,16 +29,6 @@ export async function POST(req: Request) {
 
     if (Math.random() < 0.01) cleanupRateLimitEvents().catch(() => { })
 
-    const config = await prisma.tenantPortalConfig.findUnique({
-        where: { tenantId: supplierTenantId },
-        select: { dealerAuthMode: true }
-    })
-    const authMode = config?.dealerAuthMode || "PASSWORD_ONLY"
-
-    if (authMode === "OTP_ONLY") {
-        return NextResponse.json({ ok: false, error: "AUTH_MODE_OTP_ONLY" }, { status: 403 })
-    }
-
     const dealerUser = await prisma.dealerUser.findUnique({
         where: { email },
         select: { id: true, passwordHash: true, defaultDealerCompanyId: true },
@@ -53,17 +43,32 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: false, error: "INVALID_CREDENTIALS" }, { status: 401 })
     }
 
+    const membershipWhere: any = {
+        dealerUserId: dealerUser.id,
+        status: "ACTIVE"
+    };
+
+    if (supplierTenantId && supplierTenantId !== "motoroils") {
+        membershipWhere.tenantId = supplierTenantId;
+    }
+
     const membership = await prisma.dealerMembership.findFirst({
-        where: {
-            dealerUserId: dealerUser.id,
-            tenantId: supplierTenantId,
-            status: "ACTIVE"
-        },
-        select: { id: true }
+        where: membershipWhere,
+        select: { id: true, tenantId: true }
     })
 
     if (!membership) {
         return NextResponse.json({ ok: false, error: "NO_ACTIVE_MEMBERSHIP_FOR_TENANT" }, { status: 403 })
+    }
+
+    const config = await prisma.tenantPortalConfig.findUnique({
+        where: { tenantId: membership.tenantId },
+        select: { dealerAuthMode: true }
+    })
+    const authMode = config?.dealerAuthMode || "PASSWORD_ONLY"
+
+    if (authMode === "OTP_ONLY") {
+        return NextResponse.json({ ok: false, error: "AUTH_MODE_OTP_ONLY" }, { status: 403 })
     }
 
     const rawSession = await createDealerSession(dealerUser.id)
