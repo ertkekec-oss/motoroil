@@ -207,11 +207,37 @@ function StepIdentity({ data, onChange, categories }: any) {
                         </select>
                     </div>
                     <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Durumu <span className="text-red-500">*</span></label>
+                        <select value={data.status || 'Aktif'} onChange={e => onChange({ ...data, status: e.target.value })} className="w-full h-12 px-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-white dark:bg-[#0f172a] text-[15px] font-medium shadow-sm hover:border-slate-400">
+                            <option value="Aktif">Aktif</option>
+                            <option value="Pasif">Pasif</option>
+                            <option value="Stokta Yok">Stokta Yok</option>
+                        </select>
+                    </div>
+                    <div className="space-y-2">
                         <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Satış Birimi</label>
                         <select value={data.unit || 'Adet'} onChange={e => onChange({ ...data, unit: e.target.value })} className="w-full h-12 px-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all bg-white dark:bg-[#0f172a] text-[15px] font-medium shadow-sm hover:border-slate-400">
                             <option value="Adet">Adet</option>
-                            <option value="KG">Kg</option>
+                            <option value="Ay">Ay</option>
+                            <option value="Bağ">Bağ</option>
+                            <option value="Bidon">Bidon</option>
+                            <option value="Boy">Boy</option>
+                            <option value="Cc">Cc</option>
+                            <option value="Cilt">Cilt</option>
+                            <option value="Cm">Cm</option>
+                            <option value="Cm2">Cm2</option>
+                            <option value="Çift">Çift</option>
+                            <option value="Çuval">Çuval</option>
+                            <option value="Dakika">Dakika</option>
+                            <option value="Dekar">Dekar</option>
+                            <option value="Desi">Desi</option>
+                            <option value="Deste">Deste</option>
+                            <option value="Dilim">Dilim</option>
+                            <option value="Dönem">Dönem</option>
+                            <option value="Düzine">Düzine</option>
+                            <option value="Galon">Galon</option>
                             <option value="Gram">Gram</option>
+                            <option value="KG">Kg</option>
                             <option value="Litre">Litre</option>
                             <option value="Metre">Metre</option>
                             <option value="Paket">Paket</option>
@@ -219,7 +245,6 @@ function StepIdentity({ data, onChange, categories }: any) {
                             <option value="Set">Set</option>
                             <option value="Takım">Takım</option>
                             <option value="Saat">Saat</option>
-                            <option value="Ay">Ay</option>
                             <option value="Yıl">Yıl</option>
                         </select>
                     </div>
@@ -261,14 +286,38 @@ function StepPricingTax({ data, onChange }: any) {
                                 <input type="number" value={data.price ?? 0} onChange={e => onChange({ ...data, price: parseFloat(e.target.value) })} className="flex-1 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all shadow-sm hover:border-slate-400" />
                                 <select value={data.currency || 'TRY'} onChange={e => onChange({ ...data, currency: e.target.value })} className="w-24 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none transition-all shadow-sm font-semibold">
                                     <option value="TRY">TRY</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+                                    <option value="CHF">CHF</option><option value="RUB">RUB</option><option value="AED">AED</option><option value="SAR">SAR</option><option value="QAR">QAR</option><option value="CNY">CNY</option>
                                 </select>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Satış KDV Oranı</label>
-                                <select value={data.salesVat ?? 20} onChange={e => onChange({ ...data, salesVat: parseInt(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm">
-                                    <option value="0">%0</option><option value="1">%1</option><option value="10">%10</option><option value="20">%20</option>
+                                <select value={data.salesVat ?? 20} onChange={e => onChange({ ...data, salesVat: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm">
+                                    <option value="0">%0</option>
+                                    <option value="1">%1</option>
+                                    <option value="4">%4</option>
+                                    <option value="5">%5</option>
+                                    <option value="5.5">%5.5</option>
+                                    <option value="6">%6</option>
+                                    <option value="7">%7</option>
+                                    <option value="8">%8</option>
+                                    <option value="9">%9</option>
+                                    <option value="10">%10</option>
+                                    <option value="11">%11</option>
+                                    <option value="12">%12</option>
+                                    <option value="12.6">%12.6</option>
+                                    <option value="13">%13</option>
+                                    <option value="14">%14</option>
+                                    <option value="15">%15</option>
+                                    <option value="16">%16</option>
+                                    <option value="18">%18</option>
+                                    <option value="19">%19</option>
+                                    <option value="20">%20</option>
+                                    <option value="21">%21</option>
+                                    <option value="23">%23</option>
+                                    <option value="24">%24</option>
+                                    <option value="27">%27</option>
                                 </select>
                             </div>
                             <div className="space-y-1">
@@ -317,14 +366,38 @@ function StepPricingTax({ data, onChange }: any) {
                                 <input type="number" value={data.buyPrice ?? 0} onChange={e => onChange({ ...data, buyPrice: parseFloat(e.target.value) })} className="flex-1 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm hover:border-slate-400 transition-all" />
                                 <select value={data.purchaseCurrency || 'TRY'} onChange={e => onChange({ ...data, purchaseCurrency: e.target.value })} className="w-24 h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm font-semibold transition-all">
                                     <option value="TRY">TRY</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+                                    <option value="CHF">CHF</option><option value="RUB">RUB</option><option value="AED">AED</option><option value="SAR">SAR</option><option value="QAR">QAR</option><option value="CNY">CNY</option>
                                 </select>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold mb-1 block">Alış KDV Oranı</label>
-                                <select value={data.purchaseVat ?? 20} onChange={e => onChange({ ...data, purchaseVat: parseInt(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 text-sm shadow-sm outline-none">
-                                    <option value="0">%0</option><option value="1">%1</option><option value="10">%10</option><option value="20">%20</option>
+                                <select value={data.purchaseVat ?? 20} onChange={e => onChange({ ...data, purchaseVat: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 text-sm shadow-sm outline-none">
+                                    <option value="0">%0</option>
+                                    <option value="1">%1</option>
+                                    <option value="4">%4</option>
+                                    <option value="5">%5</option>
+                                    <option value="5.5">%5.5</option>
+                                    <option value="6">%6</option>
+                                    <option value="7">%7</option>
+                                    <option value="8">%8</option>
+                                    <option value="9">%9</option>
+                                    <option value="10">%10</option>
+                                    <option value="11">%11</option>
+                                    <option value="12">%12</option>
+                                    <option value="12.6">%12.6</option>
+                                    <option value="13">%13</option>
+                                    <option value="14">%14</option>
+                                    <option value="15">%15</option>
+                                    <option value="16">%16</option>
+                                    <option value="18">%18</option>
+                                    <option value="19">%19</option>
+                                    <option value="20">%20</option>
+                                    <option value="21">%21</option>
+                                    <option value="23">%23</option>
+                                    <option value="24">%24</option>
+                                    <option value="27">%27</option>
                                 </select>
                             </div>
                             <div className="space-y-1">
@@ -522,7 +595,7 @@ function StepVariantsPriceLists({
 
                         {useVariants && (
                             <div className="space-y-5">
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap gap-2 items-center">
                                     {variantAttributes.map((attr: any) => (
                                         <button
                                             key={attr.id}
@@ -538,6 +611,34 @@ function StepVariantsPriceLists({
                                             {attr.name}
                                         </button>
                                     ))}
+                                    
+                                    <div className="h-6 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                                    
+                                    <button
+                                        onClick={() => {
+                                            const name = window.prompt("Yeni Variant Özelliği Adı (Örn: Renk, Beden, Malzeme):");
+                                            if (name) {
+                                                fetch('/api/products/attributes', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ name, values: ["Tanımsız"] })
+                                                })
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    if(data.success && window.location.reload) {
+                                                        // Refresh to fetch the new attribute from page.tsx side
+                                                        // A more robust way would be to pass setVariantAttributes down, but reload is safe.
+                                                        alert("Varyant Özelliği eklendi! Listede görünmesi için ilgili özelliği Seçenekler > Nitelikler menüsünden detaylandırabilirsiniz.");
+                                                    } else {
+                                                        alert("Eklenirken bir sorun oluştu.");
+                                                    }
+                                                });
+                                            }
+                                        }}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-dashed border-slate-300 dark:border-white/20 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center gap-1"
+                                    >
+                                        + Yeni Özellik
+                                    </button>
                                 </div>
 
                                 {selectedAttributes.length > 0 && (

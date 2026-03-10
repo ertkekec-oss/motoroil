@@ -78,19 +78,21 @@ export async function POST(req: Request) {
         // Compute Public URL endpoint
         const imageUrl = getPublicObjectUrl(s3Key);
 
-        // Update the Product in the database with multi-tenant isolation
-        const { default: prisma } = await import('@/lib/prisma');
+        // Update the Product in the database with multi-tenant isolation IF it's not a temp product
+        if (productId !== 'temp') {
+            const { default: prisma } = await import('@/lib/prisma');
 
-        await prisma.product.updateMany({
-            where: {
-                id: productId,
-                companyId: tenantId
-            },
-            data: {
-                imageKey: s3Key,
-                imageUrl: imageUrl
-            }
-        });
+            await prisma.product.updateMany({
+                where: {
+                    id: productId,
+                    companyId: tenantId
+                },
+                data: {
+                    imageKey: s3Key,
+                    imageUrl: imageUrl
+                }
+            });
+        }
 
         return NextResponse.json({ ok: true, key: s3Key, imageUrl });
     } catch (error: any) {

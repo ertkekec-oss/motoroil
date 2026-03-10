@@ -19,7 +19,6 @@ export default function ProductImageUpload({
     const [isUploading, setIsUploading] = useState(false);
 
     const handleContainerClick = () => {
-        if (!productId) return;
         if (!isUploading) {
             fileInputRef.current?.click();
         }
@@ -45,7 +44,7 @@ export default function ProductImageUpload({
 
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("productId", String(productId));
+        formData.append("productId", productId ? String(productId) : "temp");
 
         try {
             const res = await fetch("/api/uploads/products/image", {
@@ -80,9 +79,8 @@ export default function ProductImageUpload({
                 className={`
                     relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm 
                     overflow-hidden flex items-center justify-center transition-all duration-200 group
-                    ${!productId
-                        ? "bg-slate-100/50 dark:bg-[#0f172a]/50 cursor-not-allowed grayscale"
-                        : "bg-slate-50 dark:bg-[#1e293b] cursor-pointer hover:border-slate-300 dark:hover:border-white/20"}
+                    relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm 
+                    overflow-hidden flex items-center justify-center transition-all duration-200 group bg-slate-50 dark:bg-[#1e293b] cursor-pointer hover:border-slate-300 dark:hover:border-white/20
                     ${isUploading ? "opacity-70 pointer-events-none" : ""}
                 `}
             >
@@ -112,7 +110,7 @@ export default function ProductImageUpload({
                 )}
 
                 {/* Hover Overlay */}
-                {!isUploading && productId && (
+                {!isUploading && (
                     <div className="absolute inset-0 bg-slate-900/20 dark:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center p-2 text-center backdrop-blur-[1px]">
                         <svg className="w-5 h-5 mb-1 text-slate-800 dark:text-white drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -121,15 +119,7 @@ export default function ProductImageUpload({
                     </div>
                 )}
 
-                {/* Disabled Overlay (Sürekli Görünür / Daha Transparan) */}
-                {!productId && (
-                    <div className="absolute inset-0 bg-slate-100/60 dark:bg-[#0f172a]/80 backdrop-blur-[1px] flex flex-col items-center justify-center text-center p-2">
-                        <svg className="w-5 h-5 mb-1 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                        <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 leading-tight">Önce<br />Kaydedin</span>
-                    </div>
-                )}
+                {/* Disabled Overlay REMOVED to support pre-upload */}
             </div>
 
             {/* Hidden File Input */}

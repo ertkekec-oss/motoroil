@@ -355,9 +355,9 @@ model Product {
   brand               String?
   type                String?                 @default("Ürün")
   branch              String?                 @default("Merkez")
-  salesVat            Int?                    @default(20)
+  salesVat            Decimal?                @default(20) @db.Decimal(5, 2)
   salesVatIncluded    Boolean?                @default(true)
-  purchaseVat         Int?                    @default(20)
+  purchaseVat         Decimal?                @default(20) @db.Decimal(5, 2)
   purchaseVatIncluded Boolean?                @default(true)
   salesOiv            Decimal?                @default(0) @db.Decimal(10, 2)
   salesOtv            Decimal?                @default(0) @db.Decimal(10, 2)
@@ -376,6 +376,7 @@ model Product {
   purchaseCurrency    String                  @default("TRY")
   supplierName        String?
   unit                String?                 @default("Adet")
+  status              String?                 @default("Aktif")
 
   // NEW DYNAMIC FIELDS AWAITING MIGRATION (Phase 32)
   countryCode         String?

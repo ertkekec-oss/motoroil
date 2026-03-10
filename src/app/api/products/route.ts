@@ -145,10 +145,11 @@ export async function POST(request: Request) {
                     supplierName: supplier || '', // Fix: supplier -> supplierName
                     branch: 'Merkez',
                     unit: unit || 'Adet',
-                    salesVat: parseInt(salesVat) || 20,
+                    salesVat: parseFloat(salesVat) || 20,
                     salesVatIncluded: salesVatIncluded !== undefined ? salesVatIncluded : true,
-                    purchaseVat: parseInt(purchaseVat) || 20,
+                    purchaseVat: parseFloat(purchaseVat) || 20,
                     purchaseVatIncluded: purchaseVatIncluded !== undefined ? purchaseVatIncluded : true,
+                    status: body.status || 'Aktif',
                     salesOiv: parseFloat(salesOiv) || 0,
                     salesOtv: parseFloat(salesOtv) || 0,
                     purchaseDiscount: parseFloat(purchaseDiscount) || 0,
@@ -197,6 +198,7 @@ export async function POST(request: Request) {
                             unit: unit || 'Adet',
                             salesVat: mainProduct.salesVat,
                             purchaseVat: mainProduct.purchaseVat,
+                            status: body.status || 'Aktif',
                             imageUrl: imageUrl || undefined,
                             imageKey: imageKey || undefined,
                             stocks: {
