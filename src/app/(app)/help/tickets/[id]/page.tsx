@@ -19,7 +19,7 @@ export default async function SupportTicketDetailPage({ params }: { params: { id
     const ticket = await prisma.supportTicket.findUnique({
         where: { id: id },
         include: {
-            comments: { orderBy: { createdAt: 'asc' }, include: { authorUser: { select: { name: true, role: true } } } },
+            comments: { orderBy: { createdAt: 'asc' } },
             tags: { include: { tag: true } }
         }
     });
@@ -31,6 +31,22 @@ export default async function SupportTicketDetailPage({ params }: { params: { id
     if (ticket.tenantId !== session.tenantId) {
         redirect('/help/tickets');
     }
+
+    const userIds = [...new Set(ticket.comments.map(c => c.userId))].filter(Boolean);
+    const users = await prisma.user.findMany({
+        where: { id: { in: userIds } },
+        select: { id: true, name: true, role: true }
+    });
+
+    const userMap = users.reduce((acc, user) => {
+        acc[user.id] = user;
+        return acc;
+    }, {} as Record<string, any>);
+
+    const commentsWithUser = ticket.comments.map(c => ({
+        ...c,
+        authorUser: userMap[c.userId] || null
+    }));
 
     return (
         <EnterprisePageShell
@@ -67,7 +83,7 @@ export default async function SupportTicketDetailPage({ params }: { params: { id
                             </div>
 
                             {/* Comments array */}
-                            {ticket.comments.map(c => (
+                            {commentsWithUser.map(c => (
                                 <div key={c.id} className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold uppercase">
                                         {c.authorType === 'USER' ? (c.authorUser?.name?.charAt(0) || 'U') : 'A'}

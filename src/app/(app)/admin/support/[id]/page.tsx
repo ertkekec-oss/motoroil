@@ -25,7 +25,7 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
         where: { id: id },
         include: {
             tenant: true,
-            comments: { orderBy: { createdAt: 'asc' }, include: { authorUser: { select: { name: true, role: true } } } },
+            comments: { orderBy: { createdAt: 'asc' } },
             tags: { include: { tag: true } },
             slaTracking: true
         }
@@ -39,6 +39,22 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
     if (!isPlatformAdmin && ticket.tenantId !== session.tenantId) {
         redirect('/admin/support');
     }
+
+    const userIds = [...new Set(ticket.comments.map(c => c.userId))].filter(Boolean);
+    const users = await prisma.user.findMany({
+        where: { id: { in: userIds } },
+        select: { id: true, name: true, role: true }
+    });
+
+    const userMap = users.reduce((acc, user) => {
+        acc[user.id] = user;
+        return acc;
+    }, {} as Record<string, any>);
+
+    const commentsWithUser = ticket.comments.map(c => ({
+        ...c,
+        authorUser: userMap[c.userId] || null
+    }));
 
     const isSlaBreached = ticket.slaTracking?.status === 'BREACHED';
 
@@ -79,7 +95,7 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
                             </div>
 
                             {/* Comments */}
-                            {ticket.comments.map(c => (
+                            {commentsWithUser.map(c => (
                                 <div key={c.id} className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold uppercase">
                                         {c.authorType === 'USER' ? 'M' : 'A'}
