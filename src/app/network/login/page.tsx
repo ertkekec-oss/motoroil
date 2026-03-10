@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 
 export default function DealerNetworkLoginPage() {
     const router = useRouter();
@@ -45,111 +46,145 @@ export default function DealerNetworkLoginPage() {
             const data = await res.json();
 
             if (data.ok) {
-                setSuccess('Giriş başarılı! Bayi paneline yönlendiriliyorsunuz...');
+                setSuccess('Kimlik doğrulandı. İşlem merkezine yönlendiriliyorsunuz...');
                 setTimeout(() => {
                     const isCustomSubdomain = window.location.hostname !== 'periodya.com' && window.location.hostname !== 'www.periodya.com' && !window.location.hostname.includes('localhost') || window.location.hostname.includes('b2b.localhost');
                     router.push(isCustomSubdomain ? '/dashboard' : '/network/dashboard');
                 }, 1000);
             } else {
                 if (data.error === 'NOT_FOUND_OR_NO_PASSWORD' || data.error === 'INVALID_CREDENTIALS') {
-                    setError('E-posta veya şifre hatalı. Lütfen tekrar deneyin.');
+                    setError('E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin.');
                 } else if (data.error === 'NO_ACTIVE_MEMBERSHIP_FOR_TENANT') {
-                    setError('Bu bayiye ait aktif bir üyeliğiniz bulunmamaktadır.');
+                    setError('Bu platformda aktif bir yetkilendirmeniz bulunmuyor.');
                 } else if (data.error === 'RATE_LIMITED') {
                     setError(`Çok fazla deneme yaptınız. Lütfen ${data.retryAfterSec} saniye bekleyin.`);
                 } else {
-                    setError('Giriş başarısız oldu. [' + data.error + ']');
+                    setError('Giriş reddedildi. [' + data.error + ']');
                 }
             }
         } catch (err) {
-            setError('Bir bağlantı hatası oluştu.');
+            setError('Sunucu ile iletişim kurulamadı. Lütfen tekrar deneyin.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 selection:bg-blue-500/30 font-sans relative overflow-hidden">
-
-            {/* Background Effects */}
+        <div className="min-h-screen bg-[#020617] flex relative overflow-hidden font-sans selection:bg-blue-500/30">
+            {/* Minimal Background Gradients */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full" />
-                <div className="absolute -bottom-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full" />
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay"></div>
+                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[130px] rounded-full" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[130px] rounded-full" />
+                <div className="absolute top-[20%] right-[20%] w-[30%] h-[30%] bg-sky-500/5 blur-[100px] rounded-full mix-blend-screen" />
             </div>
 
-            <div className="max-w-[420px] w-full z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20 border border-white/10">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                            <path d="M2 17l10 5 10-5" />
-                            <path d="M2 12l10 5 10-5" />
-                        </svg>
-                    </div>
-                    <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Yetkili Bayi Portalı</h1>
-                    <p className="text-slate-400 font-medium text-sm">B2B Yönetim Paneline Hoş Geldiniz</p>
-                </div>
-
-                <div className="bg-[#0f172a]/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/[0.05]">
-
-                    {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-2xl mb-6 flex items-start gap-3 animate-in fade-in zoom-in-95 font-medium">
-                            <span className="text-lg leading-none">⚠️</span>
-                            <span className="leading-snug">{error}</span>
-                        </div>
-                    )}
-
-                    {success && (
-                        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm p-4 rounded-2xl mb-6 flex items-start gap-3 animate-in fade-in zoom-in-95 font-medium">
-                            <span className="text-lg leading-none">✅</span>
-                            <span className="leading-snug">{success}</span>
-                        </div>
-                    )}
-
-                    <form onSubmit={handleLogin} className="space-y-5">
-                        <div className="space-y-1.5">
-                            <label className="text-[13px] font-bold text-slate-400 uppercase tracking-wider ml-1">E-Posta Adresi</label>
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-[#1e293b]/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all font-medium"
-                                placeholder="bayi@sirket.com"
-                            />
-                        </div>
-
-                        <div className="space-y-1.5">
-                            <div className="flex items-center justify-between ml-1">
-                                <label className="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Şifre</label>
+            <div className="flex-1 flex flex-col items-center justify-center p-6 z-10 w-full">
+                
+                {/* Main Card Container */}
+                <div className="w-full max-w-[420px] animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    
+                    {/* Header Details */}
+                    <div className="mb-10 text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#0f172a] border border-white/5 shadow-xl mb-6 ring-1 ring-white/10 relative group">
+                            <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white relative z-10 shadow-inner">
+                                <ShieldCheck className="w-5 h-5" />
                             </div>
-                            <input
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-[#1e293b]/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all font-medium"
-                                placeholder="••••••••"
-                            />
                         </div>
+                        <h1 className="text-[28px] font-semibold text-white tracking-tight mb-2">
+                            İşlem Merkezi
+                        </h1>
+                        <p className="text-slate-400 text-[14px]">
+                            Kurumsal hizmet ağına güvenle giriş yapın
+                        </p>
+                    </div>
 
-                        <button
-                            type="submit"
-                            disabled={loading || !tenantId}
-                            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center justify-center gap-2"
-                        >
-                            {loading ? (
-                                <>
-                                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                    </svg>
-                                    Doğrulanıyor...
-                                </>
-                            ) : 'Bayi Ağına Giriş Yap'}
-                        </button>
-                    </form>
+                    {/* Login Card */}
+                    <div className="bg-[#0f172a]/90 backdrop-blur-2xl rounded-[24px] p-8 shadow-2xl border border-white/[0.05] relative overflow-hidden ring-1 ring-white/[0.02]">
+                        
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.01] via-white/[0.03] to-transparent pointer-events-none" />
+
+                        {error && (
+                            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[13px] p-4 rounded-xl mb-6 flex items-start gap-3 animate-in fade-in zoom-in-95 backdrop-blur-md">
+                                <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span className="leading-relaxed">{error}</span>
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[13px] p-4 rounded-xl mb-6 flex items-start gap-3 animate-in fade-in zoom-in-95 backdrop-blur-md">
+                                <ShieldCheck className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                                <span className="leading-relaxed">{success}</span>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleLogin} className="space-y-5 relative z-10">
+                            
+                            <div className="space-y-2">
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">E-Posta Adresi</label>
+                                <div className="relative group/mail">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Mail className="h-5 w-5 text-slate-500 group-focus-within/mail:text-blue-500 transition-colors" />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl pl-11 pr-4 py-3.5 text-[14px] text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-[#020617] transition-all"
+                                        placeholder="ornek@sirket.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between ml-1">
+                                    <label className="text-[12px] font-medium text-slate-400">Şifre</label>
+                                    <a href="#" className="text-[12px] text-blue-500 hover:text-blue-400 transition-colors opacity-80 hover:opacity-100">Şifremi unuttum</a>
+                                </div>
+                                <div className="relative group/lock">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Lock className="h-5 w-5 text-slate-500 group-focus-within/lock:text-blue-500 transition-colors" />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl pl-11 pr-4 py-3.5 text-[14px] text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-[#020617] transition-all tracking-wide"
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading || !tenantId}
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-[15px] py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 group border border-blue-500/30"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <span>Kimlik Doğrulanıyor...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Sisteme Giriş Yap</span>
+                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    </>
+                                )}
+                            </button>
+                        </form>
+
+                    </div>
+
+                    <div className="mt-8 text-center flex items-center justify-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+                        <ShieldCheck className="w-4 h-4 text-slate-400" />
+                        <p className="text-[12px] text-slate-400 font-medium tracking-wide">GÜVENLİ B2B ALTYAPISI</p>
+                    </div>
                 </div>
             </div>
         </div>
