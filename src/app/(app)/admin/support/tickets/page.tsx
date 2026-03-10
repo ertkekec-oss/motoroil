@@ -114,19 +114,46 @@ export default async function AdminTicketsPage({
                 </EnterpriseCard>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <Link href="/admin/support/tickets" className={`px-4 py-2 text-sm rounded-md font-medium transition-colors ${!status ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80'}`}>
-                    Hepsi ({metrics.total})
-                </Link>
-                <Link href="/admin/support/tickets?status=NEW" className={`px-4 py-2 text-sm rounded-md font-medium transition-colors ${status === 'NEW' ? 'bg-blue-600 text-white border-transparent' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80'}`}>
-                    Yeni Gelenler
-                </Link>
-                <Link href="/admin/support/tickets?status=IN_PROGRESS" className={`px-4 py-2 text-sm rounded-md font-medium transition-colors ${status === 'IN_PROGRESS' ? 'bg-amber-500 text-white border-transparent' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80'}`}>
-                    İşlemde Olanlar
-                </Link>
-                <Link href="/admin/support/tickets?status=WAITING_CUSTOMER" className={`px-4 py-2 text-sm rounded-md font-medium transition-colors ${status === 'WAITING_CUSTOMER' ? 'bg-purple-600 text-white border-transparent' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80'}`}>
-                    Cevap Bekleyenler
-                </Link>
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                    {[
+                        { 
+                            group: 'GENEL', 
+                            items: [
+                                { id: '', label: `Hepsi (${metrics.total})` },
+                                { id: 'NEW', label: 'Yeni Gelenler' }
+                            ] 
+                        },
+                        { 
+                            group: 'SÜREÇ', 
+                            items: [
+                                { id: 'IN_PROGRESS', label: 'İşlemde Olanlar' }, 
+                                { id: 'WAITING_CUSTOMER', label: 'Yanıt Bekleyenler' },
+                                { id: 'RESOLVED', label: 'Çözümlenenler' }
+                            ] 
+                        },
+                    ].map((grp, i) => (
+                        <div key={grp.group} className="flex items-center gap-3">
+                            {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
+                            <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                {grp.items.map(tab => {
+                                    const isActive = status === tab.id || (!status && tab.id === '');
+                                    return (
+                                        <Link
+                                            key={tab.id}
+                                            href={tab.id ? `/admin/support/tickets?status=${tab.id}` : '/admin/support/tickets'}
+                                            className={isActive
+                                                ? "px-3 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px] transition-all"
+                                                : "px-3 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
+                                        >
+                                            {tab.label}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <EnterpriseCard className="p-0 overflow-hidden">
@@ -153,10 +180,10 @@ export default async function AdminTicketsPage({
                                     <td className="px-6 py-4 min-w-[300px] max-w-md">
                                         <Link href={`/admin/support/tickets/${ticket.id}`} className="block">
                                             <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-1 truncate">
-                                                #{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message.substring(0, 40).replace(/\*\*/g, '') || ticket.type}
+                                                #{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message ? ticket.messages[0].message.substring(0, 40).replace(/\*\*/g, '') : ticket.type}
                                             </div>
                                             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                                                {ticket.messages[0]?.message.substring(0, 80).replace(/\*\*/g, '') || "Detay bulunamadı."}
+                                                {ticket.messages[0]?.message ? ticket.messages[0].message.substring(0, 80).replace(/\*\*/g, '') : "Detay bulunamadı."}
                                             </p>
                                         </Link>
                                     </td>
@@ -173,10 +200,10 @@ export default async function AdminTicketsPage({
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="text-sm text-slate-900 dark:text-slate-200 font-medium">
-                                            {new Date(ticket.createdAt).toLocaleDateString('tr-TR')}
+                                            {new Date(ticket.createdAt).toISOString().substring(0, 10).split('-').reverse().join('.')}
                                         </div>
                                         <div className="text-[10px] text-slate-500 font-mono mt-1">
-                                            {new Date(ticket.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                            {new Date(ticket.createdAt).toISOString().substring(11, 16)}
                                         </div>
                                     </td>
                                 </tr>
