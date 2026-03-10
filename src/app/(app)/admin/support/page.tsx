@@ -35,7 +35,7 @@ export default async function AdminSupportListPage({
     const tickets = await prisma.supportTicket.findMany({
         where: whereClause,
         orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
-        include: { _count: { select: { comments: true } }, tenant: { select: { name: true } } },
+        include: { _count: { select: { comments: true } } },
         take: 100
     });
 
@@ -77,7 +77,7 @@ export default async function AdminSupportListPage({
                                     {ticket.id.slice(-6).toUpperCase()}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-slate-700 font-semibold truncate max-w-[150px]">
-                                    {ticket.tenant?.name || 'Global'}
+                                    {ticket.tenantId}
                                 </td>
                                 <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100 truncate max-w-[200px]">
                                     {ticket.subject}
@@ -96,7 +96,7 @@ export default async function AdminSupportListPage({
                                     </span>
                                 </td>
                                 <td className="px-4 py-3 text-[10px] uppercase font-bold text-slate-400">
-                                    {ticket.createdAt.toLocaleDateString('tr-TR')}
+                                    {new Date(ticket.createdAt).toISOString().substring(0, 10).split('-').reverse().join('.')}
                                 </td>
                                 <td className="px-4 py-3 text-right">
                                     <Link href={`/admin/support/${ticket.id}`} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold whitespace-nowrap transition-colors">

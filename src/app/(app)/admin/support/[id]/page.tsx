@@ -24,7 +24,6 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
     const ticket = await prisma.supportTicket.findUnique({
         where: { id: id },
         include: {
-            tenant: true,
             comments: { orderBy: { createdAt: 'asc' } },
             tags: { include: { tag: true } },
             slaTracking: true
@@ -58,10 +57,15 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
 
     const isSlaBreached = ticket.slaTracking?.status === 'BREACHED';
 
+    const tenantCompany = await prisma.company.findUnique({
+        where: { id: ticket.tenantId },
+        select: { name: true }
+    });
+
     return (
         <EnterprisePageShell
             title={`Bilet: ${ticket.subject}`}
-            description={`${ticket.tenant?.name || 'Global'} / Bilet ID: ${ticket.id}`}
+            description={`${tenantCompany?.name || ticket.tenantId || 'Global'} / Bilet ID: ${ticket.id}`}
             className="bg-slate-50 dark:bg-slate-950 min-h-screen"
             actions={
                 <Link href="/admin/support" className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">
