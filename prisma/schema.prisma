@@ -17,6 +17,7 @@ model Tenant {
   setupState           String                   @default("PENDING")
   createdAt            DateTime                 @default(now())
   updatedAt            DateTime                 @updatedAt
+  b2bCustomDomain      String?                  @unique
   companies            Company[]
   growthEvents         GrowthEvent[]
   subscription         Subscription?

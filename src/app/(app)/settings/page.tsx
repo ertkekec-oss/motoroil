@@ -18,7 +18,8 @@ import {
     Cloud,
     ScrollText,
     Mail,
-    ShieldAlert
+    ShieldAlert,
+    Globe
 } from 'lucide-react';
 import MailSettingsPanel from './_components/forms/MailSettingsPanel';
 import SystemResetPanel from './_components/forms/SystemResetPanel';
@@ -38,6 +39,7 @@ import IntegrationsPanel from './_components/forms/IntegrationsPanel';
 import AuthorizedSignersPanel from './_components/forms/AuthorizedSignersPanel';
 import PricingPage from './pricing/page';
 import BranchSettingsPage from './branch/page';
+import CustomDomainPanel from './_components/forms/CustomDomainPanel';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -1097,6 +1099,7 @@ export default function SettingsPage() {
                 <nav className="flex-1 p-3 flex flex-col gap-0.5">
                     {[
                         { id: 'company', label: 'Firma Profili', icon: <Building2 className="w-5 h-5 text-indigo-500" /> },
+                        { id: 'custom_domain', label: 'Özel Alan Adı (B2B)', icon: <Globe className="w-5 h-5 text-blue-500" /> },
                         { id: 'authorized_signers', label: 'İmza Yetkilileri', icon: <ShieldCheck className="w-5 h-5 text-emerald-600" /> },
                         { id: 'integrations', label: 'Entegrasyonlar', icon: <Plug className="w-5 h-5 text-emerald-500" /> },
                         { id: 'branches', label: 'Şubeler & Depo', icon: <Building className="w-5 h-5 text-sky-500" /> },
@@ -1149,6 +1152,9 @@ export default function SettingsPage() {
 
                 {/* 0. FİRMA PROFİLİ */}
                 {activeTab === 'company' && <CompanyProfileForm {...sharedProps} />}
+
+                {/* ÖZEL ALAN ADI */}
+                {activeTab === 'custom_domain' && <CustomDomainPanel />}
 
                 {/* IMZA YETKILILERI */}
                 {activeTab === 'authorized_signers' && <AuthorizedSignersPanel />}

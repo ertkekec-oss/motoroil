@@ -78,37 +78,100 @@ export async function middleware(request: NextRequest) {
         }
     }
 
+    // --- SUBDOMAIN LOGIC FOR B2B PORTAL & CUSTOM DOMAINS ---
+    const hostname = request.headers.get("host") || "";
+    // Note: Always remove port number before evaluating production domains if needed (localhost keeps it)
+    const hostnameWithoutPort = hostname.split(':')[0];
+
+    const isPrimaryDomain = 
+        hostnameWithoutPort === 'periodya.com' || 
+        hostnameWithoutPort === 'www.periodya.com' ||
+        hostnameWithoutPort === 'localhost' ||
+        hostnameWithoutPort === 'vercel.app' || // For default vercel deployment urls
+        hostname.includes('vercel.app');
+
+    // A subdomain is considered a B2B subdomain if it's the default b2b.* domain, 
+    // OR if it's NOT the primary app domain (thus presumed to be a custom tenant domain)
+    const isB2BSubdomain = 
+        hostnameWithoutPort === 'b2b.periodya.com' || 
+        hostname.startsWith('b2b.localhost') || 
+        !isPrimaryDomain;
+
+    const base = portalBasePath(); // usually "/network"
+
+    // Feature 1: Redirect old /network/* accessed via main domain to subdomain
+    // E.g. periodya.com/network/login -> b2b.periodya.com/login
+    if (!isB2BSubdomain && pathname.startsWith(base)) {
+        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/';
+        const url = request.nextUrl.clone();
+        url.pathname = newPath === '/' ? '/dashboard' : newPath;
+        url.hostname = hostname.includes('localhost') ? 'b2b.localhost' : 'b2b.periodya.com';
+        if (hostname.includes('localhost') && hostname.includes(':')) {
+            url.port = hostname.split(':')[1];
+        } else {
+            url.port = ''; // Clear port for production
+        }
+        return NextResponse.redirect(url);
+    }
+
+    // Feature 2: Redirect /network/* accessed via subdomain to root of subdomain
+    // E.g. b2b.periodya.com/network/login -> b2b.periodya.com/login
+    if (isB2BSubdomain && pathname.startsWith(base)) {
+        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/';
+        const url = request.nextUrl.clone();
+        url.pathname = newPath === '/' ? '/dashboard' : newPath;
+        return NextResponse.redirect(url);
+    }
+
+    // If user accesses the root of the subdomain, redirect to /dashboard
+    if (isB2BSubdomain && pathname === '/') {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    // Determine if the current request is for the B2B portal
+    // Either it's on the subdomain (and not an API or admin path) or it has the /network prefix (handled above)
+    const isApiOrAdmin = pathname.startsWith('/api/') || pathname.startsWith('/admin/');
+    const isB2BPortalRequest = (isB2BSubdomain && !isApiOrAdmin) || pathname.startsWith(base);
+
+    let finalResponse: NextResponse | null = null;
+
     // 3. NETWORK B2B PORTAL GUARD (Dealer Auth)
-    const base = portalBasePath();
-    if (pathname.startsWith(base)) {
-        const isLogin = pathname.startsWith(`${base}/login`);
-        const isInvite = pathname.startsWith(`${base}/invite`);
-        const isApi = pathname.startsWith(`${base}/api`);
+    if (isB2BPortalRequest) {
+        // Evaluate effective pathname for internal guard checks
+        const effectivePathname = (isB2BSubdomain && !pathname.startsWith(base)) 
+            ? `${base}${pathname === '/' ? '' : pathname}` 
+            : pathname;
 
-        if (isLogin || isInvite) {
-            return NextResponse.next();
-        }
+        const isLogin = effectivePathname.startsWith(`${base}/login`);
+        const isInvite = effectivePathname.startsWith(`${base}/invite`);
+        const isApi = effectivePathname.startsWith(`${base}/api`); // For B2B specific API if any
 
-        const hasSession = Boolean(request.cookies.get("pdya_ds")?.value);
-        const hasMembership = Boolean(request.cookies.get("pdya_nm")?.value);
+        if (!(isLogin || isInvite)) {
+            const hasSession = Boolean(request.cookies.get("pdya_ds")?.value);
+            const hasMembership = Boolean(request.cookies.get("pdya_nm")?.value);
 
-        if (!hasSession) {
-            if (isApi) {
-                return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+            if (!hasSession) {
+                if (isApi) {
+                    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+                }
+                const loginUrl = isB2BSubdomain ? '/login' : `${base}/login`;
+                return NextResponse.redirect(new URL(loginUrl, request.url));
             }
-            return NextResponse.redirect(new URL(`${base}/login`, request.url));
-        }
 
-        // session var, membership yoksa select sayfasına yönlendir
-        const isSelect = pathname.startsWith(`${base}/select-supplier`);
-        if (!hasMembership && !isSelect) {
-            if (isApi) {
-                return NextResponse.json({ error: 'Membership required' }, { status: 403 });
+            // session var, membership yoksa select sayfasına yönlendir
+            const isSelect = effectivePathname.startsWith(`${base}/select-supplier`);
+            if (!hasMembership && !isSelect) {
+                if (isApi) {
+                    return NextResponse.json({ error: 'Membership required' }, { status: 403 });
+                }
+                const selectUrl = isB2BSubdomain ? '/select-supplier' : `${base}/select-supplier`;
+                return NextResponse.redirect(new URL(selectUrl, request.url));
             }
-            return NextResponse.redirect(new URL(`${base}/select-supplier`, request.url));
         }
 
-        return NextResponse.next();
+        if (isB2BSubdomain) {
+            finalResponse = NextResponse.rewrite(new URL(effectivePathname, request.url));
+        }
     }
 
     // 4. Auth Related Paths & Public API - Allowed
@@ -121,12 +184,12 @@ export async function middleware(request: NextRequest) {
         '/api/test-me', '/api/test-db', '/api/test-cookies'
     ];
     if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
-        return NextResponse.next();
+        return finalResponse || NextResponse.next();
     }
 
     // Special case: Allow public invoice PDF downloads for sharing
     if (pathname === '/api/sales/invoices' && request.nextUrl.searchParams.get('action') === 'get-pdf') {
-        return NextResponse.next();
+        return finalResponse || NextResponse.next();
     }
 
     // 5. GLOBAL SESSION GUARD (Protected Paths)
@@ -141,7 +204,7 @@ export async function middleware(request: NextRequest) {
 
     try {
         await jwtVerify(sessionToken, getJWTAscii());
-        return NextResponse.next();
+        return finalResponse || NextResponse.next();
     } catch (err) {
         console.error('Middleware global session error:', err);
         const response = pathname.startsWith('/api')
