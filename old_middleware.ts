@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
 
         if (!sessionToken) {
             if (pathname.startsWith('/api')) {
-                return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+                return NextResponse.json({ error: 'Yetkisiz eri┼şim' }, { status: 401 });
             }
             return NextResponse.redirect(new URL('/login', request.url));
         }
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
 
             if (!allowedAdminRoles.includes(userRole)) {
                 if (pathname.startsWith('/api')) {
-                    return NextResponse.json({ error: 'Bu alana erişim yetkiniz yok.' }, { status: 403 });
+                    return NextResponse.json({ error: 'Bu alana eri┼şim yetkiniz yok.' }, { status: 403 });
                 }
                 return NextResponse.redirect(new URL('/login', request.url));
             }
@@ -71,7 +71,7 @@ export async function middleware(request: NextRequest) {
         } catch (err) {
             console.error('Middleware admin session error:', err);
             const response = pathname.startsWith('/api')
-                ? NextResponse.json({ error: 'Oturum geçersiz' }, { status: 401 })
+                ? NextResponse.json({ error: 'Oturum ge├ğersiz' }, { status: 401 })
                 : NextResponse.redirect(new URL('/login', request.url));
             response.cookies.delete('session');
             return response;
@@ -102,9 +102,9 @@ export async function middleware(request: NextRequest) {
     // Feature 1: Redirect old /network/* accessed via main domain to subdomain
     // E.g. periodya.com/network/login -> b2b.periodya.com/login
     if (!isB2BSubdomain && pathname.startsWith(base)) {
-        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/login';
+        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/';
         const url = request.nextUrl.clone();
-        url.pathname = newPath;
+        url.pathname = newPath === '/' ? '/dashboard' : newPath;
         url.hostname = hostname.includes('localhost') ? 'b2b.localhost' : 'b2b.periodya.com';
         if (hostname.includes('localhost') && hostname.includes(':')) {
             url.port = hostname.split(':')[1];
@@ -114,10 +114,18 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    // Feature 2: If user accesses the root of the B2B subdomain, redirect to /login
-    // E.g. b2b.periodya.com/ -> b2b.periodya.com/login (this happens visible to user)
+    // Feature 2: Redirect /network/* accessed via subdomain to root of subdomain
+    // E.g. b2b.periodya.com/network/login -> b2b.periodya.com/login
+    if (isB2BSubdomain && pathname.startsWith(base)) {
+        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/';
+        const url = request.nextUrl.clone();
+        url.pathname = newPath === '/' ? '/dashboard' : newPath;
+        return NextResponse.redirect(url);
+    }
+
+    // If user accesses the root of the subdomain, redirect to /dashboard
     if (isB2BSubdomain && pathname === '/') {
-        return NextResponse.redirect(new URL('/login', request.url));
+        return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
     // Determine if the current request is for the B2B portal
@@ -144,13 +152,13 @@ export async function middleware(request: NextRequest) {
 
             if (!hasSession) {
                 if (isApi) {
-                    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+                    return NextResponse.json({ error: 'Yetkisiz eri┼şim' }, { status: 401 });
                 }
                 const loginUrl = isB2BSubdomain ? '/login' : `${base}/login`;
                 return NextResponse.redirect(new URL(loginUrl, request.url));
             }
 
-            // session var, membership yoksa select sayfasına yönlendir
+            // session var, membership yoksa select sayfas─▒na y├Ânlendir
             const isSelect = effectivePathname.startsWith(`${base}/select-supplier`);
             if (!hasMembership && !isSelect) {
                 if (isApi) {
@@ -173,14 +181,9 @@ export async function middleware(request: NextRequest) {
         '/api/auth', '/api/public', '/api/network', '/api/portal',
         '/api/admin/marketplace/queue/health',
         '/pdks', '/api/v1/pdks/display',
-        '/api/test-me', '/api/test-db', '/api/test-cookies',
-        `${base}/login`, `${base}/invite`
+        '/api/test-me', '/api/test-db', '/api/test-cookies'
     ];
-    
-    // We also consider /network/login and such as public if handled behind a B2B rewrite
-    const effectivePublicPath = isB2BSubdomain ? (pathname === '/login' ? '/network/login' : pathname) : pathname;
-
-    if (publicPaths.some(path => effectivePublicPath === path || effectivePublicPath.startsWith(path + '/'))) {
+    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
         return finalResponse || NextResponse.next();
     }
 
@@ -194,7 +197,7 @@ export async function middleware(request: NextRequest) {
 
     if (!sessionToken) {
         if (pathname.startsWith('/api')) {
-            return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+            return NextResponse.json({ error: 'Yetkisiz eri┼şim' }, { status: 401 });
         }
         return NextResponse.redirect(new URL('/login', request.url));
     }
@@ -205,7 +208,7 @@ export async function middleware(request: NextRequest) {
     } catch (err) {
         console.error('Middleware global session error:', err);
         const response = pathname.startsWith('/api')
-            ? NextResponse.json({ error: 'Oturum geçersiz' }, { status: 401 })
+            ? NextResponse.json({ error: 'Oturum ge├ğersiz' }, { status: 401 })
             : NextResponse.redirect(new URL('/login', request.url));
 
         response.cookies.delete('session');
