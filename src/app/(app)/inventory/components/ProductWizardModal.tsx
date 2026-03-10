@@ -136,7 +136,7 @@ export default function ProductWizardModal({
                                         {isUploading ? "Yükleniyor..." : "Döküman Yükle"}
                                     </button>
                                     
-                                    <button onClick={() => { router.push('/settings/printing?product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/inventory/labels?product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
                                         <Printer size={14} /> Etiket Yazdır
                                     </button>
                                 </div>
