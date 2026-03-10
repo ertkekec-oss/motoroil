@@ -7,6 +7,7 @@ import { useSales } from '@/contexts/SalesContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
+import { useSettings } from '@/contexts/SettingsContext';
 
 import { useOfflineDetector, addToQueue, syncQueue, getQueue } from '@/lib/pos-offline';
 
@@ -25,6 +26,7 @@ export default function TerminalClient() {
     const { processSale, suspendedSales, suspendSale, removeSuspendedSale } = useSales();
     const { currentUser } = useApp();
     const { showSuccess, showError, showWarning } = useModal();
+    const { appSettings, updateAppSetting } = useSettings();
 
     const searchInputRef = useRef<HTMLInputElement>(null);
     const checkoutPanelRef = useRef<HTMLDivElement>(null);
@@ -57,11 +59,42 @@ export default function TerminalClient() {
     const [isProcessing, setIsProcessing] = useState(false);
     const { isOnline } = useOfflineDetector();
 
+    // Forex Currency Rates
+    const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
+    const useForex = appSettings?.useForexRate === true;
+
+    useEffect(() => {
+        if (useForex && isOnline) {
+            // Fetch live rates. Free public API returning base TRY.
+            fetch('https://open.er-api.com/v6/latest/TRY')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.rates) {
+                        // rates are 1 TRY = X USD. So 1 USD = 1 / X TRY
+                        const ratesToTry: Record<string, number> = {};
+                        Object.keys(data.rates).forEach(currency => {
+                            ratesToTry[currency] = 1 / data.rates[currency];
+                        });
+                        ratesToTry['TRY'] = 1;
+                        setExchangeRates(ratesToTry);
+                    }
+                })
+                .catch(err => console.error("Forex fetch failed", err));
+        }
+    }, [useForex, isOnline]);
+
     // Price Resolution
     const getPrice = useCallback((product: any) => {
-        if (priceMap[product.id] !== undefined) return priceMap[product.id];
-        return Number(product.price || 0);
-    }, [priceMap]);
+        let basePrice = Number(product.price || 0);
+        if (priceMap[product.id] !== undefined) basePrice = priceMap[product.id];
+
+        // Apply Forex Exchange Rate Conversion if enabled and product is not TRY
+        if (useForex && product.currency && product.currency !== 'TRY' && exchangeRates[product.currency]) {
+            basePrice = basePrice * exchangeRates[product.currency];
+        }
+
+        return basePrice;
+    }, [priceMap, useForex, exchangeRates]);
 
     useEffect(() => {
         const resolvePriceList = async () => {
@@ -303,6 +336,20 @@ export default function TerminalClient() {
 
                 <div className="ml-auto flex items-center gap-4">
                     <div className="hidden md:flex items-center gap-2 border-r border-slate-200 dark:border-white/10 pr-4 mr-2">
+                        {/* Forex Toggle */}
+                        <button 
+                            onClick={() => updateAppSetting('useForexRate', !useForex)} 
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-colors ${useForex ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 ring-2 ring-indigo-500/30' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                            title="Aktif olduğunda ürünlerin döviz kurları anlık olarak TL'ye çevrilerek satışı yapılır."
+                        >
+                            <span className="flex h-2 w-2 relative">
+                                {useForex && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>}
+                                <span className={`relative inline-flex rounded-full h-2 w-2 ${useForex ? 'bg-indigo-500' : 'bg-slate-400'}`}></span>
+                            </span>
+                            Canlı Kur {useForex ? 'Açık' : 'Kapalı'}
+                        </button>
+                        <div className="h-6 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                        
                         <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/5 text-[11px] font-bold transition-colors">
                             <Tag size={12} /> Kupon {discountCode && <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>}
                         </button>
@@ -315,7 +362,7 @@ export default function TerminalClient() {
                     </div>
 
                     <button onClick={() => setShowResumptionModal(true)} className="flex items-center gap-2 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-500 hover:bg-amber-100 px-3 py-1.5 rounded-full text-xs font-bold border border-amber-200 dark:border-amber-500/20 transition-colors">
-                        <Clock size={14} /> Bekleyenler ({suspendedSales?.length || 0}) <kbd className="hidden sm:inline-block font-sans opacity-70 border border-current px-1 rounded ml-1">F9</kbd>
+                        <Clock size={14} /> Bekleyen ({suspendedSales?.length || 0})
                     </button>
                     <OfflineBadge />
                 </div>
