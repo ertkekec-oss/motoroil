@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Server, Network } from "lucide-react";
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Check } from "lucide-react";
 
 export default function DealerNetworkLoginPage() {
     const router = useRouter();
@@ -70,105 +70,91 @@ export default function DealerNetworkLoginPage() {
     };
 
     return (
-        <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#f8fafc] font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
-            {/* SOL PANEL (Brand & Info) - 40% */}
-            <div className="hidden md:flex flex-col w-[40%] bg-slate-900 p-12 relative overflow-hidden justify-between border-r border-slate-800">
-                {/* Subtle Grid Background */}
-                <div 
-                    className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-                    style={{ backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
-                    aria-hidden="true" 
-                />
+        <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#f6f8fb] font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 items-stretch">
+            {/* SOL PANEL (Blue Gradient Background) - 40% */}
+            <div className="hidden md:flex flex-col w-[35%] lg:w-[40%] bg-gradient-to-b from-[#1a55a8] to-[#0a2f6b] p-12 lg:p-16 relative justify-center border-r border-[#144283] overflow-hidden">
+                {/* Abstract Background Elements mimicking the image */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-400/20 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-1/2 opacity-30 bg-gradient-to-t from-white/10 to-transparent pointer-events-none" />
                 
-                {/* Brand Logo Top */}
-                <div className="relative z-10">
-                    <img 
-                        src="/periodya-enterprise-logo.png" 
-                        alt="Periodya Enterprise" 
-                        className="h-10 w-auto" 
-                    />
-                </div>
+                {/* Network / Glow lines simulation via CSS */}
+                <div className="absolute bottom-[0%] left-[-20%] w-[140%] h-[60%] border-t-[2px] border-white/5 rounded-[100%] pointer-events-none transform rotate-12" />
+                <div className="absolute bottom-[5%] left-[-10%] w-[120%] h-[50%] border-t-[1px] border-white/10 rounded-[100%] pointer-events-none transform -rotate-6" />
+                <div className="absolute bottom-[15%] left-[-30%] w-[150%] h-[40%] border-t-[1px] border-white/5 rounded-[100%] pointer-events-none transform -rotate-2" />
 
-                {/* Main Content */}
-                <div className="relative z-10 max-w-sm mt-12 mb-auto">
-                    <h1 className="text-3xl font-semibold text-white tracking-tight mb-8">
-                        Kurumsal Ticaret Altyapısı
+                <div className="relative z-10 max-w-[340px]">
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-white tracking-tight leading-snug mb-10">
+                        Kurumsal<br/>Ticaret Altyapısı
                     </h1>
                     
                     <div className="space-y-6">
-                        <div className="flex items-start gap-4">
-                            <div className="mt-1 w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-                                <ShieldCheck className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
+                        <div className="flex items-center gap-4">
+                            <div className="w-6 h-6 rounded-full bg-transparent border border-white/40 flex items-center justify-center shrink-0">
+                                <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
-                            <div>
-                                <h3 className="font-medium text-slate-200">Güvenli şirket ağı</h3>
-                                <p className="text-sm text-slate-400 mt-1">Uçtan uca doğrulanmış bayi ve distribütör ekosistemi.</p>
-                            </div>
+                            <h3 className="font-medium text-[16px] text-white/95">Güvenli şirket ağı</h3>
                         </div>
 
-                        <div className="flex items-start gap-4">
-                            <div className="mt-1 w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-                                <Network className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
+                        <div className="flex items-center gap-4">
+                            <div className="w-6 h-6 rounded-full bg-transparent border border-white/40 flex items-center justify-center shrink-0">
+                                <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
-                            <div>
-                                <h3 className="font-medium text-slate-200">Akıllı ticaret eşleşmesi</h3>
-                                <p className="text-sm text-slate-400 mt-1">Özelleştirilmiş fiyatlamalar ve kapasite bazlı routing.</p>
-                            </div>
+                            <h3 className="font-medium text-[16px] text-white/95">Akıllı ticaret eşleşmesi</h3>
                         </div>
 
-                        <div className="flex items-start gap-4">
-                            <div className="mt-1 w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-                                <Server className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
+                        <div className="flex items-center gap-4">
+                            <div className="w-6 h-6 rounded-full bg-transparent border border-white/40 flex items-center justify-center shrink-0">
+                                <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
-                            <div>
-                                <h3 className="font-medium text-slate-200">Kurumsal işlem altyapısı</h3>
-                                <p className="text-sm text-slate-400 mt-1">Sınırsız ölçeklenebilir altyapı ile kesintisiz B2B ticaret.</p>
-                            </div>
+                            <h3 className="font-medium text-[16px] text-white/95">Kurumsal işlem altyapısı</h3>
                         </div>
                     </div>
-                </div>
-
-                {/* Footer Left */}
-                <div className="relative z-10 text-xs text-slate-500">
-                    {new Date().getFullYear()} © Periodya Enterprise. Tüm hakları saklıdır.
                 </div>
             </div>
 
             {/* SAĞ PANEL (Login Form) - 60% */}
-            <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 relative bg-[#f8fafc]">
+            <div className="flex-1 flex flex-col justify-center items-center p-6 relative">
                 
-                {/* Mobile/Top Logo */}
-                <div className="md:absolute md:top-12 md:left-12 mb-8 md:mb-0">
+                {/* Subtle Dot Pattern */}
+                <div 
+                    className="absolute inset-0 opacity-[0.4] pointer-events-none" 
+                    style={{ backgroundImage: "radial-gradient(#cbd5e1 1.2px, transparent 1.2px)", backgroundSize: "24px 24px" }} 
+                />
+
+                {/* Logo Top Center */}
+                <div className="relative z-10 mb-8 mt-[-20px] bg-white/50 px-6 py-2 rounded-xl backdrop-blur-md border border-white/20">
                     <img 
                         src="/periodya-enterprise-logo.png" 
                         alt="Periodya Enterprise" 
-                        className="h-8 w-auto md:opacity-40 md:grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300" 
+                        className="h-7 sm:h-8 w-auto mix-blend-multiply" 
                     />
                 </div>
 
                 {/* Login Card */}
-                <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 p-8 sm:p-10 relative">
+                <div className="w-full max-w-[420px] bg-white rounded-[24px] shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-white/50 p-8 sm:p-10 relative z-10">
                     
                     {/* Header Details */}
-                    <div className="mb-8">
-                        <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6 shadow-sm">
-                            <ShieldCheck className="w-6 h-6 text-blue-600" strokeWidth={1.5} />
+                    <div className="flex flex-col items-center text-center mb-8">
+                        <div className="w-[60px] h-[60px] rounded-[18px] bg-gradient-to-br from-[#2a68c4] to-[#124290] flex items-center justify-center mb-5 shadow-[0_8px_16px_rgba(42,104,196,0.3)] border border-[#3a78eb] relative">
+                             {/* Glimmer effect inside shield box */}
+                             <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 rounded-[18px] opacity-50" />
+                            <ShieldCheck className="w-8 h-8 text-white relative z-10" strokeWidth={1.5} />
                         </div>
-                        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight mb-2">
+                        <h2 className="text-[22px] font-semibold text-slate-800 tracking-tight mb-1.5">
                             İşlem Merkezi
                         </h2>
-                        <p className="text-[15px] text-slate-500">
+                        <p className="text-[14px] text-slate-500 font-medium tracking-wide">
                             Kurumsal ticaret ağına güvenli erişim
                         </p>
                     </div>
 
-                    {/* Alerts */}
+                    {/* Alerts (Error/Success rendering above the inner grey box if needed) */}
                     {error && (
                         <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200/60 flex items-start gap-3">
                             <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center">
                                 <span className="text-rose-600 text-[11px] font-bold">!</span>
                             </div>
-                            <p className="text-[14px] text-rose-700 leading-relaxed font-medium">
+                            <p className="text-[13px] text-rose-700 leading-relaxed font-medium">
                                 {error}
                             </p>
                         </div>
@@ -177,87 +163,90 @@ export default function DealerNetworkLoginPage() {
                     {success && (
                         <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-start gap-3">
                             <ShieldCheck className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
-                            <p className="text-[14px] text-emerald-700 leading-relaxed font-medium">
+                            <p className="text-[13px] text-emerald-700 leading-relaxed font-medium">
                                 {success}
                             </p>
                         </div>
                     )}
 
-                    {/* Form */}
-                    <form onSubmit={handleLogin} className="space-y-5">
-                        <div className="space-y-2">
-                            <label className="text-[13px] font-medium text-slate-700" htmlFor="email">E-Posta Adresi</label>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" strokeWidth={1.5} />
+                    {/* Inner Grey Form Box container as in image */}
+                    <div className="bg-[#f8f9fb] rounded-[20px] p-6 sm:p-7 border border-slate-100/80">
+                        <form onSubmit={handleLogin} className="space-y-4">
+                            
+                            {/* Email Input */}
+                            <div className="space-y-1.5">
+                                <label className="text-[12px] font-bold text-slate-800 tracking-wide" htmlFor="email">E-Posta Adresi</label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        <Mail className="h-[18px] w-[18px] text-slate-400 group-focus-within:text-[#2a68c4] transition-colors" strokeWidth={2} />
+                                    </div>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full bg-transparent border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2a68c4] focus:ring-1 focus:ring-[#2a68c4] transition-all"
+                                        placeholder="ornek@sirket.com"
+                                        disabled={loading}
+                                    />
                                 </div>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-white border border-slate-300 rounded-xl pl-11 pr-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-sm"
-                                    placeholder="ornek@sirket.com"
-                                    disabled={loading}
-                                />
                             </div>
-                        </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <label className="text-[13px] font-medium text-slate-700" htmlFor="password">Şifre</label>
-                                <a href="#" className="text-[13px] text-blue-600 font-medium hover:text-blue-700 transition-colors">
-                                    Şifremi unuttum
-                                </a>
-                            </div>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" strokeWidth={1.5} />
+                            {/* Password Input */}
+                            <div className="space-y-1.5 pt-2">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[12px] font-bold text-slate-800 tracking-wide" htmlFor="password">Şifre</label>
+                                    <a href="#" className="text-[12px] text-[#2a68c4] font-medium hover:text-[#124290] transition-colors">
+                                        Şifremi unuttum
+                                    </a>
                                 </div>
-                                <input
-                                    id="password"
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-white border border-slate-300 rounded-xl pl-11 pr-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-sm tracking-wide"
-                                    placeholder="••••••••"
-                                    disabled={loading}
-                                />
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        <Lock className="h-[18px] w-[18px] text-slate-400 group-focus-within:text-[#2a68c4] transition-colors" strokeWidth={2} />
+                                    </div>
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full bg-transparent border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2a68c4] focus:ring-1 focus:ring-[#2a68c4] transition-all tracking-wide"
+                                        placeholder="••••••••"
+                                        disabled={loading}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <button
-                            type="submit"
-                            disabled={loading || !tenantId}
-                            className="w-full h-[52px] bg-blue-600 hover:bg-blue-700 text-white font-medium text-[15px] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6 flex items-center justify-center gap-2 group active:scale-[0.98]"
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 animate-spin text-white" />
-                                    <span>Kimlik Doğrulanıyor...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>Sisteme Giriş Yap</span>
-                                    <ArrowRight className="w-4 h-4 text-white/80 group-hover:translate-x-1 group-hover:text-white transition-all" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-                    
-                    {/* B2B Status under form */}
-                    <div className="mt-8 flex items-center justify-center gap-2 text-slate-400">
-                        <ShieldCheck className="w-4 h-4" strokeWidth={2} />
-                        <span className="text-[13px] font-medium">Kurumsal B2B</span>
+                            <button
+                                type="submit"
+                                disabled={loading || !tenantId}
+                                className="w-full h-[48px] bg-[#316ec5] hover:bg-[#124290] text-white font-medium text-[14px] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6 flex items-center justify-center gap-2 shadow-md focus:ring-2 focus:ring-[#2a68c4] focus:ring-offset-2 active:scale-[0.98]"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                        <span>Giriş Yapılıyor...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Sisteme Giriş Yap</span>
+                                        <ArrowRight className="w-4 h-4 ml-1" strokeWidth={2.5} />
+                                    </>
+                                )}
+                            </button>
+
+                            {/* Footer Badge inside inner box */}
+                            <div className="pt-4 flex items-center justify-center gap-2">
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#316ec5] flex items-center justify-center">
+                                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                                </div>
+                                <span className="text-[13px] font-medium text-slate-600">Kurumsal B2B</span>
+                            </div>
+
+                        </form>
                     </div>
 
-                </div>
-
-                {/* Optional Mobile Footer */}
-                <div className="mt-10 md:hidden text-center text-xs text-slate-500">
-                    {new Date().getFullYear()} © Periodya Enterprise. Tüm hakları saklıdır.
                 </div>
             </div>
         </div>
