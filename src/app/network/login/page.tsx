@@ -47,7 +47,8 @@ export default function DealerNetworkLoginPage() {
             if (data.ok) {
                 setSuccess('Giriş başarılı! Bayi paneline yönlendiriliyorsunuz...');
                 setTimeout(() => {
-                    router.push('/network/dashboard');
+                    const isCustomSubdomain = window.location.hostname !== 'periodya.com' && window.location.hostname !== 'www.periodya.com' && !window.location.hostname.includes('localhost') || window.location.hostname.includes('b2b.localhost');
+                    router.push(isCustomSubdomain ? '/dashboard' : '/network/dashboard');
                 }, 1000);
             } else {
                 if (data.error === 'NOT_FOUND_OR_NO_PASSWORD' || data.error === 'INVALID_CREDENTIALS') {
