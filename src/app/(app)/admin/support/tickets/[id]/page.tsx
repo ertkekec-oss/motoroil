@@ -70,7 +70,9 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                         ← Inbox'a Dön
                     </Link>
                     <div className="flex items-center gap-3 mb-2">
-                        <h1 className="text-2xl font-black text-slate-900 truncate">#{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message.substring(0, 30).replace(/\*\*/g, '').split('\n')[0] || ticket.type}</h1>
+                        <h1 className="text-2xl font-black text-slate-900 truncate">
+                            #{ticket.id.substring(ticket.id.length - 6).toUpperCase()} - {ticket.messages[0]?.message ? ticket.messages[0].message.substring(0, 30).replace(/\*\*/g, '').split('\n')[0] : ticket.type}
+                        </h1>
                     </div>
                 </div>
 
@@ -94,7 +96,9 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                                             {isCustomer ? `${isFirstMessage ? ticket.createdByUserId || 'Bilinmiyor' : 'Müşteri'}` : isAdmin ? `Destek: ${msg.senderTenantId}` : 'Sistem Botu'}
                                         </span>
                                     </div>
-                                    <div className="text-xs text-slate-400">{new Date(msg.createdAt).toLocaleString('tr-TR')}</div>
+                                    <div className="text-xs text-slate-400">
+                                        {new Date(msg.createdAt).toISOString().replace('T', ' ').substring(0, 19)}
+                                    </div>
                                 </div>
                                 <div className={`text-slate-700 whitespace-pre-wrap text-sm leading-relaxed mb-4`}>
                                     {msg.message}

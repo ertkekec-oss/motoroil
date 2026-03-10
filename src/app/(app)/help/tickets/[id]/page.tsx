@@ -51,7 +51,7 @@ export default async function SupportTicketDetailPage({ params }: { params: { id
     return (
         <EnterprisePageShell
             title={`Talep: ${ticket.subject}`}
-            description={`Oluşturulma: ${ticket.createdAt.toLocaleString('tr-TR')} | ID: ${ticket.id}`}
+            description={`Oluşturulma: ${new Date(ticket.createdAt).toISOString().replace('T', ' ').substring(0, 19)} | ID: ${ticket.id}`}
             className="bg-slate-50 dark:bg-slate-950 min-h-screen"
             actions={
                 <Link href="/help/tickets" className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">
@@ -74,7 +74,7 @@ export default async function SupportTicketDetailPage({ params }: { params: { id
                                 <div className="flex-1 bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl rounded-tl-sm border border-slate-100 dark:border-slate-800">
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="font-semibold text-sm">{session.user?.name || 'Kullanıcı'} (Siz)</span>
-                                        <span className="text-xs text-slate-400">{ticket.createdAt.toLocaleString('tr-TR')}</span>
+                                        <span className="text-xs text-slate-400">{new Date(ticket.createdAt).toISOString().replace('T', ' ').substring(0, 19)}</span>
                                     </div>
                                     <div className="text-sm whitespace-pre-wrap text-slate-700 dark:text-slate-300">
                                         {ticket.description}
@@ -94,7 +94,7 @@ export default async function SupportTicketDetailPage({ params }: { params: { id
                                                 {c.authorType === 'SYSTEM' ? 'Sistem & AI' : (c.authorUser?.name || 'Destek Ekibi')}
                                                 {c.authorType === 'SUPPORT_AGENT' && <span className="ml-2 text-[10px] bg-blue-100 text-blue-800 px-1 py-0.5 rounded">Uzman</span>}
                                             </span>
-                                            <span className="text-xs text-slate-400">{c.createdAt.toLocaleString('tr-TR')}</span>
+                                            <span className="text-xs text-slate-400">{new Date(c.createdAt).toISOString().replace('T', ' ').substring(0, 19)}</span>
                                         </div>
                                         <div className="text-sm whitespace-pre-wrap text-slate-700 dark:text-slate-300">
                                             {c.message}

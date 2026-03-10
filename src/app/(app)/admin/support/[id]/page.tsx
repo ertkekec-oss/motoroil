@@ -88,7 +88,7 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
                                 <div className="flex-1 bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 rounded-tl-sm">
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="font-semibold text-sm">Müşteri</span>
-                                        <span className="text-xs text-slate-400">{ticket.createdAt.toLocaleString('tr-TR')}</span>
+                                        <span className="text-xs text-slate-400">{new Date(ticket.createdAt).toISOString().replace('T', ' ').substring(0, 19)}</span>
                                     </div>
                                     <div className="text-sm whitespace-pre-wrap text-slate-700 dark:text-slate-300">{ticket.description}</div>
                                 </div>
@@ -105,7 +105,7 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
                                             <span className="font-semibold text-sm">
                                                 {c.authorType === 'SYSTEM' ? 'Sistem Botu' : (c.authorUser?.name || (c.authorType === 'USER' ? 'Müşteri' : 'Destek Ekibi'))}
                                             </span>
-                                            <span className="text-xs text-slate-400">{c.createdAt.toLocaleString('tr-TR')}</span>
+                                            <span className="text-xs text-slate-400">{new Date(c.createdAt).toISOString().replace('T', ' ').substring(0, 19)}</span>
                                         </div>
                                         <div className="text-sm whitespace-pre-wrap text-slate-700 dark:text-slate-300">{c.message}</div>
                                     </div>
@@ -160,7 +160,7 @@ export default async function AdminSupportTicketDetailPage({ params }: { params:
                                 <div>
                                     <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">SLA Target Resolution</label>
                                     <div className={`mt-1 text-xs font-medium ${ticket.slaTracking.status === 'BREACHED' ? 'text-rose-600' : 'text-slate-800 dark:text-slate-200'}`}>
-                                        {ticket.slaTracking.resolutionDeadline.toLocaleString('tr-TR')}
+                                        {new Date(ticket.slaTracking.resolutionDeadline).toISOString().replace('T', ' ').substring(0, 19)}
                                     </div>
                                 </div>
                             )}
