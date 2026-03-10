@@ -102,9 +102,9 @@ export async function middleware(request: NextRequest) {
     // Feature 1: Redirect old /network/* accessed via main domain to subdomain
     // E.g. periodya.com/network/login -> b2b.periodya.com/login
     if (!isB2BSubdomain && pathname.startsWith(base)) {
-        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/';
+        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/login';
         const url = request.nextUrl.clone();
-        url.pathname = newPath === '/' ? '/dashboard' : newPath;
+        url.pathname = newPath;
         url.hostname = hostname.includes('localhost') ? 'b2b.localhost' : 'b2b.periodya.com';
         if (hostname.includes('localhost') && hostname.includes(':')) {
             url.port = hostname.split(':')[1];
@@ -114,18 +114,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    // Feature 2: Redirect /network/* accessed via subdomain to root of subdomain
-    // E.g. b2b.periodya.com/network/login -> b2b.periodya.com/login
-    if (isB2BSubdomain && pathname.startsWith(base)) {
-        const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/';
-        const url = request.nextUrl.clone();
-        url.pathname = newPath === '/' ? '/dashboard' : newPath;
-        return NextResponse.redirect(url);
-    }
-
-    // If user accesses the root of the subdomain, redirect to /dashboard
+    // Feature 2: If user accesses the root of the B2B subdomain, redirect to /login
+    // E.g. b2b.periodya.com/ -> b2b.periodya.com/login (this happens visible to user)
     if (isB2BSubdomain && pathname === '/') {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        return NextResponse.redirect(new URL('/login', request.url));
     }
 
     // Determine if the current request is for the B2B portal
@@ -183,7 +175,11 @@ export async function middleware(request: NextRequest) {
         '/pdks', '/api/v1/pdks/display',
         '/api/test-me', '/api/test-db', '/api/test-cookies'
     ];
-    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
+    
+    // We also consider /network/login and such as public if handled behind a B2B rewrite
+    const effectivePublicPath = isB2BSubdomain ? (pathname === '/login' ? '/network/login' : pathname) : pathname;
+
+    if (publicPaths.some(path => effectivePublicPath === path || effectivePublicPath.startsWith(path + '/'))) {
         return finalResponse || NextResponse.next();
     }
 
