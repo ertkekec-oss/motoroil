@@ -89,161 +89,278 @@ export default function PurchasingPage() {
     };
 
     return (
-        <div className="container" style={{ padding: '40px 20px' }}>
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-[#0f172a] animate-in fade-in duration-300">
 
             {/* Header */}
-            <header className="flex-between" style={{ marginBottom: '32px' }}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:p-8 bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/5 shadow-sm gap-4">
                 <div>
-                    <h1 className="text-gradient">Satın Alma & Mal Kabul</h1>
-                    <p className="text-muted">Gelen Faturalar ve Depo Giriş İşlemleri</p>
+                    <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+                            📦
+                        </span>
+                        Satın Alma & Mal Kabul
+                    </h1>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 sm:ml-[3.25rem]">Gelen Faturalar ve Depo Giriş İşlemleri</p>
                 </div>
                 {view === 'list' && (
-                    <button onClick={() => setView('new_invoice')} className="btn btn-primary">
-                        + Yeni Alım Faturası Gir
+                    <button onClick={() => setView('new_invoice')} className="flex items-center gap-2 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-[#0f172a]">
+                        <span>+ Yeni Alım Faturası Gir</span>
                     </button>
                 )}
-            </header>
+            </div>
 
             {/* --- LIST VIEW --- */}
-            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                        <tr className="text-muted" style={{ borderBottom: '1px solid var(--border-light)', fontSize: '12px' }}>
-                            <th style={{ padding: '12px' }}>Fatura Bilgisi</th>
-                            <th>Hedef Depo</th>
-                            <th>Tarih</th>
-                            <th>Tutar</th>
-                            <th>Durum</th>
-                            <th>İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {invoices.map((inv, idx) => (
-                            <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <td style={{ padding: '16px 0' }}>
-                                    <div style={{ fontWeight: 'bold' }}>{inv.supplier}</div>
-                                    <div className="text-muted" style={{ fontSize: '12px' }}>{inv.id} - {inv.msg}</div>
-                                </td>
-                                <td>
-                                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.1)' }}>
-                                        {inv.target}
-                                    </span>
-                                </td>
-                                <td>{inv.date}</td>
-                                <td style={{ fontWeight: 'bold' }}>{inv.total.toLocaleString()} ₺</td>
-                                <td>
-                                    <span style={{ color: inv.status === 'Onaylandı' ? 'var(--success)' : '#F59E0B' }}>
-                                        {inv.status === 'Onaylandı' ? '● Stokta' : '● Bekliyor'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button className="btn btn-outline" style={{ fontSize: '12px' }}>Detay</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            {view === 'list' && (
+            <div className="p-6 sm:p-8 flex-1 overflow-y-auto">
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-slate-50 dark:bg-[#0f172a]/50 border-b border-slate-200 dark:border-white/5">
+                                <tr>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fatura Bilgisi</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hedef Depo</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tarih</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tutar</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Durum</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                {invoices.length > 0 ? invoices.map((inv, idx) => (
+                                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="font-bold text-slate-900 dark:text-white text-sm">{inv.supplier}</div>
+                                            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{inv.id} - {inv.msg}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/5">
+                                                {inv.target}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-300">{inv.date}</td>
+                                        <td className="px-6 py-4 font-black text-slate-900 dark:text-white">{inv.total.toLocaleString()} ₺</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${inv.status === 'Onaylandı' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${inv.status === 'Onaylandı' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
+                                                {inv.status === 'Onaylandı' ? 'Stokta' : 'Bekliyor'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <button className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                                Detay
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-12 text-center text-sm font-medium text-slate-500 dark:text-slate-400">
+                                            Henüz fatura bulunmamaktadır.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+            )}
 
             {/* --- NEW INVOICE MODAL --- */}
             {view === 'new_invoice' && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
-                    <div className="card" style={{ maxWidth: '800px', width: '100%', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--primary)', background: 'var(--bg-main)' }}>
-                        <div className="flex-between mb-4">
-                            <h3>🧾 Fatura Girişi (Stok & Cari)</h3>
-                            <button onClick={() => setView('list')} className="btn btn-ghost">İptal</button>
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] flex justify-center items-center p-4 sm:p-6 animate-in fade-in">
+                    <div className="bg-white dark:bg-[#0f172a] w-full max-w-5xl max-h-[90vh] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+                        {/* Modal Header */}
+                        <div className="flex justify-between items-center px-8 py-5 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e293b]/50">
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span className="text-xl">📥</span> MANUEL FATURA GİRİŞ
+                                </h3>
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Alış faturanızı ve detaylarını girip envantere işleyin.</p>
+                            </div>
+                            <button onClick={() => setView('list')} className="p-2 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            </button>
                         </div>
 
-                        <div className="grid-cols-2 gap-4 mb-6">
-                            <div className="flex-col gap-2">
-                                <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ</label>
-                                <select
-                                    value={formData.supplierId} onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
-                                    style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'white' }}
-                                >
-                                    <option value="">Seçiniz...</option>
-                                    {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                </select>
-                            </div>
-                            <div className="flex-col gap-2">
-                                <label className="text-muted" style={{ fontSize: '12px' }}>GİRİŞ YAPILACAK DEPO / ŞUBE</label>
-                                <select
-                                    value={formData.targetBranch} onChange={e => setFormData({ ...formData, targetBranch: e.target.value })}
-                                    style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--primary)', borderRadius: '6px', color: 'white' }}
-                                >
-                                    <option>Merkez Depo</option>
-                                    <option>Kadıköy Şube</option>
-                                    <option>Beşiktaş Şube</option>
-                                    <option>İzmir Şube</option>
-                                </select>
-                            </div>
-                            <div className="flex-col gap-2">
-                                <label className="text-muted" style={{ fontSize: '12px' }}>FATURA NO</label>
-                                <input type="text" placeholder="Örn: GIB2026..." value={formData.invNo} onChange={e => setFormData({ ...formData, invNo: e.target.value })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'white' }} />
-                            </div>
-                            <div className="flex-col gap-2">
-                                <label className="text-muted" style={{ fontSize: '12px' }}>FATURA TARİHİ</label>
-                                <input type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'white' }} />
-                            </div>
-                        </div>
-
-                        {/* ITEMS ADDER */}
-                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
-                            <h4 className="text-muted mb-4" style={{ fontSize: '14px' }}>Ürünleri Giriniz</h4>
-                            <div className="flex-center gap-2 mb-4">
-                                <select
-                                    value={tempItem.productId}
-                                    onChange={e => {
-                                        const p = products.find(prod => prod.id === e.target.value);
-                                        setTempItem({ ...tempItem, productId: e.target.value, name: p?.name || '' });
-                                    }}
-                                    style={{ flex: 2, padding: '10px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '4px', color: 'var(--text-main)' }}
-                                >
-                                    <option value="">Ürün Seçiniz...</option>
-                                    {products.map(p => <option key={p.id} value={p.id}>{p.name} ({p.code})</option>)}
-                                </select>
-                                <input type="number" placeholder="Adet" value={tempItem.qty} onChange={e => setTempItem({ ...tempItem, qty: parseInt(e.target.value) })} style={{ width: '80px', padding: '10px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '4px', color: 'var(--text-main)' }} />
-                                <input type="number" placeholder="Birim Fiyat" value={tempItem.price} onChange={e => setTempItem({ ...tempItem, price: parseFloat(e.target.value) })} style={{ width: '100px', padding: '10px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '4px', color: 'var(--text-main)' }} />
-                                <button onClick={addItem} className="btn btn-outline">Ekle</button>
+                        {/* Modal Body */}
+                        <div className="flex-1 overflow-y-auto p-8 custom-scroll space-y-8">
+                            
+                            {/* General Info */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Tedarikçi</label>
+                                    <select
+                                        value={formData.supplierId} onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
+                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
+                                    >
+                                        <option value="" disabled>Seçiniz...</option>
+                                        {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Hedef Depo / Şube</label>
+                                    <select
+                                        value={formData.targetBranch} onChange={e => setFormData({ ...formData, targetBranch: e.target.value })}
+                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
+                                    >
+                                        <option>Merkez Depo</option>
+                                        <option>Kadıköy Şube</option>
+                                        <option>Beşiktaş Şube</option>
+                                        <option>İzmir Şube</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Fatura No</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Örn: GIB2026..." 
+                                        value={formData.invNo} 
+                                        onChange={e => setFormData({ ...formData, invNo: e.target.value })} 
+                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Fatura Tarihi</label>
+                                    <input 
+                                        type="date" 
+                                        value={formData.date} 
+                                        onChange={e => setFormData({ ...formData, date: e.target.value })} 
+                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                    />
+                                </div>
                             </div>
 
-                            {/* ITEMS LIST */}
+                            {/* ITEMS ADDER */}
+                            <div className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm">
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Ürün Girişi</h4>
+                                
+                                <div className="flex flex-col md:flex-row gap-3 items-end">
+                                    <div className="flex-1 w-full">
+                                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Ürün Seçiniz</label>
+                                        <select
+                                            value={tempItem.productId}
+                                            onChange={e => {
+                                                const p = products.find(prod => prod.id === e.target.value);
+                                                setTempItem({ ...tempItem, productId: e.target.value, name: p?.name || '', price: parseFloat(p?.buyPrice) || 0 });
+                                            }}
+                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
+                                        >
+                                            <option value="" disabled>Ürün Arayın & Seçin...</option>
+                                            {products.map(p => <option key={p.id} value={p.id}>{p.name} ({p.code})</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="w-full md:w-32">
+                                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Miktar</label>
+                                        <input 
+                                            type="number" 
+                                            min="1"
+                                            placeholder="Adet" 
+                                            value={tempItem.qty || ''} 
+                                            onChange={e => setTempItem({ ...tempItem, qty: parseInt(e.target.value) || 0 })} 
+                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                        />
+                                    </div>
+                                    <div className="w-full md:w-40">
+                                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Birim Alış Fiyatı (₺)</label>
+                                        <input 
+                                            type="number" 
+                                            step="0.01"
+                                            placeholder="Fiyat" 
+                                            value={tempItem.price || ''} 
+                                            onChange={e => setTempItem({ ...tempItem, price: parseFloat(e.target.value) || 0 })} 
+                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                        />
+                                    </div>
+                                    <button 
+                                        onClick={addItem}
+                                        disabled={!tempItem.productId || tempItem.qty <= 0}
+                                        className="h-11 px-6 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto"
+                                    >
+                                        Listeye Ekle
+                                    </button>
+                                </div>
+
+                                {/* ITEMS LIST */}
+                                {formData.items.length > 0 && (
+                                    <div className="mt-8 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden bg-white dark:bg-[#0f172a]">
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left border-collapse">
+                                                <thead className="bg-slate-50/50 dark:bg-[#1e293b]/50 border-b border-slate-200 dark:border-white/5">
+                                                    <tr>
+                                                        <th className="px-5 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sıra</th>
+                                                        <th className="px-5 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ürün</th>
+                                                        <th className="px-5 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Miktar</th>
+                                                        <th className="px-5 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Birim Fiyat</th>
+                                                        <th className="px-5 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Toplam</th>
+                                                        <th className="px-5 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">İşlem</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                                    {formData.items.map((item, i) => (
+                                                        <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
+                                                            <td className="px-5 py-3 text-sm font-medium text-slate-500 dark:text-slate-400">{i + 1}</td>
+                                                            <td className="px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white">{item.name}</td>
+                                                            <td className="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 text-right">{item.qty}</td>
+                                                            <td className="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 text-right">{item.price.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+                                                            <td className="px-5 py-3 text-sm font-black text-slate-900 dark:text-white text-right">{(item.qty * item.price).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+                                                            <td className="px-5 py-3 text-center">
+                                                                <button 
+                                                                    onClick={() => removeItem(i)} 
+                                                                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors"
+                                                                    title="Sil"
+                                                                >
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* SUMMARY & SAVE */}
                             {formData.items.length > 0 && (
-                                <table style={{ width: '100%', fontSize: '13px', textAlign: 'left' }}>
-                                    <thead className="text-muted"><tr><th>Ürün</th><th>Miktar</th><th>Birim Fiyat</th><th>Toplam</th><th></th></tr></thead>
-                                    <tbody>
-                                        {formData.items.map((item, i) => (
-                                            <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                                <td style={{ padding: '8px 0' }}>{item.name}</td>
-                                                <td>{item.qty}</td>
-                                                <td>{item.price} ₺</td>
-                                                <td style={{ fontWeight: 'bold' }}>{item.qty * item.price} ₺</td>
-                                                <td><button onClick={() => removeItem(i)} style={{ color: 'var(--danger)', background: 'none', border: 'none', cursor: 'pointer' }}>×</button></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-center sm:items-start gap-6 shadow-xl relative overflow-hidden">
+                                    <div className="absolute -right-8 -top-8 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                                    <div className="absolute -left-8 -bottom-8 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                                    
+                                    <div className="relative z-10 w-full sm:w-auto text-center sm:text-left">
+                                        <div className="text-slate-400 font-medium text-sm">Fatura Özeti</div>
+                                        <div className="mt-4 flex gap-8">
+                                            <div>
+                                                <div className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">Ara Toplam</div>
+                                                <div className="text-lg font-semibold">{calculateTotal().toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">+ KDV Toplamı (%20)</div>
+                                                <div className="text-lg font-semibold text-slate-300">{(calculateTotal() * 0.2).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="relative z-10 w-full sm:w-auto pt-6 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-700 sm:pl-8 text-center sm:text-right">
+                                        <div className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">ÖDENECEK GENEL TOPLAM</div>
+                                        <div className="text-4xl font-black text-white tracking-tight">{(calculateTotal() * 1.2).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
+                                    </div>
+                                </div>
                             )}
                         </div>
 
-                        {/* SUMMARY & SAVE */}
-                        <div className="flex-between box-shadow" style={{ background: 'var(--bg-deep)', padding: '20px', borderRadius: '12px' }}>
-                            <div>
-                                <div className="text-muted">Ara Toplam</div>
-                                <div style={{ fontSize: '12px' }}>+ KDV (%20)</div>
-                                <div style={{ fontSize: '20px', fontWeight: 'bold', marginTop: '8px' }}>GENEL TOPLAM</div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div>{calculateTotal().toLocaleString()} ₺</div>
-                                <div style={{ fontSize: '12px' }}>{(calculateTotal() * 0.2).toLocaleString()} ₺</div>
-                                <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--primary)' }}>{(calculateTotal() * 1.2).toLocaleString()} ₺</div>
-                            </div>
-                        </div>
-
-                        <div className="flex-end gap-4 mt-6">
-                            <button onClick={() => setView('list')} className="btn btn-outline" style={{ padding: '16px 32px' }}>Vazgeç</button>
-                            <button onClick={handleSaveInvoice} className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '18px' }}>
-                                FATURAYI KAYDET VE STOĞA İŞLE
+                        {/* Modal Footer */}
+                        <div className="px-8 py-5 border-t border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e293b]/50 flex justify-end gap-3 z-20">
+                            <button onClick={() => setView('list')} className="px-6 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-sm transition-colors">
+                                İptal & Vazgeç
+                            </button>
+                            <button 
+                                onClick={handleSaveInvoice} 
+                                disabled={formData.items.length === 0 || !formData.supplierId}
+                                className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                <span>Faturayı Kaydet ve İlerlet</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                             </button>
                         </div>
                     </div>
