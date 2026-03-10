@@ -781,20 +781,19 @@ function StepConnectedProducts({ mode, data, onChange, setCurrentStep }: any) {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="p-8 bg-blue-50/50 dark:bg-blue-900/10 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl text-center space-y-4">
+                <div className="p-8 bg-blue-50/50 dark:bg-blue-900/10 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl text-center space-y-4 cursor-pointer hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-all" onClick={() => { if(typeof window !== 'undefined') { window.location.href = '/integrations' } }}>
                     <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto text-2xl">
                         🔗
                     </div>
                     <div>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">E-Ticaret ve Bağlı Ürünler (Faz 32+)</h4>
+                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">E-Ticaret ve Bağlı Ürünler</h4>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mx-auto">
                             Pazarama, Trendyol ve N11 gibi pazaryeri eşleştirmeleri ürün kaydedildikten sonra ana envanter ekranından veya direkt entegrasyon panelleri üzerinden yönetilebilecektir.
                         </p>
                     </div>
                     <div className="pt-2">
                         <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 text-xs font-bold rounded-lg mt-2">
-                            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                            YAKINDA AKTİF
+                            YÖNET & ENTEGRE ET
                         </span>
                     </div>
                 </div>
@@ -810,12 +809,12 @@ function StepConnectedProducts({ mode, data, onChange, setCurrentStep }: any) {
                         </div>
                     </div>
                     <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                        Migros A.Ş. gibi bazı firmalar, kendilerine kesilen e-faturalarda kendi ürün kodlarını görmek istiyorlar. Bu sayfada bu ürün için dilediğiniz müşteriye onların özel kodunu tanımlayabilirsiniz.
+                        Kendilerine kesilen faturalarda ürün kodlarını görmek isteyen firmalar için bu alanda bu ürün için müşterilerinize özel kod tanımlayabilirsiniz.
                     </p>
                     <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-3 rounded-xl text-xs text-amber-800 dark:text-amber-400 font-medium leading-relaxed">
                         Tanımladığınız kodlar oluşan e-faturanın XML'inde "BuyersItemIdentification" adlı özel bir alanda iletilir. Eğer bu kodun XML haricinde, ayrıca fatura çıktısı üzerinde de gözükmesini istiyorsanız, e-fatura entegratörünüze "BuyersItemIdentification" alanını "Alıcı Ürün Kodu" isimli bir kolonda görmek istediğinizi iletin.
                     </div>
-                    <button onClick={() => alert("Müşteri kodu eşleştirme modülü ile entegre edilecek.")} className="w-full py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all">
+                    <button onClick={() => { if(typeof window !== 'undefined') window.location.href = '/customers?action=map_code&product=' + data.id }} className="w-full py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all">
                         + Müşteri Kodu Ekle
                     </button>
                 </div>
