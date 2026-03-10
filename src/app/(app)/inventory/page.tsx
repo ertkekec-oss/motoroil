@@ -102,6 +102,13 @@ function InventoryContent() {
   >({});
   const [auditReport, setAuditReport] = useState<any>(null);
 
+  useEffect(() => {
+    if (searchParams.get("action") === "count") {
+      setIsCounting(true);
+      setActiveTab("all"); // Ensure we're on the all tab
+    }
+  }, [searchParams]);
+
   const [showTransferModal, setShowTransferModal] = useState(false);
   const branches =
     contextBranches?.length > 0
