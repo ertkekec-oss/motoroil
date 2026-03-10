@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Check } from "lucide-react";
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Building2 } from "lucide-react";
 
 export default function DealerNetworkLoginPage() {
     const router = useRouter();
@@ -70,127 +70,105 @@ export default function DealerNetworkLoginPage() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row min-h-screen md:h-screen w-full bg-[#f4f6fa] font-sans text-slate-900 md:overflow-hidden items-stretch">
+        <div className="min-h-screen flex items-center justify-center bg-[#f1f5f9] p-4 sm:p-6 lg:p-8 font-sans selection:bg-blue-100 selection:text-blue-900 relative">
             
-            {/* SOL PANEL (Blue Panel) - Takes full height, fixed width on desktop */}
-            <div className="flex-none w-full md:w-[40%] bg-gradient-to-br from-[#1753a8] to-[#0a2f6b] p-12 lg:p-20 relative flex flex-col justify-center border-r border-[#124283] overflow-hidden">
-                
-                {/* Subtle curve/mesh shapes for background */}
-                <div className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none opacity-20">
-                    <svg viewBox="0 0 800 600" preserveAspectRatio="none" className="w-full h-full">
-                        <path d="M0,400 Q200,300 400,450 T800,350 L800,600 L0,600 Z" fill="rgba(255,255,255,0.1)"></path>
-                        <path d="M0,500 Q250,400 500,500 T800,400 L800,600 L0,600 Z" fill="rgba(255,255,255,0.05)"></path>
-                    </svg>
-                </div>
-                {/* Extra intersecting curved lines */}
-                <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
-                    <div className="absolute w-[150%] h-[150%] top-[-25%] left-[-25%] border-[1px] border-white rounded-[50%]" />
-                    <div className="absolute w-[120%] h-[120%] top-[10%] left-[-10%] border-[1px] border-white rounded-[50%]" />
-                </div>
-
-                <div className="relative z-10 w-full max-w-[360px] mx-auto">
-                    <h1 className="text-[34px] lg:text-[40px] font-semibold text-white tracking-tight leading-[1.2] mb-12">
-                        Kurumsal<br/>Ticaret Altyapısı
-                    </h1>
-                    
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-[22px] h-[22px] rounded-full border border-white/50 flex items-center justify-center shrink-0">
-                                <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-                            </div>
-                            <h3 className="font-medium text-[16px] text-white">Güvenli şirket ağı</h3>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <div className="w-[22px] h-[22px] rounded-full border border-white/50 flex items-center justify-center shrink-0">
-                                <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-                            </div>
-                            <h3 className="font-medium text-[16px] text-white">Akıllı ticaret eşleşmesi</h3>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <div className="w-[22px] h-[22px] rounded-full border border-white/50 flex items-center justify-center shrink-0">
-                                <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-                            </div>
-                            <h3 className="font-medium text-[16px] text-white">Kurumsal işlem altyapısı</h3>
-                        </div>
-                    </div>
-                </div>
+            {/* Background Decor */}
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/5 blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/5 blur-[120px]" />
             </div>
 
-            {/* SAĞ PANEL (Login Area) */}
-            <div className="flex-1 relative flex flex-col justify-center items-center p-6 min-h-[600px] overflow-y-auto">
+            {/* Main Floating Container */}
+            <div className="w-full max-w-[1040px] bg-white rounded-[24px] sm:rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col md:flex-row min-h-[620px] relative z-10 border border-slate-200/60">
                 
-                {/* Dot Pattern Full Background */}
-                <div 
-                    className="absolute inset-0 opacity-[0.5] pointer-events-none" 
-                    style={{ backgroundImage: "radial-gradient(#d1d5db 1.2px, transparent 1.2px)", backgroundSize: "24px 24px" }} 
-                />
+                {/* LEFT SIDE - Brand & Pitch */}
+                <div className="w-full md:w-[45%] bg-[#0a1124] p-10 lg:p-14 flex flex-col justify-between relative overflow-hidden hidden md:flex">
+                    {/* Deep Grid Background */}
+                    <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-600/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
 
-                <div className="w-full max-w-[420px] relative z-10 flex flex-col items-center">
-                    
-                    {/* Simulated Logo (To avoid broken image link) */}
-                    <div className="mb-10 flex items-center gap-3 select-none">
-                        {/* Logo Icon */}
-                        <div className="w-[42px] h-[42px] bg-[#1a55a8] rounded-[10px] flex items-center justify-center shadow-md">
-                            <div className="w-6 h-6 border-[2px] border-white/90 rounded-[4px] relative flex items-center justify-center">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                                </svg>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-16">
+                            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                                <span className="text-white font-bold text-lg leading-none">P</span>
                             </div>
+                            <span className="text-white font-bold text-xl tracking-wide">
+                                PERIODY<span className="text-blue-500">A</span>
+                                <span className="ml-2 text-xs opacity-60 font-medium tracking-[0.2em] uppercase">B2B</span>
+                            </span>
                         </div>
-                        {/* Logo Text */}
-                        <div className="flex flex-col justify-center">
-                            <span className="text-[22px] font-black text-[#14234b] tracking-tight leading-none uppercase">Periodya</span>
-                            <span className="text-[11px] font-bold text-[#2a68c4] tracking-[0.2em] leading-tight">ENTERPRISE</span>
+
+                        <div className="space-y-6">
+                            <h1 className="text-[32px] lg:text-[40px] font-semibold text-white leading-[1.15] tracking-tight">
+                                Operasyonu değil,<br />büyümeyi düşünün.
+                            </h1>
+                            <p className="text-slate-400 text-[15px] leading-relaxed max-w-[300px]">
+                                Kurumsal ticaret merkezimizle ödemelerinizi, siparişlerinizi ve envanterinizi saniyeler içinde yönetin.
+                            </p>
                         </div>
                     </div>
 
-                    {/* Main Login Card */}
-                    <div className="w-full bg-white rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.06)] p-10 sm:p-12 border border-black/[0.03]">
-                        
-                        {/* Header Details */}
-                        <div className="flex flex-col items-center text-center mb-8">
-                            <div className="w-14 h-14 rounded-[14px] bg-[#1a55a8] flex items-center justify-center mb-5 shadow-[0_8px_16px_rgba(26,85,168,0.25)]">
-                                <ShieldCheck className="w-[26px] h-[26px] text-white" strokeWidth={1.5} />
-                            </div>
-                            <h2 className="text-[22px] font-semibold text-slate-900 tracking-tight mb-1.5">
-                                İşlem Merkezi
-                            </h2>
-                            <p className="text-[14px] text-slate-500 font-medium">
-                                Kurumsal ticaret ağına güvenli erişim
-                            </p>
+                    <div className="relative z-10 mt-12 bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 backdrop-blur-md">
+                        <div className="flex items-center gap-3 mb-3">
+                            <ShieldCheck className="w-5 h-5 text-blue-400" />
+                            <span className="text-white font-medium text-sm">Uçtan Uca Şifreleme</span>
+                        </div>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                            Verileriniz KVKK standartlarına uygun olarak en üst düzey bulut güvenliğiyle korunmaktadır.
+                        </p>
+                    </div>
+                </div>
+
+                {/* RIGHT SIDE - Form */}
+                <div className="w-full md:w-[55%] p-8 sm:p-12 lg:p-16 flex flex-col justify-center bg-white relative">
+                    
+                    {/* Mobile Header (Only visible on small screens) */}
+                    <div className="flex items-center gap-2 mb-10 md:hidden">
+                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-base leading-none">P</span>
+                        </div>
+                        <span className="text-slate-900 font-bold text-lg tracking-wide">
+                            PERIODY<span className="text-blue-600">A</span>
+                            <span className="ml-2 text-[10px] text-slate-500 font-bold tracking-widest uppercase">B2B</span>
+                        </span>
+                    </div>
+
+                    <div className="w-full max-w-[380px] mx-auto">
+                        <div className="mb-10">
+                            <h2 className="text-[28px] font-bold text-slate-900 mb-3 tracking-tight">Hoş Geldiniz</h2>
+                            <p className="text-slate-500 text-[15px]">Tedarikçi portalına erişmek için giriş yapın.</p>
                         </div>
 
                         {/* Alerts */}
                         {error && (
-                            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200/60 flex items-start gap-3">
-                                <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center">
-                                    <span className="text-rose-600 text-[11px] font-bold">!</span>
+                            <div className="mb-6 p-4 rounded-xl bg-red-50/80 border border-red-100 flex items-start gap-3">
+                                <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
+                                    <span className="text-red-600 text-[11px] font-bold">!</span>
                                 </div>
-                                <p className="text-[13px] text-rose-700 leading-relaxed font-medium">
+                                <p className="text-sm text-red-700 font-medium leading-relaxed">
                                     {error}
                                 </p>
                             </div>
                         )}
 
                         {success && (
-                            <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-start gap-3">
+                            <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-100 flex items-start gap-3">
                                 <ShieldCheck className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
-                                <p className="text-[13px] text-emerald-700 leading-relaxed font-medium">
+                                <p className="text-sm text-emerald-700 font-medium leading-relaxed">
                                     {success}
                                 </p>
                             </div>
                         )}
 
-                        <form onSubmit={handleLogin} className="space-y-5">
+                        <form onSubmit={handleLogin} className="space-y-6">
                             
                             {/* Email Input */}
                             <div className="space-y-2">
-                                <label className="text-[13px] font-bold text-slate-800 tracking-wide" htmlFor="email">E-Posta Adresi</label>
+                                <label className="text-[13px] font-bold text-slate-700 uppercase tracking-wide" htmlFor="email">E-Posta Adresi</label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-[#1a55a8] transition-colors" strokeWidth={1.5} />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Mail className="h-[18px] w-[18px] text-slate-400 group-focus-within:text-blue-600 transition-colors" strokeWidth={2} />
                                     </div>
                                     <input
                                         id="email"
@@ -198,7 +176,7 @@ export default function DealerNetworkLoginPage() {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full bg-[#f8f9fb] border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1a55a8] focus:ring-1 focus:ring-[#1a55a8] transition-all"
+                                        className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm"
                                         placeholder="ornek@sirket.com"
                                         disabled={loading}
                                     />
@@ -208,14 +186,14 @@ export default function DealerNetworkLoginPage() {
                             {/* Password Input */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <label className="text-[13px] font-bold text-slate-800 tracking-wide" htmlFor="password">Şifre</label>
-                                    <a href="#" className="text-[12px] text-[#1a55a8] font-medium hover:text-[#0a2f6b] transition-colors">
+                                    <label className="text-[13px] font-bold text-slate-700 uppercase tracking-wide" htmlFor="password">Şifre</label>
+                                    <a href="#" className="text-[13px] text-blue-600 font-medium hover:text-blue-700 transition-colors">
                                         Şifremi unuttum
                                     </a>
                                 </div>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-[#1a55a8] transition-colors" strokeWidth={1.5} />
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Lock className="h-[18px] w-[18px] text-slate-400 group-focus-within:text-blue-600 transition-colors" strokeWidth={2} />
                                     </div>
                                     <input
                                         id="password"
@@ -223,18 +201,17 @@ export default function DealerNetworkLoginPage() {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full bg-[#f8f9fb] border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1a55a8] focus:ring-1 focus:ring-[#1a55a8] transition-all tracking-wide"
+                                        className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium tracking-wide shadow-sm"
                                         placeholder="••••••••"
                                         disabled={loading}
                                     />
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={loading || !tenantId}
-                                className="w-full h-[52px] bg-[#1a55a8] hover:bg-[#124290] text-white font-medium text-[15px] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2 active:scale-[0.98] shadow-sm"
+                                className="w-full h-[52px] bg-slate-900 hover:bg-slate-800 text-white font-medium text-[15px] rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 active:scale-[0.98]"
                             >
                                 {loading ? (
                                     <>
@@ -243,24 +220,24 @@ export default function DealerNetworkLoginPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <span>Sisteme Giriş Yap</span>
-                                        <ArrowRight className="w-4 h-4 ml-1" strokeWidth={2} />
+                                        <span>Giriş Yap</span>
+                                        <ArrowRight className="w-4 h-4 ml-1 opacity-80" strokeWidth={2.5} />
                                     </>
                                 )}
                             </button>
-                            
-                            {/* Footer Badge inside card */}
-                            <div className="pt-4 flex items-center justify-center gap-2">
-                                <div className="w-[18px] h-[18px] rounded-full bg-[#1b93f1] flex items-center justify-center shadow-sm">
-                                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                                </div>
-                                <span className="text-[13px] font-medium text-slate-600">Kurumsal B2B</span>
-                            </div>
 
                         </form>
-                    </div>
 
+                        {/* Footer text */}
+                        <div className="mt-10 text-center">
+                            <p className="text-[13px] text-slate-500 flex items-center justify-center gap-1.5 font-medium">
+                                <Building2 className="w-4 h-4" /> B2B Portal Altyapısı
+                            </p>
+                        </div>
+
+                    </div>
                 </div>
+
             </div>
         </div>
     );
