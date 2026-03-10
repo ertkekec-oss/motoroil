@@ -41,6 +41,12 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
             if (productData.imageKey === undefined || productData.imageKey === null) {
                 delete productData.imageKey;
             }
+            if (productData.documentUrl === undefined) {
+                delete productData.documentUrl;
+            }
+            if (productData.documentName === undefined) {
+                delete productData.documentName;
+            }
             if (productData.salesVat !== undefined) productData.salesVat = parseFloat(productData.salesVat);
             if (productData.purchaseVat !== undefined) productData.purchaseVat = parseFloat(productData.purchaseVat);
 

@@ -42,7 +42,7 @@ export default function ProductWizardModal({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
 
-    const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         if (file.type !== "application/pdf") {
@@ -53,15 +53,36 @@ export default function ProductWizardModal({
             showWarning("Boyut Aşımı", "Dosya boyutu 5MB'dan büyük olamaz.");
             return;
         }
+        
         setIsUploading(true);
-        setTimeout(() => {
-            setIsUploading(false);
+        
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("productId", data?.id || "temp");
+
+            const res = await fetch("/api/uploads/products/document", {
+                method: "POST",
+                body: formData,
+            });
+
+            const uploadData = await res.json();
+
+            if (!res.ok || uploadData.error) {
+                throw new Error(uploadData.error || "Yükleme başarısız");
+            }
+
             showSuccess("Başarılı", "Döküman başarıyla yüklendi ve ürüne bağlandı.");
             if (onChange && data) {
-                onChange({ ...data, documentName: file.name, documentUrl: URL.createObjectURL(file) });
+                onChange({ ...data, documentName: uploadData.documentName, documentUrl: uploadData.documentUrl });
             }
+        } catch (error: any) {
+            console.error("Document upload error:", error);
+            showError("Hata", error.message || "Döküman yüklenirken bir hata oluştu.");
+        } finally {
+            setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
-        }, 1500);
+        }
     };
 
     useEffect(() => {

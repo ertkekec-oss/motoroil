@@ -351,6 +351,8 @@ model Product {
   description         String?
   imageUrl            String?                 @db.VarChar(2048)
   imageKey            String?                 @db.VarChar(1024)
+  documentUrl         String?                 @db.VarChar(2048)
+  documentName        String?                 @db.VarChar(1024)
   minStock            Int                     @default(5)
   brand               String?
   type                String?                 @default("Ürün")
