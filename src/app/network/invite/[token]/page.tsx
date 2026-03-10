@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 type RedeemState =
     | { status: "idle" }
@@ -15,11 +15,10 @@ function normalizePhone(input: string) {
     return input.replace(/[^\d+]/g, "")
 }
 
-export default function InviteRedeemPage({ params }: { params: { token: string } }) {
+export default function InviteRedeemPage() {
     const router = useRouter()
-    // Wait for `params` if it's considered asynchronous in standard Next.js (params is wrapped or unwrapped based on version, assuming normal prop here since it's Next.js 15 usually `React.use()` for asynchronous params, but we'll use string token)
-    // Let's rely on standard Next.js access or unwrapping mechanism.
-    const token = params.token
+    const params = useParams()
+    const token = params?.token as string
 
     const [phone, setPhone] = useState("")
     const [email, setEmail] = useState("")
@@ -31,7 +30,7 @@ export default function InviteRedeemPage({ params }: { params: { token: string }
 
     const canSubmit = useMemo(() => {
         return (
-            token &&
+            !!token &&
             normalizePhone(phone).length >= 10 &&
             email.includes("@") &&
             legalName.trim().length >= 2 &&
@@ -193,7 +192,7 @@ export default function InviteRedeemPage({ params }: { params: { token: string }
                                     disabled={!canSubmit || state.status === "loading"}
                                     className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {state.status === "loading" ? "İşleniyor…" : "Davetimi Kabul Et"}
+                                    {state.status === "loading" ? "İşleniyor…" : "Onayla"}
                                 </button>
 
                                 <div className="text-xs text-muted-foreground mt-4 text-center">
