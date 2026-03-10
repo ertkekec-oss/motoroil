@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ProductPricesTab } from "@/components/pricing/ProductPricesTab";
 import ProductImageUpload from "./ProductImageUpload";
 import { Package, Settings, FileText, Printer, FileDown, PlusCircle, ShoppingCart } from "lucide-react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ProductWizardModal({
     isOpen,
@@ -37,6 +38,7 @@ export default function ProductWizardModal({
     const totalSteps = 5;
     
     const router = useRouter();
+    const { showSuccess, showError, showWarning } = useModal();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -44,17 +46,20 @@ export default function ProductWizardModal({
         const file = e.target.files?.[0];
         if (!file) return;
         if (file.type !== "application/pdf") {
-            alert("Sadece PDF formatında döküman yüklenebilir.");
+            showWarning("Uyumsuz Format", "Sadece PDF formatında döküman yüklenebilir.");
             return;
         }
         if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            alert("Dosya boyutu 5MB'dan büyük olamaz.");
+            showWarning("Boyut Aşımı", "Dosya boyutu 5MB'dan büyük olamaz.");
             return;
         }
         setIsUploading(true);
         setTimeout(() => {
             setIsUploading(false);
-            alert("Döküman başarıyla yüklendi ve ürüne bağlandı.");
+            showSuccess("Başarılı", "Döküman başarıyla yüklendi ve ürüne bağlandı.");
+            if (onChange && data) {
+                onChange({ ...data, documentName: file.name, documentUrl: URL.createObjectURL(file) });
+            }
             if (fileInputRef.current) fileInputRef.current.value = "";
         }, 1500);
     };
@@ -329,6 +334,30 @@ function StepIdentity({ data, onChange, categories }: any) {
                             onChange({ ...data, imageUrl, imageKey });
                         }}
                     />
+                    
+                    {data.documentName && (
+                        <div className="w-full mt-2 p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl flex items-center justify-between shadow-sm animate-in fade-in zoom-in-95">
+                            <div className="flex items-center gap-3 overflow-hidden">
+                                <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                                    <FileText size={16} />
+                                </div>
+                                <div className="truncate text-left">
+                                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{data.documentName}</p>
+                                    <p className="text-[10px] text-slate-500">PDF Dökümanı</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                                {data.documentUrl && (
+                                    <a href={data.documentUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10 transition-colors" title="Görüntüle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </a>
+                                )}
+                                <button onClick={() => onChange({...data, documentName: null, documentUrl: null})} className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors" title="Kaldır">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
