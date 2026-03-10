@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import IntegrationsContent from '@/components/IntegrationsContent';
 
 export default function IntegrationsPage() {
-    redirect('/settings?tab=integrations');
+    return <IntegrationsContent />;
 }

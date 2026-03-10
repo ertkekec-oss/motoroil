@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -324,6 +324,7 @@ export default function Sidebar() {
                 group: "Sistem",
                 items: [
                     { name: 'Gelişmiş İçe Aktar', href: '/data-import', icon: UploadCloud },
+                    { name: 'Entegrasyonlar', href: '/integrations', icon: Plug },
                     { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
                     { name: 'Abonelik', href: '/billing', icon: CreditCard },
                     { name: 'Ayarlar', href: '/settings', icon: Settings },

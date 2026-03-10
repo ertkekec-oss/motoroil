@@ -1101,7 +1101,6 @@ export default function SettingsPage() {
                         { id: 'company', label: 'Firma Profili', icon: <Building2 className="w-5 h-5 text-indigo-500" /> },
                         { id: 'custom_domain', label: 'Özel Alan Adı (B2B)', icon: <Globe className="w-5 h-5 text-blue-500" /> },
                         { id: 'authorized_signers', label: 'İmza Yetkilileri', icon: <ShieldCheck className="w-5 h-5 text-emerald-600" /> },
-                        { id: 'integrations', label: 'Entegrasyonlar', icon: <Plug className="w-5 h-5 text-emerald-500" /> },
                         { id: 'branches', label: 'Şubeler & Depo', icon: <Building className="w-5 h-5 text-sky-500" /> },
                         { id: 'branch_auth', label: 'Şube-Kasa Yetkileri', icon: <ShieldCheck className="w-5 h-5 text-rose-500" /> },
                         { id: 'profile', label: 'Hesabım', icon: <User className="w-5 h-5 text-amber-500" /> },
@@ -1156,11 +1155,8 @@ export default function SettingsPage() {
                 {/* ÖZEL ALAN ADI */}
                 {activeTab === 'custom_domain' && <CustomDomainPanel />}
 
-                {/* IMZA YETKILILERI */}
+                {/* İMZA YETKİLİLERİ */}
                 {activeTab === 'authorized_signers' && <AuthorizedSignersPanel />}
-
-                {/* 0. ENTEGRASYONLAR */}
-                {activeTab === 'integrations' && <IntegrationsPanel {...sharedProps} />}
 
                 {/* 1. ŞUBELER & DEPO */}
                 {activeTab === 'branches' && <BranchesPanel {...sharedProps} />}
