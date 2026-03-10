@@ -73,9 +73,8 @@ export async function POST(req: Request) {
 
     const rawSession = await createDealerSession(dealerUser.id)
 
-    const res = NextResponse.json({ ok: true })
     await setDealerSessionCookie(rawSession)
     await setActiveMembershipCookie(membership.id)
 
-    return res
+    return NextResponse.json({ ok: true })
 }
