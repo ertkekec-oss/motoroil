@@ -43,12 +43,8 @@ export default function ProductWizardModal({
     if (!isOpen || !data) return null;
 
     const handleNext = () => {
-        // Basic UI Validation step 1 (only warning or block if completely empty, per prompt logic remains same, but we can block next if required fields are missing)
         if (currentStep === 1) {
-            if (!data.name || !data.category) {
-                // We can just let them proceed according to logic, or highlight. The prompt says "Kategori seçilmeden ileriye geçişi UI seviyesinde engelle"
-                if (!data.category) return;
-            }
+            if (!data.name) return;
         }
         setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     };
@@ -90,16 +86,16 @@ export default function ProductWizardModal({
                         ].map((s, idx) => (
                             <React.Fragment key={s.step}>
                                 <div className="flex flex-col items-center gap-1 relative z-10">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${currentStep === s.step ? 'border-slate-900 bg-slate-900 text-white' : currentStep > s.step ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-200 bg-white text-slate-500'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${currentStep === s.step ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900' : currentStep > s.step ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-200 bg-white text-slate-500 dark:bg-[#1e293b] dark:border-slate-600 dark:text-slate-400'}`}>
                                         {currentStep > s.step ? "✓" : s.step}
                                     </div>
-                                    <span className={`text-[11px] font-semibold mt-1 hidden xl:block whitespace-nowrap ${currentStep === s.step ? 'text-slate-900 underline underline-offset-4 decoration-slate-300' : currentStep > s.step ? 'text-emerald-600' : 'text-slate-500'}`}>
+                                    <span className={`text-[11px] font-semibold mt-1 hidden xl:block whitespace-nowrap ${currentStep === s.step ? 'text-slate-900 dark:text-white underline underline-offset-4 decoration-slate-300 dark:decoration-slate-500' : currentStep > s.step ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
                                         {s.label}
                                     </span>
                                 </div>
                                 {idx < 4 && (
-                                    <div className="flex-1 h-1 mx-2 rounded-full bg-slate-200 relative overflow-hidden">
-                                        <div className={`absolute left-0 top-0 bottom-0 bg-slate-900 transition-all duration-300 ${currentStep > s.step ? 'w-full !bg-emerald-600' : currentStep === s.step ? 'w-1/2' : 'w-0'}`} />
+                                    <div className="flex-1 h-1 mx-2 rounded-full bg-slate-200 dark:bg-white/10 relative overflow-hidden">
+                                        <div className={`absolute left-0 top-0 bottom-0 bg-slate-900 dark:bg-white transition-all duration-300 ${currentStep > s.step ? 'w-full !bg-emerald-600' : currentStep === s.step ? 'w-1/2' : 'w-0'}`} />
                                     </div>
                                 )}
                             </React.Fragment>
@@ -149,7 +145,7 @@ export default function ProductWizardModal({
                     <div className="flex items-center gap-3">
                         <button
                             onClick={currentStep === 1 ? onClose : handlePrev}
-                            className="px-6 py-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors"
+                            className="px-6 py-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                         >
                             {currentStep === 1 ? "Vazgeç" : "Geri"}
                         </button>
@@ -157,8 +153,8 @@ export default function ProductWizardModal({
                         {currentStep < totalSteps ? (
                             <button
                                 onClick={handleNext}
-                                disabled={currentStep === 1 && !data.category}
-                                className="px-8 py-2.5 bg-slate-900 border border-transparent text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={currentStep === 1 && !data.name}
+                                className="px-8 py-2.5 bg-slate-900 dark:bg-white border border-transparent text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 İleri
                             </button>
@@ -170,7 +166,7 @@ export default function ProductWizardModal({
                                 <button
                                     onClick={onSave}
                                     disabled={isProcessing}
-                                    className="px-8 py-2.5 bg-slate-900 border border-transparent text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition-colors flex items-center gap-2"
+                                    className="px-8 py-2.5 bg-slate-900 dark:bg-white border border-transparent text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isProcessing ? "Kaydediliyor..." : (mode === "create" ? "✨ Ürünü Oluştur" : "Değişiklikleri Kaydet")}
                                 </button>
