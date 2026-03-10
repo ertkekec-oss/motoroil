@@ -65,13 +65,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
         // Convert S3 payload into byte array
         const byteArray = await s3Response.Body.transformToByteArray();
+        const buffer = Buffer.from(byteArray);
 
         const headers = new Headers();
         headers.set('Content-Type', 'application/pdf');
         headers.set('Content-Disposition', `inline; filename="${targetFileName}"`);
         headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
-        return new NextResponse(byteArray, {
+        return new NextResponse(buffer, {
             status: 200,
             headers,
         });
