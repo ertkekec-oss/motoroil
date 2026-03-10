@@ -79,10 +79,10 @@ export default function DealerNetworkLoginPage() {
             </div>
 
             {/* Main Floating Container */}
-            <div className="w-full max-w-[1040px] bg-white rounded-[24px] sm:rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col md:flex-row min-h-[620px] relative z-10 border border-slate-200/60">
+            <div className="w-full max-w-[1040px] bg-white rounded-[24px] sm:rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col lg:flex-row min-h-[620px] relative z-10 border border-slate-200/60">
                 
                 {/* LEFT SIDE - Brand & Pitch */}
-                <div className="w-full md:w-[45%] bg-[#0a1124] p-10 lg:p-14 flex flex-col justify-between relative overflow-hidden hidden md:flex">
+                <div className="w-full lg:w-[45%] bg-[#0a1124] p-10 lg:p-14 hidden lg:flex flex-col justify-between relative overflow-hidden">
                     {/* Deep Grid Background */}
                     <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
                     <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
@@ -121,10 +121,10 @@ export default function DealerNetworkLoginPage() {
                 </div>
 
                 {/* RIGHT SIDE - Form */}
-                <div className="w-full md:w-[55%] p-8 sm:p-12 lg:p-16 flex flex-col justify-center bg-white relative">
+                <div className="w-full lg:w-[55%] p-8 sm:p-12 lg:p-16 flex flex-col justify-center bg-white relative">
                     
                     {/* Mobile Header (Only visible on small screens) */}
-                    <div className="flex items-center gap-2 mb-10 md:hidden">
+                    <div className="flex items-center gap-2 mb-10 lg:hidden">
                         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                             <span className="text-white font-bold text-base leading-none">P</span>
                         </div>
