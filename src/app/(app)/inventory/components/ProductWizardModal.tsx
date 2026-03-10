@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ProductPricesTab } from "@/components/pricing/ProductPricesTab";
 import ProductImageUpload from "./ProductImageUpload";
+import { Package, Settings, FileText, Printer, FileDown, PlusCircle, ShoppingCart } from "lucide-react";
 
 export default function ProductWizardModal({
     isOpen,
@@ -59,16 +60,57 @@ export default function ProductWizardModal({
             <div className="bg-white dark:bg-[#0f172a] rounded-[16px] border border-slate-200 dark:border-white/5 shadow-xl overflow-hidden flex flex-col w-full max-w-[1040px] max-h-[95vh] h-full sm:h-auto sm:min-h-[600px] animate-in slide-in-from-bottom-4 duration-300">
 
                 {/* HEADER */}
-                <div className="flex justify-between items-start px-8 py-6 border-b border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b]/50 shrink-0">
-                    <div>
-                        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                            {mode === "create" ? "✨ Yeni Ürün" : `✏️ Ürün Düzenle (#${data.code})`}
-                        </h2>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Ürün bilgilerini adım adım tamamlayın.</p>
+                <div className="flex justify-between items-start px-6 py-4 border-b border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b]/50 shrink-0">
+                    <div className="flex flex-col gap-1 w-full pr-8">
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                {mode === "create" ? 
+                                    <><span className="text-amber-500"><Package size={20} /></span> Yeni Ürün Ekle</> : 
+                                    <><span className="text-emerald-500"><Settings size={20} /></span> Ürün Düzenle (#{(data.code || "").toUpperCase()})</>
+                                }
+                            </h2>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Ürün bilgilerini adım adım tamamlayın.</p>
+                        </div>
+
+                        {mode === "edit" && (
+                            <div className="flex flex-wrap items-center gap-3 mt-4">
+                                {/* STATS */}
+                                <div className="flex items-center gap-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 px-4 py-2 rounded-xl shadow-sm text-xs">
+                                    <div className="flex flex-col"><span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Alış</span><span className="font-black text-slate-700 dark:text-slate-200">{Number(data.buyPrice || 0).toLocaleString()} ₺</span></div>
+                                    <div className="w-px h-6 bg-slate-200 dark:bg-white/10"></div>
+                                    <div className="flex flex-col"><span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Satış</span><span className="font-black text-emerald-600 dark:text-emerald-400">{Number(data.price || 0).toLocaleString()} ₺</span></div>
+                                    <div className="w-px h-6 bg-slate-200 dark:bg-white/10"></div>
+                                    <div className="flex flex-col"><span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Toplam Stok</span><span className="font-black text-slate-700 dark:text-slate-200">{data.stock || 0}</span></div>
+                                    <div className="w-px h-6 bg-slate-200 dark:bg-white/10"></div>
+                                    <div className="flex flex-col"><span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Stok Değeri</span><span className="font-black text-blue-600 dark:text-blue-400">{Number((data.stock || 0) * (data.buyPrice || 0)).toLocaleString()} ₺</span></div>
+                                </div>
+                                
+                                <div className="mx-2 h-6 w-px bg-slate-200 dark:bg-white/10 hidden lg:block"></div>
+                                
+                                {/* ACTIONS */}
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <button onClick={() => alert("Tedarikçiden alış faturası formuna yönlendirilecek.")} className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors shadow-sm">
+                                        <ShoppingCart size={14} /> Tedarikçiden Alış Yap
+                                    </button>
+                                    <button onClick={() => alert("Stok sayım / giriş modülü ile entegre edilecek.")} className="flex items-center gap-1.5 bg-sky-50 border border-sky-200 text-sky-700 dark:bg-sky-500/10 dark:border-sky-500/20 dark:text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-sky-100 transition-colors shadow-sm">
+                                        <PlusCircle size={14} /> Manuel Stok Ekle
+                                    </button>
+                                    <button onClick={() => alert("Ekstre raporu modülü ile entegre edilecek.")} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                        <FileText size={14} /> Ekstre Al
+                                    </button>
+                                    <button onClick={() => alert("Döküman yükleme modülü ile entegre edilecek.")} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                        <FileDown size={14} /> Döküman Yükle
+                                    </button>
+                                    <button onClick={() => alert("Etiket boyutlandırma ayarları ile entegre edilecek.")} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                        <Printer size={14} /> Etiket Yazdır
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#334155]/50 hover:bg-slate-200 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+                        className="absolute right-6 top-6 w-8 h-8 rounded-full bg-slate-100 dark:bg-[#334155]/50 hover:bg-slate-200 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors shadow-sm z-50"
                     >
                         ✕
                     </button>
@@ -708,29 +750,52 @@ function StepConnectedProducts({ data, onChange, setCurrentStep }: any) {
                 </div>
             )}
 
-            <div className="p-8 bg-blue-50/50 dark:bg-blue-900/10 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl text-center space-y-4">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto text-2xl">
-                    🔗
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="p-8 bg-blue-50/50 dark:bg-blue-900/10 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl text-center space-y-4">
+                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                        🔗
+                    </div>
+                    <div>
+                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">E-Ticaret ve Bağlı Ürünler (Faz 32+)</h4>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mx-auto">
+                            Pazarama, Trendyol ve N11 gibi pazaryeri eşleştirmeleri ürün kaydedildikten sonra ana envanter ekranından veya direkt entegrasyon panelleri üzerinden yönetilebilecektir.
+                        </p>
+                    </div>
+                    <div className="pt-2">
+                        <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 text-xs font-bold rounded-lg mt-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                            YAKINDA AKTİF
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">E-Ticaret ve Bağlı Ürünler (Faz 32+)</h4>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                        Pazarama, Trendyol ve N11 gibi pazaryeri eşleştirmeleri ürün kaydedildikten sonra ana envanter ekranından veya direkt entegrasyon panelleri üzerinden yönetilebilecektir.
+
+                <div className="p-6 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl space-y-4">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl flex items-center justify-center">
+                            🏢
+                        </div>
+                        <div>
+                            <h4 className="text-base font-bold text-slate-900 dark:text-white">Müşteri Kodları (BuyersItemIdentification)</h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">B2B E-Fatura Eşleştirmesi</p>
+                        </div>
+                    </div>
+                    <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Migros A.Ş. gibi bazı firmalar, kendilerine kesilen e-faturalarda kendi ürün kodlarını görmek istiyorlar. Bu sayfada bu ürün için dilediğiniz müşteriye onların özel kodunu tanımlayabilirsiniz.
                     </p>
-                </div>
-                <div className="pt-2">
-                    <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 text-xs font-bold rounded-lg mt-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                        YAKINDA AKTİF
-                    </span>
+                    <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-3 rounded-xl text-xs text-amber-800 dark:text-amber-400 font-medium leading-relaxed">
+                        Tanımladığınız kodlar oluşan e-faturanın XML'inde "BuyersItemIdentification" adlı özel bir alanda iletilir. Eğer bu kodun XML haricinde, ayrıca fatura çıktısı üzerinde de gözükmesini istiyorsanız, e-fatura entegratörünüze "BuyersItemIdentification" alanını "Alıcı Ürün Kodu" isimli bir kolonda görmek istediğinizi iletin.
+                    </div>
+                    <button onClick={() => alert("Müşteri kodu eşleştirme modülü ile entegre edilecek.")} className="w-full py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all">
+                        + Müşteri Kodu Ekle
+                    </button>
                 </div>
             </div>
 
             <div className="border-t border-slate-200 dark:border-white/5 pt-6 mt-6">
-                <div className="bg-slate-50 dark:bg-[#1e293b] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between border border-slate-200 dark:border-white/5">
+                <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between border border-slate-200 dark:border-white/5 shadow-sm">
                     <div>
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Her şey hazır mı?</h4>
-                        <p className="text-sm text-slate-500">Ürünü kaydettikten sonra dilediğiniz zaman düzenleyebilirsiniz.</p>
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">{mode === "create" ? "Her şey hazır mı?" : "Değişiklikleri kaydedin"}</h4>
+                        <p className="text-sm text-slate-500">{mode === "create" ? "Ürünü kaydettikten sonra dilediğiniz zaman düzenleyebilirsiniz." : "Düzenlediğiniz bu ürünün tüm verileri anında güncellenecektir."}</p>
                     </div>
                 </div>
             </div>
