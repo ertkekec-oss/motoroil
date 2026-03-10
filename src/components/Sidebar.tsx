@@ -64,7 +64,7 @@ export default function Sidebar() {
             'reports-parent': ['/reports', '/reports/ceo', '/reports/daily', '/reports/suppliers'],
             'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
-            'staff-parent': ['/staff', '/staff/performance', '/admin/hr/performance/matrix']
+            'staff-parent': ['/staff', '/staff/performance']
         };
 
         setOpenSections(prev => {
@@ -129,7 +129,6 @@ export default function Sidebar() {
             '/settings/pricing': { perm: 'settings_manage' },
             '/staff': { perm: 'staff_manage', feature: 'team_management' },
             '/staff/performance': { perm: 'staff_manage', feature: 'team_management' },
-            '/admin/hr/performance/matrix': { perm: 'staff_manage', feature: 'team_management' },
             '/advisor': { perm: 'finance_view', feature: 'accountant' },
             '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
             '/staff/pdks': { perm: 'staff_manage' },
@@ -284,7 +283,6 @@ export default function Sidebar() {
                         subItems: [
                             { name: 'Personeller', href: '/staff' },
                             { name: 'Performans & Hedef', href: '/staff/performance' },
-                            { name: 'Hedef Yönetimi', href: '/admin/hr/performance/matrix' },
                         ]
                     },
                     {
