@@ -25,12 +25,12 @@ export async function POST(req: Request) {
 
             // Direct Tenant generic invite
             if (String(body.token).length === 25 && String(body.token).startsWith("c")) {
-                const tenantCompany = await tx.company.findUnique({
+                const tenantData = await tx.tenant.findUnique({
                     where: { id: String(body.token) },
                     select: { id: true }
                 });
-                if (tenantCompany) {
-                    supplierTenantId = tenantCompany.id;
+                if (tenantData) {
+                    supplierTenantId = tenantData.id;
                 }
             }
 
