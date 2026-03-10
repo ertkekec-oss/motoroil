@@ -520,44 +520,44 @@ function StepVariantsPriceLists({
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Genişletilmiş fiyat opsiyonları ve çoklu yapılandırmalar.</p>
             </div>
 
-            {mode === "edit" ? (
-                <div className="space-y-8">
+            <div className="space-y-8">
+                {mode === "edit" && (
                     <div className="bg-slate-50 dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 p-6">
                         <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide mb-4">💰 Çoklu Fiyat Yönetimi</h4>
                         <div className="bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/5 p-4">
                             <ProductPricesTab productId={data.id} />
                         </div>
                     </div>
+                )}
 
-                    {data.isParent && (
-                        <div className="bg-slate-50 dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 p-6">
-                            <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide mb-4">🎨 Alt Varyantlar</h4>
-                            <div className="space-y-3">
-                                {allProducts.filter((p: any) => p.parentId === data.id).map((variant: any) => (
-                                    <div key={variant.id} className="flex justify-between items-center p-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg shadow-sm">
-                                        <div>
-                                            <div className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                                {variant.name.replace(data.name, '').trim() || variant.name}
-                                                <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#334155]/50 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/5">{variant.code}</span>
-                                            </div>
-                                            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-                                                Stok: <span className={variant.stock <= 0 ? 'text-red-500' : 'text-emerald-600'}>{variant.stock}</span> |
-                                                Fiyat: {Number(variant.price).toLocaleString()} ₺
-                                            </div>
+                {mode === "edit" && data.isParent && (
+                    <div className="bg-slate-50 dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 p-6">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide mb-4">🎨 Mevcut Alt Varyantlar</h4>
+                        <div className="space-y-3">
+                            {allProducts.filter((p: any) => p.parentId === data.id).map((variant: any) => (
+                                <div key={variant.id} className="flex justify-between items-center p-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg shadow-sm">
+                                    <div>
+                                        <div className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                            {variant.name.replace(data.name, '').trim() || variant.name}
+                                            <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#334155]/50 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/5">{variant.code}</span>
+                                        </div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                                            Stok: <span className={variant.stock <= 0 ? 'text-red-500' : 'text-emerald-600'}>{variant.stock}</span> |
+                                            Fiyat: {Number(variant.price).toLocaleString()} ₺
                                         </div>
                                     </div>
-                                ))}
-                                {allProducts.filter((p: any) => p.parentId === data.id).length === 0 && (
-                                    <div className="text-sm text-slate-500 dark:text-slate-400 text-center py-4 bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/5 border-dashed">
-                                        Henüz varyant eklenmemiş.
-                                    </div>
-                                )}
-                            </div>
+                                </div>
+                            ))}
+                            {allProducts.filter((p: any) => p.parentId === data.id).length === 0 && (
+                                <div className="text-sm text-slate-500 dark:text-slate-400 text-center py-4 bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/5 border-dashed">
+                                    Henüz varyant eklenmemiş.
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
-            ) : (
-                <div className="space-y-8">
+                    </div>
+                )}
+
+                {mode === "create" && (
                     <div className="bg-slate-50 dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 p-6">
                         <div className="flex justify-between items-center mb-4">
                             <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide">💰 Diğer Fiyat Listeleri ({priceLists.filter((pl: any) => ["Perakende", "Toptan"].includes(pl.name)).length})</h4>
@@ -579,100 +579,99 @@ function StepVariantsPriceLists({
                             </div>
                         )}
                     </div>
+                )}
 
-                    <div className="bg-slate-50 dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide">🎨 Varyant Yapılandırması</h4>
-                            <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
-                                <span className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Varyant Kullan</span>
-                                <input type="checkbox" checked={useVariants} onChange={(e) => setUseVariants(e.target.checked)} className="w-4 h-4 text-slate-900 dark:text-white rounded border-slate-300 dark:border-white/10 focus:ring-slate-900" />
-                            </div>
+                <div className="bg-slate-50 dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 p-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide">🎨 Varyant Yapılandırması</h4>
+                        <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
+                            <span className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Varyant Kullan</span>
+                            <input type="checkbox" checked={useVariants} onChange={(e) => setUseVariants(e.target.checked)} className="w-4 h-4 text-slate-900 dark:text-white rounded border-slate-300 dark:border-white/10 focus:ring-slate-900" />
                         </div>
+                    </div>
 
-                        {useVariants && (
-                            <div className="space-y-5">
-                                <div className="flex flex-wrap gap-2 items-center">
-                                    {variantAttributes.map((attr: any) => (
-                                        <button
-                                            key={attr.id}
-                                            onClick={() => {
-                                                if (selectedAttributes.includes(attr.id)) {
-                                                    setSelectedAttributes((prev: any) => prev.filter((id: any) => id !== attr.id));
-                                                } else {
-                                                    setSelectedAttributes((prev: any) => [...prev, attr.id]);
-                                                }
-                                            }}
-                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide border transition-all ${selectedAttributes.includes(attr.id) ? "bg-slate-900 border-slate-900 text-white" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}
-                                        >
-                                            {attr.name}
-                                        </button>
-                                    ))}
-                                    
-                                    <div className="h-6 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
-                                    
+                    {useVariants && (
+                        <div className="space-y-5">
+                            <div className="flex flex-wrap gap-2 items-center">
+                                {variantAttributes.map((attr: any) => (
                                     <button
+                                        key={attr.id}
                                         onClick={() => {
-                                            const name = window.prompt("Yeni Variant Özelliği Adı (Örn: Renk, Beden, Malzeme):");
-                                            if (name) {
-                                                fetch('/api/products/attributes', {
-                                                    method: 'POST',
-                                                    headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify({ name, values: ["Tanımsız"] })
-                                                })
-                                                .then(res => res.json())
-                                                .then(data => {
-                                                    if(data.success && window.location.reload) {
-                                                        // Refresh to fetch the new attribute from page.tsx side
-                                                        // A more robust way would be to pass setVariantAttributes down, but reload is safe.
-                                                        alert("Varyant Özelliği eklendi! Listede görünmesi için ilgili özelliği Seçenekler > Nitelikler menüsünden detaylandırabilirsiniz.");
-                                                    } else {
-                                                        alert("Eklenirken bir sorun oluştu.");
-                                                    }
-                                                });
+                                            if (selectedAttributes.includes(attr.id)) {
+                                                setSelectedAttributes((prev: any) => prev.filter((id: any) => id !== attr.id));
+                                            } else {
+                                                setSelectedAttributes((prev: any) => [...prev, attr.id]);
                                             }
                                         }}
-                                        className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-dashed border-slate-300 dark:border-white/20 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center gap-1"
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide border transition-all ${selectedAttributes.includes(attr.id) ? "bg-slate-900 border-slate-900 text-white" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}
                                     >
-                                        + Yeni Özellik
+                                        {attr.name}
                                     </button>
-                                </div>
-
-                                {selectedAttributes.length > 0 && (
-                                    <div className="space-y-4">
-                                        <button onClick={generateCombinations} className="w-full py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
-                                            🔄 Kombinasyonları Oluştur
-                                        </button>
-                                        {generatedVariants.length > 0 && (
-                                            <div className="space-y-3">
-                                                {generatedVariants.map((v: any, idx: number) => (
-                                                    <div key={idx} className="p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg grid grid-cols-4 gap-3 items-end shadow-sm">
-                                                        <div>
-                                                            <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{v.variantLabel}</div>
-                                                            <input type="text" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.code} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].code = e.target.value; setGeneratedVariants(copy); }} />
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Stok</div>
-                                                            <input type="number" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.stock} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].stock = parseFloat(e.target.value); setGeneratedVariants(copy); }} />
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Alış</div>
-                                                            <input type="number" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.buyPrice} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].buyPrice = parseFloat(e.target.value); setGeneratedVariants(copy); }} />
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Satış</div>
-                                                            <input type="number" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.price} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].price = parseFloat(e.target.value); setGeneratedVariants(copy); }} />
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                ))}
+                                
+                                <div className="h-6 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                                
+                                <button
+                                    onClick={() => {
+                                        const name = window.prompt("Yeni Variant Özelliği Adı (Örn: Renk, Beden, Malzeme):");
+                                        if (name) {
+                                            fetch('/api/products/attributes', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ name, values: ["Tanımsız"] })
+                                            })
+                                            .then(res => res.json())
+                                            .then(data => {
+                                                if(data.success && window.location.reload) {
+                                                    alert("Varyant Özelliği eklendi! Sisteme işlenmesi için sayfa yenileniyor...");
+                                                    window.location.reload();
+                                                } else {
+                                                    alert("Eklenirken bir sorun oluştu.");
+                                                }
+                                            });
+                                        }
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-dashed border-slate-300 dark:border-white/20 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center gap-1"
+                                >
+                                    + Yeni Özellik
+                                </button>
                             </div>
-                        )}
-                    </div>
+
+                            {selectedAttributes.length > 0 && (
+                                <div className="space-y-4">
+                                    <button onClick={generateCombinations} className="w-full py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                                        🔄 Kombinasyonları Oluştur
+                                    </button>
+                                    {generatedVariants.length > 0 && (
+                                        <div className="space-y-3">
+                                            {generatedVariants.map((v: any, idx: number) => (
+                                                <div key={idx} className="p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg grid grid-cols-4 gap-3 items-end shadow-sm">
+                                                    <div>
+                                                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{v.variantLabel}</div>
+                                                        <input type="text" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.code} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].code = e.target.value; setGeneratedVariants(copy); }} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Stok</div>
+                                                        <input type="number" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.stock} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].stock = parseFloat(e.target.value); setGeneratedVariants(copy); }} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Alış</div>
+                                                        <input type="number" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.buyPrice} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].buyPrice = parseFloat(e.target.value); setGeneratedVariants(copy); }} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Satış</div>
+                                                        <input type="number" className="w-full h-8 px-2 rounded-md border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-slate-900" value={v.price} onChange={(e) => { const copy = [...generatedVariants]; copy[idx].price = parseFloat(e.target.value); setGeneratedVariants(copy); }} />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

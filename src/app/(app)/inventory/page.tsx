@@ -602,6 +602,11 @@ function InventoryContent() {
         }
       });
 
+      if (useVariants && generatedVariants && generatedVariants.length > 0) {
+        updateData.isParent = true;
+        updateData.variantsData = generatedVariants;
+      }
+
       const res = await fetch(`/api/products/${selectedProduct.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

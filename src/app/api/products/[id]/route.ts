@@ -44,14 +44,79 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
             if (productData.salesVat !== undefined) productData.salesVat = parseFloat(productData.salesVat);
             if (productData.purchaseVat !== undefined) productData.purchaseVat = parseFloat(productData.purchaseVat);
 
+            const isParent = productData.isParent;
+            const variantsData = productData.variantsData;
+            delete productData.isParent;
+            delete productData.variantsData;
+
             // 2. Update Product Basic Info
             const product = await tx.product.update({
                 where: { id: params.id },
                 data: productData
             });
 
-            // 3. Handle Stock Update if provided
-            if (body.stock !== undefined && body.stock !== null) {
+            // If it converts to parent, zero out the main stock
+            if (isParent) {
+                await tx.product.update({
+                    where: { id: params.id },
+                    data: { isParent: true, stock: 0 }
+                });
+            }
+
+            // 2.5 Generate variants if provided
+            if (isParent && variantsData && Array.isArray(variantsData)) {
+                for (const v of variantsData) {
+                    const childProduct = await tx.product.create({
+                        data: {
+                            companyId: companyId,
+                            name: `${product.name} (${v.variantLabel})`,
+                            code: v.code || `${product.code}-${v.variantLabel.replace(/\s+/g, '-').toUpperCase()}`,
+                            barcode: v.barcode || '',
+                            brand: product.brand || '',
+                            category: product.category || 'Genel',
+                            type: 'Varyant',
+                            stock: parseFloat(v.stock) || 0,
+                            price: parseFloat(v.price) || product.price,
+                            currency: product.currency || 'TRY',
+                            buyPrice: parseFloat(v.buyPrice) || product.buyPrice,
+                            purchaseCurrency: product.purchaseCurrency || 'TRY',
+                            supplierName: product.supplierName || '',
+                            branch: 'Merkez',
+                            parentId: product.id,
+                            unit: product.unit || 'Adet',
+                            salesVat: product.salesVat,
+                            purchaseVat: product.purchaseVat,
+                            status: product.status,
+                            imageUrl: product.imageUrl || undefined,
+                            imageKey: product.imageKey || undefined,
+                            stocks: {
+                                create: {
+                                    branch: targetBranch,
+                                    quantity: parseFloat(v.stock) || 0
+                                }
+                            },
+                        }
+                    });
+
+                    // Initial movement for child
+                    if (parseFloat(v.stock) > 0) {
+                        await tx.stockMovement.create({
+                            data: {
+                                productId: childProduct.id,
+                                companyId: companyId,
+                                branch: targetBranch,
+                                quantity: parseFloat(v.stock),
+                                price: parseFloat(v.buyPrice) || product.buyPrice || 0,
+                                type: 'ADJUSTMENT',
+                                referenceId: `MIGRATE_${Date.now()}`
+                            }
+                        });
+                    }
+                }
+            }
+
+            // 3. Handle Stock Update if provided and not a parent
+            if (body.stock !== undefined && body.stock !== null && !isParent) {
                 const newQty = Number(body.stock);
                 const currentStockRecord = await tx.stock.findUnique({
                     where: { productId_branch: { productId: params.id, branch: targetBranch } }
