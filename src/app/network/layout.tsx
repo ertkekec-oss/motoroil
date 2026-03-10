@@ -7,16 +7,20 @@ import { usePathname } from "next/navigation"
 export default function NetworkLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
 
+    const isNetworkPrefix = pathname.startsWith("/network");
+    const getPath = (basePath: string) => isNetworkPrefix ? basePath : basePath.replace("/network", "");
+
     // Public sayfalar için minimal topbar veya gizli
-    if (pathname === "/network/login" || pathname.startsWith("/network/invite")) {
+    const isPublic = pathname === "/network/login" || pathname === "/login" || pathname === "/" || pathname.startsWith("/network/invite") || pathname.startsWith("/invite");
+    if (isPublic) {
         return <>{children}</>
     }
 
     const navs = [
-        { path: "/network/dashboard", label: "Dashboard" },
-        { path: "/network/catalog", label: "Catalog" },
-        { path: "/network/orders", label: "Orders" },
-        { path: "/network/account", label: "Account" },
+        { path: getPath("/network/dashboard"), label: "Dashboard" },
+        { path: getPath("/network/catalog"), label: "Catalog" },
+        { path: getPath("/network/orders"), label: "Orders" },
+        { path: getPath("/network/account"), label: "Account" },
     ]
 
     return (
@@ -26,7 +30,7 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center">
-                            <Link href="/network/dashboard" className="text-xl font-bold tracking-tight text-blue-600">
+                            <Link href={getPath("/network/dashboard")} className="text-xl font-bold tracking-tight text-blue-600">
                                 B2B Portal
                             </Link>
                             <nav className="hidden md:ml-10 md:flex md:space-x-8">
@@ -48,7 +52,7 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
                             </nav>
                         </div>
                         <div className="flex items-center space-x-4 border-l border-slate-200 pl-4 ml-4">
-                            <Link href="/network/cart" className="text-sm font-semibold text-slate-700 hover:text-blue-600">
+                            <Link href={getPath("/network/cart")} className="text-sm font-semibold text-slate-700 hover:text-blue-600">
                                 Sepet
                             </Link>
                         </div>
