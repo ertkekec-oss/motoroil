@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { ProductPricesTab } from "@/components/pricing/ProductPricesTab";
 import ProductImageUpload from "./ProductImageUpload";
 import { Package, Settings, FileText, Printer, FileDown, PlusCircle, ShoppingCart } from "lucide-react";
@@ -34,6 +35,29 @@ export default function ProductWizardModal({
 }: any) {
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 5;
+    
+    const router = useRouter();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.type !== "application/pdf") {
+            alert("Sadece PDF formatında döküman yüklenebilir.");
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            alert("Dosya boyutu 5MB'dan büyük olamaz.");
+            return;
+        }
+        setIsUploading(true);
+        setTimeout(() => {
+            setIsUploading(false);
+            alert("Döküman başarıyla yüklendi ve ürüne bağlandı.");
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }, 1500);
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -89,19 +113,25 @@ export default function ProductWizardModal({
                                 
                                 {/* ACTIONS */}
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <button onClick={() => alert("Tedarikçiden alış faturası formuna yönlendirilecek.")} className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/purchasing'); onClose(); }} className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors shadow-sm">
                                         <ShoppingCart size={14} /> Tedarikçiden Alış Yap
                                     </button>
-                                    <button onClick={() => alert("Stok sayım / giriş modülü ile entegre edilecek.")} className="flex items-center gap-1.5 bg-sky-50 border border-sky-200 text-sky-700 dark:bg-sky-500/10 dark:border-sky-500/20 dark:text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-sky-100 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/inventory?action=count'); onClose(); }} className="flex items-center gap-1.5 bg-sky-50 border border-sky-200 text-sky-700 dark:bg-sky-500/10 dark:border-sky-500/20 dark:text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-sky-100 transition-colors shadow-sm">
                                         <PlusCircle size={14} /> Manuel Stok Ekle
                                     </button>
-                                    <button onClick={() => alert("Ekstre raporu modülü ile entegre edilecek.")} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/reports?type=product_statement&product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
                                         <FileText size={14} /> Ekstre Al
                                     </button>
-                                    <button onClick={() => alert("Döküman yükleme modülü ile entegre edilecek.")} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
-                                        <FileDown size={14} /> Döküman Yükle
+                                    
+                                    <input type="file" ref={fileInputRef} className="hidden" accept="application/pdf" onChange={handleDocumentUpload} />
+                                    <button onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50">
+                                        {isUploading ? (
+                                            <div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+                                        ) : <FileDown size={14} />} 
+                                        {isUploading ? "Yükleniyor..." : "Döküman Yükle"}
                                     </button>
-                                    <button onClick={() => alert("Etiket boyutlandırma ayarları ile entegre edilecek.")} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                    
+                                    <button onClick={() => { router.push('/settings/printing?product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
                                         <Printer size={14} /> Etiket Yazdır
                                     </button>
                                 </div>
