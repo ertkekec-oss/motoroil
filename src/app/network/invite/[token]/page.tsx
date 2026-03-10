@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 
 type RedeemState =
     | { status: "idle" }
@@ -16,6 +17,7 @@ function normalizePhone(input: string) {
 }
 
 export default function InviteRedeemPage() {
+    const getPath = useNetworkPath()
     const router = useRouter()
     const params = useParams()
     const token = params?.token as string
@@ -87,8 +89,7 @@ export default function InviteRedeemPage() {
         qs.set("email", email)
 
         setTimeout(() => {
-            // Hardcoded base path /network since NEXT_PUBLIC_PORTAL_BASE_PATH is used in backend
-            router.push(`/network/login?${qs.toString()}`)
+            router.push(getPath(`/network/login?${qs.toString()}`))
         }, 900)
     }
 

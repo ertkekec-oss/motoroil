@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 
 type CartItem = {
     id: string
@@ -23,6 +24,7 @@ type CartData = {
 }
 
 export default function CartPage() {
+    const getPath = useNetworkPath()
     const [cart, setCart] = useState<CartData | null>(null)
     const [credit, setCredit] = useState<{ creditLimit: number; exposureBase: number; availableCredit: number } | null>(null)
     const [paymentMode, setPaymentMode] = useState<"ON_ACCOUNT" | "CARD">("ON_ACCOUNT")
@@ -142,7 +144,7 @@ export default function CartPage() {
         }
 
         // Success redirect
-        window.location.href = `/network/orders/${data.orderId}`
+        window.location.href = getPath(`/network/orders/${data.orderId}`)
     }
 
     return (
@@ -159,13 +161,13 @@ export default function CartPage() {
 
                     <div className="flex items-center gap-2">
                         <Link
-                            href="/network/catalog"
+                            href={getPath("/network/catalog")}
                             className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40"
                         >
                             Kataloğa Dön
                         </Link>
                         <Link
-                            href="/network"
+                            href={getPath("/network/dashboard")}
                             className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40"
                         >
                             Dashboard

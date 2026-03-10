@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 
 type Membership = {
     id: string
@@ -12,6 +13,7 @@ type Membership = {
 }
 
 export default function SelectSupplierPage() {
+    const getPath = useNetworkPath()
     const router = useRouter()
     const [items, setItems] = useState<Membership[]>([])
     const [loading, setLoading] = useState(true)
@@ -56,7 +58,7 @@ export default function SelectSupplierPage() {
             setErr("Context seçimi başarısız. Lütfen tekrar deneyin.")
             return
         }
-        router.push("/network")
+        router.push(getPath("/network/dashboard"))
     }
 
     return (

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { approvalLabel, isPaid, paymentLabel } from "@/lib/ui/orderBadges"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 
 type OrderItem = {
     id: string
@@ -30,6 +31,7 @@ type OrderData = {
 }
 
 export default function OrderSuccessPage() {
+    const getPath = useNetworkPath()
     const { id } = useParams()
     const [order, setOrder] = useState<OrderData | null>(null)
     const [loading, setLoading] = useState(true)
@@ -76,7 +78,7 @@ export default function OrderSuccessPage() {
                         <p className="text-muted-foreground">{err || "Sipariş bulunamadı"}</p>
                         <div className="mt-8">
                             <Link
-                                href="/network"
+                                href={getPath("/network/dashboard")}
                                 className="h-11 px-6 inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground font-medium"
                             >
                                 Dashboard'a Dön
@@ -108,13 +110,13 @@ export default function OrderSuccessPage() {
 
                     <div className="flex items-center gap-2">
                         <Link
-                            href="/network/catalog"
+                            href={getPath("/network/catalog")}
                             className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40"
                         >
                             Yeni Sipariş
                         </Link>
                         <Link
-                            href="/network"
+                            href={getPath("/network/dashboard")}
                             className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40"
                         >
                             Dashboard

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { approvalLabel, isPaid } from "@/lib/ui/orderBadges"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 
 type Row = {
     id: string
@@ -14,6 +15,7 @@ type Row = {
 }
 
 export default function OrdersListPage() {
+    const getPath = useNetworkPath()
     const [items, setItems] = useState<Row[]>([])
     const [cursor, setCursor] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
@@ -70,10 +72,10 @@ export default function OrdersListPage() {
                         <p className="mt-2 text-sm text-muted-foreground">Üyeliğin kapsamındaki sipariş geçmişi.</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Link href="/network" className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40">
+                        <Link href={getPath("/network/dashboard")} className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40">
                             Dashboard
                         </Link>
-                        <Link href="/network/catalog" className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40">
+                        <Link href={getPath("/network/catalog")} className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40">
                             Katalog
                         </Link>
                     </div>
@@ -98,7 +100,7 @@ export default function OrdersListPage() {
                     ) : (
                         <div className="divide-y">
                             {items.map((o) => (
-                                <Link key={o.id} href={`/network/orders/${o.id}`} className="block p-4 hover:bg-muted/30">
+                                <Link key={o.id} href={getPath(`/network/orders/${o.id}`)} className="block p-4 hover:bg-muted/30">
                                     <div className="flex items-center justify-between gap-4">
                                         <div>
                                             <div className="font-medium">{o.orderNumber}</div>

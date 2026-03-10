@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 
 export default function NetworkAccountPage() {
+    const getPath = useNetworkPath()
     const router = useRouter()
     const [me, setMe] = useState<any>(null)
     const [loading, setLoading] = useState(true)
@@ -22,7 +24,7 @@ export default function NetworkAccountPage() {
 
     const handleLogout = async () => {
         await fetch("/api/network/auth/logout", { method: "POST" })
-        router.push("/network/login")
+        router.push(getPath("/network/login"))
     }
 
     if (loading) return <div className="p-10 text-center">Yükleniyor...</div>
@@ -64,7 +66,7 @@ export default function NetworkAccountPage() {
 
             <div className="flex flex-col gap-4">
                 <Link
-                    href="/network/select-supplier"
+                    href={getPath("/network/select-supplier")}
                     className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
                 >
                     Farklı Bir Tedarikçiye Geç

@@ -4,8 +4,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import { usePaymentIntentPoll } from "@/lib/network/payments/usePaymentIntentPoll";
+import { useNetworkPath } from "@/hooks/useNetworkPath";
 
 function ResultContent() {
+    const getPath = useNetworkPath();
     const sp = useSearchParams();
     const router = useRouter();
     const intentId = sp.get("intentId");
@@ -31,13 +33,13 @@ function ResultContent() {
                 {intent?.orderId && phase.state === "done" && phase.status === "SUCCEEDED" && (
                     <div className="mt-6 flex gap-2">
                         <button
-                            onClick={() => router.push(`/network/orders/${intent.orderId}`)}
+                            onClick={() => router.push(getPath(`/network/orders/${intent.orderId}`))}
                             className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
                         >
                             Siparişi Gör
                         </button>
                         <Link
-                            href="/network/orders"
+                            href={getPath("/network/orders")}
                             className="h-10 px-4 rounded-xl border bg-card text-sm font-medium hover:bg-muted/40 inline-flex items-center"
                         >
                             Siparişler
@@ -48,13 +50,13 @@ function ResultContent() {
                 {phase.state === "done" && phase.status !== "SUCCEEDED" && (
                     <div className="mt-6 flex gap-2">
                         <Link
-                            href="/network/cart"
+                            href={getPath("/network/cart")}
                             className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium inline-flex items-center"
                         >
                             Sepete Dön
                         </Link>
                         <Link
-                            href="/network/catalog"
+                            href={getPath("/network/catalog")}
                             className="h-10 px-4 rounded-xl border bg-card text-sm font-medium hover:bg-muted/40 inline-flex items-center"
                         >
                             Kataloğa Git
