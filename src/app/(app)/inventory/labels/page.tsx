@@ -11,7 +11,10 @@ import { useSettings } from "@/contexts/SettingsContext"; // Ensure accurate imp
 export default function LableGeneratorPage() {
     const searchParams = useSearchParams();
     const { products } = useInventory();
-    const { brands, prodCats } = useSettings();
+    
+    // dynamically build unique list of categories and brands from actual products locally
+    const dynamicCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean))) as string[];
+    const dynamicBrands = Array.from(new Set(products.map(p => p.brand).filter(Boolean))) as string[];
 
     const productIdParam = searchParams.get("product");
 
@@ -109,13 +112,13 @@ export default function LableGeneratorPage() {
                             {targetType === "category" && (
                                 <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] text-sm font-medium">
                                     <option value="" disabled>Kategori Seçiniz...</option>
-                                    {prodCats.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                    {dynamicCategories.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             )}
                             {targetType === "brand" && (
                                 <select value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)} className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] text-sm font-medium">
                                     <option value="" disabled>Marka Seçiniz...</option>
-                                    {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                    {dynamicBrands.map(b => <option key={b} value={b}>{b}</option>)}
                                 </select>
                             )}
                         </div>
@@ -128,12 +131,12 @@ export default function LableGeneratorPage() {
                         <h3 className="text-xs uppercase tracking-widest font-bold text-slate-500 flex items-center gap-1.5"><Box size={14}/> Etiket Boyutları</h3>
                         <div className="space-y-2">
                             {["30x50", "40x80", "50x100"].map(size => (
-                                <label key={size} className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${labelSize === size ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
+                                <button key={size} onClick={() => setLabelSize(size)} className={`w-full flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${labelSize === size ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
                                     <span className={`text-sm font-bold ${labelSize === size ? 'text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>{size} mm (Geniş x Dar)</span>
                                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${labelSize === size ? 'border-blue-600' : 'border-slate-300'}`}>
                                         {labelSize === size && <div className="w-2 h-2 rounded-full bg-blue-600"></div>}
                                     </div>
-                                </label>
+                                </button>
                             ))}
                         </div>
                     </div>
