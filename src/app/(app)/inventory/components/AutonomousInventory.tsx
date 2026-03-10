@@ -49,7 +49,43 @@ export function DailyBriefPanel({ onClose }: { onClose: () => void }) {
     );
 }
 
-export function WeeklyHealthReport({ onClose }: { onClose: () => void }) {
+export function WeeklyHealthReport({ products = [], onClose }: { products?: any[], onClose: () => void }) {
+    const totalProducts = products.length || 1;
+    
+    const criticalCount = products.filter(p => Number(p.stock) <= Number(p.minStock)).length;
+    const excessCount = products.filter(p => Number(p.stock) > Number(p.minStock) * 3).length;
+    
+    // Stok Riski: 100 üzerinden kritik stok oranına göre puanlama
+    const stokRiski = Math.max(0, 100 - Math.round((criticalCount / totalProducts) * 100));
+    
+    // Depo Denge: 100 üzerinden fazla stok oranına göre puanlama
+    const depoDenge = Math.max(0, 100 - Math.round((excessCount / totalProducts) * 100));
+
+    // Marj Stabilite
+    let totalMargin = 0;
+    let marginCount = 0;
+    products.forEach(p => {
+        if (Number(p.buyPrice) > 0) {
+            totalMargin += ((Number(p.price) - Number(p.buyPrice)) / Number(p.buyPrice));
+            marginCount++;
+        }
+    });
+    const avgMargin = marginCount > 0 ? (totalMargin / marginCount) : 0;
+    const marjStabilite = Math.min(100, Math.max(0, Math.round(avgMargin * 100))); 
+
+    const healthScore = Math.round((stokRiski + depoDenge + marjStabilite) / 3) || 0;
+
+    // Ort Stok Adedi - (Gerçek gün süresi hesaplanamıyorsa stok ortalaması gösterilecek)
+    const totalStock = products.reduce((acc, p) => acc + Number(p.stock || 0), 0);
+    const avgStock = totalProducts ? Math.round(totalStock / totalProducts) : 0;
+
+    const excessPercent = ((excessCount / totalProducts) * 100).toFixed(1);
+
+    const topValueProducts = [...products]
+        .filter(p => Number(p.stock) > 0)
+        .sort((a,b) => (Number(b.stock) * Number(b.buyPrice)) - (Number(a.stock) * Number(a.buyPrice)))
+        .slice(0, 5);
+
     return (
         <div className="fixed inset-y-0 right-0 w-full md:w-[480px] bg-white dark:bg-[#0f172a] border-l border-slate-200 dark:border-white/5 shadow-2xl z-[5000] flex flex-col animate-in slide-in-from-right duration-300">
             <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-[#1e293b]/50">
@@ -68,11 +104,11 @@ export function WeeklyHealthReport({ onClose }: { onClose: () => void }) {
                 {/* Main KPI */}
                 <div className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl text-white shadow-sm">
                     <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Inventory Health Score</span>
-                    <div className="text-5xl font-black mt-2 text-emerald-400">78<span className="text-xl text-slate-500 dark:text-slate-400">/100</span></div>
+                    <div className={`text-5xl font-black mt-2 ${healthScore >= 80 ? 'text-emerald-400' : healthScore >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>{healthScore}<span className="text-xl text-slate-500 dark:text-slate-400">/100</span></div>
                     <div className="flex gap-4 mt-6 w-full px-4">
-                        <div className="flex-1 text-center"><div className="text-[10px] text-slate-400 uppercase">Stok Riski</div><div className="font-bold text-emerald-400">65</div></div>
-                        <div className="flex-1 text-center border-l border-slate-700"><div className="text-[10px] text-slate-400 uppercase">Marj Stabilite</div><div className="font-bold text-emerald-400">82</div></div>
-                        <div className="flex-1 text-center border-l border-slate-700"><div className="text-[10px] text-slate-400 uppercase">Depo Denge</div><div className="font-bold text-amber-400">74</div></div>
+                        <div className="flex-1 text-center"><div className="text-[10px] text-slate-400 uppercase">Stok Riski</div><div className={`font-bold ${stokRiski >= 70 ? 'text-emerald-400' : stokRiski >= 40 ? 'text-amber-400' : 'text-rose-400'}`}>{stokRiski}</div></div>
+                        <div className="flex-1 text-center border-l border-slate-700"><div className="text-[10px] text-slate-400 uppercase">Marj Stabilite</div><div className={`font-bold ${marjStabilite >= 50 ? 'text-emerald-400' : 'text-amber-400'}`}>{marjStabilite}</div></div>
+                        <div className="flex-1 text-center border-l border-slate-700"><div className="text-[10px] text-slate-400 uppercase">Depo Denge</div><div className={`font-bold ${depoDenge >= 70 ? 'text-emerald-400' : depoDenge >= 40 ? 'text-amber-400' : 'text-rose-400'}`}>{depoDenge}</div></div>
                     </div>
                 </div>
 
@@ -81,33 +117,40 @@ export function WeeklyHealthReport({ onClose }: { onClose: () => void }) {
 
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl p-4">
-                            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Ortalama Stok Gün</div>
-                            <div className="text-lg font-black text-slate-900 dark:text-white mt-1">42 Gün</div>
+                            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Ortalama Stok Adedi</div>
+                            <div className="text-lg font-black text-slate-900 dark:text-white mt-1">{avgStock} Adet</div>
                         </div>
                         <div className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl p-4">
                             <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Fazla Stok Oranı</div>
-                            <div className="text-lg font-black text-slate-900 dark:text-white mt-1">%14.2</div>
+                            <div className="text-lg font-black text-slate-900 dark:text-white mt-1">%{excessPercent}</div>
+                        </div>
+                        <div className={`${criticalCount > 0 ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'} border rounded-xl p-4`}>
+                            <div className={`text-[11px] font-bold ${criticalCount > 0 ? 'text-amber-700' : 'text-emerald-700'} uppercase`}>Kritik Stoktaki Ürün</div>
+                            <div className={`flex items-center gap-1 text-lg font-black ${criticalCount > 0 ? 'text-amber-700' : 'text-emerald-700'} mt-1`}>
+                                {criticalCount > 0 ? <AlertTriangle className="w-5 h-5 flex-shrink-0" /> : <TrendingDown className="w-5 h-5 flex-shrink-0" />} 
+                                {criticalCount} Adet
+                            </div>
                         </div>
                         <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
-                            <div className="text-[11px] font-bold text-emerald-700 uppercase">Kritik Stok Trendi</div>
-                            <div className="flex items-center gap-1 text-lg font-black text-emerald-700 mt-1"><TrendingDown className="w-5 h-5" /> %8 Azaldı</div>
-                        </div>
-                        <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
-                            <div className="text-[11px] font-bold text-amber-700 uppercase">Marj Değişimi</div>
-                            <div className="flex items-center gap-1 text-lg font-black text-amber-700 mt-1"><TrendingDown className="w-5 h-5" /> -%1.2</div>
+                            <div className="text-[11px] font-bold text-emerald-700 uppercase">Ortalama Kâr Marjı</div>
+                            <div className="flex items-center gap-1 text-lg font-black text-emerald-700 mt-1"><TrendingUp className="w-5 h-5 flex-shrink-0" /> +%{(avgMargin * 100).toFixed(1)}</div>
                         </div>
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">En Çok Satan 5 Ürün</h3>
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">En Yüksek Stok Değerli 5 Ürün</h3>
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl divide-y divide-slate-100 overflow-hidden">
-                        {[1, 2, 3, 4, 5].map(i => (
+                        {topValueProducts.length > 0 ? topValueProducts.map((p, i) => (
                             <div key={i} className="flex items-center justify-between p-3 text-sm">
-                                <span className="font-medium text-slate-700 dark:text-slate-300">Premium Madeni Yağ 5W-30 {i}</span>
-                                <span className="font-bold text-emerald-600">+142 Satış</span>
+                                <span className="font-medium text-slate-700 dark:text-slate-300 truncate mr-2" title={p.name}>{p.name}</span>
+                                <span className="font-bold text-emerald-600 whitespace-nowrap">{(Number(p.stock) * Number(p.buyPrice)).toLocaleString()} ₺</span>
                             </div>
-                        ))}
+                        )) : (
+                            <div className="p-4 text-center text-sm text-slate-500">
+                                Yeterli veri bulunamadı.
+                            </div>
+                        )}
                     </div>
                 </div>
 
