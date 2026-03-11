@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { authorize } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import { ActionProviderRegistry } from '@/services/marketplaces/actions/registry';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { getLabelSignedUrl } from '@/lib/s3';
+import { redisConnection } from '@/lib/queue/redis';
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -35,6 +37,36 @@ export async function POST(request: Request) {
             if (!marketplace || !orderId || !shipmentPackageId) continue;
 
             try {
+                // 0) Check if label already exists in DB (Fast Path)
+                let existingPdfBuffer: Buffer | null = null;
+                const existingLabel = await (prisma as any).marketplaceLabel.findUnique({
+                    where: { companyId_marketplace_shipmentPackageId: { companyId, marketplace, shipmentPackageId } }
+                });
+
+                if (existingLabel?.storageKey) {
+                    try {
+                        const b64 = await redisConnection.get(`LABEL_CACHE:${existingLabel.storageKey}`);
+                        if (b64) existingPdfBuffer = Buffer.from(b64, 'base64');
+                    } catch(ex) { console.warn("Redis read error in bulk existing:", ex); }
+
+                    if (!existingPdfBuffer) {
+                        try {
+                            const url = await getLabelSignedUrl(existingLabel.storageKey);
+                            const pdfBufferResp = await fetch(url);
+                            if (pdfBufferResp.ok) {
+                                existingPdfBuffer = Buffer.from(await pdfBufferResp.arrayBuffer());
+                            }
+                        } catch(ex) { console.warn("S3 read error in bulk existing:", ex); }
+                    }
+
+                    if (existingPdfBuffer) {
+                        const sourcePdf = await PDFDocument.load(existingPdfBuffer);
+                        const pages = await mergedPdf.copyPages(sourcePdf, sourcePdf.getPageIndices());
+                        pages.forEach(p => mergedPdf.addPage(p));
+                        continue;
+                    }
+                }
+
                 // 1) Get provider
                 const provider = ActionProviderRegistry.getProvider(marketplace);
                 
@@ -66,17 +98,32 @@ export async function POST(request: Request) {
                 }
 
                 if (result.status === 'SUCCESS' && result.result?.storageKey) {
-                    // Success! Fetch PDF buffer from S3
-                    const url = await getLabelSignedUrl(result.result.storageKey);
-                    const pdfBufferResp = await fetch(url);
-                    if (pdfBufferResp.ok) {
-                        const buffer = await pdfBufferResp.arrayBuffer();
-                        const sourcePdf = await PDFDocument.load(buffer);
+                    let pdfBuffer: Buffer | null = null;
+                    
+                    // 1) Fast Path: Try retrieving from Redis cache
+                    try {
+                        const b64 = await redisConnection.get(`LABEL_CACHE:${result.result.storageKey}`);
+                        if (b64) {
+                            pdfBuffer = Buffer.from(b64, 'base64');
+                        }
+                    } catch(ex) { console.warn("Redis read error in bulk:", ex); }
+
+                    // 2) S3 Fallback
+                    if (!pdfBuffer) {
+                        const url = await getLabelSignedUrl(result.result.storageKey);
+                        const pdfBufferResp = await fetch(url);
+                        if (pdfBufferResp.ok) {
+                            pdfBuffer = Buffer.from(await pdfBufferResp.arrayBuffer());
+                        } else {
+                            throw new Error(`S3 okuma hatası: ${pdfBufferResp.status}`);
+                        }
+                    }
+                    
+                    if (pdfBuffer) {
+                        const sourcePdf = await PDFDocument.load(pdfBuffer);
                         const pages = await mergedPdf.copyPages(sourcePdf, sourcePdf.getPageIndices());
                         pages.forEach(p => mergedPdf.addPage(p));
                         continue;
-                    } else {
-                        throw new Error(`S3 okuma hatası: ${pdfBufferResp.status}`);
                     }
                 }
 
