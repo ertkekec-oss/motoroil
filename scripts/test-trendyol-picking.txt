@@ -1,0 +1,11 @@
+Found 2 TEX orders in Picking status.
+
+Testing TEX Order: 11029796559 - Pkg: 3671353294
+Tracking number: 7330030985495024
+GET Common Label Status: 200
+Response snippet: {"data":[{"label":"^XA^POI^FS^FWN,0^FO40,70^GB490,360,3^FS^CFA,20^FO70,90^FD^FS^CFA,22^FO50,90^FDAKPINAR MAH ISTANBUL/SANCAKTEPE AKPINAR ^FS^CFA,22^FO
+
+Testing TEX Order: 11037472809 - Pkg: 3679014643
+Tracking number: 7330031064550009
+GET Common Label Status: 400
+Response snippet: {"error":{"status":400,"errors":[{"code":400,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Ortak barkod bilgileri alınırken bir hata oluştu"}]}}
