@@ -324,6 +324,7 @@ function fallbackLabelHtml(fallbackData: any, errorMessage: string) {
     <div class="label-container">
         <div class="header">
             <div class="buyer-info">
+                <div style="font-size: 14px; font-weight: bold; color: #475569; margin-bottom: 5px;">${fallbackData?.marketplace ? fallbackData.marketplace + ' Siparişi' : 'Pazaryeri Siparişi'}</div>
                 <h3>Kargo Alıcı Bilgileri</h3>
                 <div class="info-row"><div class="info-label">Sipariş No</div><div class="info-value">: ${orderNumber}</div></div>
                 <div class="info-row"><div class="info-label">Ad-Soyad</div><div class="info-value">: ${fullName}</div></div>
@@ -341,17 +342,9 @@ function fallbackLabelHtml(fallbackData: any, errorMessage: string) {
                 `}
             </div>
         </div>
-        <div class="items">
-            <h3>Sipariş İçeriği</h3>
-            <table>
-                <thead><tr><th>Ürün Bilgisi</th><th>Adet</th><th>Barkod</th></tr></thead>
-                <tbody>
-                    ${linesHtml}
-                </tbody>
-            </table>
-        </div>
         <div class="error-footer">
-            Bu etiket, kargo firması ZPL servisinde geçici bir arıza (${String(errorMessage).substring(0, 50)}) yaşandığı için Periodya Güvenlik Ağı tarafından A4 Fallback formatında otomatik oluşturulmuştur. Bu belgeyi yazdırıp paketinize yapıştırabilirsiniz.
+            <strong>Periodya Güvenlik Ağı tarafından oluşturulmuştur.</strong><br/><br/>
+            DİKKAT: Paketinizi kargo görevlisinin önünde açıp kontrol ediniz. Siparişinizde istenmeyen bir durum oluştuğunu düşünüyorsanız kargo görevlisi ile birlikte tutanak tutarak gerekli aksiyonu almanızı tavsiye ederiz.
         </div>
     </div>
     <script>
