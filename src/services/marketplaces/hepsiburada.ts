@@ -149,11 +149,17 @@ export class HepsiburadaService implements IMarketplaceService {
                     return { pdfBase64, status };
                 } else if (contentType.includes('json')) {
                     const text = await res.text();
-                    const data = JSON.parse(text);
-                    if (data?.pdfData) return { pdfBase64: data.pdfData, status };
-                    if (data?.base64) return { pdfBase64: data.base64, status };
-                    if (typeof data?.data === 'string' && data.data.length > 500) return { pdfBase64: data.data, status };
-                    return { error: 'HB JSON döndürdü fakat etiket bulunamadı.', status, rawBody: text };
+                    try {
+                        const data = JSON.parse(text);
+                        if (data?.pdfData) return { pdfBase64: data.pdfData, status };
+                        if (data?.base64) return { pdfBase64: data.base64, status };
+                        if (typeof data?.data === 'string' && data.data.length > 500) return { pdfBase64: data.data, status };
+                        if (Array.isArray(data?.data) && data.data.length > 0 && typeof data.data[0] === 'string') return { pdfBase64: data.data[0], status };
+                        if (data?.zplData) return { pdfBase64: data.zplData, status }; // some integrations might use zplData
+                        return { error: 'HB JSON döndürdü fakat etiket bulunamadı.', status, rawBody: text };
+                    } catch (e: any) {
+                        return { error: `HB JSON parse hatası: ${e.message}`, status, rawBody: text };
+                    }
                 }
 
                 const buffer = await res.arrayBuffer();
