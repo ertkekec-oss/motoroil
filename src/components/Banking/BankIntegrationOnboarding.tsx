@@ -93,7 +93,6 @@ export default function BankOnboardingHub() {
         const ips = selectedBank.technicalAppendix.ipWhitelist.length > 0 ? selectedBank.technicalAppendix.ipWhitelist.join(', ') : defaultIp;
 
         if (selectedBank.id === 'KUVEYT_TURK') {
-        if (selectedBank.id === 'KUVEYT_TURK') {
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(11);
             doc.setFont("helvetica", "bold");
