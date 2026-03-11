@@ -26,9 +26,9 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getAuthHeader(): string {
-        const username = (this.config.username || '').trim();
         const password = (this.config.password || '').trim();
-        const token = Buffer.from(`${username}:${password}`).toString('base64');
+        const merchantId = (this.config.merchantId || '').trim();
+        const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
         return `Basic ${token}`;
     }
 
