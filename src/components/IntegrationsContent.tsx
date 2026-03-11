@@ -276,9 +276,10 @@ const MARKETPLACE_CONFIGS = [
 
 function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, stats, onRefreshStats, branches }: any) {
     const activeCount = MARKETPLACE_CONFIGS.filter(m => (settings as any)[m.key]?.enabled).length;
+    const [activeConfigObj, setActiveConfigObj] = useState<any>(null);
 
     return (
-        <div className="max-w-5xl mx-auto w-full px-8 py-8 space-y-6 animate-in fade-in duration-300">
+        <div className="max-w-6xl mx-auto w-full px-8 py-8 space-y-8 animate-in fade-in duration-300">
             {/* Ozet / Dashboard Strip */}
             <div className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50">
@@ -286,142 +287,189 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
                         <p className="text-[14px] font-semibold text-slate-900 dark:text-white">Çoklu Kanal (Omnichannel) İzleme</p>
                         <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">Sipariş verileri asenkron senkronize edilir.</p>
                     </div>
-                    <button onClick={onRefreshStats} className="text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0B1220] px-3 py-1.5 rounded-lg shadow-sm">
-                        Verileri Tazele
+                    <button onClick={onRefreshStats} className="text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 transition-colors border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0B1220] px-3 py-1.5 rounded-lg shadow-sm">
+                        Verileri Tazele 🔄
                     </button>
                 </div>
-                <div className="grid grid-cols-4 divide-x divide-slate-100">
+                <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-white/5">
                     {[
                         { val: `₺${stats?.financials?.openReceivables?.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) ?? '—'}`, label: 'Açık Alacaklar' },
                         { val: `${stats?.financials?.pendingSettlements || 0}`, label: 'Bekleyen Settlement' },
                         { val: `${stats?.orders?.last24h || 0}`, label: '24s Sipariş' },
                         { val: `${activeCount} / ${MARKETPLACE_CONFIGS.length}`, label: 'Bağlı Kanal' },
                     ]?.map((s, i) => (
-                        <div key={i} className="p-5">
-                            <p className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">{s.val}</p>
-                            <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{s.label}</p>
+                        <div key={i} className="p-5 md:p-6 flex flex-col items-center text-center">
+                            <p className="text-[26px] font-bold text-slate-900 dark:text-white tracking-tight">{s.val}</p>
+                            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1.5">{s.label}</p>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Kanal Konfigürasyonları - Liste Formati */}
-            <div className="space-y-4">
+            {/* Kanal Konfigürasyonları - Grid Formati */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {MARKETPLACE_CONFIGS?.map(ch => {
                     const mktSettings = (settings as any)[ch.key] || {};
                     const enabled = mktSettings.enabled ?? false;
 
                     return (
-                        <div key={ch.key} className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] transition-all">
-                            {/* Satır Header */}
-                            <div className="px-6 py-5 flex items-center justify-between cursor-pointer" onClick={() => onChange({ ...settings, [ch.key]: { ...mktSettings, enabled: !enabled } })}>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: enabled ? '#0f172a' : '#cbd5e1' }} />
-                                    <div>
-                                        <h4 className="text-[15px] font-semibold text-slate-900 dark:text-white">{ch.title}</h4>
-                                        <span className="text-[12px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">{ch.method}</span>
+                        <div key={ch.key} className={`bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden flex flex-col transition-all duration-200 ${enabled ? 'ring-1 ring-blue-500/20 shadow-blue-500/5' : 'hover:border-slate-300 dark:hover:border-white/10'}`}>
+                            <div className="p-6 flex flex-col h-full">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-[20px] shadow-sm ${enabled ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white' : 'bg-slate-100 dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/5'}`}>
+                                        {ch.title.substring(0, 1)}
                                     </div>
-                                </div>
-                                <ERPSwitch
-                                    checked={enabled}
-                                    onChange={(e: any) => { e.stopPropagation(); onChange({ ...settings, [ch.key]: { ...mktSettings, enabled: e.target.checked } }); }}
-                                />
-                            </div>
-
-                            {/* Genişletilmiş Form */}
-                            {enabled && (
-                                <div className="px-6 pb-6 border-t border-slate-100 dark:border-white/5 pt-5">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
-                                        {ch.fields.includes('url') && (
-                                            <div className="col-span-1 md:col-span-2"><ERPField label="XML URL">
-                                                <ERPInput value={mktSettings.url || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, url: e.target.value } })} />
-                                            </ERPField></div>
-                                        )}
-                                        {ch.fields.includes('apiKey') && (
-                                            <ERPField label="API Key / Application Key">
-                                                <ERPInput type="password" value={mktSettings.apiKey || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, apiKey: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('apiSecret') && (
-                                            <ERPField label="API Secret / App Secret">
-                                                <ERPInput type="password" value={mktSettings.apiSecret || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, apiSecret: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('supplierId') && (
-                                            <ERPField label="Supplier ID">
-                                                <ERPInput value={mktSettings.supplierId || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, supplierId: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('merchantId') && (
-                                            <ERPField label="Merchant ID">
-                                                <ERPInput value={mktSettings.merchantId || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, merchantId: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('username') && (
-                                            <ERPField label="API Kullanıcısı">
-                                                <ERPInput value={mktSettings.username || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, username: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('password') && (
-                                            <ERPField label="Secret Key / Parola">
-                                                <ERPInput type="password" value={mktSettings.password || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, password: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('sellerId') && (
-                                            <ERPField label="Seller ID">
-                                                <ERPInput value={mktSettings.sellerId || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, sellerId: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('mwsAuthToken') && (
-                                            <ERPField label="MWS Auth Token">
-                                                <ERPInput type="password" value={mktSettings.mwsAuthToken || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, mwsAuthToken: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('accessKey') && (
-                                            <ERPField label="Access Key">
-                                                <ERPInput value={mktSettings.accessKey || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, accessKey: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('secretKey') && (
-                                            <ERPField label="Secret Key">
-                                                <ERPInput type="password" value={mktSettings.secretKey || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, secretKey: e.target.value } })} />
-                                            </ERPField>
-                                        )}
-                                        {ch.fields.includes('branch') && (
-                                            <ERPField label="İşlem Deposu (Envanter)">
-                                                <ERPSelect value={mktSettings.branch || 'Merkez'} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, branch: e.target.value } })}>
-                                                    {branches?.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>)}
-                                                    {branches.length === 0 && <option value="Merkez">Merkez</option>}
-                                                </ERPSelect>
-                                            </ERPField>
-                                        )}
-                                    </div>
-
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl">
+                                    <div onClick={(e) => e.stopPropagation()}>
                                         <ERPSwitch
-                                            checked={mktSettings.autoSync ?? false}
-                                            onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, autoSync: e.target.checked } })}
-                                            label="Arka Plan Sync."
+                                            checked={enabled}
+                                            onChange={(e: any) => { onChange({ ...settings, [ch.key]: { ...mktSettings, enabled: e.target.checked } }); }}
                                         />
-                                        <button
-                                            onClick={() => onTest(ch.key)}
-                                            disabled={isTesting}
-                                            className="h-9 px-4 bg-white dark:bg-[#0B1220] border border-slate-300 dark:border-white/10 rounded-lg text-[13px] font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition-colors"
-                                        >
-                                            Bağlantıyı Doğrula
-                                        </button>
                                     </div>
-                                    {testResults[ch.key] && (
-                                        <div className="mt-3">
-                                            <TestResultBanner result={testResults[ch.key]} />
-                                        </div>
-                                    )}
                                 </div>
-                            )}
+                                <div className="mb-8">
+                                    <h4 className="text-[17px] font-semibold text-slate-900 dark:text-white tracking-tight">{ch.title}</h4>
+                                    <span className="text-[12px] font-medium text-slate-500 dark:text-slate-400 mt-1 block">{ch.method}</span>
+                                </div>
+                                
+                                <div className="mt-auto pt-5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+                                    <span className={`text-[12px] font-bold flex items-center gap-2 ${enabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                                        <span className={`w-2 h-2 rounded-full ${enabled ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-slate-300 dark:bg-slate-600'}`}></span>
+                                        {enabled ? 'Bağlantı Aktif' : 'Pasif'}
+                                    </span>
+                                    <button
+                                        onClick={() => setActiveConfigObj(ch)}
+                                        className="text-[13px] font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
+                                    >
+                                        Yapılandır <span>&rarr;</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     );
                 })}
             </div>
+
+            {/* Config Modal */}
+            {activeConfigObj && (() => {
+                const ch = activeConfigObj;
+                const mktSettings = (settings as any)[ch.key] || {};
+                return (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6" onClick={() => setActiveConfigObj(null)}>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200" style={{ maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
+                            <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-[#0B1220]">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-lg font-bold text-slate-700 dark:text-slate-300 shadow-sm">
+                                        {ch.title.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-[16px] font-semibold text-slate-900 dark:text-white">{ch.title} Yapılandırması</h3>
+                                        <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">{ch.method} Portalı Bağlantı Ayarları</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setActiveConfigObj(null)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors text-slate-700 dark:text-white">✕</button>
+                            </div>
+                            
+                            <div className="p-6 md:p-8 overflow-y-auto flex-1 space-y-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    {ch.fields.includes('url') && (
+                                        <div className="col-span-1 md:col-span-2"><ERPField label="XML URL">
+                                            <ERPInput value={mktSettings.url || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, url: e.target.value } })} />
+                                        </ERPField></div>
+                                    )}
+                                    {ch.fields.includes('apiKey') && (
+                                        <ERPField label="API Key / Application Key">
+                                            <ERPInput type="password" value={mktSettings.apiKey || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, apiKey: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('apiSecret') && (
+                                        <ERPField label="API Secret / App Secret">
+                                            <ERPInput type="password" value={mktSettings.apiSecret || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, apiSecret: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('supplierId') && (
+                                        <ERPField label="Supplier ID">
+                                            <ERPInput value={mktSettings.supplierId || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, supplierId: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('merchantId') && (
+                                        <ERPField label="Merchant ID">
+                                            <ERPInput value={mktSettings.merchantId || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, merchantId: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('username') && (
+                                        <ERPField label="API Kullanıcısı">
+                                            <ERPInput value={mktSettings.username || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, username: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('password') && (
+                                        <ERPField label="Secret Key / Parola">
+                                            <ERPInput type="password" value={mktSettings.password || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, password: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('sellerId') && (
+                                        <ERPField label="Seller ID">
+                                            <ERPInput value={mktSettings.sellerId || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, sellerId: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('mwsAuthToken') && (
+                                        <ERPField label="MWS Auth Token">
+                                            <ERPInput type="password" value={mktSettings.mwsAuthToken || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, mwsAuthToken: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('accessKey') && (
+                                        <ERPField label="Access Key">
+                                            <ERPInput value={mktSettings.accessKey || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, accessKey: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('secretKey') && (
+                                        <ERPField label="Secret Key">
+                                            <ERPInput type="password" value={mktSettings.secretKey || ''} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, secretKey: e.target.value } })} />
+                                        </ERPField>
+                                    )}
+                                    {ch.fields.includes('branch') && (
+                                        <ERPField label="İşlem Deposu (Envanter)">
+                                            <ERPSelect value={mktSettings.branch || 'Merkez'} onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, branch: e.target.value } })}>
+                                                {branches?.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                                {branches.length === 0 && <option value="Merkez">Merkez</option>}
+                                            </ERPSelect>
+                                        </ERPField>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 md:p-6 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl">
+                                    <div className="flex gap-4 items-start">
+                                        <div className="mt-1 text-slate-400">⚡</div>
+                                        <ERPSwitch
+                                            checked={mktSettings.autoSync ?? false}
+                                            onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, autoSync: e.target.checked } })}
+                                            label="Arka Plan Sync."
+                                            description="Siparişleri otomatik tarar."
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => onTest(ch.key)}
+                                        disabled={isTesting}
+                                        className="shrink-0 h-10 px-5 bg-white dark:bg-[#0B1220] border border-slate-300 dark:border-white/10 rounded-xl text-[13px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/10 transition-colors shadow-sm"
+                                    >
+                                        {isTesting ? 'Sınanıyor...' : 'Bağlantıyı Doğrula'}
+                                    </button>
+                                </div>
+                                {testResults[ch.key] && (
+                                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                        <TestResultBanner result={testResults[ch.key]} />
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0B1220] flex justify-end gap-3">
+                                <button onClick={() => setActiveConfigObj(null)} className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[14px] font-semibold transition-colors shadow-sm">
+                                    Tamam, Kapat
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
         </div>
     );
 }
