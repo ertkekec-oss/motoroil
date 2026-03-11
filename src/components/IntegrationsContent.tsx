@@ -716,7 +716,7 @@ export default function IntegrationsContent() {
                 <button
                     onClick={saveSettings}
                     disabled={isSaving}
-                    className="h-10 px-5 bg-slate-900 dark:bg-white rounded-lg text-white text-[14px] font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    className="h-10 px-5 bg-slate-900 dark:bg-slate-100 rounded-lg text-white dark:text-slate-900 text-[14px] font-bold hover:bg-slate-800 dark:hover:bg-white transition-colors disabled:opacity-50"
                 >
                     {isSaving ? 'İşleniyor...' : 'Ayarları Kaydet'}
                 </button>
