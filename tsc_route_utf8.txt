@@ -1,0 +1,7 @@
+﻿src/app/api/marketplaces/bulk-label/route.ts(2,34): error TS2307: Cannot find module 'next-auth' or its corresponding type declarations.
+src/app/api/marketplaces/bulk-label/route.ts(3,29): error TS2307: Cannot find module '@/app/api/auth/[...nextauth]/route' or its corresponding type declarations.
+src/app/api/marketplaces/bulk-label/route.ts(4,24): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.
+src/app/api/marketplaces/bulk-label/route.ts(5,40): error TS2307: Cannot find module '@/services/marketplaces/actions/registry' or its corresponding type declarations.
+src/app/api/marketplaces/bulk-label/route.ts(7,35): error TS2307: Cannot find module '@/lib/s3' or its corresponding type declarations.
+src/app/api/marketplaces/bulk-label/route.ts(112,33): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
