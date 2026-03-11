@@ -27,6 +27,7 @@ export async function POST(request: Request) {
 
         const mergedPdf = await PDFDocument.create();
         const helveticaFont = await mergedPdf.embedFont(StandardFonts.Helvetica);
+        const helveticaBoldFont = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
 
         // Process sequentially to not overload S3 / APIGateways
         for (const order of orders) {
@@ -79,7 +80,13 @@ export async function POST(request: Request) {
                     }
                 }
 
-                // If FAILED or fallbackData returned
+                // If fallbackData is returned, draw natively inside the PDF
+                if (result.result?.fallbackData) {
+                    await drawNativePdfFallback(mergedPdf, helveticaFont, helveticaBoldFont, result.result.fallbackData, result.errorMessage || "ZPL/PDF Hatasi");
+                    continue;
+                }
+
+                // If FAILED completely
                 throw new Error(result.errorMessage || "Etiket servisi reddedildi.");
 
             } catch (error: any) {
@@ -123,4 +130,108 @@ export async function POST(request: Request) {
         console.error('Bulk label critical error:', error);
         return NextResponse.json({ error: error.message || "Bilinmeyen bir hata oluştu" }, { status: 500 });
     }
+}
+
+async function drawNativePdfFallback(
+    pdf: PDFDocument, 
+    font: any, 
+    fontBold: any, 
+    fallbackData: any, 
+    errorMsg: string
+) {
+    const page = pdf.addPage([595, 842]); // A4
+    const sanitizeText = (txt: string) => txt ? txt.toString().replace(/ğ/g, 'g').replace(/Ğ/g, 'G').replace(/ç/g, 'c').replace(/Ç/g, 'C').replace(/ş/g, 's').replace(/Ş/g, 'S').replace(/ü/g, 'u').replace(/Ü/g, 'U').replace(/ö/g, 'o').replace(/Ö/g, 'O').replace(/ı/g, 'i').replace(/İ/g, 'I').replace(/[^A-Za-z0-9 .,:;\/\-\_()]/g, '') : "";
+
+    const orderNumber = sanitizeText(fallbackData?.orderNumber || fallbackData?.id || "BILINMIYOR");
+    const addressInfo = fallbackData?.shipmentAddress || fallbackData?.invoiceAddress || {};
+    const fullName = sanitizeText(addressInfo.fullName || (fallbackData?.customerFirstName + " " + fallbackData?.customerLastName) || "Alici Adi Bulunamadi");
+    const fullAddress = sanitizeText(addressInfo.fullAddress || [addressInfo.address1, addressInfo.address2, addressInfo.district, addressInfo.city].filter(Boolean).join(" ") || "Adres Bilgisi Yok");
+    const providerName = sanitizeText(fallbackData?.cargoProviderName || "Kargo Firmasi");
+    const trackingNumber = sanitizeText(fallbackData?.cargoTrackingNumber || "");
+    const marketplace = sanitizeText(fallbackData?.marketplace || "Pazaryeri");
+
+    const marginX = 40;
+    let currentY = 780;
+
+    // Header Marketplace
+    page.drawText(`${marketplace} Siparisi`.toUpperCase(), { x: marginX, y: currentY, size: 12, font: fontBold, color: rgb(0.3, 0.4, 0.5) });
+    currentY -= 30;
+
+    // Title
+    page.drawText(`KARGO ALICI BILGILERI`, { x: marginX, y: currentY, size: 16, font: fontBold });
+    currentY -= 25;
+
+    // Info
+    page.drawText(`Siparis No : ${orderNumber}`, { x: marginX, y: currentY, size: 12, font: fontBold });
+    currentY -= 20;
+    page.drawText(`Ad-Soyad   : ${fullName}`, { x: marginX, y: currentY, size: 12, font: fontBold });
+    currentY -= 20;
+
+    // Word wrap address
+    const wrappedAddress = [];
+    let currentLine = "";
+    const words = fullAddress.split(" ");
+    for (const w of words) {
+        if ((currentLine + w).length > 40) {
+            wrappedAddress.push(currentLine);
+            currentLine = w + " ";
+        } else {
+            currentLine += w + " ";
+        }
+    }
+    if (currentLine) wrappedAddress.push(currentLine);
+
+    page.drawText(`Adres      :`, { x: marginX, y: currentY, size: 12, font: fontBold });
+    for (let i = 0; i < wrappedAddress.length; i++) {
+        page.drawText(wrappedAddress[i], { x: marginX + 65, y: currentY - (i * 15), size: 12, font: font });
+    }
+    
+    currentY -= (wrappedAddress.length * 15) + 30;
+
+    // Barcode Section (Right Side)
+    const rightX = 350;
+    const barcodeY = 740;
+    page.drawText(`KARGO BARKODU`, { x: rightX + 20, y: barcodeY + 25, size: 14, font: fontBold });
+    
+    if (trackingNumber) {
+        try {
+            const bwipUrl = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${trackingNumber}&scale=3&includetext=false`;
+            const bcResp = await fetch(bwipUrl);
+            if (bcResp.ok) {
+                const bcBuffer = await bcResp.arrayBuffer();
+                const pngImage = await pdf.embedPng(bcBuffer);
+                const pngDims = pngImage.scale(0.5);
+                page.drawImage(pngImage, {
+                    x: rightX,
+                    y: barcodeY - 30,
+                    width: Math.min(200, pngDims.width),
+                    height: 40
+                });
+            }
+        } catch(e) { console.error('barcode png embed error', e); }
+        
+        page.drawText(trackingNumber, { x: rightX + 20, y: barcodeY - 50, size: 14, font: fontBold });
+        page.drawText(providerName, { x: rightX + 30, y: barcodeY - 70, size: 12, font: font });
+    } else {
+        page.drawText(`Barkod Alinamadi`, { x: rightX + 20, y: barcodeY - 20, size: 12, font: fontBold, color: rgb(0.8, 0.1, 0.1) });
+    }
+
+    // Divider
+    page.drawLine({
+        start: { x: marginX, y: currentY },
+        end: { x: 555, y: currentY },
+        thickness: 1,
+        color: rgb(0.8, 0.8, 0.8)
+    });
+    currentY -= 30;
+
+    // Footer Security Text
+    page.drawText(`Periodya Guvenlik Agi tarafindan olusturulmustur.`, { x: marginX + 100, y: currentY, size: 10, font: fontBold });
+    currentY -= 20;
+    const secMsg = "DIKKAT: Paketinizi kargo gorevlisinin onunde acip kontrol ediniz. Siparisinizde istenmeyen\nbir durum olustugunu dusunuyorsaniz kargo gorevlisi ile birlikte tutanak tutarak\ngerekli aksiyonu almanizi tavsiye ederiz.";
+    page.drawText(secMsg, { x: marginX + 30, y: currentY, size: 9, font: font, lineHeight: 12, color: rgb(0.4, 0.4, 0.4) });
+
+    // Debug Error String
+    const safeErr = sanitizeText(errorMsg || "").substring(0, 150);
+    page.drawText(`System Log: ${safeErr}`, { x: marginX, y: 30, size: 7, font: font, color: rgb(0.7, 0.7, 0.7) });
 }
