@@ -243,8 +243,33 @@ export class HepsiburadaService implements IMarketplaceService {
                         break;
                     }
 
-                    for (const item of items) {
-                        const mapped = this.mapOrder(item, target.name);
+                    const detailedItems = [];
+                    const concurrency = 5;
+                    for (let i = 0; i < items.length; i += concurrency) {
+                        const batch = items.slice(i, i + concurrency);
+                        const promises = batch.map(async (item: any) => {
+                            // If it's a bare package log, it won't have customer or items. Fetch the full order.
+                            if (!item.customer && !item.customerName && (item.OrderNumber || item.orderNumber)) {
+                                const oNum = item.OrderNumber || item.orderNumber;
+                                try {
+                                    const fullRes = await this.safeFetchJson(`${this.baseUrl}/orders/merchantid/${merchantId}/ordernumber/${oNum}`, { headers: this.getHeaders() });
+                                    if (fullRes.data) {
+                                        return { ...fullRes.data, __targetStatus: target.name };
+                                    }
+                                } catch (e) { /* fallback to basic package info */ }
+                            }
+                            return { ...item, __targetStatus: target.name };
+                        });
+                        
+                        detailedItems.push(...(await Promise.all(promises)));
+                        if (items.length > concurrency) await new Promise(r => setTimeout(r, 100)); // rate limit buffer
+                    }
+
+                    for (const row of detailedItems) {
+                        const mapped = this.mapOrder(row, row.__targetStatus || target.name);
+                        // Hepsiburada specific fix: forcefully override status if explicitly defined by the sync target endpoint
+                        if (row.__targetStatus && row.__targetStatus !== 'UNKNOWN') mapped.status = row.__targetStatus;
+                        
                         const key = mapped.id || mapped.orderNumber;
                         if (key && key !== 'unknown') allOrdersMap.set(key, mapped);
                     }
@@ -317,7 +342,7 @@ export class HepsiburadaService implements IMarketplaceService {
                 customerEmail: hbOrder.customer?.email || '',
                 orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || Date.now()),
                 status: rawStatus.toString().toUpperCase(),
-                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || 0),
+                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || orderItems.reduce((acc: number, curr: any) => acc + Number(curr.totalPrice?.amount || curr.price || curr.unitPrice?.amount || 0), 0)),
                 currency: hbOrder.totalPrice?.currency || hbOrder.currency || 'TRY',
                 shipmentPackageId: shipmentPackageId,
                 shippingAddress: {
@@ -339,8 +364,8 @@ export class HepsiburadaService implements IMarketplaceService {
                     sku: item.sku || item.merchantSku || 'SKU',
                     quantity: Number(item.quantity || 1),
                     price: Number(item.totalPrice?.amount || item.unitPrice?.amount || item.price || 0),
-                    taxRate: Number(item.taxRate || 20),
-                    discountAmount: Number(item.discountAmount || 0)
+                    taxRate: Number(item.taxRate || item.vatRate || 20),
+                    discountAmount: Number(item.discountAmount || (item.hbDiscount?.totalPrice?.amount || 0) + (item.merchantDiscount?.totalPrice?.amount || 0))
                 }))
             };
         } catch (err) {
