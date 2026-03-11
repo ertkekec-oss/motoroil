@@ -63,6 +63,21 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             return notFound();
         }
 
+        // Fetch Marketplace Orders specifically for this Customer
+        // Since marketplace orders may not have direct relation, we match by email and name
+        const marketplaceOrders = await prisma.order.findMany({
+            where: {
+                companyId: customer.companyId,
+                deletedAt: null,
+                OR: [
+                    ...(customer.email ? [{ customerEmail: customer.email }] : []),
+                    { customerName: customer.name }
+                ]
+            },
+            orderBy: { orderDate: 'desc' },
+            take: 50
+        });
+
         // Fetch category separately and resiliently
         if (customer.categoryId) {
             try {
@@ -163,7 +178,31 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             };
         });
 
-        const historyList = [...txs, ...invs, ...chkList]
+        const orderList = marketplaceOrders.map((o: any) => {
+            let safeItems = [];
+            try {
+                if (o.items) {
+                    safeItems = typeof o.items === 'string' ? JSON.parse(o.items) : (Array.isArray(o.items) ? o.items : []);
+                }
+            } catch { safeItems = []; }
+
+            const mplace = o.marketplace === 'trendyol' ? 'Trendyol' : o.marketplace === 'n11' ? 'N11' : o.marketplace === 'hepsiburada' ? 'Hepsiburada' : o.marketplace === 'pazarama' ? 'Pazarama' : o.marketplace;
+            return {
+                id: o.id,
+                date: new Date(o.orderDate).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                rawDate: o.orderDate,
+                type: 'Satış', // Puts it in "Satış ve Faturalar" and "Tüm Hareketler"
+                desc: `${mplace} Siparişi - #${o.orderNumber || '-'} (${o.status || '-'})`,
+                amount: Number(o.totalAmount || 0),
+                color: '#f59e0b', // A different color for marketplace orders
+                items: safeItems,
+                orderId: o.id,
+                isMarketplaceOrder: true,
+                isFormal: false
+            };
+        });
+
+        const historyList = [...txs, ...invs, ...chkList, ...orderList]
             .filter(item => {
                 // MÜKERRER KAYIT FİLTRESİ:
                 // Eğer bir 'Satış' hareketi zaten faturalandırılmışsa (isFormal: true),
