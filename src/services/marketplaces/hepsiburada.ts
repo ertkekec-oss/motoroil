@@ -20,8 +20,9 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getFetchUrl(targetUrl: string): string {
-        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
-        return proxy ? `${proxy}?url=${encodeURIComponent(targetUrl)}` : targetUrl;
+        // Hepsiburada does not require IP whitelists, so we bypass the Vercel->Contabo proxy
+        // which was returning 403 Forbidden Host because Hepsiburada was not in its allowed list.
+        return targetUrl;
     }
 
     private getAuthHeader(): string {
