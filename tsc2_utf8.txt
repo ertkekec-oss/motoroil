@@ -1,0 +1,3 @@
+﻿src/app/api/marketplaces/bulk-label/route.ts(2,27): error TS2307: Cannot find module '@/lib/auth' or its corresponding type declarations.
+src/app/api/marketplaces/bulk-label/route.ts(3,40): error TS2307: Cannot find module '@/services/marketplaces/actions/registry' or its corresponding type declarations.
+src/app/api/marketplaces/bulk-label/route.ts(5,35): error TS2307: Cannot find module '@/lib/s3' or its corresponding type declarations.

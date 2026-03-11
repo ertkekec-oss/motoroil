@@ -1,24 +1,17 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from '@/lib/prisma';
+import { authorize } from "@/lib/auth";
 import { ActionProviderRegistry } from '@/services/marketplaces/actions/registry';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { getLabelSignedUrl } from '@/lib/s3';
 
 export async function POST(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        const auth = await authorize();
+        if (!auth.authorized) {
             return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
         }
         
-        // Ensure user tenant validation
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            include: { userRoles: { include: { company: true } } }
-        });
-        const companyId = user?.userRoles?.[0]?.companyId;
+        const companyId = auth.user.companyId;
         if (!companyId) return NextResponse.json({ error: "Şirket hesabı bulunamadı" }, { status: 400 });
 
         const body = await request.json();
