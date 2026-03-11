@@ -239,7 +239,17 @@ export class TrendyolService implements IMarketplaceService {
                 };
 
                 if (!postResult.success) {
-                    throw new Error(`ZPL Generate Request Failed: ${postResult.status}`);
+                    let errorMessage = `ZPL Generate Request Failed: ${postResult.status}`;
+                    if (postResult.body || postResult.error) {
+                        const errText = postResult.body || postResult.error || "";
+                        if (errText.includes('EXTERNAL_SERVICE_RETURNED_ERROR') || errText.includes('Ortak barkod bilgileri')) {
+                            const match = errText.match(/"title":"([^"]+)"/);
+                            if (match) errorMessage = `Trendyol Kargo Sistemi Hatası: ${match[1]}`;
+                        } else {
+                            errorMessage += `\nDetay: ${errText}`;
+                        }
+                    }
+                    throw new Error(errorMessage);
                 }
 
                 const schedule = [1000, 2000, 3000, 5000, 8000, 10000];
