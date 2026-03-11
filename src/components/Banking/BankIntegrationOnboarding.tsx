@@ -93,73 +93,104 @@ export default function BankOnboardingHub() {
         const ips = selectedBank.technicalAppendix.ipWhitelist.length > 0 ? selectedBank.technicalAppendix.ipWhitelist.join(', ') : defaultIp;
 
         if (selectedBank.id === 'KUVEYT_TURK') {
+            // 1. Navy Blue Enterprise Header
+            doc.setFillColor(15, 23, 42); // slate-900 / enterprise navy
+            doc.rect(0, 0, 210, 32, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("HESAP EKSTRESI WEB SERVIS ENTEGRASYONU BASVURU FORMU", 105, 20, { align: "center" });
+            doc.text("BANKA ENTEGRASYON BASVURU FORMU", 105, 18, { align: "center" });
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("PERIODYA ENTERPRISE B2B FINANS PLATFORMU", 105, 25, { align: "center" });
+
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("HESAP EKSTRESI WEB SERVIS ENTEGRASYONU", 105, 45, { align: "center" });
+            
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(100, 116, 139);
+            doc.text("KUVEYT TURK KATILIM BANKASI", 105, 52, { align: "center" });
 
             // Table 1: Müşteri
             autoTable(doc, {
-                startY: 30,
+                startY: 62,
                 theme: 'grid',
-                head: [[{ content: 'MUSTERI', colSpan: 2, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', textColor: 0 } }]],
+                head: [[{ content: 'MUSTERI BILGILERI', colSpan: 2, styles: { fillColor: [15, 23, 42], fontStyle: 'bold', textColor: 255, halign: 'center' } }]],
                 body: [
-                    [{ content: 'MUSTERI ISMI', styles: { fontStyle: 'bold', cellWidth: 70 } }, ''],
-                    [{ content: 'MUSTERI NO', styles: { fontStyle: 'bold' } }, credentials.customerNo || ''],
-                    [{ content: 'MUSTERI VKN/TCKN', styles: { fontStyle: 'bold' } }, '']
+                    [{ content: 'MUSTERI ISMI', styles: { fontStyle: 'bold', cellWidth: 70, fillColor: [248, 250, 252] } }, ''],
+                    [{ content: 'MUSTERI NO', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, credentials.customerNo || ''],
+                    [{ content: 'MUSTERI VKN/TCKN', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, '']
                 ],
-                styles: { fontSize: 10, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
+                styles: { fontSize: 10, cellPadding: 5, textColor: [15, 23, 42], lineColor: [200, 205, 215], lineWidth: 0.1 }
             });
 
             // Table 2: Hesaplar
             autoTable(doc, {
-                startY: (doc as any).lastAutoTable.finalY + 5,
+                startY: (doc as any).lastAutoTable.finalY + 8,
                 theme: 'grid',
-                head: [[{ content: 'WEB SERVIS KULLANILACAK HESAPLAR', colSpan: 2, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', textColor: 0 } }]],
+                head: [[{ content: 'WEB SERVIS KULLANILACAK HESAPLAR', colSpan: 2, styles: { fillColor: [15, 23, 42], fontStyle: 'bold', textColor: 255, halign: 'center' } }]],
                 body: [
-                    [{ content: 'TUM HESAPLARIM', styles: { fontStyle: 'bold', cellWidth: 70 } }, '[ X ]'],
-                    [{ content: 'BELIRTTIGIM HESAPLAR', styles: { fontStyle: 'bold' } }, '..........................................................................................\n..........................................................................................\n..........................................................................................']
+                    [{ content: 'TUM HESAPLARIM', styles: { fontStyle: 'bold', cellWidth: 70, fillColor: [248, 250, 252] } }, '[ X ]'],
+                    [{ content: 'BELIRTTIGIM HESAPLAR', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, '..........................................................................................\n..........................................................................................\n..........................................................................................']
                 ],
-                styles: { fontSize: 10, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
+                styles: { fontSize: 10, cellPadding: 5, textColor: [15, 23, 42], lineColor: [200, 205, 215], lineWidth: 0.1 }
             });
 
             // Table 3: Erişim Yetkilisi
             autoTable(doc, {
-                startY: (doc as any).lastAutoTable.finalY + 5,
+                startY: (doc as any).lastAutoTable.finalY + 8,
                 theme: 'grid',
-                head: [[{ content: 'ERISIM YETKILISI BILGILERI', colSpan: 2, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', textColor: 0 } }]],
+                head: [[{ content: 'ERISIM YETKILISI BILGILERI', colSpan: 2, styles: { fillColor: [15, 23, 42], fontStyle: 'bold', textColor: 255, halign: 'center' } }]],
                 body: [
-                    [{ content: 'IP ADRESI', styles: { fontStyle: 'bold', cellWidth: 70 } }, { content: ips, styles: { fontStyle: 'bold' } }],
-                    [{ content: 'YETKILI ADI', styles: { fontStyle: 'bold' } }, ''],
-                    [{ content: 'YETKILI TCKN', styles: { fontStyle: 'bold' } }, ''],
-                    [{ content: 'YETKILI GSM NO', styles: { fontStyle: 'bold' } }, ''],
-                    [{ content: 'YETKILI E-POSTA', styles: { fontStyle: 'bold' } }, ''],
-                    [{ content: 'YETKILI DOGUM TARIHI', styles: { fontStyle: 'bold' } }, '']
+                    [{ content: 'IP ADRESI', styles: { fontStyle: 'bold', cellWidth: 70, fillColor: [248, 250, 252] } }, { content: ips, styles: { fontStyle: 'bold' } }],
+                    [{ content: 'YETKILI ADI', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
+                    [{ content: 'YETKILI TCKN', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
+                    [{ content: 'YETKILI GSM NO', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
+                    [{ content: 'YETKILI E-POSTA', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
+                    [{ content: 'YETKILI DOGUM TARIHI', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, '']
                 ],
-                styles: { fontSize: 10, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
+                styles: { fontSize: 10, cellPadding: 5, textColor: [15, 23, 42], lineColor: [200, 205, 215], lineWidth: 0.1 }
             });
 
             // Footer Declaration
-            const startY = (doc as any).lastAutoTable.finalY + 5;
-            doc.rect(14, startY, 182, 60);
+            const startY = (doc as any).lastAutoTable.finalY + 12;
+            doc.setDrawColor(200, 205, 215);
+            doc.setFillColor(248, 250, 252);
+            doc.rect(14, startY, 182, 60, 'FD');
 
             doc.setFontSize(8);
             doc.setFont("helvetica", "italic");
-            const declaration = unTurk("Hesaba iliskin her turlu islemi yapma yetkisi ve her turlu kontrol yetkisi tarafimiza ait olmak uzere ve ayrica hesaba iliskin bu bilgilerin elektronik ortamda aktarildiginin bilincinde olarak, Bankaniz Web Servis Uygulamasindan yararlanmak icin yukarida belirtilen hesabimiza/hesaplarimiza ait hesap hareketlerinin Bizim Hesap A.S'ye web servis entegrasyonu kurularak paylasilmasini rica ederiz. Bu talebimiz kapsaminda isbu Formun arka sayfasindaki Web Servis Guvenligi Bilgilendirmesini okudugumuzu ve bu bilgilendirmedeki guvenlik tedbirlerinin tarafimizca alinacagini, aksi durumda ortaya cikacak her turlu sonuctan da tarafimizin sorumlu olacagini kabul, beyan ve taahhut etmekteyiz. ......../......../............");
+            doc.setTextColor(50, 60, 70);
+            const declaration = unTurk("Hesaba iliskin her turlu islemi yapma yetkisi ve her turlu kontrol yetkisi tarafimiza ait olmak uzere ve ayrica hesaba iliskin bu bilgilerin elektronik ortamda aktarildiginin bilincinde olarak, Bankaniz Web Servis Uygulamasindan yararlanmak icin yukarida belirtilen hesabimiza/hesaplarimiza ait hesap hareketlerinin Periodya Bilisim A.S.'ye web servis entegrasyonu kurularak paylasilmasini rica ederiz. Bu talebimiz kapsaminda isbu Formun arka sayfasindaki Web Servis Guvenligi Bilgilendirmesini okudugumuzu ve bu bilgilendirmedeki guvenlik tedbirlerinin tarafimizca alinacagini, aksi durumda ortaya cikacak her turlu sonuctan da tarafimizin sorumlu olacagini kabul, beyan ve taahhut etmekteyiz. ......../......../............");
             const splitDecl = doc.splitTextToSize(declaration, 178);
-            doc.text(splitDecl, 16, startY + 5);
+            doc.text(splitDecl, 16, startY + 6);
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
-            doc.text("MUSTERI", 140, startY + 50);
+            doc.setTextColor(15, 23, 42);
+            doc.text("MUSTERI / IMZA / KASE", 140, startY + 50);
 
             // PAGE 2: Security Information
             doc.addPage();
+            // Navy Header for Page 2
+            doc.setFillColor(15, 23, 42); 
+            doc.rect(0, 0, 210, 32, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text("WEB SERVIS GUVENLIGI BILGILENDIRMESI", 105, 20, { align: "center" });
+
+            doc.setTextColor(15, 23, 42);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text("Web Servis Guvenligi Bilgilendirmesi", 105, 20, { align: "center" });
+            doc.text("Kuveyt Turk Katilim Bankasi A.S. Bilgilendirme Tutanagi", 105, 45, { align: "center" });
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
+            doc.setTextColor(50, 60, 70);
             const p2Text = unTurk("Bankamizin Web Servis-API hizmetlerini hizmetlerin kullaniminda guvenlik icin dikkat etmeniz gereken hususlar soyledir:\n\n" +
                 "- Web servislere erisimin sadece yetkilendirilmis kaynaklar tarafindan yapilmasi saglanmalidir. Bu kapsamda gerekli bilesenler kullanilmali (Switch, Router, Firewall, v.b.) ve gerekli guvenlik konfigurasyonlari yapilmalidir.\n" +
                 "- Web servis iletisimi guvenli iletisim protokolu olan TLS kullanilarak saglanmalidir. Web servis saglayicisi iletisimi zamani dolmamis, iptal edilmemis ve yururlukten kaldirilmamis sunucu sertifikalari ile saglamalidir.\n" +
