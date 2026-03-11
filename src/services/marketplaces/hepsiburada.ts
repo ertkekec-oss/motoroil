@@ -25,9 +25,9 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getAuthHeader(): string {
+        const username = (this.config.username || '').trim();
         const password = (this.config.password || '').trim();
-        const merchantId = (this.config.merchantId || '').trim();
-        const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
+        const token = Buffer.from(`${username}:${password}`).toString('base64');
         return `Basic ${token}`;
     }
 
@@ -208,11 +208,11 @@ export class HepsiburadaService implements IMarketplaceService {
         const eStr = this.hbDateYmdHi(this.endOfDay(end));
 
         const syncTargets = [
-            { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}`, params: ['limit'] },
-            { name: 'PACKED', urlPart: `packages/merchantid/${merchantId}/packed`, params: ['limit'] },
-            { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped`, params: ['begindate', 'enddate'] },
-            { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered`, params: ['begindate', 'enddate'] },
-            { name: 'CANCELLED', urlPart: `orders/merchantid/${merchantId}/cancelled`, params: ['begindate', 'enddate'] }
+            { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}`, params: ['limit', 'offset'] },
+            { name: 'PACKED', urlPart: `packages/merchantid/${merchantId}/packed`, params: ['limit', 'offset'] },
+            { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped`, params: ['begindate', 'enddate', 'limit', 'offset'] },
+            { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered`, params: ['begindate', 'enddate', 'limit', 'offset'] },
+            { name: 'CANCELLED', urlPart: `orders/merchantid/${merchantId}/cancelled`, params: ['begindate', 'enddate', 'limit', 'offset'] }
         ];
 
         for (const target of syncTargets) {
