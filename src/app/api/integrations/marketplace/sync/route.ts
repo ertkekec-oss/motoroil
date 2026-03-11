@@ -180,7 +180,8 @@ export async function POST(request: Request) {
                         categoryId: categoryId
                     },
                     update: {
-                        categoryId: categoryId
+                        categoryId: categoryId,
+                        ...(order.customerName && order.customerName !== 'Müşteri' ? { name: order.customerName } : {})
                     }
                 });
 
@@ -254,6 +255,7 @@ export async function POST(request: Request) {
                     const needsUpdate = existingOrder.status !== order.status ||
                         (shipmentPackageId && !existingOrder.shipmentPackageId) ||
                         (dbItems.length === 0 && (order.items?.length || 0) > 0) ||
+                        (existingOrder.customerName === 'Müşteri' && order.customerName !== 'Müşteri') ||
                         (Number(existingOrder.totalAmount || 0) === 0 && normalizedTotal > 0);
 
                     if (needsUpdate) {
@@ -263,6 +265,7 @@ export async function POST(request: Request) {
                                 status: order.status,
                                 marketplace: normalizedMarketplace,
                                 totalAmount: Number(order.totalAmount || 0),
+                                ...(existingOrder.customerName === 'Müşteri' && order.customerName !== 'Müşteri' ? { customerName: order.customerName } : {}),
                                 items: order.items as any,
                                 rawData: order as any,
                                 shipmentPackageId: shipmentPackageId || existingOrder.shipmentPackageId
