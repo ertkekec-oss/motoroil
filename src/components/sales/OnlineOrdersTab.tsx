@@ -59,6 +59,7 @@ export function OnlineOrdersTab({
     const [turnoverCustomEnd, setTurnoverCustomEnd] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+    const [isGeneratingBulk, setIsGeneratingBulk] = useState(false);
 
     const toggleExpand = async (id: string, order?: any) => {
         const isExpanding = expandedOrderId !== id;
@@ -242,12 +243,47 @@ export function OnlineOrdersTab({
                     </span>
                     {selectedOrders.length > 0 && (
                         <button
-                            onClick={handleCollectBulk}
-                            disabled={isCollecting}
-                            className={`h-[40px] px-4 rounded-[12px] font-medium text-[13px] transition-colors flex items-center justify-center gap-2 ${isLight ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'} ${isCollecting ? 'opacity-70' : ''}`}
+                            disabled={isGeneratingBulk}
+                            onClick={async () => {
+                                const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id)).map(o => ({
+                                    marketplace: o.marketplace?.toLowerCase() || '',
+                                    id: o.id,
+                                    shipmentPackageId: o.shipmentPackageId || (['hepsiburada', 'pazarama', 'n11'].includes(o.marketplace?.toLowerCase() || '') ? o.orderNumber : undefined)
+                                })).filter(o => o.shipmentPackageId);
+                                
+                                if (selectedOrderData.length === 0) {
+                                     showError("Hata", "Seçili siparişlerin etiket numaraları bulunamadı.");
+                                     return;
+                                }
+                                
+                                setIsGeneratingBulk(true);
+                                try {
+                                    const res = await fetch('/api/marketplaces/bulk-label', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ orders: selectedOrderData })
+                                    });
+                                    if (!res.ok) {
+                                        const err = await res.json().catch(()=>({}));
+                                        throw new Error(err?.error || "Toplu etiket oluşturulamadı");
+                                    }
+                                    const blob = await res.blob();
+                                    const url = URL.createObjectURL(blob);
+                                    window.open(url, '_blank');
+                                } catch(e: any) {
+                                    showError("İşlem Başarısız", e.message);
+                                } finally {
+                                    setIsGeneratingBulk(false);
+                                }
+                            }}
+                            className={`h-[40px] px-4 rounded-[12px] font-medium text-[13px] transition-colors flex items-center justify-center gap-2 ${isLight ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} ${isGeneratingBulk ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            Seçilenleri Tahsil Et ({selectedOrders.length})
+                            {isGeneratingBulk ? (
+                                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            ) : (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                            )}
+                            {isGeneratingBulk ? 'Etiketler Hazırlanıyor...' : `Toplu Etiket Yazdır (${selectedOrders.length})`}
                         </button>
                     )}
                 </div>
