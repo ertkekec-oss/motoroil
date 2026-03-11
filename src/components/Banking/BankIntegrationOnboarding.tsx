@@ -93,122 +93,100 @@ export default function BankOnboardingHub() {
         const ips = selectedBank.technicalAppendix.ipWhitelist.length > 0 ? selectedBank.technicalAppendix.ipWhitelist.join(', ') : defaultIp;
 
         if (selectedBank.id === 'KUVEYT_TURK') {
-            // 1. Navy Blue Enterprise Header
-            doc.setFillColor(15, 23, 42); // slate-900 / enterprise navy
-            doc.rect(0, 0, 210, 32, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(16);
+        if (selectedBank.id === 'KUVEYT_TURK') {
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
             doc.setFont("helvetica", "bold");
-            doc.text("BANKA ENTEGRASYON BASVURU FORMU", 105, 18, { align: "center" });
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text("PERIODYA ENTERPRISE B2B FINANS PLATFORMU", 105, 25, { align: "center" });
-
-            doc.setTextColor(15, 23, 42);
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text("HESAP EKSTRESI WEB SERVIS ENTEGRASYONU", 105, 45, { align: "center" });
-            
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(100, 116, 139);
-            doc.text("KUVEYT TURK KATILIM BANKASI", 105, 52, { align: "center" });
+            doc.text("HESAP EKSTRESI WEB SERVIS ENTEGRASYONU BASVURU FORMU", 105, 20, { align: "center" });
 
             // Table 1: Müşteri
             autoTable(doc, {
-                startY: 62,
+                startY: 28,
                 theme: 'grid',
-                head: [[{ content: 'MUSTERI BILGILERI', colSpan: 2, styles: { fillColor: [15, 23, 42], fontStyle: 'bold', textColor: 255, halign: 'center' } }]],
+                head: [[{ content: 'MUSTERI', colSpan: 2, styles: { fillColor: 255, fontStyle: 'bold', textColor: 0, halign: 'left' } }]],
                 body: [
-                    [{ content: 'MUSTERI ISMI', styles: { fontStyle: 'bold', cellWidth: 70, fillColor: [248, 250, 252] } }, ''],
-                    [{ content: 'MUSTERI NO', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, credentials.customerNo || ''],
-                    [{ content: 'MUSTERI VKN/TCKN', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, '']
+                    [{ content: 'MUSTERI ISMI', styles: { fontStyle: 'bold', cellWidth: 70 } }, ''],
+                    [{ content: 'MUSTERI NO', styles: { fontStyle: 'bold' } }, credentials.customerNo || ''],
+                    [{ content: 'MUSTERI VKN/TCKN', styles: { fontStyle: 'bold' } }, '']
                 ],
-                styles: { fontSize: 10, cellPadding: 5, textColor: [15, 23, 42], lineColor: [200, 205, 215], lineWidth: 0.1 }
+                styles: { fontSize: 9, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
             });
 
             // Table 2: Hesaplar
             autoTable(doc, {
-                startY: (doc as any).lastAutoTable.finalY + 8,
+                startY: (doc as any).lastAutoTable.finalY + 4,
                 theme: 'grid',
-                head: [[{ content: 'WEB SERVIS KULLANILACAK HESAPLAR', colSpan: 2, styles: { fillColor: [15, 23, 42], fontStyle: 'bold', textColor: 255, halign: 'center' } }]],
+                head: [[{ content: 'WEB SERVIS KULLANILACAK HESAPLAR', colSpan: 2, styles: { fillColor: 255, fontStyle: 'bold', textColor: 0, halign: 'left' } }]],
                 body: [
-                    [{ content: 'TUM HESAPLARIM', styles: { fontStyle: 'bold', cellWidth: 70, fillColor: [248, 250, 252] } }, '[ X ]'],
-                    [{ content: 'BELIRTTIGIM HESAPLAR', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, '..........................................................................................\n..........................................................................................\n..........................................................................................']
+                    [{ content: 'TUM HESAPLARIM', styles: { fontStyle: 'bold', cellWidth: 70 } }, '[ X ]'],
+                    [{ content: 'BELIRTTIGIM HESAPLAR', styles: { fontStyle: 'bold' } }, '..........................................................................................\n..........................................................................................\n..........................................................................................']
                 ],
-                styles: { fontSize: 10, cellPadding: 5, textColor: [15, 23, 42], lineColor: [200, 205, 215], lineWidth: 0.1 }
+                styles: { fontSize: 9, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
             });
 
             // Table 3: Erişim Yetkilisi
             autoTable(doc, {
-                startY: (doc as any).lastAutoTable.finalY + 8,
+                startY: (doc as any).lastAutoTable.finalY + 4,
                 theme: 'grid',
-                head: [[{ content: 'ERISIM YETKILISI BILGILERI', colSpan: 2, styles: { fillColor: [15, 23, 42], fontStyle: 'bold', textColor: 255, halign: 'center' } }]],
+                head: [[{ content: 'ERISIM YETKILISI BILGILERI', colSpan: 2, styles: { fillColor: 255, fontStyle: 'bold', textColor: 0, halign: 'left' } }]],
                 body: [
-                    [{ content: 'IP ADRESI', styles: { fontStyle: 'bold', cellWidth: 70, fillColor: [248, 250, 252] } }, { content: ips, styles: { fontStyle: 'bold' } }],
-                    [{ content: 'YETKILI ADI', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
-                    [{ content: 'YETKILI TCKN', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
-                    [{ content: 'YETKILI GSM NO', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
-                    [{ content: 'YETKILI E-POSTA', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, ''],
-                    [{ content: 'YETKILI DOGUM TARIHI', styles: { fontStyle: 'bold', fillColor: [248, 250, 252] } }, '']
+                    [{ content: 'IP ADRESI', styles: { fontStyle: 'bold', cellWidth: 70 } }, { content: ips, styles: { fontStyle: 'bold' } }],
+                    [{ content: 'YETKILI ADI', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI TCKN', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI GSM NO', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI E-POSTA', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI DOGUM TARIHI', styles: { fontStyle: 'bold' } }, '']
                 ],
-                styles: { fontSize: 10, cellPadding: 5, textColor: [15, 23, 42], lineColor: [200, 205, 215], lineWidth: 0.1 }
+                styles: { fontSize: 9, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
             });
 
             // Footer Declaration
-            const startY = (doc as any).lastAutoTable.finalY + 12;
-            doc.setDrawColor(200, 205, 215);
-            doc.setFillColor(248, 250, 252);
-            doc.rect(14, startY, 182, 60, 'FD');
+            const startY = (doc as any).lastAutoTable.finalY + 4;
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.4);
+            // Double line border simulation: thick outer, thin inner. 
+            doc.rect(14, startY, 182, 55);
+            doc.setLineWidth(0.1);
+            doc.rect(15, startY + 1, 180, 53);
 
             doc.setFontSize(8);
             doc.setFont("helvetica", "italic");
-            doc.setTextColor(50, 60, 70);
+            doc.setTextColor(0, 0, 0);
             const declaration = unTurk("Hesaba iliskin her turlu islemi yapma yetkisi ve her turlu kontrol yetkisi tarafimiza ait olmak uzere ve ayrica hesaba iliskin bu bilgilerin elektronik ortamda aktarildiginin bilincinde olarak, Bankaniz Web Servis Uygulamasindan yararlanmak icin yukarida belirtilen hesabimiza/hesaplarimiza ait hesap hareketlerinin Periodya Bilisim A.S.'ye web servis entegrasyonu kurularak paylasilmasini rica ederiz. Bu talebimiz kapsaminda isbu Formun arka sayfasindaki Web Servis Guvenligi Bilgilendirmesini okudugumuzu ve bu bilgilendirmedeki guvenlik tedbirlerinin tarafimizca alinacagini, aksi durumda ortaya cikacak her turlu sonuctan da tarafimizin sorumlu olacagini kabul, beyan ve taahhut etmekteyiz. ......../......../............");
-            const splitDecl = doc.splitTextToSize(declaration, 178);
-            doc.text(splitDecl, 16, startY + 6);
+            const splitDecl = doc.splitTextToSize(declaration, 176);
+            doc.text(splitDecl, 17, startY + 6);
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
-            doc.setTextColor(15, 23, 42);
-            doc.text("MUSTERI / IMZA / KASE", 140, startY + 50);
+            doc.text("MUSTERI", 140, startY + 45);
 
             // PAGE 2: Security Information
             doc.addPage();
-            // Navy Header for Page 2
-            doc.setFillColor(15, 23, 42); 
-            doc.rect(0, 0, 210, 32, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(16);
-            doc.setFont("helvetica", "bold");
-            doc.text("WEB SERVIS GUVENLIGI BILGILENDIRMESI", 105, 20, { align: "center" });
-
-            doc.setTextColor(15, 23, 42);
+            doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text("Kuveyt Turk Katilim Bankasi A.S. Bilgilendirme Tutanagi", 105, 45, { align: "center" });
+            doc.text("Web Servis Guvenligi Bilgilendirmesi", 105, 20, { align: "center" });
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
-            doc.setTextColor(50, 60, 70);
             const p2Text = unTurk("Bankamizin Web Servis-API hizmetlerini hizmetlerin kullaniminda guvenlik icin dikkat etmeniz gereken hususlar soyledir:\n\n" +
-                "- Web servislere erisimin sadece yetkilendirilmis kaynaklar tarafindan yapilmasi saglanmalidir. Bu kapsamda gerekli bilesenler kullanilmali (Switch, Router, Firewall, v.b.) ve gerekli guvenlik konfigurasyonlari yapilmalidir.\n" +
-                "- Web servis iletisimi guvenli iletisim protokolu olan TLS kullanilarak saglanmalidir. Web servis saglayicisi iletisimi zamani dolmamis, iptal edilmemis ve yururlukten kaldirilmamis sunucu sertifikalari ile saglamalidir.\n" +
-                "- Web servislere erisim ve ilgili fonksiyonlarin kullanimi daha onceden tanimlanmis Dogrulama (Validation) ve Yetkilendirme (Authentication) mekanizmasi tarafindan kontrol edilmeli ve yetkisiz erisimler engellenmelidir.\n" +
+                "- Web servislere erisimin sadece yetkilendirilmis kaynaklar tarafindan yapilmasi saglanmalidir. Bu kapsamda gerekli bilesenler kullanilmali (Switch, Router, Firewall, v.b.) ve gerekli guvenlik konfigurasyonlari yapilmalidir.\n\n" +
+                "- Web servis iletisimi guvenli iletisim protokolu olan TLS kullanilarak saglanmalidir. Web servis saglayicisi iletisimi zamani dolmamis, iptal edilmemis ve yururlukten kaldirilmamis sunucu sertifikalari ile saglamalidir.\n\n" +
+                "- Web servislere erisim ve ilgili fonksiyonlarin kullanimi daha onceden tanimlanmis Dogrulama (Validation) ve Yetkilendirme (Authentication) mekanizmasi tarafindan kontrol edilmeli ve yetkisiz erisimler engellenmelidir.\n\n" +
                 "- Web servise iletisim kapsaminda cesitli filtreler uygulanmalidir. Bu filtreler ayni anda veya birbirinin yerine kullanilabilir. Iki tip filtreleme kullanilabilir: Zaman Filtresi ve IP Filtresi.\n" +
                 "    - Zaman filtresi, sunulan web servise ve/veya fonksiyonuna sadece o fonksiyon tarafindan belirlenen zaman dilimlerinde erisimi saglamalidir.\n" +
-                "    - IP filtresi, sunulan web servise sadece belirlenen IP adres bloklarindan erisimi saglamalidir.\n" +
-                "- Web servisi kapsaminda kullanilan mesajlarin belirlenen XML semasina uygun oldugu denetlenmelidir. Schema validasyonundan gecemeyen istekler kabul edilmemelidir.\n" +
-                "- Web servislerinin yogun kullanimi durumunda hizmetin erisilebilirliginin saglanmasi amaciyla gerekli alt yapi kurulu olmalidir. Gelen isteklerin yuku dengelenmeli ve web servislerine erisim surekli olarak saglanmalidir.\n" +
-                "- Web servisleri kapsaminda giden ve gelen XML mesajlarin buyuklugu icin bir mesaj kapasitesi kullanilan web servis fonksiyonlari bazinda belirlenmelidir. Gelen web servis istekleri eger mesaj kapasitesini asiyorsa reddedilmeli, gonderilecek mesajlar kapasite asimini onleyecek sekilde gonderilmelidir.\n" +
-                "- Web servisleri kapsaminda giden, gelen mesajlar herhangi bir zararli yazilim ve kotu niyetli kod parcacigina karsi taranmali ve zararli icerik tasiyan istekler reddedilmelidir.\n" +
-                "- Web servislerine yapilan her turlu erisim (erisim yapan IP, zaman, erisim yapilan fonksiyon, erisimi gerceklestiren kullanici) gibi bilgilerle kayit altina alinmalidir.\n" +
-                "- Web servisleri surekli kontrol edilerek degisen teknoloji ve ihtiyaclara gore gerekli guvenlik guncellemeleri yapilmalidir. Alinan kayitlar incelenmeli ve varsa yetkisiz erisimler tespit edilerek guvenlik onlemleri arttirilmalidir. Ayrica her yeni eklenen web servis veya fonksiyonun gerekli yetkilendirmeleri ve her yeni eklenen kullanicinin tanimlari kontrol edilmelidir. Benzer sekilde iptal edilen fonksiyonlar ve iptal edilen kullanicilara gore guvenlik onlemleri guncellenmelidir.\n" +
+                "    - IP filtresi, sunulan web servise sadece belirlenen IP adres bloklarindan erisimi saglamalidir.\n\n" +
+                "- Web servisi kapsaminda kullanilan mesajlarin belirlenen XML semasina uygun oldugu denetlenmelidir. Schema validasyonundan gecemeyen istekler kabul edilmemelidir.\n\n" +
+                "- Web servislerinin yogun kullanimi durumunda hizmetin erisilebilirliginin saglanmasi amaciyla gerekli alt yapi kurulu olmalidir. Gelen isteklerin yuku dengelenmeli ve web servislerine erisim surekli olarak saglanmalidir.\n\n" +
+                "- Web servisleri kapsaminda giden ve gelen XML mesajlarin buyuklugu icin bir mesaj kapasitesi kullanilan web servis fonksiyonlari bazinda belirlenmelidir. Gelen web servis istekleri eger mesaj kapasitesini asiyorsa reddedilmeli, gonderilecek mesajlar kapasite asimini onleyecek sekilde gonderilmelidir.\n\n" +
+                "- Web servisleri kapsaminda giden, gelen mesajlar herhangi bir zararli yazilim ve kotu niyetli kod parcacigina karsi taranmali ve zararli icerik tasiyan istekler reddedilmelidir.\n\n" +
+                "- Web servislerine yapilan her turlu erisim (erisim yapan IP, zaman, erisim yapilan fonksiyon, erisimi gerceklestiren kullanici) gibi bilgilerle kayit altina alinmalidir.\n\n" +
+                "- Web servisleri surekli kontrol edilerek degisen teknoloji ve ihtiyaclara gore gerekli guvenlik guncellemeleri yapilmalidir. Alinan kayitlar incelenmeli ve varsa yetkisiz erisimler tespit edilerek guvenlik onlemleri arttirilmalidir. Ayrica her yeni eklenen web servis veya fonksiyonun gerekli yetkilendirmeleri ve her yeni eklenen kullanicinin tanimlari kontrol edilmelidir. Benzer sekilde iptal edilen fonksiyonlar ve iptal edilen kullanicilara gore guvenlik onlemleri guncellenmelidir.\n\n" +
                 "- Kullanici adi-sifreler yalnizca size ozeldir, acik bicimde herhangi bir yere kaydedilmemeli ve destek kapsaminda olsa dahi 3. Taraflarla paylasilmamalidir. Aciga cikmis kullanici adi-sifre oldugu fark edilirse Bankamiz ile derhal iletisime gecilmelidir.");
 
             const splitP2Text = doc.splitTextToSize(p2Text, 180);
             doc.text(splitP2Text, 15, 30);
-
+            
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
             doc.text("KUVEYT TURK KATILIM BANKASI A.S. | Buyukdere Cad. No: 129/1 Esentepe / Sisli / Istanbul.", 15, 275);
