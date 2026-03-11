@@ -1,0 +1,18 @@
+GET https://apigw.trendyol.com/integration/order/sellers/548512/shipment-packages/3679014643/label
+Status: 401 null
+Snippet: 
+
+GET https://api.trendyol.com/sapigw/integration/order/sellers/548512/shipment-packages/3679014643/label
+Status: 403 text/html; charset=UTF-8
+Snippet: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-
+
+GET https://stageapigw.trendyol.com/integration/sellers/548512/labels?shipmentPackageIds=3679014643
+Status: 403 text/html; charset=UTF-8
+Snippet: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-
+

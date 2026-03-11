@@ -88,6 +88,15 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
 
                 if (labelResult.status === 'FAILED') {
+                    let fallbackHtmlData = null;
+                    if (labelResult.error?.includes('Service Unavailable') || labelResult.error?.includes('Hatası') || labelResult.error?.includes('hata')) {
+                         try {
+                             fallbackHtmlData = await service.getShipmentPackageDetails(shipmentPackageId);
+                         } catch(e) {}
+                    }
+                    if (fallbackHtmlData) {
+                         return { status: "FAILED", auditId: audit.id, errorMessage: labelResult.error, result: { fallbackData: fallbackHtmlData } };
+                    }
                     throw new Error(labelResult.error || 'Etiket alınamadı');
                 }
 
@@ -117,6 +126,15 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 }
 
                 if (labelResult.status === 'FAILED') {
+                    let fallbackHtmlData = null;
+                    if (labelResult.error?.includes('Service Unavailable') || labelResult.error?.includes('Hatası') || labelResult.error?.includes('hata')) {
+                         try {
+                             fallbackHtmlData = await service.getShipmentPackageDetails(shipmentPackageId);
+                         } catch(e) {}
+                    }
+                    if (fallbackHtmlData) {
+                         return { status: "FAILED", auditId: audit.id, errorMessage: labelResult.error, result: { fallbackData: fallbackHtmlData } };
+                    }
                     throw new Error(labelResult.error || 'Etiket alınamadı');
                 }
 

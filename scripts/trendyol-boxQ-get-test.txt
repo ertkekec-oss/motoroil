@@ -1,0 +1,3 @@
+GETting the label after the 200 POST...
+Status: 400
+Response: {"error":{"status":400,"errors":[{"code":400,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Ortak barkod bilgileri alınırken bir hata oluştu"}]}}

@@ -149,6 +149,11 @@ export async function GET(
             const status = result.httpStatus || 502;
 
             if (isDocumentRequest(request)) {
+                if (result.result?.fallbackData && result.result.fallbackData.cargoTrackingNumber) {
+                     return respondWith(new Response(fallbackLabelHtml(result.result.fallbackData, result.errorMessage || ""), {
+                         status: 200, headers: { "Content-Type": "text/html; charset=utf-8" }
+                     }));
+                }
                 return respondWith(new Response(errorHtml(result.errorMessage || "Etiket alınamadı"), {
                     status, headers: { "Content-Type": "text/html; charset=utf-8" }
                 }));
@@ -260,6 +265,108 @@ function errorHtml(message: string) {
         Sekmeyi Kapat
     </button>
   </div>
+</body>
+</html>`;
+}
+
+function fallbackLabelHtml(fallbackData: any, errorMessage: string) {
+    const orderNumber = fallbackData.orderNumber || fallbackData.id || "BİLİNMİYOR";
+    const addressInfo = fallbackData.shipmentAddress || fallbackData.invoiceAddress || {};
+    const fullName = addressInfo.fullName || (fallbackData.customerFirstName + " " + fallbackData.customerLastName) || "Alıcı Adı Yok";
+    const fullAddress = addressInfo.fullAddress || [addressInfo.address1, addressInfo.address2, addressInfo.district, addressInfo.city].filter(Boolean).join(" ") || "Adres Bilgisi Yok";
+    const providerName = fallbackData.cargoProviderName || "Kargo Firması Yok";
+    const trackingNumber = fallbackData.cargoTrackingNumber || "";
+
+    const linesHtml = Array.isArray(fallbackData.lines) ? fallbackData.lines.map((l: any) => `
+        <tr>
+            <td>
+                <strong>${l.productName || 'Ürün'}</strong><br/>
+                <span style="color: #666;">Renk: ${l.productColor || '-'} | Beden: ${l.productSize || '-'} | Stok Kodu: ${l.merchantSku || l.stockCode || '-'}</span>
+            </td>
+            <td>${l.quantity || 1} Adet</td>
+            <td>${l.barcode || l.sku || '-'}</td>
+        </tr>
+    `).join("") : "<tr><td colspan='3'>Ürün detayı bulunamadı</td></tr>";
+
+    return `<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>Kargo Etiketi - ${orderNumber}</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { font-family: Arial, sans-serif; background: #e2e8f0; color: #000; padding: 20mm; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .print-btn { padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-block; margin-bottom: 20px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .print-btn:hover { background: #1d4ed8; }
+        .label-container { background: #fff; border: 2px solid #333; padding: 30px; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; }
+        .buyer-info { flex: 1.5; font-size: 15px; line-height: 1.6; padding-right: 20px; }
+        .barcode-section { flex: 1; text-align: center; border-left: 2px solid #e2e8f0; padding-left: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        h3 { margin: 0 0 15px 0; font-size: 18px; font-weight: bold; color: #1e293b; text-transform: uppercase; }
+        .info-row { display: flex; margin-bottom: 8px; }
+        .info-label { width: 100px; font-weight: bold; flex-shrink: 0; }
+        .info-value { flex-grow: 1; font-weight: 500; }
+        .barcode-svg-container { background: white; padding: 10px; border: 1px dashed #cbd5e1; border-radius: 8px; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th { background: #f8fafc; border-bottom: 2px solid #cbd5e1; padding: 12px; text-align: left; font-weight: bold; color: #475569; }
+        td { border-bottom: 1px solid #e2e8f0; padding: 12px; vertical-align: top; }
+        .error-footer { margin-top:30px; font-size: 11px; color: #64748b; text-align: center; padding: 10px; background: #f1f5f9; border-radius: 6px; border: 1px dashed #cbd5e1; }
+        @media print { 
+            body { background: white; padding: 0; align-items: flex-start; }
+            .print-btn { display: none; } 
+            .label-container { border: 2px solid #000; box-shadow: none; max-width: 100%; width: 100%; padding: 20px; border-radius: 0; page-break-inside: avoid; } 
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ A4 Olarak Yazdır</button>
+    <div class="label-container">
+        <div class="header">
+            <div class="buyer-info">
+                <h3>Kargo Alıcı Bilgileri</h3>
+                <div class="info-row"><div class="info-label">Sipariş No</div><div class="info-value">: ${orderNumber}</div></div>
+                <div class="info-row"><div class="info-label">Ad-Soyad</div><div class="info-value">: ${fullName}</div></div>
+                <div class="info-row"><div class="info-label">Adres</div><div class="info-value">: ${fullAddress}</div></div>
+            </div>
+            <div class="barcode-section">
+                <h3>Kargo Barkodu</h3>
+                ${!trackingNumber ? '<div style="color:red;font-weight:bold;margin-top:20px;">Barkod Numarası Yok</div>' : `
+                <div class="barcode-svg-container">
+                    <svg id="barcode"></svg>
+                </div>
+                <div style="font-weight:bold; margin-top: 10px; font-size: 14px;">${providerName}</div>
+                `}
+            </div>
+        </div>
+        <div class="items">
+            <h3>Sipariş İçeriği</h3>
+            <table>
+                <thead><tr><th>Ürün Bilgisi</th><th>Adet</th><th>Barkod</th></tr></thead>
+                <tbody>
+                    ${linesHtml}
+                </tbody>
+            </table>
+        </div>
+        <div class="error-footer">
+            Bu etiket, kargo firması ZPL servisinde geçici bir arıza (${String(errorMessage).substring(0, 50)}) yaşandığı için Periodya Güvenlik Ağı tarafından A4 Fallback formatında otomatik oluşturulmuştur. Bu belgeyi yazdırıp paketinize yapıştırabilirsiniz.
+        </div>
+    </div>
+    <script>
+        if("${trackingNumber}") {
+            JsBarcode("#barcode", "${trackingNumber}", {
+                format: "CODE128",
+                width: 2,
+                height: 80,
+                displayValue: true,
+                fontSize: 18,
+                fontOptions: "bold",
+                textMargin: 8,
+                margin: 0
+            });
+        }
+        setTimeout(() => { window.print(); }, 500);
+    </script>
 </body>
 </html>`;
 }

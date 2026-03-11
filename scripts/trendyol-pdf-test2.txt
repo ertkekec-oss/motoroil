@@ -1,0 +1,17 @@
+
+POST https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009 (PDF format)
+Status: 400
+Body: {"error":{"status":400,"errors":[{"code":400,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Ortak barkod oluşturulurken bir hata oluştu"}]}}
+Waiting 3s for generation...
+
+GET https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009
+Status: 400 application/json
+Body length: 148
+Snippet: {"error":{"status":400,"errors":[{"code":400,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Ortak barkod bilgileri alınırken bir hata oluştu"}]}}
+
+
+=== WORKING ORDER ===
+GET https://apigw.trendyol.com/integration/sellers/548512/common-label/7330030985495024
+Status: 200 application/json
+Body length: 653
+Snippet: {"data":[{"label":"^XA^POI^FS^FWN,0^FO40,70^GB490,360,3^FS^CFA,20^FO70,90^FD^FS^CFA,22^FO50,90^FDAKPINAR MAH ISTANBUL/SANCAKTEPE AKPINAR ^FS^CFA,22^FO50,120^FDMAH AKINCILAR SOKAK NO3/5 D:6 ^FS^CFA,22^FO50,150^FD^FS^A0N,25,25^FO50,350^FDISTANBUL^FS^A0N,25,25^FO50,390^FDSANCAKTEPE^FS^FXBarkod^BY3,3,150^FO610,70^BCB,150,N,N,N^FD7330030985495024^FS^A0N,40,40^FO40,450^FD1-668-3^FS^FXKutu2^FO40,510^GB490,75,3^FS^CFA,20^FO50,530^FDSALIH EFE TUNC^FS^CFA,20^FO50,555^FD^FS^CFA,20^FO70,600^FDTY11029796559^

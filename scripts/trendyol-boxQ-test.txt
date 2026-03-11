@@ -1,0 +1,6 @@
+POSTing with NO volumetric height, and boxQuantity = 1
+Status: 200
+Response: 
+POSTing with ONLY format ZPL
+Status: 200
+Response: 

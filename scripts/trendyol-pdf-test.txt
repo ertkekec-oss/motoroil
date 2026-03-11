@@ -1,0 +1,13 @@
+GET https://apigw.trendyol.com/integration/sellers/548512/labels?shipmentPackageIds=3679014643
+Status: 556 application/json; charset=utf-8
+
+GET https://api.trendyol.com/sapigw/integration/sellers/548512/labels?shipmentPackageIds=3679014643
+Status: 403 text/html; charset=UTF-8
+
+GET https://apigw.trendyol.com/integration/sellers/548512/labels?shipmentPackageIds=3679014643 (Accept JSON)
+Status: 556 application/json; charset=utf-8
+Body: {"message":"Service Unavailable"}
+
+POST https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009 (A4 format)
+Status: 400
+Body: {"error":{"status":400,"errors":[{"code":400,"type":"HttpMessageNotReadableException","title":"Format: A4 is invalid. Valid formats: [ZPL, PDF]"}]}}
