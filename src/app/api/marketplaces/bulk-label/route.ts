@@ -92,7 +92,11 @@ export async function POST(request: Request) {
                 errorPage.drawText(`Paket ID..: ${shipmentPackageId}`, { x: 50, y: 680, size: 16, font: helveticaFont });
                 
                 const errMsg = String(error?.message || "Bilinmeyen hata");
-                const safeErr = errMsg.length > 500 ? errMsg.substring(0, 500) + '...' : errMsg;
+                let safeErr = errMsg.length > 500 ? errMsg.substring(0, 500) + '...' : errMsg;
+                // Sanitize Turkish characters for WinAnsi encoding compatibility
+                const sanitizeText = (txt: string) => txt.replace(/ğ/g, 'g').replace(/Ğ/g, 'G').replace(/ç/g, 'c').replace(/Ç/g, 'C').replace(/ş/g, 's').replace(/Ş/g, 'S').replace(/ü/g, 'u').replace(/Ü/g, 'U').replace(/ö/g, 'o').replace(/Ö/g, 'O').replace(/ı/g, 'i').replace(/İ/g, 'I');
+                safeErr = sanitizeText(safeErr);
+                
                 errorPage.drawText(`System Error:\n${safeErr.replace(/[\n\r]+/g, ' ')}`, {
                     x: 50,
                     y: 630,
