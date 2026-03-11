@@ -244,7 +244,7 @@ export class HepsiburadaService implements IMarketplaceService {
                     }
 
                     const detailedItems = [];
-                    const concurrency = 5;
+                    const concurrency = 1; // Extremely strictly rate limit to 1 req per loop for full order detail
                     for (let i = 0; i < items.length; i += concurrency) {
                         const batch = items.slice(i, i + concurrency);
                         const promises = batch.map(async (item: any) => {
@@ -262,7 +262,7 @@ export class HepsiburadaService implements IMarketplaceService {
                         });
                         
                         detailedItems.push(...(await Promise.all(promises)));
-                        if (items.length > concurrency) await new Promise(r => setTimeout(r, 100)); // rate limit buffer
+                        if (items.length > concurrency) await new Promise(r => setTimeout(r, 400)); // sleep 400ms between calls
                     }
 
                     for (const row of detailedItems) {
