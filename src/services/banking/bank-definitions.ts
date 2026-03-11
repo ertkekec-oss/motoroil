@@ -95,7 +95,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
                 "Bankanın sağladığı servis kullanıcı/şifre ile erişim, Periodya sabit IP’leri üzerinden kısıtlanır.",
                 "Format seçimi bankanın desteklediği seçeneklere göre yapılır (XML/MT940/CSV)."
             ],
-            ipWhitelist: ["[IP_1]", "[IP_2]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SERVICE_USER",
             securityNotes: [
                 "Erişim salt okuma (read-only). Para transferi / talimat yok.",
@@ -139,7 +139,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
                 "Hesap ekstreleri banka tarafından tanımlanan kurumsal kanal üzerinden dosya bazlı sağlanır (bank provided).",
                 "Erişim için banka SFTP veya eşdeğer kanal bilgilerini sağlar."
             ],
-            ipWhitelist: ["[IP_1]", "[IP_2]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SFTP_CREDENTIALS",
             securityNotes: [
                 "Salt okuma; dosya çekimi/okuma dışında işlem yapılmaz.",
@@ -180,7 +180,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
                 "Entegrasyon kanalı ve format bankanın sağladığı kurumsal servise göre belirlenir.",
                 "Enpara hesapları QNB altyapısı üzerinden yönetilebilir."
             ],
-            ipWhitelist: ["[IP_1]", "[IP_2]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SERVICE_USER",
             securityNotes: [
                 "Salt okuma; transfer/talimat yok.",
@@ -218,7 +218,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
             accessType: "READ_ONLY",
             dataScope: ["TRANSACTIONS"],
             protocolNotes: ["İş Bankası kurumsal dosya transfer (SFTP) kanalı kullanılır.", "Dosya formatı standart MT940 veya XML (İşbank) olmalıdır."],
-            ipWhitelist: ["[IP_1]", "[IP_2]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SFTP_CREDENTIALS",
             securityNotes: ["Erişim kısıtlıdır.", "Kullanıcı bilgileri Vault/KMS üzerinde saklanır."]
         },
@@ -249,7 +249,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
             accessType: "READ_ONLY",
             dataScope: ["BALANCE", "TRANSACTIONS"],
             protocolNotes: ["Yapı Kredi Kurumsal Web Servisleri (SOAP/REST) protokolü kullanılır."],
-            ipWhitelist: ["[IP_1]", "[IP_2]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SERVICE_USER",
             securityNotes: ["IP whitelist tanımlanması zorunludur."]
         },
@@ -280,7 +280,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
             accessType: "READ_ONLY",
             dataScope: ["TRANSACTIONS"],
             protocolNotes: ["Vakıfbank 'Vakıf Katılım' veya 'Vakıfbank' kurumsal servisleri."],
-            ipWhitelist: ["[IP_1]", "[IP_3]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SERVICE_USER",
             securityNotes: ["Credential şifreli saklanır."]
         },
@@ -311,7 +311,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
             accessType: "READ_ONLY",
             dataScope: ["TRANSACTIONS"],
             protocolNotes: ["Standart HTTP PULL protokolü."],
-            ipWhitelist: ["[IP_1]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SERVICE_USER",
             securityNotes: ["Read-only erişim."]
         },
@@ -342,7 +342,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
             accessType: "READ_ONLY",
             dataScope: ["BALANCE", "TRANSACTIONS"],
             protocolNotes: ["Ziraat Kurumsal Entegrasyon kanalı."],
-            ipWhitelist: ["[IP_1]", "[IP_2]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SERVICE_USER",
             securityNotes: ["IP whitelist kısıtı vardır."]
         },
@@ -373,7 +373,7 @@ export const BANK_FORM_DEFINITIONS: Record<string, BankDefinition> = {
             accessType: "READ_ONLY",
             dataScope: ["BALANCE", "TRANSACTIONS"],
             protocolNotes: ["Kuveyt Türk 'BOA' API altyapısı üzerinden JSON/XML entegrasyonu kullanılır."],
-            ipWhitelist: ["[IP_1]", "[IP_2]"],
+            ipWhitelist: ["38.242.134.156"],
             authenticationCategory: "SERVICE_USER",
             securityNotes: ["IP whitelist tanımlanması kesinlikle zorunludur."]
         },
