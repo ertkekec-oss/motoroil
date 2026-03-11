@@ -254,6 +254,9 @@ export class HepsiburadaService implements IMarketplaceService {
                     if (hasMore) await new Promise(r => setTimeout(r, 200));
                 } catch (err: any) {
                     console.error(`[HB_SYNC_ERR] ${target.name}: ${err.message}`);
+                    if (err.httpStatus === 401 || err.httpStatus === 403) {
+                        throw new Error(`Kimlik/Erişim Hatası (HTTP ${err.httpStatus}): API Kullanıcı adı, şifre yanlış veya IP adresiniz Hepsiburada panelinde beyaz listeye (whitelist) eklenmemiş.`);
+                    }
                     hasMore = false;
                 }
             }
