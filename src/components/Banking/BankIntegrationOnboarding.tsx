@@ -5,6 +5,7 @@ import { BANK_FORM_DEFINITIONS } from '@/services/banking/bank-definitions';
 import { useModal } from '@/contexts/ModalContext';
 import { jsPDF } from 'jspdf';
 import { apiFetch } from '@/lib/api-client';
+import autoTable from 'jspdf-autotable';
 import {
     EnterpriseCard,
     EnterpriseButton,
@@ -87,112 +88,208 @@ export default function BankOnboardingHub() {
                 .replace(/ç/g, 'c').replace(/Ç/g, 'C');
         };
 
-        const doc = new jsPDF();
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const defaultIp = "[SABIT_IP]";
+        const ips = selectedBank.technicalAppendix.ipWhitelist.length > 0 ? selectedBank.technicalAppendix.ipWhitelist.join(', ') : defaultIp;
 
-        // Setup default font
-        doc.setFont("helvetica");
-
-        // 1. Navy Blue Header
-        doc.setFillColor(15, 23, 42); // slate-900 / enterprise navy
-        doc.rect(0, 0, 210, 32, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-        doc.text("BANKA ENTEGRASYON BASVURU FORMU", 105, 18, { align: "center" });
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text("PERIODYA ENTERPRISE B2B FINANS PLATFORMU", 105, 25, { align: "center" });
-
-        // 2. Info Box
-        doc.setTextColor(15, 23, 42);
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "bold");
-        doc.text("Basvuru / Firma Detayi", 20, 50);
-
-        doc.setLineWidth(0.5);
-        doc.setDrawColor(200, 205, 215);
-        doc.line(20, 53, 190, 53);
-
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 62);
-        doc.text(`Entegrasyon Hedefi: ${unTurk(selectedBank.displayName)}`, 20, 70);
-        doc.text(`Baglanti Protokolu: ${unTurk(selectedBank.integrationMethod)}`, 20, 78);
-
-        // 3. Info Text
-        doc.setTextColor(100, 116, 139); // slate-500
-        const descText = unTurk("Sistem entegrasyonunun aktif edilebilmesi adina, asagida istenilen servis baglanti bilgilerinin bankaniz tarafindan uretilmesi ve size iletilmesi gerekmektedir. Ilgili veriler sadece B2B panelinizden girilebilir, e-posta ile paylasmayiniz.");
-        const splitDesc = doc.splitTextToSize(descText, 170);
-        doc.text(splitDesc, 20, 90);
-
-        // 4. Form Fields
-        doc.setTextColor(15, 23, 42);
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "bold");
-        doc.text("Banka Tarafindan Iletilecek Degerler", 20, 115);
-        doc.line(20, 118, 190, 118);
-
-        let y = 128;
-        doc.setFontSize(10);
-        selectedBank.onboardingFields.forEach((field) => {
-            const isRequired = selectedBank.requiredCredentials.includes(field.key);
-            let statusText = isRequired ? "(ZORUNLU)" : "(OPSIYONEL)";
-
-            // Field Label
+        if (selectedBank.id === 'KUVEYT_TURK') {
             doc.setFont("helvetica", "bold");
-            const cleanLabel = unTurk(field.label);
-            doc.text(cleanLabel + ":", 20, y);
+            doc.setFontSize(11);
+            doc.text("HESAP EKSTRESI WEB SERVIS ENTEGRASYONU BASVURU FORMU", 105, 20, { align: "center" });
 
-            // Input Line
-            doc.setDrawColor(180, 185, 195);
-            doc.setLineDashPattern([1, 1], 0); // dotted line
-            doc.line(75, y, 165, y);
-            doc.setLineDashPattern([], 0); // solid reset
+            // Table 1: Müşteri
+            autoTable(doc, {
+                startY: 30,
+                theme: 'grid',
+                head: [[{ content: 'MUSTERI', colSpan: 2, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', textColor: 0 } }]],
+                body: [
+                    [{ content: 'MUSTERI ISMI', styles: { fontStyle: 'bold', cellWidth: 70 } }, ''],
+                    [{ content: 'MUSTERI NO', styles: { fontStyle: 'bold' } }, credentials.customerNo || ''],
+                    [{ content: 'MUSTERI VKN/TCKN', styles: { fontStyle: 'bold' } }, '']
+                ],
+                styles: { fontSize: 10, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
+            });
 
-            // Requirement Status
+            // Table 2: Hesaplar
+            autoTable(doc, {
+                startY: (doc as any).lastAutoTable.finalY + 5,
+                theme: 'grid',
+                head: [[{ content: 'WEB SERVIS KULLANILACAK HESAPLAR', colSpan: 2, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', textColor: 0 } }]],
+                body: [
+                    [{ content: 'TUM HESAPLARIM', styles: { fontStyle: 'bold', cellWidth: 70 } }, '[ X ]'],
+                    [{ content: 'BELIRTTIGIM HESAPLAR', styles: { fontStyle: 'bold' } }, '..........................................................................................\n..........................................................................................\n..........................................................................................']
+                ],
+                styles: { fontSize: 10, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
+            });
+
+            // Table 3: Erişim Yetkilisi
+            autoTable(doc, {
+                startY: (doc as any).lastAutoTable.finalY + 5,
+                theme: 'grid',
+                head: [[{ content: 'ERISIM YETKILISI BILGILERI', colSpan: 2, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', textColor: 0 } }]],
+                body: [
+                    [{ content: 'IP ADRESI', styles: { fontStyle: 'bold', cellWidth: 70 } }, { content: ips, styles: { fontStyle: 'bold' } }],
+                    [{ content: 'YETKILI ADI', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI TCKN', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI GSM NO', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI E-POSTA', styles: { fontStyle: 'bold' } }, ''],
+                    [{ content: 'YETKILI DOGUM TARIHI', styles: { fontStyle: 'bold' } }, '']
+                ],
+                styles: { fontSize: 10, cellPadding: 3, textColor: 0, lineColor: 0, lineWidth: 0.1 }
+            });
+
+            // Footer Declaration
+            const startY = (doc as any).lastAutoTable.finalY + 5;
+            doc.rect(14, startY, 182, 60);
+
+            doc.setFontSize(8);
             doc.setFont("helvetica", "italic");
+            const declaration = unTurk("Hesaba iliskin her turlu islemi yapma yetkisi ve her turlu kontrol yetkisi tarafimiza ait olmak uzere ve ayrica hesaba iliskin bu bilgilerin elektronik ortamda aktarildiginin bilincinde olarak, Bankaniz Web Servis Uygulamasindan yararlanmak icin yukarida belirtilen hesabimiza/hesaplarimiza ait hesap hareketlerinin Bizim Hesap A.S'ye web servis entegrasyonu kurularak paylasilmasini rica ederiz. Bu talebimiz kapsaminda isbu Formun arka sayfasindaki Web Servis Guvenligi Bilgilendirmesini okudugumuzu ve bu bilgilendirmedeki guvenlik tedbirlerinin tarafimizca alinacagini, aksi durumda ortaya cikacak her turlu sonuctan da tarafimizin sorumlu olacagini kabul, beyan ve taahhut etmekteyiz. ......../......../............");
+            const splitDecl = doc.splitTextToSize(declaration, 178);
+            doc.text(splitDecl, 16, startY + 5);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("MUSTERI", 140, startY + 50);
+
+            // PAGE 2: Security Information
+            doc.addPage();
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("Web Servis Guvenligi Bilgilendirmesi", 105, 20, { align: "center" });
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            const p2Text = unTurk("Bankamizin Web Servis-API hizmetlerini hizmetlerin kullaniminda guvenlik icin dikkat etmeniz gereken hususlar soyledir:\n\n" +
+                "- Web servislere erisimin sadece yetkilendirilmis kaynaklar tarafindan yapilmasi saglanmalidir. Bu kapsamda gerekli bilesenler kullanilmali (Switch, Router, Firewall, v.b.) ve gerekli guvenlik konfigurasyonlari yapilmalidir.\n" +
+                "- Web servis iletisimi guvenli iletisim protokolu olan TLS kullanilarak saglanmalidir. Web servis saglayicisi iletisimi zamani dolmamis, iptal edilmemis ve yururlukten kaldirilmamis sunucu sertifikalari ile saglamalidir.\n" +
+                "- Web servislere erisim ve ilgili fonksiyonlarin kullanimi daha onceden tanimlanmis Dogrulama (Validation) ve Yetkilendirme (Authentication) mekanizmasi tarafindan kontrol edilmeli ve yetkisiz erisimler engellenmelidir.\n" +
+                "- Web servise iletisim kapsaminda cesitli filtreler uygulanmalidir. Bu filtreler ayni anda veya birbirinin yerine kullanilabilir. Iki tip filtreleme kullanilabilir: Zaman Filtresi ve IP Filtresi.\n" +
+                "    - Zaman filtresi, sunulan web servise ve/veya fonksiyonuna sadece o fonksiyon tarafindan belirlenen zaman dilimlerinde erisimi saglamalidir.\n" +
+                "    - IP filtresi, sunulan web servise sadece belirlenen IP adres bloklarindan erisimi saglamalidir.\n" +
+                "- Web servisi kapsaminda kullanilan mesajlarin belirlenen XML semasina uygun oldugu denetlenmelidir. Schema validasyonundan gecemeyen istekler kabul edilmemelidir.\n" +
+                "- Web servislerinin yogun kullanimi durumunda hizmetin erisilebilirliginin saglanmasi amaciyla gerekli alt yapi kurulu olmalidir. Gelen isteklerin yuku dengelenmeli ve web servislerine erisim surekli olarak saglanmalidir.\n" +
+                "- Web servisleri kapsaminda giden ve gelen XML mesajlarin buyuklugu icin bir mesaj kapasitesi kullanilan web servis fonksiyonlari bazinda belirlenmelidir. Gelen web servis istekleri eger mesaj kapasitesini asiyorsa reddedilmeli, gonderilecek mesajlar kapasite asimini onleyecek sekilde gonderilmelidir.\n" +
+                "- Web servisleri kapsaminda giden, gelen mesajlar herhangi bir zararli yazilim ve kotu niyetli kod parcacigina karsi taranmali ve zararli icerik tasiyan istekler reddedilmelidir.\n" +
+                "- Web servislerine yapilan her turlu erisim (erisim yapan IP, zaman, erisim yapilan fonksiyon, erisimi gerceklestiren kullanici) gibi bilgilerle kayit altina alinmalidir.\n" +
+                "- Web servisleri surekli kontrol edilerek degisen teknoloji ve ihtiyaclara gore gerekli guvenlik guncellemeleri yapilmalidir. Alinan kayitlar incelenmeli ve varsa yetkisiz erisimler tespit edilerek guvenlik onlemleri arttirilmalidir. Ayrica her yeni eklenen web servis veya fonksiyonun gerekli yetkilendirmeleri ve her yeni eklenen kullanicinin tanimlari kontrol edilmelidir. Benzer sekilde iptal edilen fonksiyonlar ve iptal edilen kullanicilara gore guvenlik onlemleri guncellenmelidir.\n" +
+                "- Kullanici adi-sifreler yalnizca size ozeldir, acik bicimde herhangi bir yere kaydedilmemeli ve destek kapsaminda olsa dahi 3. Taraflarla paylasilmamalidir. Aciga cikmis kullanici adi-sifre oldugu fark edilirse Bankamiz ile derhal iletisime gecilmelidir.");
+
+            const splitP2Text = doc.splitTextToSize(p2Text, 180);
+            doc.text(splitP2Text, 15, 30);
+
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
-            doc.text(statusText, 168, y);
+            doc.text("KUVEYT TURK KATILIM BANKASI A.S. | Buyukdere Cad. No: 129/1 Esentepe / Sisli / Istanbul.", 15, 275);
+            doc.text("Mersis No: 0600002681400074 | kuveytturk@hs03.kep.tr | www.kuveytturk.com.tr | Tel: 444 0 123", 15, 279);
+            doc.text("Faaliyet Konusu: 5411 Sayili Bankacilik Kanunu'nda izin verilen her turlu faaliyet.", 15, 283);
+        } else {
+            // Default Standard Form
+            // Setup default font
+            doc.setFont("helvetica");
 
-            // Reset for next
-            doc.setTextColor(15, 23, 42);
+            // 1. Navy Blue Header
+            doc.setFillColor(15, 23, 42); // slate-900 / enterprise navy
+            doc.rect(0, 0, 210, 32, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text("BANKA ENTEGRASYON BASVURU FORMU", 105, 18, { align: "center" });
             doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("PERIODYA ENTERPRISE B2B FINANS PLATFORMU", 105, 25, { align: "center" });
+
+            // 2. Info Box
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.text("Basvuru / Firma Detayi", 20, 50);
+
+            doc.setLineWidth(0.5);
+            doc.setDrawColor(200, 205, 215);
+            doc.line(20, 53, 190, 53);
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 62);
+            doc.text(`Entegrasyon Hedefi: ${unTurk(selectedBank.displayName)}`, 20, 70);
+            doc.text(`Baglanti Protokolu: ${unTurk(selectedBank.integrationMethod)}`, 20, 78);
+
+            // 3. Info Text
+            doc.setTextColor(100, 116, 139); // slate-500
+            const descText = unTurk("Sistem entegrasyonunun aktif edilebilmesi adina, asagida istenilen servis baglanti bilgilerinin bankaniz tarafindan uretilmesi ve size iletilmesi gerekmektedir. Ilgili veriler sadece B2B panelinizden girilebilir, e-posta ile paylasmayiniz.");
+            const splitDesc = doc.splitTextToSize(descText, 170);
+            doc.text(splitDesc, 20, 90);
+
+            // 4. Form Fields
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.text("Banka Tarafindan Iletilecek Degerler", 20, 115);
+            doc.line(20, 118, 190, 118);
+
+            let y = 128;
+            doc.setFontSize(10);
+            selectedBank.onboardingFields.forEach((field) => {
+                const isRequired = selectedBank.requiredCredentials.includes(field.key);
+                let statusText = isRequired ? "(ZORUNLU)" : "(OPSIYONEL)";
+
+                // Field Label
+                doc.setFont("helvetica", "bold");
+                const cleanLabel = unTurk(field.label);
+                doc.text(cleanLabel + ":", 20, y);
+
+                // Input Line
+                doc.setDrawColor(180, 185, 195);
+                doc.setLineDashPattern([1, 1], 0); // dotted line
+                doc.line(75, y, 165, y);
+                doc.setLineDashPattern([], 0); // solid reset
+
+                // Requirement Status
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text(statusText, 168, y);
+
+                // Reset for next
+                doc.setTextColor(15, 23, 42);
+                doc.setFontSize(10);
+
+                y += 12;
+            });
+
+            // 5. Technical Requirements
+            y += 5;
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.text("Teknik Parametreler ve Uyari Notlari", 20, y);
+            doc.setDrawColor(200, 205, 215);
+            doc.line(20, y + 3, 190, y + 3);
 
             y += 12;
-        });
-
-        // 5. Technical Requirements
-        y += 5;
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "bold");
-        doc.text("Teknik Parametreler ve Uyari Notlari", 20, y);
-        doc.setDrawColor(200, 205, 215);
-        doc.line(20, y + 3, 190, y + 3);
-
-        y += 12;
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-        selectedBank.technicalAppendix.protocolNotes.forEach((note) => {
-            const cleanNote = "- " + unTurk(note);
-            const splitNote = doc.splitTextToSize(cleanNote, 170);
-            doc.text(splitNote, 20, y);
-            y += splitNote.length * 6;
-        });
-
-        if (selectedBank.technicalAppendix.ipWhitelist.length > 0) {
-            y += 4;
-            doc.setFont("helvetica", "bold");
-            doc.text("Whitelist Icin Erisim IP Listesi:", 20, y);
+            doc.setFontSize(9);
             doc.setFont("helvetica", "normal");
-            doc.text(selectedBank.technicalAppendix.ipWhitelist.join(', '), 70, y);
-        }
+            selectedBank.technicalAppendix.protocolNotes.forEach((note) => {
+                const cleanNote = "- " + unTurk(note);
+                const splitNote = doc.splitTextToSize(cleanNote, 170);
+                doc.text(splitNote, 20, y);
+                y += splitNote.length * 6;
+            });
 
-        // 6. Print Footer
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "italic");
-        doc.setTextColor(150, 160, 175);
-        doc.text("Dokuman Otomasyonu: Periodya Enterprise ERP / BankConfig", 105, 285, { align: "center" });
+            if (ips) {
+                y += 4;
+                doc.setFont("helvetica", "bold");
+                doc.text("Whitelist Icin Erisim IP Listesi:", 20, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(ips, 80, y);
+            }
+
+            // 6. Print Footer
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "italic");
+            doc.setTextColor(150, 160, 175);
+            doc.text("Dokuman Otomasyonu: Periodya Enterprise ERP / BankConfig", 105, 285, { align: "center" });
+        }
 
         // Save
         doc.save(`${selectedBank.id.replace(/_/g, '')}_Entegrasyon_Formu.pdf`);
