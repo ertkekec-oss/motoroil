@@ -332,9 +332,11 @@ function fallbackLabelHtml(fallbackData: any, errorMessage: string) {
             <div class="barcode-section">
                 <h3>Kargo Barkodu</h3>
                 ${!trackingNumber ? '<div style="color:red;font-weight:bold;margin-top:20px;">Barkod Numarası Yok</div>' : `
-                <div class="barcode-svg-container">
+                <div class="barcode-svg-container" style="text-align: center;">
                     <svg id="barcode"></svg>
+                    <img id="barcode-img" src="https://bwipjs-api.metafloor.com/?bcid=code128&text=${trackingNumber}&scale=2&includetext=false" style="max-width: 100%; height: 80px; display: none;" onload="this.style.display='inline-block'; document.getElementById('barcode').style.display='none';" onerror="this.style.display='none';" />
                 </div>
+                <div style="font-weight:bold; margin-top: 8px; font-size: 18px; letter-spacing: 2px;">${trackingNumber}</div>
                 <div style="font-weight:bold; margin-top: 10px; font-size: 14px;">${providerName}</div>
                 `}
             </div>
@@ -354,18 +356,19 @@ function fallbackLabelHtml(fallbackData: any, errorMessage: string) {
     </div>
     <script>
         if("${trackingNumber}") {
-            JsBarcode("#barcode", "${trackingNumber}", {
-                format: "CODE128",
-                width: 2,
-                height: 80,
-                displayValue: true,
-                fontSize: 18,
-                fontOptions: "bold",
-                textMargin: 8,
-                margin: 0
-            });
+            try {
+                JsBarcode("#barcode", "${trackingNumber}", {
+                    format: "CODE128",
+                    width: 2,
+                    height: 80,
+                    displayValue: false,
+                    margin: 0
+                });
+            } catch(e) {
+                document.getElementById('barcode-img').style.display = 'inline-block';
+            }
         }
-        setTimeout(() => { window.print(); }, 500);
+        setTimeout(() => { window.print(); }, 1000);
     </script>
 </body>
 </html>`;
