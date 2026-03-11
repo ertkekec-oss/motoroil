@@ -27,30 +27,29 @@ export default function ContextualHelpWidget() {
         };
     }, [isOpen]);
 
-    // Contextual topics based on pathname (Mocked for now)
     const getContextualTopics = () => {
         if (pathname.includes("/inventory")) {
             return [
-                { title: "Ürün nasıl eklenir?", url: "/help/inventory-add-product" },
-                { title: "Stok güncellemeleri", url: "/help/inventory-stock" },
+                { title: "Ürün nasıl eklenir?", url: "/help/articles/inventory-add-product" },
+                { title: "Stok güncellemeleri", url: "/help/articles/inventory-stock" },
             ];
         }
         if (pathname.includes("/sales")) {
             return [
-                { title: "Fatura nasıl kesilir?", url: "/help/sales-invoice" },
-                { title: "E-Fatura gönderimi", url: "/help/sales-einvoice" },
+                { title: "Fatura nasıl kesilir?", url: "/help/articles/sales-invoice" },
+                { title: "E-Fatura gönderimi", url: "/help/articles/sales-einvoice" },
             ];
         }
         if (pathname.includes("/customers")) {
             return [
-                { title: "Müşteri bakiyesi ekleme", url: "/help/customers-balance" },
-                { title: "Cari limit yönetimi", url: "/help/customers-limit" },
+                { title: "Müşteri bakiyesi ekleme", url: "/help/articles/customers-balance" },
+                { title: "Cari limit yönetimi", url: "/help/articles/customers-limit" },
             ];
         }
         return [
-            { title: "Periodya'ya Hızlı Başlangıç", url: "/help/quickstart" },
-            { title: "Kullanıcı Yönetimi", url: "/help/users" },
-            { title: "Şirket Ayarları", url: "/help/settings" },
+            { title: "Periodya'ya Hızlı Başlangıç", url: "/help/articles/quickstart" },
+            { title: "Kullanıcı Yönetimi", url: "/help/articles/users" },
+            { title: "Şirket Ayarları", url: "/help/articles/settings" },
         ];
     };
 
@@ -134,7 +133,7 @@ export default function ContextualHelpWidget() {
                                 onChange={(e) => setQuery(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && query.trim()) {
-                                        router.push(`/help?q=${encodeURIComponent(query)}`);
+                                        router.push(`/help/articles?q=${encodeURIComponent(query)}`);
                                         setIsOpen(false);
                                     }
                                 }}
@@ -144,7 +143,7 @@ export default function ContextualHelpWidget() {
                                 className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-700 p-1 rounded-md"
                                 onClick={() => {
                                     if (query.trim()) {
-                                        router.push(`/help?q=${encodeURIComponent(query)}`);
+                                        router.push(`/help/articles?q=${encodeURIComponent(query)}`);
                                         setIsOpen(false);
                                     }
                                 }}

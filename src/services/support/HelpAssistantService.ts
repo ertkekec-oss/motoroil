@@ -131,7 +131,7 @@ export class HelpAssistantService {
             aiResponse += `Muhtemelen sistemsel veya konfigürasyonel bir durum olabilir.\n\n`;
             aiResponse += `**Önerilen Çözüm:**\nAşağıdaki rehberleri inceleyerek sorunu hızlıca çözebilirsiniz:\n\n`;
             articles.forEach(article => {
-                aiResponse += `• [${article.title}](/help/${article.slug})\n`;
+                aiResponse += `• [${article.title}](/help/articles/${article.slug})\n`;
             });
         } else {
             aiResponse += `Maalesef bilgi bankasında bu soruya tam uyan bir sonuç bulamadım. Ekibimiz size memnuniyetle yardımcı olacaktır.\n\n`;

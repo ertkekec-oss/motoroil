@@ -116,7 +116,7 @@ export default async function KnowledgeHubArticleDetail({ params }: { params: { 
                                     <CheckCircle2 className="w-5 h-5 text-green-500" /> Evet, faydalı
                                 </button>
                             </form>
-                            <Link href="/help/tickets/new" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 transition-all shadow-md">
+                            <Link href="/support/new" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 transition-all shadow-md">
                                 <AlertCircle className="w-5 h-5" /> Hayır, Talep Oluştur
                             </Link>
                         </div>
@@ -151,7 +151,7 @@ export default async function KnowledgeHubArticleDetail({ params }: { params: { 
                                 <LifeBuoy className="w-4 h-4 text-blue-500" /> Hızlı Yardıma mı İhtiyacınız Var?
                             </h4>
                             <p className="text-sm text-slate-500 mb-6 leading-relaxed">Dökümantasyon sorununuzu çözmediyse hiç vakit kaybetmeden teknik ekibimize ulaşın. Talebiniz AI tarafından analiz edilip uygun uzmana iletilecektir.</p>
-                            <Link href="/help/tickets/new" className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-bold bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg hover:opacity-90 transition-opacity">
+                            <Link href="/support/new" className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-bold bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg hover:opacity-90 transition-opacity">
                                 Destek Talebi Oluştur
                             </Link>
                         </EnterpriseCard>

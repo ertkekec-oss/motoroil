@@ -110,7 +110,7 @@ export function AIAssistantPanel() {
                                 {msg.role === 'SYSTEM' && msg.content.includes('yardımcı oldu mu') && (
                                     <div className="mt-4 flex gap-2">
                                         <button onClick={() => setMessages(prev => [...prev, { id: Date.now().toString(), role: 'USER', content: 'Evet, işime yaradı.' }])} className="px-3 py-1.5 text-xs font-semibold rounded-md bg-white border border-rose-200 text-slate-700 hover:bg-slate-50 transition-colors">Evet</button>
-                                        <Link href="/help/tickets/new" className="px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-900 text-white hover:bg-slate-800 transition-colors">Hayır, Bilet Oluştur</Link>
+                                        <Link href="/support/new" className="px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-900 text-white hover:bg-slate-800 transition-colors">Hayır, Bilet Oluştur</Link>
                                     </div>
                                 )}
                             </div>
