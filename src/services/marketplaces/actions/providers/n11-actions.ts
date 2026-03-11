@@ -78,6 +78,21 @@ export class N11ActionProvider implements MarketplaceActionProvider {
                 }
 
                 if (labelResult.error) {
+                    if (labelResult.fallbackData) {
+                        const errMsg = labelResult.error;
+                        await (prisma as any).marketplaceActionAudit.update({
+                            where: { id: audit.id },
+                            data: { status: 'FAILED', responsePayload: { fallbackData: labelResult.fallbackData }, errorMessage: errMsg }
+                        });
+                        metrics.externalCall(marketplace, actionKey, 'FAILED');
+                        return { 
+                            status: "FAILED", 
+                            errorMessage: errMsg,
+                            errorCode: MarketplaceActionErrorCode.E_REMOTE_API_ERROR,
+                            auditId: audit.id,
+                            result: { fallbackData: labelResult.fallbackData }
+                        };
+                    }
                     throw new Error(`N11 API Hatası (HTTP ${labelResult.status || '??'}): ${labelResult.error}`);
                 }
                 if (!labelResult.pdfBase64) throw new Error('Etiket verisi boş');

@@ -95,30 +95,38 @@ export class N11Service implements IMarketplaceService {
         }
     }
 
-    async getCargoLabel(packageId: string): Promise<{ pdfBase64?: string; error?: string; status?: number }> {
-        const url = `${this.baseUrl}/shipmentPackages/${packageId}/label`;
+    async getCargoLabel(packageId: string): Promise<{ pdfBase64?: string; error?: string; status?: number; fallbackData?: any }> {
         try {
-            console.log(`[N11_LABEL_REQ] URL: ${url}`);
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'appkey': this.config.apiKey,
-                    'appsecret': this.config.apiSecret,
-                    'Accept': 'application/pdf'
-                }
+            // N11 doesn't provide a PDF label endpoint in REST API. We generate a fallback label payload.
+            const result = await this.makeRequest('shipmentPackages', {
+                packageIds: packageId,
+                page: '0',
+                size: '1'
             });
 
-            const status = response.status;
-            if (!response.ok) {
-                const text = await response.text();
-                console.error(`[N11_LABEL_ERR] Status: ${status} | URL: ${url} | Res: ${text.substring(0, 200)}`);
-                return { error: `N11 Etiket Hatası (${status}): ${text}`, status };
+            if (result?.content && Array.isArray(result.content) && result.content.length > 0) {
+                const pkg = result.content[0];
+                return {
+                    error: "N11 PDF kargo etiketi servisi sunmamaktadır. Periodya akıllı etiket sistemi kullanılacaktır.",
+                    status: 502,
+                    fallbackData: {
+                        marketplace: "N11",
+                        orderNumber: pkg.orderNumber || packageId,
+                        shipmentAddress: {
+                            ...(pkg.shippingAddress || pkg.billingAddress),
+                            fullAddress: (pkg.shippingAddress || pkg.billingAddress)?.address
+                        },
+                        cargoProviderName: pkg.cargoProviderName,
+                        cargoTrackingNumber: pkg.cargoTrackingNumber || pkg.cargoSenderNumber,
+                        lines: Array.isArray(pkg.lines) ? pkg.lines.map((l: any) => ({
+                            productName: l.productName,
+                            sku: l.stockCode,
+                            quantity: l.quantity
+                        })) : []
+                    }
+                };
             }
-
-            const buffer = await response.arrayBuffer();
-            const pdfBase64 = Buffer.from(buffer).toString('base64');
-            console.log(`[N11_LABEL_SUCCESS] pkg: ${packageId} | buffer: ${buffer.byteLength} bytes`);
-            return { pdfBase64, status };
+            return { error: 'N11 Paket bulunamadı.', status: 404 };
         } catch (error: any) {
             console.error(`[N11_LABEL_CRITICAL_ERR] pkg: ${packageId}:`, error);
             return { error: error.message || 'N11 etiket bağlantı hatası' };
