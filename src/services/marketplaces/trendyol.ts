@@ -111,7 +111,14 @@ export class TrendyolService implements IMarketplaceService {
             const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
-            const response = await fetch(fetchUrl, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ status }) });
+            // According to Trendyol documentation for changing status, the body structure varies.
+            // But the generic one is { "lines": [ { "lineId": 111, "quantity": 1 } ], "params": {}, "status": "Picking" }
+            const packageDetails = await this.getShipmentPackageDetails(shipmentPackageId);
+            const lines = packageDetails.lines.map((l: any) => ({ lineId: l.id, quantity: l.quantity }));
+            
+            const reqBody = JSON.stringify({ lines, params: {}, status });
+
+            const response = await fetch(fetchUrl, { method: 'PUT', headers: this.getHeaders(), body: reqBody });
             if (!response.ok) return { success: false, error: await response.text() };
             return { success: true };
         } catch (error: any) {
@@ -157,7 +164,7 @@ export class TrendyolService implements IMarketplaceService {
             const cargoProviderName = pkg.cargoProviderName || '';
             const cargoProvider = cargoProviderName.toLowerCase();
             const status = pkg.shipmentPackageStatus;
-            const trackingNo = pkg.cargoTrackingNumber ? String(pkg.cargoTrackingNumber) : null;
+            let trackingNo = pkg.cargoTrackingNumber ? String(pkg.cargoTrackingNumber) : null;
 
             // Debugging object to collect all raw API data
             const fullDebugTimeline: any = {
@@ -165,6 +172,21 @@ export class TrendyolService implements IMarketplaceService {
             };
 
             console.info(`${ctx} Processing: carrier="${cargoProvider}", status="${status}", trk="${trackingNo}"`);
+
+            // If status is "Created", we must update it to "Picking" for TEX and others to generate tracking number / label.
+            if (status === 'Created' || status === 'CREATED') {
+                console.log(`${ctx} Package status is Created. Auto-updating to Picking...`);
+                const updateStatus = await this.updateShipmentPackageStatus(shipmentPackageId, 'Picking');
+                if (updateStatus.success) {
+                    console.log(`${ctx} Status updated to Picking successfully. Refetching package details to get fresh tracking number...`);
+                    const refreshedPkg = await this.getShipmentPackageDetails(shipmentPackageId);
+                    trackingNo = refreshedPkg.cargoTrackingNumber ? String(refreshedPkg.cargoTrackingNumber) : trackingNo;
+                    fullDebugTimeline.step1b_refreshedPackage = refreshedPkg;
+                } else {
+                    console.warn(`${ctx} Auto-update to Picking failed: ${updateStatus.error}`);
+                    fullDebugTimeline.step1b_updateError = updateStatus.error;
+                }
+            }
 
             // 2) Skip local hardcoded restrictions and let the Trendyol API decide.
             // Many legacy/different configurations might work with the PDF fallback even if they don't look valid locally.
@@ -249,8 +271,15 @@ export class TrendyolService implements IMarketplaceService {
                         } catch { }
                     }
 
-                    if (response.status === 400 && bodyText.includes('COMMON_LABEL_NOT_ALLOWED')) {
-                        throw new Error("Trendyol: Ortak barkod oluşturma izni reddedildi (NOT_ALLOWED).");
+                    if (response.status === 400) {
+                        if (bodyText.includes('COMMON_LABEL_NOT_ALLOWED')) {
+                            throw new Error("Trendyol: Ortak barkod oluşturma izni reddedildi (NOT_ALLOWED).");
+                        }
+                        if (bodyText.includes('EXTERNAL_SERVICE_RETURNED_ERROR') || bodyText.includes('Ortak barkod bilgileri')) {
+                            const match = bodyText.match(/"title":"([^"]+)"/);
+                            const msg = match ? match[1] : 'Trendyol Kargo Sistemi bu paket için etiket oluşturamıyor.';
+                            throw new Error(`Trendyol Kargo Sistemi Hatası: ${msg}`);
+                        }
                     }
                 }
             }
@@ -288,6 +317,7 @@ export class TrendyolService implements IMarketplaceService {
         } catch (error: any) {
             console.error(`${ctx} Error or Fallback Triggered:`, error);
             // IF ANY OF THE ABOVE ERROR OUT, FALLBACK TO NORMAL LABEL!
+            const originalExtract = error?.message || 'ZPL veya Ortak Barkod alınamadı';
 
             console.warn(`${ctx} Falling back to integrated (standard) label endpoint...`);
             const fallback = await this.getIntegratedLabel(shipmentPackageId);
@@ -297,13 +327,13 @@ export class TrendyolService implements IMarketplaceService {
                     status: 'SUCCESS',
                     pdfBase64: fallback.pdfBase64,
                     httpStatus: 200,
-                    error: format === 'ZPL' ? "Trendyol Ortak ZPL barkod hatası. Standart PDF barkoduna geri dönüldü." : undefined
+                    error: format === 'ZPL' ? `Trendyol Ortak ZPL barkod hatası: ${originalExtract}. Standart PDF barkoduna geri dönüldü.` : undefined
                 };
             }
 
             return {
                 status: 'FAILED',
-                error: `Trendyol API Hatası: İletmiş olduğunuz paketin durumunu kontrol ediniz.\n\nStandart barkod denemesi (Fallback) de başarısız oldu: ${fallback.error || 'Bilinmeyen Hata'}`,
+                error: `Trendyol API Hatası: ${originalExtract}\n\nStandart barkod denemesi (Fallback) de başarısız oldu: ${fallback.error || 'Service Unavailable'}`,
                 __debugErrorObject: error.message
             };
         }

@@ -52,10 +52,10 @@ model Company {
   createdAt             DateTime                       @default(now())
   updatedAt             DateTime                       @updatedAt
   status                CompanyStatus                  @default(ACTIVE)
-  salesXInsights         SalesXInsight[]
-  salesXOpportunities    SalesXOpportunity[]
-  predictiveVisits       PredictiveVisit[]
-  routeSuggestions       RouteSuggestion[]
+  salesXInsights        SalesXInsight[]
+  salesXOpportunities   SalesXOpportunity[]
+  predictiveVisits      PredictiveVisit[]
+  routeSuggestions      RouteSuggestion[]
   revenueInsights       RevenueInsight[]
   salesForecasts        SalesForecast[]
   salesOpportunities    SalesOpportunity[]
@@ -339,71 +339,71 @@ model Order {
 }
 
 model Product {
-  id                  String                  @id @default(cuid())
+  id                  String    @id @default(cuid())
   name                String
   code                String
   barcode             String?
-  price               Decimal                 @db.Decimal(10, 2)
-  buyPrice            Decimal                 @default(0) @db.Decimal(10, 2)
-  stock               Int                     @default(0)
-  reservedStock       Int                     @default(0)
+  price               Decimal   @db.Decimal(10, 2)
+  buyPrice            Decimal   @default(0) @db.Decimal(10, 2)
+  stock               Int       @default(0)
+  reservedStock       Int       @default(0)
   category            String?
   description         String?
-  imageUrl            String?                 @db.VarChar(2048)
-  imageKey            String?                 @db.VarChar(1024)
-  documentUrl         String?                 @db.VarChar(2048)
-  documentName        String?                 @db.VarChar(1024)
-  minStock            Int                     @default(5)
+  imageUrl            String?   @db.VarChar(2048)
+  imageKey            String?   @db.VarChar(1024)
+  documentUrl         String?   @db.VarChar(2048)
+  documentName        String?   @db.VarChar(1024)
+  minStock            Int       @default(5)
   brand               String?
-  type                String?                 @default("Ürün")
-  branch              String?                 @default("Merkez")
-  salesVat            Decimal?                @default(20) @db.Decimal(5, 2)
-  salesVatIncluded    Boolean?                @default(true)
-  purchaseVat         Decimal?                @default(20) @db.Decimal(5, 2)
-  purchaseVatIncluded Boolean?                @default(true)
-  salesOiv            Decimal?                @default(0) @db.Decimal(10, 2)
-  salesOtv            Decimal?                @default(0) @db.Decimal(10, 2)
-  otvType             String?                 @default("Ö.T.V yok")
+  type                String?   @default("Ürün")
+  branch              String?   @default("Merkez")
+  salesVat            Decimal?  @default(20) @db.Decimal(5, 2)
+  salesVatIncluded    Boolean?  @default(true)
+  purchaseVat         Decimal?  @default(20) @db.Decimal(5, 2)
+  purchaseVatIncluded Boolean?  @default(true)
+  salesOiv            Decimal?  @default(0) @db.Decimal(10, 2)
+  salesOtv            Decimal?  @default(0) @db.Decimal(10, 2)
+  otvType             String?   @default("Ö.T.V yok")
   gtip                String?
-  purchaseDiscount    Decimal?                @default(0) @db.Decimal(5, 2)
-  purchaseOtv         Decimal?                @default(0) @db.Decimal(10, 2)
-  otvCode             String?                 @default("7")
+  purchaseDiscount    Decimal?  @default(0) @db.Decimal(5, 2)
+  purchaseOtv         Decimal?  @default(0) @db.Decimal(10, 2)
+  otvCode             String?   @default("7")
   deletedAt           DateTime?
-  createdAt           DateTime                @default(now())
-  updatedAt           DateTime                @updatedAt
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
   companyId           String
-  currency            String                  @default("TRY")
-  isParent            Boolean                 @default(false)
+  currency            String    @default("TRY")
+  isParent            Boolean   @default(false)
   parentId            String?
-  purchaseCurrency    String                  @default("TRY")
+  purchaseCurrency    String    @default("TRY")
   supplierName        String?
-  unit                String?                 @default("Adet")
-  status              String?                 @default("Aktif")
+  unit                String?   @default("Adet")
+  status              String?   @default("Aktif")
 
   // NEW DYNAMIC FIELDS AWAITING MIGRATION (Phase 32)
-  countryCode         String?
-  invoiceTitle        String?
-  showDescriptionOnInvoice Boolean?           @default(false)
-  shelfLocation       String?
-  tags                String?                 @db.Text
-  gtin                String?
+  countryCode              String?
+  invoiceTitle             String?
+  showDescriptionOnInvoice Boolean? @default(false)
+  shelfLocation            String?
+  tags                     String?  @db.Text
+  gtin                     String?
 
-  b2bSuggestions      B2BSuggestion[]
-  companyProductMaps  CompanyProductMap[]
-  marketplaceMaps     MarketplaceProductMap[]
-  marketplacePnls     MarketplaceProductPnl[]
-  networkListings     NetworkListing[]
-  company             Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  parent              Product?                @relation("ProductVariants", fields: [parentId], references: [id])
-  variants            Product[]               @relation("ProductVariants")
-  productPrices       ProductPrice[]
-  variantValues       ProductVariantValue[]
-  salesOrderItems     SalesOrderItem[]
-  pricingRules        SmartPricingRule[]
-  stocks              Stock[]
-  movements           StockMovement[]
-  dealerCartItems     DealerCartItem[]
-  dealerCatalogItems  DealerCatalogItem[]
+  b2bSuggestions     B2BSuggestion[]
+  companyProductMaps CompanyProductMap[]
+  marketplaceMaps    MarketplaceProductMap[]
+  marketplacePnls    MarketplaceProductPnl[]
+  networkListings    NetworkListing[]
+  company            Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  parent             Product?                @relation("ProductVariants", fields: [parentId], references: [id])
+  variants           Product[]               @relation("ProductVariants")
+  productPrices      ProductPrice[]
+  variantValues      ProductVariantValue[]
+  salesOrderItems    SalesOrderItem[]
+  pricingRules       SmartPricingRule[]
+  stocks             Stock[]
+  movements          StockMovement[]
+  dealerCartItems    DealerCartItem[]
+  dealerCatalogItems DealerCatalogItem[]
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -587,55 +587,55 @@ model SalesInvoice {
 }
 
 model Customer {
-  id                 String                       @id @default(cuid())
-  name               String
-  email              String?
-  phone              String?
-  address            String?
-  taxNumber          String?
-  taxOffice          String?
-  contactPerson      String?
-  iban               String?
-  balance            Decimal                      @default(0) @db.Decimal(12, 2)
-  points             Decimal                      @default(0) @db.Decimal(10, 2)
-  branch             String?                      @default("Merkez")
-  categoryId         String?
-  supplierClass      String?
-  customerClass      String?
-  deletedAt          DateTime?
-  createdAt          DateTime                     @default(now())
-  updatedAt          DateTime                     @updatedAt
-  referralCode       String?                      @unique
-  city               String?
-  companyId          String
-  district           String?
-  isPortalActive     Boolean                      @default(false)
-  lastPortalLogin    DateTime?
-  portalPassword     String?
+  id                  String                       @id @default(cuid())
+  name                String
+  email               String?
+  phone               String?
+  address             String?
+  taxNumber           String?
+  taxOffice           String?
+  contactPerson       String?
+  iban                String?
+  balance             Decimal                      @default(0) @db.Decimal(12, 2)
+  points              Decimal                      @default(0) @db.Decimal(10, 2)
+  branch              String?                      @default("Merkez")
+  categoryId          String?
+  supplierClass       String?
+  customerClass       String?
+  deletedAt           DateTime?
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  referralCode        String?                      @unique
+  city                String?
+  companyId           String
+  district            String?
+  isPortalActive      Boolean                      @default(false)
+  lastPortalLogin     DateTime?
+  portalPassword      String?
   salesXOpportunities SalesXOpportunity[]
   predictiveVisits    PredictiveVisit[]
-  assignedStaffId    String?
-  lat                Float?
-  lng                Float?
-  locationPinnedAt   DateTime?
-  checks             Check[]
-  coupons            Coupon[]
-  assignedStaff      Staff?                       @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
-  category           CustomerCategory?            @relation(fields: [categoryId], references: [id])
-  company            Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  documents          CustomerDocument[]
-  locationRequests   CustomerLocationRequest[]
-  quotes             Quote[]
-  routeStops         RouteStop[]
-  routeTemplateStops RouteTemplateStop[]
-  invoices           SalesInvoice[]
-  salesOrders        SalesOrder[]
-  visits             SalesVisit[]
-  services           ServiceRecord[]
-  transactions       Transaction[]
-  warranties         Warranty[]
-  reconciliations    Reconciliation[]
-  accountReconStatus AccountReconciliationStatus?
+  assignedStaffId     String?
+  lat                 Float?
+  lng                 Float?
+  locationPinnedAt    DateTime?
+  checks              Check[]
+  coupons             Coupon[]
+  assignedStaff       Staff?                       @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
+  category            CustomerCategory?            @relation(fields: [categoryId], references: [id])
+  company             Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documents           CustomerDocument[]
+  locationRequests    CustomerLocationRequest[]
+  quotes              Quote[]
+  routeStops          RouteStop[]
+  routeTemplateStops  RouteTemplateStop[]
+  invoices            SalesInvoice[]
+  salesOrders         SalesOrder[]
+  visits              SalesVisit[]
+  services            ServiceRecord[]
+  transactions        Transaction[]
+  warranties          Warranty[]
+  reconciliations     Reconciliation[]
+  accountReconStatus  AccountReconciliationStatus?
 
   @@unique([email, companyId])
   @@index([name])
@@ -1188,70 +1188,70 @@ model SuspendedSale {
 }
 
 model Staff {
-  id                  String                    @id @default(cuid())
-  username            String                    @unique
-  password            String?
-  email               String?
-  name                String
-  role                String?
-  branch              String?                   @default("Merkez")
-  type                String?                   @default("service")
-  status              String?                   @default("Boşta")
-  currentJob          String?
-  permissions         String[]                  @default([])
+  id                     String                    @id @default(cuid())
+  username               String                    @unique
+  password               String?
+  email                  String?
+  name                   String
+  role                   String?
+  branch                 String?                   @default("Merkez")
+  type                   String?                   @default("service")
+  status                 String?                   @default("Boşta")
+  currentJob             String?
+  permissions            String[]                  @default([])
   salesPerformanceScores SalesPerformanceScore[]
-  targetAssignments   TargetAssignment[]
-  achievementBadges   AchievementBadge[]
-  leaderboardScores   LeaderboardScore[]
-  performance         Int?                      @default(100)
-  lastActive          DateTime?                 @default(now())
-  createdAt           DateTime                  @default(now())
-  updatedAt           DateTime                  @updatedAt
-  deletedAt           DateTime?
-  salary              Decimal?                  @default(17002) @db.Decimal(10, 2)
-  address             String?
-  companyId           String?
-  phone               String?
-  tenantId            String?                   @default("PLATFORM_ADMIN")
-  assignedCategoryIds String[]                  @default([])
-  birthDate           DateTime?
-  bloodType           String?
-  certificate         String?
-  city                String?
-  dailyWorkingHours   Float?                    @default(8)
-  district            String?
-  educationLevel      String?
-  hasDriverLicense    Boolean?                  @default(false)
-  healthReport        String?
-  maritalStatus       String?
-  militaryStatus      String?
-  notes               String?
-  reference           String?
-  relativeName        String?
-  relativePhone       String?
-  shiftTemplate       String?
-  weeklyOffDays       String?                   @default("Sunday")
-  workType            String?                   @default("FULL_TIME")
-  attendance          Attendance[]
-  assignedCustomers   Customer[]                @relation("StaffCustomers")
-  locationRequests    CustomerLocationRequest[]
-  expenses            Expense[]                 @relation("StaffExpenses")
-  leaveRequests       LeaveRequest[]
-  receivedMessages    Message[]                 @relation("ReceivedMessages")
-  sentMessages        Message[]                 @relation("SentMessages")
-  storeOrders         Order[]                   @relation("StaffStoreOrders")
-  payrolls            Payroll[]
-  routes              Route[]
-  salesOrders         SalesOrder[]
-  visits              SalesVisit[]
-  shifts              Shift[]
-  company             Company?                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  documents           StaffDocument[]
-  employeeDocuments   EmployeeDocument[]
-  targets             StaffTarget[]
-  salesXInsights      SalesXInsight[]
-  predictiveVisits    PredictiveVisit[]
-  routeSuggestions    RouteSuggestion[]
+  targetAssignments      TargetAssignment[]
+  achievementBadges      AchievementBadge[]
+  leaderboardScores      LeaderboardScore[]
+  performance            Int?                      @default(100)
+  lastActive             DateTime?                 @default(now())
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
+  deletedAt              DateTime?
+  salary                 Decimal?                  @default(17002) @db.Decimal(10, 2)
+  address                String?
+  companyId              String?
+  phone                  String?
+  tenantId               String?                   @default("PLATFORM_ADMIN")
+  assignedCategoryIds    String[]                  @default([])
+  birthDate              DateTime?
+  bloodType              String?
+  certificate            String?
+  city                   String?
+  dailyWorkingHours      Float?                    @default(8)
+  district               String?
+  educationLevel         String?
+  hasDriverLicense       Boolean?                  @default(false)
+  healthReport           String?
+  maritalStatus          String?
+  militaryStatus         String?
+  notes                  String?
+  reference              String?
+  relativeName           String?
+  relativePhone          String?
+  shiftTemplate          String?
+  weeklyOffDays          String?                   @default("Sunday")
+  workType               String?                   @default("FULL_TIME")
+  attendance             Attendance[]
+  assignedCustomers      Customer[]                @relation("StaffCustomers")
+  locationRequests       CustomerLocationRequest[]
+  expenses               Expense[]                 @relation("StaffExpenses")
+  leaveRequests          LeaveRequest[]
+  receivedMessages       Message[]                 @relation("ReceivedMessages")
+  sentMessages           Message[]                 @relation("SentMessages")
+  storeOrders            Order[]                   @relation("StaffStoreOrders")
+  payrolls               Payroll[]
+  routes                 Route[]
+  salesOrders            SalesOrder[]
+  visits                 SalesVisit[]
+  shifts                 Shift[]
+  company                Company?                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documents              StaffDocument[]
+  employeeDocuments      EmployeeDocument[]
+  targets                StaffTarget[]
+  salesXInsights         SalesXInsight[]
+  predictiveVisits       PredictiveVisit[]
+  routeSuggestions       RouteSuggestion[]
 
   @@index([tenantId])
   @@index([companyId])
@@ -1512,24 +1512,24 @@ model Campaign {
   company                   Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   // Campaign Engine V2 Fields
-  tenantId          String?
-  campaignType      String?
-  status            String    @default("ACTIVE")
-  channels          CampaignChannel[] @default([])
-  priority          Int       @default(0)
-  stackingRule      CampaignStackingRule @default(STACKABLE)
-  validFrom         DateTime?
-  validUntil        DateTime?
-  
+  tenantId     String?
+  campaignType String?
+  status       String               @default("ACTIVE")
+  channels     CampaignChannel[]    @default([])
+  priority     Int                  @default(0)
+  stackingRule CampaignStackingRule @default(STACKABLE)
+  validFrom    DateTime?
+  validUntil   DateTime?
+
   // Conditions
-  minOrderAmount    Float?
-  minQuantity       Int?
-  productIds        String[]  @default([])
-  categoryIds       String[]  @default([])
-  customerSegment   String?
-  salesRepId        String?
-  regionId          String?
-  hubVisibility     String?
+  minOrderAmount  Float?
+  minQuantity     Int?
+  productIds      String[] @default([])
+  categoryIds     String[] @default([])
+  customerSegment String?
+  salesRepId      String?
+  regionId        String?
+  hubVisibility   String?
 
   @@index([companyId])
   @@index([type])
@@ -2428,18 +2428,18 @@ model Expense {
 }
 
 model HelpCategory {
-  id          String        @id @default(cuid())
+  id          String   @id @default(cuid())
   tenantId    String?
   name        String
-  slug        String        @unique
+  slug        String   @unique
   description String?
   icon        String?
-  order       Int           @default(0)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  
-  topics      HelpTopic[]
-  articles    HelpArticle[]
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  topics   HelpTopic[]
+  articles HelpArticle[]
 
   @@index([tenantId])
 }
@@ -2464,11 +2464,11 @@ model HelpArticle {
   tenantId     String?
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
-  
-  category     HelpCategory      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  searchIndex  HelpSearchIndex?
+
+  category        HelpCategory         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  searchIndex     HelpSearchIndex?
   recommendations HelpRecommendation[]
-  
+
   @@index([tenantId])
   @@index([categoryId])
 }
@@ -2480,13 +2480,13 @@ model HelpTag {
 }
 
 model HelpSearchIndex {
-  id            String      @id @default(cuid())
-  articleId     String      @unique
+  id            String   @id @default(cuid())
+  articleId     String   @unique
   titleVector   String?
   contentVector String?
   tags          String[]
-  
-  article       HelpArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  article HelpArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
 }
 
 model HelpTopic {
@@ -8366,32 +8366,31 @@ model DemandForecastSnapshot {
   createdAt             DateTime @default(now())
 }
 
-
 // --- UNIFIED TRADE LEDGER ---
 
 model TradeLedgerEntry {
-  id                String   @id @default(cuid())
-  tenantId          String?
-  buyerTenantId     String?
-  sellerTenantId    String?
+  id                 String   @id @default(cuid())
+  tenantId           String?
+  buyerTenantId      String?
+  sellerTenantId     String?
   canonicalProductId String?
-  productId         String?
-  opportunityId     String?
-  proposalId        String?
-  contractId        String?
-  escrowId          String?
-  shipmentId        String?
-  disputeId         String?
-  eventType         String
-  eventStatus       String?
-  amount            Float?
-  quantity          Float?
-  currency          String?
-  metadataJson      Json?
-  sourceType        String?
-  sourceRef         String?
-  occurredAt        DateTime @default(now())
-  createdAt         DateTime @default(now())
+  productId          String?
+  opportunityId      String?
+  proposalId         String?
+  contractId         String?
+  escrowId           String?
+  shipmentId         String?
+  disputeId          String?
+  eventType          String
+  eventStatus        String?
+  amount             Float?
+  quantity           Float?
+  currency           String?
+  metadataJson       Json?
+  sourceType         String?
+  sourceRef          String?
+  occurredAt         DateTime @default(now())
+  createdAt          DateTime @default(now())
 
   @@index([buyerTenantId])
   @@index([sellerTenantId])
@@ -8400,11 +8399,11 @@ model TradeLedgerEntry {
 }
 
 model TradeLedgerLink {
-  id                String   @id @default(cuid())
-  ledgerEntryId     String
-  linkedEntityType  String
-  linkedEntityId    String
-  createdAt         DateTime @default(now())
+  id               String   @id @default(cuid())
+  ledgerEntryId    String
+  linkedEntityType String
+  linkedEntityId   String
+  createdAt        DateTime @default(now())
 
   @@index([ledgerEntryId])
   @@index([linkedEntityType, linkedEntityId])
@@ -8413,17 +8412,17 @@ model TradeLedgerLink {
 // --- NETWORK GROWTH ENGINE ---
 
 model NetworkGrowthTrigger {
-  id                  String   @id @default(cuid())
-  tenantId            String?
-  buyerTenantId       String?
-  sellerTenantId      String?
-  canonicalProductId  String?
-  triggerType         String
-  triggerStrength     Float
-  status              String   @default("OPEN")
-  metadataJson        Json?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  tenantId           String?
+  buyerTenantId      String?
+  sellerTenantId     String?
+  canonicalProductId String?
+  triggerType        String
+  triggerStrength    Float
+  status             String   @default("OPEN")
+  metadataJson       Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@index([tenantId, status])
   @@index([canonicalProductId])
@@ -8431,15 +8430,15 @@ model NetworkGrowthTrigger {
 }
 
 model NetworkGrowthAction {
-  id                  String   @id @default(cuid())
-  triggerId           String
-  actionType          String
-  targetType          String?
-  targetRef           String?
-  status              String   @default("PENDING")
-  payloadJson         Json?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id          String   @id @default(cuid())
+  triggerId   String
+  actionType  String
+  targetType  String?
+  targetRef   String?
+  status      String   @default("PENDING")
+  payloadJson Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([triggerId])
   @@index([status])
@@ -8483,42 +8482,42 @@ enum PlatformDocumentContentType {
 }
 
 model PlatformDocument {
-  id               String                         @id @default(cuid())
-  documentNo       String                         @unique
-  title            String
-  category         PlatformDocumentCategory       @default(CONTRACT)
-  targetModule     PlatformDocumentTargetModule   @default(GENERAL)
-  approvalMethod   PlatformDocumentApprovalMethod @default(CHECKBOX)
-  contentType      PlatformDocumentContentType    @default(PDF)
-  
-  fileKey          String?
-  textContent      String?                        @db.Text
-  version          Int                            @default(1)
-  
-  isActive         Boolean                        @default(true)
-  
-  createdAt        DateTime                       @default(now())
-  updatedAt        DateTime                       @updatedAt
-  revisedAt        DateTime                       @default(now())
-  
-  approvals        TenantDocumentApproval[]
+  id             String                         @id @default(cuid())
+  documentNo     String                         @unique
+  title          String
+  category       PlatformDocumentCategory       @default(CONTRACT)
+  targetModule   PlatformDocumentTargetModule   @default(GENERAL)
+  approvalMethod PlatformDocumentApprovalMethod @default(CHECKBOX)
+  contentType    PlatformDocumentContentType    @default(PDF)
+
+  fileKey     String?
+  textContent String? @db.Text
+  version     Int     @default(1)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  revisedAt DateTime @default(now())
+
+  approvals TenantDocumentApproval[]
 }
 
 model TenantDocumentApproval {
-  id                  String                         @id @default(cuid())
-  tenantId            String
-  documentId          String
-  documentVersion     Int
-  approvedByUserId    String
-  approvedAt          DateTime                       @default(now())
-  
-  ipAddress           String?
-  userAgent           String?
-  methodUsed          PlatformDocumentApprovalMethod
-  otpVerifiedToken    String?
-  
-  document            PlatformDocument               @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
+  id               String   @id @default(cuid())
+  tenantId         String
+  documentId       String
+  documentVersion  Int
+  approvedByUserId String
+  approvedAt       DateTime @default(now())
+
+  ipAddress        String?
+  userAgent        String?
+  methodUsed       PlatformDocumentApprovalMethod
+  otpVerifiedToken String?
+
+  document PlatformDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
   @@unique([tenantId, documentId, documentVersion])
   @@index([tenantId])
   @@index([documentId])
@@ -8526,30 +8525,30 @@ model TenantDocumentApproval {
 }
 
 model PaymentGateway {
-  id              String   @id @default(cuid())
-  provider        String   @unique // 'IYZICO', 'PAYTR', 'PAYNET'
-  isActive        Boolean  @default(false)
-  isTestMode      Boolean  @default(true)
-  apiKey          String?
-  apiSecret       String?
-  merchantId      String?
-  supportedTypes  String[] // e.g. ["SAAS", "SMS", "EINVOICE"]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  provider       String   @unique // 'IYZICO', 'PAYTR', 'PAYNET'
+  isActive       Boolean  @default(false)
+  isTestMode     Boolean  @default(true)
+  apiKey         String?
+  apiSecret      String?
+  merchantId     String?
+  supportedTypes String[] // e.g. ["SAAS", "SMS", "EINVOICE"]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model BillingProduct {
-  id            String   @id @default(cuid())
-  type          String   // 'SAAS', 'SMS', 'EINVOICE'
-  name          String
-  description   String?
-  price         Decimal  @db.Decimal(10, 2)
-  currency      String   @default("TRY")
-  creditAmount  Int      @default(0) // How much credit this product gives (e.g. 500 SMS)
-  planId        String?  // If type is SAAS, which Plan does this correspond to
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  type         String // 'SAAS', 'SMS', 'EINVOICE'
+  name         String
+  description  String?
+  price        Decimal  @db.Decimal(10, 2)
+  currency     String   @default("TRY")
+  creditAmount Int      @default(0) // How much credit this product gives (e.g. 500 SMS)
+  planId       String? // If type is SAAS, which Plan does this correspond to
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model TenantCredit {
@@ -8561,289 +8560,286 @@ model TenantCredit {
   einvoiceUsed    Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
-  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model PaymentTransaction {
-  id               String   @id @default(cuid())
-  tenantId         String
-  gatewayProvider  String
-  productType      String
-  productId        String
-  amount           Decimal  @db.Decimal(10, 2)
-  currency         String   @default("TRY")
-  status           String   @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  id                String   @id @default(cuid())
+  tenantId          String
+  gatewayProvider   String
+  productType       String
+  productId         String
+  amount            Decimal  @db.Decimal(10, 2)
+  currency          String   @default("TRY")
+  status            String   @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
   externalReference String? // order token or callback reference
-  errorMessage     String?
-  rawResponse      Json?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
-  tenant           Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  errorMessage      String?
+  rawResponse       Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
-
 model TargetPlan {
-  id               String            @id @default(cuid())
-  companyId        String
-  tenantId         String
-  year             Int
-  totalTarget      Decimal           @db.Decimal(12, 2)
-  bonusPool        Decimal           @db.Decimal(12, 2)
-  status           String            @default("ACTIVE") // ACTIVE, DRAFT, CLOSED
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id          String   @id @default(cuid())
+  companyId   String
+  tenantId    String
+  year        Int
+  totalTarget Decimal  @db.Decimal(12, 2)
+  bonusPool   Decimal  @db.Decimal(12, 2)
+  status      String   @default("ACTIVE") // ACTIVE, DRAFT, CLOSED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  periods          TargetPeriod[]
-  assignments      TargetAssignment[]
-  suggestions      AITargetSuggestion[]
+  periods     TargetPeriod[]
+  assignments TargetAssignment[]
+  suggestions AITargetSuggestion[]
 
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model TargetPeriod {
-  id               String            @id @default(cuid())
-  planId           String
-  name             String            // Q1, Q2, Q3, Q4
-  startDate        DateTime
-  endDate          DateTime
-  target           Decimal           @db.Decimal(12, 2)
-  bonus            Decimal           @db.Decimal(12, 2)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id        String   @id @default(cuid())
+  planId    String
+  name      String // Q1, Q2, Q3, Q4
+  startDate DateTime
+  endDate   DateTime
+  target    Decimal  @db.Decimal(12, 2)
+  bonus     Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  plan             TargetPlan        @relation(fields: [planId], references: [id], onDelete: Cascade)
-  assignments      TargetAssignment[]
+  plan        TargetPlan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  assignments TargetAssignment[]
 }
 
 model TargetAssignment {
-  id               String            @id @default(cuid())
-  planId           String
-  periodId         String
-  staffId          String
-  target           Decimal           @db.Decimal(12, 2)
-  bonusPotential   Decimal           @db.Decimal(12, 2)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id             String   @id @default(cuid())
+  planId         String
+  periodId       String
+  staffId        String
+  target         Decimal  @db.Decimal(12, 2)
+  bonusPotential Decimal  @db.Decimal(12, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  plan             TargetPlan        @relation(fields: [planId], references: [id], onDelete: Cascade)
-  period           TargetPeriod      @relation(fields: [periodId], references: [id], onDelete: Cascade)
-  staff            Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  performances     Performance[]
-  bonusResults     BonusResult[]
+  plan         TargetPlan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  period       TargetPeriod  @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  staff        Staff         @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  performances Performance[]
+  bonusResults BonusResult[]
 }
 
 model Performance {
-  id               String            @id @default(cuid())
-  assignmentId     String
-  actual           Decimal           @db.Decimal(12, 2)
-  achievement      Decimal           @db.Decimal(5, 4) // Example: 1.0500 for 105%
-  isCumulative     Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id           String   @id @default(cuid())
+  assignmentId String
+  actual       Decimal  @db.Decimal(12, 2)
+  achievement  Decimal  @db.Decimal(5, 4) // Example: 1.0500 for 105%
+  isCumulative Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  assignment       TargetAssignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  assignment TargetAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
 }
 
 model BonusResult {
-  id               String            @id @default(cuid())
-  assignmentId     String
-  baseBonus        Decimal           @db.Decimal(12, 2)
-  accelerator      Decimal           @db.Decimal(5, 2) // Example: 1.20
-  finalBonus       Decimal           @db.Decimal(12, 2)
-  isRecovered      Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id           String   @id @default(cuid())
+  assignmentId String
+  baseBonus    Decimal  @db.Decimal(12, 2)
+  accelerator  Decimal  @db.Decimal(5, 2) // Example: 1.20
+  finalBonus   Decimal  @db.Decimal(12, 2)
+  isRecovered  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  assignment       TargetAssignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  assignment TargetAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
 }
 
 model AchievementBadge {
-  id               String            @id @default(cuid())
-  staffId          String
-  badgeType        String            // FIRST_SALE, TARGET_CRUSHER, CONSISTENCY, RAINMAKER
-  earnedAt         DateTime          @default(now())
-  streakCount      Int               @default(0) // 3, 6 vs
-  
-  staff            Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  staffId     String
+  badgeType   String // FIRST_SALE, TARGET_CRUSHER, CONSISTENCY, RAINMAKER
+  earnedAt    DateTime @default(now())
+  streakCount Int      @default(0) // 3, 6 vs
+
+  staff Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
 }
 
 model LeaderboardScore {
-  id               String            @id @default(cuid())
-  companyId        String
-  periodId         String            // Q1 vs
-  staffId          String
-  rank             Int
-  scoreType        String            // HIGHEST_SALES, HIGHEST_GROWTH, HIGHEST_ACHIEVEMENT
-  scoreValue       Decimal           @db.Decimal(12, 2)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  staff            Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  companyId  String
+  periodId   String // Q1 vs
+  staffId    String
+  rank       Int
+  scoreType  String // HIGHEST_SALES, HIGHEST_GROWTH, HIGHEST_ACHIEVEMENT
+  scoreValue Decimal  @db.Decimal(12, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  staff Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
 }
 
 model AITargetSuggestion {
-  id               String            @id @default(cuid())
+  id               String   @id @default(cuid())
   planId           String
-  safeTarget       Decimal           @db.Decimal(12, 2)
-  balancedTarget   Decimal           @db.Decimal(12, 2)
-  aggressiveTarget Decimal           @db.Decimal(12, 2)
-  analysisData     Json?             // trend details
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  safeTarget       Decimal  @db.Decimal(12, 2)
+  balancedTarget   Decimal  @db.Decimal(12, 2)
+  aggressiveTarget Decimal  @db.Decimal(12, 2)
+  analysisData     Json? // trend details
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  plan             TargetPlan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  plan TargetPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
 }
 
-
 model RevenueInsight {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  type             String            // INFO, WARNING, OPPORTUNITY, RECOMMENDATION
-  title            String
-  description      String
-  category         String            // RISK, COACHING, PERFORMANCE
-  referenceId      String?           
-  isRead           Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  tenantId    String
+  companyId   String
+  type        String // INFO, WARNING, OPPORTUNITY, RECOMMENDATION
+  title       String
+  description String
+  category    String // RISK, COACHING, PERFORMANCE
+  referenceId String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model SalesForecast {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  periodType       String            // NEXT_MONTH, NEXT_QUARTER, YEAR
-  targetPeriod     String
-  expectedSales    Decimal           @db.Decimal(12, 2)
-  confidenceScore  Int               // e.g. 78 for 78%
-  factors          Json?             // { seasonality, growthRate, categoryTrend }
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  tenantId        String
+  companyId       String
+  periodType      String // NEXT_MONTH, NEXT_QUARTER, YEAR
+  targetPeriod    String
+  expectedSales   Decimal  @db.Decimal(12, 2)
+  confidenceScore Int // e.g. 78 for 78%
+  factors         Json? // { seasonality, growthRate, categoryTrend }
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model SalesPerformanceScore {
-  id               String            @id @default(cuid())
+  id               String   @id @default(cuid())
   tenantId         String
   companyId        String
   staffId          String
-  period           String            // e.g. 2026-Q1
-  totalScore       Int               // 0-100
-  achievementScore Int               @default(0)
-  growthScore      Int               @default(0)
-  consistencyScore Int               @default(0)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  staff            Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  period           String // e.g. 2026-Q1
+  totalScore       Int // 0-100
+  achievementScore Int      @default(0)
+  growthScore      Int      @default(0)
+  consistencyScore Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  staff Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
 }
 
 model SalesOpportunity {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  opportunityType  String            // UPSELL, REACTIVATION, CATEGORY_EXPANSION
-  title            String
-  description      String
-  potentialValue   Decimal           @db.Decimal(12, 2)
-  status           String            @default("OPEN")
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  tenantId        String
+  companyId       String
+  opportunityType String // UPSELL, REACTIVATION, CATEGORY_EXPANSION
+  title           String
+  description     String
+  potentialValue  Decimal  @db.Decimal(12, 2)
+  status          String   @default("OPEN")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model SalesRiskAlert {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  riskLevel        String            // LOW, MEDIUM, HIGH
-  title            String
-  description      String
-  metric           String
-  currentValue     String
-  threshold        String
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  tenantId     String
+  companyId    String
+  riskLevel    String // LOW, MEDIUM, HIGH
+  title        String
+  description  String
+  metric       String
+  currentValue String
+  threshold    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
-
 model SalesXInsight {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  type             String            // INFO, WARNING, OPPORTUNITY, RECOMMENDATION
-  title            String
-  description      String
-  category         String            // REACTIVATION, UPSELL, ROUTE_OPTIMIZATION, RISK
-  referenceId      String?
-  targetStaffId    String?
-  isRead           Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  staff            Staff?            @relation(fields: [targetStaffId], references: [id], onDelete: SetNull)
+  id            String   @id @default(cuid())
+  tenantId      String
+  companyId     String
+  type          String // INFO, WARNING, OPPORTUNITY, RECOMMENDATION
+  title         String
+  description   String
+  category      String // REACTIVATION, UPSELL, ROUTE_OPTIMIZATION, RISK
+  referenceId   String?
+  targetStaffId String?
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  staff   Staff?  @relation(fields: [targetStaffId], references: [id], onDelete: SetNull)
 }
 
 model SalesXOpportunity {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  customerId       String
-  opportunityType  String            // REACTIVATION, UPSELL, CATEGORY_EXPANSION, HIGH_POTENTIAL
-  title            String
-  description      String
-  potentialValue   Decimal           @db.Decimal(12, 2)
-  priorityScore    Int               @default(0) // 0 - 100
-  status           String            @default("OPEN") // OPEN, IN_PROGRESS, WON, LOST
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customer         Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  tenantId        String
+  companyId       String
+  customerId      String
+  opportunityType String // REACTIVATION, UPSELL, CATEGORY_EXPANSION, HIGH_POTENTIAL
+  title           String
+  description     String
+  potentialValue  Decimal  @db.Decimal(12, 2)
+  priorityScore   Int      @default(0) // 0 - 100
+  status          String   @default("OPEN") // OPEN, IN_PROGRESS, WON, LOST
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
 model PredictiveVisit {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  customerId       String
-  suggestedDate    DateTime
-  priorityScore    Int               // 0 - 100
-  reason           String            // e.g. "90 gündür ziyaret edilmedi, yüksek potansiyel"
-  status           String            @default("SUGGESTED") // SUGGESTED, PLANNED, REGECTED
-  assignedStaffId  String?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customer         Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  staff            Staff?            @relation(fields: [assignedStaffId], references: [id], onDelete: SetNull)
+  id              String   @id @default(cuid())
+  tenantId        String
+  companyId       String
+  customerId      String
+  suggestedDate   DateTime
+  priorityScore   Int // 0 - 100
+  reason          String // e.g. "90 gündür ziyaret edilmedi, yüksek potansiyel"
+  status          String   @default("SUGGESTED") // SUGGESTED, PLANNED, REGECTED
+  assignedStaffId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  staff    Staff?   @relation(fields: [assignedStaffId], references: [id], onDelete: SetNull)
 }
 
 model RouteSuggestion {
-  id               String            @id @default(cuid())
-  tenantId         String
-  companyId        String
-  staffId          String
-  planDate         DateTime
-  routeData        Json              // Ordered array of customer optimization
-  estimatedValue   Decimal           @db.Decimal(12, 2)
-  status           String            @default("PENDING") // PENDING, ACCEPTED, REJECTED
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  staff            Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  id             String   @id @default(cuid())
+  tenantId       String
+  companyId      String
+  staffId        String
+  planDate       DateTime
+  routeData      Json // Ordered array of customer optimization
+  estimatedValue Decimal  @db.Decimal(12, 2)
+  status         String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  staff   Staff   @relation(fields: [staffId], references: [id], onDelete: Cascade)
 }
 
 // --- AUTONOMOUS SUPPORT PLATFORM ---
@@ -8878,16 +8874,16 @@ model OnboardingStep {
 }
 
 model PlatformDiagnosticEvent {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   tenantId      String
-  component     String   // e.g. "EFATURA_NILVERA", "PAYTR_GATEWAY", "SYNC_ENGINE"
-  level         String   // "WARNING", "ERROR", "CRITICAL"
+  component     String // e.g. "EFATURA_NILVERA", "PAYTR_GATEWAY", "SYNC_ENGINE"
+  level         String // "WARNING", "ERROR", "CRITICAL"
   message       String
   details       Json?
-  status        String   @default("OPEN") // "OPEN", "AUTO_FIXED", "MANUAL_FIX_REQUIRED", "IGNORED"
-  autoFixAction String?  // "cache_reset", "reconnect"
+  status        String    @default("OPEN") // "OPEN", "AUTO_FIXED", "MANUAL_FIX_REQUIRED", "IGNORED"
+  autoFixAction String? // "cache_reset", "reconnect"
   resolvedAt    DateTime?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 
   @@index([tenantId, status])
   @@index([component, status])
@@ -8929,26 +8925,26 @@ enum SupportTicketAuthorType {
 }
 
 model SupportTicket {
-  id               String                @id @default(cuid())
+  id               String                    @id @default(cuid())
   tenantId         String
   createdByUserId  String
   assignedToUserId String?
   category         SupportTicketCategory
-  priority         SupportTicketPriority @default(NORMAL)
-  status           SupportTicketStatus   @default(OPEN)
+  priority         SupportTicketPriority     @default(NORMAL)
+  status           SupportTicketStatus       @default(OPEN)
   subject          String
-  description      String                @db.Text
+  description      String                    @db.Text
   currentPage      String?
   browserInfo      String?
   metadataJson     Json?
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
   resolvedAt       DateTime?
   comments         SupportTicketComment[]
   attachments      SupportTicketAttachment[]
   tags             SupportTicketTagMap[]
   slaTracking      SupportSLATracking?
-  
+
   @@index([tenantId])
   @@index([status])
   @@index([createdByUserId])
@@ -8956,32 +8952,32 @@ model SupportTicket {
 }
 
 model SupportTicketComment {
-  id          String                  @id @default(cuid())
-  ticketId    String
-  userId      String
-  authorType  SupportTicketAuthorType @default(USER)
-  message     String                  @db.Text
-  createdAt   DateTime                @default(now())
-  updatedAt   DateTime                @updatedAt
-  
-  ticket      SupportTicket           @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  
+  id         String                  @id @default(cuid())
+  ticketId   String
+  userId     String
+  authorType SupportTicketAuthorType @default(USER)
+  message    String                  @db.Text
+  createdAt  DateTime                @default(now())
+  updatedAt  DateTime                @updatedAt
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
   @@index([ticketId])
   @@index([userId])
 }
 
 model SupportTicketAttachment {
-  id               String        @id @default(cuid())
+  id               String   @id @default(cuid())
   ticketId         String
   uploadedByUserId String
   fileName         String
-  fileUrl          String        @db.Text
+  fileUrl          String   @db.Text
   mimeType         String?
   size             Int?
-  createdAt        DateTime      @default(now())
-  
-  ticket           SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  
+  createdAt        DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
   @@index([ticketId])
 }
 
@@ -8992,15 +8988,15 @@ enum HelpConversationRole {
 }
 
 model HelpConversation {
-  id          String                    @id @default(cuid())
-  tenantId    String
-  userId      String
-  sessionId   String
-  question    String                    @db.Text
-  createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @updatedAt
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  sessionId String
+  question  String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  messages    HelpConversationMessage[]
+  messages        HelpConversationMessage[]
   recommendations HelpRecommendation[]
 
   @@index([tenantId])
@@ -9014,20 +9010,20 @@ model HelpConversationMessage {
   content        String               @db.Text
   createdAt      DateTime             @default(now())
 
-  conversation   HelpConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation HelpConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
 }
 
 model HelpRecommendation {
-  id             String           @id @default(cuid())
+  id             String   @id @default(cuid())
   conversationId String
   articleId      String
   score          Float
-  createdAt      DateTime         @default(now())
+  createdAt      DateTime @default(now())
 
-  conversation   HelpConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  article        HelpArticle      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  conversation HelpConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  article      HelpArticle      @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
   @@index([articleId])
@@ -9087,7 +9083,7 @@ model PlatformHealthCheck {
 
 model PlatformIncident {
   id          String                   @id @default(cuid())
-  tenantId    String?                  // System-wide incidents may have null tenantId
+  tenantId    String? // System-wide incidents may have null tenantId
   type        PlatformIncidentType
   severity    PlatformIncidentSeverity
   title       String
@@ -9109,18 +9105,18 @@ model PlatformRunbook {
   autoFixAvailable Boolean              @default(false)
   createdAt        DateTime             @default(now())
 
-  actions          RunbookAction[]
+  actions RunbookAction[]
 
   @@index([incidentType])
 }
 
 model RunbookAction {
-  id          String            @id @default(cuid())
-  runbookId   String
-  actionType  RunbookActionType
-  configJson  Json?
+  id         String            @id @default(cuid())
+  runbookId  String
+  actionType RunbookActionType
+  configJson Json?
 
-  runbook     PlatformRunbook   @relation(fields: [runbookId], references: [id], onDelete: Cascade)
+  runbook PlatformRunbook @relation(fields: [runbookId], references: [id], onDelete: Cascade)
 
   @@index([runbookId])
 }
@@ -9139,18 +9135,18 @@ model SupportTicketTag {
   color     String?
   createdAt DateTime @default(now())
 
-  maps      SupportTicketTagMap[]
+  maps SupportTicketTagMap[]
 
   @@unique([tenantId, slug])
 }
 
 model SupportTicketTagMap {
-  id        String   @id @default(cuid())
-  ticketId  String
-  tagId     String
+  id       String @id @default(cuid())
+  ticketId String
+  tagId    String
 
-  ticket    SupportTicket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  tag       SupportTicketTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  ticket SupportTicket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  tag    SupportTicketTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@unique([ticketId, tagId])
 }
@@ -9176,5 +9172,91 @@ model SupportSLATracking {
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
 
-  ticket                SupportTicket         @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+enum RequirementType {
+  DOCUMENT
+  CONTRACT
+}
+
+enum RequirementStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+model PlatformRequirement {
+  id             String          @id @default(cuid())
+  moduleId       String // e.g., EFATURA, ODEAL_POS, GLOBAL
+  name           String
+  description    String?         @db.Text
+  type           RequirementType
+  contractId     String? // if type is CONTRACT, link to PlatformContract
+  validityMonths Int? // e.g., 12 months for tax plate. Null = infinite
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  contract    PlatformContract?             @relation(fields: [contractId], references: [id])
+  submissions TenantRequirementSubmission[]
+
+  @@index([moduleId])
+  @@index([type])
+}
+
+model PlatformContract {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String   @db.Text
+  version   Int      @default(1)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requirements PlatformRequirement[]
+  signatures   TenantContractSignature[]
+}
+
+model TenantRequirementSubmission {
+  id              String            @id @default(cuid())
+  tenantId        String
+  userId          String // The user who uploaded it
+  requirementId   String
+  status          RequirementStatus @default(PENDING)
+  documentUrl     String?           @db.Text
+  documentKey     String? // for S3 secure retrieval
+  rejectionReason String?           @db.Text
+  expiresAt       DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  requirement PlatformRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, requirementId]) // only one active submission per tenant per requirement at a time
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model TenantContractSignature {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  contractId    String
+  version       Int
+  signedAt      DateTime @default(now())
+  ipAddress     String?
+  userAgent     String?  @db.Text
+  signatureHash String? // Optional hash of contract content + timestamp for proof
+
+  contract PlatformContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, contractId, version]) // A user signs a specific version once
+  @@index([tenantId])
+  @@index([userId])
+  @@index([contractId])
 }

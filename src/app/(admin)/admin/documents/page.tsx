@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import PlatformDocumentsClient from "./PlatformDocumentsClient";
+import MainClient from "./MainClient";
 
 export const metadata = {
     title: "Platform Dökümanları | Periodya Admin",
@@ -26,7 +26,7 @@ export default async function PlatformDocumentsPage() {
                 </div>
             </div>
 
-            <PlatformDocumentsClient />
+            <MainClient />
         </div>
     );
 }

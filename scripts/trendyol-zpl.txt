@@ -1,0 +1,12 @@
+GET https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009
+GET Status: 400
+GET Response: {"error":{"status":400,"errors":[{"code":400,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Ortak
+
+POST https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009
+POST Status: 200
+POST Response: 
+Waiting 3s...
+
+GET https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009
+GET Status: 400
+GET Response: {"error":{"status":400,"errors":[{"code":400,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Ortak barkod bilgileri alınırken bir hata oluştu"}]}}

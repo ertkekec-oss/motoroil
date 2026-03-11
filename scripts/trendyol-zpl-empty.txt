@@ -1,0 +1,9 @@
+
+POST https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009 (EMPTY BODY)
+POST Status: 400
+POST Response: {"timestamp":"2026-03-11T00:25:53.647+00:00","status":400,"error":"Bad Request","message":"","path":"/sellers/548512/common-label/7330031064550009"}
+Waiting 5s...
+
+GET https://apigw.trendyol.com/integration/sellers/548512/common-label/7330031064550009
+GET Status: 400
+GET Response: {"error":{"status":400,"errors":[{"code":400,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Ortak barkod bilgileri alınırken bir hata oluştu"}]}}

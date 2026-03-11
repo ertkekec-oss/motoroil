@@ -6,14 +6,7 @@
         Type '{ params: Promise<{ provider: string; }>; }' is not assignable to type '{ params: { provider: string; }; }'.
           Types of property 'params' are incompatible.
             Property 'provider' is missing in type 'Promise<{ provider: string; }>' but required in type '{ provider: string; }'.
-.next/types/validator.ts(3402,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/admin/kyc/submissions/[id]/review/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/kyc/submissions/[id]/review">'.
-  Types of property 'POST' are incompatible.
-    Type '(req: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ success: boolean; submission: any; }> | NextResponse<{ success: boolean; error: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
-      Types of parameters '__1' and 'context' are incompatible.
-        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
-          Types of property 'params' are incompatible.
-            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
-.next/types/validator.ts(7155,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/payments/webhooks/[provider]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/payments/webhooks/[provider]">'.
+.next/types/validator.ts(7146,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/payments/webhooks/[provider]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/payments/webhooks/[provider]">'.
   Types of property 'POST' are incompatible.
     Type '(request: Request, { params }: { params: { provider: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | NextResponse<{ success: boolean; processed: any; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ provider: string; }>; }) => void | Response | Promise<void | Response>'.
       Types of parameters '__1' and 'context' are incompatible.
@@ -57,16 +50,6 @@ src/app/(app)/help/articles/[slug]/page.tsx(151,34): error TS2304: Cannot find n
 src/app/(app)/purchasing/page.tsx(244,142): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
 src/app/api/admin/documents/[id]/download/route.ts(57,33): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
   Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
-src/app/api/admin/kyc/contracts/route.ts(3,10): error TS2305: Module '"@/lib/auth"' has no exported member 'getCurrentUser'.
-src/app/api/admin/kyc/requirements/route.ts(3,10): error TS2305: Module '"@/lib/auth"' has no exported member 'getCurrentUser'.
-src/app/api/admin/kyc/submissions/[id]/review/route.ts(3,10): error TS2305: Module '"@/lib/auth"' has no exported member 'getCurrentUser'.
-src/app/api/admin/kyc/submissions/route.ts(3,10): error TS2305: Module '"@/lib/auth"' has no exported member 'getCurrentUser'.
-src/app/api/kyc/sign/route.ts(3,10): error TS2305: Module '"@/lib/auth"' has no exported member 'getCurrentUser'.
-src/app/api/kyc/sign/route.ts(4,30): error TS2307: Cannot find module '@/lib/company' or its corresponding type declarations.
-src/app/api/kyc/status/route.ts(3,10): error TS2305: Module '"@/lib/auth"' has no exported member 'getCurrentUser'.
-src/app/api/kyc/status/route.ts(4,30): error TS2307: Cannot find module '@/lib/company' or its corresponding type declarations.
-src/app/api/kyc/submit/route.ts(3,10): error TS2305: Module '"@/lib/auth"' has no exported member 'getCurrentUser'.
-src/app/api/kyc/submit/route.ts(5,30): error TS2307: Cannot find module '@/lib/company' or its corresponding type declarations.
 src/app/api/portal/signatures/document/pdf/route.ts(73,33): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
   Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
 src/lib/domain-resolver.ts(6,30): error TS2339: Property 'get' does not exist on type 'Promise<ReadonlyHeaders>'.
