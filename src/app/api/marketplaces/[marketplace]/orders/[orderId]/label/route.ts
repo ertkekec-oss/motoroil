@@ -314,13 +314,19 @@ function fallbackLabelHtml(fallbackData: any, errorMessage: string) {
         .error-footer { margin-top:30px; font-size: 11px; color: #64748b; text-align: center; padding: 10px; background: #f1f5f9; border-radius: 6px; border: 1px dashed #cbd5e1; }
         @media print { 
             body { background: white; padding: 0; align-items: flex-start; }
-            .print-btn { display: none; } 
+            .print-options { display: none; }
             .label-container { border: 2px solid #000; box-shadow: none; max-width: 100%; width: 100%; padding: 20px; border-radius: 0; page-break-inside: avoid; } 
         }
     </style>
 </head>
 <body>
-    <button class="print-btn" onclick="window.print()">🖨️ A4 Olarak Yazdır</button>
+    <div class="print-options" style="margin-bottom: 20px; text-align: center;">
+        <button class="print-btn" onclick="window.print()" style="margin-bottom: 10px;">🖨️ A4 Olarak Yazdır</button><br/>
+        <label style="font-family: Arial, sans-serif; font-size: 14px; cursor: pointer; color: #475569; font-weight: bold;">
+            <input type="checkbox" id="toggleProducts" onchange="document.getElementById('products-section').style.display = this.checked ? 'none' : 'block';" />
+            Sipariş İçeriğini Gizle (+18 / Hassas Ürünler)
+        </label>
+    </div>
     <div class="label-container">
         <div class="header">
             <div class="buyer-info">
@@ -341,6 +347,15 @@ function fallbackLabelHtml(fallbackData: any, errorMessage: string) {
                 <div style="font-weight:bold; margin-top: 10px; font-size: 14px;">${providerName}</div>
                 `}
             </div>
+        </div>
+        <div class="items" id="products-section">
+            <h3 style="margin-top: 10px;">Sipariş İçeriği</h3>
+            <table>
+                <thead><tr><th>Ürün Bilgisi</th><th>Adet</th><th>Barkod</th></tr></thead>
+                <tbody>
+                    ${linesHtml}
+                </tbody>
+            </table>
         </div>
         <div class="error-footer">
             <strong>Periodya Güvenlik Ağı tarafından oluşturulmuştur.</strong><br/><br/>
