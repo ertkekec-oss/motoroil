@@ -4,6 +4,10 @@ import { ActionProviderRegistry } from '@/services/marketplaces/actions/registry
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { getLabelSignedUrl } from '@/lib/s3';
 
+export const runtime = "nodejs";
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
     try {
         const auth = await authorize();

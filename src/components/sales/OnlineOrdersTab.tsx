@@ -257,6 +257,14 @@ export function OnlineOrdersTab({
                                 }
                                 
                                 setIsGeneratingBulk(true);
+                                const newWindow = window.open('', '_blank');
+                                if (!newWindow) {
+                                    setIsGeneratingBulk(false);
+                                    showError("Tarayıcı Engeli", "Lütfen açılır pencere (popup) engelleyicisini kapatın ve tekrar deneyin.");
+                                    return;
+                                }
+                                newWindow.document.write('<body style="background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;margin:0;"><div><h2>Toplu Etiketler Hazırlanıyor...</h2><p style="color:#94a3b8;">Lütfen bekleyin, PDF birleştirme işlemi biraz zaman alabilir.</p></div></body>');
+
                                 try {
                                     const res = await fetch('/api/marketplaces/bulk-label', {
                                         method: 'POST',
@@ -269,8 +277,9 @@ export function OnlineOrdersTab({
                                     }
                                     const blob = await res.blob();
                                     const url = URL.createObjectURL(blob);
-                                    window.open(url, '_blank');
+                                    newWindow.location.href = url;
                                 } catch(e: any) {
+                                    if (newWindow) newWindow.close();
                                     showError("İşlem Başarısız", e.message);
                                 } finally {
                                     setIsGeneratingBulk(false);
