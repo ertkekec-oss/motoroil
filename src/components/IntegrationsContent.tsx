@@ -55,15 +55,15 @@ function ERPBlock({ title, children, aside }: { title?: string, children: React.
 
 function ERPSwitch({ checked, onChange, label, description }: any) {
     return (
-        <label className="flex items-start gap-3 cursor-pointer group">
-            <div className="relative inline-flex items-center mt-0.5">
+        <label className="flex items-start gap-3 cursor-pointer group w-fit">
+            <div className="relative inline-flex items-center mt-0.5 shrink-0">
                 <input type="checkbox" className="sr-only peer" checked={checked} onChange={onChange} />
-                <div className="w-9 h-5 bg-slate-200 peer-checked:bg-slate-900 dark:bg-white rounded-full transition-colors duration-200">
-                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#0B1220] shadow-sm transition-transform duration-200 ${checked ? 'translate-x-4' : 'translate-x-0'}`} />
+                <div className="w-9 h-5 bg-slate-200 dark:bg-white/10 peer-checked:bg-slate-900 dark:peer-checked:bg-indigo-500 rounded-full transition-colors duration-200">
+                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${checked ? 'left-[2px]' : 'left-0.5'}`} style={{ transform: checked ? 'translateX(16px)' : 'translateX(0)' }} />
                 </div>
             </div>
             <div>
-                <p className="text-[14px] font-medium text-slate-900 dark:text-white group-hover:text-black transition-colors">{label}</p>
+                <p className="text-[14px] font-medium text-slate-900 dark:text-white group-hover:text-black dark:group-hover:text-slate-200 transition-colors">{label}</p>
                 {description && <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
             </div>
         </label>
@@ -104,10 +104,10 @@ function NavStrip({ activeTab, onTabChange }: { activeTab: TabId; onTabChange: (
                     <button
                         key={tab.id}
                         onClick={() => onTabChange(tab.id)}
-                        className={`relative px-6 py-4 flex flex-col items-start gap-0.5 transition-colors focus:outline-none ${isActive ? '' : 'hover:bg-slate-50'
+                        className={`relative px-6 py-4 flex flex-col items-start gap-0.5 transition-colors focus:outline-none ${isActive ? '' : 'hover:bg-slate-50 dark:hover:bg-white/5'
                             }`}
                     >
-                        <span className={`text-[14px] font-semibold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300'}`}>{tab.label}</span>
+                        <span className={`text-[14px] font-semibold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>{tab.label}</span>
                         <span className="text-[12px] text-slate-400 dark:text-slate-500">{tab.desc}</span>
                         {isActive && (
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 dark:bg-white rounded-t-sm" />
@@ -282,7 +282,7 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
         <div className="max-w-6xl mx-auto w-full px-8 py-8 space-y-8 animate-in fade-in duration-300">
             {/* Ozet / Dashboard Strip */}
             <div className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5">
                     <div>
                         <p className="text-[14px] font-semibold text-slate-900 dark:text-white">Çoklu Kanal (Omnichannel) İzleme</p>
                         <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">Sipariş verileri asenkron senkronize edilir.</p>
