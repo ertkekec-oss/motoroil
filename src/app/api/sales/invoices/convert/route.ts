@@ -46,7 +46,7 @@ export async function POST(request: Request) {
                     companyId: order.companyId,
                     invoiceNo: invoiceNo || `INV-${Date.now()}`,
                     customerId: customerId,
-                    orderId: orderId || null,
+                    orderId: order.id,
                     amount: subtotal - discAmount,
                     taxAmount: totalVat + totalOtv, // Total tax includes OTV
                     totalAmount: grandTotal,

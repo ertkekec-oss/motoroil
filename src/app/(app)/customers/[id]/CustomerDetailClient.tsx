@@ -490,7 +490,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 customerId: customer.id,
                                 supplierId: '',
                                 isExisting: true, 
-                                description: selectedOrder?.id || ''
+                                description: data.invoice?.id || selectedOrder?.id || ''
                             })
                         });
                     } catch (e) {
@@ -572,8 +572,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const paginatedHistory = filteredHistory.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     const todayStr = new Date().toISOString().split('T')[0];
+    const next30DaysDate = new Date();
+    next30DaysDate.setDate(next30DaysDate.getDate() + 30);
+    const next30DaysStr = next30DaysDate.toISOString().split('T')[0];
+
     const todayInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] === todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
     const overdueInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] < todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
+    const upcomingInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] > todayStr && i.dueDate.split('T')[0] <= next30DaysStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
+
+    const overdueAmount = overdueInstallments.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
+    const upcomingAmount = upcomingInstallments.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
+    const todayAmount = todayInstallments.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
 
     return (
         <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-main)', color: 'var(--text-main)' }}>
@@ -583,9 +592,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 <div style={{ background: overdueInstallments.length > 0 ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.2) 100%)' : 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.2) 100%)', borderBottom: overdueInstallments.length > 0 ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
                     <span style={{ fontSize: '20px' }}>⚠️</span>
                     <span style={{ color: 'var(--text-main, #fff)', fontWeight: '800', fontSize: '14px', letterSpacing: '0.5px' }}>
-                        {overdueInstallments.length > 0 ? `${overdueInstallments.length} adet gecikmiş taksit ödemesi bulunmaktadır.` : ''}
-                        {overdueInstallments.length > 0 && todayInstallments.length > 0 ? ' Ayrıca, ' : ''}
-                        {todayInstallments.length > 0 ? `BUGÜN VADE GÜNÜ olan ${todayInstallments.length} adet ödeme var.` : ''}
+                        {overdueInstallments.length > 0 ? `${overdueInstallments.length} adet gecikmiş taksit ödemesi bulunmaktadır (Toplam: ${overdueAmount.toLocaleString('tr-TR')} ₺). ` : ''}
+                        {todayInstallments.length > 0 ? `BUGÜN VADE GÜNÜ olan ${todayInstallments.length} adet ödeme var (Toplam: ${todayAmount.toLocaleString('tr-TR')} ₺).` : ''}
                     </span>
                     <button style={{ marginLeft: '12px', padding: '6px 12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '11px', fontWeight: '800' }}>Detayları İncele</button>
                 </div>
@@ -722,8 +730,27 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     {balance > 0 ? 'Borçlu (Risk)' : balance < 0 ? 'Alacaklı' : 'Kapalı (Dengeli)'}
                                 </div>
                             </div>
+
+                            {/* DUE INSTALLMENTS SUMMARY */}
+                            {(overdueInstallments.length > 0 || upcomingInstallments.length > 0) && (
+                                <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    {overdueInstallments.length > 0 && (
+                                        <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', padding: '8px 12px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                            <span style={{ fontSize: '10px', color: '#ef4444', fontWeight: '800', textTransform: 'uppercase' }}>VADESİ GEÇEN</span>
+                                            <span style={{ fontSize: '14px', color: '#ef4444', fontWeight: '900', fontFamily: 'monospace' }}>{overdueAmount.toLocaleString('tr-TR')} ₺</span>
+                                        </div>
+                                    )}
+                                    {upcomingInstallments.length > 0 && (
+                                        <div style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', padding: '8px 12px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                            <span style={{ fontSize: '10px', color: '#3b82f6', fontWeight: '800', textTransform: 'uppercase' }}>YAKLAŞAN VADE (30 GÜN)</span>
+                                            <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: '900', fontFamily: 'monospace' }}>{upcomingAmount.toLocaleString('tr-TR')} ₺</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {portfolioChecks > 0 && (
-                                <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '600', marginTop: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '600', marginTop: '12px', display: 'flex', gap: '6px', alignItems: 'center' }}>
                                     <span>⚠️</span> Portföyde {portfolioChecks.toLocaleString()} ₺ değerinde aktif çek/senet var.
                                 </div>
                             )}
