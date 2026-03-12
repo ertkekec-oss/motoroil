@@ -165,6 +165,31 @@ export default function AccountingPage() {
         return <span className={`px-2.5 py-1 rounded-[6px] text-[11px] font-bold tracking-[0.08em] uppercase inline-flex ${bg} ${text}`}>{label}</span>;
     };
 
+    const handleCheckImageUpload = async (checkId: string, file: File) => {
+        const loadingStr = 'upload_' + checkId;
+        setSyncStates(prev => ({ ...prev, [loadingStr]: 'SYNCING' }));
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const res = await fetch(`/api/financials/checks/${checkId}/image`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.ok) {
+                showSuccess('Başarılı', 'Görsel yüklendi');
+                refreshData();
+            } else {
+                showError('Hata', data.error);
+            }
+        } catch (e) {
+            showError('Hata', 'Görsel yüklenemedi');
+        } finally {
+            setSyncStates(prev => ({ ...prev, [loadingStr]: 'IDLE' }));
+        }
+    };
+
     return (
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-10 transition-colors duration-300 font-sans">
             <AccountingModals
@@ -304,6 +329,7 @@ export default function AccountingPage() {
                                     <th className="h-[56px] px-4 text-left text-[11px] uppercase tracking-[0.08em] font-bold text-slate-500 align-middle">Vade / Tarih</th>
                                     <th className="h-[56px] px-4 text-right text-[11px] uppercase tracking-[0.08em] font-bold text-slate-500 align-middle">Tutar</th>
                                     <th className="h-[56px] px-4 text-right text-[11px] uppercase tracking-[0.08em] font-bold text-slate-500 align-middle">Durum</th>
+                                    {activeTab === 'checks' && <th className="h-[56px] px-4 text-right text-[11px] uppercase tracking-[0.08em] font-bold text-slate-500 align-middle">İşlem</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[rgba(15,23,42,0.04)] dark:divide-[rgba(96,165,250,0.05)]">
@@ -390,10 +416,40 @@ export default function AccountingPage() {
                                         {checks.map((check, i) => (
                                             <tr key={`ch-${i}`} className={`h-[56px] transition-colors ${theme === 'light' ? 'hover:bg-slate-50/50' : 'hover:bg-blue-500/5'}`}>
                                                 {renderCell(check.description || 'Çek')}
-                                                {renderCell(renderBadge(check.type === 'In' ? 'Alacak' : 'Borç', check.type === 'In' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-slate-500/10 text-slate-600 dark:text-slate-400'))}
+                                                {renderCell(renderBadge(check.type === 'In' || check.type.includes('Alınan') ? 'Alacak' : 'Borç', check.type === 'In' || check.type.includes('Alınan') ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-slate-500/10 text-slate-600 dark:text-slate-400'))}
                                                 {renderCell(new Date(check.dueDate).toLocaleDateString('tr-TR'))}
                                                 {renderCell(formatCurrency(check.amount), "text-right", "font-semibold")}
                                                 {renderCell(renderBadge(check.status, 'bg-slate-500/10 text-slate-500 dark:text-slate-400'), "text-right")}
+                                                {renderCell(
+                                                    <div className="flex gap-2 justify-end items-center">
+                                                        {check.type?.includes('Senet') ? (
+                                                            check.signatureStatus === 'İmzalandı' ? (
+                                                                <button onClick={() => window.open(check.signedDocumentUrl, '_blank')} className="px-2 py-1 text-[10px] bg-emerald-500/10 text-emerald-600 font-bold rounded">İmzalı Belgeyi Gör</button>
+                                                            ) : (
+                                                                <button onClick={() => window.open(`/signatures/envelopes/new?ref=${check.id}`, '_blank')} className="px-2 py-1 text-[10px] bg-blue-500/10 text-blue-600 font-bold rounded cursor-pointer whitespace-nowrap">İmzaya Sun (OTP)</button>
+                                                            )
+                                                        ) : (
+                                                            <>
+                                                                {(check as any).imageUrl && (
+                                                                    <button onClick={() => window.open((check as any).imageUrl, '_blank')} className="px-2 py-1 text-[10px] bg-slate-500/10 text-slate-600 font-bold rounded cursor-pointer">Görseli Gör</button>
+                                                                )}
+                                                                <input 
+                                                                    type="file" 
+                                                                    id={`upload-${check.id}`}
+                                                                    className="hidden" 
+                                                                    accept="image/*,.pdf"
+                                                                    onChange={(e) => {
+                                                                        if (e.target.files?.[0]) handleCheckImageUpload(check.id, e.target.files[0])
+                                                                    }}
+                                                                />
+                                                                <label htmlFor={`upload-${check.id}`} className="cursor-pointer px-2 py-1 text-[10px] bg-amber-500/10 text-amber-600 font-bold rounded whitespace-nowrap">
+                                                                    {syncStates['upload_' + check.id] === 'SYNCING' ? 'Yükleniyor...' : 'Görsel Yükle'}
+                                                                </label>
+                                                            </>
+                                                        )}
+                                                    </div>,
+                                                    "text-right"
+                                                )}
                                             </tr>
                                         ))}
                                     </>
