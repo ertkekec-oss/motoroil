@@ -13,6 +13,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         const body = await request.json().catch(() => ({}));
         let { skipStockUpdate = false, skipFinanceUpdate = false } = body;
         const companyId = session.user?.companyId || (session as any).companyId;
+        let relatedDespatches: string[] = [];
 
         // 1. Try to find the invoice locally
         let invoice = await prisma.purchaseInvoice.findFirst({
@@ -135,7 +136,6 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
                 // B. Detect Waybill (İrsaliye) integration inherently to prevent stock duplicates
                 let hasDespatchRef = false;
-                let relatedDespatches: string[] = [];
                 
                 // Root references
                 if (invData.DespatchDocumentReference) {
@@ -303,6 +303,40 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                         branch: String(branch)
                     }
                 });
+            }
+
+            // E. Auto-close related despatches so they don't remain open 
+            if (relatedDespatches && relatedDespatches.length > 0) {
+                for (const dId of relatedDespatches) {
+                    console.log(`[PurchaseApprove] Auto-closing related despatch: ${dId}`);
+                    const existingDesp = await tx.purchaseInvoice.findFirst({
+                        where: { companyId, invoiceNo: String(dId) }
+                    });
+                    if (existingDesp) {
+                        if (existingDesp.status !== 'Onaylandı') {
+                            await tx.purchaseInvoice.update({
+                                where: { id: existingDesp.id },
+                                data: { status: 'Onaylandı' }
+                            });
+                        }
+                    } else {
+                        // Create an empty, pre-approved Despatch marker so it skips "Bekliyor"
+                        await tx.purchaseInvoice.create({
+                            data: {
+                                companyId,
+                                supplierId: invoice!.supplierId,
+                                invoiceNo: String(dId),
+                                invoiceDate: invoice!.invoiceDate || new Date(),
+                                amount: 0,
+                                taxAmount: 0,
+                                totalAmount: 0,
+                                items: [],
+                                status: 'Onaylandı',
+                                description: `Otomatik Kapatıldı (Fatura Ref: ${invoice!.invoiceNo})`
+                            }
+                        });
+                    }
+                }
             }
 
             return { updatedInvoice, transaction };
