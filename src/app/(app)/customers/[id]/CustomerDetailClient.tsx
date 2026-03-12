@@ -397,6 +397,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     const vatRate = realProduct ? Number(realProduct.salesVat || 20) : Number(it.vat || 20);
                     const otvType = realProduct ? (realProduct.otvType || 'Ö.T.V yok') : 'Ö.T.V yok';
                     const otvRate = realProduct ? Number(realProduct.salesOtv || 0) : 0;
+                    const otvCode = realProduct ? (realProduct.otvCode || '0071') : '0071';
                     const oivRate = realProduct ? Number(realProduct.salesOiv || 0) : 0;
 
                     // PRICE RESOLUTION LOGIC
@@ -427,6 +428,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         price: netPrice,
                         vat: vatRate,
                         otv: otvRate,
+                        otvCode: otvCode,
                         otvType: otvType,
                         oiv: oivRate
                     };
@@ -1498,6 +1500,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                     price: Number(selectedProduct.price || 0),
                                                                                     vat: Number(selectedProduct.salesVat || 20),
                                                                                     otv: Number(selectedProduct.salesOtv || 0),
+                                                                                    otvCode: selectedProduct.otvCode || '0071',
                                                                                     otvType: selectedProduct.otvType || 'Ö.T.V yok',
                                                                                     oiv: Number(selectedProduct.salesOiv || 0)
                                                                                 };
@@ -2002,6 +2005,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         const vatRate = Number(p.salesVat || 20);
                                         const otvType = p.otvType || 'Ö.T.V yok';
                                         const otvRate = Number(p.salesOtv || 0);
+                                        const otvCode = p.otvCode || '0071';
                                         const oivRate = Number(p.salesOiv || 0);
                                         const effectiveVatOiv = (1 + (vatRate + oivRate) / 100);
 
@@ -2030,6 +2034,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             price: netPrice,
                                                             vat: vatRate,
                                                             otv: otvRate,
+                                                            otvCode: otvCode,
                                                             otvType: otvType,
                                                             oiv: oivRate,
                                                             productId: p.id

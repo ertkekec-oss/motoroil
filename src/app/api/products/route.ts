@@ -116,7 +116,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { name, code, barcode, brand, category, type, stock, price, buyPrice, supplier, branch,
             salesVat, salesVatIncluded, purchaseVat, purchaseVatIncluded,
-            salesOiv, salesOtv, otvType, isParent, variantsData, unit,
+            salesOiv, salesOtv, otvType, otvCode, isParent, variantsData, unit,
             currency, purchaseCurrency, imageUrl, imageKey,
             description, countryCode, invoiceTitle, showDescriptionOnInvoice, shelfLocation, tags, gtin,
             purchaseDiscount, purchaseOtv
@@ -155,6 +155,7 @@ export async function POST(request: Request) {
                     purchaseDiscount: parseFloat(purchaseDiscount) || 0,
                     purchaseOtv: parseFloat(purchaseOtv) || 0,
                     otvType: otvType || 'Ö.T.V yok',
+                    otvCode: otvCode || '0071',
                     imageUrl: imageUrl || undefined,
                     imageKey: imageKey || undefined,
                     description: description || undefined,

@@ -466,9 +466,24 @@ function StepPricingTax({ data, onChange }: any) {
                             </div>
                         </div>
                         {data.otvType !== 'Ö.T.V yok' && (
-                            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                <label className="text-xs uppercase tracking-wide text-purple-600 dark:text-purple-400 font-bold mb-1 block">Satış ÖTV {data.otvType === 'Yüzdesel' ? 'Oranı (%)' : 'Tutarı'}</label>
-                                <input type="number" value={data.salesOtv ?? 0} onChange={e => onChange({ ...data, salesOtv: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border-2 border-purple-200 dark:border-purple-500/30 text-slate-900 dark:text-white focus:ring-0 focus:border-purple-500 outline-none shadow-sm transition-all bg-purple-50/30 dark:bg-purple-900/10" placeholder="0.00" />
+                            <div className="animate-in fade-in slide-in-from-top-2 duration-300 grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs uppercase tracking-wide text-purple-600 dark:text-purple-400 font-bold mb-1 block">Satış ÖTV {data.otvType === 'Yüzdesel' ? 'Oranı (%)' : 'Tutarı'}</label>
+                                    <input type="number" value={data.salesOtv ?? 0} onChange={e => onChange({ ...data, salesOtv: parseFloat(e.target.value) })} className="w-full h-12 px-3 rounded-xl border-2 border-purple-200 dark:border-purple-500/30 text-slate-900 dark:text-white focus:ring-0 focus:border-purple-500 outline-none shadow-sm transition-all bg-purple-50/30 dark:bg-purple-900/10" placeholder="0.00" />
+                                </div>
+                                {data.salesOtv > 0 && (
+                                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <label className="text-xs uppercase tracking-wide text-purple-600 dark:text-purple-400 font-bold mb-1 block">Ö.T.V Kodu</label>
+                                        <select value={data.otvCode || '0071'} onChange={e => onChange({ ...data, otvCode: e.target.value })} className="w-full h-12 px-3 rounded-xl border-2 border-purple-200 dark:border-purple-500/30 text-slate-900 dark:text-white focus:ring-0 focus:border-purple-500 outline-none shadow-sm transition-all bg-purple-50/30 dark:bg-purple-900/10">
+                                            <option value="0071">0071 - Özel Tüketim Vergisi</option>
+                                            <option value="0073">0073 - Kolalı Gazozlardan Alınan ÖTV</option>
+                                            <option value="0074">0074 - Alkollü İçeceklerden Alınan ÖTV</option>
+                                            <option value="0075">0075 - Tütün Mamüllerinden Alınan ÖTV</option>
+                                            <option value="0076">0076 - Motorlu Taşıtlardan Alınan ÖTV</option>
+                                            <option value="0077">0077 - Elektrik ve Havagazı Tüketim Vergisi</option>
+                                        </select>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
