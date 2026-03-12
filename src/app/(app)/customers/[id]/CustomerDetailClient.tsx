@@ -485,7 +485,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 totalAmount: data.invoice.totalAmount,
                                 installmentCount: invoiceData.installments.toString(),
                                 startDate: new Date().toISOString().split('T')[0],
-                                type: 'Kredi',
+                                type: invoiceData.installmentType || 'Açık Hesap',
                                 direction: 'IN',
                                 customerId: customer.id,
                                 supplierId: '',
@@ -1511,11 +1511,24 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         </label>
                                     </div>
                                     {isInstallmentInvoice && (
-                                        <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                            <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-main, white)' }}>Vade Sayısı:</span>
-                                            <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-panel, #0f172a)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '800', outline: 'none' }}>
-                                                {[1,2,3,4,5,6,7,8,9,10,11,12].map(n => <option key={n} value={n}>{n} Ay Vade</option>)}
-                                            </select>
+                                        <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-main, white)' }}>Vade Sayısı:</span>
+                                                <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-panel, #0f172a)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '800', outline: 'none' }}>
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Vade</option>)}
+                                                </select>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-main, white)' }}>Ödeme Türü:</span>
+                                                <select id="inv_installment_type" style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-panel, #0f172a)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '800', outline: 'none' }}>
+                                                    <option value="Açık Hesap">Açık Hesap</option>
+                                                    <option value="Çek">Çek Alınacak</option>
+                                                    <option value="Senet">Senet (Periodya İmza)</option>
+                                                </select>
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: '#94a3b8', width: '100%', marginTop: '4px' }}>
+                                                📝 Not: Sensiz (Çek/Senet) ödeme planları finansal hareketlerde o kategorilerde takip edilir. Senet seçeneği "Periodya Trust & Compliance Suite" (Dijital İmza) kullanılarak müşterinin e-onayına sunulur.
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -1820,6 +1833,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             createWayslip: (document.getElementById('inv_create_wayslip') as HTMLInputElement)?.checked || false,
                                             isInstallment: isInstallmentInvoice,
                                             installments: invoiceInstallmentCount,
+                                            installmentType: (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap',
                                             description: (() => {
                                                 if (isInstallmentInvoice) {
                                                     const dates = [];
@@ -1829,7 +1843,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         d.setMonth(d.getMonth() + i);
                                                         dates.push(d.toLocaleDateString('tr-TR'));
                                                     }
-                                                    return `VADE SAYISI: ${invoiceInstallmentCount} | VADE TARİHLERİ: ${dates.join(', ')}`;
+                                                    const instType = (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap';
+                                                    return `VADE SAYISI: ${invoiceInstallmentCount} | ÖDEME TİPİ: ${instType} | VADE TARİHLERİ: ${dates.join(', ')}`;
                                                 }
                                                 return '';
                                             })()

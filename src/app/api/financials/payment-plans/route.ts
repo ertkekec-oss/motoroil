@@ -78,7 +78,7 @@ export async function POST(request: Request) {
             if (!isExisting) {
                 // 1. Receivables (Vadeli Satış) -> Müşteri Borçlanır
                 if (direction === 'IN' && customerId) {
-                    // Create Sales Transaction (Without Kasa - Veresiye)
+                    // Create Sales Transaction (Without Kasa - Veresiye) to record the debt
                     await tx.transaction.create({
                         data: {
                             companyId: company.id, // Set Company ID
@@ -97,6 +97,50 @@ export async function POST(request: Request) {
                         where: { id: customerId },
                         data: { balance: { increment: total } }
                     });
+
+                    // If they selected Çek or Senet, we automatically "receive" those instruments
+                    if (type === 'Çek' || type === 'Senet') {
+                        // For each installment, create a Check/Senet record
+                        for (let i = 0; i < count; i++) {
+                            const dueDate = new Date(start);
+                            dueDate.setMonth(dueDate.getMonth() + i);
+                            const amount = i === count - 1 ? monthlyAmount + remainder : monthlyAmount;
+                            
+                            await tx.check.create({
+                                data: {
+                                    companyId: company.id,
+                                    type: type === 'Senet' ? 'Senet (Alınan)' : 'Çek (Alınan)',
+                                    number: `PLN-${Date.now().toString().slice(-6)}-${i+1}`,
+                                    dueDate: dueDate,
+                                    amount: amount,
+                                    status: 'Beklemede',
+                                    description: `${title} - ${i+1}. Taksit`,
+                                    customerId: customerId,
+                                    branch: branch || 'Merkez'
+                                }
+                            });
+                        }
+
+                        // We optionally create a transaction for receiving the Check/Senet 
+                        // so it shows up in "Finansal Hareketler" as well.
+                        await tx.transaction.create({
+                            data: {
+                                companyId: company.id,
+                                type: type === 'Senet' ? 'Senet' : 'Check',
+                                amount: total, // Total amount of checks/senets received
+                                description: `${count} Adet ${type} Alındı - ${title}`,
+                                date: start,
+                                branch: branch || 'Merkez',
+                                customerId: customerId
+                            }
+                        });
+                        
+                        // Receiving Check/Senet pays off the open balance
+                        await tx.customer.update({
+                            where: { id: customerId },
+                            data: { balance: { decrement: total } }
+                        });
+                    }
                 }
 
                 // 2. Payables (Vadeli Borç/Mal Alımı) -> Tedarikçiye Borçlanırız
@@ -121,6 +165,47 @@ export async function POST(request: Request) {
                         where: { id: supplierId },
                         data: { balance: { decrement: total } }
                     });
+                    
+                    if (type === 'Çek' || type === 'Senet') {
+                        // For each installment, create a Check/Senet record
+                        for (let i = 0; i < count; i++) {
+                            const dueDate = new Date(start);
+                            dueDate.setMonth(dueDate.getMonth() + i);
+                            const amount = i === count - 1 ? monthlyAmount + remainder : monthlyAmount;
+                            
+                            await tx.check.create({
+                                data: {
+                                    companyId: company.id,
+                                    type: type === 'Senet' ? 'Senet (Verilen)' : 'Çek (Verilen)',
+                                    number: `PLN-${Date.now().toString().slice(-6)}-${i+1}`,
+                                    dueDate: dueDate,
+                                    amount: amount,
+                                    status: 'Beklemede',
+                                    description: `${title} - ${i+1}. Taksit`,
+                                    supplierId: supplierId,
+                                    branch: branch || 'Merkez'
+                                }
+                            });
+                        }
+
+                        await tx.transaction.create({
+                            data: {
+                                companyId: company.id,
+                                type: type === 'Senet' ? 'Senet' : 'Check', // Treat as payment going out
+                                amount: total,
+                                description: `${count} Adet ${type} Verildi - ${title}`,
+                                date: start,
+                                branch: branch || 'Merkez',
+                                supplierId: supplierId
+                            }
+                        });
+                        
+                        // Giving a check/senet pays our debt, increasing the supplier balance back
+                        await tx.supplier.update({
+                            where: { id: supplierId },
+                            data: { balance: { increment: total } }
+                        });
+                    }
                 }
             }
 
