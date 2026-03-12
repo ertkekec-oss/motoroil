@@ -364,8 +364,9 @@ export class NilveraInvoiceService {
         }
 
         // Sanal (Virtual) İrsaliye Desteği: Mükellef olmayanlara da e-İrsaliye gönderilebilir
-        // Nilvera API'sinde sanal irsaliye için CustomerAlias alanı ya hiç gönderilmemeli ya da null olmalıdır.
-        const finalAlias = (isDespatchUser && alias) ? alias : null;
+        // GİB kuralı gereği sanal irsaliye alias'ı atanır. Eğer sistem yanılarak bunu gönderirse ve 
+        // karşı taraf mükellef ise Nilvera 3000 hatası döner, biz de bunu yakalayıp düzeltiriz.
+        let finalAlias = (isDespatchUser && alias) ? alias : "urn:mail:defaultpk@gib.gov.tr";
 
         const series = params.despatchSeries || await this.getDefaultDespatchSeries();
 
@@ -451,20 +452,30 @@ export class NilveraInvoiceService {
                 DespatchLines: despatchLines,
                 ShipmentDetail: shipmentDetail,
                 Notes: [params.description || "İrsaliye"]
-            }
+            },
+            CustomerAlias: finalAlias
         };
 
-        if (finalAlias) {
-            payload.CustomerAlias = finalAlias;
-        }
-
         try {
-            // E-İrsaliye alıcısı değilse matbu irsaliye olarak (arşiv gibi) mi gider?
-            // Nilvera'da e-İrsaliye zorunlu mükellefler arasıdır. Ama biz model gönderiyoruz.
-            const response = await axios.post(`${this.config.baseUrl}/EDespatch/Send/Model`, payload, {
+            // İlk deneme: Gerçek alias veya GİB Sanal İrsaliye alias'ı
+            let response = await axios.post(`${this.config.baseUrl}/EDespatch/Send/Model`, payload, {
                 headers: this.getHeaders(),
                 validateStatus: () => true
             });
+
+            // GİB/Nilvera 3000 Hatası: "Alıcı Ait Etiket Bulunamadı"
+            // Bu durum, VKN'nin aslında kayıtlı bir mükellef olduğu ancak test veya sorgu hatası nedeniyle 
+            // bizim ona "Sanal İrsaliye" (gib.gov.tr) kesmeye çalıştığımızda ortaya çıkar.
+            // ÇÖZÜM: Nilvera'nın varsayılan posta kutusuna yönlendirerek Retry (Yeniden Deneme) yaparız.
+            if (response.status >= 400 && response.data && JSON.stringify(response.data).includes('Etiket Bulunamadı')) {
+                console.log("[NilveraService] Etiket Bulunamadı hatası alındı (Muhtemel test ortamı/eksik alias). Nilvera Default PK ile Retry ediliyor...");
+                payload.CustomerAlias = "urn:mail:defaultpk@nilvera.com";
+                
+                response = await axios.post(`${this.config.baseUrl}/EDespatch/Send/Model`, payload, {
+                    headers: this.getHeaders(),
+                    validateStatus: () => true
+                });
+            }
 
             if (response.status >= 400) {
                 return { success: false, status: response.status, error: JSON.stringify(response.data), data: response.data };
