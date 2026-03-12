@@ -11,7 +11,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         const { id } = await context.params;
         const body = await request.json().catch(() => ({}));
-        const { skipStockUpdate = false, skipFinanceUpdate = false } = body;
+        let { skipStockUpdate = false, skipFinanceUpdate = false } = body;
         const companyId = session.user?.companyId || (session as any).companyId;
 
         // 1. Try to find the invoice locally
@@ -133,9 +133,48 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     });
                 }
 
-                // B. Map Items and Prepare Local Invoice Data
+                // B. Detect Waybill (İrsaliye) integration inherently to prevent stock duplicates
+                let hasDespatchRef = false;
+                let relatedDespatches: string[] = [];
+                
+                // Root references
+                if (invData.DespatchDocumentReference) {
+                    const refs = Array.isArray(invData.DespatchDocumentReference) ? invData.DespatchDocumentReference : [invData.DespatchDocumentReference];
+                    for (const r of refs) {
+                        if (r.ID) { hasDespatchRef = true; relatedDespatches.push(r.ID); }
+                    }
+                }
+                if (invData.OrderReference && String(invData.OrderReference.ID || '').toLowerCase().includes('irs')) {
+                    hasDespatchRef = true;
+                    relatedDespatches.push(invData.OrderReference.ID);
+                }
+                if (invData.AdditionalDocumentReference) {
+                    const refs = Array.isArray(invData.AdditionalDocumentReference) ? invData.AdditionalDocumentReference : [invData.AdditionalDocumentReference];
+                    for (const r of refs) {
+                        if (r.DocumentType === 'Irsaliye' || r.DocumentType === 'İrsaliye' || r.DocumentTypeCode === 'Despatch') {
+                            hasDespatchRef = true;
+                            if (r.ID) relatedDespatches.push(r.ID);
+                        }
+                    }
+                }
+
+                // C. Map Items and Prepare Local Invoice Data
                 const nilveraLines = invData.DespatchLines || invData.InvoiceLines || invData.Items || invData.Lines || invData.PurchaseInvoiceLines || [];
                 console.log(`[PurchaseApprove] Line count: ${nilveraLines.length}`);
+
+                // Line references
+                for (const line of nilveraLines) {
+                    const desc = String(line.Name || line.Description || line.Note || "");
+                    if (desc.toLowerCase().includes('irsaliye:')) {
+                        hasDespatchRef = true;
+                    }
+                }
+
+                if (hasDespatchRef && !invData.DespatchLines) {
+                    // IF it is an Invoice (not a Despatch itself) and it has despatch refs:
+                    skipStockUpdate = true;
+                    console.log('[PurchaseApprove] 📦 WAYBILL DETECTED in Invoice Payload! Overriding skipStockUpdate=true for:', relatedDespatches);
+                }
 
                 const localItems = [];
                 for (const line of nilveraLines) {
@@ -281,7 +320,11 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             })();
         }
 
-        return NextResponse.json({ success: true, message: 'Fatura kabul edildi ve stoklara işlendi.' });
+        return NextResponse.json({ 
+            success: true, 
+            message: 'Fatura kabul edildi ve işlemleri tamamlandı.',
+            autoSkippedStock: skipStockUpdate
+        });
     } catch (error: any) {
         console.error('Purchase Approve Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });

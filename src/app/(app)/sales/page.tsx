@@ -403,13 +403,7 @@ export default function SalesPage() {
             let skipStock = false;
             let skipFinance = false;
 
-            if (!isDespatch) {
-                // Fatura ise sor (mükerrer stok olmaması için)
-                const answer = window.confirm('BİLGİ: Bu faturanın irsaliyesini daha önce kabul edip stoklarınıza eklediniz mi?\n\n[TAMAM] => EVET, bu faturanın stoklarını tekrar ekleme, sadece Cari/Muhasebe işlemini yap.\n[İPTAL] => HAYIR, henüz eklemedim, faturadaki ürünleri stoklara işle.');
-                if (answer) {
-                    skipStock = true;
-                }
-            } else {
+            if (isDespatch) {
                 // İrsaliye ise cari hareket yapılmaz, sadece stok etkilenir
                 skipFinance = true;
             }
@@ -424,8 +418,10 @@ export default function SalesPage() {
                 const data = await res.json();
                 if (data.success) {
                     let successMsg = '✅ Belge başarıyla işlendi.';
-                    if (skipStock && !isDespatch) successMsg += ' (Stoklar atlandı, sadece Cari Kayıt yapıldı)';
-                    if (skipFinance && isDespatch) successMsg += ' (Stoklar eklendi, Cari Kayıt atlandı)';
+                    // If the backend detected it automatically, data.message might have more info, 
+                    // or we just trust the backend logic
+                    if (data.autoSkippedStock) successMsg += ' (Stoklar atlandı, sadece Cari Kayıt yapıldı)';
+                    else if (skipFinance && isDespatch) successMsg += ' (Stoklar eklendi, Cari Kayıt atlandı)';
 
                     showSuccess('Başarılı', successMsg);
                     fetchPurchaseInvoices();
