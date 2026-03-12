@@ -99,7 +99,7 @@ export class NilveraInvoiceService {
                 const findAlias = (item: any) => item.Name || item.Alias || item.alias || item.identifier;
                 const defaultAliasObj = data.find((d: any) => findAlias(d)?.toLowerCase().includes('defaultpk'));
                 const finalAlias = defaultAliasObj ? findAlias(defaultAliasObj) : findAlias(data[0]);
-                return { isDespatchUser: true, alias: finalAlias || "urn:mail:defaultpk@nilvera.com" };
+                return { isDespatchUser: true, alias: finalAlias || "urn:mail:irsaliyepk@gib.gov.tr" };
             }
             return { isDespatchUser: false };
         } catch (error) {
@@ -368,7 +368,8 @@ export class NilveraInvoiceService {
         // Sanal (Virtual) İrsaliye Desteği: Mükellef olmayanlara da e-İrsaliye gönderilebilir
         // GİB kuralı gereği sanal irsaliye alias'ı atanır. Eğer sistem yanılarak bunu gönderirse ve 
         // karşı taraf mükellef ise Nilvera 3000 hatası döner, biz de bunu yakalayıp düzeltiriz.
-        let finalAlias = (isDespatchUser && alias) ? alias : "urn:mail:defaultpk@gib.gov.tr";
+        // DİKKAT: Sanal e-İrsaliye için doğru etiket 'urn:mail:irsaliyepk@gib.gov.tr' dir.
+        let finalAlias = (isDespatchUser && alias) ? alias : "urn:mail:irsaliyepk@gib.gov.tr";
 
         const series = params.despatchSeries || await this.getDefaultDespatchSeries();
 
@@ -471,7 +472,7 @@ export class NilveraInvoiceService {
                 console.log("[NilveraService] Etiket Bulunamadı hatası alındı (Muhtemel test ortamı/eksik alias). Test Retry yapılıyor...");
                 
                 // Genel kurtarma etiketi
-                payload.CustomerAlias = "urn:mail:defaultpk@nilvera.com";
+                payload.CustomerAlias = "urn:mail:irsaliyepk@gib.gov.tr";
                 
                 response = await axios.post(`${this.config.baseUrl}/EDespatch/Send/Model`, payload, {
                     headers: this.getHeaders(),
