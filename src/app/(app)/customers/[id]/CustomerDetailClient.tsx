@@ -430,7 +430,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         otv: otvRate,
                         otvCode: otvCode,
                         otvType: otvType,
-                        oiv: oivRate
+                        oiv: oivRate,
+                        description: it.description || (realProduct && realProduct.showDescriptionOnInvoice ? realProduct.description : ''),
+                        showDesc: !!(it.description || (realProduct && realProduct.showDescriptionOnInvoice))
                     };
                 });
 
@@ -1502,7 +1504,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                     otv: Number(selectedProduct.salesOtv || 0),
                                                                                     otvCode: selectedProduct.otvCode || '0071',
                                                                                     otvType: selectedProduct.otvType || 'Ö.T.V yok',
-                                                                                    oiv: Number(selectedProduct.salesOiv || 0)
+                                                                                    oiv: Number(selectedProduct.salesOiv || 0),
+                                                                                    description: selectedProduct.showDescriptionOnInvoice ? (selectedProduct.description || '') : '',
+                                                                                    showDesc: selectedProduct.showDescriptionOnInvoice ? true : false
                                                                                 };
                                                                                 setInvoiceItems(currentItems);
                                                                             }
@@ -1540,15 +1544,33 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                 ÖİV %${it.oiv}
                                                                             </span>
                                                                         )}
-                                                                        <button
-                                                                            onClick={() => setTaxEditIndex(i)}
-                                                                            style={{ fontSize: '11px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-muted, #aaa)', border: '1px dashed var(--border-color, rgba(255,255,255,0.2))', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', fontWeight: '700' }}
-                                                                            className="hover:border-blue-500 hover:text-blue-500"
-                                                                        >
-                                                                            ⚙️ Vergi Ayarı
-                                                                        </button>
+                                                                            <button
+                                                                                onClick={() => updateItem('showDesc', !it.showDesc)}
+                                                                                style={{ fontSize: '11px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: it.showDesc ? '#3b82f6' : 'var(--text-muted, #aaa)', border: `1px dashed ${it.showDesc ? '#3b82f6' : 'var(--border-color, rgba(255,255,255,0.2))'}`, padding: '4px 10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', fontWeight: '700' }}
+                                                                                className="hover:border-blue-500 hover:text-blue-500"
+                                                                            >
+                                                                                📝 {it.showDesc ? 'Açıklamayı Gizle' : 'Açıklama Ekle'}
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => setTaxEditIndex(i)}
+                                                                                style={{ fontSize: '11px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-muted, #aaa)', border: '1px dashed var(--border-color, rgba(255,255,255,0.2))', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', fontWeight: '700' }}
+                                                                                className="hover:border-blue-500 hover:text-blue-500"
+                                                                            >
+                                                                                ⚙️ Vergi Ayarı
+                                                                            </button>
+                                                                        </div>
+                                                                        {it.showDesc && (
+                                                                            <div style={{ marginTop: '12px' }} className="animate-in fade-in slide-in-from-top-1 duration-200">
+                                                                                <textarea
+                                                                                    placeholder="Malzeme / Hizmet Açıklaması (Örn: ŞASE NO: XYZ, Motor NO: 123...)"
+                                                                                    value={it.description || ''}
+                                                                                    onChange={(e) => updateItem('description', e.target.value)}
+                                                                                    style={{ width: '100%', background: 'var(--bg-card, rgba(255,255,255,0.02))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', padding: '10px 14px', borderRadius: '10px', fontSize: '13px', resize: 'vertical', minHeight: '60px', outline: 'none' }}
+                                                                                    className="focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all custom-scrollbar"
+                                                                                />
+                                                                            </div>
+                                                                        )}
                                                                     </div>
-                                                                </div>
                                                             </td>
                                                             <td style={{ padding: '20px', textAlign: 'center' }}>
                                                                 <input
@@ -2037,7 +2059,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             otvCode: otvCode,
                                                             otvType: otvType,
                                                             oiv: oivRate,
-                                                            productId: p.id
+                                                            productId: p.id,
+                                                            description: p.showDescriptionOnInvoice ? (p.description || '') : '',
+                                                            showDesc: p.showDescriptionOnInvoice ? true : false
                                                         }]);
                                                     }
                                                     setIsProductPickerOpen(false);

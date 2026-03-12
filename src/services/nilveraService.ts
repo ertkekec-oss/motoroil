@@ -8,13 +8,15 @@ export interface NilveraConfig {
     apiKey: string;
     baseUrl: string; // https://api.nilvera.com veya https://apitest.nilvera.com
 }
-
 export interface InvoiceLine {
     Name: string;
     Quantity: number;
     UnitType: string; // C62 (Adet) vb.
     Price: number;
     VatRate: number;
+    Description?: string;
+    OtvRate?: number;
+    OtvCode?: string;
 }
 
 export interface CustomerInfo {
@@ -277,8 +279,21 @@ export class NilveraInvoiceService {
                 VatRate: line.VatRate,
                 KDVPercent: line.VatRate,
                 VatAmount: vatAmount,
-                KDVTotal: vatAmount
+                KDVTotal: vatAmount,
+                Description: line.Description,
+                Notes: line.Description ? [line.Description] : undefined
             };
+
+            if (line.OtvRate && line.OtvRate > 0) {
+                const otvAmount = Number((lineExtensionAmount * (line.OtvRate / 100)).toFixed(2));
+                baseLine.Taxes = [
+                    {
+                        TaxCode: line.OtvCode || "0071",
+                        Total: otvAmount,
+                        Percent: line.OtvRate
+                    }
+                ];
+            }
 
             const isExempt = line.VatRate === 0;
             if (isExempt) {

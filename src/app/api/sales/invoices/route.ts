@@ -356,6 +356,8 @@ export async function POST(request: Request) {
                         Price: price,
                         VatRate: vatRate,
                         OtvRate: otvRate,
+                        OtvCode: String(i.otvCode || '0071'),
+                        Description: i.description || "",
                         LineNet: lineNet,
                         LineVat: lineVat,
                         LineOtv: lineOtv,
@@ -397,7 +399,8 @@ export async function POST(request: Request) {
                             Quantity: l.Quantity,
                             UnitType: l.UnitType,
                             Price: l.Price,
-                            VatRate: l.VatRate
+                            VatRate: l.VatRate,
+                            Description: l.Description
                         })),
                         description: invoice.description || "İrsaliye",
                         shipmentDate,
@@ -436,7 +439,10 @@ export async function POST(request: Request) {
                             Quantity: l.Quantity,
                             UnitType: l.UnitType,
                             Price: l.Price,
-                            VatRate: l.VatRate
+                            VatRate: l.VatRate,
+                            Description: l.Description,
+                            OtvRate: l.OtvRate,
+                            OtvCode: l.OtvCode
                         })),
                         amounts: {
                             base: Number(totalNet.toFixed(2)),
