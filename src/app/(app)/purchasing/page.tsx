@@ -29,10 +29,10 @@ export default function PurchasingPage() {
         invNo: '',
         date: new Date().toISOString().split('T')[0],
         targetBranch: 'Merkez Depo',
-        items: [] as { productId: string, name: string, qty: number, price: number }[]
+        items: [] as { productId: string, name: string, qty: number, price: number, description?: string }[]
     });
 
-    const [tempItem, setTempItem] = useState({ productId: '', name: '', qty: 1, price: 0 });
+    const [tempItem, setTempItem] = useState({ productId: '', name: '', qty: 1, price: 0, description: '' });
 
     // --- ACTIONS ---
     const addItem = () => {
@@ -41,7 +41,7 @@ export default function PurchasingPage() {
             ...formData,
             items: [...formData.items, tempItem]
         });
-        setTempItem({ productId: '', name: '', qty: 1, price: 0 });
+        setTempItem({ productId: '', name: '', qty: 1, price: 0, description: '' });
     };
 
     const removeItem = (index: number) => {
@@ -241,7 +241,7 @@ export default function PurchasingPage() {
                                             value={tempItem.productId}
                                             onChange={e => {
                                                 const p = products.find(prod => prod.id === e.target.value);
-                                                setTempItem({ ...tempItem, productId: e.target.value, name: p?.name || '', price: parseFloat(p?.buyPrice) || 0 });
+                                                setTempItem({ ...tempItem, productId: e.target.value, name: p?.name || '', price: parseFloat(String(p?.buyPrice)) || 0 });
                                             }}
                                             className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
                                         >
@@ -268,6 +268,16 @@ export default function PurchasingPage() {
                                             placeholder="Fiyat" 
                                             value={tempItem.price || ''} 
                                             onChange={e => setTempItem({ ...tempItem, price: parseFloat(e.target.value) || 0 })} 
+                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                        />
+                                    </div>
+                                    <div className="w-full md:w-3/12">
+                                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">Açıklama / Şase No vs. (Opsiyonel)</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Örn: ŞASE: XYZ123" 
+                                            value={tempItem.description || ''} 
+                                            onChange={e => setTempItem({ ...tempItem, description: e.target.value })} 
                                             className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
                                         />
                                     </div>
@@ -299,7 +309,14 @@ export default function PurchasingPage() {
                                                     {formData.items.map((item, i) => (
                                                         <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
                                                             <td className="px-5 py-3 text-sm font-medium text-slate-500 dark:text-slate-400">{i + 1}</td>
-                                                            <td className="px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white">{item.name}</td>
+                                                            <td className="px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white">
+                                                                {item.name}
+                                                                {item.description && (
+                                                                    <div className="text-xs text-slate-500 font-medium mt-1 inline-block bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                                                                        {item.description}
+                                                                    </div>
+                                                                )}
+                                                            </td>
                                                             <td className="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 text-right">{item.qty}</td>
                                                             <td className="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 text-right">{item.price.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
                                                             <td className="px-5 py-3 text-sm font-black text-slate-900 dark:text-white text-right">{(item.qty * item.price).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>

@@ -48,12 +48,19 @@ export async function POST(request: Request) {
                     if (branch === 'Merkez') {
                         await tx.product.update({
                             where: { id: item.productId },
-                            data: { stock: { increment: item.qty }, buyPrice: item.price }
+                            data: { 
+                                stock: { increment: item.qty }, 
+                                buyPrice: item.price,
+                                ...(item.description ? { description: item.description, showDescriptionOnInvoice: true } : {})
+                            }
                         });
                     } else {
                         await tx.product.update({
                             where: { id: item.productId },
-                            data: { buyPrice: item.price }
+                            data: { 
+                                buyPrice: item.price,
+                                ...(item.description ? { description: item.description, showDescriptionOnInvoice: true } : {}) 
+                            }
                         });
                     }
 
