@@ -370,21 +370,22 @@ export class NilveraInvoiceService {
         const series = params.despatchSeries || await this.getDefaultDespatchSeries();
 
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
-        const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss
-        const issueTime = issueDate.split('T')[1];
+        const issueDateFull = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss
+        const issueDateOnly = issueDateFull.split('T')[0]; // YYYY-MM-DD
+        const issueTimeOnly = issueDateFull.split('T')[1]; // HH:mm:ss
 
         // GİB kuralı: Fiili sevk tarihi irsaliye tarihinden küçük olamaz.
         // Eğer kullanıcı geçmiş tarih seçtiyse bugüne çekiyoruz.
-        const actualDate = params.shipmentDate || issueDate.split('T')[0];
-        const actualTime = params.shipmentTime || issueTime;
+        const actualDate = params.shipmentDate || issueDateOnly;
+        const actualTime = params.shipmentTime || issueTimeOnly;
 
         const despatchInfo: any = {
             UUID: crypto.randomUUID(),
             DespatchType: "SEVK",
             DespatchProfile: "TEMELIRSALIYE",
             DespatchSerieOrNumber: series,
-            IssueDate: issueDate,
-            IssueTime: issueTime,
+            IssueDate: issueDateOnly,
+            IssueTime: issueTimeOnly,
             CurrencyCode: "TRY",
             ActualDespatchDate: actualDate,
             ActualDespatchTime: actualTime
@@ -413,23 +414,29 @@ export class NilveraInvoiceService {
         };
 
         const transportEquipment = [];
-        if (params.plateNumber) transportEquipment.push({ ID: params.plateNumber });
-        if (params.trailerPlateNumber) transportEquipment.push({ ID: params.trailerPlateNumber });
+        // Nilvera API expects LicensePlateID
+        transportEquipment.push({ LicensePlateID: params.plateNumber || "34ABC123" });
+        if (params.trailerPlateNumber) transportEquipment.push({ LicensePlateID: params.trailerPlateNumber });
 
         const shipmentDetail: any = {
             ShipmentInfo: {
                 TransportEquipment: transportEquipment,
                 DriverPerson: [{
                     FirstName: params.driverName || "Sürücü",
-                    FamilyName: params.driverSurname || "Adı",
-                    IdentityDocumentReference: [{ ID: params.driverId || "11111111111" }]
+                    LastName: params.driverSurname || "Adı", // API is LastName, not FamilyName
+                    TaxNumber: params.driverId || "11111111111" // API is TaxNumber, not IdentityDocumentReference
                 }]
             },
             Delivery: {
                 AddressInfo: customerAddress,
                 CarrierInfo: {
-                    TaxNumber: params.company.TaxNumber, // Genelde kendi VKN'niz veya kargo VKN'si
-                    Name: params.company.Name
+                    TaxNumber: params.company.TaxNumber, 
+                    Name: params.company.Name,
+                    Country: params.company.Country || "Türkiye",
+                    City: params.company.City || "İstanbul",
+                    District: params.company.District || "Merkez",
+                    Address: params.company.Address || "Merkez",
+                    PostalCode: (params.company as any).PostalCode || "34000"
                 }
             }
         };
