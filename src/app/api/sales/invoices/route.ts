@@ -297,13 +297,13 @@ export async function POST(request: Request) {
 
                 console.log('[Formal Send] Using baseUrl:', nilveraBaseUrl, 'apiKey (first 10):', nilveraApiKey.substring(0, 10));
 
-                // Company VKN: Use Company.vkn (authoritative source) rather than appSettings.companyVkn
-                const companyVkn = (company?.vkn || config.companyVkn || '').trim();
-                const companyTitle = company?.name || config.companyTitle || 'FIRMA UNVANI';
-                const companyAddress = company?.address || config.companyAddress || 'ADRES';
-                const companyDistrict = company?.district || config.portalDistrict || 'KADIKOY';
-                const companyCity = company?.city || config.portalCity || 'ISTANBUL';
-                const companyTaxOffice = company?.taxOffice || config.portalTaxOffice || 'KADIKOY';
+                // DEV & TEST ENVIRONMENT FIX: Entegrasyon ayarlarında verilen VKN her zaman api anahtarı ile eşleştiği için önceliklendirilmeli. Yoksa test tokenı ile gerçek db vkn'si çatışır (Hata 1000).
+                const companyVkn = (config.companyVkn || company?.vkn || '').trim();
+                const companyTitle = config.companyTitle || company?.name || 'FIRMA UNVANI';
+                const companyAddress = config.companyAddress || company?.address || 'ADRES';
+                const companyDistrict = config.portalDistrict || company?.district || 'KADIKOY';
+                const companyCity = config.portalCity || company?.city || 'ISTANBUL';
+                const companyTaxOffice = config.portalTaxOffice || company?.taxOffice || 'KADIKOY';
 
                 console.log('[Formal Send] Company VKN:', companyVkn, '| Company Name:', companyTitle);
 
@@ -312,6 +312,29 @@ export async function POST(request: Request) {
                     apiKey: nilveraApiKey,
                     baseUrl: nilveraBaseUrl
                 });
+
+                // Get absolute ground-truth company info directly from Nilvera using Key, fallbacks to internal if fails
+                let finalCompanyVkn = companyVkn;
+                let finalCompanyTitle = companyTitle;
+                let finalCompanyAddress = companyAddress;
+                let finalCompanyDistrict = companyDistrict;
+                let finalCompanyCity = companyCity;
+                let finalCompanyTaxOffice = companyTaxOffice;
+
+                try {
+                    const actualCompanyData = await nilveraService.getCompanyInfo();
+                    if (actualCompanyData && actualCompanyData.TaxNumber) {
+                        console.log('[Formal Send] Auto-Correcting CompanyInfo from Nilvera Profile directly:', actualCompanyData.TaxNumber);
+                        if (actualCompanyData.TaxNumber) finalCompanyVkn = actualCompanyData.TaxNumber;
+                        if (actualCompanyData.Name) finalCompanyTitle = actualCompanyData.Name;
+                        if (actualCompanyData.Address) finalCompanyAddress = actualCompanyData.Address;
+                        if (actualCompanyData.District) finalCompanyDistrict = actualCompanyData.District;
+                        if (actualCompanyData.City) finalCompanyCity = actualCompanyData.City;
+                        if (actualCompanyData.TaxOffice) finalCompanyTaxOffice = actualCompanyData.TaxOffice;
+                    }
+                } catch(e) {
+                    console.log('[Formal Send] Could not fetch real Nilvera company info, using fallbacks.');
+                }
 
                 // Prepare Data with precise rounding to prevent report generation errors
                 const items = (invoice.items as any[]) || [];
@@ -360,14 +383,14 @@ export async function POST(request: Request) {
                             TaxOffice: invoice.customer.taxOffice || "KADIKOY"
                         },
                         company: {
-                            TaxNumber: companyVkn || "1111111111",
-                            Name: companyTitle,
+                            TaxNumber: finalCompanyVkn || "1111111111",
+                            Name: finalCompanyTitle,
                             Email: config.portalEmail || "destek@periodya.com",
-                            Address: companyAddress,
-                            District: companyDistrict,
-                            City: companyCity,
+                            Address: finalCompanyAddress,
+                            District: finalCompanyDistrict,
+                            City: finalCompanyCity,
                             Country: "TR",
-                            TaxOffice: companyTaxOffice
+                            TaxOffice: finalCompanyTaxOffice
                         },
                         lines: invoiceLines.map(l => ({
                             Name: l.Name,
@@ -399,14 +422,14 @@ export async function POST(request: Request) {
                             TaxOffice: invoice.customer.taxOffice || "KADIKOY"
                         },
                         company: {
-                            TaxNumber: companyVkn || "1111111111",
-                            Name: companyTitle,
+                            TaxNumber: finalCompanyVkn || "1111111111",
+                            Name: finalCompanyTitle,
                             Email: config.portalEmail || "destek@periodya.com",
-                            Address: companyAddress,
-                            District: companyDistrict,
-                            City: companyCity,
+                            Address: finalCompanyAddress,
+                            District: finalCompanyDistrict,
+                            City: finalCompanyCity,
                             Country: "TR",
-                            TaxOffice: companyTaxOffice
+                            TaxOffice: finalCompanyTaxOffice
                         },
                         lines: invoiceLines.map(l => ({
                             Name: l.Name,

@@ -107,6 +107,19 @@ export class NilveraInvoiceService {
     }
 
     /**
+     * Firma Ana Bilgileri (API Key sahibinin bilgileri)
+     */
+    async getCompanyInfo(): Promise<any> {
+        try {
+            const res = await axios.get(`${this.config.baseUrl}/general/Company`, { headers: this.getHeaders() });
+            return res.data;
+        } catch(error) {
+            console.error("Nilvera getCompanyInfo Error:", error);
+            return null;
+        }
+    }
+
+    /**
      * 2. Adım: Varsayılan Seri Çekme
      */
     async getDefaultSeries(type: 'EFATURA' | 'EARSIV'): Promise<string> {
