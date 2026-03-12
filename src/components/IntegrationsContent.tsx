@@ -201,14 +201,14 @@ function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) 
                     {/* Kullanıcı Kimliği */}
                     <ERPBlock title="Portal Kullanıcı Kimliği">
                         <div className="space-y-4">
-                            <ERPField label="Kullanıcı Adı">
+                            <ERPField label="Portal Kullanıcı Adı (Opsiyonel)">
                                 <ERPInput
                                     placeholder="ornek@firma.com"
                                     value={settings.username}
                                     onChange={(e: any) => onChange({ ...settings, username: e.target.value })}
                                 />
                             </ERPField>
-                            <ERPField label="Portal Şifresi">
+                            <ERPField label="Portal Şifresi (Opsiyonel)">
                                 <ERPInput
                                     type="password"
                                     placeholder="••••••••"
@@ -216,25 +216,30 @@ function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) 
                                     onChange={(e: any) => onChange({ ...settings, password: e.target.value })}
                                 />
                             </ERPField>
+                            <div className="mt-1">
+                                <p className="text-[12px] text-slate-500 dark:text-slate-400">
+                                    Bilgi: Kullanıcı adı ve şifre yalnızca hatırlatma amaçlıdır. Sistem API bağlantısı için sadece aşağıdaki <strong className="text-slate-700 dark:text-slate-200">API Key</strong> bilgisini kullanır.
+                                </p>
+                            </div>
                         </div>
                     </ERPBlock>
 
                     {/* API Bağlantısı (Gizlenebilir, Compact) */}
                     <div className="bg-white dark:bg-[#0B1220] border text-sm border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
-                        <h4 className="text-[14px] font-semibold text-slate-900 dark:text-white mb-4">Gelişmiş API Ayarları</h4>
+                        <h4 className="text-[14px] font-semibold text-slate-900 dark:text-white mb-4">API Bağlantı Ayarları</h4>
                         <div className="space-y-4">
+                            <ERPField label="API Key / Token (Zorunlu)">
+                                <ERPInput
+                                    type="password"
+                                    placeholder="Nilvera portalından alınan API Key"
+                                    value={settings.apiKey}
+                                    onChange={(e: any) => onChange({ ...settings, apiKey: e.target.value })}
+                                />
+                            </ERPField>
                             <ERPField label="API Uç Noktası (Endpoint)">
                                 <ERPInput
                                     value={settings.apiUrl}
                                     onChange={(e: any) => onChange({ ...settings, apiUrl: e.target.value })}
-                                />
-                            </ERPField>
-                            <ERPField label="API Key (Opsiyonel)">
-                                <ERPInput
-                                    type="password"
-                                    placeholder="Opsiyonel özel token"
-                                    value={settings.apiKey}
-                                    onChange={(e: any) => onChange({ ...settings, apiKey: e.target.value })}
                                 />
                             </ERPField>
                         </div>
