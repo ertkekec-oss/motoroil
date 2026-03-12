@@ -364,8 +364,8 @@ export class NilveraInvoiceService {
         }
 
         // Sanal (Virtual) İrsaliye Desteği: Mükellef olmayanlara da e-İrsaliye gönderilebilir
-        // GİB kuralı gereği sanal irsaliye alias'ı atanır.
-        const finalAlias = (isDespatchUser && alias) ? alias : "urn:mail:defaultpk@gib.gov.tr";
+        // Nilvera API'sinde sanal irsaliye için CustomerAlias alanı ya hiç gönderilmemeli ya da null olmalıdır.
+        const finalAlias = (isDespatchUser && alias) ? alias : null;
 
         const series = params.despatchSeries || await this.getDefaultDespatchSeries();
 
@@ -443,7 +443,7 @@ export class NilveraInvoiceService {
             }
         };
 
-        const payload = {
+        const payload: any = {
             EDespatch: {
                 DespatchInfo: despatchInfo,
                 DespatchSupplierInfo: companyAddress,
@@ -451,9 +451,12 @@ export class NilveraInvoiceService {
                 DespatchLines: despatchLines,
                 ShipmentDetail: shipmentDetail,
                 Notes: [params.description || "İrsaliye"]
-            },
-            CustomerAlias: finalAlias
+            }
         };
+
+        if (finalAlias) {
+            payload.CustomerAlias = finalAlias;
+        }
 
         try {
             // E-İrsaliye alıcısı değilse matbu irsaliye olarak (arşiv gibi) mi gider?
