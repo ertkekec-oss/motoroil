@@ -74,7 +74,8 @@ export class NilveraInvoiceService {
             );
             const data = res.data;
             if (Array.isArray(data) && data.length > 0) {
-                const findAlias = (item: any) => item.Alias || item.alias || item.identifier;
+                // Nilvera API schema notes that the alias is returned in the 'Name' property, while company title is in 'Title'
+                const findAlias = (item: any) => item.Name || item.Alias || item.alias || item.identifier;
                 const defaultAliasObj = data.find((d: any) => findAlias(d)?.toLowerCase().includes('defaultpk'));
                 const finalAlias = defaultAliasObj ? findAlias(defaultAliasObj) : findAlias(data[0]);
                 return { isEInvoiceUser: true, alias: finalAlias || "urn:mail:defaultpk@nilvera.com" };
@@ -94,7 +95,8 @@ export class NilveraInvoiceService {
             );
             const data = res.data;
             if (Array.isArray(data) && data.length > 0) {
-                const findAlias = (item: any) => item.Alias || item.alias || item.identifier;
+                // Nilvera API schema notes that the alias is returned in the 'Name' property, while company title is in 'Title'
+                const findAlias = (item: any) => item.Name || item.Alias || item.alias || item.identifier;
                 const defaultAliasObj = data.find((d: any) => findAlias(d)?.toLowerCase().includes('defaultpk'));
                 const finalAlias = defaultAliasObj ? findAlias(defaultAliasObj) : findAlias(data[0]);
                 return { isDespatchUser: true, alias: finalAlias || "urn:mail:defaultpk@nilvera.com" };
