@@ -179,7 +179,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [showPlanModal, setShowPlanModal] = useState(false);
     const [planData, setPlanData] = useState({
         title: '', totalAmount: '', installmentCount: '3', startDate: new Date().toISOString().split('T')[0],
-        type: 'Kredi', direction: 'IN', customerId: '', supplierId: '', isExisting: true
+        type: 'Kredi', direction: 'IN', customerId: '', supplierId: '', isExisting: true, description: ''
     });
 
     const handleOpenPlanModal = (item: any) => {
@@ -192,7 +192,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             direction: 'IN', // Müşteri için
             customerId: customer.id,
             supplierId: '',
-            isExisting: true // Default: Mevcut bakiyeden
+            isExisting: true, // Default: Mevcut bakiyeden
+            description: item.orderId || item.id
         });
         setShowPlanModal(true);
     };
@@ -242,6 +243,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [taxEditIndex, setTaxEditIndex] = useState<number | null>(null);
     const [discountType, setDiscountType] = useState<'percent' | 'amount'>('percent');
     const [discountValue, setDiscountValue] = useState(0);
+
+    const [isInstallmentInvoice, setIsInstallmentInvoice] = useState(false);
+    const [invoiceInstallmentCount, setInvoiceInstallmentCount] = useState(3);
 
     // RETURN LOGIC STATES
     const [processingIds, setProcessingIds] = useState<string[]>([]);
@@ -471,6 +475,29 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             });
             const data = await res.json();
             if (data.success) {
+                if (invoiceData.isInstallment) {
+                    try {
+                        await fetch('/api/financials/payment-plans', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                title: `Vadeli Satış: ${invoiceData.name}`,
+                                totalAmount: data.invoice.totalAmount,
+                                installmentCount: invoiceData.installments.toString(),
+                                startDate: new Date().toISOString().split('T')[0],
+                                type: 'Kredi',
+                                direction: 'IN',
+                                customerId: customer.id,
+                                supplierId: '',
+                                isExisting: true, 
+                                description: selectedOrder?.id || ''
+                            })
+                        });
+                    } catch (e) {
+                        console.error('Payment plan auto-creation failed', e);
+                    }
+                }
+
                 // If it's formal, we need to call the "formal-send" action
                 if (invoiceData.isFormal) {
                     try {
@@ -544,8 +571,25 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const totalPages = Math.ceil(filteredHistory.length / ITEMS_PER_PAGE);
     const paginatedHistory = filteredHistory.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] === todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
+    const overdueInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] < todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
+
     return (
         <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-main)', color: 'var(--text-main)' }}>
+
+            {/* UPCOMING / OVERDUE BANNER */}
+            {(todayInstallments.length > 0 || overdueInstallments.length > 0) && (
+                <div style={{ background: overdueInstallments.length > 0 ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.2) 100%)' : 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.2) 100%)', borderBottom: overdueInstallments.length > 0 ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>⚠️</span>
+                    <span style={{ color: 'var(--text-main, #fff)', fontWeight: '800', fontSize: '14px', letterSpacing: '0.5px' }}>
+                        {overdueInstallments.length > 0 ? `${overdueInstallments.length} adet gecikmiş taksit ödemesi bulunmaktadır.` : ''}
+                        {overdueInstallments.length > 0 && todayInstallments.length > 0 ? ' Ayrıca, ' : ''}
+                        {todayInstallments.length > 0 ? `BUGÜN VADE GÜNÜ olan ${todayInstallments.length} adet ödeme var.` : ''}
+                    </span>
+                    <button style={{ marginLeft: '12px', padding: '6px 12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '11px', fontWeight: '800' }}>Detayları İncele</button>
+                </div>
+            )}
 
             {/* EXECUTIVE HEADER STRIP */}
             <div style={{
@@ -1218,13 +1262,22 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         </button>
                                                                     )
                                                                 )}
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
-                                                                    style={{ padding: '6px 12px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-                                                                    className="hover:bg-amber-500 hover:text-white"
-                                                                >
-                                                                    📅 Vadelendir
-                                                                </button>
+                                                                {(() => {
+                                                                    const isVadelendi = customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId));
+                                                                    return (
+                                                                        <button
+                                                                            onClick={(e) => { 
+                                                                                e.stopPropagation(); 
+                                                                                if (!isVadelendi) handleOpenPlanModal(item); 
+                                                                            }}
+                                                                            disabled={isVadelendi}
+                                                                            style={{ padding: '6px 12px', background: isVadelendi ? 'var(--bg-card, rgba(255,255,255,0.05))' : 'rgba(245, 158, 11, 0.1)', color: isVadelendi ? 'var(--text-muted, #888)' : '#f59e0b', border: isVadelendi ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: isVadelendi ? 'default' : 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', opacity: isVadelendi ? 0.7 : 1 }}
+                                                                            className={isVadelendi ? "" : "hover:bg-amber-500 hover:text-white"}
+                                                                        >
+                                                                            {isVadelendi ? '✅ Vadelendi' : '📅 Vadelendir'}
+                                                                        </button>
+                                                                    );
+                                                                })()}
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
@@ -1322,6 +1375,27 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                             </div>
                                                                         </div>
                                                                     </div>
+
+                                                                    {(() => {
+                                                                        const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId));
+                                                                        if (!attachedPlan) return null;
+                                                                        return (
+                                                                            <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                                                                    <h4 style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#f59e0b', letterSpacing: '1px' }}>ÖDEME PLANI DETAYI</h4>
+                                                                                    <span style={{ fontSize: '11px', fontWeight: '800', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', padding: '4px 8px', borderRadius: '8px' }}>{attachedPlan.installments?.length || attachedPlan.installmentCount} Taksit</span>
+                                                                                </div>
+                                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                                    {attachedPlan.installments?.map((inst: any) => (
+                                                                                        <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                                            <span style={{ color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '600' }}>{inst.installmentNo}. Taksit ({new Date(inst.dueDate).toLocaleDateString('tr-TR')})</span>
+                                                                                            <span style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '800', fontFamily: 'monospace' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })()}
 
                                                                     <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
                                                                         <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>ZAMAN ÇİZELGESİ</h4>
@@ -1424,12 +1498,26 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 {/* Section: Ekstra Seçenekler */}
                                 <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', marginBottom: '40px' }}>
                                     <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#10b981', marginBottom: '24px', borderLeft: '4px solid #10b981', paddingLeft: '12px', letterSpacing: '1px' }}>EKSTRA SEÇENEKLER</h3>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                                         <input type="checkbox" id="inv_create_wayslip" style={{ width: '24px', height: '24px', cursor: 'pointer', accentColor: '#10b981' }} />
                                         <label htmlFor="inv_create_wayslip" style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-main, white)', cursor: 'pointer', userSelect: 'none' }}>
                                             Fatura ile birlikte Giden Sevk İrsaliyesi oluştur <span style={{color: '#94a3b8', fontWeight: '600', fontSize: '13px'}}>(İrsaliye numarası fatura üzerine yazılır)</span>
                                         </label>
                                     </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <input type="checkbox" id="inv_is_installment" checked={isInstallmentInvoice} onChange={(e) => setIsInstallmentInvoice(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer', accentColor: '#3b82f6' }} />
+                                        <label htmlFor="inv_is_installment" style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-main, white)', cursor: 'pointer', userSelect: 'none' }}>
+                                            Vade Uygula ve Ödeme Planı Yarat <span style={{color: '#94a3b8', fontWeight: '600', fontSize: '13px'}}>(Fatura içeriğine otomatik eklenecektir)</span>
+                                        </label>
+                                    </div>
+                                    {isInstallmentInvoice && (
+                                        <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                            <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-main, white)' }}>Vade Sayısı:</span>
+                                            <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-panel, #0f172a)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '800', outline: 'none' }}>
+                                                {[1,2,3,4,5,6,7,8,9,10,11,12].map(n => <option key={n} value={n}>{n} Ay Vade</option>)}
+                                            </select>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Section: Items Table */}
@@ -1729,7 +1817,22 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             phone: (document.getElementById('inv_phone') as HTMLInputElement).value,
                                             name: (document.getElementById('inv_name') as HTMLInputElement).value,
                                             isFormal: true,
-                                            createWayslip: (document.getElementById('inv_create_wayslip') as HTMLInputElement)?.checked || false
+                                            createWayslip: (document.getElementById('inv_create_wayslip') as HTMLInputElement)?.checked || false,
+                                            isInstallment: isInstallmentInvoice,
+                                            installments: invoiceInstallmentCount,
+                                            description: (() => {
+                                                if (isInstallmentInvoice) {
+                                                    const dates = [];
+                                                    const baseDate = new Date();
+                                                    for (let i = 1; i <= invoiceInstallmentCount; i++) {
+                                                        const d = new Date(baseDate);
+                                                        d.setMonth(d.getMonth() + i);
+                                                        dates.push(d.toLocaleDateString('tr-TR'));
+                                                    }
+                                                    return `VADE SAYISI: ${invoiceInstallmentCount} | VADE TARİHLERİ: ${dates.join(', ')}`;
+                                                }
+                                                return '';
+                                            })()
                                         };
                                         handleConvertToInvoice(data);
                                     }}

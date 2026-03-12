@@ -36,6 +36,16 @@ export async function GET(
                 invoices: {
                     where: { deletedAt: null },
                     orderBy: { invoiceDate: 'desc' }
+                },
+                paymentPlans: {
+                    include: {
+                        installments: {
+                            orderBy: { installmentNo: 'asc' }
+                        }
+                    },
+                    orderBy: {
+                        startDate: 'desc'
+                    }
                 }
             }
         });

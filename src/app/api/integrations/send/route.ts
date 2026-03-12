@@ -76,9 +76,18 @@ export async function POST(req: NextRequest) {
                 totalTaxAmount += vat;
                 if (vatRate === 20) totalKdv20 += vat;
 
+                let itemDescription = '';
+                if (item.showDesc && item.description) {
+                    itemDescription += item.description + "\n";
+                }
+                if (item.otvType && item.otvType !== 'Ö.T.V yok' && item.otv > 0) {
+                    itemDescription += `(ÖTV Katkısı: ${item.otvType === 'yüzdesel Ö.T.V' ? '%' + item.otv : item.otv + ' ₺'} - ÖTV Kodu: ${item.otvCode || '0071'})`;
+                }
+
                 return {
                     Index: idx + 1,
                     Name: item.name || 'Urun',
+                    Description: itemDescription.trim() || undefined,
                     Quantity: qty,
                     UnitType: "C62",
                     UnitPrice: price,

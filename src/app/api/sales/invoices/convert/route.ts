@@ -100,16 +100,25 @@ export async function POST(request: Request) {
                 }
             });
 
-            // C. Update Products' Tax Settings (Learning)
+            // C. Update Products' Tax Settings and Description (Learning & Sync)
             for (const item of itemsToUse) {
                 if (item.productId) {
+                    const updateData: any = {
+                        salesVat: Number(item.vat || 20),
+                        salesOtv: Number(item.otv || 0)
+                    };
+
+                    if (item.showDesc !== undefined) {
+                        updateData.showDescriptionOnInvoice = Boolean(item.showDesc);
+                        if (item.showDesc && item.description) {
+                            updateData.description = String(item.description);
+                        }
+                    }
+
                     await tx.product.update({
                         where: { id: String(item.productId) },
-                        data: {
-                            salesVat: Number(item.vat || 20),
-                            salesOtv: Number(item.otv || 0)
-                        }
-                    }).catch(e => console.warn(`Product ${item.productId} tax update failed:`, e.message));
+                        data: updateData
+                    }).catch(e => console.warn(`Product ${item.productId} sync update failed:`, e.message));
                 }
             }
 
