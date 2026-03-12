@@ -250,12 +250,23 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     amount: invoice!.totalAmount,
                     description: `Alış Faturası Onayı: ${invoice!.invoiceNo} - ${invoice!.supplier.name}`,
                     supplierId: invoice!.supplierId,
+                    kasaId: null, // Required to be generic payable transaction
                     branch: String(branch)
                 }
             });
 
             return { updatedInvoice, transaction };
         });
+
+        // Create Accounting Journal Entry (in background)
+        (async () => {
+            try {
+                const { createJournalFromTransaction } = await import('@/lib/accounting');
+                await createJournalFromTransaction(resultTransaction.transaction);
+            } catch (err) {
+                console.error('[Muhasebe Entegrasyon Hatası - Alış Kabul]:', err);
+            }
+        })();
 
         return NextResponse.json({ success: true, message: 'Fatura kabul edildi ve stoklara işlendi.' });
     } catch (error: any) {

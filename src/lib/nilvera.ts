@@ -22,12 +22,11 @@ export class NilveraService {
         this.username = config.username?.trim();
         this.password = config.password?.trim();
 
-        if (config.baseUrl) {
-            this.baseUrl = config.baseUrl.endsWith('/') ? config.baseUrl.slice(0, -1) : config.baseUrl;
+        // Zorunlu olarak doğru çevre URL'lerini kullanıyoruz, kullanıcı hatalı `/v1` vb girdiyse eziyoruz.
+        if (config.environment === 'production') {
+            this.baseUrl = 'https://api.nilvera.com';
         } else {
-            this.baseUrl = config.environment === 'production'
-                ? 'https://api.nilvera.com'
-                : 'https://apitest.nilvera.com';
+            this.baseUrl = 'https://apitest.nilvera.com';
         }
     }
 
