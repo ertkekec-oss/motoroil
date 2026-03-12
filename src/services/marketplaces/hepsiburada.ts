@@ -216,7 +216,7 @@ export class HepsiburadaService implements IMarketplaceService {
 
         const syncTargets = [
             { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}`, params: ['limit', 'offset'] },
-            { name: 'PACKED', urlPart: `packages/merchantid/${merchantId}/packed`, params: ['limit', 'offset'] },
+            { name: 'PACKED', urlPart: `packages/merchantid/${merchantId}`, params: ['limit', 'offset'] },
             { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped`, params: ['begindate', 'enddate', 'limit', 'offset'] },
             { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered`, params: ['begindate', 'enddate', 'limit', 'offset'] },
             { name: 'CANCELLED', urlPart: `orders/merchantid/${merchantId}/cancelled`, params: ['begindate', 'enddate', 'limit', 'offset'] }
@@ -332,38 +332,40 @@ export class HepsiburadaService implements IMarketplaceService {
                 rawLines = hbOrder.data.items || hbOrder.data.lines || hbOrder.data.packageItems || [];
             }
 
-            const orderNo = hbOrder.orderNumber || hbOrder.OrderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null) || hbOrder.packageNumber || hbOrder.id || 'unknown';
             const orderItems = Array.isArray(rawLines) ? rawLines : [];
+            let orderNo = hbOrder.orderNumber || hbOrder.OrderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null);
+            if (!orderNo && orderItems.length > 0) orderNo = orderItems[0].orderNumber || orderItems[0].OrderNumber;
+            orderNo = orderNo || hbOrder.packageNumber || hbOrder.id || 'unknown';
 
             let shipmentPackageId = (hbOrder.packageNumber || hbOrder.shipmentPackageId || hbOrder.id)?.toString();
             if (!shipmentPackageId || shipmentPackageId === orderNo.toString()) {
-                const firstWithPkg = orderItems.find(i => i.packageNumber || i.PackageNumber);
+                const firstWithPkg = orderItems.find((i: any) => i.packageNumber || i.PackageNumber);
                 if (firstWithPkg) shipmentPackageId = (firstWithPkg.packageNumber || firstWithPkg.PackageNumber).toString();
             }
 
             return {
                 id: (hbOrder.id || orderNo || 'unknown').toString(),
                 orderNumber: orderNo.toString(),
-                customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || 'Müşteri',
-                customerEmail: hbOrder.customer?.email || '',
-                orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || Date.now()),
+                customerName: hbOrder.customer?.name || hbOrder.deliveryAddress?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || 'Müşteri',
+                customerEmail: hbOrder.customer?.email || hbOrder.deliveryAddress?.email || '',
+                orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || hbOrder.ShippedDate || hbOrder.DeliveredDate || Date.now()),
                 status: rawStatus.toString().toUpperCase(),
                 totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || orderItems.reduce((acc: number, curr: any) => acc + Number(curr.totalPrice?.amount || curr.price || curr.unitPrice?.amount || 0), 0)),
                 currency: hbOrder.totalPrice?.currency || hbOrder.currency || 'TRY',
                 shipmentPackageId: shipmentPackageId,
                 shippingAddress: {
-                    fullName: hbOrder.shippingAddress?.fullName || hbOrder.customerName || '',
-                    address: hbOrder.shippingAddress?.address || '',
-                    city: hbOrder.shippingAddress?.city || '',
-                    district: hbOrder.shippingAddress?.town || '',
-                    phone: hbOrder.shippingAddress?.phoneNumber || ''
+                    fullName: hbOrder.deliveryAddress?.name || hbOrder.shippingAddress?.fullName || hbOrder.recipientName || hbOrder.customer?.name || hbOrder.customerName || '',
+                    address: hbOrder.deliveryAddress?.address || hbOrder.shippingAddress?.address || hbOrder.shippingAddressDetail || '',
+                    city: hbOrder.deliveryAddress?.city || hbOrder.shippingAddress?.city || hbOrder.shippingCity || '',
+                    district: hbOrder.deliveryAddress?.town || hbOrder.deliveryAddress?.district || hbOrder.shippingAddress?.town || hbOrder.shippingTown || hbOrder.shippingDistrict || '',
+                    phone: hbOrder.deliveryAddress?.phoneNumber || hbOrder.shippingAddress?.phoneNumber || hbOrder.phoneNumber || ''
                 },
                 invoiceAddress: {
-                    fullName: hbOrder.billingAddress?.fullName || hbOrder.customerName || '',
-                    address: hbOrder.billingAddress?.address || '',
-                    city: hbOrder.billingAddress?.city || '',
-                    district: hbOrder.billingAddress?.town || '',
-                    phone: hbOrder.billingAddress?.phoneNumber || ''
+                    fullName: hbOrder.invoice?.address?.name || hbOrder.billingAddress?.fullName || hbOrder.companyName || hbOrder.customer?.name || hbOrder.customerName || '',
+                    address: hbOrder.invoice?.address?.address || hbOrder.billingAddress?.address || hbOrder.billingAddress || '',
+                    city: hbOrder.invoice?.address?.city || hbOrder.billingAddress?.city || hbOrder.billingCity || '',
+                    district: hbOrder.invoice?.address?.town || hbOrder.invoice?.address?.district || hbOrder.billingAddress?.town || hbOrder.billingTown || hbOrder.billingDistrict || '',
+                    phone: hbOrder.invoice?.address?.phoneNumber || hbOrder.billingAddress?.phoneNumber || hbOrder.phoneNumber || ''
                 },
                 items: orderItems.map((item: any) => ({
                     productName: item.productName || item.name || item.skuDescription || 'Ürün',

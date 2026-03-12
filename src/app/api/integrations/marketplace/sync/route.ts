@@ -259,14 +259,17 @@ export async function POST(request: Request) {
                         (Number(existingOrder.totalAmount || 0) === 0 && normalizedTotal > 0);
 
                     if (needsUpdate) {
+                        const newItems = (order.items?.length || 0) > 0 ? order.items : dbItems;
+                        const newTotalAmount = normalizedTotal > 0 ? normalizedTotal : Number(existingOrder.totalAmount || 0);
+
                         await prisma.order.update({
                             where: { id: existingOrder.id },
                             data: {
                                 status: order.status,
                                 marketplace: normalizedMarketplace,
-                                totalAmount: Number(order.totalAmount || 0),
-                                ...(existingOrder.customerName === 'Müşteri' && order.customerName !== 'Müşteri' ? { customerName: order.customerName } : {}),
-                                items: order.items as any,
+                                totalAmount: newTotalAmount,
+                                ...(existingOrder.customerName === 'Müşteri' && order.customerName && order.customerName !== 'Müşteri' ? { customerName: order.customerName } : {}),
+                                items: newItems as any,
                                 rawData: order as any,
                                 shipmentPackageId: shipmentPackageId || existingOrder.shipmentPackageId
                             }
