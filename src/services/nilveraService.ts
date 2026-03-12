@@ -506,7 +506,8 @@ export class NilveraInvoiceService {
             const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
 
             const startDate = threeMonthsAgo.toISOString().split('T')[0];
-            const endDate = now.toISOString().split('T')[0];
+            const endDateObj = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const endDate = endDateObj.toISOString().split('T')[0];
 
             console.log(`[NilveraService] Fetching Incoming: url=${this.config.baseUrl}/einvoice/Purchase, page=${page}, range=${startDate}-${endDate}`);
 
@@ -539,7 +540,8 @@ export class NilveraInvoiceService {
             const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
 
             const startDate = threeMonthsAgo.toISOString().split('T')[0];
-            const endDate = now.toISOString().split('T')[0];
+            const endDateObj = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const endDate = endDateObj.toISOString().split('T')[0];
 
             console.log(`[NilveraService] Fetching Incoming Despatches: url=${this.config.baseUrl}/edespatch/Purchase, page=${page}, range=${startDate}-${endDate}`);
 

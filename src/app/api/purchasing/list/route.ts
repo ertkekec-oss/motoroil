@@ -85,7 +85,8 @@ export async function GET() {
                             status: localVersion ? (localVersion.status === 'Onaylandı' ? 'İşlendi' : localVersion.status) : 'Bekliyor',
                             isFormal: true,
                             invoiceNo: invoiceNumber,
-                            isImported: !!localVersion
+                            isImported: !!localVersion,
+                            documentType: 'INVOICE'
                         };
                     });
                 }
@@ -104,10 +105,11 @@ export async function GET() {
                             date: inv.IssueDate ? new Date(inv.IssueDate).toLocaleDateString('tr-TR') : '-',
                             msg: `e-İrsaliye: ${invoiceNumber}`,
                             total: Number(inv.PayableAmount || 0),
-                            status: localVersion ? (localVersion.status === 'Onaylandı' ? 'İşlendi' : localVersion.status) : 'İrsaliye',
+                            status: localVersion ? (localVersion.status === 'Onaylandı' ? 'İşlendi' : localVersion.status) : 'Bekliyor',
                             isFormal: true,
                             invoiceNo: invoiceNumber,
-                            isImported: !!localVersion
+                            isImported: !!localVersion,
+                            documentType: 'DESPATCH'
                         };
                     });
                     
@@ -132,7 +134,8 @@ export async function GET() {
                 total: Number(inv.totalAmount),
                 status: inv.status === 'Bekliyor' ? 'Bekliyor' : (inv.status === 'Onaylandı' ? 'Onaylandı' : inv.status),
                 isFormal: false,
-                items: inv.items
+                items: inv.items,
+                documentType: inv.description?.includes('İrsaliye') ? 'DESPATCH' : 'INVOICE'
             }));
 
         // Combined results

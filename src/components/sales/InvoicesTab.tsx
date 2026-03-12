@@ -443,6 +443,14 @@ export function InvoicesTab({
                                                                                     📄 PDF
                                                                                 </button>
                                                                             )}
+                                                                            {(irs.type === 'Gelen' && String(irs.status).includes('Bekliyor')) && (
+                                                                                <button
+                                                                                    onClick={(e) => { e.stopPropagation(); handleAcceptPurchaseInvoice(irs.id); }}
+                                                                                    className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                                                >
+                                                                                    Kabul Et / Envantere İşle
+                                                                                </button>
+                                                                            )}
                                                                             {!irs.isFormal && irs.type === 'Giden' && (
                                                                                 <button onClick={() => handleDeleteInvoice(irs.id)} className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/30'}`}>
                                                                                     🗑️ Sil

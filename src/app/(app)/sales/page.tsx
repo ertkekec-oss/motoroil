@@ -128,7 +128,7 @@ export default function SalesPage() {
             const data = await res.json();
             if (data.success) {
                 // api/purchasing/list formatted the data already, but we might want raw or similar
-                setPurchaseInvoices(data.invoices);
+                setPurchaseInvoices((data.invoices || []).filter((i: any) => i.documentType !== 'DESPATCH'));
             }
         } catch (err) { console.error(err); }
         finally { setIsLoadingPurchaseInvoices(false); }
@@ -168,15 +168,16 @@ export default function SalesPage() {
                 items: i.items
             }));
 
-            const purIrs = (purData.invoices || []).filter((i: any) => i.status === 'İrsaliye').map((i: any) => ({
+            const purIrs = (purData.invoices || []).filter((i: any) => i.documentType === 'DESPATCH' || i.msg?.includes('İrsaliye')).map((i: any) => ({
                 id: i.id,
+                invoiceNo: i.invoiceNo,
                 type: 'Gelen',
-                supplier: i.supplier,
+                customer: i.supplier, // to display in UI table interchangeably
                 date: i.date,
                 total: i.total,
-                status: 'Kabul Edildi',
-                isFormal: false,
-                items: i.items || i.InvoiceLines
+                status: i.status === 'İşlendi' || i.status === 'Onaylandı' ? 'Kabul Edildi' : 'Bekliyor',
+                isFormal: i.isFormal,
+                items: i.items || i.InvoiceLines || []
             }));
 
             const combined = [...salesIrs, ...purIrs].sort((a, b) => {
