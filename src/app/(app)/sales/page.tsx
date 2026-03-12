@@ -591,18 +591,54 @@ export default function SalesPage() {
             // 2. Process Sale & Invoice
             const saleItems = selectedOrder.items.map((item: any) => ({
                 productId: mappedItems[item.name]?.productId,
-                qty: item.qty || 1
+                qty: item.qty || item.quantity || 1,
+                name: item.name,
+                price: item.price || 0,
+                vat: item.vat || 20, // ensure proper tax
+                otv: item.otv || 0
             }));
 
-            await processSale({
-                items: saleItems,
-                total: selectedOrder.totalAmount || selectedOrder.total,
-                kasaId: 1,
-                description: `Sipariş Faturalandırma: ${selectedOrder.orderNumber} - ${selectedOrder.marketplace}`
+            // Call ecommerce-convert to create a SalesInvoice, resolve Customer, update Stock
+            const res = await apiFetch('/api/sales/invoices/ecommerce-convert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId: selectedOrder.id,
+                    items: saleItems
+                })
             });
+            const data = await res.json();
+
+            if (!data.success) {
+                 showError("İşlem Başarısız", data.error || "Fatura oluşturulamadı.");
+                 setIsLoadingMapping(false);
+                 return;
+            }
+
+            // 3. Immediately Formal-Send
+            const sendRes = await apiFetch('/api/sales/invoices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    invoiceId: data.invoice.id,
+                    action: 'formal-send'
+                })
+            });
+            const sendData = await sendRes.json();
+
+            if (!sendData.success) {
+                 if (sendData.error?.includes('QUOTA_EXCEEDED')) {
+                     showQuotaExceeded();
+                 } else {
+                     const detail = (sendData.errorCode ? ` (Kodu: ${sendData.errorCode})` : '') + (sendData.details ? `\nDetay: ${sendData.details}` : '');
+                     showError('Fatura Oluştu Ancak Nilvera Hatası', '❌ ' + (sendData.error || 'Gönderim başarısız') + detail);
+                 }
+            } else {
+                 showSuccess('Fatura Oluşturuldu', `✅ FATURA NİLVERA'YA İLETİLDİ!\n\nStoklar eşleştirildi ve düşüldü.\nUUID: ${sendData.formalId}`);
+                 fetchInvoices();
+            }
 
             setOnlineOrders(onlineOrders.map(o => o.id === selectedOrder.id ? { ...o, status: 'Faturalandırıldı' } : o));
-            showSuccess('Fatura Oluşturuldu', '✅ FATURA OLUŞTURULDU!\n\nStoklar eşleştirildi. Gelecek siparişlerde otomatik tanınacak.');
             setSelectedOrder(null);
             setMappedItems({});
             setRawMappings({});
@@ -611,10 +647,6 @@ export default function SalesPage() {
             showError("İşlem Başarısız", "Hata: " + error.message);
         } finally {
             setIsLoadingMapping(false);
-            // ... (existing helper functions)
-
-
-
         }
     };
 
