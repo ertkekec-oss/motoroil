@@ -89,7 +89,7 @@ export class NilveraInvoiceService {
     async checkDespatchTaxpayer(vkn: string): Promise<{ isDespatchUser: boolean; alias?: string }> {
         try {
             const res = await axios.get(
-                `${this.config.baseUrl}/general/GlobalCompany/Check/TaxNumber/${vkn}?globalUserType=Despatch`,
+                `${this.config.baseUrl}/general/GlobalCompany/Check/TaxNumber/${vkn}?globalUserType=DespatchAdvice`,
                 { headers: this.getHeaders() }
             );
             const data = res.data;
