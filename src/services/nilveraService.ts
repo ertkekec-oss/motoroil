@@ -386,9 +386,11 @@ export class NilveraInvoiceService {
             DespatchSerieOrNumber: series,
             IssueDate: issueDateOnly,
             IssueTime: issueTimeOnly,
+            IssueDateTime: issueDateFull,
             CurrencyCode: "TRY",
             ActualDespatchDate: actualDate,
-            ActualDespatchTime: actualTime
+            ActualDespatchTime: actualTime,
+            ActualDespatchDateTime: actualDate + "T" + actualTime
         };
 
         const despatchLines = params.lines.map((line, idx) => ({
@@ -420,7 +422,7 @@ export class NilveraInvoiceService {
 
         const shipmentDetail: any = {
             ShipmentInfo: {
-                TransportEquipment: transportEquipment,
+                LicensePlateID: params.plateNumber || "34ABC123",
                 DriverPerson: [{
                     FirstName: params.driverName || "Sürücü",
                     LastName: params.driverSurname || "Adı", // API is LastName, not FamilyName
