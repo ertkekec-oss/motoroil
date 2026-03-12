@@ -1,0 +1,192 @@
+﻿[HB_INIT] baseUrl=https://oms-external.hepsiburada.com | Target: oms-external.hepsiburada.com
+Fetching order 4655737501 (Emre Yalava├ğ - SHIPPED) RAW...
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4655737501 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4655737501
+Raw API Response data: {
+  "orderId": "69afde01-fc34-6f4e-e1dd-04bf06060606",
+  "orderNumber": "4655737501",
+  "paymentStatus": "Received",
+  "orderDate": "2026-03-10T12:01:52",
+  "createdDate": "2026-03-10T12:01:53.046",
+  "customer": {
+    "customerId": "fdc4bf25-9e8e-42af-8a4c-a42ba8846e9c",
+    "name": "Emre Yalava├ğ"
+  },
+  "invoice": {
+    "turkishIdentityNumber": "11111111111",
+    "taxNumber": "",
+    "taxOffice": null,
+    "address": {
+      "addressId": "6c423688-1f1b-4692-bdbd-f5314cf02342",
+      "address": "Ayd─▒ntepe mah. Alaaddin sok. No:7 Evora sitesi A parsel A8 blok Kat:12 Daire:107 AYDINTEPE TUZLA ─░stanbul",
+      "name": "Emre Yalava├ğ",
+      "email": "4655737501_5454836190@hepsifatura.com",
+      "countryCode": "TR",
+      "phoneNumber": "",
+      "alternatePhoneNumber": "",
+      "district": "AYDINTEPE",
+      "city": "─░stanbul",
+      "town": "TUZLA",
+      "directions": "",
+      "postalCode": "34947"
+    }
+  },
+  "deliveryAddress": {
+    "addressId": "d2b77a71-3f75-48a6-9746-abaecf38b664",
+    "address": "Ayd─▒ntepe mah. Alaaddin sok. No:7 Evora sitesi A parsel A8 blok Kat:12 Daire:107 AYDINTEPE TUZLA ─░stanbul",
+    "name": "Emre Yalava├ğ",
+    "email": "4655737501_5454836190@hepsifatura.com",
+    "countryCode": "TR",
+    "phoneNumber": "",
+    "alternatePhoneNumber": "",
+    "district": "AYDINTEPE",
+    "city": "─░stanbul",
+    "town": "TUZLA",
+    "directions": "",
+    "postalCode": "34947"
+  },
+  "orderNote": {},
+  "items": [
+    {
+      "dueDate": "2026-03-10T18:00:00",
+      "lastStatusUpdateDate": "2026-03-10T15:24:32.299",
+      "id": "69afde01-fc34-6f4e-e1dd-04be06060606",
+      "name": "Motul Auto Cool Expert Antifriz -37┬░C 1 Litre",
+      "sku": "HBCV00000R631W",
+      "orderId": "69afde01-fc34-6f4e-e1dd-04bf06060606",
+      "orderNumber": "4655737501",
+      "orderDate": "2026-03-10T12:01:52",
+      "quantity": 1,
+      "merchantId": "f225561c-5ae7-4208-9eb4-3541340b7229",
+      "totalPrice": {
+        "currency": "TRY",
+        "amount": 339
+      },
+      "unitPrice": {
+        "currency": "TRY",
+        "amount": 339
+      },
+      "hbDiscount": {
+        "totalPrice": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "unitPrice": {
+          "currency": "TRY",
+          "amount": 0
+        }
+      },
+      "merchantDiscount": {
+        "totalPrice": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "unitPrice": {
+          "currency": "TRY",
+          "amount": 0
+        }
+      },
+      "vat": 56.5,
+      "vatRate": 20,
+      "customerName": "Emre Yalava├ğ",
+      "customerId": "fdc4bf25-9e8e-42af-8a4c-a42ba8846e9c",
+      "status": "InTransit",
+      "shippingAddress": {
+        "addressId": "d2b77a71-3f75-48a6-9746-abaecf38b664",
+        "address": "Ayd─▒ntepe mah. Alaaddin sok. No:7 Evora sitesi A parsel A8 blok Kat:12 Daire:107 AYDINTEPE TUZLA ─░stanbul",
+        "name": "Emre Yalava├ğ",
+        "email": "4655737501_5454836190@hepsifatura.com",
+        "countryCode": "TR",
+        "phoneNumber": "",
+        "alternatePhoneNumber": "",
+        "district": "AYDINTEPE",
+        "city": "─░stanbul",
+        "town": "TUZLA",
+        "directions": "",
+        "postalCode": "34947"
+      },
+      "invoice": {
+        "turkishIdentityNumber": "11111111111",
+        "taxNumber": "",
+        "taxOffice": null,
+        "address": {
+          "addressId": "6c423688-1f1b-4692-bdbd-f5314cf02342",
+          "address": "Ayd─▒ntepe mah. Alaaddin sok. No:7 Evora sitesi A parsel A8 blok Kat:12 Daire:107 AYDINTEPE TUZLA ─░stanbul",
+          "name": "Emre Yalava├ğ",
+          "email": "4655737501_5454836190@hepsifatura.com",
+          "countryCode": "TR",
+          "phoneNumber": "",
+          "alternatePhoneNumber": "",
+          "district": "AYDINTEPE",
+          "city": "─░stanbul",
+          "town": "TUZLA",
+          "directions": "",
+          "postalCode": "34947"
+        }
+      },
+      "sapNumber": "000010",
+      "dispatchTime": 0,
+      "commission": {
+        "currency": "TRY",
+        "amount": 47.46
+      },
+      "commissionRate": 14,
+      "paymentTermInDays": 24,
+      "commissionType": 0,
+      "cargoCompanyModel": {
+        "id": 21,
+        "name": "hepsiJET",
+        "shortName": "HX",
+        "logoUrl": "https://images.hepsiburada.net/assets/cargo-logo/hepsijet.svg",
+        "trackingUrl": null
+      },
+      "cargoCompany": "hepsiJET",
+      "customizedText01": "",
+      "customizedText02": "",
+      "customizedText03": "",
+      "customizedText04": "",
+      "customizedTextX": "",
+      "creditCardHolderName": null,
+      "isCustomized": false,
+      "canCreatePackage": true,
+      "isCancellable": false,
+      "isCancellableByHbAdmin": true,
+      "deliveryType": "StandardDelivery",
+      "deliveryOptionId": 1,
+      "slot": null,
+      "pickUpTime": null,
+      "discountInfo": [],
+      "merchantSKU": "HBCV00000R631W",
+      "purchasePrice": {
+        "currency": "TRY",
+        "amount": 0
+      },
+      "deliveryNote": {},
+      "isCargoChangable": true,
+      "warehouse": {
+        "shippingModel": "Standard",
+        "shippingAddressLabel": "BIRINCIL"
+      },
+      "deptorDifferenceAmount": 0,
+      "isJetDelivery": false,
+      "isSundayDelivery": false,
+      "properties": [],
+      "discountToBeBilledToHB": 0,
+      "bnplCommissionAmount": {
+        "currency": "TRY",
+        "amount": 0
+      },
+      "unitLaborCost": {
+        "currency": "TRY",
+        "amount": 0
+      },
+      "productBarcode": "MOTULAUOTCOOLEXPERT1LT",
+      "creationReason": "OrderCreated",
+      "packageNumber": "5454836190",
+      "barcode": "62754548361900",
+      "isMicroExport": false,
+      "releatedLineIndexesWithCampaign": [],
+      "parentItemIndex": -1,
+      "productImageUrlFormat": "https://productimages.hepsiburada.net/s/125/{size}/110000075012514.jpg"
+    }
+  ]
+}

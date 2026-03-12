@@ -1,0 +1,3572 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "General API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "/general"
+    }
+  ],
+  "paths": {
+    "/Alerts": {
+      "get": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Uyarı mesajlarını getirir.",
+        "responses": {
+          "200": {
+            "description": "Uyarı mesajlarını getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlertResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Campaigns": {
+      "get": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Kampanyaları getirir.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CampaignResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Company": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Firma bilgilerini getirir.",
+        "responses": {
+          "200": {
+            "description": "Firma bilgilerini getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Firma bilgilerini günceller.",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyResponseCommand"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyResponseCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyResponseCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyResponseCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Firma bilgilerini günceller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Company/Modules": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Firma modüllerini getirir.",
+        "responses": {
+          "200": {
+            "description": "Firma modüllerini getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyModulesResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Company/Certificate": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Firma sertifikalarını getirir.",
+        "responses": {
+          "200": {
+            "description": "Firma sertifikalarını getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CertificateResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Firmaya sertifika ekler.",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyCertificateCommand"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyCertificateCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyCertificateCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyCertificateCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Firmaya sertifika ekler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Firma sertifikasını günceller.",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyCertificateCommand"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyCertificateCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyCertificateCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyCertificateCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Firma sertifikasını günceller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Company/Certificate/{SerialNumber}": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Seri numarasına göre sertifika getirilir.",
+        "parameters": [
+          {
+            "name": "SerialNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seri numarasına göre sertifika getirilir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Company/Certificate/{ID}": {
+      "delete": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Firma sertifikasını siler.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Firma sertifikasını siler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Company/List": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Kullanıcıya tanımlı firmaları getirir.",
+        "responses": {
+          "200": {
+            "description": "Kullanıcıya tanımlı firmaları getirir."
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/CompanyDocuments": {
+      "get": {
+        "tags": [
+          "CompanyDocuments"
+        ],
+        "summary": "Firma döküman bilgilerini listeler.",
+        "responses": {
+          "200": {
+            "description": "Firma döküman bilgilerini listeler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyDocumentResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CompanyDocuments"
+        ],
+        "summary": "Firmaya yeni döküman ekler.",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyDocumentCommand"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyDocumentCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyDocumentCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyDocumentCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Firmaya yeni döküman ekler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDocumentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "409": {
+            "description": "Gönderdiğiniz istek sistemde daha önce bulunduğunda dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#conflict-409\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/CompanyDocuments/{ID}": {
+      "delete": {
+        "tags": [
+          "CompanyDocuments"
+        ],
+        "summary": "Firmaya eklenen dökümanı siler.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Firmaya eklenen dökümanı siler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/CompanyIdentification": {
+      "get": {
+        "tags": [
+          "CompanyIdentification"
+        ],
+        "summary": "Firma kimlik bilgilerini listeler.",
+        "responses": {
+          "200": {
+            "description": "Firma kimlik bilgilerini listeler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyIdentificationResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CompanyIdentification"
+        ],
+        "summary": "Firmaya yeni kimlik bilgisi ekler.",
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/CompanyIdentificationType"
+            }
+          },
+          {
+            "name": "Value",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Firmaya yeni kimlik bilgisi ekler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyIdentificationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "409": {
+            "description": "Gönderdiğiniz istek sistemde daha önce bulunduğunda dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#conflict-409\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/CompanyIdentification/{ID}": {
+      "delete": {
+        "tags": [
+          "CompanyIdentification"
+        ],
+        "summary": "Firmadan kimlik bilgisi siler.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Firmadan kimlik bilgisi siler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Credits": {
+      "get": {
+        "tags": [
+          "Credits"
+        ],
+        "summary": "Kredi bilgisi getirir.",
+        "responses": {
+          "200": {
+            "description": "Kredi bilgisi getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreditResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Customers": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Müşteri listeler.",
+        "parameters": [
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortColumn",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SortType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Müşteri listeler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponsePagination"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Müşteri ekler.",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomerDto"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomerDto"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomerDto"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomerDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Müşteri ekler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Müşteri günceller.",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerCommand"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Müşteri günceller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Customers/{ID}": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Müşteri Bilgisini Getirir.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Müşteri Bilgisini Getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Müşteri Siler.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Müşteri Siler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Customers/Bulk": {
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Müşteri Toplu Siler.",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Müşteri Toplu Siler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Customers/Search/{searchText}": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Müşteri Arar.",
+        "parameters": [
+          {
+            "name": "searchText",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Müşteri Arar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Customers/GetCustomerInfo/{TaxNumber}": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Vergi Kimlik Numarası İle Müşteri Bilgisini Getirir.",
+        "parameters": [
+          {
+            "name": "TaxNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vergi Kimlik Numarası İle Müşteri Bilgisini Getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/ExchangeRate": {
+      "get": {
+        "tags": [
+          "ExchangeRate"
+        ],
+        "summary": "Döviz kurlarını getirir.",
+        "responses": {
+          "200": {
+            "description": "Döviz kurlarını getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeRateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GibEArchiveAccount": {
+      "get": {
+        "tags": [
+          "GibEArchiveAccount"
+        ],
+        "summary": "Gib kullanıcı adı ve parola getirir.",
+        "responses": {
+          "200": {
+            "description": "Gib kullanıcı adı ve parola getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GibEArchiveResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "GibEArchiveAccount"
+        ],
+        "summary": "Gib kullanıcı adı ve parola günceller.",
+        "parameters": [
+          {
+            "name": "UserName",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Password",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gib kullanıcı adı ve parola günceller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GlobalCompany": {
+      "get": {
+        "tags": [
+          "GlobalCompany"
+        ],
+        "summary": "Mükellef listesi getirir.",
+        "parameters": [
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mükellef listesi getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalCustomerResponsePagination"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GlobalCompany/Search/{searchText}": {
+      "get": {
+        "tags": [
+          "GlobalCompany"
+        ],
+        "summary": "Mükellef listesi içerisinde arama yapar.",
+        "parameters": [
+          {
+            "name": "searchText",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "globalUserType",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/GlobalUserType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mükellef listesi içerisinde arama yapar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SearchGlobalCompanyResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GlobalCompany/GetGlobalCustomerInfo/{TaxNumber}": {
+      "get": {
+        "tags": [
+          "GlobalCompany"
+        ],
+        "summary": "Mükellef bilgisini getirir.",
+        "parameters": [
+          {
+            "name": "TaxNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "globalUserType",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/GlobalUserType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mükellef bilgisini getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalCustomerInfoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GlobalCompany/GetGlobalCustomerInfo": {
+      "post": {
+        "tags": [
+          "GlobalCompany"
+        ],
+        "summary": "Mükellef bilgisini liste halinde getirir.",
+        "parameters": [
+          {
+            "name": "globalUserType",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/GlobalUserType"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mükellef bilgisini liste halinde getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalCustomerAliasesResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GlobalCompany/Check/TaxNumber/{TaxNumber}": {
+      "get": {
+        "tags": [
+          "GlobalCompany"
+        ],
+        "summary": "Vergi numarasından mükellef olup olmadığı sorgular.",
+        "parameters": [
+          {
+            "name": "TaxNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "globalUserType",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/GlobalUserType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vergi numarasından mükellef olup olmadığı sorgular.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalCompanyInfoResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GlobalCompany/Check/Name/{Name}": {
+      "get": {
+        "tags": [
+          "GlobalCompany"
+        ],
+        "summary": "Ünvandan mükellef olup olmadığı sorgular.",
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "globalUserType",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "$ref": "#/components/schemas/GlobalUserType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ünvandan mükellef olup olmadığı sorgular.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalCompanyInfoResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/GlobalCompany/{AliasType}/{GlobalUserType}": {
+      "get": {
+        "tags": [
+          "GlobalCompany"
+        ],
+        "summary": "Mükellef listesi ZIP olarak dönülür",
+        "parameters": [
+          {
+            "name": "AliasType",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AliasType"
+            }
+          },
+          {
+            "name": "GlobalUserType",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/GlobalUserType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Mailing/Setting": {
+      "get": {
+        "tags": [
+          "Mailing"
+        ],
+        "summary": "Mail ayarlarını getirir.",
+        "responses": {
+          "200": {
+            "description": "Mail ayarlarını getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MailingSettingResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Mailing/Whatsapp/Setting/{IsActive}": {
+      "post": {
+        "tags": [
+          "Mailing"
+        ],
+        "summary": "Whatsapp özelliğini değiştirir.",
+        "parameters": [
+          {
+            "name": "IsActive",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Whatsapp özelliğini değiştirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Mailing/Email/Setting": {
+      "post": {
+        "tags": [
+          "Mailing"
+        ],
+        "summary": "Mail özelliğini değiştirir.",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInvoiceMailingMailCommand"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInvoiceMailingMailCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInvoiceMailingMailCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInvoiceMailingMailCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mail özelliğini değiştirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Mailing/Sms/Setting/{IsActive}": {
+      "post": {
+        "tags": [
+          "Mailing"
+        ],
+        "summary": "Sms özelliğini değiştirir.",
+        "parameters": [
+          {
+            "name": "IsActive",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sms özelliğini değiştirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Stocks": {
+      "get": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Stokları getirir.",
+        "parameters": [
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortColumn",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SortType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SortType"
+            }
+          },
+          {
+            "name": "IsActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stokları getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockResponsePagination"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Stok ekler.",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/StockDto"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/StockDto"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/StockDto"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/StockDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stok ekler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Stok Günceller.",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStockCommand"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStockCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStockCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStockCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stok Günceller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Stocks/{ID}": {
+      "get": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Stok Getirir.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stok Getirir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Stok siler.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stok siler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Stocks/Bulk": {
+      "delete": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Stokları Toplu Siler.",
+        "description": "Stokları Toplu silmek için bu uç kullanılır.",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stokları Toplu Siler.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          },
+          "422": {
+            "description": "Gönderdiğiniz istek geçerli fakat iş kuralları gereği geçersiz değerler içerdiğinde dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#unprocessableentity-422\">tıklayınız</a>"
+          }
+        }
+      }
+    },
+    "/Stocks/SearchStock/{searchText}": {
+      "get": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Stok arar.",
+        "parameters": [
+          {
+            "name": "searchText",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stok arar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StockResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz İstek | Gönderdiğiniz istekte geçersiz veriler bulunduğu anlamında gelmektedir | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#badrequest-400\">tıklayınız</a>"
+          },
+          "403": {
+            "description": "Yetkisiz Erişim | Bu uca erişmek için gerekli yetkiye sahip olmadığınız durumda dönülür"
+          },
+          "404": {
+            "description": "Parametrede belirtilen kayıt bulunamadığında dönülür | Detaylar için <a target=\"_blank\" href=\"https://developer.nilvera.com/hata-kodlari#notfound-404\">tıklayınız</a>"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AlertResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Type": {
+            "$ref": "#/components/schemas/AlertType"
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Title": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AlertType": {
+        "enum": [
+          "Information",
+          "Warning",
+          "Error"
+        ],
+        "type": "string"
+      },
+      "Alias": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "DeletionTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AliasType": {
+        "enum": [
+          "PK",
+          "GB"
+        ],
+        "type": "string"
+      },
+      "CampaignResponse": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreatedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Content": {
+            "type": "string",
+            "nullable": true
+          },
+          "Subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "Url": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CertificateResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "SerialNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "StartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Type": {
+            "$ref": "#/components/schemas/CertificateType"
+          },
+          "Password": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CertificateType": {
+        "enum": [
+          "MALIMUHUR",
+          "EIMZA",
+          "HSM"
+        ],
+        "type": "string"
+      },
+      "CompanyAliases": {
+        "type": "object",
+        "properties": {
+          "Alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "AliasType": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Type": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "$ref": "#/components/schemas/CompanyDocumentType"
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyDocumentType": {
+        "enum": [
+          "DIGER",
+          "VUK483",
+          "VUK507",
+          "VUK509",
+          "IMZASIRKU",
+          "VERGILEVHA",
+          "KIMLIK"
+        ],
+        "type": "string"
+      },
+      "CompanyIdentificationResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CompanyID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyIdentificationType": {
+        "enum": [
+          "HIZMETNO",
+          "MUSTERINO",
+          "TESISATNO",
+          "TELEFONNO",
+          "DISTRIBUTORNO",
+          "TICARETSICILNO",
+          "TAPDKNO",
+          "BAYINO",
+          "ABONENO",
+          "SAYACNO",
+          "EPDKNO",
+          "SUBENO",
+          "PASAPORTNO",
+          "URETICINO",
+          "ARACIKURUMETIKET",
+          "ARACIKURUMVKN",
+          "CIFTCINO",
+          "IMALATCINO",
+          "DOSYANO",
+          "HASTANO",
+          "MERSISNO"
+        ],
+        "type": "string"
+      },
+      "CompanyModulesResponse": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "IsActivation": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyResponse": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxOffice": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "District": {
+            "type": "string",
+            "nullable": true
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "Country": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "PhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSite": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "IsDeleted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "PayeeFinancialAccountID": {
+            "type": "string",
+            "nullable": true
+          },
+          "PaymentMeansChannelCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "PaymentMeansCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Aliases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompanyAliases"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyResponseCommand": {
+        "type": "object",
+        "properties": {
+          "TaxOffice": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "District": {
+            "type": "string",
+            "nullable": true
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "Country": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "PhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSite": {
+            "type": "string",
+            "nullable": true
+          },
+          "PayeeFinancialAccountID": {
+            "type": "string",
+            "nullable": true
+          },
+          "PaymentMeansChannelCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "PaymentMeansCode": {
+            "$ref": "#/components/schemas/PaymentMeansCode"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCompanyCertificateCommand": {
+        "type": "object",
+        "properties": {
+          "SerialNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "StartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Type": {
+            "$ref": "#/components/schemas/CertificateType"
+          },
+          "Password": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCompanyDocumentCommand": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "$ref": "#/components/schemas/CompanyDocumentType"
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreditResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ModuleID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "TotalCredit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UsedCredit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "RemainingCredit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UsePercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "DurationType": {
+            "$ref": "#/components/schemas/DurationType"
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "IsControl": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomerDto": {
+        "type": "object",
+        "properties": {
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxDepartment": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "Country": {
+            "type": "string",
+            "nullable": true
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "District": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSite": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExport": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomerResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxDepartment": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "Country": {
+            "type": "string",
+            "nullable": true
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "District": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSite": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExport": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomerResponsePagination": {
+        "type": "object",
+        "properties": {
+          "Page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "PageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalPages": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerResponse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DurationType": {
+        "enum": [
+          "Indefinite",
+          "Year",
+          "Month",
+          "Day"
+        ],
+        "type": "string"
+      },
+      "ExchangeRateResponse": {
+        "type": "object",
+        "properties": {
+          "USDBuy": {
+            "type": "string",
+            "nullable": true
+          },
+          "USDSale": {
+            "type": "string",
+            "nullable": true
+          },
+          "EUROBuy": {
+            "type": "string",
+            "nullable": true
+          },
+          "EUROSale": {
+            "type": "string",
+            "nullable": true
+          },
+          "GBPBuy": {
+            "type": "string",
+            "nullable": true
+          },
+          "GBPSale": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GibEArchiveResponse": {
+        "type": "object",
+        "properties": {
+          "UserName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalCompanyInfoResponse": {
+        "type": "object",
+        "properties": {
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title": {
+            "type": "string",
+            "nullable": true
+          },
+          "FirstCreatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "DocumentType": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalCustomerAliasesResponse": {
+        "type": "object",
+        "properties": {
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "ModuleType": {
+            "type": "string",
+            "nullable": true
+          },
+          "FirstCreationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Aliases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Alias"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalCustomerInfoResponse": {
+        "type": "object",
+        "properties": {
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxDepartment": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "Country": {
+            "type": "string",
+            "nullable": true
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "District": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSite": {
+            "type": "string",
+            "nullable": true
+          },
+          "ModuleType": {
+            "type": "string",
+            "nullable": true
+          },
+          "FirstCreationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Aliases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Alias"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalCustomerResponse": {
+        "type": "object",
+        "properties": {
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title": {
+            "type": "string",
+            "nullable": true
+          },
+          "AccountType": {
+            "type": "string",
+            "nullable": true
+          },
+          "FirstCreationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "Aliases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Alias"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalCustomerResponsePagination": {
+        "type": "object",
+        "properties": {
+          "Page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "PageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalPages": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GlobalCustomerResponse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalUserType": {
+        "enum": [
+          "Invoice",
+          "DespatchAdvice"
+        ],
+        "type": "string"
+      },
+      "MailingSettingResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CompanyID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ModuleID": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "ReplyToName": {
+            "type": "string",
+            "nullable": true
+          },
+          "ReplyTo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Module": {
+        "enum": [
+          "Portal",
+          "Sms",
+          "WhatsApp"
+        ],
+        "type": "string"
+      },
+      "PaymentMeansCode": {
+        "enum": [
+          "ODEMETIPIMUHTELIF",
+          "NAKIT",
+          "CEK",
+          "BANKACEKI",
+          "HAVALE_EFT",
+          "KREDIKARTI_BANKAKARTI"
+        ],
+        "type": "string"
+      },
+      "SearchGlobalCompanyResponse": {
+        "type": "object",
+        "properties": {
+          "TaxNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "Title": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxDepartment": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "Country": {
+            "type": "string",
+            "nullable": true
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "District": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSite": {
+            "type": "string",
+            "nullable": true
+          },
+          "ModuleType": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SortType": {
+        "enum": [
+          "ASC",
+          "DESC"
+        ],
+        "type": "string"
+      },
+      "StockDto": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "UnitCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "UnitName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Price": {
+            "type": "number",
+            "format": "double"
+          },
+          "SellerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "BuyerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ManufacturerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "GTIPCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Brand": {
+            "type": "string",
+            "nullable": true
+          },
+          "Model": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "Note": {
+            "type": "string",
+            "nullable": true
+          },
+          "DeliveryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ShippingCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxPercent": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StockResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "UnitCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "UnitName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Price": {
+            "type": "number",
+            "format": "double"
+          },
+          "SellerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "BuyerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ManufacturerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "CreatedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "GTIPCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Brand": {
+            "type": "string",
+            "nullable": true
+          },
+          "Model": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "Note": {
+            "type": "string",
+            "nullable": true
+          },
+          "DeliveryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ShippingCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxPercent": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StockResponsePagination": {
+        "type": "object",
+        "properties": {
+          "Page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "PageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "TotalPages": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockResponse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateCompanyCertificateCommand": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "SerialNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "StartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Type": {
+            "$ref": "#/components/schemas/CertificateType"
+          },
+          "Password": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateCustomerCommand": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxDepartment": {
+            "type": "string",
+            "nullable": true
+          },
+          "Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "Country": {
+            "type": "string",
+            "nullable": true
+          },
+          "City": {
+            "type": "string",
+            "nullable": true
+          },
+          "District": {
+            "type": "string",
+            "nullable": true
+          },
+          "PostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "Fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSite": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExport": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateInvoiceMailingMailCommand": {
+        "type": "object",
+        "properties": {
+          "IsActive": {
+            "type": "boolean"
+          },
+          "ReplyTo": {
+            "type": "string",
+            "nullable": true
+          },
+          "ReplyToName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateStockCommand": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "UnitCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "UnitName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Price": {
+            "type": "number",
+            "format": "double"
+          },
+          "SellerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "BuyerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ManufacturerCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "GTIPCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "Brand": {
+            "type": "string",
+            "nullable": true
+          },
+          "Model": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "Note": {
+            "type": "string",
+            "nullable": true
+          },
+          "ShippingCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "DeliveryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "TaxPercent": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "API anahtar� giriniz",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

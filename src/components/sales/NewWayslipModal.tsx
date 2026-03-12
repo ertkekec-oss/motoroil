@@ -11,6 +11,7 @@ interface NewWayslipModalProps {
     inventoryProducts: any[];
     handleSaveWayslip: () => void;
     isSavingWayslip: boolean;
+    realInvoices?: any[];
 }
 
 export function NewWayslipModal({
@@ -22,9 +23,32 @@ export function NewWayslipModal({
     suppliers,
     inventoryProducts,
     handleSaveWayslip,
-    isSavingWayslip
+    isSavingWayslip,
+    realInvoices
 }: NewWayslipModalProps) {
     if (view !== 'new_wayslip') return null;
+
+    const unfactoredInvoices = realInvoices?.filter(i => 
+        i.customerId === newWayslipData.customerId && 
+        i.formalType !== 'EIRSALIYE' &&
+        !(i.description || '').includes('[İrsaliyeli]')
+    ) || [];
+
+    const handleSelectInvoice = (invoiceId: string) => {
+        if (!invoiceId) {
+            setNewWayslipData({ ...newWayslipData, relatedInvoiceId: undefined, relatedInvoiceNo: undefined, items: [] });
+            return;
+        }
+        const inv = unfactoredInvoices.find(i => i.id === invoiceId);
+        if (inv) {
+            setNewWayslipData({
+                ...newWayslipData,
+                relatedInvoiceId: inv.id,
+                relatedInvoiceNo: inv.invoiceNo,
+                items: Array.isArray(inv.items) ? inv.items.map((it:any) => ({...it})) : []
+            });
+        }
+    };
 
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -68,6 +92,24 @@ export function NewWayslipModal({
                             </select>
                         )}
                     </div>
+                    {newWayslipData.type === 'Giden' && newWayslipData.customerId && (
+                        <div className="flex-col gap-2 col-span-2">
+                            <label className="text-muted" style={{ fontSize: '12px' }}>FATURADAN İRSALİYE OLUŞTUR (SEÇMELİ)</label>
+                            <select
+                                value={newWayslipData.relatedInvoiceId || ''}
+                                onChange={(e) => handleSelectInvoice(e.target.value)}
+                                style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                            >
+                                <option value="">Bağımsız İrsaliye (Fatura Seçmeden Devam Et)</option>
+                                {unfactoredInvoices.map((inv: any) => (
+                                    <option key={inv.id} value={inv.id}>
+                                        Fatura No: {inv.invoiceNo} - Tutar: {inv.totalAmount}₺ - Tarih: {new Date(inv.invoiceDate || inv.createdAt).toLocaleDateString('tr-TR')}
+                                    </option>
+                                ))}
+                            </select>
+                            <span style={{fontSize: '11px', color: '#94a3b8'}}>Fatura seçildiğinde ürünler otomatik eklenir ve irsaliye açıklamasında bu faturanın referansı yer alır.</span>
+                        </div>
+                    )}
                     <div className="flex-col gap-2">
                         <label className="text-muted" style={{ fontSize: '12px' }}>İRSALİYE NO</label>
                         <input

@@ -10,7 +10,12 @@ export async function POST(request: Request) {
         const companyId = session.user?.companyId || (session as any).companyId;
 
         const body = await request.json();
-        const { type, customerId, supplierId, irsNo, date, items, description } = body;
+        const { type, customerId, supplierId, irsNo, date, items, description, relatedInvoiceId, relatedInvoiceNo } = body;
+
+        let finalDescription = description || (type === 'Giden' ? 'Sevk İrsaliyesi' : 'Alım İrsaliyesi');
+        if (relatedInvoiceNo && relatedInvoiceNo.trim() !== '') {
+            finalDescription += ` - Fatura Ref: ${relatedInvoiceNo}`;
+        }
 
         if (type === 'Giden') {
             const wayslip = await prisma.salesInvoice.create({
@@ -26,9 +31,22 @@ export async function POST(request: Request) {
                     status: 'İrsaliye',
                     isFormal: false,
                     branch: (session.branch as string) || 'Merkez',
-                    description: description || 'Sevk İrsaliyesi'
+                    description: finalDescription,
+                    orderId: relatedInvoiceId || undefined // We use orderId as a loose reference to the related invoice ID
                 }
             });
+
+            // Also update the related invoice to indicate it has been waybilled
+            if (relatedInvoiceId) {
+                const parentInv = await prisma.salesInvoice.findUnique({where: {id: relatedInvoiceId}});
+                if (parentInv && !(parentInv.description || '').includes('[İrsaliyeli]')) {
+                     await prisma.salesInvoice.update({
+                         where: { id: relatedInvoiceId },
+                         data: { description: `[İrsaliyeli] ${parentInv.description || ''}`.trim() }
+                     });
+                }
+            }
+
             return NextResponse.json({ success: true, wayslip });
         } else {
             const wayslip = await prisma.purchaseInvoice.create({
@@ -41,7 +59,7 @@ export async function POST(request: Request) {
                     totalAmount: items.reduce((acc: number, item: any) => acc + (item.price || 0) * item.qty, 0),
                     items: items,
                     status: 'İrsaliye',
-                    description: description || 'Alım İrsaliyesi'
+                    description: finalDescription
                 }
             });
             return NextResponse.json({ success: true, wayslip });

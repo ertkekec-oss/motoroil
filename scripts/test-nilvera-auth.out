@@ -1,0 +1,12 @@
+﻿Testing: /Token
+  -> Status: 404
+Testing: /Auth
+  -> Status: 404
+Testing: /Auth/Login
+  -> Status: 404
+Testing: /general/Token
+  -> Status: 404
+Testing: /v1/Token
+  -> Status: 404
+Testing: /v1/Auth/Login
+  -> Status: 404

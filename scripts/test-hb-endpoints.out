@@ -1,0 +1,16 @@
+﻿[HB_INIT] baseUrl=https://oms-external.hepsiburada.com | Target: oms-external.hepsiburada.com
+Testing UNPACKED | URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+ -> SUCCESS! Count: 0
+Testing PACKED | URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/packed?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/packed?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/packed?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+ -> ERROR! Status: 404 | Msg: Hepsiburada API Hatas─▒ (404): {"message":"Not Found"}
+Testing SHIPPED | URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/shipped?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/shipped?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/shipped?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+ -> SUCCESS! Count: 1
+Testing DELIVERED | URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/delivered?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/delivered?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/delivered?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+ -> SUCCESS! Count: 1
+Testing CANCELLED | URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/cancelled?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/cancelled?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/cancelled?limit=1&offset=0&begindate=2026-02-10%2000%3A00&enddate=2026-03-12%2023%3A59
+ -> SUCCESS! Count: 1

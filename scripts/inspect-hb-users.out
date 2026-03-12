@@ -1,0 +1,15 @@
+﻿[HB_INIT] baseUrl=https://oms-external.hepsiburada.com | Target: oms-external.hepsiburada.com
+
+--- Fetching Order: 4319156565 ---
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4319156565 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4319156565
+RAW API Response for 4319156565 exists: true
+MAPPED Name: EGEMEN TOP├çUO─ŞLU, Date: 2026-03-05T21:55:55.000Z, Total: 165, Status: UNKNOWN, Items: 1
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4319156565 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4319156565
+Packages fetch failed: Hepsiburada API Hatas─▒ (404): {"message":"Not Found"}
+
+--- Fetching Order: 4480163364 ---
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4480163364 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4480163364
+RAW API Response for 4480163364 exists: true
+MAPPED Name: SONER YILDIRIM, Date: 2026-03-05T10:22:52.000Z, Total: 314.1, Status: UNKNOWN, Items: 1
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4480163364 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4480163364
+Packages fetch failed: Hepsiburada API Hatas─▒ (404): {"message":"Not Found"}

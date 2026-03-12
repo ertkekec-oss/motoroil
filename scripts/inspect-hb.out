@@ -1,0 +1,111 @@
+﻿[HB_INIT] baseUrl=https://oms-external.hepsiburada.com | Target: oms-external.hepsiburada.com
+Fetching order 4655737501 (Emre Yalava├ğ - SHIPPED)...
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4655737501 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4655737501
+Full Order 4655737501 data: {
+  "id": "4655737501",
+  "orderNumber": "4655737501",
+  "customerName": "Emre Yalava├ğ",
+  "customerEmail": "",
+  "orderDate": "2026-03-10T09:01:52.000Z",
+  "status": "UNKNOWN",
+  "totalAmount": 339,
+  "currency": "TRY",
+  "shipmentPackageId": "5454836190",
+  "shippingAddress": {
+    "fullName": "",
+    "address": "",
+    "city": "",
+    "district": "",
+    "phone": ""
+  },
+  "invoiceAddress": {
+    "fullName": "",
+    "address": "",
+    "city": "",
+    "district": "",
+    "phone": ""
+  },
+  "items": [
+    {
+      "productName": "Motul Auto Cool Expert Antifriz -37┬░C 1 Litre",
+      "sku": "HBCV00000R631W",
+      "quantity": 1,
+      "price": 339,
+      "taxRate": 20,
+      "discountAmount": 0
+    }
+  ]
+}
+Fetching order 4150187025 (─░zzeddin G├╝m├╝┼ş├ğ├╝ - DELIVERED)...
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4150187025 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4150187025
+Full Order 4150187025 data: {
+  "id": "4150187025",
+  "orderNumber": "4150187025",
+  "customerName": "─░zzeddin G├╝m├╝┼ş├ğ├╝",
+  "customerEmail": "",
+  "orderDate": "2026-03-05T20:56:47.000Z",
+  "status": "UNKNOWN",
+  "totalAmount": 450,
+  "currency": "TRY",
+  "shipmentPackageId": "5453258813",
+  "shippingAddress": {
+    "fullName": "",
+    "address": "",
+    "city": "",
+    "district": "",
+    "phone": ""
+  },
+  "invoiceAddress": {
+    "fullName": "",
+    "address": "",
+    "city": "",
+    "district": "",
+    "phone": ""
+  },
+  "items": [
+    {
+      "productName": "LIQUI MOLY SPEED TEC Benzin Katk─▒s─▒ 3720",
+      "sku": "OTSONLM3720",
+      "quantity": 1,
+      "price": 450,
+      "taxRate": 20,
+      "discountAmount": 0
+    }
+  ]
+}
+Fetching SHIPPED packages list...
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/shipped?limit=2&offset=0 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/shipped?limit=2&offset=0
+SHIPPED list data: {
+  "totalCount": 4,
+  "limit": 2,
+  "offset": 0,
+  "pageCount": 2,
+  "items": [
+    {
+      "Id": "69afde01-d017-6208-d515-25ae06060606",
+      "Barcode": "62754548361900",
+      "PackageNumber": "5454836190",
+      "OrderNumber": "4655737501",
+      "OrderNumbers": [
+        "4655737501"
+      ],
+      "MerchantId": "f225561c-5ae7-4208-9eb4-3541340b7229",
+      "ShippedDate": "2026-03-10T15:24:31",
+      "Deci": 1,
+      "EtgbNo": ""
+    },
+    {
+      "Id": "69afb80b-f862-c127-b0b0-ea3c06060606",
+      "Barcode": "62754547650560",
+      "PackageNumber": "5454765056",
+      "OrderNumber": "4387022637",
+      "OrderNumbers": [
+        "4387022637"
+      ],
+      "MerchantId": "f225561c-5ae7-4208-9eb4-3541340b7229",
+      "ShippedDate": "2026-03-10T15:24:41",
+      "Deci": 2,
+      "EtgbNo": ""
+    }
+  ]
+}

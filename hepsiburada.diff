@@ -1,0 +1,83 @@
+﻿commit affa971c133344f1f4ec26af049d48d88d820567
+Author: Ertke Kec <ertkekec@gmail.com>
+Date:   Wed Mar 11 23:57:51 2026 +0300
+
+    fix(marketplaces): bypass proxy for Hepsiburada since it does not require IP whitelisting
+
+diff --git a/src/services/marketplaces/hepsiburada.ts b/src/services/marketplaces/hepsiburada.ts
+index eebb3cf8..bf5ddc77 100644
+--- a/src/services/marketplaces/hepsiburada.ts
++++ b/src/services/marketplaces/hepsiburada.ts
+@@ -20,8 +20,9 @@ export class HepsiburadaService implements IMarketplaceService {
+     }
+ 
+     private getFetchUrl(targetUrl: string): string {
+-        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+-        return proxy ? `${proxy}?url=${encodeURIComponent(targetUrl)}` : targetUrl;
++        // Hepsiburada does not require IP whitelists, so we bypass the Vercel->Contabo proxy
++        // which was returning 403 Forbidden Host because Hepsiburada was not in its allowed list.
++        return targetUrl;
+     }
+ 
+     private getAuthHeader(): string {
+
+commit 23484694ba0158da878723f48ff0834704ab6f3c
+Author: Ertke Kec <ertkekec@gmail.com>
+Date:   Wed Mar 11 23:38:12 2026 +0300
+
+    fix(marketplaces): bubble up Hepsiburada 401/403 auth errors to UI instead of silently empty syncing
+
+diff --git a/src/services/marketplaces/hepsiburada.ts b/src/services/marketplaces/hepsiburada.ts
+index 94dbc771..eebb3cf8 100644
+--- a/src/services/marketplaces/hepsiburada.ts
++++ b/src/services/marketplaces/hepsiburada.ts
+@@ -254,6 +254,9 @@ export class HepsiburadaService implements IMarketplaceService {
+                     if (hasMore) await new Promise(r => setTimeout(r, 200));
+                 } catch (err: any) {
+                     console.error(`[HB_SYNC_ERR] ${target.name}: ${err.message}`);
++                    if (err.httpStatus === 401 || err.httpStatus === 403) {
++                        throw new Error(`Kimlik/Eri┼şim Hatas─▒ (HTTP ${err.httpStatus}): API Kullan─▒c─▒ ad─▒, ┼şifre yanl─▒┼ş veya IP adresiniz Hepsiburada panelinde beyaz listeye (whitelist) eklenmemi┼ş.`);
++                    }
+                     hasMore = false;
+                 }
+             }
+
+commit 3ee1006f2e29e96ef691f95fcb8bbab508a8d3e2
+Author: Ertke Kec <ertkekec@gmail.com>
+Date:   Wed Mar 11 16:01:12 2026 +0300
+
+    fix(hepsiburada): fix basic auth credential order (username instead of merchantId) and fix pagination parameter loops
+
+diff --git a/src/services/marketplaces/hepsiburada.ts b/src/services/marketplaces/hepsiburada.ts
+index e08937c2..94dbc771 100644
+--- a/src/services/marketplaces/hepsiburada.ts
++++ b/src/services/marketplaces/hepsiburada.ts
+@@ -25,9 +25,9 @@ export class HepsiburadaService implements IMarketplaceService {
+     }
+ 
+     private getAuthHeader(): string {
++        const username = (this.config.username || '').trim();
+         const password = (this.config.password || '').trim();
+-        const merchantId = (this.config.merchantId || '').trim();
+-        const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
++        const token = Buffer.from(`${username}:${password}`).toString('base64');
+         return `Basic ${token}`;
+     }
+ 
+@@ -208,11 +208,11 @@ export class HepsiburadaService implements IMarketplaceService {
+         const eStr = this.hbDateYmdHi(this.endOfDay(end));
+ 
+         const syncTargets = [
+-            { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}`, params: ['limit'] },
+-            { name: 'PACKED', urlPart: `packages/merchantid/${merchantId}/packed`, params: ['limit'] },
+-            { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped`, params: ['begindate', 'enddate'] },
+-            { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered`, params: ['begindate', 'enddate'] },
+-            { name: 'CANCELLED', urlPart: `orders/merchantid/${merchantId}/cancelled`, params: ['begindate', 'enddate'] }
++            { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}`, params: ['limit', 'offset'] },
++            { name: 'PACKED', urlPart: `packages/merchantid/${merchantId}/packed`, params: ['limit', 'offset'] },
++            { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped`, params: ['begindate', 'enddate', 'limit', 'offset'] },
++            { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered`, params: ['begindate', 'enddate', 'limit', 'offset'] },
++            { name: 'CANCELLED', urlPart: `orders/merchantid/${merchantId}/cancelled`, params: ['begindate', 'enddate', 'limit', 'offset'] }
+         ];
+ 
+         for (const target of syncTargets) {

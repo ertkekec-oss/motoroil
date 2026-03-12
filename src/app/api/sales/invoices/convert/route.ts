@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { orderId, customerId, invoiceNo, taxNumber, taxOffice, address, phone, name, isFormal, description, items: customItems, discount } = body;
+        const { orderId, customerId, invoiceNo, taxNumber, taxOffice, address, phone, name, isFormal, description, items: customItems, discount, createWayslip } = body;
 
         // 1. Fetch the original order
         const order = await prisma.order.findUnique({
@@ -56,6 +56,36 @@ export async function POST(request: Request) {
                     status: 'Onaylandı'
                 }
             });
+
+            // If user requested a tied Wayslip
+            let createdWayslip = null;
+            if (createWayslip) {
+                const wayslipNo = `IRS-${Date.now()}`;
+                
+                // Update the original invoice with the reference
+                await tx.salesInvoice.update({
+                    where: { id: invoice.id },
+                    data: {
+                        description: `[İrsaliyeli: ${wayslipNo}] ${invoice.description || ''}`.trim()
+                    }
+                });
+
+                createdWayslip = await tx.salesInvoice.create({
+                    data: {
+                        companyId: order.companyId,
+                        invoiceNo: wayslipNo,
+                        customerId: customerId,
+                        orderId: invoice.id, // Store parent invoice ID in orderId for back-reference
+                        amount: subtotal - discAmount,
+                        taxAmount: totalVat + totalOtv,
+                        totalAmount: grandTotal,
+                        description: `Otomatik Sevk İrsaliyesi - Fatura Ref: ${invoice.invoiceNo}`,
+                        items: itemsToUse as any,
+                        isFormal: false, // E-İrsaliye gönderimi için daha sonra Gönder butonuna basılabilir
+                        status: 'İrsaliye'
+                    }
+                });
+            }
 
 
             // B. Update Customer with provided info

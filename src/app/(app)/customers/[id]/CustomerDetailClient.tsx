@@ -1417,6 +1417,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     </div>
                                 </div>
 
+                                {/* Section: Ekstra Seçenekler */}
+                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', marginBottom: '40px' }}>
+                                    <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#10b981', marginBottom: '24px', borderLeft: '4px solid #10b981', paddingLeft: '12px', letterSpacing: '1px' }}>EKSTRA SEÇENEKLER</h3>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <input type="checkbox" id="inv_create_wayslip" style={{ width: '24px', height: '24px', cursor: 'pointer', accentColor: '#10b981' }} />
+                                        <label htmlFor="inv_create_wayslip" style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-main, white)', cursor: 'pointer', userSelect: 'none' }}>
+                                            Fatura ile birlikte Giden Sevk İrsaliyesi oluştur <span style={{color: '#94a3b8', fontWeight: '600', fontSize: '13px'}}>(İrsaliye numarası fatura üzerine yazılır)</span>
+                                        </label>
+                                    </div>
+                                </div>
+
                                 {/* Section: Items Table */}
                                 <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -1692,7 +1703,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             address: (document.getElementById('inv_address') as HTMLTextAreaElement).value,
                                             phone: (document.getElementById('inv_phone') as HTMLInputElement).value,
                                             name: (document.getElementById('inv_name') as HTMLInputElement).value,
-                                            isFormal: true
+                                            isFormal: true,
+                                            createWayslip: (document.getElementById('inv_create_wayslip') as HTMLInputElement)?.checked || false
                                         };
                                         handleConvertToInvoice(data);
                                     }}

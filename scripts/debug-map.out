@@ -1,0 +1,72 @@
+﻿[HB_INIT] baseUrl=https://oms-external.hepsiburada.com | Target: oms-external.hepsiburada.com
+node.exe : [HB_MAP_ERR] 69afd
+e01-fc34-6f4e-e1dd-04bf060606
+06 ReferenceError: orderItems
+ is not defined
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: ([HB_MAP  
+  _ERR] 69... is not defin   
+ ed:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+    at HepsiburadaService.map
+Order (C:\Users\ertke\OneDriv
+e\Masa├╝st├╝\periodya\muhaseb
+eapp\motoroil\src\services\ma
+rketplaces\hepsiburada.ts:352
+:90)
+    at run (C:\Users\ertke\On
+eDrive\Masa├╝st├╝\periodya\mu
+hasebeapp\motoroil\scripts\de
+bug-map.ts:13:37)
+    at <anonymous> (C:\Users\
+ertke\OneDrive\Masa├╝st├╝\per
+iodya\muhasebeapp\motoroil\sc
+ripts\debug-map.ts:19:1)
+    at Object.<anonymous> (C:
+\Users\ertke\OneDrive\Masa├╝s
+t├╝\periodya\muhasebeapp\moto
+roil\scripts\debug-map.ts:19:
+5)
+    at Module._compile (node:
+internal/modules/cjs/loader:1
+706:14)
+    at Object.transformer (C:
+\Users\ertke\OneDrive\Masa├╝s
+t├╝\periodya\muhasebeapp\moto
+roil\node_modules\tsx\dist\re
+gister-D46fvsV_.cjs:3:1104)
+    at Module.load (node:inte
+rnal/modules/cjs/loader:1441:
+32)
+    at Function._load (node:i
+nternal/modules/cjs/loader:12
+63:12)
+    at TracingChannel.traceSy
+nc (node:diagnostics_channel:
+322:14)
+    at wrapModuleLoad (node:i
+nternal/modules/cjs/loader:23
+7:24)
+{
+  id: 'err',
+  orderNumber: 'err',
+  customerName: 'Error',
+  customerEmail: '',
+  orderDate: 2026-03-12T00:10:17.935Z,
+  status: 'MAPPING_ERROR',
+  totalAmount: 0,
+  currency: 'TRY',
+  shippingAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+  invoiceAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+  items: []
+}

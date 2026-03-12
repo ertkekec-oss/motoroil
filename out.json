@@ -1,0 +1,17 @@
+{
+  "invId": "cmmmtyvdg000wqzjne609nhek",
+  "invoiceNo": "EFT2025000000238",
+  "status": "Onaylandı",
+  "supplier": "Nilvera Yazılım ve Bilişim Hiz. Tic. Ltd. Şti.",
+  "companyId": "cmmi7rnux00069mobu3uchs37",
+  "items": [
+    {
+      "qty": 1,
+      "name": "Laptop",
+      "unit": "C62",
+      "price": 100,
+      "vatRate": 18,
+      "productId": "cmmmtyv88000uqzjn7f7jaicy"
+    }
+  ]
+}

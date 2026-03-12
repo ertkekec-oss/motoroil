@@ -1,0 +1,98 @@
+﻿[HB_INIT] baseUrl=https://oms-external.hepsiburada.com | Target: oms-external.hepsiburada.com
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?limit=50&offset=0 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?limit=50&offset=0
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/packed?limit=50&offset=0 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/packed?limit=50&offset=0
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/shipped?limit=50&offset=0&begindate=2026-02-10+00%3A00&enddate=2026-03-12+23%3A59 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/shipped?limit=50&offset=0&begindate=2026-02-10+00%3A00&enddate=2026-03-12+23%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4655737501 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4655737501
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4387022637 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4387022637
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4036952010 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4036952010
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4668331828 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4668331828
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/delivered?limit=50&offset=0&begindate=2026-02-10+00%3A00&enddate=2026-03-12+23%3A59 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/delivered?limit=50&offset=0&begindate=2026-02-10+00%3A00&enddate=2026-03-12+23%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4534832471 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4534832471
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4033360305 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4033360305
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4531369395 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4531369395
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4763473834 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4763473834
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4588712228 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4588712228
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4331711697 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4331711697
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4574300234 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4574300234
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4812502171 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4812502171
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4782391977 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4782391977
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4781167382 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4781167382
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4111459839 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4111459839
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4800204780 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4800204780
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4821140910 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4821140910
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4376899314 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4376899314
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4289873292 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4289873292
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4756539309 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4756539309
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4270542152 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4270542152
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4771076869 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4771076869
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4809424392 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4809424392
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4768071622 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4768071622
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4761732534 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4761732534
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4408121013 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4408121013
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4124416386 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4124416386
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4711372942 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4711372942
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4434520522 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4434520522
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4464599805 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4464599805
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4511682136 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4511682136
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4202349663 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4202349663
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4722381928 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4722381928
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4173107049 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4173107049
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4800204780 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4800204780
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4801846587 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4801846587
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4480163364 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4480163364
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4269894252 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4269894252
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4057505215 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4057505215
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4319156565 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4319156565
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4150187025 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4150187025
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/cancelled?limit=50&offset=0&begindate=2026-02-10+00%3A00&enddate=2026-03-12+23%3A59 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/cancelled?limit=50&offset=0&begindate=2026-02-10+00%3A00&enddate=2026-03-12+23%3A59
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4323752771 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4323752771
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4742075407 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4742075407
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4299669947 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4299669947
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4448396788 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4448396788
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4624209464 | Proxy URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4624209464
+{
+  id: '4448396788',
+  orderNumber: '4448396788',
+  customerName: '├£mm├╝g├╝ls├╝m ├ûzg├╝n',
+  customerEmail: '',
+  orderDate: 2026-03-03T12:13:16.000Z,
+  status: 'CANCELLED',
+  totalAmount: 1899,
+  currency: 'TRY',
+  shipmentPackageId: undefined,
+  shippingAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+  invoiceAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+  items: [
+    {
+      productName: 'C Zigon G├╝m├╝┼ş Sehpa Siyah Aynal─▒',
+      sku: 'HBCV0000AL75FJ',
+      quantity: 1,
+      price: 1899,
+      taxRate: 10,
+      discountAmount: 0
+    }
+  ]
+}
+{
+  id: '4624209464',
+  orderNumber: '4624209464',
+  customerName: 'Cem Olcay',
+  customerEmail: '',
+  orderDate: 2026-03-10T18:49:43.000Z,
+  status: 'CANCELLED',
+  totalAmount: 339,
+  currency: 'TRY',
+  shipmentPackageId: undefined,
+  shippingAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+  invoiceAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+  items: [
+    {
+      productName: 'Motul Auto Cool Expert Antifriz -37┬░C 1 Litre',
+      sku: 'HBCV00000R631W',
+      quantity: 1,
+      price: 339,
+      taxRate: 20,
+      discountAmount: 0
+    }
+  ]
+}

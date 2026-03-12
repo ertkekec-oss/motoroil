@@ -950,6 +950,7 @@ export default function SalesPage() {
                     inventoryProducts={inventoryProducts}
                     handleSaveWayslip={handleSaveWayslip}
                     isSavingWayslip={isSavingWayslip}
+                    realInvoices={realInvoices}
                 />
 
                 <DespatchModal

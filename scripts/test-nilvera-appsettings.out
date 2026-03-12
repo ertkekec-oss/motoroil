@@ -1,0 +1,43 @@
+﻿Token: 1D4533A521...
+Error: Request failed with status code 401
+CompanyInfo (TEST) response: {
+  "Name": "Test Kurum Bir",
+  "TaxNumber": "1234567801",
+  "TaxOffice": "Erciyes32123",
+  "Address": "SDASDASDASDASDASD",
+  "District": "asd",
+  "City": "I─şd─▒r",
+  "Country": "T├╝rkiye",
+  "PostalCode": "38070",
+  "PhoneNumber": "05545555558",
+  "Fax": "05403211144",
+  "Email": "denem222e10@gmail.com",
+  "WebSite": "https://www.nilvera11.com",
+  "IsActive": true,
+  "IsDeleted": false,
+  "PayeeFinancialAccountID": "TR231313211111111111111111",
+  "PaymentMeansChannelCode": "9",
+  "PaymentMeansCode": "1",
+  "Aliases": [
+    {
+      "Alias": "urn:mail:defaultgb@nilvera.com",
+      "AliasType": 0,
+      "Type": 0
+    },
+    {
+      "Alias": "urn:mail:defaultpk@nilvera.com",
+      "AliasType": 1,
+      "Type": 0
+    },
+    {
+      "Alias": "urn:mail:defaultgb@nilvera.com",
+      "AliasType": 0,
+      "Type": 2
+    },
+    {
+      "Alias": "urn:mail:defaultpk@nilvera.com",
+      "AliasType": 1,
+      "Type": 2
+    }
+  ]
+}

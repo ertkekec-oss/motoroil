@@ -1,0 +1,16 @@
+﻿
+============ Direct OLD Auth (MerchantId:Pass) ============
+URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?offset=0&limit=1
+Status: 200
+Body: {"totalCount":0,"limit":1,"offset":0,"pageCount":0,"items":[]}
+
+
+============ Proxy path /hepsiburada (MerchantId:Pass) ============
+URL: http://38.242.134.156:1561/hepsiburada/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?offset=0&limit=1
+Status: 404
+Body: Not Found
+
+============ Direct NEW Auth (Username:Pass) ============
+URL: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?offset=0&limit=1
+Status: 401
+Body: 

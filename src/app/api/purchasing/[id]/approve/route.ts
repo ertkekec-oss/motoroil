@@ -24,59 +24,75 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             include: { supplier: true }
         });
 
-        // 2. If NOT found locally, try to fetch from Nilvera and import
-        if (!invoice) {
+        // 1.5 Get Nilvera credentials (we might need them even if invoice exists locally)
+        let apiKey = '';
+        let baseUrl = '';
+
+        const intSettings = await (prisma as any).integratorSettings.findFirst({
+            where: { companyId, isActive: true }
+        });
+
+        if (intSettings?.credentials) {
+            try {
+                const { decrypt } = await import('@/lib/encryption');
+                const creds = JSON.parse(decrypt(intSettings.credentials));
+                apiKey = (creds.apiKey || creds.ApiKey || '').trim();
+                baseUrl = (intSettings.environment === 'PRODUCTION') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+            } catch (e) {
+                console.warn('[PurchaseApprove] Failed to decrypt integratorSettings');
+            }
+        }
+
+        if (!apiKey) {
+            const settingsRecord = await prisma.appSettings.findUnique({
+                where: { companyId_key: { companyId, key: 'eFaturaSettings' } }
+            });
+            const raw = (settingsRecord?.value as any) || {};
+            const config = raw.apiKey ? raw : (raw.nilvera || {});
+            apiKey = (config.apiKey || '').trim();
+            baseUrl = (config.environment === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+        }
+
+        // 2. If NOT found locally OR we need to check despatches on an existing invoice, fetch Nilvera
+        let fetchedFromNilvera = false;
+        let invData = null;
+
+        if (!invoice || (invoice && !skipFinanceUpdate && apiKey)) {
             console.log(`[PurchaseApprove] Invoice ${id} not found locally. Attempting Nilvera import...`);
 
-            // Get Nilvera credentials
-            let apiKey = '';
-            let baseUrl = '';
-
-            const intSettings = await (prisma as any).integratorSettings.findFirst({
-                where: { companyId, isActive: true }
-            });
-
-            if (intSettings?.credentials) {
-                try {
-                    const { decrypt } = await import('@/lib/encryption');
-                    const creds = JSON.parse(decrypt(intSettings.credentials));
-                    apiKey = (creds.apiKey || creds.ApiKey || '').trim();
-                    baseUrl = (intSettings.environment === 'PRODUCTION') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
-                } catch (e) {
-                    console.warn('[PurchaseApprove] Failed to decrypt integratorSettings');
-                }
+            if (!invoice) {
+                console.log(`[PurchaseApprove] Invoice ${id} not found locally. Attempting Nilvera import...`);
+            } else {
+                console.log(`[PurchaseApprove] Invoice ${id} found locally. Fetching Nilvera to check related despatches...`);
             }
 
             if (!apiKey) {
-                const settingsRecord = await prisma.appSettings.findUnique({
-                    where: { companyId_key: { companyId, key: 'eFaturaSettings' } }
-                });
-                const raw = (settingsRecord?.value as any) || {};
-                const config = raw.apiKey ? raw : (raw.nilvera || {});
-                apiKey = (config.apiKey || '').trim();
-                baseUrl = (config.environment === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
-            }
+                if (!invoice) {
+                    return NextResponse.json({ success: false, error: 'Nilvera API bağlantısı yapılandırılamadı.' }, { status: 400 });
+                }
+            } else {
+                const nilvera = new NilveraInvoiceService({ apiKey, baseUrl });
+                let result = await nilvera.getInvoiceDetails(invoice ? invoice.invoiceNo : id); // Use invoiceNo if local, else id
 
-            if (!apiKey) {
-                return NextResponse.json({ success: false, error: 'Nilvera API bağlantısı yapılandırılamadı.' }, { status: 400 });
-            }
+                if (!result.success && !invoice) {
+                    console.log(`[PurchaseApprove] Fatura olarak bulunamadı. İrsaliye olarak deneniyor...`);
+                    result = await nilvera.getDespatchDetails(id);
+                    if (!result.success) {
+                        return NextResponse.json({ success: false, error: `Nilvera'dan fatura/irsaliye detayları alınamadı: ${result.error}` }, { status: 404 });
+                    }
+                }
 
-            const nilvera = new NilveraInvoiceService({ apiKey, baseUrl });
-            let result = await nilvera.getInvoiceDetails(id);
-
-            if (!result.success) {
-                console.log(`[PurchaseApprove] Fatura olarak bulunamadı. İrsaliye olarak deneniyor...`);
-                result = await nilvera.getDespatchDetails(id);
-                if (!result.success) {
-                    return NextResponse.json({ success: false, error: `Nilvera'dan fatura/irsaliye detayları alınamadı: ${result.error}` }, { status: 404 });
+                if (result.success) {
+                    fetchedFromNilvera = true;
+                    const rawData = result.data;
+                    invData = rawData.EDespatch || rawData.PurchaseInvoice || rawData.Model || rawData.EInvoice || rawData.EArchive || rawData;
                 }
             }
+        }
 
-            // DYNAMIC STRUCTURE MAPPING
-            const rawData = result.data;
-            console.log(`[PurchaseApprove] Raw Keys: ${Object.keys(rawData).join(', ')}`);
-
-            const invData = rawData.EDespatch || rawData.PurchaseInvoice || rawData.Model || rawData.EInvoice || rawData.EArchive || rawData;
+        // If we fetched the payload from Nilvera (either new or existing)
+        if (fetchedFromNilvera && invData) {
+            const rawData = invData; // We already unwrapped it
             const supplierData = invData.Supplier || invData.Seller || invData.DespatchSupplierInfo || invData.SenderInfo || invData.Sender;
 
             let vkn = supplierData?.TaxNumber || supplierData?.SupplierVknTckn || supplierData?.VknTckn || invData.SupplierVknTckn || invData.SenderVknTckn;
@@ -165,15 +181,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 // Line references
                 for (const line of nilveraLines) {
                     const desc = String(line.Name || line.Description || line.Note || "");
-                    if (desc.toLowerCase().includes('irsaliye:')) {
+                    const irsMatch = desc.match(/(?:irsaliye|irs)\s*[:#.-]?\s*([A-Z0-9]{13,16})/i);
+                    if (irsMatch) {
                         hasDespatchRef = true;
+                        if (!relatedDespatches.includes(irsMatch[1])) {
+                            relatedDespatches.push(irsMatch[1]);
+                        }
                     }
                 }
 
-                if (hasDespatchRef && !invData.DespatchLines) {
-                    // IF it is an Invoice (not a Despatch itself) and it has despatch refs:
+                if (hasDespatchRef && !invData.DespatchLines && relatedDespatches.length > 0) {
+                    // IF it is an Invoice (not a Despatch itself) and we know the related despatches:
                     skipStockUpdate = true;
-                    console.log('[PurchaseApprove] 📦 WAYBILL DETECTED in Invoice Payload! Overriding skipStockUpdate=true for:', relatedDespatches);
+                    console.log('[PurchaseApprove] 📦 WAYBILL DETECTED in Invoice Payload! Defaulting to skipStockUpdate=true for:', relatedDespatches);
                 }
 
                 const localItems = [];
@@ -232,6 +252,31 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     },
                     include: { supplier: true }
                 });
+            }
+        } // End of fetchedFromNilvera processing
+
+        if (!invoice) {
+             return NextResponse.json({ success: false, error: 'Fatura bulunamadı ve oluşturulamadı.' }, { status: 404 });
+        }
+
+        // 3. Prevent Stock Updates if a related despatch was already approved BEFORE this invoice
+        if (relatedDespatches.length > 0 && !skipFinanceUpdate) {
+            // Check if any of these despatches are ALREADY approved
+            const existingApprovedDespatch = await prisma.purchaseInvoice.findFirst({
+                where: {
+                    companyId,
+                    invoiceNo: { in: relatedDespatches },
+                    status: 'Onaylandı'
+                }
+            });
+
+            if (existingApprovedDespatch) {
+                console.log(`[PurchaseApprove] 🛡️ Related Despatch ${existingApprovedDespatch.invoiceNo} is already APPROVED. Skipping stock update for Invoice!`);
+                skipStockUpdate = true;
+            } else {
+                console.log(`[PurchaseApprove] 🔄 Related Despatches exist but none are approved yet. We will update stock via this invoice and auto-close the despatches.`);
+                // We MUST update stock via invoice, so we DO NOT skip stock update
+                skipStockUpdate = false; 
             }
         }
 

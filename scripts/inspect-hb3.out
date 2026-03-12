@@ -1,0 +1,253 @@
+﻿[HB_INIT] baseUrl=https://oms-external.hepsiburada.com | Target: oms-external.hepsiburada.com
+Testing generic package list...
+[HB_FETCH_REQ] Target URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?limit=3&offset=0 | Proxy URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229?limit=3&offset=0
+Generic packages: [
+  {
+    "id": "69b189b4-d017-6208-d5fd-5bdb06060606",
+    "status": "Open",
+    "customerId": "e635562a-9e60-480f-9661-db7def698635",
+    "orderDate": "2026-03-11T18:26:42",
+    "dueDate": "2026-03-12T18:00:00",
+    "barcode": "62754553164532",
+    "packageNumber": "5455316453",
+    "cargoCompany": "hepsiJET",
+    "shippingAddressDetail": "K─▒z─▒ltoprak mah 921.sokak bar─▒┼ş─▒k apt no:6 daire 6 meydan vak─▒fbank arkas─▒  KIZILTOPRAK MURATPA┼ŞA Antalya",
+    "recipientName": "ebru ─▒┼ş─▒k",
+    "shippingCountryCode": "TR",
+    "shippingDistrict": "KIZILTOPRAK",
+    "shippingTown": "MURATPA┼ŞA",
+    "shippingCity": "Antalya",
+    "email": "4779015791_5455316453@hepsifatura.com",
+    "phoneNumber": "",
+    "companyName": "Tu─şba Akalan",
+    "billingAddress": "ALTINOVA S─░NAN Mah. Serik Cd. Bina No : 30 Daire No : 30 Kat : 30 KEPEZ / Antalya ALTINOVA S─░NAN KEPEZ Antalya",
+    "billingCity": "Antalya",
+    "billingTown": "KEPEZ",
+    "billingDistrict": "ALTINOVA S─░NAN",
+    "billingPostalCode": "07170",
+    "billingCountryCode": "TR",
+    "taxOffice": null,
+    "taxNumber": "",
+    "identityNo": "11111111111",
+    "shippingTotalPrice": null,
+    "customsTotalPrice": null,
+    "totalPrice": {
+      "currency": "TRY",
+      "amount": 1399
+    },
+    "items": [
+      {
+        "lineItemId": "69b189b2-d017-6208-d5fd-57c906060606",
+        "listingId": "28792526-a509-4330-b92c-c41cb5aa22e7",
+        "merchantId": "f225561c-5ae7-4208-9eb4-3541340b7229",
+        "hbSku": "HBCV00004VUA3D",
+        "merchantSku": "HBCV00004VUA3D",
+        "quantity": 1,
+        "price": {
+          "currency": "TRY",
+          "amount": 1399
+        },
+        "vat": 233.17,
+        "totalPrice": {
+          "currency": "TRY",
+          "amount": 1399
+        },
+        "commission": {
+          "currency": "TRY",
+          "amount": 167.88
+        },
+        "commissionRate": 12,
+        "unitHBDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "totalHBDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "unitMerchantDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "totalMerchantDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "merchantUnitPrice": {
+          "currency": "TRY",
+          "amount": 1399
+        },
+        "merchantTotalPrice": {
+          "currency": "TRY",
+          "amount": 1399
+        },
+        "unitLaborCost": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "cargoPaymentInfo": "Seller",
+        "customizedText01": "",
+        "customizedText02": "",
+        "customizedText03": "",
+        "customizedText04": "",
+        "properties": [],
+        "productName": "Rowe Hightec Synt Rs Dls Sae 5W-30 5 Litre Motor Ya─ş─▒ ( ├£retim Y─▒l─▒: 2023 )",
+        "orderNumber": "4779015791",
+        "orderDate": "2026-03-11T18:26:42",
+        "deliveryType": "Standart Teslimat",
+        "customerDelivery": "",
+        "pickupTime": null,
+        "gtip": "",
+        "weight": 0,
+        "vatRate": 20,
+        "warehouse": {
+          "shippingModel": "Standard",
+          "shippingAddressLabel": "BIRINCIL"
+        },
+        "deptorDifferenceAmount": 0,
+        "purchasePrice": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "discountToBeBilledToHB": 0,
+        "productBarcode": "4049339103163",
+        "bnplCommissionAmount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "creationReason": "OrderCreated",
+        "isMicroExport": false,
+        "releatedLineIndexesWithCampaign": null,
+        "parentItemIndex": 0,
+        "productImageUrlFormat": "https://productimages.hepsiburada.net/s/476/{size}/110000519786315.jpg"
+      }
+    ],
+    "isCargoChangable": true,
+    "customerName": "tu─şba Akalan",
+    "estimatedArrivalDate": "2026-03-14T15:00:00Z"
+  },
+  {
+    "id": "69b1b5f6-3e64-63c9-0b8d-558b06060606",
+    "status": "Open",
+    "customerId": "b0856d97-53ee-4f4d-92ba-ead513e8bdde",
+    "orderDate": "2026-03-11T21:35:33",
+    "dueDate": "2026-03-12T18:00:00",
+    "barcode": "62754553563432",
+    "packageNumber": "5455356343",
+    "cargoCompany": "hepsiJET",
+    "shippingAddressDetail": "GOP Bulvar─▒ 8.Sokak. 1/C YE┼Ş─░LIRMAK MERKEZ Tokat",
+    "recipientName": "Hakan Kara",
+    "shippingCountryCode": "TR",
+    "shippingDistrict": "YE┼Ş─░LIRMAK",
+    "shippingTown": "MERKEZ",
+    "shippingCity": "Tokat",
+    "email": "4714886949_5455356343@hepsifatura.com",
+    "phoneNumber": "",
+    "companyName": "hakan kara",
+    "billingAddress": "GOP Bulvar─▒ 8.Sokak.1/C YE┼Ş─░LIRMAK MERKEZ Tokat",
+    "billingCity": "Tokat",
+    "billingTown": "MERKEZ",
+    "billingDistrict": "YE┼Ş─░LIRMAK",
+    "billingPostalCode": "60100",
+    "billingCountryCode": "TR",
+    "taxOffice": null,
+    "taxNumber": "",
+    "identityNo": "11111111111",
+    "shippingTotalPrice": null,
+    "customsTotalPrice": null,
+    "totalPrice": {
+      "currency": "TRY",
+      "amount": 480
+    },
+    "items": [
+      {
+        "lineItemId": "69b1b5f5-d84d-4c5d-159b-7fa006060606",
+        "listingId": "cff4f757-f90f-4f20-bfb6-71f9be13da61",
+        "merchantId": "f225561c-5ae7-4208-9eb4-3541340b7229",
+        "hbSku": "HBV00000H4BWI",
+        "merchantSku": " HBV00000H4BWI",
+        "quantity": 1,
+        "price": {
+          "currency": "TRY",
+          "amount": 480
+        },
+        "vat": 80,
+        "totalPrice": {
+          "currency": "TRY",
+          "amount": 480
+        },
+        "commission": {
+          "currency": "TRY",
+          "amount": 57.6
+        },
+        "commissionRate": 12,
+        "unitHBDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "totalHBDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "unitMerchantDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "totalMerchantDiscount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "merchantUnitPrice": {
+          "currency": "TRY",
+          "amount": 480
+        },
+        "merchantTotalPrice": {
+          "currency": "TRY",
+          "amount": 480
+        },
+        "unitLaborCost": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "cargoPaymentInfo": "Seller",
+        "customizedText01": "",
+        "customizedText02": "",
+        "customizedText03": "",
+        "customizedText04": "",
+        "properties": [],
+        "productName": "Motul Fork Oil Expert Light 5W 1 Litre",
+        "orderNumber": "4714886949",
+        "orderDate": "2026-03-11T21:35:33",
+        "deliveryType": "Standart Teslimat",
+        "customerDelivery": "",
+        "pickupTime": null,
+        "gtip": "",
+        "weight": 1,
+        "vatRate": 20,
+        "warehouse": {
+          "shippingModel": "Standard",
+          "shippingAddressLabel": "BIRINCIL"
+        },
+        "deptorDifferenceAmount": 0,
+        "purchasePrice": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "discountToBeBilledToHB": 0,
+        "productBarcode": "OMY3374650008431",
+        "bnplCommissionAmount": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "creationReason": "OrderCreated",
+        "isMicroExport": false,
+        "releatedLineIndexesWithCampaign": null,
+        "parentItemIndex": 0,
+        "productImageUrlFormat": "https://productimages.hepsiburada.net/s/24/{size}/10073134301234.jpg"
+      }
+    ],
+    "isCargoChangable": true,
+    "customerName": "hakan Kara",
+    "estimatedArrivalDate": "2026-03-14T15:00:00Z"
+  }
+]

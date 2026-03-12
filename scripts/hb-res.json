@@ -1,0 +1,4 @@
+﻿URL: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/delivered?offset=0&limit=1
+Status: 200
+Body: {"totalCount":37,"limit":1,"offset":0,"pageCount":37,"items":[{"Id":"69822207-4d39-8e9a-e823-db3006060606","Barcode":"62754424170323","PackageNumber":"5442417032","OrderNumber":"4534832471","OrderNumbers":["4534832471"],"MerchantId":"f225561c-5ae7-4208-9eb4-3541340b7229","DeliveredDate":"2026-02-11T12:26:21","EtgbNo":""}]}
+
