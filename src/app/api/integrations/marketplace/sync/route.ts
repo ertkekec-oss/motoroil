@@ -91,7 +91,11 @@ export async function POST(request: Request) {
         const endDate = new Date();
         let startDate = new Date();
 
-        if (marketplaceConfig?.lastSync) {
+        if (config.days && config.days > 0) {
+            // Manual deep sync requested
+            startDate = new Date(Date.now() - (config.days * 24 * 60 * 60 * 1000));
+            console.log(`[MARKETPLACE] Manual deep sync detected, going back ${config.days} days.`);
+        } else if (marketplaceConfig?.lastSync) {
             // Aggressive lookback: Go back 3 days (was 14) to catch delayed orders/cancellations without overloading
             startDate = new Date(marketplaceConfig.lastSync.getTime() - (3 * 24 * 60 * 60 * 1000));
         } else {
@@ -252,11 +256,15 @@ export async function POST(request: Request) {
                 } else {
                     const dbItems = Array.isArray(existingOrder.items) ? existingOrder.items : [];
                     const normalizedTotal = Number(order.totalAmount || 0);
+                    const isSameDay = (d1: Date, d2: Date) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+                    const wrongDateVal = new Date();
+                    
                     const needsUpdate = existingOrder.status !== order.status ||
                         (shipmentPackageId && !existingOrder.shipmentPackageId) ||
                         (dbItems.length === 0 && (order.items?.length || 0) > 0) ||
                         (existingOrder.customerName === 'Müşteri' && order.customerName !== 'Müşteri') ||
-                        (Number(existingOrder.totalAmount || 0) === 0 && normalizedTotal > 0);
+                        (Number(existingOrder.totalAmount || 0) === 0 && normalizedTotal > 0) ||
+                        (isSameDay(existingOrder.orderDate, wrongDateVal) && !isSameDay(order.orderDate, wrongDateVal));
 
                     if (needsUpdate) {
                         const newItems = (order.items?.length || 0) > 0 ? order.items : dbItems;
@@ -269,6 +277,7 @@ export async function POST(request: Request) {
                                 marketplace: normalizedMarketplace,
                                 totalAmount: newTotalAmount,
                                 ...(existingOrder.customerName === 'Müşteri' && order.customerName && order.customerName !== 'Müşteri' ? { customerName: order.customerName } : {}),
+                                ...((isSameDay(existingOrder.orderDate, wrongDateVal) && !isSameDay(order.orderDate, wrongDateVal)) || existingOrder.customerName === 'Müşteri' ? { orderDate: order.orderDate } : {}),
                                 items: newItems as any,
                                 rawData: order as any,
                                 shipmentPackageId: shipmentPackageId || existingOrder.shipmentPackageId
