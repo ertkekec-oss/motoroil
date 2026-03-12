@@ -59,17 +59,21 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             }
 
             const nilvera = new NilveraInvoiceService({ apiKey, baseUrl });
-            const result = await nilvera.getInvoiceDetails(id);
+            let result = await nilvera.getInvoiceDetails(id);
 
             if (!result.success) {
-                return NextResponse.json({ success: false, error: `Nilvera'dan fatura detayları alınamadı: ${result.error}` }, { status: 404 });
+                console.log(`[PurchaseApprove] Fatura olarak bulunamadı. İrsaliye olarak deneniyor...`);
+                result = await nilvera.getDespatchDetails(id);
+                if (!result.success) {
+                    return NextResponse.json({ success: false, error: `Nilvera'dan fatura/irsaliye detayları alınamadı: ${result.error}` }, { status: 404 });
+                }
             }
 
             // DYNAMIC STRUCTURE MAPPING
             const rawData = result.data;
             console.log(`[PurchaseApprove] Raw Keys: ${Object.keys(rawData).join(', ')}`);
 
-            const invData = rawData.PurchaseInvoice || rawData.Model || rawData.EInvoice || rawData.EArchive || rawData;
+            const invData = rawData.EDespatch || rawData.PurchaseInvoice || rawData.Model || rawData.EInvoice || rawData.EArchive || rawData;
             const supplierData = invData.Supplier || invData.Seller || invData.DespatchSupplierInfo || invData.SenderInfo || invData.Sender;
 
             let vkn = supplierData?.TaxNumber || supplierData?.SupplierVknTckn || supplierData?.VknTckn || invData.SupplierVknTckn || invData.SenderVknTckn;
@@ -80,8 +84,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 vkn = rawData.SenderVknTckn || rawData.SupplierVknTckn || rawData.TaxNumber;
             }
 
-            const header = invData.InvoiceInfo || invData.PurchaseInvoiceInfo || invData;
-            const finalInvoiceNo = header.InvoiceSerieOrNumber || header.InvoiceNumber || invData.InvoiceNumber || id;
+            const header = invData.DespatchInfo || invData.InvoiceInfo || invData.PurchaseInvoiceInfo || invData;
+            const finalInvoiceNo = header.DespatchSerieOrNumber || header.DespatchNumber || header.InvoiceSerieOrNumber || header.InvoiceNumber || invData.InvoiceNumber || id;
 
             // Re-check by invoiceNo to prevent duplicate import
             const existingLocally = await prisma.purchaseInvoice.findFirst({
@@ -128,7 +132,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 }
 
                 // B. Map Items and Prepare Local Invoice Data
-                const nilveraLines = invData.InvoiceLines || invData.Items || invData.Lines || invData.PurchaseInvoiceLines || [];
+                const nilveraLines = invData.DespatchLines || invData.InvoiceLines || invData.Items || invData.Lines || invData.PurchaseInvoiceLines || [];
                 console.log(`[PurchaseApprove] Line count: ${nilveraLines.length}`);
 
                 const localItems = [];
@@ -178,8 +182,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                         supplierId: supplier.id,
                         invoiceNo: finalInvoiceNo,
                         invoiceDate: header.IssueDate ? new Date(header.IssueDate) : new Date(),
-                        amount: Number(header.TaxExclusiveAmount || header.LineExtensionAmount || (header.InvoiceAmount - (header.TaxAmount || 0)) || 0),
-                        taxAmount: Number(header.TaxInclusiveAmount - header.TaxExclusiveAmount || header.TaxAmount || 0),
+                        amount: Number(header.TaxExclusiveAmount || header.LineExtensionAmount || (header.InvoiceAmount ? (header.InvoiceAmount - (header.TaxAmount || 0)) : 0) || 0),
+                        taxAmount: Number((header.TaxInclusiveAmount && header.TaxExclusiveAmount) ? (header.TaxInclusiveAmount - header.TaxExclusiveAmount) : (header.TaxAmount || 0)),
                         totalAmount: Number(header.PayableAmount || header.TaxInclusiveAmount || header.InvoiceAmount || 0),
                         items: localItems as any,
                         status: 'Bekliyor',

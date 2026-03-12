@@ -533,6 +533,39 @@ export class NilveraInvoiceService {
         }
     }
 
+    async getIncomingDespatches(page: number = 1, pageSize: number = 20) {
+        try {
+            const now = new Date();
+            const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+
+            const startDate = threeMonthsAgo.toISOString().split('T')[0];
+            const endDate = now.toISOString().split('T')[0];
+
+            console.log(`[NilveraService] Fetching Incoming Despatches: url=${this.config.baseUrl}/edespatch/Purchase, page=${page}, range=${startDate}-${endDate}`);
+
+            const res = await axios.get(
+                `${this.config.baseUrl}/edespatch/Purchase`,
+                {
+                    headers: this.getHeaders(),
+                    params: {
+                        Page: page,
+                        PageSize: pageSize,
+                        StartDate: startDate,
+                        EndDate: endDate
+                    }
+                }
+            );
+
+            console.log(`[NilveraService] Received Despatches. TotalCount=${res.data?.TotalCount || 0}, ContentSize=${res.data?.Content?.length || 0}`);
+
+            return { success: true, data: res.data };
+        } catch (error: any) {
+            const detail = error.response?.data || error.message;
+            console.error("[NilveraService] Incoming Despatches Error:", detail);
+            return { success: false, error: typeof detail === 'object' ? JSON.stringify(detail) : detail };
+        }
+    }
+
     /**
      * Fatura detaylarını çek (Alım faturası için)
      */
@@ -589,6 +622,33 @@ export class NilveraInvoiceService {
         const detail = lastError?.response?.data || lastError?.message || "Detay bulunamadı";
         console.error("[NilveraService] Get Invoice Details Error FINAL:", detail);
         return { success: false, error: typeof detail === 'object' ? JSON.stringify(detail) : detail };
+    }
+
+    async getDespatchDetails(uuid: string) {
+        const endpoints = [
+            `${this.config.baseUrl}/edespatch/Purchase/${uuid}/Model`,
+            `${this.config.baseUrl}/edespatch/Purchase/${uuid}/Details`,
+            `${this.config.baseUrl}/edespatch/Purchase/${uuid}`
+        ];
+
+        let lastError = null;
+        for (const url of endpoints) {
+            try {
+                const res = await axios.get(url, { headers: this.getHeaders() });
+                const data = res.data;
+                const hasLines = !!(data.DespatchLines || data.Items || data.Lines || data.Model?.DespatchLines || data.EDespatch?.DespatchLines);
+                const hasVkn = !!(data.TaxNumber || data.SupplierVknTckn || data.DespatchSupplierInfo?.TaxNumber || data.SenderTaxNumber);
+
+                if (hasLines && hasVkn) {
+                    return { success: true, data: res.data };
+                }
+            } catch (error: any) {
+                lastError = error;
+            }
+        }
+        
+        // No XML fallback yet for despatches as Model usually works
+        return { success: false, error: lastError?.message || "Detay bulunamadı" };
     }
 
     private extractText(obj: any): string | null {

@@ -62,9 +62,13 @@ export async function GET() {
                     baseUrl: baseUrl || 'https://apitest.nilvera.com'
                 });
 
-                const result = await nilvera.getIncomingInvoices();
-                if (result.success) {
-                    const content = result.data?.Content || (Array.isArray(result.data) ? result.data : []);
+                const [invoiceResult, despatchResult] = await Promise.all([
+                    nilvera.getIncomingInvoices(),
+                    nilvera.getIncomingDespatches()
+                ]);
+
+                if (invoiceResult.success) {
+                    const content = invoiceResult.data?.Content || (Array.isArray(invoiceResult.data) ? invoiceResult.data : []);
                     nilveraInvoices = content.map((inv: any) => {
                         const supplierName = inv.SenderName || inv.SenderTitle || inv.SupplierName || inv.SupplierTitle || "Bilinmeyen Tedarikçi";
                         const invoiceNumber = inv.InvoiceNumber || inv.Id;
@@ -84,6 +88,30 @@ export async function GET() {
                             isImported: !!localVersion
                         };
                     });
+                }
+
+                if (despatchResult.success) {
+                    const dContent = despatchResult.data?.Content || (Array.isArray(despatchResult.data) ? despatchResult.data : []);
+                    const mappedDespatches = dContent.map((inv: any) => {
+                        const supplierName = inv.SenderName || inv.SenderTitle || inv.SupplierName || inv.SupplierTitle || "Bilinmeyen Tedarikçi";
+                        const invoiceNumber = inv.DespatchNumber || inv.Id || inv.UUID;
+
+                        const localVersion = localInvoices.find(li => li.invoiceNo === invoiceNumber);
+
+                        return {
+                            id: inv.UUID || inv.Id,
+                            supplier: supplierName,
+                            date: inv.IssueDate ? new Date(inv.IssueDate).toLocaleDateString('tr-TR') : '-',
+                            msg: `e-İrsaliye: ${invoiceNumber}`,
+                            total: Number(inv.PayableAmount || 0),
+                            status: localVersion ? (localVersion.status === 'Onaylandı' ? 'İşlendi' : localVersion.status) : 'İrsaliye',
+                            isFormal: true,
+                            invoiceNo: invoiceNumber,
+                            isImported: !!localVersion
+                        };
+                    });
+                    
+                    nilveraInvoices = [...nilveraInvoices, ...mappedDespatches];
                 }
             }
         } catch (nilErr: any) {
