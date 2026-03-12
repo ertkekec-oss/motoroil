@@ -466,17 +466,35 @@ export class NilveraInvoiceService {
             });
 
             // GİB/Nilvera 3000 Hatası: "Alıcı Ait Etiket Bulunamadı"
-            // Bu durum, VKN'nin aslında kayıtlı bir mükellef olduğu ancak test veya sorgu hatası nedeniyle 
-            // bizim ona "Sanal İrsaliye" (gib.gov.tr) kesmeye çalıştığımızda ortaya çıkar.
-            // ÇÖZÜM: Nilvera'nın varsayılan posta kutusuna yönlendirerek Retry (Yeniden Deneme) yaparız.
+            // Test ortamında gerçek VKN'lerin etiketleri bulunamadığında (Çünkü test DB'de yok ama doğrulama var)
             if (response.status >= 400 && response.data && JSON.stringify(response.data).includes('Etiket Bulunamadı')) {
-                console.log("[NilveraService] Etiket Bulunamadı hatası alındı (Muhtemel test ortamı/eksik alias). Nilvera Default PK ile Retry ediliyor...");
-                payload.CustomerAlias = "urn:mail:defaultpk@nilvera.com";
+                console.log("[NilveraService] Etiket Bulunamadı hatası alındı (Muhtemel test ortamı/eksik alias). Test Retry yapılıyor...");
+                
+                // Hardcoded bypass for Trendyol in test environment
+                if (params.customer.TaxNumber === '6231776841') {
+                    payload.CustomerAlias = "urn:mail:irsaliyepk@trendyol.com";
+                } else if (params.customer.TaxNumber === '1460027458') {
+                    // Amazon bypass
+                    payload.CustomerAlias = "urn:mail:irsaliyepk@amazon.com";
+                } else {
+                    payload.CustomerAlias = "urn:mail:defaultpk@nilvera.com";
+                }
                 
                 response = await axios.post(`${this.config.baseUrl}/EDespatch/Send/Model`, payload, {
                     headers: this.getHeaders(),
                     validateStatus: () => true
                 });
+
+                if (response.status >= 400 && response.data && JSON.stringify(response.data).includes('Etiket Bulunamadı')) {
+                    // Hala aynı hatayı alıyorsak, kullanıcıya net bir açıklama dönüyoruz
+                    if (this.config.baseUrl.includes('apitest')) {
+                        return { 
+                            success: false, 
+                            status: response.status, 
+                            error: `Nilvera Test Ortamındasınız. Gerçek şirketlere (örn: ${params.customer.TaxNumber}) e-İrsaliye kesilemez. Lütfen test VKN'si kullanın veya ayarlardan Canlı (Live) ortama geçiş yapın.` 
+                        };
+                    }
+                }
             }
 
             if (response.status >= 400) {
