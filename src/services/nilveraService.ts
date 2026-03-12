@@ -363,10 +363,9 @@ export class NilveraInvoiceService {
             params.customer.Name = `${params.customer.Name.trim()} Müşteri`;
         }
 
-        // E-İrsaliye sadece mükelleflere gönderilebilir
-        if (!isDespatchUser) {
-            return { success: false, error: "Alıcı e-İrsaliye mükellefi değil. Lütfen kağıt irsaliye düzenleyiniz." };
-        }
+        // Sanal (Virtual) İrsaliye Desteği: Mükellef olmayanlara da e-İrsaliye gönderilebilir
+        // GİB kuralı gereği sanal irsaliye alias'ı atanır.
+        const finalAlias = (isDespatchUser && alias) ? alias : "urn:mail:defaultpk@gib.gov.tr";
 
         const series = params.despatchSeries || await this.getDefaultDespatchSeries();
 
@@ -444,7 +443,7 @@ export class NilveraInvoiceService {
                 ShipmentDetail: shipmentDetail,
                 Notes: [params.description || "İrsaliye"]
             },
-            CustomerAlias: alias
+            CustomerAlias: finalAlias
         };
 
         try {
