@@ -10,6 +10,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const { id } = await context.params;
+        const body = await request.json().catch(() => ({}));
+        const { skipStockUpdate = false, skipFinanceUpdate = false } = body;
         const companyId = session.user?.companyId || (session as any).companyId;
 
         // 1. Try to find the invoice locally
@@ -210,67 +212,74 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             const items = invoice!.items as any[];
             const branch = (session.user as any)?.branch || (session as any).branch || 'Merkez';
 
-            for (const item of items) {
-                if (item.productId) {
-                    await tx.product.update({
-                        where: { id: item.productId },
-                        data: {
-                            stock: { increment: item.qty },
-                            buyPrice: item.price
-                        }
-                    });
+            if (!skipStockUpdate) {
+                for (const item of items) {
+                    if (item.productId) {
+                        await tx.product.update({
+                            where: { id: item.productId },
+                            data: {
+                                stock: { increment: item.qty },
+                                buyPrice: item.price
+                            }
+                        });
 
-                    await tx.stock.upsert({
-                        where: { productId_branch: { productId: item.productId, branch: String(branch) } },
-                        update: { quantity: { increment: item.qty } },
-                        create: { productId: item.productId, branch: String(branch), quantity: item.qty }
-                    });
+                        await tx.stock.upsert({
+                            where: { productId_branch: { productId: item.productId, branch: String(branch) } },
+                            update: { quantity: { increment: item.qty } },
+                            create: { productId: item.productId, branch: String(branch), quantity: item.qty }
+                        });
 
-                    await (tx as any).stockMovement.create({
-                        data: {
-                            productId: item.productId,
-                            branch: String(branch),
-                            companyId,
-                            quantity: item.qty,
-                            price: item.price,
-                            type: 'PURCHASE',
-                            referenceId: invoice!.id
-                        }
-                    });
+                        await (tx as any).stockMovement.create({
+                            data: {
+                                productId: item.productId,
+                                branch: String(branch),
+                                companyId,
+                                quantity: item.qty,
+                                price: item.price,
+                                type: 'PURCHASE',
+                                referenceId: invoice!.id
+                            }
+                        });
+                    }
                 }
             }
 
-            // C. Update Supplier Balance
-            await tx.supplier.update({
-                where: { id: invoice!.supplierId },
-                data: { balance: { decrement: Number(invoice!.totalAmount) } }
-            });
+            let transaction = null;
+            if (!skipFinanceUpdate) {
+                // C. Update Supplier Balance
+                await tx.supplier.update({
+                    where: { id: invoice!.supplierId },
+                    data: { balance: { decrement: Number(invoice!.totalAmount) } }
+                });
 
-            // D. Create Financial Transaction
-            const transaction = await tx.transaction.create({
-                data: {
-                    companyId,
-                    type: 'Purchase',
-                    amount: invoice!.totalAmount,
-                    description: `Alış Faturası Onayı: ${invoice!.invoiceNo} - ${invoice!.supplier.name}`,
-                    supplierId: invoice!.supplierId,
-                    kasaId: null, // Required to be generic payable transaction
-                    branch: String(branch)
-                }
-            });
+                // D. Create Financial Transaction
+                transaction = await tx.transaction.create({
+                    data: {
+                        companyId,
+                        type: 'Purchase',
+                        amount: invoice!.totalAmount,
+                        description: `Alış Faturası Onayı: ${invoice!.invoiceNo} - ${invoice!.supplier.name}`,
+                        supplierId: invoice!.supplierId,
+                        kasaId: null, // Required to be generic payable transaction
+                        branch: String(branch)
+                    }
+                });
+            }
 
             return { updatedInvoice, transaction };
         });
 
         // Create Accounting Journal Entry (in background)
-        (async () => {
-            try {
-                const { createJournalFromTransaction } = await import('@/lib/accounting');
-                await createJournalFromTransaction(resultTransaction.transaction);
-            } catch (err) {
-                console.error('[Muhasebe Entegrasyon Hatası - Alış Kabul]:', err);
-            }
-        })();
+        if (resultTransaction.transaction) {
+            (async () => {
+                try {
+                    const { createJournalFromTransaction } = await import('@/lib/accounting');
+                    await createJournalFromTransaction(resultTransaction.transaction);
+                } catch (err) {
+                    console.error('[Muhasebe Entegrasyon Hatası - Alış Kabul]:', err);
+                }
+            })();
+        }
 
         return NextResponse.json({ success: true, message: 'Fatura kabul edildi ve stoklara işlendi.' });
     } catch (error: any) {

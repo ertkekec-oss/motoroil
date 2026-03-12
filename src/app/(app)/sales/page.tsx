@@ -391,16 +391,45 @@ export default function SalesPage() {
 
     const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null);
 
-    const handleAcceptPurchaseInvoice = async (id: string) => {
+    const handleAcceptPurchaseInvoice = async (id: string, documentType: 'INVOICE' | 'DESPATCH' = 'INVOICE') => {
         if (isProcessingAction) return;
-        showConfirm('Kabul Et', 'Bu faturayı kabul etmek ve stoklara işlemek istediğinize emin misiniz?', async () => {
+        
+        const isDespatch = documentType === 'DESPATCH';
+        const mainMsg = isDespatch 
+            ? 'Bu irsaliyeyi onaylayıp DEPO STOKLARINA işlemek istediğinize emin misiniz?'
+            : 'Bu faturayı kabul edip sisteme işlemek istediğinize emin misiniz?';
+
+        showConfirm('Kabul Et', mainMsg, async () => {
+            let skipStock = false;
+            let skipFinance = false;
+
+            if (!isDespatch) {
+                // Fatura ise sor (mükerrer stok olmaması için)
+                const answer = window.confirm('BİLGİ: Bu faturanın irsaliyesini daha önce kabul edip stoklarınıza eklediniz mi?\n\n[TAMAM] => EVET, bu faturanın stoklarını tekrar ekleme, sadece Cari/Muhasebe işlemini yap.\n[İPTAL] => HAYIR, henüz eklemedim, faturadaki ürünleri stoklara işle.');
+                if (answer) {
+                    skipStock = true;
+                }
+            } else {
+                // İrsaliye ise cari hareket yapılmaz, sadece stok etkilenir
+                skipFinance = true;
+            }
+
             setIsProcessingAction(id);
             try {
-                const res = await apiFetch(`/api/purchasing/${id}/approve`, { method: 'POST' });
+                const res = await apiFetch(`/api/purchasing/${id}/approve`, { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ skipStockUpdate: skipStock, skipFinanceUpdate: skipFinance })
+                });
                 const data = await res.json();
                 if (data.success) {
-                    showSuccess('Başarılı', '✅ Fatura kabul edildi ve stoklara işlendi.');
+                    let successMsg = '✅ Belge başarıyla işlendi.';
+                    if (skipStock && !isDespatch) successMsg += ' (Stoklar atlandı, sadece Cari Kayıt yapıldı)';
+                    if (skipFinance && isDespatch) successMsg += ' (Stoklar eklendi, Cari Kayıt atlandı)';
+
+                    showSuccess('Başarılı', successMsg);
                     fetchPurchaseInvoices();
+                    if (invoiceSubTab === 'wayslips' || setInvoiceSubTab) fetchWayslips(); // Refresh wayslips as well
                 } else { showError('Hata', data.error || 'İşlem başarısız.'); }
             } catch (e) { showError('Hata', 'Bağlantı hatası.'); }
             finally { setIsProcessingAction(null); }

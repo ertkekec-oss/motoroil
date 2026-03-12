@@ -19,7 +19,7 @@ interface InvoicesTabProps {
     handleDeleteInvoice: (id: string) => Promise<void>;
     handleSendToELogo: (id: string, type: any) => Promise<void>;
     handleViewPDF: (id: string) => Promise<void>;
-    handleAcceptPurchaseInvoice: (id: string) => Promise<void>;
+    handleAcceptPurchaseInvoice: (id: string, documentType?: 'INVOICE' | 'DESPATCH') => Promise<void>;
     handleRejectPurchaseInvoice: (id: string) => Promise<void>;
     setView: (view: any) => void;
     showWarning: (title: string, message: string) => void;
@@ -295,7 +295,7 @@ export function InvoicesTab({
                                                     {inv.status === 'Bekliyor' && (
                                                         <>
                                                             <button
-                                                                onClick={() => handleAcceptPurchaseInvoice(inv.id)}
+                                                                onClick={() => handleAcceptPurchaseInvoice(inv.id, inv.documentType || 'INVOICE')}
                                                                 className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
                                                             >
                                                                 Kabul Et
@@ -445,7 +445,7 @@ export function InvoicesTab({
                                                                             )}
                                                                             {(irs.type === 'Gelen' && String(irs.status).includes('Bekliyor')) && (
                                                                                 <button
-                                                                                    onClick={(e) => { e.stopPropagation(); handleAcceptPurchaseInvoice(irs.id); }}
+                                                                                    onClick={(e) => { e.stopPropagation(); handleAcceptPurchaseInvoice(irs.id, 'DESPATCH'); }}
                                                                                     className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
                                                                                 >
                                                                                     Kabul Et / Envantere İşle
