@@ -470,15 +470,8 @@ export class NilveraInvoiceService {
             if (response.status >= 400 && response.data && JSON.stringify(response.data).includes('Etiket Bulunamadı')) {
                 console.log("[NilveraService] Etiket Bulunamadı hatası alındı (Muhtemel test ortamı/eksik alias). Test Retry yapılıyor...");
                 
-                // Hardcoded bypass for Trendyol in test environment
-                if (params.customer.TaxNumber === '6231776841') {
-                    payload.CustomerAlias = "urn:mail:irsaliyepk@trendyol.com";
-                } else if (params.customer.TaxNumber === '1460027458') {
-                    // Amazon bypass
-                    payload.CustomerAlias = "urn:mail:irsaliyepk@amazon.com";
-                } else {
-                    payload.CustomerAlias = "urn:mail:defaultpk@nilvera.com";
-                }
+                // Genel kurtarma etiketi
+                payload.CustomerAlias = "urn:mail:defaultpk@nilvera.com";
                 
                 response = await axios.post(`${this.config.baseUrl}/EDespatch/Send/Model`, payload, {
                     headers: this.getHeaders(),
