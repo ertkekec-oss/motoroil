@@ -509,54 +509,10 @@ function SettingsView() {
 
     return (
         <div className="flex flex-col animate-in fade-in h-full overflow-y-auto px-1 py-1">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
-                {/* L-Col: Channel Mappings */}
-                <div className="lg:col-span-1 flex flex-col gap-4">
-                    <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm h-full">
-                        <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Satış Kanalı Eşleştirmeleri</h3>
-                        <p className="text-sm text-slate-500 mb-6">Mevcut kanallarınızın öntanımlı fiyat yapılarını buradan bir listeye bağlayın.</p>
-                        
-                        <div className="space-y-4">
-                            {[
-                                { key: 'channel_terminal_list', name: 'Mağaza Satışı / Terminal', description: 'POS ekranından yapılan direkt kasadan satışlarda' },
-                                { key: 'channel_dealer_list', name: 'B2B Dealer (Bayiler)', description: 'Bayi Portalından yapılan online B2B toptan siparişlerde' },
-                                { key: 'channel_hub_list', name: 'B2B HUB', description: 'Bölge Satış Yönetimi / Dağıtım Ağında' },
-                                { key: 'channel_field_sales_list', name: 'Saha Satış (Plasiyer)', description: 'Saha ekipleri ve mobil sipariş ekranlarında' }
-                            ].map(c => (
-                                <div key={c.key} className="flex flex-col gap-1.5 pb-4 border-b border-slate-100 dark:border-slate-800/80 last:border-0 last:pb-0">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <div>
-                                            <div className="font-semibold text-slate-700 dark:text-slate-200 text-[13px]">{c.name}</div>
-                                            <div className="text-[11px] text-slate-400">{c.description}</div>
-                                        </div>
-                                    </div>
-                                    <select 
-                                        className="w-full bg-slate-50 dark:bg-[#1e293b] text-[13px] font-medium border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors"
-                                        value={settings[c.key] || 'default'}
-                                        onChange={e => saveChannelMap(c.key, e.target.value)}
-                                    >
-                                        <option value="default">-- Ana Satış Fiyatı (Kanala Özel Liste Yok) --</option>
-                                        <option value="buy_price">Ana Alış Fiyatı (Maliyet)</option>
-                                        {lists.map(l => (
-                                            <option key={l.id} value={l.id}>{l.name} Listesi</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl mt-6">
-                            <h4 className="font-bold text-amber-800 dark:text-amber-500 text-[13px] mb-1">Eşleştirme Neden Gerekli?</h4>
-                            <p className="text-amber-700/80 dark:text-amber-400/80 text-[11px] leading-relaxed">
-                                Farklı kanalların farklı kâr marjları ve operasyon maliyetleri vardır. Bayilere daha az kârlı toptan fiyatları sunarken, perakende Terminal ekranında varsayılan fiyatı gösterebilirsiniz.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* M-Col: Create/Manage Lists */}
-                <div className="lg:col-span-1 flex flex-col gap-4">
+                {/* L-Col: Create/Manage Lists */}
+                <div className="flex flex-col gap-4">
                     <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm h-full flex flex-col">
                         <div>
                             <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Özel Fiyat Listeleri</h3>
@@ -580,7 +536,7 @@ function SettingsView() {
                             </div>
                         </div>
 
-                        <div className="space-y-2 flex-1 overflow-y-auto custom-scroll pr-1">
+                        <div className="space-y-2 flex-1 overflow-y-auto custom-scroll pr-1 max-h-[400px]">
                             {lists.map(list => (
                                 <div key={list.id} className="group flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-200 dark:hover:border-blue-900/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
                                     <span className="font-semibold text-slate-700 dark:text-slate-300 text-[13px]">{list.name} Listesi</span>
