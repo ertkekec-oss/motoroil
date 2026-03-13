@@ -1579,80 +1579,92 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <EnterpriseCard className="w-[1200px] max-w-[98vw] flex flex-col h-[90vh] overflow-hidden !p-0 shadow-2xl">
                             {/* Header */}
-                            <div className="px-8 pt-6 pb-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                                <EnterpriseSectionHeader
-                                    title="RESMİ FATURALANDIRMA SİSTEMİ"
-                                    subtitle="E-ARŞİV / E-FATURA TASLAĞI"
-                                    icon={<span className="text-blue-500">📄</span>}
-                                    rightElement={
-                                        <button onClick={() => setInvoiceModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors">
-                                            &times;
-                                        </button>
-                                    }
-                                />
+                            <div className="px-6 pt-4 pb-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl text-blue-500">📄</span>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">RESMİ FATURALANDIRMA SİSTEMİ</h2>
+                                        <p className="text-xs font-semibold text-slate-500 tracking-wide">E-ARŞİV / E-FATURA TASLAĞI</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setInvoiceModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors">
+                                    &times;
+                                </button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-slate-50 dark:bg-slate-950/30">
-
-                                {/* Section: Buyer Information */}
-                                <EnterpriseCard borderLeftColor="#3b82f6" className="space-y-6">
-                                    <h3 className="text-xs font-bold text-blue-500 uppercase tracking-wider">ALICI BİLGİLERİ</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <EnterpriseInput id="inv_name" label="ÜNVAN / AD SOYAD" defaultValue={customer.name} />
-                                        <EnterpriseInput id="inv_tax_no" label="V.N. / T.C. KİMLİK NO" defaultValue={customer.taxNumber} />
-                                        <EnterpriseInput id="inv_tax_office" label="VERGİ DAİRESİ" defaultValue={customer.taxOffice} />
-                                        <EnterpriseInput id="inv_phone" label="TELEFON" defaultValue={customer.phone} />
-                                        <div className="md:col-span-4">
-                                            <EnterpriseTextarea id="inv_address" label="ADRES" defaultValue={customer.address} className="min-h-[80px]" />
-                                        </div>
-                                    </div>
-                                </EnterpriseCard>
-
-                                {/* Section: Ekstra Seçenekler */}
-                                <EnterpriseCard borderLeftColor="#10b981" className="space-y-6">
-                                    <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider">EKSTRA SEÇENEKLER</h3>
-                                    <div className="flex flex-col gap-4">
-                                        <EnterpriseSwitch
-                                            id="inv_create_wayslip"
-                                            checked={document.getElementById('inv_create_wayslip') ? (document.getElementById('inv_create_wayslip') as HTMLInputElement).checked : false}
-                                            onChange={(e) => {
-                                                const el = document.getElementById('inv_create_wayslip') as HTMLInputElement;
-                                                if(el) el.checked = e.target.checked;
-                                            }}
-                                            label="Fatura ile birlikte Giden Sevk İrsaliyesi oluştur"
-                                            description="İrsaliye numarası fatura üzerine yazılır"
-                                        />
-                                        <EnterpriseSwitch
-                                            checked={isInstallmentInvoice}
-                                            onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
-                                            label="Vade Uygula ve Ödeme Planı Yarat"
-                                            description="Fatura içeriğine otomatik eklenecektir"
-                                        />
-                                    </div>
-
-                                    {isInstallmentInvoice && (
-                                        <div className="p-4 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap gap-6 items-center">
-                                            <div className="flex-1 min-w-[200px]">
-                                                <EnterpriseSelect label="VADE SAYISI" value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))}>
-                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Vade</option>)}
-                                                </EnterpriseSelect>
-                                            </div>
-                                            <div className="flex-1 min-w-[200px]">
-                                                <EnterpriseSelect id="inv_installment_type" label="ÖDEME TÜRÜ" defaultValue="Açık Hesap">
-                                                    <option value="Açık Hesap">Açık Hesap</option>
-                                                    <option value="Çek">Çek Alınacak</option>
-                                                    <option value="Senet">Senet (Periodya İmza)</option>
-                                                </EnterpriseSelect>
-                                            </div>
-                                            <div className="w-full text-xs text-slate-500 dark:text-slate-400">
-                                                📝 Not: Sensiz (Çek/Senet) ödeme planları finansal hareketlerde o kategorilerde takip edilir. Senet seçeneği "Periodya Trust & Compliance Suite" (Dijital İmza) kullanılarak müşterinin e-onayına sunulur.
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-950/30">
+                                
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                    {/* Section: Buyer Information */}
+                                    <EnterpriseCard borderLeftColor="#3b82f6" className="space-y-4 lg:col-span-2 !p-4">
+                                        <h3 className="text-[11px] font-bold text-blue-500 uppercase tracking-widest">ALICI BİLGİLERİ</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <EnterpriseInput id="inv_name" label="ÜNVAN / AD SOYAD" defaultValue={customer.name} />
+                                            <EnterpriseInput id="inv_tax_no" label="V.N. / T.C. KİMLİK NO" defaultValue={customer.taxNumber} />
+                                            <EnterpriseInput id="inv_tax_office" label="VERGİ DAİRESİ" defaultValue={customer.taxOffice} />
+                                            <EnterpriseInput id="inv_phone" label="TELEFON" defaultValue={customer.phone} />
+                                            <div className="md:col-span-2">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400">ADRES</label>
+                                                    <textarea id="inv_address" defaultValue={customer.address} className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all min-h-[50px] resize-y" />
+                                                </div>
                                             </div>
                                         </div>
-                                    )}
-                                </EnterpriseCard>
+                                    </EnterpriseCard>
+
+                                    {/* Section: Ekstra Seçenekler */}
+                                    <EnterpriseCard borderLeftColor="#10b981" className="space-y-4 lg:col-span-1 !p-4">
+                                        <h3 className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">AYARLAR & VADE</h3>
+                                        <div className="flex flex-col gap-3">
+                                            <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                                                <input
+                                                    type="checkbox"
+                                                    id="inv_create_wayslip"
+                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500"
+                                                />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Giden Sevk İrsaliyesi</span>
+                                                    <span className="text-[10px] text-slate-500">İrsaliye ref nosu faturaya yazılır</span>
+                                                </div>
+                                            </label>
+
+                                            <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isInstallmentInvoice}
+                                                    onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
+                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500"
+                                                />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Vade & Ödeme Planı</span>
+                                                    <span className="text-[10px] text-slate-500">Plan ödeme notu faturaya yazılır</span>
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        {isInstallmentInvoice && (
+                                            <div className="p-3 bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-200 dark:border-emerald-500/20 rounded-xl flex items-end gap-3 animate-in fade-in zoom-in-95 duration-200">
+                                                <div className="flex-1">
+                                                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">TÜR</label>
+                                                    <select id="inv_installment_type" defaultValue="Açık Hesap" className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white">
+                                                        <option value="Açık Hesap">Açık Hesap</option>
+                                                        <option value="Çek">Çek Alınacak</option>
+                                                        <option value="Senet">Senet (Periodya İmza)</option>
+                                                    </select>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">VADE</label>
+                                                    <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-bold text-slate-900 dark:text-white">
+                                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </EnterpriseCard>
+                                </div>
 
                                 {/* Section: Items Table */}
-                                <EnterpriseCard borderLeftColor="#3b82f6" className="space-y-6">
+                                <EnterpriseCard borderLeftColor="#3b82f6" className="space-y-4 !p-4">
                                     <div className="flex justify-between items-center">
                                         <h3 className="text-xs font-bold text-blue-500 uppercase tracking-wider">FATURA KALEMLERİ</h3>
                                         <EnterpriseButton variant="secondary" onClick={() => setIsProductPickerOpen(true)}>
