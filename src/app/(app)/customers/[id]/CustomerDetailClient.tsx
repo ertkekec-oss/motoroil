@@ -39,6 +39,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     // PAGINATION
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
+    
+    // UI State for instantaneous UI update after converting to installment
+    const [vadelenenIds, setVadelenenIds] = useState<string[]>([]);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -221,6 +224,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             if (data.success) {
                 showSuccess('Başarılı', 'Ödeme planı oluşturuldu.');
                 setShowPlanModal(false);
+                setVadelenenIds(prev => [...prev, planData.description]);
                 refreshTransactions(); // Refresh history
             } else {
                 showError('Hata', data.error || 'Plan oluşturulamadı');
@@ -583,6 +587,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 description: data.invoice?.id || selectedOrder?.id || ''
                             })
                         });
+                        setVadelenenIds(prev => [...prev, data.invoice?.id, selectedOrder?.id].filter(Boolean) as string[]);
                     } catch (e) {
                         console.error('Payment plan auto-creation failed', e);
                     }
@@ -1387,7 +1392,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     )
                                                                 )}
                                                                 {(() => {
-                                                                    const isVadelendi = customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
+                                                                    const isVadelendi = vadelenenIds.includes(item.id) || vadelenenIds.includes(item.orderId || '') || customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
                                                                     return (
                                                                         <button
                                                                             onClick={(e) => { 
@@ -2866,10 +2871,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 onClick={async () => {
                                     setIsSendingOtp(true);
                                     try {
-                                        // Simulate network request or API call to actually send it
-                                        await new Promise(res => setTimeout(res, 1500));
-                                        showSuccess("Başarılı", "Müşteriye senet onayı (OTP) SMS ve Email bağlantıları iletildi.");
-                                        setOtpModalOpen(false);
+                                        const res = await fetch(`/api/documents/senet?action=send-otp&invoiceId=${lastInvoice?.id || ''}`);
+                                        const data = await res.json();
+                                        if (data.success) {
+                                            showSuccess("Başarılı", "Müşteriye senet onayı (OTP) SMS ve Email bağlantıları iletildi.");
+                                            setOtpModalOpen(false);
+                                        } else {
+                                            showError("Hata", data.error || "İmza zarfı oluşturulamadı.");
+                                        }
                                     } catch (err: any) {
                                         showError("Hata", err.message);
                                     } finally {
@@ -2884,7 +2893,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                             <button
                                 onClick={() => {
-                                    window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice?.id || ''}`, '_blank');
+                                    window.open(`/api/documents/senet?action=get-pdf&invoiceId=${lastInvoice?.id || ''}`, '_blank');
                                     setOtpModalOpen(false);
                                 }}
                                 style={{ marginTop: '12px', padding: '18px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', fontSize: '15px', cursor: 'pointer' }}
