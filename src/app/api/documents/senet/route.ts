@@ -50,46 +50,112 @@ export async function GET(req: NextRequest) {
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
+        let installmentsToPrint = [];
         if (!paymentPlan || paymentPlan.installments.length === 0) {
-            // No plan? Generate a single summary senet
-            const page = pdfDoc.addPage([595.28, 841.89]); // A4
-            page.drawText('PROMISSORY NOTE (SENET)', { x: 200, y: 800, size: 16, font: boldFont });
-            page.drawText(`Date: ${new Date().toLocaleDateString('tr-TR')}`, { x: 50, y: 760, size: 12, font });
-            page.drawText(`Company: ${tr2en(invoice.company.name)}`, { x: 50, y: 740, size: 12, font });
-            page.drawText(`Customer: ${tr2en(invoice.customer.name)}`, { x: 50, y: 720, size: 12, font });
-            page.drawText(`Amount: ${invoice.totalAmount} TL`, { x: 50, y: 700, size: 12, font });
-            page.drawText(`Invoice No: ${tr2en(invoice.invoiceNo)}`, { x: 50, y: 680, size: 12, font });
-            page.drawText(`This document serves as a promissory note for the invoice.`, { x: 50, y: 640, size: 12, font });
+            installmentsToPrint = [{
+                amount: Number(invoice.totalAmount),
+                dueDate: invoice.dueDate || new Date(),
+                installmentNo: 1
+            }];
         } else {
-            // Generate multiple pages (one per installment)
-            for (const inst of paymentPlan.installments) {
-                const page = pdfDoc.addPage([595.28, 841.89]);
-                page.drawText('EMRE MUHARRER SENET (PROMISSORY NOTE)', { x: 140, y: 800, size: 14, font: boldFont });
-                
-                page.drawText(`Duzenleme Tarihi (Issue Date): ${new Date(paymentPlan.startDate).toLocaleDateString('tr-TR')}`, { x: 50, y: 750, size: 12, font });
-                page.drawText(`Vade Tarihi (Due Date): ${new Date(inst.dueDate).toLocaleDateString('tr-TR')}`, { x: 50, y: 730, size: 12, font: boldFont, color: rgb(0.8, 0.1, 0.1) });
-                page.drawText(`Tutar (Amount): ${inst.amount.toLocaleString('tr-TR')} TL`, { x: 50, y: 710, size: 12, font: boldFont });
-                
-                page.drawText(`Alici (Debtor): ${tr2en(invoice.customer.name)}`, { x: 50, y: 670, size: 12, font });
-                page.drawText(`TCKN/VKN: ${invoice.customer.taxNumber || invoice.customer.identityNumber || '-'}`, { x: 50, y: 650, size: 12, font });
-                page.drawText(`Adres: ${tr2en(invoice.customer.address || '-')}`, { x: 50, y: 630, size: 10, font });
-                
-                page.drawText(`Alacakli (Creditor): ${tr2en(invoice.company.name)}`, { x: 50, y: 590, size: 12, font: boldFont });
-                
-                // For PDF-lib you need multiple calls for line wraps.
-                const line1 = `Isbu emre muharrer senedimin vadesinde yukarida yazili olan ${inst.amount.toLocaleString('tr-TR')} TL`;
-                const line2 = `bedelini ${tr2en(invoice.company.name)}'e veya emrine odeyecegimi beyan`;
-                const line3 = `ve taahhut ederim. Ihtilaf halinde Istanbul Mahkemeleri yetkilidir.`;
-                page.drawText(line1, { x: 50, y: 540, size: 11, font });
-                page.drawText(line2, { x: 50, y: 524, size: 11, font });
-                page.drawText(line3, { x: 50, y: 508, size: 11, font });
-                
-                page.drawText('Borclu Imza (Debtor Signature)', { x: 350, y: 460, size: 12, font: boldFont });
-                page.drawText('(OTP/Digital Signature Pending)', { x: 340, y: 440, size: 10, font, color: rgb(0.5, 0.5, 0.5) });
-                
-                page.drawText(`Taksit No: ${inst.installmentNo} / ${paymentPlan.installmentCount}`, { x: 50, y: 100, size: 10, font });
-                page.drawText(`Fatura Ref: ${tr2en(invoice.invoiceNo)} (${invoice.id})`, { x: 50, y: 80, size: 10, font });
+            installmentsToPrint = paymentPlan.installments;
+        }
+
+        const totalInstallments = installmentsToPrint.length;
+        const startDateString = paymentPlan ? new Date(paymentPlan.startDate).toLocaleDateString('tr-TR') : new Date().toLocaleDateString('tr-TR');
+
+        for (const inst of installmentsToPrint) {
+            const page = pdfDoc.addPage([595.28, 841.89]);
+            const w = page.getWidth();
+            const h = page.getHeight();
+            
+            // Outer Border
+            page.drawRectangle({ x: 30, y: 30, width: w - 60, height: h - 60, borderColor: rgb(0,0,0), borderWidth: 2 });
+            page.drawRectangle({ x: 35, y: 35, width: w - 70, height: h - 70, borderColor: rgb(0,0,0), borderWidth: 0.5 });
+            
+            // Header: EMRE MUHARRER SENET (Centered)
+            const title = "EMRE MUHARRER SENET";
+            const titleWidth = boldFont.widthOfTextAtSize(title, 20);
+            page.drawText(title, { x: (w - titleWidth) / 2, y: h - 80, size: 20, font: boldFont });
+            
+            // Amount Box (Top Right)
+            const amtStr = `# ${Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL #`;
+            const amtBoxW = 180;
+            const amtBoxH = 50;
+            const amtBoxX = w - 40 - amtBoxW;
+            const amtBoxY = h - 160;
+            
+            page.drawRectangle({ x: amtBoxX, y: amtBoxY, width: amtBoxW, height: amtBoxH, borderColor: rgb(0,0,0), borderWidth: 1, color: rgb(0.97,0.97,0.97) });
+            page.drawText("TUTAR:", { x: amtBoxX + 15, y: amtBoxY + 30, size: 10, font: boldFont });
+            page.drawText(amtStr, { x: amtBoxX + 15, y: amtBoxY + 12, size: 14, font: boldFont });
+            
+            // Dates (Top Left)
+            page.drawText("Duzenleme Tarihi:", { x: 50, y: amtBoxY + 30, size: 10, font: boldFont });
+            page.drawText(startDateString, { x: 155, y: amtBoxY + 30, size: 10, font });
+            
+            page.drawText("Vade Tarihi:", { x: 50, y: amtBoxY + 12, size: 10, font: boldFont });
+            page.drawText(new Date(inst.dueDate).toLocaleDateString('tr-TR'), { x: 155, y: amtBoxY + 12, size: 10, font: boldFont, color: rgb(0.8, 0, 0) });
+            
+            // No / Ref
+            const refNo = `No: ${inst.installmentNo}/${totalInstallments}   -   Islem Ref: ${tr2en(invoice.invoiceNo)}`;
+            page.drawText(refNo, { x: 50, y: amtBoxY - 25, size: 10, font: boldFont });
+
+            // Legal Text (Center)
+            const textY = amtBoxY - 70;
+            const legalText = `Isbu emre muharrer senedimin vadesinde yukarida yazili olan ${Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL bedelini,\n${tr2en(invoice.company.name)} sirketine veya emrine havalesine,\nkayitsiz sartsiz ve nakden odeyecegimi beyan ve taahhut ederim.\n\nBedeli malen/nakden ahzolunmustur. Ihtilaf vukuunda Istanbul Mahkemeleri ve\nIcra Dairelerinin yetkili oldugunu pesinen kabul eylerim.`;
+            page.drawText(legalText, { x: 50, y: textY, size: 11, font, lineHeight: 18 });
+            
+            // Info boxes: ALACAKLI & BORCLU
+            const boxY = textY - 140;
+            const boxWidth = w/2 - 60;
+            const boxHeight = 130;
+            
+            // BORCLU BOX
+            page.drawRectangle({ x: 50, y: boxY - boxHeight + 20, width: boxWidth, height: boxHeight, borderColor: rgb(0.5,0.5,0.5), borderWidth: 1 });
+            page.drawRectangle({ x: 50, y: boxY, width: boxWidth, height: 20, color: rgb(0.9,0.9,0.9), borderColor: rgb(0.5,0.5,0.5), borderWidth: 1 });
+            page.drawText("ODECEYEK OLAN (BORCLU)", { x: 55, y: boxY + 6, size: 10, font: boldFont });
+            
+            page.drawText(tr2en(invoice.customer.name), { x: 55, y: boxY - 20, size: 10, font: boldFont });
+            page.drawText(`VKN/TCKN: ${invoice.customer.taxNumber || invoice.customer.identityNumber || 'Belirtilmemis'}`, { x: 55, y: boxY - 40, size: 10, font });
+            
+            // Safe wrap address text
+            const addr = tr2en(invoice.customer.address || 'Adres bilgisi bulunmuyor.');
+            const maxLen = 35;
+            if (addr.length > maxLen) {
+                page.drawText("Adres: " + addr.substring(0, maxLen), { x: 55, y: boxY - 60, size: 9, font });
+                page.drawText(addr.substring(maxLen, maxLen * 2), { x: 55, y: boxY - 72, size: 9, font });
+                page.drawText(addr.substring(maxLen * 2, maxLen * 3), { x: 55, y: boxY - 84, size: 9, font });
+            } else {
+                page.drawText("Adres: " + addr, { x: 55, y: boxY - 60, size: 9, font });
             }
+            page.drawText(`Tel: ${invoice.customer.phone || '-'}`, { x: 55, y: boxY - 100, size: 9, font });
+
+            // KEFIL BOX
+            const kefilX = w/2 + 10;
+            page.drawRectangle({ x: kefilX, y: boxY - boxHeight + 20, width: boxWidth, height: boxHeight, borderColor: rgb(0.5,0.5,0.5), borderWidth: 1 });
+            page.drawRectangle({ x: kefilX, y: boxY, width: boxWidth, height: 20, color: rgb(0.9,0.9,0.9), borderColor: rgb(0.5,0.5,0.5), borderWidth: 1 });
+            page.drawText("KEFIL (AVAL)", { x: kefilX + 5, y: boxY + 6, size: 10, font: boldFont });
+            
+            page.drawText("Ad Soyad: ___________________________", { x: kefilX + 5, y: boxY - 20, size: 10, font });
+            page.drawText("TCKN:        ___________________________", { x: kefilX + 5, y: boxY - 40, size: 10, font });
+            page.drawText("Adres:       ___________________________", { x: kefilX + 5, y: boxY - 60, size: 10, font });
+            page.drawText("                 ___________________________", { x: kefilX + 5, y: boxY - 80, size: 10, font });
+            page.drawText("Tel:            ___________________________", { x: kefilX + 5, y: boxY - 100, size: 10, font });
+
+            // Signatures
+            const sigY = boxY - boxHeight - 20;
+            
+            // BORÇLU İMZA
+            page.drawText("BORCLU IMZASI", { x: 90, y: sigY, size: 11, font: boldFont });
+            page.drawText("(Secure Digital OTP / Wet Signature)", { x: 60, y: sigY - 15, size: 8, font, color: rgb(0.5,0.5,0.5) });
+            
+            // KEFİL İMZA
+            page.drawText("KEFIL IMZASI", { x: kefilX + 50, y: sigY, size: 11, font: boldFont });
+            page.drawText("(Secure Digital OTP / Wet Signature)", { x: kefilX + 20, y: sigY - 15, size: 8, font, color: rgb(0.5,0.5,0.5) });
+            
+            // Footer Warning
+            page.drawText("Isbu belge Periodya Guvenli Agi tarafindan uretilmis olup 5549 Sayili Kanun kapsaminda dijital iz tasimaktadir.", { x: 50, y: 50, size: 8, font, color: rgb(0.4, 0.4, 0.4) });
+            page.drawText(`Document ID: ${invoice.id} * SysDate: ${new Date().toISOString()}`, { x: 50, y: 40, size: 8, font, color: rgb(0.4, 0.4, 0.4) });
         }
 
         const pdfBytes = await pdfDoc.save();
