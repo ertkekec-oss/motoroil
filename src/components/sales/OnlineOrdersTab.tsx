@@ -60,6 +60,7 @@ export function OnlineOrdersTab({
     const [currentPage, setCurrentPage] = useState(1);
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
     const [isGeneratingBulk, setIsGeneratingBulk] = useState(false);
+    const [bulkInvoiceStatus, setBulkInvoiceStatus] = useState<string | null>(null);
 
     const toggleExpand = async (id: string, order?: any) => {
         const isExpanding = expandedOrderId !== id;
@@ -293,6 +294,97 @@ export function OnlineOrdersTab({
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                             )}
                             {isGeneratingBulk ? 'Etiketler Hazırlanıyor...' : `Toplu Etiket Yazdır (${selectedOrders.length})`}
+                        </button>
+                        
+                        <button
+                            disabled={!!bulkInvoiceStatus || isGeneratingBulk}
+                            onClick={async () => {
+                                const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id));
+                                
+                                if (selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length === 0) {
+                                     showError("Hata", "Seçili siparişler zaten faturalandırılmış.");
+                                     return;
+                                }
+
+                                if (!confirm(`${selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length} adet sipariş otomatik olarak faturalandırılıp resmileştirilecektir (e-Fatura/e-Arşiv gönderimi). Devam etmek istiyor musunuz?`)) {
+                                    return;
+                                }
+                                
+                                setBulkInvoiceStatus(`Hazırlanıyor...`);
+                                let successCount = 0;
+                                let failCount = 0;
+
+                                try {
+                                    const mappingRes = await fetch('/api/integrations/marketplace/get-mapping');
+                                    const mappingData = await mappingRes.json();
+                                    const rawMappings = mappingData.mappings || [];
+
+                                    for(let i = 0; i < selectedOrderData.length; i++) {
+                                        const o = selectedOrderData[i];
+                                        
+                                        // Zaten faturalıysa atla
+                                        if (['Faturalandırıldı', 'Tamamlandı'].includes(o.status)) {
+                                            continue;
+                                        }
+
+                                        setBulkInvoiceStatus(`Faturalandırılıyor: ${i+1}/${selectedOrderData.length}`);
+                                        
+                                        const saleItems = o.items?.map((item: any) => {
+                                            const code = item.code || item.barcode || item.name;
+                                            const mapMatch = rawMappings.find((m: any) => m.marketplace?.toLowerCase() === o.marketplace?.toLowerCase() && m.marketplaceCode === code);
+                                            return {
+                                                productId: mapMatch ? mapMatch.productId : undefined,
+                                                qty: item.qty || item.quantity || 1,
+                                                name: item.name,
+                                                price: item.price || 0,
+                                                vat: item.vat || 20,
+                                                otv: item.otv || 0
+                                            };
+                                        }) || [];
+
+                                        const convRes = await fetch('/api/sales/invoices/ecommerce-convert', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ orderId: o.id, items: saleItems })
+                                        });
+                                        const convData = await convRes.json();
+                                        
+                                        if (convData.success && convData.invoice) {
+                                            const sendRes = await fetch('/api/sales/invoices', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ action: 'formal-send', invoiceId: convData.invoice.id })
+                                            });
+                                            if (sendRes.ok) successCount++;
+                                            else failCount++;
+                                        } else {
+                                            failCount++;
+                                        }
+                                    }
+
+                                    if (failCount > 0) {
+                                        showError("Kısmi Başarı / Hata", `${successCount} fatura başarıyla oluşturuldu ve gönderildi. ${failCount} siparişte hata oluştu.`);
+                                    } else {
+                                        // Wait, periodya usually uses showWarning for custom alerts when it's not an error.
+                                        alert(`Başarılı: Tüm faturalar başarıyla oluşturuldu ve gönderildi. (${successCount} adet)`);
+                                    }
+                                    
+                                } catch(e: any) {
+                                    showError("İşlem Başarısız", e.message || "Bilinmeyen bir hata oluştu.");
+                                } finally {
+                                    setBulkInvoiceStatus(null);
+                                    setSelectedOrders([]);
+                                    fetchOnlineOrders();
+                                }
+                            }}
+                            className={`h-[40px] px-4 rounded-[12px] font-medium text-[13px] transition-colors flex items-center justify-center gap-2 ${isLight ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} ${(!!bulkInvoiceStatus || isGeneratingBulk) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {!!bulkInvoiceStatus ? (
+                                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            ) : (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            )}
+                            {bulkInvoiceStatus ? bulkInvoiceStatus : `Toplu Fatura Oluştur (${selectedOrders.length})`}
                         </button>
                     )}
                 </div>
