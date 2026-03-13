@@ -101,6 +101,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             }
         });
 
+        // Track fetched order IDs so we can merge their corresponding Transactions and Invoices into a single row
+        const fetchedOrderIds = new Set(marketplaceOrders.map((o: any) => o.id));
+
         // Prepare history data on server to keep client component clean and fast
         const txs = (customer.transactions || [])
             .map((t: any) => {
@@ -134,11 +137,19 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     formalUuid: orderId ? (invoiceByOrderId.get(orderId)?.formalUuid || null) : null,
                     formalInvoiceId: orderId ? (invoiceByOrderId.get(orderId)?.id || null) : null
                 };
+            })
+            .filter((t: any) => {
+                // Remove duplicate 'Sales' transactions if we also have the Order row
+                if (t.type === 'Satış' && t.orderId && fetchedOrderIds.has(t.orderId)) {
+                    return false;
+                }
+                return true;
             });
 
 
-        const invs = (customer.invoices || []).map((inv: any) => {
-            let safeItems = [];
+        const invs = (customer.invoices || [])
+            .map((inv: any) => {
+                let safeItems = [];
             try {
                 if (inv.items) {
                     safeItems = typeof inv.items === 'string' ? JSON.parse(inv.items) : (Array.isArray(inv.items) ? inv.items : []);
@@ -159,6 +170,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 formalType: inv.formalType || null,
                 orderId: inv.orderId || null
             };
+        })
+        .filter((inv: any) => {
+            // Remove standalone invoice row if the parent Order row will be displayed (which has the Faturalandı badge + Print button)
+            if (inv.orderId && fetchedOrderIds.has(inv.orderId)) {
+                return false;
+            }
+            return true;
         });
 
 
@@ -187,20 +205,27 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             } catch { safeItems = []; }
 
             const mplace = o.marketplace === 'trendyol' ? 'Trendyol' : o.marketplace === 'n11' ? 'N11' : o.marketplace === 'hepsiburada' ? 'Hepsiburada' : o.marketplace === 'pazarama' ? 'Pazarama' : o.marketplace;
+            let currentDesc = `${mplace} Siparişi - #${o.orderNumber || '-'} (${o.status || '-'})`;
+            
+            const linkedInvoice = invoiceByOrderId.get(o.id);
+            if (linkedInvoice) {
+                currentDesc += ` | Fatura: ${linkedInvoice.invoiceNo || 'Taslak'}`;
+            }
+
             return {
                 id: o.id,
                 date: new Date(o.orderDate).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                 rawDate: o.orderDate,
                 type: 'Satış', // Puts it in "Satış ve Faturalar" and "Tüm Hareketler"
-                desc: `${mplace} Siparişi - #${o.orderNumber || '-'} (${o.status || '-'})`,
+                desc: currentDesc,
                 amount: Number(o.totalAmount || 0),
                 color: '#f59e0b', // A different color for marketplace orders
                 items: safeItems,
                 orderId: o.id,
                 isMarketplaceOrder: true,
-                isFormal: invoiceByOrderId.has(o.id),
-                formalUuid: invoiceByOrderId.get(o.id)?.formalUuid || null,
-                formalInvoiceId: invoiceByOrderId.get(o.id)?.id || null
+                isFormal: !!linkedInvoice,
+                formalUuid: linkedInvoice?.formalUuid || null,
+                formalInvoiceId: linkedInvoice?.id || null
             };
         });
 
