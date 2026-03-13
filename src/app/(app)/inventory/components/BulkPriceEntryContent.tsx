@@ -630,24 +630,35 @@ function SettingsView() {
                         </div>
 
                         <div className="space-y-2 flex-1 overflow-y-auto custom-scroll pr-1">
-                            {categories.map(cat => (
-                                <div key={cat.id} className="group flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-200 dark:hover:border-blue-900/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                            {(settings.custClasses || []).map((clsName: string) => {
+                                // Find if this class has a mapping in categories DB
+                                const matchedCat = categories.find(c => c.name === clsName);
+                                const listName = matchedCat?.priceList?.name || 'Ana Satış Fiyatı (Standart)';
+                                
+                                return (
+                                <div key={clsName} className="group flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-200 dark:hover:border-blue-900/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
                                     <div className="flex flex-col">
-                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-[13px]">{cat.name}</span>
-                                        {cat.defaultPriceList && (
-                                            <span className="text-[10px] text-blue-600 dark:text-blue-400">Liste: {cat.defaultPriceList.name}</span>
-                                        )}
+                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-[13px]">{clsName}</span>
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Atanan Liste:</span>
+                                            <span className={`text-[11px] font-semibold ${matchedCat?.priceList ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500'}`}>
+                                                {listName}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <button 
-                                        onClick={() => handleDeleteCategory(cat.id, cat.name)}
-                                        className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
+                                    {matchedCat && (
+                                        <button 
+                                            onClick={() => handleDeleteCategory(matchedCat.id, matchedCat.name)}
+                                            title="Eşleştirmeyi Kaldır"
+                                            className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
-                            ))}
+                            )})}
                             {categories.length === 0 && !loading && (
                                 <div className="text-center py-6 text-slate-400 text-sm">Hiç müşteri sınıfı bulunmuyor.</div>
                             )}
