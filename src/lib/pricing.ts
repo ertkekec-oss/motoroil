@@ -35,67 +35,13 @@ export async function resolveCustomerPriceList(companyId: string, customerId?: s
     }
 
     if (!priceListId) {
-        const defaultList = await prisma.priceList.findFirst({
-            where: { companyId, isDefault: true, isActive: true }
-        });
-        priceListId = defaultList?.id;
+        // Müşterinin veya sınıfının özel bir listesi tanımlanmamış.
+        // Sistem bu noktada, ürünlerin varsayılan ana fiyatı olan (Product.price)'ın kullanılacağını anlar.
+        return null;
     }
-
-    // Fallback if no default found
-    if (!priceListId) {
-        const anyList = await prisma.priceList.findFirst({
-            where: { companyId, isActive: true }
-        });
-        priceListId = anyList?.id;
-    }
-
-    // Final fallback: Auto-create or activate a default list
-    if (!priceListId) {
-        console.log(`[Pricing] No active price list found for company ${companyId}. Searching for existing default name.`);
-
-        // Try to find if a list with the same name already exists (even if inactive)
-        const existingList = await prisma.priceList.findFirst({
-            where: { companyId, name: "Genel Satış Listesi" }
-        });
-
-        if (existingList) {
-            console.log(`[Pricing] Found existing list "${existingList.name}". Activating as default.`);
-            const updated = await prisma.priceList.update({
-                where: { id: existingList.id },
-                data: { isActive: true, isDefault: true }
-            });
-            priceListId = updated.id;
-        } else {
-            try {
-                console.log(`[Pricing] Creating new automatic default list.`);
-                const newList = await prisma.priceList.create({
-                    data: {
-                        companyId,
-                        name: "Genel Satış Listesi",
-                        currency: "TRY",
-                        isDefault: true,
-                        isActive: true
-                    }
-                });
-                priceListId = newList.id;
-            } catch (err: any) {
-                // Handle race condition: another process created it simultaneously
-                if (err.code === 'P2002') {
-                    const raceList = await prisma.priceList.findFirst({
-                        where: { companyId, name: "Genel Satış Listesi" }
-                    });
-                    priceListId = raceList?.id;
-                } else {
-                    throw err;
-                }
-            }
-        }
-    }
-
-    if (!priceListId) throw new Error("Could not resolve or create a Price List.");
 
     const priceList = await prisma.priceList.findUnique({ where: { id: priceListId } });
-    return priceList!;
+    return priceList;
 }
 
 /**

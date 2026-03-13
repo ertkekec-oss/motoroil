@@ -134,6 +134,11 @@ export default function TerminalClient() {
                             }));
                         }
                     }
+                } else {
+                    // Müşterinin veya sınıfının özel bir listesi yok, varsayılan fiyata (Product.price) dön.
+                    setActivePriceListId(null);
+                    setActivePriceListName(null);
+                    setPriceMap({});
                 }
             } catch (e) { console.error("Price resolution failed", e); }
         };

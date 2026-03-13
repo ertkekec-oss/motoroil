@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo, Suspense, useCallback, useRef } from 'react';
 import { useApp } from '@/contexts/AppContext';
@@ -164,6 +164,11 @@ function POSContent() {
               }));
             }
           }
+        } else {
+            // Müşterinin veya sınıfının özel bir listesi yok, varsayılan fiyata dön
+            setActivePriceListId(null);
+            setActivePriceListName(null);
+            setPriceMap({});
         }
       } catch (e) { console.error("Price resolution failed", e); }
     };
