@@ -13,16 +13,6 @@ import { useModal } from '@/contexts/ModalContext';
 import StatementModal from '@/components/modals/StatementModal';
 import Pagination from '@/components/Pagination';
 import ReconciliationWizard from '@/components/modals/ReconciliationWizard';
-import {
-    EnterpriseCard,
-    EnterpriseSectionHeader,
-    EnterpriseInput,
-    EnterpriseTextarea,
-    EnterpriseSelect,
-    EnterpriseButton,
-    EnterpriseSwitch,
-    EnterpriseTable
-} from '@/components/ui/enterprise';
 
 export default function CustomerDetailClient({ customer, historyList }: { customer: any, historyList: any[] }) {
     const router = useRouter();
@@ -1577,273 +1567,285 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {
                 invoiceModalOpen && selectedOrder && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <EnterpriseCard className="w-[1200px] max-w-[98vw] flex flex-col h-[90vh] overflow-hidden !p-0 shadow-2xl">
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '1200px', maxWidth: '98vw', padding: 0, border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(59, 130, 246, 0.1)' }}>
                             {/* Header */}
-                            <div className="px-6 pt-4 pb-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-2xl text-blue-500">📄</span>
-                                    <div>
-                                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">RESMİ FATURALANDIRMA SİSTEMİ</h2>
-                                        <p className="text-xs font-semibold text-slate-500 tracking-wide">E-ARŞİV / E-FATURA TASLAĞI</p>
-                                    </div>
+                            <div style={{ padding: '24px 40px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '900', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                        <span style={{ padding: '10px', background: '#3b82f6', borderRadius: '12px', fontSize: '20px', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)' }}>📄</span>
+                                        RESMİ FATURALANDIRMA SİSTEMİ
+                                    </h2>
+                                    <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '800', letterSpacing: '2px', marginTop: '6px' }}>E-ARŞİV / E-FATURA TASLAĞI</div>
                                 </div>
-                                <button onClick={() => setInvoiceModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors">
-                                    &times;
-                                </button>
+                                <button onClick={() => setInvoiceModalOpen(false)} style={{ width: '48px', height: '48px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', cursor: 'pointer', fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10 hover:border-white/30">&times;</button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-950/30">
-                                
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                    {/* Section: Buyer Information */}
-                                    <EnterpriseCard borderLeftColor="#3b82f6" className="space-y-4 lg:col-span-2 !p-4">
-                                        <h3 className="text-[11px] font-bold text-blue-500 uppercase tracking-widest">ALICI BİLGİLERİ</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            <EnterpriseInput id="inv_name" label="ÜNVAN / AD SOYAD" defaultValue={customer.name} />
-                                            <EnterpriseInput id="inv_tax_no" label="V.N. / T.C. KİMLİK NO" defaultValue={customer.taxNumber} />
-                                            <EnterpriseInput id="inv_tax_office" label="VERGİ DAİRESİ" defaultValue={customer.taxOffice} />
-                                            <EnterpriseInput id="inv_phone" label="TELEFON" defaultValue={customer.phone} />
-                                            <div className="md:col-span-2">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400">ADRES</label>
-                                                    <textarea id="inv_address" defaultValue={customer.address} className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all min-h-[50px] resize-y" />
-                                                </div>
+                            <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '40px', maxHeight: '80vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)' }}>
+
+                                {/* Section: Buyer Information */}
+                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#3b82f6', marginBottom: '24px', borderLeft: '4px solid #3b82f6', paddingLeft: '12px', letterSpacing: '1px' }}>ALICI BİLGİLERİ</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>ÜNVAN / AD SOYAD</label>
+                                            <input id="inv_name" defaultValue={customer.name} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
+                                        </div>
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>V.N. / T.C. KİMLİK NO</label>
+                                            <input id="inv_tax_no" defaultValue={customer.taxNumber} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
+                                        </div>
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>VERGİ DAİRESİ</label>
+                                            <input id="inv_tax_office" defaultValue={customer.taxOffice} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
+                                        </div>
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>TELEFON</label>
+                                            <input id="inv_phone" defaultValue={customer.phone} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
+                                        </div>
+                                        <div className="flex-col gap-2" style={{ gridColumn: 'span 4' }}>
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>ADRES</label>
+                                            <textarea id="inv_address" defaultValue={customer.address} style={{ width: '100%', minHeight: '80px', borderRadius: '14px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', padding: '16px 20px', fontWeight: '600', resize: 'vertical', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Section: Ekstra Seçenekler */}
+                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', marginBottom: '40px' }}>
+                                    <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#10b981', marginBottom: '24px', borderLeft: '4px solid #10b981', paddingLeft: '12px', letterSpacing: '1px' }}>EKSTRA SEÇENEKLER</h3>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                                        <input type="checkbox" id="inv_create_wayslip" style={{ width: '24px', height: '24px', cursor: 'pointer', accentColor: '#10b981' }} />
+                                        <label htmlFor="inv_create_wayslip" style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-main, white)', cursor: 'pointer', userSelect: 'none' }}>
+                                            Fatura ile birlikte Giden Sevk İrsaliyesi oluştur <span style={{color: '#94a3b8', fontWeight: '600', fontSize: '13px'}}>(İrsaliye numarası fatura üzerine yazılır)</span>
+                                        </label>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <input type="checkbox" id="inv_is_installment" checked={isInstallmentInvoice} onChange={(e) => setIsInstallmentInvoice(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer', accentColor: '#3b82f6' }} />
+                                        <label htmlFor="inv_is_installment" style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-main, white)', cursor: 'pointer', userSelect: 'none' }}>
+                                            Vade Uygula ve Ödeme Planı Yarat <span style={{color: '#94a3b8', fontWeight: '600', fontSize: '13px'}}>(Fatura içeriğine otomatik eklenecektir)</span>
+                                        </label>
+                                    </div>
+                                    {isInstallmentInvoice && (
+                                        <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-main, white)' }}>Vade Sayısı:</span>
+                                                <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-panel, #0f172a)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '800', outline: 'none' }}>
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Vade</option>)}
+                                                </select>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-main, white)' }}>Ödeme Türü:</span>
+                                                <select id="inv_installment_type" style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-panel, #0f172a)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '800', outline: 'none' }}>
+                                                    <option value="Açık Hesap">Açık Hesap</option>
+                                                    <option value="Çek">Çek Alınacak</option>
+                                                    <option value="Senet">Senet (Periodya İmza)</option>
+                                                </select>
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: '#94a3b8', width: '100%', marginTop: '4px' }}>
+                                                📝 Not: Sensiz (Çek/Senet) ödeme planları finansal hareketlerde o kategorilerde takip edilir. Senet seçeneği "Periodya Trust & Compliance Suite" (Dijital İmza) kullanılarak müşterinin e-onayına sunulur.
                                             </div>
                                         </div>
-                                    </EnterpriseCard>
-
-                                    {/* Section: Ekstra Seçenekler */}
-                                    <EnterpriseCard borderLeftColor="#10b981" className="space-y-4 lg:col-span-1 !p-4">
-                                        <h3 className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">AYARLAR & VADE</h3>
-                                        <div className="flex flex-col gap-3">
-                                            <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 transition-colors">
-                                                <input
-                                                    type="checkbox"
-                                                    id="inv_create_wayslip"
-                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500"
-                                                />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Giden Sevk İrsaliyesi</span>
-                                                    <span className="text-[10px] text-slate-500">İrsaliye ref nosu faturaya yazılır</span>
-                                                </div>
-                                            </label>
-
-                                            <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 transition-colors">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isInstallmentInvoice}
-                                                    onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
-                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500"
-                                                />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Vade & Ödeme Planı</span>
-                                                    <span className="text-[10px] text-slate-500">Plan ödeme notu faturaya yazılır</span>
-                                                </div>
-                                            </label>
-                                        </div>
-
-                                        {isInstallmentInvoice && (
-                                            <div className="p-3 bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-200 dark:border-emerald-500/20 rounded-xl flex items-end gap-3 animate-in fade-in zoom-in-95 duration-200">
-                                                <div className="flex-1">
-                                                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">TÜR</label>
-                                                    <select id="inv_installment_type" defaultValue="Açık Hesap" className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white">
-                                                        <option value="Açık Hesap">Açık Hesap</option>
-                                                        <option value="Çek">Çek Alınacak</option>
-                                                        <option value="Senet">Senet (Periodya İmza)</option>
-                                                    </select>
-                                                </div>
-                                                <div className="flex-1">
-                                                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">VADE</label>
-                                                    <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-bold text-slate-900 dark:text-white">
-                                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </EnterpriseCard>
+                                    )}
                                 </div>
 
                                 {/* Section: Items Table */}
-                                <EnterpriseCard borderLeftColor="#3b82f6" className="space-y-4 !p-4">
-                                    <div className="flex justify-between items-center">
-                                        <h3 className="text-xs font-bold text-blue-500 uppercase tracking-wider">FATURA KALEMLERİ</h3>
-                                        <EnterpriseButton variant="secondary" onClick={() => setIsProductPickerOpen(true)}>
-                                            <span className="text-blue-500 mr-1">➕</span> Envanterden Ürün Seç
-                                        </EnterpriseButton>
+                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                                        <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#3b82f6', margin: 0, borderLeft: '4px solid #3b82f6', paddingLeft: '12px', letterSpacing: '1px' }}>FATURA KALEMLERİ</h3>
+                                        <button
+                                            onClick={() => setIsProductPickerOpen(true)}
+                                            style={{ padding: '10px 20px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', fontSize: '13px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                            className="hover:bg-blue-500 hover:text-white"
+                                        >
+                                            <span>➕</span> Envanterden Ürün Seç
+                                        </button>
                                     </div>
+                                    <div style={{ background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', overflowX: 'auto' }}>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
+                                            <thead>
+                                                <tr style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-muted, #666)', fontSize: '11px', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'center', width: '50px' }}>NO</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'left', minWidth: '250px' }}>MALZEME / HİZMET</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'center', width: '90px' }}>MİKTAR</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'right', width: '150px' }}>BİRİM FİYAT (NET)</th>
 
-                                    <EnterpriseTable
-                                        headers={[
-                                            { label: 'NO' },
-                                            { label: 'MALZEME / HİZMET' },
-                                            { label: 'MİKTAR', alignRight: true },
-                                            { label: 'BİRİM FİYAT (NET)', alignRight: true },
-                                            { label: 'KDV %', alignRight: true },
-                                            { label: 'KDV TUTARI', alignRight: true },
-                                            { label: 'BRÜT TOPLAM', alignRight: true },
-                                            { label: '' }
-                                        ]}
-                                    >
-                                        {invoiceItems.map((it: any, i: number) => {
-                                            const qty = Number(it.qty || 1);
-                                            const netPrice = Number(it.price || 0);
-                                            const vatRate = Number(it.vat || 20);
-                                            const otvRate = Number(it.otv || 0);
-
-                                            const lineNetTotal = qty * netPrice;
-                                            const otvAmount = lineNetTotal * (otvRate / 100);
-                                            const vatMatrah = lineNetTotal + otvAmount;
-                                            const vatAmount = vatMatrah * (vatRate / 100);
-                                            const lineGrossTotal = vatMatrah + vatAmount;
-
-                                            const updateItem = (field: string, val: any) => {
-                                                const newItems = [...invoiceItems];
-                                                newItems[i][field] = val;
-                                                setInvoiceItems(newItems);
-                                            };
-
-                                            const handleGrossChange = (newGross: number) => {
-                                                if (qty === 0) return;
-                                                const calculatedNet = newGross / (qty * (1 + otvRate / 100) * (1 + vatRate / 100));
-                                                updateItem('price', calculatedNet);
-                                            };
-
-                                            return (
-                                                <tr key={it.id || i}>
-                                                    <td className="h-14 px-4 text-sm font-semibold text-slate-500">{i + 1}</td>
-                                                    <td className="px-4 py-2">
-                                                        <div className="flex flex-col gap-2 min-w-[250px]">
-                                                            <select
-                                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-medium focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 outline-none"
-                                                                value={it.productId || ''}
-                                                                onChange={(e) => {
-                                                                    const selectedProduct = products.find(p => String(p.id) === e.target.value);
-                                                                    if (selectedProduct) {
-                                                                        const currentItems = JSON.parse(JSON.stringify(invoiceItems));
-                                                                        currentItems[i] = {
-                                                                            ...currentItems[i],
-                                                                            productId: selectedProduct.id,
-                                                                            name: selectedProduct.name,
-                                                                            price: Number(selectedProduct.price || 0),
-                                                                            vat: Number(selectedProduct.salesVat || 20),
-                                                                            otv: Number(selectedProduct.salesOtv || 0),
-                                                                            otvCode: selectedProduct.otvCode || '0071',
-                                                                            otvType: selectedProduct.otvType || 'Ö.T.V yok',
-                                                                            oiv: Number(selectedProduct.salesOiv || 0),
-                                                                            description: selectedProduct.showDescriptionOnInvoice ? (selectedProduct.description || '') : '',
-                                                                            showDesc: selectedProduct.showDescriptionOnInvoice ? true : false
-                                                                        };
-                                                                        setInvoiceItems(currentItems);
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <option value="">Ürün veya hizmet seçin...</option>
-                                                                {products.map(p => (
-                                                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                                                ))}
-                                                            </select>
-                                                            {it.name && it.name !== 'Ürün' && (
-                                                                <div className="text-xs text-slate-500 font-medium pl-1">
-                                                                    Seçili: {it.name}
-                                                                </div>
-                                                            )}
-                                                            <div className="flex flex-wrap items-center gap-2 pl-1">
-                                                                {(it.otvType && it.otvType !== 'Ö.T.V yok') && (
-                                                                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-500">
-                                                                        {it.otvType === 'yüzdesel Ö.T.V' ? `ÖTV %${it.otv}` : `ÖTV ${it.otv} ₺`}
-                                                                    </span>
-                                                                )}
-                                                                {(Number(it.oiv || 0) > 0) && (
-                                                                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-500">
-                                                                        ÖİV %${it.oiv}
-                                                                    </span>
-                                                                )}
-                                                                <button
-                                                                    onClick={() => updateItem('showDesc', !it.showDesc)}
-                                                                    className={`text-[10px] font-bold px-2 py-1 rounded border border-dashed transition-colors ${it.showDesc ? 'text-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-500/10' : 'text-slate-500 border-slate-300 dark:border-slate-700 hover:text-blue-500 hover:border-blue-500'}`}
-                                                                >
-                                                                    📝 {it.showDesc ? 'Açıklamayı Gizle' : 'Açıklama Ekle'}
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setTaxEditIndex(i)}
-                                                                    className="text-[10px] font-bold px-2 py-1 rounded border border-dashed border-slate-300 dark:border-slate-700 text-slate-500 hover:text-blue-500 hover:border-blue-500 transition-colors"
-                                                                >
-                                                                    ⚙️ Vergi Ayarı
-                                                                </button>
-                                                            </div>
-
-                                                            {it.showDesc && (
-                                                                <div className="mt-2">
-                                                                    <textarea
-                                                                        placeholder="Malzeme / Hizmet Açıklaması (Örn: ŞASE NO: XYZ, Motor NO: 123...)"
-                                                                        value={it.description || ''}
-                                                                        onChange={(e) => updateItem('description', e.target.value)}
-                                                                        className="w-full min-h-[60px] p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:ring-1 focus:ring-blue-500/30 resize-y"
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-2 text-right">
-                                                        <input
-                                                            type="number"
-                                                            value={it.qty}
-                                                            onChange={(e) => updateItem('qty', Number(e.target.value))}
-                                                            className="w-[70px] h-9 px-2 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300 ml-auto"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <input
-                                                                type="number"
-                                                                step="0.0001"
-                                                                value={netPrice > 0 ? Number(netPrice.toFixed(4)) : ''}
-                                                                placeholder="0.00"
-                                                                onChange={(e) => updateItem('price', Number(e.target.value))}
-                                                                className="w-[100px] h-9 px-2 text-right bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-mono font-semibold outline-none focus:ring-1 focus:ring-slate-300"
-                                                            />
-                                                            <span className="text-xs font-semibold text-slate-500">₺ + KDV</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-2 text-right">
-                                                        <div className="relative inline-block ml-auto w-[64px]">
-                                                            <input
-                                                                type="number"
-                                                                value={it.vat}
-                                                                onChange={(e) => updateItem('vat', Number(e.target.value))}
-                                                                className="w-full h-9 pl-2 pr-6 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300"
-                                                            />
-                                                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">%</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-2 text-right font-mono text-sm font-bold text-slate-500">
-                                                        {vatAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
-                                                    </td>
-                                                    <td className="px-4 py-2 text-right">
-                                                        <input
-                                                            type="number"
-                                                            value={lineGrossTotal.toFixed(2)}
-                                                            onChange={(e) => handleGrossChange(Number(e.target.value))}
-                                                            className="w-[110px] h-9 px-2 text-right bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg text-sm font-mono font-bold outline-none ml-auto"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 text-center">
-                                                        <button
-                                                            onClick={() => setInvoiceItems(invoiceItems.filter((_, idx) => idx !== i))}
-                                                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-500 transition-colors mx-auto"
-                                                        >
-                                                            🗑️
-                                                        </button>
-                                                    </td>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'center', width: '90px' }}>KDV %</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'right', width: '120px' }}>KDV TUTARI</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'right', width: '160px' }}>BRÜT TOPLAM</th>
+                                                    <th style={{ width: '60px' }}></th>
                                                 </tr>
-                                            );
-                                        })}
-                                    </EnterpriseTable>
-                                </EnterpriseCard>
+                                            </thead>
+                                            <tbody>
+                                                {invoiceItems.map((it: any, i: number) => {
+                                                    const qty = Number(it.qty || 1);
+                                                    const netPrice = Number(it.price || 0);
+                                                    const vatRate = Number(it.vat || 20);
+                                                    const otvRate = Number(it.otv || 0);
+
+                                                    const lineNetTotal = qty * netPrice;
+                                                    const otvAmount = lineNetTotal * (otvRate / 100);
+                                                    const vatMatrah = lineNetTotal + otvAmount;
+                                                    const vatAmount = vatMatrah * (vatRate / 100);
+                                                    const lineGrossTotal = vatMatrah + vatAmount;
+
+                                                    const updateItem = (field: string, val: any) => {
+                                                        const newItems = [...invoiceItems];
+                                                        newItems[i][field] = val;
+                                                        setInvoiceItems(newItems);
+                                                    };
+
+                                                    const handleGrossChange = (newGross: number) => {
+                                                        if (qty === 0) return;
+                                                        const calculatedNet = newGross / (qty * (1 + otvRate / 100) * (1 + vatRate / 100));
+                                                        updateItem('price', calculatedNet);
+                                                    };
+
+                                                    return (
+                                                        <tr key={it.id || i} style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '14px', transition: 'background 0.2s' }} className="hover:bg-white/5">
+                                                            <td style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted, #888)', fontWeight: '700' }}>{i + 1}</td>
+                                                            <td style={{ padding: '20px' }}>
+                                                                <div className="flex-col gap-2">
+                                                                    <select
+                                                                        value={it.productId || ''}
+                                                                        onChange={(e) => {
+                                                                            const selectedProduct = products.find(p => String(p.id) === e.target.value);
+                                                                            if (selectedProduct) {
+                                                                                const currentItems = JSON.parse(JSON.stringify(invoiceItems));
+                                                                                currentItems[i] = {
+                                                                                    ...currentItems[i],
+                                                                                    productId: selectedProduct.id,
+                                                                                    name: selectedProduct.name,
+                                                                                    price: Number(selectedProduct.price || 0),
+                                                                                    vat: Number(selectedProduct.salesVat || 20),
+                                                                                    otv: Number(selectedProduct.salesOtv || 0),
+                                                                                    otvCode: selectedProduct.otvCode || '0071',
+                                                                                    otvType: selectedProduct.otvType || 'Ö.T.V yok',
+                                                                                    oiv: Number(selectedProduct.salesOiv || 0),
+                                                                                    description: selectedProduct.showDescriptionOnInvoice ? (selectedProduct.description || '') : '',
+                                                                                    showDesc: selectedProduct.showDescriptionOnInvoice ? true : false
+                                                                                };
+                                                                                setInvoiceItems(currentItems);
+                                                                            }
+                                                                        }}
+                                                                        style={{
+                                                                            width: '100%',
+                                                                            background: 'var(--bg-card, rgba(255,255,255,0.05))',
+                                                                            border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                                                                            color: 'var(--text-main, white)',
+                                                                            fontWeight: '700',
+                                                                            padding: '12px 16px',
+                                                                            borderRadius: '12px',
+                                                                            cursor: 'pointer',
+                                                                            fontSize: '14px'
+                                                                        }}
+                                                                    >
+                                                                        <option value="">Ürün veya hizmet seçin...</option>
+                                                                        {products.map(p => (
+                                                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                    {it.name && it.name !== 'Ürün' && (
+                                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', paddingLeft: '6px', fontWeight: '500' }}>
+                                                                            Seçili: {it.name}
+                                                                        </div>
+                                                                    )}
+                                                                    <div style={{ paddingLeft: '6px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                                        {(it.otvType && it.otvType !== 'Ö.T.V yok') && (
+                                                                            <span style={{ fontSize: '10px', background: 'rgba(245,158,11,0.15)', color: '#f59e0b', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(245,158,11,0.2)', fontWeight: '800' }}>
+                                                                                {it.otvType === 'yüzdesel Ö.T.V' ? `ÖTV %${it.otv}` : `ÖTV ${it.otv} ₺`}
+                                                                            </span>
+                                                                        )}
+                                                                        {(Number(it.oiv || 0) > 0) && (
+                                                                            <span style={{ fontSize: '10px', background: 'rgba(59,130,246,0.15)', color: '#60a5fa', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(59,130,246,0.2)', fontWeight: '800' }}>
+                                                                                ÖİV %${it.oiv}
+                                                                            </span>
+                                                                        )}
+                                                                            <button
+                                                                                onClick={() => updateItem('showDesc', !it.showDesc)}
+                                                                                style={{ fontSize: '11px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: it.showDesc ? '#3b82f6' : 'var(--text-muted, #aaa)', border: `1px dashed ${it.showDesc ? '#3b82f6' : 'var(--border-color, rgba(255,255,255,0.2))'}`, padding: '4px 10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', fontWeight: '700' }}
+                                                                                className="hover:border-blue-500 hover:text-blue-500"
+                                                                            >
+                                                                                📝 {it.showDesc ? 'Açıklamayı Gizle' : 'Açıklama Ekle'}
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => setTaxEditIndex(i)}
+                                                                                style={{ fontSize: '11px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-muted, #aaa)', border: '1px dashed var(--border-color, rgba(255,255,255,0.2))', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', fontWeight: '700' }}
+                                                                                className="hover:border-blue-500 hover:text-blue-500"
+                                                                            >
+                                                                                ⚙️ Vergi Ayarı
+                                                                            </button>
+                                                                        </div>
+                                                                        {it.showDesc && (
+                                                                            <div style={{ marginTop: '12px' }} className="animate-in fade-in slide-in-from-top-1 duration-200">
+                                                                                <textarea
+                                                                                    placeholder="Malzeme / Hizmet Açıklaması (Örn: ŞASE NO: XYZ, Motor NO: 123...)"
+                                                                                    value={it.description || ''}
+                                                                                    onChange={(e) => updateItem('description', e.target.value)}
+                                                                                    style={{ width: '100%', background: 'var(--bg-card, rgba(255,255,255,0.02))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', padding: '10px 14px', borderRadius: '10px', fontSize: '13px', resize: 'vertical', minHeight: '60px', outline: 'none' }}
+                                                                                    className="focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all custom-scrollbar"
+                                                                                />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                            </td>
+                                                            <td style={{ padding: '20px', textAlign: 'center' }}>
+                                                                <input
+                                                                    type="number"
+                                                                    value={it.qty}
+                                                                    onChange={(e) => updateItem('qty', Number(e.target.value))}
+                                                                    style={{ width: '70px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', textAlign: 'center', borderRadius: '10px', padding: '12px 8px', fontWeight: '700' }}
+                                                                />
+                                                            </td>
+                                                            <td style={{ padding: '20px', textAlign: 'right' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                                                                    <input
+                                                                        type="number"
+                                                                        step="0.0001"
+                                                                        value={netPrice > 0 ? Number(netPrice.toFixed(4)) : ''}
+                                                                        placeholder="0.00"
+                                                                        onChange={(e) => updateItem('price', Number(e.target.value))}
+                                                                        style={{ width: '120px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', textAlign: 'right', borderRadius: '10px', padding: '12px 10px', fontWeight: '700', fontFamily: 'monospace' }}
+                                                                    />
+                                                                    <span style={{ color: 'var(--text-muted, #888)', fontSize: '12px', fontWeight: '700' }}>₺ + KDV</span>
+                                                                </div>
+                                                            </td>
+
+                                                            <td style={{ padding: '20px', textAlign: 'center' }}>
+                                                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={it.vat}
+                                                                        onChange={(e) => updateItem('vat', Number(e.target.value))}
+                                                                        style={{ width: '64px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', textAlign: 'center', borderRadius: '10px', padding: '12px 20px 12px 8px', fontWeight: '700' }}
+                                                                    />
+                                                                    <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--text-muted, #888)', pointerEvents: 'none' }}>%</span>
+                                                                </div>
+                                                            </td>
+                                                            <td style={{ padding: '20px', textAlign: 'right', color: 'var(--text-muted, #888)', fontFamily: 'monospace', fontWeight: '700', fontSize: '15px' }}>
+                                                                {vatAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
+                                                            </td>
+                                                            <td style={{ padding: '20px', textAlign: 'right' }}>
+                                                                <input
+                                                                    type="number"
+                                                                    value={lineGrossTotal.toFixed(2)}
+                                                                    onChange={(e) => handleGrossChange(Number(e.target.value))}
+                                                                    style={{ width: '130px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.4)', color: '#3b82f6', textAlign: 'right', borderRadius: '10px', fontWeight: '900', fontFamily: 'monospace', padding: '12px 10px', fontSize: '15px' }}
+                                                                />
+                                                            </td>
+                                                            <td style={{ padding: '20px', textAlign: 'center' }}>
+                                                                <button onClick={() => setInvoiceItems(invoiceItems.filter((_, idx) => idx !== i))} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', cursor: 'pointer', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-red-500 hover:text-white">🗑️</button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
 
                                 {/* Section: Totals Summary */}
-                                <div className="flex justify-end">
-                                    <EnterpriseCard className="w-[480px] bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/50">
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <div style={{ width: '480px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.1) 100%)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(59, 130, 246, 0.2)', boxShadow: '0 12px 30px rgba(59, 130, 246, 0.15)' }}>
                                         {(() => {
                                             const subtotal = invoiceItems.reduce((acc, it) => acc + (Number(it.qty) * Number(it.price)), 0);
 
@@ -1876,68 +1878,63 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             const finalTotal = subtotal + totalOtv + totalOiv + totalVat - discAmount;
 
                                             return (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-semibold text-slate-500">Ara Toplam (Net)</span>
-                                                        <span className="font-mono font-bold text-[15px]">{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                <div className="flex-col gap-4">
+                                                    <div className="flex-between">
+                                                        <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>Ara Toplam (Net)</span>
+                                                        <span style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
 
                                                     {totalOtv > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-sm font-semibold text-slate-500">ÖTV Toplam</span>
-                                                            <span className="font-mono font-bold text-[15px] text-amber-500">{totalOtv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                        <div className="flex-between">
+                                                            <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>ÖTV Toplam</span>
+                                                            <span style={{ fontWeight: '800', fontSize: '15px', color: '#f59e0b', fontFamily: 'monospace' }}>{totalOtv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                         </div>
                                                     )}
 
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-sm font-semibold text-slate-500">İskonto</span>
+                                                    <div className="flex-between">
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                            <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>İskonto (İndirim)</span>
                                                             <select
                                                                 value={discountType}
                                                                 onChange={(e: any) => setDiscountType(e.target.value)}
-                                                                className="px-2 py-1 text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md outline-none"
+                                                                style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '13px', fontWeight: '800' }}
                                                             >
-                                                                <option value="percent">% (Yüzde)</option>
+                                                                <option value="percent">% Yüzde</option>
                                                                 <option value="amount">₺ Tutar</option>
                                                             </select>
                                                             <input
                                                                 type="number"
                                                                 value={discountValue}
                                                                 onChange={(e) => setDiscountValue(Number(e.target.value))}
-                                                                className="w-20 px-2 py-1 text-center text-sm font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md outline-none focus:ring-1 focus:ring-slate-300"
+                                                                style={{ width: '80px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '14px', padding: '6px 12px', fontWeight: '800', textAlign: 'center' }}
                                                             />
                                                         </div>
-                                                        <span className="font-mono font-bold text-[15px] text-red-500">- {discAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                        <span style={{ fontWeight: '800', fontSize: '15px', color: '#ef4444', fontFamily: 'monospace' }}>- {discAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
 
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-semibold text-slate-500">KDV Toplam</span>
-                                                        <span className="font-mono font-bold text-[15px]">{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                    <div className="flex-between">
+                                                        <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>KDV Toplam</span>
+                                                        <span style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
 
-                                                    <div className="h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
+                                                    <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.4) 50%, transparent 100%)', margin: '20px 0' }}></div>
 
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-base font-bold tracking-widest text-slate-900 dark:text-white">GENEL TOPLAM</span>
-                                                        <span className="text-3xl font-mono font-black text-blue-600 dark:text-blue-500 tracking-tight">
-                                                            {finalTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl text-blue-400 opacity-80">₺</span>
-                                                        </span>
+                                                    <div className="flex-between items-center">
+                                                        <span style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '1px' }}>GENEL TOPLAM</span>
+                                                        <span style={{ fontSize: '32px', fontWeight: '900', color: '#3b82f6', letterSpacing: '-1px', textShadow: '0 4px 12px rgba(59,130,246,0.3)', fontFamily: 'monospace' }}>{finalTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span style={{ fontSize: '20px', opacity: 0.8 }}>₺</span></span>
                                                     </div>
                                                 </div>
                                             );
                                         })()}
-                                    </EnterpriseCard>
+                                    </div>
                                 </div>
 
                             </div>
 
                             {/* Footer Actions */}
-                            <div className="px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 mt-auto shrink-0">
-                                <EnterpriseButton variant="secondary" onClick={() => setInvoiceModalOpen(false)} className="w-32">
-                                    İPTAL
-                                </EnterpriseButton>
-                                <EnterpriseButton
-                                    variant="primary"
+                            <div style={{ padding: '24px 40px', background: 'var(--bg-panel, rgba(15, 23, 42, 0.95))', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', gap: '20px', justifyContent: 'flex-end' }}>
+                                <button onClick={() => setInvoiceModalOpen(false)} className="btn btn-outline" style={{ minWidth: '160px', height: '60px', borderRadius: '16px', fontWeight: '800', fontSize: '15px', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', color: 'var(--text-main, #fff)', background: 'var(--bg-card, rgba(255,255,255,0.05))', letterSpacing: '1px' }}>İPTAL ET</button>
+                                <button
                                     disabled={isConverting}
                                     onClick={() => {
                                         const data = {
@@ -1968,16 +1965,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         };
                                         triggerInvoiceConversion(data);
                                     }}
-                                    className="min-w-[200px]"
+                                    style={{ minWidth: '260px', height: '60px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 12px 24px rgba(37, 99, 235, 0.4)', fontSize: '16px', letterSpacing: '1px', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
+                                    className={isConverting ? "opacity-70" : "hover:-translate-y-1 hover:shadow-2xl"}
                                 >
                                     {isConverting ? (
-                                        <><div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div> İŞLENİYOR...</>
+                                        <><div className="loader border-t-white w-5 h-5 rounded-full border-2 border-white/20 animate-spin"></div> İŞLENİYOR...</>
                                     ) : (
-                                        <>FATURAYI ONAYLA</>
+                                        <><span>✅</span> FATURAYI ONAYLA</>
                                     )}
-                                </EnterpriseButton>
+                                </button>
                             </div>
-                        </EnterpriseCard>
+                        </div>
                     </div>
                 )
             }
@@ -1986,168 +1984,154 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* INVOICE SUCCESS & SHARE MODAL */}
             {
                 shareModalOpen && lastInvoice && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[4000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-md text-center bg-white dark:bg-slate-900 shadow-2xl animate-in zoom-in-95 duration-200 border-emerald-500/30">
-                            <div className="w-24 h-24 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center text-5xl mx-auto mb-6 shadow-sm shadow-emerald-500/20">
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '480px', padding: '48px 40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5), 0 0 60px rgba(16, 185, 129, 0.15)' }}>
+                            <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '64px', margin: '0 auto 32px', boxShadow: '0 12px 30px rgba(16, 185, 129, 0.2)' }}>
                                 🎉
                             </div>
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Fatura Hazır!</h2>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-8 px-4">
-                                Resmi faturanız başarıyla oluşturuldu ve GİB sistemine entegre edildi.
-                            </p>
+                            <h2 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--text-main, #fff)', marginBottom: '12px', letterSpacing: '-0.5px' }}>Fatura Hazır!</h2>
+                            <p style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '15px', marginBottom: '40px', lineHeight: '1.6', fontWeight: '500' }}>Resmi faturanız başarıyla oluşturuldu ve GİB sistemine entegre edildi.</p>
 
-                            <div className="flex flex-col gap-3">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 <button
                                     onClick={() => {
                                         const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                         window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                     }}
-                                    className="w-full h-14 rounded-xl flex items-center justify-center gap-3 font-semibold text-white bg-green-500 hover:bg-green-600 shadow-sm shadow-green-500/30 transition-all hover:-translate-y-0.5"
+                                    className="btn btn-primary hover:-translate-y-1"
+                                    style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)', boxShadow: '0 8px 24px rgba(37, 211, 102, 0.3)', border: 'none', height: '64px', borderRadius: '20px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
                                 >
-                                    <span className="text-2xl">💬</span> Müşteriye WhatsApp'tan İlet
+                                    <span style={{ fontSize: '24px' }}>💬</span> Müşteriye WhatsApp'tan İlet
                                 </button>
-
-                                <EnterpriseButton
-                                    variant="secondary"
+                                <button
                                     onClick={() => {
                                         window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                     }}
-                                    className="h-14 font-semibold text-base"
+                                    className="btn btn-outline hover:bg-white/10"
+                                    style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
                                 >
-                                    <span className="text-2xl mr-2">📧</span> E-Posta ile Gönder
-                                </EnterpriseButton>
+                                    <span style={{ fontSize: '24px' }}>📧</span> E-Posta ile Gönder
+                                </button>
                                 
                                 {lastInvoice?.description?.includes('Senet') && (
                                     <button
-                                        onClick={() => setOtpModalOpen(true)}
-                                        className="w-full h-14 rounded-xl flex items-center justify-center gap-3 font-semibold text-amber-700 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 transition-colors hover:bg-amber-100 dark:hover:bg-amber-500/20"
+                                        onClick={() => {
+                                            setOtpModalOpen(true);
+                                        }}
+                                        className="btn btn-primary"
+                                        style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.2) 100%)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
                                     >
-                                        <span className="text-xl">✍️</span> Seneti Yazdır / OTP İmzaya Sun
+                                        <span style={{ fontSize: '24px' }}>✍️</span> Seneti Yazdır / OTP İmzaya Sun
                                     </button>
                                 )}
-
                                 <button
                                     onClick={() => window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`, '_blank')}
-                                    className="mt-2 text-sm font-semibold text-blue-600 dark:text-blue-500 hover:underline flex items-center justify-center gap-2"
+                                    style={{ marginTop: '16px', background: 'none', border: 'none', color: '#3b82f6', fontSize: '15px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                                    className="hover:text-blue-400"
                                 >
-                                    <span className="text-lg">📄</span> PDF İndir / Görüntüle
+                                    <span>📄</span> PDF İndir / Görüntüle
                                 </button>
                             </div>
 
                             <button
                                 onClick={() => setShareModalOpen(false)}
-                                className="mt-8 w-full p-4 rounded-xl font-bold tracking-wide text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 transition-colors"
+                                style={{ marginTop: '48px', width: '100%', padding: '20px', background: 'var(--bg-card, rgba(255,255,255,0.02))', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', borderRadius: '20px', color: 'var(--text-muted, #888)', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', letterSpacing: '1px' }}
+                                className="hover:bg-white/5 hover:text-white"
                             >
                                 PENCEREYİ KAPAT
                             </button>
-                        </EnterpriseCard>
+                        </div>
                     </div>
                 )
             }
 
             {/* INSTALLMENT PROMPT MODAL */}
             {installmentPrompt.isOpen && (
-                <div className="fixed inset-0 bg-slate-900/80 z-[6000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                    <EnterpriseCard className="w-full max-w-xl animate-in zoom-in-95 duration-200 shadow-2xl border-blue-500/30">
-                        <div className="flex justify-between items-center mb-8 pb-4 border-b border-slate-200 dark:border-slate-800">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                                <span className="text-2xl">💼</span> Vadelendirme Seçimi
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '540px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '24px' }}>💼</span> Vadelendirme Seçimi
                             </h3>
-                            <button
-                                onClick={() => setInstallmentPrompt({ isOpen: false, type: null })}
-                                className="text-2xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                            >
-                                &times;
-                            </button>
+                            <button onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
                         </div>
 
                         {installmentPrompt.type === 'NO_DIFFERENCE' && (
-                            <div className="flex flex-col gap-6">
-                                <p className="text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Bu siparişin <strong>{installmentPrompt.paidAmount?.toLocaleString('tr-TR')} ₺</strong>&apos;lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.
+                            <div className="flex-col gap-6">
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
+                                    Bu siparişin <strong>{installmentPrompt.paidAmount?.toLocaleString('tr-TR')} ₺</strong>'lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.
                                 </p>
-                                <p className="text-[15px] text-amber-700 dark:text-amber-500 font-semibold p-4 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20">
-                                    Eğer bu işleme yinede vade yapmak istiyorsanız Vadelendir&apos;e basarak önceki tahsilatı iptal edip tüm bakiyeyi vadelendirebilirsiniz.
+                                <p style={{ fontSize: '15px', color: '#f59e0b', fontWeight: '600', padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                                    Eğer bu işleme yinede vade yapmak istiyorsanız Vadelendir'e basarak önceki tahsilatı iptal edip tüm bakiyeyi vadelendirebilirsiniz.
                                 </p>
-                                <div className="flex gap-4 mt-2">
-                                    <EnterpriseButton variant="secondary" onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} className="flex-1">
-                                        İPTAL
-                                    </EnterpriseButton>
-                                    <EnterpriseButton
-                                        variant="primary"
+                                <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                                    <button onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} style={{ flex: 1, padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700' }} className="hover:bg-white/10">İPTAL</button>
+                                    <button 
                                         onClick={() => {
                                             const data = { ...installmentPrompt.invoiceData, cancelPreviousPayment: true };
                                             setInstallmentPrompt({ isOpen: false, type: null });
                                             proceedWithInvoice(data, installmentPrompt.newTotalAmount || 0);
-                                        }}
-                                        className="flex-1"
-                                    >
+                                        }} 
+                                        style={{ flex: 1, padding: '16px', borderRadius: '12px', background: '#3b82f6', color: 'white', border: 'none', fontWeight: '800' }} className="hover:bg-blue-600">
                                         TÜMÜNÜ VADELENDİR
-                                    </EnterpriseButton>
+                                    </button>
                                 </div>
                             </div>
                         )}
 
                         {installmentPrompt.type === 'PARTIAL_PAYMENT' && (
-                            <div className="flex flex-col gap-6">
-                                <p className="text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Bu siparişin <strong>{installmentPrompt.paidAmount?.toLocaleString('tr-TR')} ₺</strong>&apos;lik kısmı tahsil edilmiş. Yeni genel toplam: <strong>{installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺</strong>.
+                            <div className="flex-col gap-6">
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
+                                    Bu siparişin <strong>{installmentPrompt.paidAmount?.toLocaleString('tr-TR')} ₺</strong>'lik kısmı tahsil edilmiş. Yeni genel toplam: <strong>{installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺</strong>.
                                 </p>
-                                <p className="text-sm text-slate-900 dark:text-white font-medium">
+                                <p style={{ fontSize: '14px', color: '#fff', fontWeight: '500' }}>
                                     Lütfen ne yapmak istediğinizi seçin:
                                 </p>
-                                
-                                <button
+                                <button 
                                     onClick={() => {
                                         setInstallmentPrompt({ isOpen: false, type: null });
                                         proceedWithInvoice(installmentPrompt.invoiceData, installmentPrompt.difference || 0);
                                     }}
-                                    className="p-4 rounded-xl text-left flex flex-col gap-1 border border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5 hover:bg-blue-100 dark:hover:bg-blue-500/10 transition-colors"
-                                >
-                                    <span className="text-base font-bold text-blue-600 dark:text-blue-500">1. Sadece Kalanı Vadelendir</span>
-                                    <span className="text-sm text-slate-500 dark:text-slate-400">Sadece yeni eklenen/kalan tutar ({installmentPrompt.difference?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
+                                    style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid rgba(59, 130, 246, 0.3)', fontWeight: '700', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '4px' }} className="hover:bg-blue-500/10">
+                                    <span style={{ fontSize: '16px', color: '#3b82f6' }}>1. Sadece Kalanı Vadelendir</span>
+                                    <span style={{ fontSize: '13px', color: 'var(--text-muted, #888)' }}>Sadece yeni eklenen/kalan tutar ({installmentPrompt.difference?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
                                 </button>
                                 
-                                <button
+                                <button 
                                     onClick={() => {
                                         const data = { ...installmentPrompt.invoiceData, cancelPreviousPayment: true };
                                         setInstallmentPrompt({ isOpen: false, type: null });
                                         proceedWithInvoice(data, installmentPrompt.newTotalAmount || 0);
                                     }}
-                                    className="p-4 rounded-xl text-left flex flex-col gap-1 border border-amber-200 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 hover:bg-amber-100 dark:hover:bg-amber-500/10 transition-colors"
-                                >
-                                    <span className="text-base font-bold text-amber-600 dark:text-amber-500">2. Eski Tahsilatı İptal Et & Tümünü Vadelendir</span>
-                                    <span className="text-sm text-slate-500 dark:text-slate-400">Önceki tahsilat iptal edilecek ve tüm tutar ({installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
+                                    style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid rgba(245, 158, 11, 0.3)', fontWeight: '700', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '4px' }} className="hover:bg-amber-500/10">
+                                    <span style={{ fontSize: '16px', color: '#f59e0b' }}>2. Eski Tahsilatı İptal Et & Tümünü Vadelendir</span>
+                                    <span style={{ fontSize: '13px', color: 'var(--text-muted, #888)' }}>Önceki tahsilat iptal edilecek ve tüm tutar ({installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
                                 </button>
                             </div>
                         )}
 
                         {installmentPrompt.type === 'NO_PAYMENT' && (
-                            <div className="flex flex-col gap-6">
-                                <p className="text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <div className="flex-col gap-6">
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
                                     Girdiğiniz fatura kalemlerinin genel toplamı <strong>{installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺</strong>.
                                 </p>
-                                
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 mb-2 tracking-wider">VADELENDİRMEK İSTEDİĞİNİZ TUTAR:</label>
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            value={customInstallAmount}
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '12px', fontWeight: '800', color: 'white' }}>VADELENDİRMEK İSTEDİĞİNİZ TUTAR:</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input 
+                                            type="number" 
+                                            value={customInstallAmount} 
                                             onChange={e => setCustomInstallAmount(e.target.value)}
-                                            className="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-blue-500 text-slate-900 dark:text-white text-lg font-bold font-mono outline-none focus:ring-2 focus:ring-blue-500/30 transition-shadow pr-10"
+                                            style={{ width: '100%', padding: '16px 20px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid #3b82f6', color: 'white', fontSize: '18px', fontWeight: '800', fontFamily: 'monospace' }}
                                         />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₺</span>
+                                        <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', color: '#888', fontWeight: '700' }}>₺</span>
                                     </div>
-                                    <span className="block mt-2 text-xs text-slate-400">Farklı bir tutar girmek istiyorsanız yukarıya yazınız. Geri kalan açık hesap carisine yansır.</span>
+                                    <span style={{ fontSize: '12px', color: '#888' }}>Farklı bir tutar girmek istiyorsanız yukarıya yazınız. Geri kalan açık hesap carisine yansır.</span>
                                 </div>
                                 
-                                <div className="flex gap-4 mt-2">
-                                    <EnterpriseButton variant="secondary" onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} className="flex-1">
-                                        İPTAL
-                                    </EnterpriseButton>
-                                    <EnterpriseButton
-                                        variant="primary"
+                                <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                                    <button onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} style={{ flex: 1, padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700' }} className="hover:bg-white/10">İPTAL</button>
+                                    <button 
                                         onClick={() => {
                                             const parsedAmount = parseFloat(customInstallAmount.replace(',', '.'));
                                             if (isNaN(parsedAmount) || parsedAmount <= 0) {
@@ -2156,72 +2140,51 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             }
                                             setInstallmentPrompt({ isOpen: false, type: null });
                                             proceedWithInvoice(installmentPrompt.invoiceData, parsedAmount);
-                                        }}
-                                        className="flex-1"
-                                    >
+                                        }} 
+                                        style={{ flex: 1, padding: '16px', borderRadius: '12px', background: '#3b82f6', color: 'white', border: 'none', fontWeight: '800' }} className="hover:bg-blue-600">
                                         ONAYLA VE DEVAM ET
-                                    </EnterpriseButton>
+                                    </button>
                                 </div>
                             </div>
                         )}
-                    </EnterpriseCard>
+                    </div>
                 </div>
             )}
 
             {
                 taxEditIndex !== null && invoiceItems[taxEditIndex] && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[5000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-md animate-in zoom-in-95 duration-200 shadow-2xl border-blue-500/30">
-                            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                                    <span className="text-2xl">⚙️</span> Ek Vergi Parametreleri
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '480px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span style={{ fontSize: '24px' }}>⚙️</span> Ek Vergi Parametreleri
                                 </h3>
-                                <button
-                                    onClick={() => setTaxEditIndex(null)}
-                                    className="text-2xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                                >
-                                    &times;
-                                </button>
+                                <button onClick={() => setTaxEditIndex(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
                             </div>
 
-                            <div className="flex flex-col gap-5">
-                                <EnterpriseSelect
-                                    label="Ö.T.V UYGULAMA TİPİ"
-                                    value={invoiceItems[taxEditIndex].otvType || 'Ö.T.V yok'}
-                                    onChange={(e) => {
-                                        const newItems = [...invoiceItems];
-                                        newItems[taxEditIndex].otvType = e.target.value;
-                                        if (e.target.value === 'Ö.T.V yok') newItems[taxEditIndex].otv = 0;
-                                        setInvoiceItems(newItems);
-                                    }}
-                                >
-                                    <option value="Ö.T.V yok">🟢 Uygulanmasın (Yok)</option>
-                                    <option value="yüzdesel Ö.T.V">🔵 Yüzde Oranlı (%)</option>
-                                    <option value="maktu Ö.T.V">🟠 Sabit Tutarlı (₺)</option>
-                                </EnterpriseSelect>
+                            <div className="flex-col gap-6">
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>Ö.T.V UYGULAMA TİPİ</label>
+                                    <select
+                                        value={invoiceItems[taxEditIndex].otvType || 'Ö.T.V yok'}
+                                        onChange={(e) => {
+                                            const newItems = [...invoiceItems];
+                                            newItems[taxEditIndex].otvType = e.target.value;
+                                            if (e.target.value === 'Ö.T.V yok') newItems[taxEditIndex].otv = 0;
+                                            setInvoiceItems(newItems);
+                                        }}
+                                        style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '15px' }}
+                                    >
+                                        <option value="Ö.T.V yok">🟢 Uygulanmasın (Yok)</option>
+                                        <option value="yüzdesel Ö.T.V">🔵 Yüzde Oranlı (%)</option>
+                                        <option value="maktu Ö.T.V">🟠 Sabit Tutarlı (₺)</option>
+                                    </select>
+                                </div>
 
                                 {invoiceItems[taxEditIndex].otvType !== 'Ö.T.V yok' && (
-                                    <div className="animate-in slide-in-from-top-2 duration-200 space-y-4">
-                                        <EnterpriseSelect
-                                            label="Ö.T.V KODU (LİSTE)"
-                                            value={invoiceItems[taxEditIndex].otvCode || '0071'}
-                                            onChange={(e) => {
-                                                const newItems = [...invoiceItems];
-                                                newItems[taxEditIndex].otvCode = e.target.value;
-                                                setInvoiceItems(newItems);
-                                            }}
-                                        >
-                                            <option value="0071">0071 - Petrol ve doğalgaz ürünleri (ÖTV 1. Liste)</option>
-                                            <option value="0073">0073 - Motorlu taşıt araçları (ÖTV 2. Liste)</option>
-                                            <option value="0074">0074 - Kolalı gazoz, alkollü içecekler (ÖTV 3. Liste)</option>
-                                            <option value="0075">0075 - Dayanıklı tüketim ve diğer mallar (ÖTV 4. Liste)</option>
-                                            <option value="0076">0076 - Alkollü içecekler (ÖTV 3A Liste)</option>
-                                            <option value="0077">0077 - Tütün mamülleri (ÖTV 3B Liste)</option>
-                                            <option value="0078">0078 - Kolalı gazozlar (ÖTV 3C Liste)</option>
-                                        </EnterpriseSelect>
-
-                                        <EnterpriseInput
-                                            label={`BELİRLENEN Ö.T.V ${invoiceItems[taxEditIndex].otvType === 'yüzdesel Ö.T.V' ? 'ORANI (%)' : 'TUTARI (₺)'}`}
+                                    <div className="flex-col gap-2 animate-scale-in">
+                                        <label style={{ fontSize: '11px', fontWeight: '800', color: '#f59e0b', letterSpacing: '0.5px' }}>BELİRLENEN Ö.T.V {invoiceItems[taxEditIndex].otvType === 'yüzdesel Ö.T.V' ? 'ORANI (%)' : 'TUTARI (₺)'}</label>
+                                        <input
                                             type="number"
                                             value={invoiceItems[taxEditIndex].otv || 0}
                                             onChange={(e) => {
@@ -2229,15 +2192,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 newItems[taxEditIndex].otv = Number(e.target.value);
                                                 setInvoiceItems(newItems);
                                             }}
-                                            className="text-amber-600 dark:text-amber-500 font-bold font-mono text-center text-lg bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 focus:border-amber-400 focus:ring-amber-400/30"
+                                            style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#f59e0b', fontWeight: '900', fontSize: '20px', textAlign: 'center' }}
                                         />
                                     </div>
                                 )}
 
-                                <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
-                                    <div className="relative">
-                                        <EnterpriseInput
-                                            label="ÖZEL İLETİŞİM VERGİSİ (Ö.İ.V %)"
+                                <div className="flex-col gap-2 pt-4" style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>ÖZEL İLETİŞİM VERGİSİ (Ö.İ.V %)</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
                                             type="number"
                                             value={invoiceItems[taxEditIndex].oiv || 0}
                                             onChange={(e) => {
@@ -2246,21 +2209,21 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 setInvoiceItems(newItems);
                                             }}
                                             placeholder="0"
-                                            className="pr-8"
+                                            style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '16px' }}
                                         />
-                                        <span className="absolute right-3 top-[34px] font-bold text-slate-400">%</span>
+                                        <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', fontWeight: '800', color: 'var(--text-muted, #888)' }}>%</span>
                                     </div>
                                 </div>
 
-                                <EnterpriseButton
-                                    variant="primary"
+                                <button
                                     onClick={() => setTaxEditIndex(null)}
-                                    className="w-full mt-4"
+                                    style={{ width: '100%', marginTop: '24px', padding: '18px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)', fontSize: '15px', letterSpacing: '1px', transition: 'all 0.2s' }}
+                                    className="hover:-translate-y-1 hover:shadow-sm"
                                 >
                                     AYARLARI ONAYLA ✅
-                                </EnterpriseButton>
+                                </button>
                             </div>
-                        </EnterpriseCard>
+                        </div>
                     </div>
                 )
             }
@@ -2381,35 +2344,29 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* PRODUCT PICKER MODAL */}
             {
                 isProductPickerOpen && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[4000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-3xl animate-in zoom-in-95 duration-200 shadow-2xl border-blue-500/30">
-                            <div className="flex justify-between items-start mb-6">
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '700px', maxWidth: '95vw', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                                 <div>
-                                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Envanterden Ürün Seçimi</h3>
-                                    <div className="text-xs font-semibold text-blue-600 dark:text-blue-500 mt-1 uppercase tracking-wider">
-                                        Gerçek Zamanlı Stok & Fiyat Bilgisi
-                                    </div>
+                                    <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '900', color: 'var(--text-main, white)' }}>Envanterden Ürün Seçimi</h3>
+                                    <div style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '800', marginTop: '6px', letterSpacing: '1px' }}>GERÇEK ZAMANLI STOK & FİYAT BİLGİSİ</div>
                                 </div>
-                                <button
-                                    onClick={() => setIsProductPickerOpen(false)}
-                                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                >
-                                    <span className="text-2xl leading-none">&times;</span>
-                                </button>
+                                <button onClick={() => setIsProductPickerOpen(false)} style={{ width: '48px', height: '48px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', fontSize: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10">&times;</button>
                             </div>
 
-                            <div className="relative mb-6">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">🔍</span>
+                            <div style={{ position: 'relative', marginBottom: '24px' }}>
+                                <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5, fontSize: '20px' }}>🔍</span>
                                 <input
                                     autoFocus
                                     placeholder="Ürün adı, barkod veya stok kodu ile arayın..."
                                     value={productSearchTerm}
                                     onChange={(e) => setProductSearchTerm(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:border-blue-500 dark:focus:border-blue-500/50 text-slate-900 dark:text-white font-medium outline-none transition-colors"
+                                    style={{ width: '100%', padding: '18px 20px 18px 56px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontSize: '15px', fontWeight: '600' }}
+                                    className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors"
                                 />
                             </div>
 
-                            <div className="max-h-[480px] overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-3">
+                            <div style={{ maxHeight: '480px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '12px' }} className="custom-scrollbar">
                                 {products
                                     .filter(p => !productSearchTerm || p.name.toLocaleLowerCase('tr').includes(productSearchTerm.toLocaleLowerCase('tr')) || p.barcode?.includes(productSearchTerm) || p.code?.includes(productSearchTerm))
                                     .slice(0, 50)
@@ -2458,46 +2415,42 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     setIsProductPickerOpen(false);
                                                     setProductSearchTerm('');
                                                 }}
-                                                className="group p-4 bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:border-blue-500/50 hover:bg-blue-50 dark:hover:bg-blue-500/5 transition-all flex justify-between items-center"
+                                                style={{ padding: '20px', borderRadius: '20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s' }}
+                                                className="hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-0.5 hover:shadow-sm"
                                             >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-lg flex items-center justify-center text-xl text-blue-600 dark:text-blue-500">
+                                                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                                    <div style={{ width: '52px', height: '52px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: '#3b82f6', fontWeight: '800', boxShadow: 'inset 0 0 12px rgba(59, 130, 246, 0.2)' }}>
                                                         {p.category?.charAt(0) || '📦'}
                                                     </div>
                                                     <div>
-                                                        <div className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{p.name}</div>
-                                                        <div className="text-xs text-slate-500 font-medium mt-1">
-                                                            Stok: <span className={p.stock > 0 ? "text-emerald-600 dark:text-emerald-500 font-bold" : "text-rose-500 font-bold"}>{p.stock}</span>
-                                                            <span className="mx-2 opacity-50">|</span> 
-                                                            Barkod: <span className="font-mono">{p.barcode || 'Yok'}</span>
+                                                        <div style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #eee)' }}>{p.name}</div>
+                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', marginTop: '4px', fontWeight: '500' }}>
+                                                            Stok: <span style={{ color: p.stock > 0 ? '#10b981' : '#ef4444', fontWeight: '800' }}>{p.stock}</span> <span style={{ margin: '0 6px', opacity: 0.3 }}>|</span> Barkod: <span style={{ fontFamily: 'monospace' }}>{p.barcode || 'Yok'}</span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="text-lg font-bold font-mono text-slate-900 dark:text-white">
-                                                        {grossPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
-                                                    </div>
-                                                    <div className="text-[10px] font-bold text-blue-600 dark:text-blue-500 mt-1 uppercase">
-                                                        %{vatRate} KDV DAHİL (BRÜT)
-                                                    </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <div style={{ fontWeight: '900', color: 'var(--text-main, #fff)', fontSize: '18px', fontFamily: 'monospace' }}>{grossPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                                    <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '800', marginTop: '2px' }}>%{vatRate} KDV DAHİL (BRÜT)</div>
                                                 </div>
                                             </div>
                                         );
                                     })}
                             </div>
 
-                            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                            <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', gap: '16px' }}>
                                 <button
                                     onClick={() => {
                                         setInvoiceItems([...invoiceItems, { name: 'Yeni Manuel Hizmet / Ürün', qty: 1, price: 0, vat: 20 }]);
                                         setIsProductPickerOpen(false);
                                     }}
-                                    className="w-full p-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-50 dark:bg-slate-900/30 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all font-bold flex items-center justify-center gap-2 text-sm"
+                                    style={{ flex: 1, padding: '18px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-muted, #aaa)', border: '1px dashed var(--border-color, rgba(255,255,255,0.2))', fontSize: '14px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                    className="hover:border-dashed hover:border-white/50 hover:bg-white/5 hover:text-white"
                                 >
-                                    <span className="text-lg">➕</span> Envanter Dışı Manuel Hizmet Ekle
+                                    <span>➕</span> Envanter Dışı Manuel Hizmet Ekle
                                 </button>
                             </div>
-                        </EnterpriseCard>
+                        </div>
                     </div>
                 )
             }
@@ -2505,68 +2458,62 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* CHECK COLLECT MODAL */}
             {
                 showCheckCollectModal && activeCheck && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-md animate-in zoom-in-95 duration-200 shadow-2xl border-blue-500/30">
-                            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                                    <span className="text-2xl">{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span>
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(15, 23, 42, 0.85)', zIndex: 10000,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                                <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-main, #fff)', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span>{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span>
                                     {activeCheck.type.includes('Alınan') ? 'Tahsilat Onayı' : 'Ödeme Çıkış Onayı'}
                                 </h3>
+                                <button onClick={() => setShowCheckCollectModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                <div style={{ padding: '24px', background: 'var(--bg-card, rgba(255,255,255,0.03))', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: '800', letterSpacing: '1px' }}>{activeCheck.type}</div>
+                                    <div style={{ fontSize: '36px', fontWeight: '900', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{Number(activeCheck.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span></div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #aaa)', marginTop: '8px', fontWeight: '600' }}>{activeCheck.bank} - <span style={{ fontFamily: 'monospace' }}>{activeCheck.number}</span></div>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    <label style={{ fontSize: '12px', color: 'var(--text-muted, #bbb)', fontWeight: '800', letterSpacing: '0.5px' }}>{activeCheck.type.includes('Alınan') ? 'TAHSİLATIN GEÇECEĞİ (GİRECEĞİ) HESAP' : 'ÖDEMENİN ÇIKACAĞI HESAP'}</label>
+                                    <select
+                                        value={targetKasaId}
+                                        onChange={(e) => setTargetKasaId(e.target.value)}
+                                        style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '15px', fontWeight: '700', outline: 'none' }}
+                                        className="focus:border-blue-500"
+                                    >
+                                        <option value="">İşlem yapılacak kasayı seçin...</option>
+                                        {kasalar.filter((k: any) => k.name !== 'ÇEK / SENET PORTFÖYÜ').map((k: any) => (
+                                            <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺)</option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 <button
-                                    onClick={() => setShowCheckCollectModal(false)}
-                                    className="text-2xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                                    onClick={handleExecuteCheckCollect}
+                                    disabled={isProcessingCollection || !targetKasaId}
+                                    style={{
+                                        width: '100%', padding: '20px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff',
+                                        border: 'none', fontWeight: '900', fontSize: '15px', cursor: 'pointer',
+                                        opacity: (isProcessingCollection || !targetKasaId) ? 0.6 : 1, transition: 'all 0.2s',
+                                        boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', letterSpacing: '1px',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                    }}
+                                    className={(!isProcessingCollection && targetKasaId) ? "hover:-translate-y-1 hover:shadow-sm" : ""}
                                 >
-                                    &times;
+                                    {isProcessingCollection ? (
+                                        <><div className="loader border-t-white w-4 h-4 rounded-full border-2 border-white/20 animate-spin"></div> İŞLENİYOR...</>
+                                    ) : (
+                                        <><span>✅</span> İŞLEMİ TAMAMLA</>
+                                    )}
                                 </button>
                             </div>
-
-                            <div className="flex flex-col gap-6">
-                                <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
-                                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                        {activeCheck.type}
-                                    </div>
-                                    <div className="text-3xl font-black font-mono text-slate-900 dark:text-white">
-                                        {Number(activeCheck.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-2xl text-slate-400 opacity-80">₺</span>
-                                    </div>
-                                    <div className="text-sm font-semibold text-slate-500 mt-2">
-                                        {activeCheck.bank} - <span className="font-mono">{activeCheck.number}</span>
-                                    </div>
-                                </div>
-
-                                <EnterpriseSelect
-                                    label={activeCheck.type.includes('Alınan') ? 'TAHSİLATIN GEÇECEĞİ KASA' : 'ÖDEMENİN ÇIKACAĞI HESAP'}
-                                    value={targetKasaId}
-                                    onChange={(e) => setTargetKasaId(e.target.value)}
-                                >
-                                    <option value="">İşlem yapılacak kasayı seçin...</option>
-                                    {kasalar.filter((k: any) => k.name !== 'ÇEK / SENET PORTFÖYÜ').map((k: any) => (
-                                        <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺)</option>
-                                    ))}
-                                </EnterpriseSelect>
-
-                                <div className="flex gap-4 pt-2">
-                                    <EnterpriseButton
-                                        variant="secondary"
-                                        onClick={() => setShowCheckCollectModal(false)}
-                                        className="flex-1"
-                                    >
-                                        İPTAL
-                                    </EnterpriseButton>
-                                    <EnterpriseButton
-                                        variant="primary"
-                                        onClick={handleExecuteCheckCollect}
-                                        disabled={isProcessingCollection || !targetKasaId}
-                                        className="flex-[2]"
-                                    >
-                                        {isProcessingCollection ? (
-                                            <><div className="loader border-t-white w-4 h-4 rounded-full border-2 border-white/20 animate-spin mr-2 inline-block align-middle"></div> İŞLENİYOR...</>
-                                        ) : (
-                                            <><span>✅</span> İŞLEMİ TAMAMLA</>
-                                        )}
-                                    </EnterpriseButton>
-                                </div>
-                            </div>
-                        </EnterpriseCard>
+                        </div>
                     </div>
                 )
             }
@@ -2574,83 +2521,82 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* PLAN MODAL */}
             {
                 showPlanModal && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[4000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-lg p-0 overflow-hidden animate-in zoom-in-95 duration-200 shadow-2xl border-amber-500/30 ring-1 ring-amber-500/10">
-                            <div className="px-8 py-6 border-b border-amber-500/10 dark:border-amber-500/10 flex justify-between items-center bg-gradient-to-br from-amber-500/10 to-amber-600/5">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                                    <span className="p-2 bg-amber-500 text-white rounded-xl text-lg shadow-[0_4px_12px_rgba(245,158,11,0.4)]">📅</span>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxWidth: '90vw', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'var(--bg-panel, #0f172a)', padding: '0', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%)' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span style={{ padding: '8px', background: '#f59e0b', borderRadius: '12px', fontSize: '18px', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)' }}>📅</span>
                                     Vadeli Satış Planı Oluştur
                                 </h3>
-                                <button
-                                    onClick={() => setShowPlanModal(false)}
-                                    className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 flex items-center justify-center text-xl transition-colors shrink-0"
-                                >
-                                    &times;
-                                </button>
+                                <button onClick={() => setShowPlanModal(false)} style={{ background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '20px', cursor: 'pointer', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10">&times;</button>
                             </div>
-                            
-                            <div className="p-8 flex flex-col gap-5 bg-white dark:bg-slate-900">
+                            <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                 <div>
-                                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">ÖDEME PLANI BAŞLIĞI</label>
+                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>ÖDEME PLANI BAŞLIĞI</label>
                                     <input
                                         value={planData.title}
                                         onChange={e => setPlanData({ ...planData, title: e.target.value })}
-                                        className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
+                                        className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-5">
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                     <div>
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TOPLAM TUTAR (₺)</label>
+                                        <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TOPLAM TUTAR (₺)</label>
                                         <input
                                             type="number"
                                             value={planData.totalAmount}
                                             onChange={e => setPlanData({ ...planData, totalAmount: e.target.value })}
-                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-black text-base font-mono outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                                            style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '900', fontSize: '16px', fontFamily: 'monospace' }}
+                                            className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TAKSİT / VADE SAYISI</label>
+                                        <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TAKSİT / VADE SAYISI</label>
                                         <input
                                             type="number"
                                             value={planData.installmentCount}
                                             onChange={e => setPlanData({ ...planData, installmentCount: e.target.value })}
-                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm text-center outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                                            style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px', textAlign: 'center' }}
+                                            className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">PLANI BAŞLATMA TARİHİ</label>
+                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>PLANI BAŞLATMA TARİHİ</label>
                                     <input
                                         type="date"
                                         value={planData.startDate}
                                         onChange={e => setPlanData({ ...planData, startDate: e.target.value })}
-                                        className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all [color-scheme:light_dark]"
+                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
+                                        className="input-date-dark focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                     />
                                 </div>
 
-                                <div className="p-4 bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-xl mt-2">
-                                    <label className="flex items-center gap-3 text-sm text-amber-600 dark:text-amber-500 cursor-pointer font-bold select-none cursor-pointer">
+                                <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '16px', marginTop: '12px' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#f59e0b', cursor: 'pointer', fontWeight: '800' }}>
                                         <input
                                             type="checkbox"
                                             checked={planData.isExisting}
                                             onChange={e => setPlanData({ ...planData, isExisting: e.target.checked })}
-                                            className="w-5 h-5 rounded accent-amber-500 cursor-pointer"
+                                            style={{ accentColor: '#f59e0b', width: '20px', height: '20px' }}
                                         />
                                         <span>Mevcut Bakiyeden Dönüştür (Re-Scheduling)</span>
                                     </label>
-                                    <div className="text-xs text-amber-600/70 dark:text-amber-500/70 mt-2 ml-8 font-medium leading-relaxed">
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #aaa)', marginTop: '8px', marginLeft: '32px', fontWeight: '500', lineHeight: '1.5' }}>
                                         Bu seçenek aktifken cari hesap bakiyesine ekstra borç eklenmez, işlemi mevcut açık risk üzerinden planlar.
                                     </div>
                                 </div>
 
                                 <button
                                     onClick={handleSavePlan}
-                                    className="mt-4 w-full p-4 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white font-black text-sm tracking-wide border-none shadow-[0_8px_24px_rgba(245,158,11,0.3)] hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 uppercase"
+                                    className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
+                                    style={{ marginTop: '20px', padding: '18px', width: '100%', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
                                 >
                                     <span>✅</span> ÖDEME PLANINI OLUŞTUR
                                 </button>
                             </div>
-                        </EnterpriseCard>
+                        </div>
                     </div>
                 )
             }
