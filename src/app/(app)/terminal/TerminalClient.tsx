@@ -23,7 +23,7 @@ import { useRouter } from 'next/navigation';
 export default function TerminalClient() {
     const router = useRouter();
     const { products } = useInventory();
-    const { kasalar } = useFinancials();
+    const { kasalar, salesExpenses } = useFinancials();
     const { customers } = useCRM();
     const { processSale, suspendedSales, suspendSale, removeSuspendedSale } = useSales();
     const { currentUser } = useApp();
@@ -38,6 +38,7 @@ export default function TerminalClient() {
     const [selectedCustomer, setSelectedCustomer] = useState('Perakende Müşteri');
     const [paymentMode, setPaymentMode] = useState<'cash' | 'card' | 'transfer' | 'account' | null>(null);
     const [selectedKasa, setSelectedKasa] = useState<string | number>('');
+    const [selectedTaksit, setSelectedTaksit] = useState<any>(null);
 
     const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
     const [customerSearch, setCustomerSearch] = useState('');
@@ -227,7 +228,8 @@ export default function TerminalClient() {
             discountAmount: totalDiscount,
             couponCode: discountCode,
             pointsUsed: pointsToUse || 0,
-            installments: undefined
+            installments: selectedTaksit ? parseInt(selectedTaksit.installment.replace(/\D/g, ''), 10) || 1 : undefined,
+            installmentLabel: selectedTaksit?.installment || undefined
         };
 
         setIsProcessing(true);
@@ -262,6 +264,7 @@ export default function TerminalClient() {
         setDiscountCode('');
         setPointsToUse(0);
         setReferenceNote('');
+        setSelectedTaksit(null);
         setShowCheckoutModal(false);
     };
 
@@ -419,6 +422,9 @@ export default function TerminalClient() {
                         handleSuspend={() => setShowSuspendModal(true)}
                         isProcessing={isProcessing}
                         isOnline={isOnline}
+                        selectedTaksit={selectedTaksit}
+                        setSelectedTaksit={setSelectedTaksit}
+                        salesExpenses={salesExpenses}
                     />
                 </div>
             </div>
@@ -571,7 +577,12 @@ export default function TerminalClient() {
                             <div className="mb-6">
                                 <label className="text-[10px] font-bold opacity-50 uppercase tracking-widest block mb-3">Hedef Kasa / Banka Seçimi</label>
                                 <div className="grid grid-cols-2 gap-3 max-h-[160px] overflow-y-auto pr-1">
-                                    {(kasalar || []).filter((k: any) => paymentMode === 'cash' ? k.type === 'Nakit' : k.type !== 'Nakit').map((k: any) => (
+                                    {(kasalar || []).filter((k: any) => {
+                                        if (paymentMode === 'cash') return k.type === 'Nakit';
+                                        if (paymentMode === 'card') return k.type === 'Kredi Kartı' || k.type?.includes('POS');
+                                        if (paymentMode === 'transfer') return k.type === 'Banka' || k.type === 'Havale/EFT' || (!k.type?.includes('POS') && k.type !== 'Nakit' && k.type !== 'Kredi Kartı');
+                                        return true;
+                                    }).map((k: any) => (
                                         <button
                                             key={k.id}
                                             onClick={() => setSelectedKasa(k.id)}
@@ -581,9 +592,32 @@ export default function TerminalClient() {
                                             <span className={`text-[10px] mt-1 text-left uppercase font-bold tracking-widest ${selectedKasa === k.id ? 'text-indigo-500 dark:text-indigo-500/70' : 'text-slate-400 dark:text-slate-500'}`}>{k.currency || 'TRY'} • Bakiye: {k.balance || 0}</span>
                                         </button>
                                     ))}
-                                    {(!(kasalar || []).filter((k: any) => paymentMode === 'cash' ? k.type === 'Nakit' : k.type !== 'Nakit').length) && (
+                                    {(!(kasalar || []).filter((k: any) => {
+                                        if (paymentMode === 'cash') return k.type === 'Nakit';
+                                        if (paymentMode === 'card') return k.type === 'Kredi Kartı' || k.type?.includes('POS');
+                                        if (paymentMode === 'transfer') return k.type === 'Banka' || k.type === 'Havale/EFT' || (!k.type?.includes('POS') && k.type !== 'Nakit' && k.type !== 'Kredi Kartı');
+                                        return true;
+                                    }).length) && (
                                         <div className="col-span-2 text-sm text-center py-4 bg-slate-50 dark:bg-[#0f172a] rounded-xl text-slate-500 border border-slate-200 dark:border-white/5 font-medium">Bu ödeme tipi için tanımlı kasa bulunamadı.</div>
                                     )}
+                                </div>
+                            </div>
+                        )}
+
+                        {paymentMode === 'card' && Array.isArray(salesExpenses?.posCommissions) && salesExpenses.posCommissions.length > 0 && (
+                            <div className="mb-6">
+                                <label className="text-[10px] font-bold opacity-50 uppercase tracking-widest block mb-3">Taksit / Kredi Kartı Komisyonu Seçimi</label>
+                                <div className="grid grid-cols-2 gap-3 max-h-[160px] overflow-y-auto pr-1">
+                                    {salesExpenses.posCommissions.map((comm: any, idx: number) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setSelectedTaksit(comm)}
+                                            className={`p-3 rounded-xl border flex flex-col justify-center transition-all shadow-sm ${selectedTaksit?.installment === comm.installment ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10 ring-2 ring-amber-500/50' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'}`}
+                                        >
+                                            <span className={`text-sm font-bold truncate block w-full text-left ${selectedTaksit?.installment === comm.installment ? 'text-amber-700 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>{comm.installment}</span>
+                                            <span className={`text-[10px] mt-1 text-left uppercase font-bold tracking-widest ${selectedTaksit?.installment === comm.installment ? 'text-amber-600 dark:text-amber-500/70' : 'text-slate-400 dark:text-slate-500'}`}>Kesinti: %{comm.rate}</span>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         )}

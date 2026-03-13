@@ -1180,8 +1180,7 @@ export default function SettingsPage() {
                 {/* 3.1. KDV & VERGİLER */}
                 {activeTab === 'taxes' && <TaxesPanel {...sharedProps} />}
 
-                {/* 3.5. SATIŞ GİDERLERİ (YENİ) */}
-                {activeTab === 'expenses' && <SalesExpensesPanel {...sharedProps} />}
+
 
                 {/* 4. TANIMLAR */}
                 {/* 4. SİSTEM TANIMLARI - REDESIGNED */}

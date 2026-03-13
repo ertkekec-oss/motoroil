@@ -32,21 +32,21 @@ export default function SalesExpensesPanel(props: any) {
     const posCommissions: any[] = salesExpenses?.posCommissions || [];
 
     return (
-        <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full p-4 lg:p-8 animate-in fade-in duration-300">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h2 className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">E-Tahsilat / POS Komisyon Katmanları</h2>
-                    <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-1">Kredi kartı ile tahsil edilen tutarlardaki aracı banka/finans firması kesinti sözleşmeleri.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">E-Tahsilat / POS Komisyon Katmanları</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Kredi kartı ile tahsil edilen tutarlardaki aracı banka/finans firması kesinti sözleşmeleri.</p>
                 </div>
             </div>
 
-            {/* FİLTRE & AKSİYON STRIP ÜSTTE (Master prompt kuralı) */}
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50">
+            {/* FİLTRE & AKSİYON STRIP ÜSTTE */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 py-5 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/50">
                     <div>
-                        <h3 className="text-[16px] font-semibold text-slate-900 dark:text-white">Ciro Kesinti Maliyetleri</h3>
-                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Tanımlanan oranlar kartlı ödemelerde faturadan otomatik düşülüp gider fişi (komisyon bedeli) olarak kaydedilecektir.</p>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white">Ciro Kesinti Maliyetleri</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 block">Tanımlanan oranlar kartlı ödemelerde faturadan otomatik düşülüp gider fişi (komisyon bedeli) olarak kaydedilecektir.</p>
                     </div>
                     <button
                         onClick={() => {
@@ -56,7 +56,7 @@ export default function SalesExpensesPanel(props: any) {
                                 posCommissions: [...currentComms, { installment: 'Taksit X', rate: 0 }],
                             });
                         }}
-                        className="h-10 px-5 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors shadow-sm whitespace-nowrap"
+                        className="h-10 px-5 bg-indigo-600 hover:bg-indigo-700 text-white border border-transparent rounded-xl text-[13px] font-bold transition-all shadow-sm shadow-indigo-500/20 whitespace-nowrap shrink-0"
                     >
                         + Yeni Dilim Ekle
                     </button>
@@ -64,79 +64,79 @@ export default function SalesExpensesPanel(props: any) {
 
                 {posCommissions.length === 0 ? (
                     <div className="p-16 text-center">
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-[#1e293b] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 dark:border-white/5 shadow-sm">
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 dark:border-white/5 shadow-sm">
                             💳
                         </div>
-                        <p className="text-[15px] font-semibold text-slate-900 dark:text-white">Komisyon Matrisi Boş</p>
-                        <p className="text-[13px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
+                        <p className="text-[15px] font-bold text-slate-900 dark:text-white mb-2">Komisyon Matrisi Boş</p>
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 leading-relaxed">
                             Herhangi bir banka veya ödeme geçidi komisyon sözleşmesi tanımlanmamış. Satışlarda kesinti hesaplanmayacaktır.
                         </p>
                     </div>
                 ) : (
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/5">
-                                <th className="px-6 py-4 text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-1/2">Bankacılık Enstrümanı / Taksit Türü</th>
-                                <th className="px-6 py-4 text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-1/3">Sanal POS Kesintisi (%)</th>
-                                <th className="px-6 py-4 text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-right">Düzenle</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {posCommissions.map((comm: any, idx: number) => (
-                                <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-6 py-4 align-top">
-                                        <ERPInput
-                                            type="text"
-                                            value={comm.installment}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                const newComms = [...salesExpenses.posCommissions];
-                                                newComms[idx].installment = e.target.value;
-                                                updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
-                                            }}
-                                            placeholder="Örn: Garanti POS, Peşin Tek Çekim"
-                                            className="font-medium bg-transparent border-transparent hover:border-slate-300 focus:bg-white"
-                                        />
-                                    </td>
-                                    <td className="px-6 py-4 align-top">
-                                        <div className="relative max-w-[150px]">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left whitespace-nowrap">
+                            <thead>
+                                <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-white/10">
+                                    <th className="px-6 py-4 text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-1/2">Bankacılık Enstrümanı / Taksit Türü</th>
+                                    <th className="px-6 py-4 text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-1/3 text-center">Sanal POS Kesintisi (%)</th>
+                                    <th className="px-6 py-4 text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-right">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                {posCommissions.map((comm: any, idx: number) => (
+                                    <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <td className="px-6 py-4">
                                             <ERPInput
-                                                type="number"
-                                                value={comm.rate}
+                                                type="text"
+                                                value={comm.installment}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                     const newComms = [...salesExpenses.posCommissions];
-                                                    newComms[idx].rate = Number(e.target.value);
+                                                    newComms[idx].installment = e.target.value;
                                                     updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
                                                 }}
-                                                className="pr-10 text-right font-mono font-semibold"
+                                                placeholder="Örn: Garanti POS, Peşin Tek Çekim"
+                                                className="font-bold bg-white dark:bg-slate-900 dark:text-white dark:border-white/10"
                                             />
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-slate-500 dark:text-slate-400 font-bold">%</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 align-top text-right">
-                                        <button
-                                            onClick={() => {
-                                                const newComms = salesExpenses.posCommissions.filter((_: any, i: number) => i !== idx);
-                                                updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
-                                            }}
-                                            className="h-10 px-4 text-[13px] font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
-                                        >
-                                            Kaldır
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="relative max-w-[150px] mx-auto">
+                                                <ERPInput
+                                                    type="number"
+                                                    value={comm.rate}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const newComms = [...salesExpenses.posCommissions];
+                                                        newComms[idx].rate = Number(e.target.value);
+                                                        updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
+                                                    }}
+                                                    className="pr-10 text-right font-mono font-bold bg-white dark:bg-slate-900 dark:text-white dark:border-white/10"
+                                                />
+                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[14px] text-slate-400 dark:text-slate-500 font-bold">%</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() => {
+                                                    const newComms = salesExpenses.posCommissions.filter((_: any, i: number) => i !== idx);
+                                                    updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
+                                                }}
+                                                className="h-10 px-4 text-[13px] font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors shrink-0"
+                                            >
+                                                Kaldır
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
-
-                {/* Kaydetme Butonu Yok çunku handle direkt state'i güncel tutuyor, ama master component 'updateSalesExpenses' çağırıyor. */}
             </div>
 
-            <div className="mt-6 p-5 border border-amber-200 bg-amber-50 text-amber-800 rounded-xl text-[13px] leading-relaxed flex items-start gap-3">
-                <span className="text-xl shrink-0 mt-0.5">⚠️</span>
+            <div className="mt-8 p-5 border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50 dark:bg-indigo-500/5 text-indigo-800 dark:text-indigo-300 rounded-2xl text-sm leading-relaxed flex items-start gap-4 shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
+                <span className="text-2xl shrink-0">ℹ️</span>
                 <div>
-                    <strong className="font-semibold block mb-1">Mali Tabloya Etkisi</strong>
-                    Sisteme girilen komisyon tutarları, ilgili faturanın "Ödeme Planında" belirtilen taksit tipine göre hesaplanır. Net Kasa girişi = Yekûn Tutar - Komisyon Kesintisi Şablonu olarak bilançoya yansıtılacaktır.
+                    <strong className="font-black block mb-1.5 uppercase tracking-wide">Mali Tabloya Etkisi</strong>
+                    Sisteme girilen komisyon tutarları, ilgili faturanın "Ödeme Planında" belirtilen taksit tipine göre hesaplanır. Net kasa girişi, Yekûn tutar üzerinden Komisyon Kesintisinin düşülmesiyle bilançoya yansıtılır.
                 </div>
             </div>
         </div>

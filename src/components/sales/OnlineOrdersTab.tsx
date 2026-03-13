@@ -243,7 +243,8 @@ export function OnlineOrdersTab({
                         LIVE v1.4
                     </span>
                     {selectedOrders.length > 0 && (
-                        <button
+                        <>
+                            <button
                             disabled={isGeneratingBulk}
                             onClick={async () => {
                                 const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id)).map(o => ({
@@ -386,6 +387,7 @@ export function OnlineOrdersTab({
                             )}
                             {bulkInvoiceStatus ? bulkInvoiceStatus : `Toplu Fatura Oluştur (${selectedOrders.length})`}
                         </button>
+                        </>
                     )}
                 </div>
 
