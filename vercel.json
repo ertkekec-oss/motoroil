@@ -3,6 +3,10 @@
         {
             "path": "/api/internal/accounting/process",
             "schedule": "*/1 * * * *"
+        },
+        {
+            "path": "/api/cron/sync-all",
+            "schedule": "*/5 * * * *"
         }
     ]
 }

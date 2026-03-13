@@ -5,16 +5,23 @@ import { authorize } from '@/lib/auth';
 import { EventBus } from '@/services/fintech/event-bus';
 
 export async function POST(request: Request) {
-    const auth = await authorize();
-    if (!auth.authorized) return auth.response;
+    const cronSecret = request.headers.get('x-cron-secret');
+    const isCron = cronSecret && cronSecret === process.env.CRON_SECRET && process.env.CRON_SECRET;
 
-    // Normalize session structure
-    const sessionData = auth.user;
-    const session: any = sessionData.user || sessionData;
+    let session: any = null;
+
+    if (!isCron) {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        const sessionData = auth.user;
+        session = sessionData.user || sessionData;
+    } else {
+        session = { username: 'cron', role: 'SYSTEM', tenantId: 'SYSTEM', companyId: null };
+    }
 
     try {
         const body = await request.json();
-        const { type, config } = body;
+        const { type, config, cronCompanyId } = body;
 
         // VERIFICATION LOG
         console.log(`[SYNC_START] User: ${session.username}, SessionCompanyId: ${session.companyId}, TenantId: ${session.tenantId}`);
@@ -24,8 +31,8 @@ export async function POST(request: Request) {
         }
 
         // 1. Company ID Resolution (Robust)
-        let companyId = session.impersonateTenantId ? null : (session as any).companyId;
-        let companyName = 'Unknown';
+        let companyId = isCron ? cronCompanyId : (session.impersonateTenantId ? null : session.companyId);
+        let companyName = isCron ? 'CronSync' : 'Unknown';
 
         // VERIFY existence of companyId in current DB (handles stale sessions after DB reset)
         if (companyId) {

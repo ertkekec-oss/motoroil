@@ -6,18 +6,43 @@ import { authorize } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-    const auth = await authorize();
-    if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const cronSecret = request.headers.get('x-cron-secret');
+    const isCron = cronSecret && cronSecret === process.env.CRON_SECRET && process.env.CRON_SECRET;
+
+    let session: any = null;
+    let cronCompanyId: string | null = null;
+
+    if (!isCron) {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        session = auth.user;
+    } else {
+        session = { username: 'cron', role: 'SYSTEM', tenantId: 'SYSTEM' };
+        try {
+            const body = await request.json();
+            cronCompanyId = body.cronCompanyId;
+        } catch (e) { /* ignore if no body */ }
+    }
 
     try {
         // Resolve companyId
-        let companyId = session.companyId;
-        if (!companyId) {
+        let companyId = isCron ? cronCompanyId : session.companyId;
+        
+        if (!companyId && !isCron) {
             const company = await prisma.company.findFirst({
                 where: { tenantId: session.tenantId }
             });
             companyId = company?.id;
+        } else if (!companyId && isCron) {
+            // Cron için companyId yollanmadıysa, e-ticareti aktif olan ilk firmayı bul
+            const customConfig = await prisma.marketplaceConfig.findFirst({
+                where: { type: 'custom', isActive: true }
+            });
+            if (customConfig) companyId = customConfig.companyId;
+            else {
+                const anyCompany = await prisma.company.findFirst();
+                companyId = anyCompany?.id;
+            }
         }
 
         if (!companyId) {

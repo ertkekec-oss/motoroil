@@ -78,7 +78,13 @@ export async function GET(request: Request) {
 
         for (const config of activeConfigs) {
             try {
-                console.log(`🔄 ${config.type} senkronizasyonu başlıyor...`);
+                // Sadece otomatik senkronizasyon açık olanları tetikle
+                if (!config.settings?.autoSync && config.type !== 'ecommerce') {
+                    console.log(`ℹ️ ${config.type} için Arka Plan Sync. kapalı, atlanıyor.`);
+                    continue;
+                }
+
+                console.log(`🔄 ${config.type} senkronizasyonu başlıyor (Firma: ${config.companyId})...`);
                 // Servisi doğrudan çağırabiliriz veya API'ye istek atabiliriz
                 const syncRes = await fetch(`${baseUrl}/api/integrations/marketplace/sync`, {
                     method: 'POST',
@@ -88,7 +94,8 @@ export async function GET(request: Request) {
                     },
                     body: JSON.stringify({
                         type: config.type,
-                        config: config.settings
+                        config: config.settings,
+                        cronCompanyId: config.companyId
                     })
                 });
                 const data = await syncRes.json();
