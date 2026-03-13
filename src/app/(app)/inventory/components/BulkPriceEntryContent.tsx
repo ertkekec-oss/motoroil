@@ -56,6 +56,10 @@ function SyncView({ products, onSave, isProcessing }: any) {
     const [priceLists, setPriceLists] = useState<any[]>([]);
     const [targetListId, setTargetListId] = useState<string>('default');
     
+    // Filters States
+    const [filterCategory, setFilterCategory] = useState<string>('all');
+    const [filterBrand, setFilterBrand] = useState<string>('all');
+
     // Rule Engine States
     const [basePriceType, setBasePriceType] = useState<string>('buy_price');
     const [operator, setOperator] = useState<string>('percent_plus');
@@ -106,12 +110,23 @@ function SyncView({ products, onSave, isProcessing }: any) {
         setSelectedRows(prev => checked ? [...prev, id] : prev.filter(rId => rId !== id));
     };
 
+    // Derived filtering logic
+    const uniqueCategories = Array.from(new Map(products.filter((p: any) => p.category?.id).map((p: any) => [p.category.id, p.category])).values()) as any[];
+    const uniqueBrands = Array.from(new Map(products.filter((p: any) => p.brand?.id).map((p: any) => [p.brand.id, p.brand])).values()) as any[];
+
+    const filteredProducts = products.filter((p: any) => {
+        let match = true;
+        if (filterCategory !== 'all' && String(p.categoryId) !== filterCategory) match = false;
+        if (filterBrand !== 'all' && String(p.brandId) !== filterBrand) match = false;
+        return match;
+    });
+
     const toggleAll = (checked: boolean) => {
-        setSelectedRows(checked ? products.map((p: any) => String(p.id)) : []);
+        setSelectedRows(checked ? filteredProducts.map((p: any) => String(p.id)) : []);
     };
 
     const calculateRules = () => {
-        const targetSelection = selectedRows.length > 0 ? selectedRows : products.map((p: any) => String(p.id));
+        const targetSelection = selectedRows.length > 0 ? selectedRows : filteredProducts.map((p: any) => String(p.id));
         if (targetSelection.length === 0) return;
 
         setPriceData(prev => {
@@ -142,7 +157,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
             return nextData;
         });
         
-        if (selectedRows.length === 0) setSelectedRows(products.map((p: any) => String(p.id)));
+        if (selectedRows.length === 0) setSelectedRows(filteredProducts.map((p: any) => String(p.id)));
     };
 
     const handleSaveList = async () => {
@@ -155,50 +170,72 @@ function SyncView({ products, onSave, isProcessing }: any) {
     return (
         <div className="flex flex-col gap-4 animate-in fade-in h-full flex-1 min-h-0">
             {/* Top Toolbar */}
-            <div className="bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0">
-                <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2">
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">İşlem Yapılacak Liste:</label>
+            <div className="bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm px-4 py-3 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4 shrink-0 overflow-hidden">
+                <div className="flex flex-wrap items-center gap-3 w-full justify-between">
+                    
+                    {/* Left: Selectors (Brand, Category, Target List) */}
+                    <div className="flex flex-wrap items-center gap-3">
                         <select 
-                            className="bg-slate-100 dark:bg-[#1e293b] font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 text-xs rounded-lg px-3 py-2 outline-none focus:ring-2 ring-blue-500"
+                            className="bg-slate-50 dark:bg-[#1e293b] font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[13px] rounded-lg px-2.5 py-2 w-[160px] outline-none hover:border-blue-400 focus:ring-1 focus:ring-blue-500 transition-colors"
+                            value={filterCategory}
+                            onChange={(e) => { setFilterCategory(e.target.value); setSelectedRows([]); }}
+                        >
+                            <option value="all">Tüm Kategoriler</option>
+                            {uniqueCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+                        
+                        <select 
+                            className="bg-slate-50 dark:bg-[#1e293b] font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[13px] rounded-lg px-2.5 py-2 w-[160px] outline-none hover:border-blue-400 focus:ring-1 focus:ring-blue-500 transition-colors"
+                            value={filterBrand}
+                            onChange={(e) => { setFilterBrand(e.target.value); setSelectedRows([]); }}
+                        >
+                            <option value="all">Tüm Markalar</option>
+                            {uniqueBrands.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                        </select>
+                        
+                        <div className="h-[28px] w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+                        <select 
+                            className="bg-slate-100 dark:bg-[#1e293b] font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 text-[13px] rounded-lg px-3 py-2 outline-none hover:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                             value={targetListId}
                             onChange={e => { setTargetListId(e.target.value); setSelectedRows([]); }}
                         >
-                            <option value="default" className="font-semibold">Ana Satış Fiyatı (Varsayılan)</option>
-                            <option value="buy_price" className="font-semibold text-rose-600">Ana Alış Fiyatı (Maliyet)</option>
+                            <option value="default" className="font-semibold">⚙ İşlem: Ana Satış Fprüsü</option>
+                            <option value="buy_price" className="font-semibold text-rose-600">⚙ İşlem: Ana Alış Fiyatı (Maliyet)</option>
                             {priceLists.map(list => (
-                                <option key={list.id} value={list.id}>{list.name} Kanal Listesi</option>
+                                <option key={list.id} value={list.id}>⚙ İşlem: {list.name} Listesi</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
-                    <span className="text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                        Seçili Ürün: <strong className="text-blue-600">{selectedRows.length}</strong> / {products.length}
-                    </span>
-                </div>
+                    {/* Right: Actions */}
+                    <div className="flex flex-wrap items-center gap-3 ml-auto">
+                        <span className="text-[12px] font-semibold text-slate-400 mr-2">
+                            Seçili: <strong className="text-blue-600 dark:text-blue-400">{selectedRows.length}</strong> / {filteredProducts.length}
+                        </span>
 
-                <div className="flex items-center gap-3">
-                    <button 
-                        onClick={() => setIsPanelOpen(!isPanelOpen)}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 border
-                            ${isPanelOpen ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 dark:bg-transparent dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'}
-                        `}
-                    >   
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        Toplu Fiyat Kuralları
-                    </button>
-                    <button
-                        onClick={handleSaveList}
-                        disabled={selectedRows.length === 0 || isProcessing}
-                        className={`px-5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-sm
-                            ${selectedRows.length === 0 ? 'bg-slate-200 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'}
-                        `}
-                    >
-                        {isProcessing ? 'Kaydediliyor...' : 'Değişimleri Kaydet'}
-                    </button>
+                        <button 
+                            onClick={() => setIsPanelOpen(!isPanelOpen)}
+                            className={`px-4 py-2 rounded-lg text-[13px] font-bold transition-all flex items-center justify-center gap-2 border w-full sm:w-auto
+                                ${isPanelOpen ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 dark:bg-transparent dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'}
+                            `}
+                        >   
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            Fiyat Kuralları
+                        </button>
+                        
+                        <button
+                            onClick={handleSaveList}
+                            disabled={selectedRows.length === 0 || isProcessing}
+                            className={`px-5 py-2 rounded-lg text-[13px] font-bold transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto
+                                ${selectedRows.length === 0 ? 'bg-slate-200 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'}
+                            `}
+                        >
+                            {isProcessing ? 'Kaydediliyor...' : 'Değişimi Kaydet'}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -261,7 +298,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
                                     <input
                                         type="checkbox"
                                         className="w-3.5 h-3.5 rounded border-slate-300 dark:border-white/10 accent-blue-600 cursor-pointer"
-                                        checked={selectedRows.length === products.length && products.length > 0}
+                                        checked={selectedRows.length === filteredProducts.length && filteredProducts.length > 0}
                                         onChange={(e) => toggleAll(e.target.checked)}
                                     />
                                 </th>
@@ -273,12 +310,12 @@ function SyncView({ products, onSave, isProcessing }: any) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                            {products.length === 0 ? (
+                            {filteredProducts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="py-12 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-[#1e293b]/50">Görüntülenecek ürün bulunamadı. Lütfen filtreleme panelinden bir filtre seçin.</td>
+                                    <td colSpan={6} className="py-12 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-[#1e293b]/50">Mevcut filtrelere uygun ürün bulunamadı.</td>
                                 </tr>
                             ) : (
-                                products.map((product: any) => {
+                                filteredProducts.map((product: any) => {
                                     const current = priceData[product.id] || { buyPrice: 0, defaultPrice: 0, currentPrice: 0, newPrice: 0 };
                                     const isSelected = selectedRows.includes(String(product.id));
 
@@ -356,21 +393,30 @@ function SyncView({ products, onSave, isProcessing }: any) {
 function SettingsView() {
     const [lists, setLists] = useState<any[]>([]);
     const [settings, setSettings] = useState<Record<string, string>>({});
+    const [categories, setCategories] = useState<any[]>([]);
+    
+    // Create states
     const [newListName, setNewListName] = useState('');
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [newCategoryListId, setNewCategoryListId] = useState('');
+    
     const [loading, setLoading] = useState(false);
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [resLists, resSettings] = await Promise.all([
+            const [resLists, resSettings, resCategories] = await Promise.all([
                 fetch('/api/pricing/lists'),
-                fetch('/api/settings')
+                fetch('/api/settings'),
+                fetch('/api/customers/categories')
             ]);
             const dLists = await resLists.json();
             const dSet = await resSettings.json();
+            const dCats = await resCategories.json();
             
             if (dLists.data) setLists(dLists.data);
             if (dSet && !dSet.error) setSettings(dSet);
+            if (dCats.data) setCategories(dCats.data);
         } catch (e) {
             toast.error("Ayarlar yüklenirken hata oluştu.");
         } finally {
@@ -414,6 +460,39 @@ function SettingsView() {
         } catch { toast.error("Sistem hatası"); }
     };
 
+    const handleCreateCategory = async () => {
+        if (!newCategoryName.trim()) return;
+        try {
+            const res = await fetch('/api/customers/categories', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newCategoryName, defaultPriceListId: newCategoryListId || null })
+            });
+            const d = await res.json();
+            if (d.success || d.ok) {
+                toast.success("Müşteri sınıfı başarıyla oluşturuldu.");
+                setNewCategoryName('');
+                setNewCategoryListId('');
+                fetchData();
+            } else {
+                toast.error(d.error || "Sınıf oluşturulamadı.");
+            }
+        } catch { toast.error("Sistem hatası"); }
+    };
+
+    const handleDeleteCategory = async (id: string, name: string) => {
+        if (!confirm(`"${name}" sınıfını silmek istediğinize emin misiniz?`)) return;
+        try {
+            const res = await fetch(`/api/customers/categories/${id}`, { method: 'DELETE' });
+            if (res.ok || (await res.json()).ok) {
+                toast.success("Sınıf silindi.");
+                fetchData();
+            } else {
+                toast.error("Silinemedi.");
+            }
+        } catch { toast.error("Sistem hatası"); }
+    };
+
     const saveChannelMap = async (key: string, listId: string) => {
         try {
             await fetch('/api/settings', {
@@ -429,91 +508,158 @@ function SettingsView() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row gap-6 animate-in fade-in h-full overflow-y-auto">
-            {/* L-Col: Channel Mappings */}
-            <div className="flex-1 min-w-[300px] flex flex-col gap-4">
-                <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm">
-                    <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Satış Kanalı Eşleştirmeleri</h3>
-                    <p className="text-sm text-slate-500 mb-6">Mevcut kanallarınızın öntanımlı fiyat yapılarını buradan bir listeye bağlayın.</p>
-                    
-                    <div className="space-y-4">
-                        {[
-                            { key: 'channel_terminal_list', name: 'Mağaza Satışı / Terminal', description: 'POS ekranından yapılan direkt kasadan satışlarda' },
-                            { key: 'channel_dealer_list', name: 'B2B Dealer (Bayiler)', description: 'Bayi Portalından yapılan online B2B toptan siparişlerde' },
-                            { key: 'channel_hub_list', name: 'B2B HUB', description: 'Bölge Satış Yönetimi / Dağıtım Ağında' },
-                            { key: 'channel_field_sales_list', name: 'Saha Satış (Plasiyer)', description: 'Saha ekipleri ve mobil sipariş ekranlarında' }
-                        ].map(c => (
-                            <div key={c.key} className="flex flex-col gap-1.5 pb-4 border-b border-slate-100 dark:border-slate-800/80 last:border-0 last:pb-0">
-                                <div className="flex justify-between items-center mb-1">
-                                    <div>
-                                        <div className="font-semibold text-slate-700 dark:text-slate-200 text-[13px]">{c.name}</div>
-                                        <div className="text-[11px] text-slate-400">{c.description}</div>
+        <div className="flex flex-col animate-in fade-in h-full overflow-y-auto px-1 py-1">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* L-Col: Channel Mappings */}
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                    <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm h-full">
+                        <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Satış Kanalı Eşleştirmeleri</h3>
+                        <p className="text-sm text-slate-500 mb-6">Mevcut kanallarınızın öntanımlı fiyat yapılarını buradan bir listeye bağlayın.</p>
+                        
+                        <div className="space-y-4">
+                            {[
+                                { key: 'channel_terminal_list', name: 'Mağaza Satışı / Terminal', description: 'POS ekranından yapılan direkt kasadan satışlarda' },
+                                { key: 'channel_dealer_list', name: 'B2B Dealer (Bayiler)', description: 'Bayi Portalından yapılan online B2B toptan siparişlerde' },
+                                { key: 'channel_hub_list', name: 'B2B HUB', description: 'Bölge Satış Yönetimi / Dağıtım Ağında' },
+                                { key: 'channel_field_sales_list', name: 'Saha Satış (Plasiyer)', description: 'Saha ekipleri ve mobil sipariş ekranlarında' }
+                            ].map(c => (
+                                <div key={c.key} className="flex flex-col gap-1.5 pb-4 border-b border-slate-100 dark:border-slate-800/80 last:border-0 last:pb-0">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <div>
+                                            <div className="font-semibold text-slate-700 dark:text-slate-200 text-[13px]">{c.name}</div>
+                                            <div className="text-[11px] text-slate-400">{c.description}</div>
+                                        </div>
                                     </div>
+                                    <select 
+                                        className="w-full bg-slate-50 dark:bg-[#1e293b] text-[13px] font-medium border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors"
+                                        value={settings[c.key] || 'default'}
+                                        onChange={e => saveChannelMap(c.key, e.target.value)}
+                                    >
+                                        <option value="default">-- Ana Satış Fiyatı (Kanala Özel Liste Yok) --</option>
+                                        <option value="buy_price">Ana Alış Fiyatı (Maliyet)</option>
+                                        {lists.map(l => (
+                                            <option key={l.id} value={l.id}>{l.name} Listesi</option>
+                                        ))}
+                                    </select>
                                 </div>
-                                <select 
-                                    className="w-full bg-slate-50 dark:bg-[#1e293b] text-[13px] font-medium border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors"
-                                    value={settings[c.key] || 'default'}
-                                    onChange={e => saveChannelMap(c.key, e.target.value)}
-                                >
-                                    <option value="default">-- Ana Satış Fiyatı (Kanala Özel Liste Yok) --</option>
-                                    <option value="buy_price">Ana Alış Fiyatı (Maliyet)</option>
-                                    {lists.map(l => (
-                                        <option key={l.id} value={l.id}>{l.name} Listesi</option>
-                                    ))}
-                                </select>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                        
+                        <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl mt-6">
+                            <h4 className="font-bold text-amber-800 dark:text-amber-500 text-[13px] mb-1">Eşleştirme Neden Gerekli?</h4>
+                            <p className="text-amber-700/80 dark:text-amber-400/80 text-[11px] leading-relaxed">
+                                Farklı kanalların farklı kâr marjları ve operasyon maliyetleri vardır. Bayilere daha az kârlı toptan fiyatları sunarken, perakende Terminal ekranında varsayılan fiyatı gösterebilirsiniz.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl">
-                    <h4 className="font-bold text-amber-800 dark:text-amber-500 text-[13px] mb-1">Eşleştirme Neden Gerekli?</h4>
-                    <p className="text-amber-700/80 dark:text-amber-400/80 text-[11px] leading-relaxed">
-                        Farklı kanalların farklı kâr marjları ve operasyon maliyetleri vardır. Bayilere daha az kârlı toptan fiyatları sunarken, perakende Terminal ekranında varsayılan fiyatı gösterebilir, saha ekiplerinize özel pazarlık tavanları atayabilirsiniz.
-                    </p>
-                </div>
-            </div>
-
-            {/* R-Col: Create/Manage Lists */}
-            <div className="md:w-[400px] flex flex-col gap-4">
-                <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm">
-                    <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Özel Fiyat Listeleri</h3>
-                    <p className="text-sm text-slate-500 mb-6">Yeni bir hedef liste oluşturun.</p>
-                    
-                    <div className="flex gap-2 mb-6">
-                        <input 
-                            className="flex-1 bg-slate-50 dark:bg-[#1e293b] text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Yeni Liste Adı..."
-                            value={newListName}
-                            onChange={e => setNewListName(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && handleCreateList()}
-                        />
-                        <button 
-                            onClick={handleCreateList} 
-                            disabled={loading}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
-                        >
-                            Ekle
-                        </button>
-                    </div>
-
-                    <div className="space-y-2">
-                        {lists.map(list => (
-                            <div key={list.id} className="group flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-200 dark:hover:border-blue-900/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
-                                <span className="font-semibold text-slate-700 dark:text-slate-300 text-[13px]">{list.name} Listesi</span>
+                {/* M-Col: Create/Manage Lists */}
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                    <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm h-full flex flex-col">
+                        <div>
+                            <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Özel Fiyat Listeleri</h3>
+                            <p className="text-sm text-slate-500 mb-6">Yeni bir hedef fiyat listesi oluşturun.</p>
+                            
+                            <div className="flex gap-2 mb-6">
+                                <input 
+                                    className="flex-1 bg-slate-50 dark:bg-[#1e293b] text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                    placeholder="Yeni Liste Adı..."
+                                    value={newListName}
+                                    onChange={e => setNewListName(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && handleCreateList()}
+                                />
                                 <button 
-                                    onClick={() => handleDeleteList(list.id, list.name)}
-                                    className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                    onClick={handleCreateList} 
+                                    disabled={loading}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
+                                    Ekle
                                 </button>
                             </div>
-                        ))}
-                        {lists.length === 0 && !loading && (
-                            <div className="text-center py-6 text-slate-400 text-sm">Hiç özel fiyat listeniz bulunmuyor.</div>
-                        )}
+                        </div>
+
+                        <div className="space-y-2 flex-1 overflow-y-auto custom-scroll pr-1">
+                            {lists.map(list => (
+                                <div key={list.id} className="group flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-200 dark:hover:border-blue-900/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                                    <span className="font-semibold text-slate-700 dark:text-slate-300 text-[13px]">{list.name} Listesi</span>
+                                    <button 
+                                        onClick={() => handleDeleteList(list.id, list.name)}
+                                        className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ))}
+                            {lists.length === 0 && !loading && (
+                                <div className="text-center py-6 text-slate-400 text-sm">Hiç özel fiyat listeniz bulunmuyor.</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* R-Col: Categories */}
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                    <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm h-full flex flex-col">
+                        <div>
+                            <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Cari Sınıfları (Kategoriler)</h3>
+                            <p className="text-sm text-slate-500 mb-6">Müşterileri ayırmak ve fiyat listeleri atamak için sınıflar oluşturun.</p>
+                            
+                            <div className="flex flex-col gap-2 mb-6">
+                                <input 
+                                    className="w-full bg-slate-50 dark:bg-[#1e293b] text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                                    placeholder="Sınıf Adı (örn: B2B Bayi)"
+                                    value={newCategoryName}
+                                    onChange={e => setNewCategoryName(e.target.value)}
+                                />
+                                <div className="flex gap-2">
+                                    <select 
+                                        className="flex-1 bg-slate-50 dark:bg-[#1e293b] text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 outline-none focus:border-blue-500 truncate"
+                                        value={newCategoryListId}
+                                        onChange={e => setNewCategoryListId(e.target.value)}
+                                    >
+                                        <option value="">Fiyat Listesi Seç (Opsiyonel)</option>
+                                        {lists.map(l => (
+                                            <option key={l.id} value={l.id}>{l.name} Listesi</option>
+                                        ))}
+                                    </select>
+                                    <button 
+                                        onClick={handleCreateCategory} 
+                                        disabled={loading}
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
+                                    >
+                                        Ekle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 flex-1 overflow-y-auto custom-scroll pr-1">
+                            {categories.map(cat => (
+                                <div key={cat.id} className="group flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-200 dark:hover:border-blue-900/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-slate-700 dark:text-slate-300 text-[13px]">{cat.name}</span>
+                                        {cat.defaultPriceList && (
+                                            <span className="text-[10px] text-blue-600 dark:text-blue-400">Liste: {cat.defaultPriceList.name}</span>
+                                        )}
+                                    </div>
+                                    <button 
+                                        onClick={() => handleDeleteCategory(cat.id, cat.name)}
+                                        className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ))}
+                            {categories.length === 0 && !loading && (
+                                <div className="text-center py-6 text-slate-400 text-sm">Hiç müşteri sınıfı bulunmuyor.</div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
