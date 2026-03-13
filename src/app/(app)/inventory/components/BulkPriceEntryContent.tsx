@@ -290,7 +290,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
 
             {/* Spreadsheet Table */}
             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] flex-1 overflow-hidden shadow-sm flex flex-col relative z-0">
-                <div className="flex-1 overflow-y-auto custom-scroll relative">
+                <div className="flex-1 overflow-auto custom-scroll relative">
                     <table className="w-full text-left border-collapse text-[12px] relative min-w-[800px]">
                         <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 shadow-sm">
                             <tr>
@@ -304,15 +304,28 @@ function SyncView({ products, onSave, isProcessing }: any) {
                                 </th>
                                 <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest min-w-[200px]">Ürün</th>
                                 <th className="px-3 py-2 font-bold text-slate-400 uppercase tracking-widest text-right w-28">Alış/Maliyet</th>
-                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-right w-32">Şu anki Fiyat</th>
-                                <th className="px-3 py-2 font-bold text-blue-600 uppercase tracking-widest text-right w-36 bg-blue-50/50 dark:bg-blue-900/10 border-l border-blue-100 dark:border-blue-900/20">Uygulanan Yeni Fiyat</th>
+                                
+                                {/* REfERANS LİSTELER */}
+                                {targetListId !== 'default' && (
+                                    <th className="px-3 py-2 font-bold text-slate-400 uppercase tracking-widest text-right w-28 whitespace-nowrap overflow-hidden text-ellipsis">Ana Satış</th>
+                                )}
+                                {priceLists.filter(list => list.id !== targetListId).map(list => (
+                                    <th key={list.id} className="px-3 py-2 font-bold text-slate-400 uppercase tracking-widest text-right w-28 whitespace-nowrap overflow-hidden text-ellipsis" title={list.name}>
+                                        {list.name}
+                                    </th>
+                                ))}
+
+                                <th className="px-3 py-2 font-bold text-amber-700 dark:text-amber-500 uppercase tracking-widest text-right w-32 bg-amber-50/50 dark:bg-amber-900/10 border-l border-amber-200/50 dark:border-amber-900/30">
+                                    Şu anki {targetListId === 'default' ? 'Satış' : targetListId === 'buy_price' ? 'Alış' : priceLists.find(l => l.id === targetListId)?.name}
+                                </th>
+                                <th className="px-3 py-2 font-bold text-blue-600 uppercase tracking-widest text-right w-36 bg-blue-50/50 dark:bg-blue-900/10 border-l border-r border-blue-100 dark:border-blue-900/20">Uygulanan Yeni Fiyat</th>
                                 <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-center w-24">Marj</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
                             {filteredProducts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="py-12 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-[#1e293b]/50">Mevcut filtrelere uygun ürün bulunamadı.</td>
+                                    <td colSpan={10} className="py-12 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-[#1e293b]/50">Mevcut filtrelere uygun ürün bulunamadı.</td>
                                 </tr>
                             ) : (
                                 filteredProducts.map((product: any) => {
@@ -336,13 +349,32 @@ function SyncView({ products, onSave, isProcessing }: any) {
                                             <td className="px-3 border-r border-slate-100 dark:border-white/5">
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-bold text-slate-900 dark:text-white truncate lg:max-w-xs">{product.name}</span>
-                                                    <span className="text-[10px] text-slate-400 font-mono ml-2 hidden sm:inline-block">{product.code}</span>
+                                                    <span className="text-[10px] text-slate-400 font-mono ml-2 hidden sm:inline-block shrink-0">{product.code}</span>
                                                 </div>
                                             </td>
                                             <td className="px-3 text-right border-r border-slate-100 dark:border-white/5 opacity-60 bg-slate-50/50 dark:bg-black/20">
                                                 <span className="font-medium text-slate-500 tabular-nums">₺{Number(current.buyPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </td>
-                                            <td className="px-3 text-right border-r border-slate-100 dark:border-white/5">
+
+                                            {/* DİĞER LİSTELER (Referans Olanlar) */}
+                                            {targetListId !== 'default' && (
+                                                <td className="px-3 text-right border-r border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-[#1e293b]/30">
+                                                    <span className="font-medium text-slate-500 tabular-nums">₺{Number(product.price || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                </td>
+                                            )}
+                                            {priceLists.filter(list => list.id !== targetListId).map(list => {
+                                                const foundListPrice = (product.prices || []).find((pp: any) => pp.priceListId === list.id);
+                                                const val = foundListPrice ? parseFloat(foundListPrice.price) : 0;
+                                                return (
+                                                    <td key={list.id} className="px-3 text-right border-r border-slate-100 dark:border-white/5 opacity-70">
+                                                        <span className="font-medium text-slate-500 tabular-nums flex items-center justify-end gap-1">
+                                                            ₺{Number(val).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </span>
+                                                    </td>
+                                                );
+                                            })}
+
+                                            <td className="px-3 text-right border-r border-slate-100 dark:border-white/5 bg-amber-50/30 dark:bg-amber-900/5">
                                                 <span className={`font-semibold tabular-nums ${hasChange ? 'text-slate-400 line-through' : 'text-slate-900 dark:text-slate-200'}`}>
                                                     ₺{Number(current.currentPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </span>
