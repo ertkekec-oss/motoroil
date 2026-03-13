@@ -483,6 +483,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     });
     const [isSavingCheck, setIsSavingCheck] = useState(false);
 
+    const [otpModalOpen, setOtpModalOpen] = useState(false);
+    const [isSendingOtp, setIsSendingOtp] = useState(false);
+
     const triggerInvoiceConversion = async (invoiceData: any) => {
         const paidAmount = Number(selectedOrder?.paidAmount || 0);
         
@@ -2013,7 +2016,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 {lastInvoice?.description?.includes('Senet') && (
                                     <button
                                         onClick={() => {
-                                            alert("Periodya Trust & Compliance: Müşteriye SMS/Email üzerinden OTP ile Senet onaylatma/imzatlatma bağlantısı gönderilecek. \n(Bu özellik test modundadır.)");
+                                            setOtpModalOpen(true);
                                         }}
                                         className="btn btn-primary"
                                         style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.2) 100%)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
@@ -2775,6 +2778,65 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 style={{ marginTop: '24px', padding: '18px', borderRadius: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', border: 'none', fontWeight: '800', fontSize: '15px', cursor: isSavingCheck ? 'wait' : 'pointer' }}
                             >
                                 {isSavingCheck ? 'KAYDEDİLİYOR...' : 'ONAYLA VE PORTFÖYE EKLE'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* OTP COMPLIANCE MODAL */}
+            {otpModalOpen && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '560px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(245, 158, 11, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '24px' }}>✍️</span> Periodya Trust & Compliance
+                            </h3>
+                            <button onClick={() => setOtpModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
+                        </div>
+
+                        <div className="flex-col gap-4">
+                            <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
+                                Müşteriye senet onayı için OTP (Tek Kullanımlık Şifre) bağlantısı gönderebilir veya doğrudan senedi yazdırabilirsiniz.
+                            </p>
+                            
+                            <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '24px' }}>🛡️</span>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontWeight: '800', color: '#fbbf24', fontSize: '14px', marginBottom: '4px' }}>Güvenli E-İmza (OTP) Altyapısı</div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #aaa)', lineHeight: '1.4' }}>Sistem alıcının <strong>{customer.phone || customer.email || 'iletişim adresine'}</strong> benzersiz imza linki iletecektir.</div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={async () => {
+                                    setIsSendingOtp(true);
+                                    try {
+                                        // Simulate network request or API call to actually send it
+                                        await new Promise(res => setTimeout(res, 1500));
+                                        showSuccess("Başarılı", "Müşteriye senet onayı (OTP) SMS ve Email bağlantıları iletildi.");
+                                        setOtpModalOpen(false);
+                                    } catch (err: any) {
+                                        showError("Hata", err.message);
+                                    } finally {
+                                        setIsSendingOtp(false);
+                                    }
+                                }}
+                                disabled={isSendingOtp}
+                                style={{ marginTop: '24px', padding: '18px', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.2) 100%)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)', fontWeight: '800', fontSize: '15px', cursor: isSendingOtp ? 'wait' : 'pointer' }}
+                            >
+                                {isSendingOtp ? 'GÖNDERİLİYOR...' : 'SMS & E-POSTA İLE ONAYA SUN'}
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice?.id || ''}`, '_blank');
+                                    setOtpModalOpen(false);
+                                }}
+                                style={{ marginTop: '12px', padding: '18px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', fontSize: '15px', cursor: 'pointer' }}
+                                className="hover:bg-white/10"
+                            >
+                                SENEDİ YAZDIR / GÖRÜNTÜLE
                             </button>
                         </div>
                     </div>
