@@ -1421,17 +1421,24 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 )}
                                                                 {(() => {
                                                                     const isVadelendi = vadelenenIds.includes(item.id) || vadelenenIds.includes(item.orderId || '') || customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
+                                                                    const isPaidSale = item.type === 'Satış' && item.rawData?.paymentMode && !['account', 'veresiye'].includes(item.rawData.paymentMode);
+                                                                    const isDisabled = isVadelendi || isPaidSale;
+                                                                    let buttonText = '📅 Vadelendir';
+                                                                    if (isVadelendi) buttonText = '✅ Vadelendi';
+                                                                    else if (isPaidSale) buttonText = '🔒 Nakit/K.K. İle Ödenmiş';
+
                                                                     return (
                                                                         <button
                                                                             onClick={(e) => { 
                                                                                 e.stopPropagation(); 
-                                                                                if (!isVadelendi) handleOpenPlanModal(item); 
+                                                                                if (!isDisabled) handleOpenPlanModal(item); 
                                                                             }}
-                                                                            disabled={isVadelendi}
-                                                                            style={{ padding: '6px 12px', background: isVadelendi ? 'var(--bg-card, rgba(255,255,255,0.05))' : 'rgba(245, 158, 11, 0.1)', color: isVadelendi ? 'var(--text-muted, #888)' : '#f59e0b', border: isVadelendi ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: isVadelendi ? 'default' : 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', opacity: isVadelendi ? 0.7 : 1 }}
-                                                                            className={isVadelendi ? "" : "hover:bg-amber-500 hover:text-white"}
+                                                                            disabled={isDisabled}
+                                                                            style={{ padding: '6px 12px', background: isDisabled ? 'var(--bg-card, rgba(255,255,255,0.05))' : 'rgba(245, 158, 11, 0.1)', color: isDisabled ? 'var(--text-muted, #888)' : '#f59e0b', border: isDisabled ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: isDisabled ? 'default' : 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', opacity: isDisabled ? 0.7 : 1 }}
+                                                                            className={isDisabled ? "" : "hover:bg-amber-500 hover:text-white"}
+                                                                            title={isPaidSale ? "Nakit veya Kredi Kartı ile ödenmiş satışlar doğrudan vadelendirilemez. Vadelendirmek için önce İade/İptal butonunu kullanarak tahsilatı geri almalısınız." : ""}
                                                                         >
-                                                                            {isVadelendi ? '✅ Vadelendi' : '📅 Vadelendir'}
+                                                                            {buttonText}
                                                                         </button>
                                                                     );
                                                                 })()}
