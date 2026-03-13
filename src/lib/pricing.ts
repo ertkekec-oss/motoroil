@@ -27,10 +27,15 @@ export async function resolveCustomerPriceList(companyId: string, customerId?: s
             include: { category: true }
         });
 
-        if (customer?.priceListOverrideId) {
-            priceListId = customer.priceListOverrideId;
-        } else if (customer?.category?.defaultPriceListId) {
-            priceListId = customer.category.defaultPriceListId;
+        if (customer?.category?.priceListId) {
+            priceListId = customer.category.priceListId;
+        } else if (customer?.customerClass) {
+            const mappedCat = await prisma.customerCategory.findFirst({
+                where: { companyId, name: customer.customerClass }
+            });
+            if (mappedCat?.priceListId) {
+                priceListId = mappedCat.priceListId;
+            }
         }
     }
 
