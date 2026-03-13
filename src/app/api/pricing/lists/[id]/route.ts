@@ -54,6 +54,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
             return apiError({ message: 'Cannot delete default price list', status: 400 }, ctx.requestId);
         }
 
+        // Unlink from categories first to avoid foreign key constraint errors
+        await prisma.customerCategory.updateMany({
+            where: { priceListId: id },
+            data: { priceListId: null }
+        });
+
         await prisma.priceList.delete({ where: { id: id } });
         return apiResponse({ success: true }, { requestId: ctx.requestId });
     } catch (error: any) {

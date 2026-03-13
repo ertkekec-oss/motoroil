@@ -111,13 +111,13 @@ function SyncView({ products, onSave, isProcessing }: any) {
     };
 
     // Derived filtering logic
-    const uniqueCategories = Array.from(new Map(products.filter((p: any) => p.category?.id).map((p: any) => [p.category.id, p.category])).values()) as any[];
-    const uniqueBrands = Array.from(new Map(products.filter((p: any) => p.brand?.id).map((p: any) => [p.brand.id, p.brand])).values()) as any[];
+    const uniqueCategories = Array.from(new Set(products.map((p: any) => p.category).filter(Boolean))) as string[];
+    const uniqueBrands = Array.from(new Set(products.map((p: any) => p.brand).filter(Boolean))) as string[];
 
     const filteredProducts = products.filter((p: any) => {
         let match = true;
-        if (filterCategory !== 'all' && String(p.categoryId) !== filterCategory) match = false;
-        if (filterBrand !== 'all' && String(p.brandId) !== filterBrand) match = false;
+        if (filterCategory !== 'all' && p.category !== filterCategory) match = false;
+        if (filterBrand !== 'all' && p.brand !== filterBrand) match = false;
         return match;
     });
 
@@ -181,7 +181,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
                             onChange={(e) => { setFilterCategory(e.target.value); setSelectedRows([]); }}
                         >
                             <option value="all">Tüm Kategoriler</option>
-                            {uniqueCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            {uniqueCategories.map((c: string) => <option key={c} value={c}>{c}</option>)}
                         </select>
                         
                         <select 
@@ -190,7 +190,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
                             onChange={(e) => { setFilterBrand(e.target.value); setSelectedRows([]); }}
                         >
                             <option value="all">Tüm Markalar</option>
-                            {uniqueBrands.map((b: any) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                            {uniqueBrands.map((b: string) => <option key={b} value={b}>{b}</option>)}
                         </select>
                         
                         <div className="h-[28px] w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
@@ -466,7 +466,7 @@ function SettingsView() {
             const res = await fetch('/api/customers/categories', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: newCategoryName, defaultPriceListId: newCategoryListId || null })
+                body: JSON.stringify({ name: newCategoryName, priceListId: newCategoryListId || null })
             });
             const d = await res.json();
             if (d.success || d.ok) {

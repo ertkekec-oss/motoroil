@@ -108,9 +108,23 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
     };
 
     const refreshClasses = async () => {
-        // Use static definitions instead of failing API call
-        // This prevents the global error gate from locking up the app due to missing endpoint
-        setCustClasses(['A Sınıfı', 'B Sınıfı', 'C Sınıfı', 'VIP', 'Kurumsal']);
+        try {
+            const res = await apiFetch('/api/customers/categories');
+            if (!res.ok) throw new Error('Failed to fetch category data');
+            const responseData = await res.json();
+            const data = responseData.data || (Array.isArray(responseData) ? responseData : []);
+            
+            if (data.length > 0) {
+                const dbClasses = data.map((c: any) => c.name);
+                setCustClasses(dbClasses);
+            } else {
+                setCustClasses(['A Sınıfı', 'B Sınıfı', 'C Sınıfı', 'VIP', 'Kurumsal']);
+            }
+        } catch (err) {
+            console.warn('CRM Fetching Error (Classes): fallback to static definition', err);
+            setCustClasses(['A Sınıfı', 'B Sınıfı', 'C Sınıfı', 'VIP', 'Kurumsal']);
+        }
+
         setSuppClasses(['Resmi', 'Spot', 'İthalatçı', 'Yerel']);
         setError(null);
     };
