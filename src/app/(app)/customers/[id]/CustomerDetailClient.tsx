@@ -499,34 +499,53 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             // Scenario Logic
             let finalInstallmentAmount = newTotalAmount; // Varsayılan olarak tümünü vadelendir
 
-            if (invoiceData.isInstallment && paidAmount > 0) {
-                const difference = newTotalAmount - paidAmount;
-                
-                if (difference <= 0) {
-                    // Tamamı ödenmiş, ekstra satır yok (Fark = 0)
-                    const confirmed = window.confirm(`DİKKAT: Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.\n\nEğer bu işleme yinede Vade yapmak istiyorsanız OK (Tamam)'a basarak önceki tahsilatı İPTAL edip tüm bakiyeyi vadelendirebilirsiniz.\n\nVazgeçmek için İPTAL'e basın.`);
-                    if (!confirmed) {
-                        setIsConverting(false);
-                        return; // Vazgeç
-                    }
-                    // TODO: API tarafında bu tahsilatı iptal etme flag'i göndermeliyiz
-                    invoiceData.cancelPreviousPayment = true; 
-                    finalInstallmentAmount = newTotalAmount; // Tüm tutar
-                } else {
-                    // Kısmen ödenmiş veya Yeni Satır Eklenmiş (Fark > 0)
-                    const choice = window.prompt(`Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik kısmı tahsil edilmiş. Yeni genel toplam: ${newTotalAmount.toLocaleString('tr-TR')} ₺\n\nLütfen ne yapmak istediğinizi seçin:\n1 -> Sadece yeni eklenen/kalan tutarı (${difference.toLocaleString('tr-TR')} ₺) vadelendir.\n2 -> Önceki tahsilatı İPTAL ET, tüm tutarı (${newTotalAmount.toLocaleString('tr-TR')} ₺) vadelendir.\n\n(Geçerli bir rakam girin, iptal için boş bırakın)`, "1");
+            if (invoiceData.isInstallment) {
+                if (paidAmount > 0) {
+                    const difference = newTotalAmount - paidAmount;
                     
-                    if (choice === "1") {
-                        // Sadece fark vadelenecek
-                        finalInstallmentAmount = difference;
-                    } else if (choice === "2") {
-                        // Her şey iptal, hepsi vadelenecek
-                        invoiceData.cancelPreviousPayment = true;
-                        finalInstallmentAmount = newTotalAmount;
+                    if (difference <= 0) {
+                        // Tamamı ödenmiş, ekstra satır yok (Fark = 0)
+                        const confirmed = window.confirm(`DİKKAT: Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.\n\nEğer bu işleme yinede Vade yapmak istiyorsanız OK (Tamam)'a basarak önceki tahsilatı İPTAL edip tüm bakiyeyi vadelendirebilirsiniz.\n\nVazgeçmek için İPTAL'e basın.`);
+                        if (!confirmed) {
+                            setIsConverting(false);
+                            return; // Vazgeç
+                        }
+                        // TODO: API tarafında bu tahsilatı iptal etme flag'i göndermeliyiz
+                        invoiceData.cancelPreviousPayment = true; 
+                        finalInstallmentAmount = newTotalAmount; // Tüm tutar
                     } else {
+                        // Kısmen ödenmiş veya Yeni Satır Eklenmiş (Fark > 0)
+                        const choice = window.prompt(`Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik kısmı tahsil edilmiş. Yeni genel toplam: ${newTotalAmount.toLocaleString('tr-TR')} ₺\n\nLütfen ne yapmak istediğinizi seçin:\n1 -> Sadece yeni eklenen/kalan tutarı (${difference.toLocaleString('tr-TR')} ₺) vadelendir.\n2 -> Önceki tahsilatı İPTAL ET, tüm tutarı (${newTotalAmount.toLocaleString('tr-TR')} ₺) vadelendir.\n\n(Geçerli bir rakam girin, iptal için boş bırakın)`, "1");
+                        
+                        if (choice === "1") {
+                            // Sadece fark vadelenecek
+                            finalInstallmentAmount = difference;
+                        } else if (choice === "2") {
+                            // Her şey iptal, hepsi vadelenecek
+                            invoiceData.cancelPreviousPayment = true;
+                            finalInstallmentAmount = newTotalAmount;
+                        } else {
+                            setIsConverting(false);
+                            return; // Vazgeç
+                        }
+                    }
+                } else {
+                    // Açık Hesap / Hiç ödeme alınmamış sipariş
+                    const userAmount = window.prompt(`Girdiğiniz fatura kalemlerinin genel toplamı ${newTotalAmount.toLocaleString('tr-TR')} ₺.\n\nVadelendirmek istediğiniz tutar nedir? Farklı bir tutar girmek istiyorsanız aşağıya yazınız:`, newTotalAmount.toString());
+                    
+                    if (!userAmount) {
                         setIsConverting(false);
                         return; // Vazgeç
                     }
+
+                    const parsedAmount = parseFloat(userAmount.replace(',', '.'));
+                    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+                        alert("Geçersiz bir tutar girdiniz. İşlem iptal edildi.");
+                        setIsConverting(false);
+                        return;
+                    }
+                    
+                    finalInstallmentAmount = parsedAmount;
                 }
             }
 
