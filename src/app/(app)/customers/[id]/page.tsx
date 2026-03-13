@@ -93,11 +93,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             }
         }
 
-        // Build a map: orderId -> invoice, for quickly checking if a sale already has a formal invoice
-        const formalInvoiceByOrderId = new Map<string, any>();
+        // Build a map: orderId -> invoice, for quickly checking if a sale already has an invoice (draft or formal)
+        const invoiceByOrderId = new Map<string, any>();
         (customer.invoices || []).forEach((inv: any) => {
-            if (inv.orderId && inv.isFormal) {
-                formalInvoiceByOrderId.set(inv.orderId, inv);
+            if (inv.orderId) {
+                invoiceByOrderId.set(inv.orderId, inv);
             }
         });
 
@@ -129,10 +129,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     color: isCollection ? '#10b981' : (t.type === 'Payment' ? '#3b82f6' : (t.type === 'Sales' ? '#10b981' : '#ef4444')),
                     items: null,
                     orderId: orderId,
-                    // If an orderId exists and a formal invoice was created for it, mark as invoiced
-                    isFormal: orderId ? (formalInvoiceByOrderId.has(orderId) ? true : false) : false,
-                    formalUuid: orderId ? (formalInvoiceByOrderId.get(orderId)?.formalUuid || null) : null,
-                    formalInvoiceId: orderId ? (formalInvoiceByOrderId.get(orderId)?.id || null) : null
+                    // If an orderId exists and ANY invoice was created for it, mark as invoiced
+                    isFormal: orderId ? invoiceByOrderId.has(orderId) : false,
+                    formalUuid: orderId ? (invoiceByOrderId.get(orderId)?.formalUuid || null) : null,
+                    formalInvoiceId: orderId ? (invoiceByOrderId.get(orderId)?.id || null) : null
                 };
             });
 
@@ -198,18 +198,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 items: safeItems,
                 orderId: o.id,
                 isMarketplaceOrder: true,
-                isFormal: false
+                isFormal: invoiceByOrderId.has(o.id),
+                formalUuid: invoiceByOrderId.get(o.id)?.formalUuid || null,
+                formalInvoiceId: invoiceByOrderId.get(o.id)?.id || null
             };
         });
 
         const historyList = [...txs, ...invs, ...chkList, ...orderList]
-            .filter(item => {
-                // MÜKERRER KAYIT FİLTRESİ:
-                // Eğer bir 'Satış' hareketi zaten faturalandırılmışsa (isFormal: true),
-                // o hareketi listede gösterme. Çünkü 'Fatura' satırı zaten listede görünüyor.
-                if (item.type === 'Satış' && item.isFormal) return false;
-                return true;
-            })
             .sort((a: any, b: any) => {
                 const tA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
                 const tB = b.rawDate ? new Date(b.rawDate).getTime() : 0;

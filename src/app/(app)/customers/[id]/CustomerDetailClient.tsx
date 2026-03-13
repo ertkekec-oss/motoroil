@@ -42,6 +42,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     
     // UI State for instantaneous UI update after converting to installment
     const [vadelenenIds, setVadelenenIds] = useState<string[]>([]);
+    
+    // UI State for instantaneous UI update after creating an invoice
+    const [invoicedOrderIds, setInvoicedOrderIds] = useState<string[]>([]);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -621,6 +624,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     setInvoiceModalOpen(false);
                 }
 
+                setInvoicedOrderIds(prev => [...prev, selectedOrder?.id].filter(Boolean) as string[]);
                 router.refresh();
                 // Refresh data
                 await Promise.all([refreshCustomers(), refreshTransactions()]);
@@ -1351,45 +1355,48 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         {item.type === 'Satış' && (
                                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
                                                                 {item.orderId && (
-                                                                    item.isFormal ? (
-                                                                        <>
-                                                                            <span style={{
-                                                                                padding: '6px 10px',
-                                                                                background: 'rgba(16,185,129,0.1)',
-                                                                                color: '#10b981',
-                                                                                border: '1px solid rgba(16,185,129,0.2)',
-                                                                                borderRadius: '8px',
-                                                                                fontSize: '11px',
-                                                                                fontWeight: '800',
-                                                                                whiteSpace: 'nowrap',
-                                                                                display: 'inline-flex',
-                                                                                alignItems: 'center',
-                                                                                gap: '6px'
-                                                                            }}>
-                                                                                ✅ Faturalandı
-                                                                            </span>
-                                                                            {item.formalInvoiceId && (
-                                                                                <button
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
-                                                                                    }}
-                                                                                    style={{ padding: '6px 10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                                                                                    className="hover:bg-indigo-500 hover:text-white transition-colors"
-                                                                                >
-                                                                                    🖨️ Yazdır
-                                                                                </button>
-                                                                            )}
-                                                                        </>
-                                                                    ) : (
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
-                                                                            style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-                                                                            className="hover:bg-blue-500 hover:text-white box-shadow-blue"
-                                                                        >
-                                                                            🧾 Faturalandır
-                                                                        </button>
-                                                                    )
+                                                                    (() => {
+                                                                        const isReallyFormal = item.isFormal || invoicedOrderIds.includes(item.orderId);
+                                                                        return isReallyFormal ? (
+                                                                            <>
+                                                                                <span style={{
+                                                                                    padding: '6px 10px',
+                                                                                    background: 'rgba(16,185,129,0.1)',
+                                                                                    color: '#10b981',
+                                                                                    border: '1px solid rgba(16,185,129,0.2)',
+                                                                                    borderRadius: '8px',
+                                                                                    fontSize: '11px',
+                                                                                    fontWeight: '800',
+                                                                                    whiteSpace: 'nowrap',
+                                                                                    display: 'inline-flex',
+                                                                                    alignItems: 'center',
+                                                                                    gap: '6px'
+                                                                                }}>
+                                                                                    ✅ Faturalandı
+                                                                                </span>
+                                                                                {item.formalInvoiceId && (
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
+                                                                                        }}
+                                                                                        style={{ padding: '6px 10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                                                                        className="hover:bg-indigo-500 hover:text-white transition-colors"
+                                                                                    >
+                                                                                        🖨️ Yazdır
+                                                                                    </button>
+                                                                                )}
+                                                                            </>
+                                                                        ) : (
+                                                                            <button
+                                                                                onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                                style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                                className="hover:bg-blue-500 hover:text-white box-shadow-blue"
+                                                                            >
+                                                                                🧾 Faturalandır
+                                                                            </button>
+                                                                        );
+                                                                    })()
                                                                 )}
                                                                 {(() => {
                                                                     const isVadelendi = vadelenenIds.includes(item.id) || vadelenenIds.includes(item.orderId || '') || customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
