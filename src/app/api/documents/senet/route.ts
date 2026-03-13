@@ -142,7 +142,7 @@ export async function GET(req: NextRequest) {
                     title: `Senet Onayı: ${invoice.invoiceNo}`,
                     documentKey: objectKey,
                     documentFileName: `Senet-${invoice.invoiceNo}.pdf`,
-                    category: 'SENET',
+                    category: 'AGREEMENT', // Changed from SENET to match valid Prisma Enum (DocumentCategory)
                     otpRequired: true,
                     recipients: recipients
                 })
