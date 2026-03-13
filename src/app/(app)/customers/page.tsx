@@ -238,7 +238,7 @@ export default function CustomersPage() {
     const totalReceivable = customers.reduce((sum, c) => {
         const netBalance = Number(c.balance);
         const portfolioChecks = (c.checks || [])
-            .filter((check: any) => check.type.includes('Alınan'))
+            .filter((check: any) => check.type?.includes('Alınan'))
             .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
 
         return sum + (netBalance > 0 ? netBalance : 0) + portfolioChecks;
@@ -423,7 +423,7 @@ export default function CustomersPage() {
                         <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
                             {paginatedCustomers.map(cust => {
                                 const portfolioChecks = (cust.checks || [])
-                                    .filter((c: any) => c.type.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
+                                    .filter((c: any) => c.type?.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
                                     .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
                                 const rawBalance = Number(cust.balance);
                                 const effectiveBalance = rawBalance + portfolioChecks;
@@ -481,7 +481,7 @@ export default function CustomersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {paginatedCustomers.map(cust => {
                         const portfolioChecks = (cust.checks || [])
-                            .filter((c: any) => c.type.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
+                            .filter((c: any) => c.type?.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
                             .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
                         const rawBalance = Number(cust.balance);
                         const effectiveBalance = rawBalance + portfolioChecks;
