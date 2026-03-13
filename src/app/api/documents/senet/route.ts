@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { putObject } from '@/services/storage/objectStorage';
 import { v4 as uuidv4 } from 'uuid';
+import { redisConnection } from '@/lib/queue/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -116,6 +117,13 @@ export async function GET(req: NextRequest) {
                 }
             } catch (s3Err) {
                 console.error("S3 Upload failed, proceeding without physical document for now:", s3Err);
+            }
+
+            // Fallback: Write backup to Redis (ttl 7 days) just in case S3 fails or is not configured
+            try {
+                await redisConnection.set(`DOC_CACHE:${objectKey}`, Buffer.from(pdfBytes).toString('base64'), 'EX', 7 * 24 * 3600);
+            } catch (redisErr) {
+                console.warn("[Redis Backup] Failed to cache senet in Redis:", redisErr);
             }
 
             // Send to envelope endpoint (create envelope)

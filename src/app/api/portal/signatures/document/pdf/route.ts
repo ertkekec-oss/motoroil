@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { s3Client, getBucketName, sanitizeS3Key } from '@/lib/s3';
 import { applyPortalRateLimit } from '@/lib/portal-security';
 import { GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { redisConnection } from '@/lib/queue/redis';
 
 export const runtime = 'nodejs'; // Required for streaming large files from S3 sometimes, though edge is also fine if small
 
@@ -37,30 +38,40 @@ export async function GET(req: Request) {
         }
 
         let targetBucket: 'private' | 'public' = 'private';
+        let byteArray: Uint8Array | null = null;
 
         try {
-            await s3Client.send(new HeadObjectCommand({
-                Bucket: getBucketName('private'),
+            try {
+                await s3Client.send(new HeadObjectCommand({
+                    Bucket: getBucketName('private'),
+                    Key: sanitizeS3Key(targetKey)
+                }));
+            } catch (e: any) {
+                targetBucket = 'public';
+            }
+
+            // Fetch the object stream from S3
+            const command = new GetObjectCommand({
+                Bucket: getBucketName(targetBucket),
                 Key: sanitizeS3Key(targetKey)
-            }));
-        } catch (e: any) {
-            targetBucket = 'public';
+            });
+
+            const s3Response = await s3Client.send(command);
+
+            if (s3Response.Body) {
+                byteArray = await s3Response.Body.transformToByteArray();
+            }
+        } catch (s3Err) {
+            console.warn(`[Sign Portal] S3 fetch failed for ${targetKey}, trying Redis cache fallback...`);
+            const cachedBase64 = await redisConnection.get(`DOC_CACHE:${targetKey}`);
+            if (cachedBase64) {
+                byteArray = Buffer.from(cachedBase64, 'base64');
+            }
         }
 
-        // Fetch the object stream from S3
-        const command = new GetObjectCommand({
-            Bucket: getBucketName(targetBucket),
-            Key: sanitizeS3Key(targetKey)
-        });
-
-        const s3Response = await s3Client.send(command);
-
-        if (!s3Response.Body) {
-            return new NextResponse('Document body empty', { status: 500 });
+        if (!byteArray) {
+            return new NextResponse('Document not found or empty', { status: 404 });
         }
-
-        // Convert the S3 payload into a byte array
-        const byteArray = await s3Response.Body.transformToByteArray();
 
         const fileName = (env.status === 'COMPLETED' && env.signedDocumentKey) ? `signed_${env.documentFileName}` : env.documentFileName;
 

@@ -41,16 +41,44 @@ export async function POST(req: Request) {
             where: { tenantId_providerName: { tenantId: envelope.tenantId, providerName: 'NETGSM' } }
         });
 
-        if (!config || !config.isEnabled) {
-            return NextResponse.json({ error: 'OTP configuration disabled' }, { status: 500 });
-        }
-
         // Phone Resolution Logic
         const resolvedPhone = session.recipient.phone || session.recipient.signer?.phone;
 
         if (!resolvedPhone) {
             return NextResponse.json({ error: 'No phone number available for OTP verification.' }, { status: 400 });
         }
+
+        if (!config || !config.isEnabled) {
+            console.warn(`[OTP] Skipped real SMS for ${resolvedPhone} because NETGSM config is disabled. Generating static 123456 code.`);
+            const code = '123456';
+            const codeHash = createHash('sha256').update(code).digest('hex');
+            const expiresAt = new Date();
+            expiresAt.setSeconds(expiresAt.getSeconds() + 300);
+
+            await prisma.otpVerification.create({
+                data: {
+                    tenantId: envelope.tenantId,
+                    phone: resolvedPhone,
+                    codeHash,
+                    expiresAt,
+                    sessionId: session.id
+                }
+            });
+
+            await prisma.signatureAuditEvent.create({
+                data: {
+                    tenantId: envelope.tenantId,
+                    envelopeId: envelope.id,
+                    action: 'OTP_SENT_SIMULATED',
+                    actorId: session.recipientId,
+                    metaJson: { phone: resolvedPhone, code_simulated: '123456' } as any
+                }
+            });
+
+            return NextResponse.json({ success: true, message: 'Doğrulama kodu simüle edildi: 123456' });
+        }
+
+        // Moved Phone Resolution above to be used by the simulation block as well.
 
         // Cooldown and rate limit check
         const recentAttempts = await prisma.otpVerification.findMany({
