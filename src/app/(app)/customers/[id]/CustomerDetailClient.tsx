@@ -462,6 +462,74 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const handleConvertToInvoice = async (invoiceData: any) => {
         setIsConverting(true);
         try {
+            // Check if user requested installment, and the order was already paid
+            const paidAmount = Number(selectedOrder?.paidAmount || 0);
+            
+            // Calculate total of new invoice
+            let newSubtotal = 0;
+            let newTotalOtv = 0;
+            let newTotalOiv = 0;
+            let newTotalVat = 0;
+
+            invoiceItems.forEach(it => {
+                const lineQty = Number(it.qty || 1);
+                const lineNet = lineQty * Number(it.price || 0);
+                let lineOtv = 0;
+                if (it.otvType === 'yüzdesel Ö.T.V') {
+                    lineOtv = lineNet * (Number(it.otv || 0) / 100);
+                } else if (it.otvType === 'maktu Ö.T.V') {
+                    lineOtv = Number(it.otv || 0) * lineQty;
+                }
+                const matrah = lineNet + lineOtv;
+                newTotalOtv += lineOtv;
+                newTotalOiv += matrah * (Number(it.oiv || 0) / 100);
+                newTotalVat += matrah * (Number(it.vat || 20) / 100);
+                newSubtotal += lineNet;
+            });
+
+            let discAmount = 0;
+            if (discountType === 'percent') {
+                discAmount = newSubtotal * (discountValue / 100);
+            } else {
+                discAmount = discountValue;
+            }
+
+            const newTotalAmount = newSubtotal + newTotalOtv + newTotalOiv + newTotalVat - discAmount;
+
+            // Scenario Logic
+            let finalInstallmentAmount = newTotalAmount; // Varsayılan olarak tümünü vadelendir
+
+            if (invoiceData.isInstallment && paidAmount > 0) {
+                const difference = newTotalAmount - paidAmount;
+                
+                if (difference <= 0) {
+                    // Tamamı ödenmiş, ekstra satır yok (Fark = 0)
+                    const confirmed = window.confirm(`DİKKAT: Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.\n\nEğer bu işleme yinede Vade yapmak istiyorsanız OK (Tamam)'a basarak önceki tahsilatı İPTAL edip tüm bakiyeyi vadelendirebilirsiniz.\n\nVazgeçmek için İPTAL'e basın.`);
+                    if (!confirmed) {
+                        setIsConverting(false);
+                        return; // Vazgeç
+                    }
+                    // TODO: API tarafında bu tahsilatı iptal etme flag'i göndermeliyiz
+                    invoiceData.cancelPreviousPayment = true; 
+                    finalInstallmentAmount = newTotalAmount; // Tüm tutar
+                } else {
+                    // Kısmen ödenmiş veya Yeni Satır Eklenmiş (Fark > 0)
+                    const choice = window.prompt(`Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik kısmı tahsil edilmiş. Yeni genel toplam: ${newTotalAmount.toLocaleString('tr-TR')} ₺\n\nLütfen ne yapmak istediğinizi seçin:\n1 -> Sadece yeni eklenen/kalan tutarı (${difference.toLocaleString('tr-TR')} ₺) vadelendir.\n2 -> Önceki tahsilatı İPTAL ET, tüm tutarı (${newTotalAmount.toLocaleString('tr-TR')} ₺) vadelendir.\n\n(Geçerli bir rakam girin, iptal için boş bırakın)`, "1");
+                    
+                    if (choice === "1") {
+                        // Sadece fark vadelenecek
+                        finalInstallmentAmount = difference;
+                    } else if (choice === "2") {
+                        // Her şey iptal, hepsi vadelenecek
+                        invoiceData.cancelPreviousPayment = true;
+                        finalInstallmentAmount = newTotalAmount;
+                    } else {
+                        setIsConverting(false);
+                        return; // Vazgeç
+                    }
+                }
+            }
+
             const res = await fetch('/api/sales/invoices/convert', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -482,7 +550,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 title: `Vadeli Satış: ${invoiceData.name}`,
-                                totalAmount: data.invoice.totalAmount,
+                                totalAmount: finalInstallmentAmount.toString(),
                                 installmentCount: invoiceData.installments.toString(),
                                 startDate: new Date().toISOString().split('T')[0],
                                 type: invoiceData.installmentType || 'Açık Hesap',

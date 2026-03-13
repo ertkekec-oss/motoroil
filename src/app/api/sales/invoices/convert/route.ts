@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { orderId, customerId, invoiceNo, taxNumber, taxOffice, address, phone, name, isFormal, description, items: customItems, discount, createWayslip } = body;
+        const { orderId, customerId, invoiceNo, taxNumber, taxOffice, address, phone, name, isFormal, description, items: customItems, discount, createWayslip, cancelPreviousPayment } = body;
 
         // 1. Fetch the original order
         const order = await prisma.order.findUnique({
@@ -99,6 +99,50 @@ export async function POST(request: Request) {
                     address: address || undefined
                 }
             });
+
+            // C. Cancel previous payment if requested (Re-Structuring debt)
+            if (cancelPreviousPayment) {
+                // Bulunan tahsilatı bul (Sipariş/Fatura numarası geçen Tahsilat işlemleri)
+                const previousPaymentTx = await tx.transaction.findFirst({
+                    where: {
+                        companyId: order.companyId,
+                        customerId: customerId,
+                        description: { contains: order.orderNumber },
+                        type: { in: ['Payment', 'Tahsilat'] }
+                    }
+                });
+
+                if (previousPaymentTx) {
+                    // İşlemi ters çevir (Kasa bakiyesini düşüp, cari alacağı sıfırla/artır)
+                    if (previousPaymentTx.kasaId) {
+                        await tx.kasa.update({
+                            where: { id: previousPaymentTx.kasaId },
+                            data: { balance: { decrement: previousPaymentTx.amount } }
+                        });
+                    }
+
+                    // Cari hesabı borçlandır (Çünkü ödemeyi iptal ettik)
+                    await tx.customer.update({
+                        where: { id: customerId },
+                        data: { balance: { increment: previousPaymentTx.amount } }
+                    });
+
+                    // İşlemi geçmişte kafa karıştırmaması için İptal olarak işaretle veya Açıklamasına İptal yaz
+                    await tx.transaction.update({
+                        where: { id: previousPaymentTx.id },
+                        data: {
+                            description: `[İPTAL EDİLDİ (Vadelendirme)] ${previousPaymentTx.description}`,
+                            amount: 0 // finansal tabloyu yanıltmaması için
+                        }
+                    });
+
+                    // Siparişin de paidAmount'unu sıfırla
+                    await tx.order.update({
+                        where: { id: order.id },
+                        data: { paidAmount: 0 }
+                    });
+                }
+            }
 
             // C. Update Products' Tax Settings and Description (Learning & Sync)
             for (const item of itemsToUse) {
