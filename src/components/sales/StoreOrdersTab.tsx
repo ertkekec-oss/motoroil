@@ -24,6 +24,10 @@ export function StoreOrdersTab({
     const [turnoverCustomStart, setTurnoverCustomStart] = useState('');
     const [turnoverCustomEnd, setTurnoverCustomEnd] = useState('');
 
+    const [dateFilter, setDateFilter] = useState('MONTH');
+    const [customStartDate, setCustomStartDate] = useState('');
+    const [customEndDate, setCustomEndDate] = useState('');
+
     const [currentPage, setCurrentPage] = useState(1);
     const ordersPerPage = 10;
 
@@ -68,8 +72,26 @@ export function StoreOrdersTab({
         }
     };
 
-    const totalPages = Math.ceil(storeOrders.length / ordersPerPage);
-    const paginatedOrders = storeOrders.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
+    const filteredOrders = storeOrders.filter(o => {
+        if (dateFilter === 'ALL') return true;
+        const d = new Date(o.orderDate || o.date);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        if (dateFilter === 'TODAY') return d >= today;
+        if (dateFilter === 'WEEK') { const w = new Date(today); w.setDate(w.getDate() - 7); return d >= w; }
+        if (dateFilter === 'MONTH') { const m = new Date(today); m.setMonth(m.getMonth() - 1); return d >= m; }
+        if (dateFilter === '3MONTHS') { const m = new Date(today); m.setMonth(m.getMonth() - 3); return d >= m; }
+        if (dateFilter === 'CUSTOM' && customStartDate && customEndDate) {
+            const end = new Date(customEndDate); end.setHours(23, 59, 59);
+            return d >= new Date(customStartDate) && d <= end;
+        }
+        return true;
+    });
+
+    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+    const paginatedOrders = filteredOrders.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
+
+    useEffect(() => { setCurrentPage(1); }, [dateFilter, customStartDate, customEndDate]);
 
     const cardClass = isLight
         ? "bg-white border border-slate-200 shadow-sm"
@@ -80,16 +102,40 @@ export function StoreOrdersTab({
 
     return (
         <div className="space-y-8 font-sans">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Mağaza Satış Geçmişi (POS)</h3>
-                <button
-                    onClick={fetchStoreOrders}
-                    className={`h-[40px] px-4 items-center justify-center flex gap-2 rounded-[12px] font-medium text-[13px] border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                
+                <div className="flex flex-wrap items-center gap-2">
+                     <select
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        className={`h-[36px] px-3 border rounded-[10px] text-[13px] font-medium transition-colors outline-none ${
+                            isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'
                         }`}
-                >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                    Yenile
-                </button>
+                    >
+                        <option value="ALL">Tüm Zamanlar</option>
+                        <option value="TODAY">Bugün</option>
+                        <option value="WEEK">Son 1 Hafta</option>
+                        <option value="MONTH">Son 1 Ay</option>
+                        <option value="3MONTHS">Son 3 Ay</option>
+                        <option value="CUSTOM">Özel</option>
+                    </select>
+                    {dateFilter === 'CUSTOM' && (
+                         <div className="flex gap-2 items-center">
+                             <input type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} className={`h-[36px] px-2 rounded-[10px] border text-[12px] ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
+                             <span className={textLabelClass}>-</span>
+                             <input type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} className={`h-[36px] px-2 rounded-[10px] border text-[12px] ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
+                         </div>
+                    )}
+                    <button
+                        onClick={fetchStoreOrders}
+                        className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[13px] border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                            }`}
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        Yenile
+                    </button>
+                </div>
             </div>
 
             {/* Store Stats Summary */}

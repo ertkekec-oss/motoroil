@@ -57,6 +57,10 @@ export function InvoicesTab({
     const [expandedDetails, setExpandedDetails] = useState<Record<string, any>>({});
     const [loadingDetails, setLoadingDetails] = useState<Record<string, boolean>>({});
 
+    const [dateFilter, setDateFilter] = useState('MONTH');
+    const [customStartDate, setCustomStartDate] = useState('');
+    const [customEndDate, setCustomEndDate] = useState('');
+
     const toggleExpand = async (id: string) => {
         if (expandedOrderId === id) {
             setExpandedOrderId(null);
@@ -86,10 +90,30 @@ export function InvoicesTab({
     else if (invoiceSubTab === 'incoming') activeList = purchaseInvoices;
     else if (invoiceSubTab === 'wayslips') activeList = (wayslips || []).filter(w => w.type === (wayslipType === 'gelen' ? 'Gelen' : 'Giden'));
 
+    activeList = activeList.filter(o => {
+        if (dateFilter === 'ALL') return true;
+        const d = new Date(o.createdAt || o.date || o.issueDate || o.invoiceDate || o.orderDate || o.timestamp);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        // Handle invalid dates
+        if (isNaN(d.getTime())) return true;
+
+        if (dateFilter === 'TODAY') return d >= today;
+        if (dateFilter === 'WEEK') { const w = new Date(today); w.setDate(w.getDate() - 7); return d >= w; }
+        if (dateFilter === 'MONTH') { const m = new Date(today); m.setMonth(m.getMonth() - 1); return d >= m; }
+        if (dateFilter === '3MONTHS') { const m = new Date(today); m.setMonth(m.getMonth() - 3); return d >= m; }
+        if (dateFilter === 'CUSTOM' && customStartDate && customEndDate) {
+            const end = new Date(customEndDate); end.setHours(23, 59, 59);
+            return d >= new Date(customStartDate) && d <= end;
+        }
+        return true;
+    });
+
     const totalPages = Math.ceil((activeList?.length || 0) / ordersPerPage);
     const paginatedList = activeList.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
 
-    useEffect(() => setCurrentPage(1), [invoiceSubTab, wayslipType]);
+    useEffect(() => setCurrentPage(1), [invoiceSubTab, wayslipType, dateFilter, customStartDate, customEndDate]);
 
     const cardClass = isLight ? "bg-white border border-slate-200 shadow-sm" : "bg-slate-900 border border-slate-800";
     const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
@@ -127,14 +151,27 @@ export function InvoicesTab({
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h3 className={`text-[16px] font-semibold ${textValueClass}`}>Kesilen Satış Faturaları</h3>
-                        <button
-                            onClick={fetchInvoices}
-                            className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
-                                }`}
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                            Yenile
-                        </button>
+                        <div className="flex gap-3 items-center">
+                            <select
+                                value={dateFilter}
+                                onChange={(e) => setDateFilter(e.target.value)}
+                                className={`h-[36px] px-3 border rounded-[10px] text-[13px] font-medium transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`}
+                            >
+                                <option value="ALL">Tüm Zamanlar</option>
+                                <option value="TODAY">Bugün</option>
+                                <option value="WEEK">Son 1 Hafta</option>
+                                <option value="MONTH">Son 1 Ay</option>
+                                <option value="3MONTHS">Son 3 Ay</option>
+                            </select>
+                            <button
+                                onClick={fetchInvoices}
+                                className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                                    }`}
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                Yenile
+                            </button>
+                        </div>
                     </div>
 
                     {isLoadingInvoices ? (
@@ -276,14 +313,27 @@ export function InvoicesTab({
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h3 className={`text-[16px] font-semibold ${textValueClass}`}>Gelen Alım Faturaları</h3>
-                        <button
-                            onClick={fetchPurchaseInvoices}
-                            className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
-                                }`}
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                            Yenile
-                        </button>
+                        <div className="flex gap-3 items-center">
+                            <select
+                                value={dateFilter}
+                                onChange={(e) => setDateFilter(e.target.value)}
+                                className={`h-[36px] px-3 border rounded-[10px] text-[13px] font-medium transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`}
+                            >
+                                <option value="ALL">Tüm Zamanlar</option>
+                                <option value="TODAY">Bugün</option>
+                                <option value="WEEK">Son 1 Hafta</option>
+                                <option value="MONTH">Son 1 Ay</option>
+                                <option value="3MONTHS">Son 3 Ay</option>
+                            </select>
+                            <button
+                                onClick={fetchPurchaseInvoices}
+                                className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                                    }`}
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                Yenile
+                            </button>
+                        </div>
                     </div>
 
                     {isLoadingPurchaseInvoices ? <div className={`text-[14px] py-8 ${textLabelClass}`}>Yükleniyor...</div> : (
@@ -357,7 +407,18 @@ export function InvoicesTab({
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h3 className={`text-[16px] font-semibold ${textValueClass}`}>e-İrsaliye Yönetimi</h3>
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 items-center">
+                            <select
+                                value={dateFilter}
+                                onChange={(e) => setDateFilter(e.target.value)}
+                                className={`h-[36px] px-3 border rounded-[10px] text-[13px] font-medium transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`}
+                            >
+                                <option value="ALL">Tüm Zamanlar</option>
+                                <option value="TODAY">Bugün</option>
+                                <option value="WEEK">Son 1 Hafta</option>
+                                <option value="MONTH">Son 1 Ay</option>
+                                <option value="3MONTHS">Son 3 Ay</option>
+                            </select>
                             <button
                                 onClick={() => setView('new_wayslip')}
                                 className={`h-[36px] px-4 rounded-[10px] text-[12px] font-medium transition-colors flex items-center gap-2 ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}

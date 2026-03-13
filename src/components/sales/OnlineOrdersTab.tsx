@@ -321,6 +321,32 @@ export function OnlineOrdersTab({
                             <OutlineChip key={val} active={statusFilter === val} onClick={() => setStatusFilter(val)}>{label}</OutlineChip>
                         ))}
                     </div>
+
+                    <div className={`w-[1px] h-[24px] ${isLight ? 'bg-slate-200' : 'bg-slate-700'}`}></div>
+
+                    <div className="flex gap-2 items-center">
+                        <select
+                            value={dateFilter}
+                            onChange={(e) => setDateFilter(e.target.value)}
+                            className={`h-[36px] px-3 rounded-[10px] text-[13px] font-medium border outline-none transition-colors ${
+                                isLight ? 'bg-white border-slate-200 text-slate-700 focus:border-blue-500' : 'bg-slate-800 border-slate-700 text-slate-300 focus:border-blue-500'
+                            }`}
+                        >
+                            <option value="ALL">Tüm Zamanlar</option>
+                            <option value="TODAY">Bugün</option>
+                            <option value="WEEK">Son 1 Hafta</option>
+                            <option value="MONTH">Son 1 Ay</option>
+                            <option value="3MONTHS">Son 3 Ay</option>
+                            <option value="CUSTOM">Özel Tarih</option>
+                        </select>
+                        {dateFilter === 'CUSTOM' && (
+                             <div className="flex gap-2 text-[12px] items-center">
+                                 <input type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} className={`h-[36px] px-2 rounded-[6px] border ${isLight ? 'bg-white border-slate-200' : 'bg-slate-800 border-slate-700'} text-slate-600 dark:text-slate-300`} />
+                                 <span className={textLabelClass}>-</span>
+                                 <input type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} className={`h-[36px] px-2 rounded-[6px] border ${isLight ? 'bg-white border-slate-200' : 'bg-slate-800 border-slate-700'} text-slate-600 dark:text-slate-300`} />
+                             </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
