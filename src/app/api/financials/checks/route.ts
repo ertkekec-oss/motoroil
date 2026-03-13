@@ -104,7 +104,10 @@ export async function POST(req: Request) {
             });
 
             // 1. Update Sub-Ledger (Current Account)
-            if (type === 'In' && customerId) {
+            const isIncoming = type === 'In' || type?.includes('Alınan');
+            const isOutgoing = type === 'Out' || type?.includes('Verilen');
+
+            if (isIncoming && customerId) {
                 await tx.customer.update({
                     where: { id: customerId },
                     data: { balance: { decrement: amt } }
@@ -139,7 +142,7 @@ export async function POST(req: Request) {
                 }, tx);
             }
 
-            if (type === 'Out' && supplierId) {
+            if (isOutgoing && supplierId) {
                 await tx.supplier.update({
                     where: { id: supplierId },
                     data: { balance: { decrement: amt } }

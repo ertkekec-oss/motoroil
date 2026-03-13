@@ -459,95 +459,85 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
         }
     };
 
-    const handleConvertToInvoice = async (invoiceData: any) => {
+    const [installmentPrompt, setInstallmentPrompt] = useState<{
+        isOpen: boolean;
+        type: 'NO_DIFFERENCE' | 'PARTIAL_PAYMENT' | 'NO_PAYMENT' | null;
+        invoiceData?: any;
+        paidAmount?: number;
+        newTotalAmount?: number;
+        difference?: number;
+    }>({ isOpen: false, type: null });
+
+    const [customInstallAmount, setCustomInstallAmount] = useState<string>('');
+
+    const [checkAddModalOpen, setCheckAddModalOpen] = useState(false);
+    const [newCheckData, setNewCheckData] = useState({
+        type: 'Alınan Çek',
+        number: '',
+        bank: '',
+        dueDate: '',
+        amount: '',
+        description: '',
+        branch: 'Merkez',
+        file: null as File | null
+    });
+    const [isSavingCheck, setIsSavingCheck] = useState(false);
+
+    const triggerInvoiceConversion = async (invoiceData: any) => {
+        const paidAmount = Number(selectedOrder?.paidAmount || 0);
+        
+        // Calculate total of new invoice
+        let newSubtotal = 0;
+        let newTotalOtv = 0;
+        let newTotalOiv = 0;
+        let newTotalVat = 0;
+
+        invoiceItems.forEach(it => {
+            const lineQty = Number(it.qty || 1);
+            const lineNet = lineQty * Number(it.price || 0);
+            let lineOtv = 0;
+            if (it.otvType === 'yüzdesel Ö.T.V') {
+                lineOtv = lineNet * (Number(it.otv || 0) / 100);
+            } else if (it.otvType === 'maktu Ö.T.V') {
+                lineOtv = Number(it.otv || 0) * lineQty;
+            }
+            const matrah = lineNet + lineOtv;
+            newTotalOtv += lineOtv;
+            newTotalOiv += matrah * (Number(it.oiv || 0) / 100);
+            newTotalVat += matrah * (Number(it.vat || 20) / 100);
+            newSubtotal += lineNet;
+        });
+
+        let discAmount = 0;
+        if (discountType === 'percent') {
+            discAmount = newSubtotal * (discountValue / 100);
+        } else {
+            discAmount = discountValue;
+        }
+
+        const newTotalAmount = newSubtotal + newTotalOtv + newTotalOiv + newTotalVat - discAmount;
+
+        if (invoiceData.isInstallment) {
+            if (paidAmount > 0) {
+                const difference = newTotalAmount - paidAmount;
+                
+                if (difference <= 0) {
+                    setInstallmentPrompt({ isOpen: true, type: 'NO_DIFFERENCE', invoiceData, paidAmount, newTotalAmount, difference });
+                } else {
+                    setInstallmentPrompt({ isOpen: true, type: 'PARTIAL_PAYMENT', invoiceData, paidAmount, newTotalAmount, difference });
+                }
+            } else {
+                setCustomInstallAmount(newTotalAmount.toString());
+                setInstallmentPrompt({ isOpen: true, type: 'NO_PAYMENT', invoiceData, paidAmount: 0, newTotalAmount, difference: 0 });
+            }
+        } else {
+            proceedWithInvoice(invoiceData, newTotalAmount);
+        }
+    };
+
+    const proceedWithInvoice = async (invoiceData: any, finalInstallmentAmount: number) => {
         setIsConverting(true);
         try {
-            // Check if user requested installment, and the order was already paid
-            const paidAmount = Number(selectedOrder?.paidAmount || 0);
-            
-            // Calculate total of new invoice
-            let newSubtotal = 0;
-            let newTotalOtv = 0;
-            let newTotalOiv = 0;
-            let newTotalVat = 0;
-
-            invoiceItems.forEach(it => {
-                const lineQty = Number(it.qty || 1);
-                const lineNet = lineQty * Number(it.price || 0);
-                let lineOtv = 0;
-                if (it.otvType === 'yüzdesel Ö.T.V') {
-                    lineOtv = lineNet * (Number(it.otv || 0) / 100);
-                } else if (it.otvType === 'maktu Ö.T.V') {
-                    lineOtv = Number(it.otv || 0) * lineQty;
-                }
-                const matrah = lineNet + lineOtv;
-                newTotalOtv += lineOtv;
-                newTotalOiv += matrah * (Number(it.oiv || 0) / 100);
-                newTotalVat += matrah * (Number(it.vat || 20) / 100);
-                newSubtotal += lineNet;
-            });
-
-            let discAmount = 0;
-            if (discountType === 'percent') {
-                discAmount = newSubtotal * (discountValue / 100);
-            } else {
-                discAmount = discountValue;
-            }
-
-            const newTotalAmount = newSubtotal + newTotalOtv + newTotalOiv + newTotalVat - discAmount;
-
-            // Scenario Logic
-            let finalInstallmentAmount = newTotalAmount; // Varsayılan olarak tümünü vadelendir
-
-            if (invoiceData.isInstallment) {
-                if (paidAmount > 0) {
-                    const difference = newTotalAmount - paidAmount;
-                    
-                    if (difference <= 0) {
-                        // Tamamı ödenmiş, ekstra satır yok (Fark = 0)
-                        const confirmed = window.confirm(`DİKKAT: Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.\n\nEğer bu işleme yinede Vade yapmak istiyorsanız OK (Tamam)'a basarak önceki tahsilatı İPTAL edip tüm bakiyeyi vadelendirebilirsiniz.\n\nVazgeçmek için İPTAL'e basın.`);
-                        if (!confirmed) {
-                            setIsConverting(false);
-                            return; // Vazgeç
-                        }
-                        // TODO: API tarafında bu tahsilatı iptal etme flag'i göndermeliyiz
-                        invoiceData.cancelPreviousPayment = true; 
-                        finalInstallmentAmount = newTotalAmount; // Tüm tutar
-                    } else {
-                        // Kısmen ödenmiş veya Yeni Satır Eklenmiş (Fark > 0)
-                        const choice = window.prompt(`Bu siparişin ${paidAmount.toLocaleString('tr-TR')} ₺'lik kısmı tahsil edilmiş. Yeni genel toplam: ${newTotalAmount.toLocaleString('tr-TR')} ₺\n\nLütfen ne yapmak istediğinizi seçin:\n1 -> Sadece yeni eklenen/kalan tutarı (${difference.toLocaleString('tr-TR')} ₺) vadelendir.\n2 -> Önceki tahsilatı İPTAL ET, tüm tutarı (${newTotalAmount.toLocaleString('tr-TR')} ₺) vadelendir.\n\n(Geçerli bir rakam girin, iptal için boş bırakın)`, "1");
-                        
-                        if (choice === "1") {
-                            // Sadece fark vadelenecek
-                            finalInstallmentAmount = difference;
-                        } else if (choice === "2") {
-                            // Her şey iptal, hepsi vadelenecek
-                            invoiceData.cancelPreviousPayment = true;
-                            finalInstallmentAmount = newTotalAmount;
-                        } else {
-                            setIsConverting(false);
-                            return; // Vazgeç
-                        }
-                    }
-                } else {
-                    // Açık Hesap / Hiç ödeme alınmamış sipariş
-                    const userAmount = window.prompt(`Girdiğiniz fatura kalemlerinin genel toplamı ${newTotalAmount.toLocaleString('tr-TR')} ₺.\n\nVadelendirmek istediğiniz tutar nedir? Farklı bir tutar girmek istiyorsanız aşağıya yazınız:`, newTotalAmount.toString());
-                    
-                    if (!userAmount) {
-                        setIsConverting(false);
-                        return; // Vazgeç
-                    }
-
-                    const parsedAmount = parseFloat(userAmount.replace(',', '.'));
-                    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-                        alert("Geçersiz bir tutar girdiniz. İşlem iptal edildi.");
-                        setIsConverting(false);
-                        return;
-                    }
-                    
-                    finalInstallmentAmount = parsedAmount;
-                }
-            }
 
             const res = await fetch('/api/sales/invoices/convert', {
                 method: 'POST',
@@ -1184,8 +1174,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         </div>
                     ) : activeTab === 'checks' ? (
                         <div style={{ padding: '32px' }}>
-                            <div style={{ marginBottom: '24px' }}>
+                            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Çek & Senetleri</h3>
+                                <button
+                                    onClick={() => setCheckAddModalOpen(true)}
+                                    className="btn btn-primary"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', fontWeight: '800', border: 'none', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}
+                                >
+                                    ➕ Yeni Evrak Ekle
+                                </button>
                             </div>
                             {!customer.checks || customer.checks.length === 0 ? (
                                 <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
@@ -1377,7 +1374,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     )
                                                                 )}
                                                                 {(() => {
-                                                                    const isVadelendi = customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId));
+                                                                    const isVadelendi = customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
                                                                     return (
                                                                         <button
                                                                             onClick={(e) => { 
@@ -1963,7 +1960,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 return '';
                                             })()
                                         };
-                                        handleConvertToInvoice(data);
+                                        triggerInvoiceConversion(data);
                                     }}
                                     style={{ minWidth: '260px', height: '60px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 12px 24px rgba(37, 99, 235, 0.4)', fontSize: '16px', letterSpacing: '1px', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
                                     className={isConverting ? "opacity-70" : "hover:-translate-y-1 hover:shadow-2xl"}
@@ -2012,6 +2009,18 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 >
                                     <span style={{ fontSize: '24px' }}>📧</span> E-Posta ile Gönder
                                 </button>
+                                
+                                {lastInvoice?.description?.includes('Senet') && (
+                                    <button
+                                        onClick={() => {
+                                            alert("Periodya Trust & Compliance: Müşteriye SMS/Email üzerinden OTP ile Senet onaylatma/imzatlatma bağlantısı gönderilecek. \n(Bu özellik test modundadır.)");
+                                        }}
+                                        className="btn btn-primary"
+                                        style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.2) 100%)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
+                                    >
+                                        <span style={{ fontSize: '24px' }}>✍️</span> Seneti Yazdır / OTP İmzaya Sun
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`, '_blank')}
                                     style={{ marginTop: '16px', background: 'none', border: 'none', color: '#3b82f6', fontSize: '15px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
@@ -2033,8 +2042,112 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 )
             }
 
+            {/* INSTALLMENT PROMPT MODAL */}
+            {installmentPrompt.isOpen && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '540px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '24px' }}>💼</span> Vadelendirme Seçimi
+                            </h3>
+                            <button onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
+                        </div>
 
-            {/* ADDITIONAL TAX MODAL */}
+                        {installmentPrompt.type === 'NO_DIFFERENCE' && (
+                            <div className="flex-col gap-6">
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
+                                    Bu siparişin <strong>{installmentPrompt.paidAmount?.toLocaleString('tr-TR')} ₺</strong>'lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.
+                                </p>
+                                <p style={{ fontSize: '15px', color: '#f59e0b', fontWeight: '600', padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                                    Eğer bu işleme yinede vade yapmak istiyorsanız Vadelendir'e basarak önceki tahsilatı iptal edip tüm bakiyeyi vadelendirebilirsiniz.
+                                </p>
+                                <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                                    <button onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} style={{ flex: 1, padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700' }} className="hover:bg-white/10">İPTAL</button>
+                                    <button 
+                                        onClick={() => {
+                                            const data = { ...installmentPrompt.invoiceData, cancelPreviousPayment: true };
+                                            setInstallmentPrompt({ isOpen: false, type: null });
+                                            proceedWithInvoice(data, installmentPrompt.newTotalAmount || 0);
+                                        }} 
+                                        style={{ flex: 1, padding: '16px', borderRadius: '12px', background: '#3b82f6', color: 'white', border: 'none', fontWeight: '800' }} className="hover:bg-blue-600">
+                                        TÜMÜNÜ VADELENDİR
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {installmentPrompt.type === 'PARTIAL_PAYMENT' && (
+                            <div className="flex-col gap-6">
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
+                                    Bu siparişin <strong>{installmentPrompt.paidAmount?.toLocaleString('tr-TR')} ₺</strong>'lik kısmı tahsil edilmiş. Yeni genel toplam: <strong>{installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺</strong>.
+                                </p>
+                                <p style={{ fontSize: '14px', color: '#fff', fontWeight: '500' }}>
+                                    Lütfen ne yapmak istediğinizi seçin:
+                                </p>
+                                <button 
+                                    onClick={() => {
+                                        setInstallmentPrompt({ isOpen: false, type: null });
+                                        proceedWithInvoice(installmentPrompt.invoiceData, installmentPrompt.difference || 0);
+                                    }}
+                                    style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid rgba(59, 130, 246, 0.3)', fontWeight: '700', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '4px' }} className="hover:bg-blue-500/10">
+                                    <span style={{ fontSize: '16px', color: '#3b82f6' }}>1. Sadece Kalanı Vadelendir</span>
+                                    <span style={{ fontSize: '13px', color: 'var(--text-muted, #888)' }}>Sadece yeni eklenen/kalan tutar ({installmentPrompt.difference?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
+                                </button>
+                                
+                                <button 
+                                    onClick={() => {
+                                        const data = { ...installmentPrompt.invoiceData, cancelPreviousPayment: true };
+                                        setInstallmentPrompt({ isOpen: false, type: null });
+                                        proceedWithInvoice(data, installmentPrompt.newTotalAmount || 0);
+                                    }}
+                                    style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid rgba(245, 158, 11, 0.3)', fontWeight: '700', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '4px' }} className="hover:bg-amber-500/10">
+                                    <span style={{ fontSize: '16px', color: '#f59e0b' }}>2. Eski Tahsilatı İptal Et & Tümünü Vadelendir</span>
+                                    <span style={{ fontSize: '13px', color: 'var(--text-muted, #888)' }}>Önceki tahsilat iptal edilecek ve tüm tutar ({installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
+                                </button>
+                            </div>
+                        )}
+
+                        {installmentPrompt.type === 'NO_PAYMENT' && (
+                            <div className="flex-col gap-6">
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
+                                    Girdiğiniz fatura kalemlerinin genel toplamı <strong>{installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺</strong>.
+                                </p>
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '12px', fontWeight: '800', color: 'white' }}>VADELENDİRMEK İSTEDİĞİNİZ TUTAR:</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input 
+                                            type="number" 
+                                            value={customInstallAmount} 
+                                            onChange={e => setCustomInstallAmount(e.target.value)}
+                                            style={{ width: '100%', padding: '16px 20px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid #3b82f6', color: 'white', fontSize: '18px', fontWeight: '800', fontFamily: 'monospace' }}
+                                        />
+                                        <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', color: '#888', fontWeight: '700' }}>₺</span>
+                                    </div>
+                                    <span style={{ fontSize: '12px', color: '#888' }}>Farklı bir tutar girmek istiyorsanız yukarıya yazınız. Geri kalan açık hesap carisine yansır.</span>
+                                </div>
+                                
+                                <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                                    <button onClick={() => setInstallmentPrompt({ isOpen: false, type: null })} style={{ flex: 1, padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700' }} className="hover:bg-white/10">İPTAL</button>
+                                    <button 
+                                        onClick={() => {
+                                            const parsedAmount = parseFloat(customInstallAmount.replace(',', '.'));
+                                            if (isNaN(parsedAmount) || parsedAmount <= 0) {
+                                                showError("Hata", "Geçersiz bir tutar girdiniz.");
+                                                return;
+                                            }
+                                            setInstallmentPrompt({ isOpen: false, type: null });
+                                            proceedWithInvoice(installmentPrompt.invoiceData, parsedAmount);
+                                        }} 
+                                        style={{ flex: 1, padding: '16px', borderRadius: '12px', background: '#3b82f6', color: 'white', border: 'none', fontWeight: '800' }} className="hover:bg-blue-600">
+                                        ONAYLA VE DEVAM ET
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {
                 taxEditIndex !== null && invoiceItems[taxEditIndex] && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -2513,6 +2626,159 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         router.refresh();
                     }}
                 />
+            )}
+
+            {/* CHECK / SENET ADD MODAL */}
+            {checkAddModalOpen && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '560px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '24px' }}>📑</span> Yeni Evrak (Çek/Senet) Ekle
+                            </h3>
+                            <button onClick={() => setCheckAddModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
+                        </div>
+
+                        <div className="flex-col gap-4">
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>EVRAK TÜRÜ</label>
+                                <select 
+                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
+                                    value={newCheckData.type}
+                                    onChange={(e) => setNewCheckData({ ...newCheckData, type: e.target.value })}
+                                >
+                                    <option value="Alınan Çek">Müşteriden Alınan Çek</option>
+                                    <option value="Alınan Senet">Müşteriden Alınan Senet</option>
+                                    <option value="Müşteri Çeki / Cirolu">Müşteri Tarafından Cirolu Çek</option>
+                                </select>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>TUTAR (₺)</label>
+                                    <input 
+                                        type="number" 
+                                        style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
+                                        value={newCheckData.amount}
+                                        onChange={(e) => setNewCheckData({ ...newCheckData, amount: e.target.value })}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>VADE TARİHİ</label>
+                                    <input 
+                                        type="date" 
+                                        style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
+                                        value={newCheckData.dueDate}
+                                        onChange={(e) => setNewCheckData({ ...newCheckData, dueDate: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>BANKA & ŞUBE (Senet ise boş bırakılabilir)</label>
+                                <input 
+                                    type="text" 
+                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
+                                    value={newCheckData.bank}
+                                    onChange={(e) => setNewCheckData({ ...newCheckData, bank: e.target.value })}
+                                    placeholder="Örn: Garanti Bankası / Beşiktaş Şb."
+                                />
+                            </div>
+
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>EVRAK/SERİ NO</label>
+                                <input 
+                                    type="text" 
+                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
+                                    value={newCheckData.number}
+                                    onChange={(e) => setNewCheckData({ ...newCheckData, number: e.target.value })}
+                                    placeholder="Seri veya Fis Numarası"
+                                />
+                            </div>
+
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>AÇIKLAMA (Opsiyonel)</label>
+                                <input 
+                                    type="text" 
+                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
+                                    value={newCheckData.description}
+                                    onChange={(e) => setNewCheckData({ ...newCheckData, description: e.target.value })}
+                                    placeholder="Ek detay veya borçlu bilgisi"
+                                />
+                            </div>
+
+                            <div className="flex-col gap-2 mt-4 p-4 border rounded-xl" style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)' }}>
+                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-main, #fff)', letterSpacing: '0.5px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <span>📸</span> EVRAK GÖRSELİ YÜKLE
+                                </label>
+                                <span style={{ fontSize: '11px', color: '#888' }}>Evrakın ön yüzünün fotoğrafını ekleyiniz.</span>
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        if (e.target.files?.[0]) {
+                                            setNewCheckData({ ...newCheckData, file: e.target.files[0] });
+                                        }
+                                    }}
+                                    style={{ marginTop: '8px' }}
+                                />
+                            </div>
+
+                            <button
+                                onClick={async () => {
+                                    if (!newCheckData.amount || !newCheckData.dueDate || !newCheckData.number) {
+                                        showError("Eksik Bilgi", "Lütfen Tutar, Vade Tarihi ve Evrak Numarasını girin.");
+                                        return;
+                                    }
+                                    setIsSavingCheck(true);
+                                    try {
+                                        const res = await fetch('/api/financials/checks', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                type: newCheckData.type,
+                                                number: newCheckData.number,
+                                                bank: newCheckData.bank || 'Bilinmiyor',
+                                                dueDate: newCheckData.dueDate,
+                                                amount: parseFloat(newCheckData.amount),
+                                                customerId: id,
+                                                description: newCheckData.description,
+                                                branch: 'Merkez'
+                                            })
+                                        });
+
+                                        const data = await res.json();
+                                        if (!res.ok) throw new Error(data.error || "Hata oluştu");
+                                        
+                                        // Image upload if file selected
+                                        if (data.check?.id && newCheckData.file) {
+                                            const formData = new FormData();
+                                            formData.append('file', newCheckData.file);
+                                            await fetch(`/api/financials/checks/${data.check.id}/image`, {
+                                                method: 'POST',
+                                                body: formData
+                                            });
+                                        }
+
+                                        showSuccess("Evrak Kaydedildi", "Yeni çek/senet başarıyla portföye eklendi.");
+                                        setCheckAddModalOpen(false);
+                                        setNewCheckData({ type: 'Alınan Çek', number: '', bank: '', dueDate: '', amount: '', description: '', branch: 'Merkez', file: null });
+                                        fetchCustomer();
+                                    } catch (err: any) {
+                                        showError("Hata", err.message);
+                                    } finally {
+                                        setIsSavingCheck(false);
+                                    }
+                                }}
+                                disabled={isSavingCheck}
+                                style={{ marginTop: '24px', padding: '18px', borderRadius: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', border: 'none', fontWeight: '800', fontSize: '15px', cursor: isSavingCheck ? 'wait' : 'pointer' }}
+                            >
+                                {isSavingCheck ? 'KAYDEDİLİYOR...' : 'ONAYLA VE PORTFÖYE EKLE'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div >
     );
