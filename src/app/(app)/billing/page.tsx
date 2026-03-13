@@ -140,21 +140,21 @@ export default function TenantBillingPage() {
                         </EnterpriseCard>
                     </div>
 
-                    <EnterpriseSectionHeader title="SaaS Lisansları" description="Daha fazla özellik için Periodya paketinizi yükseltin." />
+                    <EnterpriseSectionHeader title="SaaS Lisansları" subtitle="Daha fazla özellik için Periodya paketinizi yükseltin." />
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {saasProducts.map(p => (
                             <ProductCard key={p.id} p={p} cart={cart} toggleCart={toggleCart} icon="☁️" />
                         ))}
                     </div>
 
-                    <EnterpriseSectionHeader title="İletişim & Pazarlama (SMS Paketi)" description="Toplu kampanya ve bildirimleriniz için SMS paketi satın alın." />
+                    <EnterpriseSectionHeader title="İletişim & Pazarlama (SMS Paketi)" subtitle="Toplu kampanya ve bildirimleriniz için SMS paketi satın alın." />
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {smsProducts.map(p => (
                             <ProductCard key={p.id} p={p} cart={cart} toggleCart={toggleCart} icon="📩" />
                         ))}
                     </div>
 
-                    <EnterpriseSectionHeader title="E-Fatura Mühür Kontörleri" description="Muhasebe ve operasyonlarınız için e-fatura/e-arşiv limitlerinizi artırın." />
+                    <EnterpriseSectionHeader title="E-Fatura Mühür Kontörleri" subtitle="Muhasebe ve operasyonlarınız için e-fatura/e-arşiv limitlerinizi artırın." />
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {invoiceProducts.map(p => (
                             <ProductCard key={p.id} p={p} cart={cart} toggleCart={toggleCart} icon="🧾" />

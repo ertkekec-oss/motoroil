@@ -6,7 +6,7 @@ import { uploadToS3, getPublicObjectUrl } from '@/lib/s3';
 import { randomUUID } from 'crypto';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getSession();
         if (!session) {
@@ -27,7 +27,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         }
 
         const file = fileEntry;
-        const checkId = params.id;
+        const checkId = (await params).id;
 
         const check = await prisma.check.findFirst({
             where: {

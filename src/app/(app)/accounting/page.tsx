@@ -423,8 +423,8 @@ export default function AccountingPage() {
                                                 {renderCell(
                                                     <div className="flex gap-2 justify-end items-center">
                                                         {check.type?.includes('Senet') ? (
-                                                            check.signatureStatus === 'İmzalandı' ? (
-                                                                <button onClick={() => window.open(check.signedDocumentUrl, '_blank')} className="px-2 py-1 text-[10px] bg-emerald-500/10 text-emerald-600 font-bold rounded">İmzalı Belgeyi Gör</button>
+                                                            (check as any).signatureStatus === 'İmzalandı' ? (
+                                                                <button onClick={() => window.open((check as any).signedDocumentUrl, '_blank')} className="px-2 py-1 text-[10px] bg-emerald-500/10 text-emerald-600 font-bold rounded">İmzalı Belgeyi Gör</button>
                                                             ) : (
                                                                 <button onClick={() => window.open(`/signatures/envelopes/new?ref=${check.id}`, '_blank')} className="px-2 py-1 text-[10px] bg-blue-500/10 text-blue-600 font-bold rounded cursor-pointer whitespace-nowrap">İmzaya Sun (OTP)</button>
                                                             )

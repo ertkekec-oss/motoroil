@@ -3,7 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { EnterprisePageShell, EnterpriseCard } from '@/components/ui/enterprise';
-import { Clock, Calendar, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Clock, Calendar, CheckCircle2, AlertCircle, Sparkles, LifeBuoy } from 'lucide-react';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
     const { slug } = await params;

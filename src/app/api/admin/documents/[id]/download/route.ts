@@ -54,7 +54,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         headers.set('Content-Disposition', `inline; filename="${fileName}"`);
         headers.set('Cache-Control', 'public, max-age=3600');
 
-        return new NextResponse(byteArray, {
+        return new NextResponse(byteArray as any, {
             status: 200,
             headers,
         });

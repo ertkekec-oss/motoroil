@@ -179,7 +179,7 @@ export default async function KnowledgeHubPage() {
                             <div>
                                 <EnterpriseInput name="description" placeholder="Açıklama (Opsiyonel)" />
                             </div>
-                            <EnterpriseButton type="submit" className="w-full flex items-center justify-center gap-2 text-xs" variant="outline">
+                            <EnterpriseButton type="submit" className="w-full flex items-center justify-center gap-2 text-xs" variant="secondary">
                                 <Plus className="w-3 h-3" /> Ekle
                             </EnterpriseButton>
                         </form>

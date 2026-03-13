@@ -3,9 +3,10 @@ import { prisma } from '@/lib/prisma';
 
 // This is a generic webhook endpoint that simulates gateway callbacks
 // and handles idempotent credit allocation.
-export async function POST(request: Request, { params }: { params: { provider: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ provider: string }> }) {
     try {
-        const provider = params.provider.toUpperCase(); // IYZICO, PAYTR, PAYNET etc.
+        const { provider: providerParam } = await params;
+        const provider = providerParam.toUpperCase(); // IYZICO, PAYTR, PAYNET etc.
         const body = await request.json();
 
         // Ensure signature is validated via external gateway libraries here.

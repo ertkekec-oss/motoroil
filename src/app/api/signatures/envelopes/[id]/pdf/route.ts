@@ -99,7 +99,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         headers.set('Content-Disposition', `inline; filename="${targetFileName}"`);
         headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
-        return new NextResponse(buffer, {
+        return new NextResponse(buffer as any, {
             status: 200,
             headers,
         });

@@ -6,7 +6,7 @@ export type OtpProviderConfigParams = {
     otpTemplate?: string | null;
 };
 
-export async function sendNetgsmOtp(config: OtpProviderConfigParams, phone: string, code: string): Promise<{ success: boolean; error?: string; raw?: any }> {
+export async function sendNetgsmOtp(config: OtpProviderConfigParams, phone: string, code: string): Promise<{ success: boolean; error?: string; raw?: any; jobId?: string }> {
     if (!config.isEnabled) {
         return { success: false, error: 'Netgsm OTP provider is disabled' };
     }

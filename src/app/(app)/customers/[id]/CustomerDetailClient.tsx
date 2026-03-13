@@ -2839,7 +2839,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 bank: newCheckData.bank || 'Bilinmiyor',
                                                 dueDate: newCheckData.dueDate,
                                                 amount: parseCurrencyToFloat(newCheckData.amount),
-                                                customerId: id,
+                                                customerId: customer.id,
                                                 description: newCheckData.description,
                                                 branch: 'Merkez'
                                             })
@@ -2861,7 +2861,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         showSuccess("Evrak Kaydedildi", "Yeni çek/senet başarıyla portföye eklendi.");
                                         setCheckAddModalOpen(false);
                                         setNewCheckData({ type: 'Alınan Çek', number: '', bank: '', dueDate: '', amount: '', description: '', branch: 'Merkez', file: null });
-                                        fetchCustomer();
+                                        router.refresh();
                                     } catch (err: any) {
                                         showError("Hata", err.message);
                                     } finally {

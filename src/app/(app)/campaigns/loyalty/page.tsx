@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
-import { useFinancials } from '@/contexts/FinancialsContext';
+import { useFinancials } from '@/contexts/FinancialContext';
 import { useInventory } from '@/contexts/InventoryContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { useSettings } from '@/contexts/SettingsContext';

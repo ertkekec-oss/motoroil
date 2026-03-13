@@ -81,7 +81,7 @@ export async function GET(req: Request) {
         headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
         // Return byte array directly
-        return new NextResponse(byteArray, {
+        return new NextResponse(byteArray as any, {
             status: 200,
             headers,
         });
