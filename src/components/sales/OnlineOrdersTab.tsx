@@ -49,7 +49,7 @@ export function OnlineOrdersTab({
 }: OnlineOrdersTabProps) {
     const isLight = posTheme === 'light';
 
-    const [statusFilter, setStatusFilter] = useState('ALL');
+    const [statusFilter, setStatusFilter] = useState('NEW');
     const [marketplaceFilter, setMarketplaceFilter] = useState('ALL');
     const [dateFilter, setDateFilter] = useState('ALL');
     const [customStartDate, setCustomStartDate] = useState('');
