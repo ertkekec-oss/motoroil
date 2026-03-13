@@ -1,5 +1,35 @@
 # 💾 SİSTEM KAYIT NOKTASI (CHECKPOINT)
 
+**Tarih:** 13 Mart 2026, 21:40
+**Versiyon:** v5.3 - Transaction De-duplication & Official Promissory Notes
+**Durum:** ✅ Üretime Hazır & Stabil
+
+---
+
+## 🚀 BU KAYIT NOKTASINDA NELER VAR?
+
+1.  **Cari Hareketler Akıllı Birleştirme (De-duplication):**
+    *   Terminalden veya manuel eklenen **1 Satış** işleminin cari detay geçmişinde Sipariş, Hareket (Finans) ve Fatura olarak 3 ayrı satır çıkarması engellendi.
+    *   Tüm satış kayıtları tekil bir referans ile birleştirilerek, faturalandıysa tek bir satırda "(Fatura: INV-XXX) - ✅ Faturalandı" etiketiyle taranır hale getirildi. 
+2.  **Resmi ve Kurumsal Senet (Emre Muharrer Senet):**
+    *   Basit senet tasarımı tamamen yenilenerek, resmi sözleşme diline uygun hukuki metin (İstanbul Mahkemeleri, nakden/malen vb.) eklendi.
+    *   Borçlu (Asıl Ödeyecek) ve Kefil (Aval) için imza alanları, tutar vurgu kutuları ve profesyonel çerçeveler PDF-lib kullanılarak sıfırdan oluşturuldu.
+3.  **Banka / POS ve OTP Hata Giderimleri:**
+    *   Senet ve döküman görüntülerken yaşanan AWS S3/Redis geri dönüş (fallback) mekanizmaları düzeltildi.
+    *   OTP sms kapalıysa simüle edilebilir hale getirildi, böylece sistemin çökmesi engellendi.
+
+---
+
+## 📂 YEDEK KONUMU
+```
+1. Veritabanı Yedeği: checkpoints/backup_2026-03-13T18-37-17.json
+2. Versiyon Kontrolü (Git Repo Push): "Feature: Redesign Promissory Note" commits
+```
+
+---
+
+# 💾 ESKİ KAYIT NOKTALARI
+
 **Tarih:** 30 Ocak 2026, 19:30
 **Versiyon:** v5.2 - Dynamic Payment Methods & Kasa Mapping
 **Durum:** ✅ Üretime Hazır & Stabil
