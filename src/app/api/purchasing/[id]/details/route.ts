@@ -5,8 +5,10 @@ import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
     try {
+        const params = await context.params;
+        const id = params.id;
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
         const companyId = session.user?.companyId || session.companyId;
@@ -50,11 +52,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         let result: any = null;
 
         if (type === 'DESPATCH') {
-            result = await nilvera.getDespatchDetails(params.id);
+            result = await nilvera.getDespatchDetails(id);
         } else {
-            result = await nilvera.getInvoiceDetails(params.id);
+            result = await nilvera.getInvoiceDetails(id);
             if (!result.success) {
-               result = await nilvera.getDespatchDetails(params.id);
+               result = await nilvera.getDespatchDetails(id);
             }
         }
 

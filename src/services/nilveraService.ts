@@ -664,7 +664,23 @@ export class NilveraInvoiceService {
             }
         }
         
-        // No XML fallback yet for despatches as Model usually works
+        // Try XML fallback for despatches if everything else fails
+        try {
+            const xmlUrl = `${this.config.baseUrl}/edespatch/Purchase/${uuid}/Xml`;
+            console.log(`[NilveraService] Attempting XML Fallback for Despatch: ${xmlUrl}`);
+            const xmlRes = await axios.get(xmlUrl, { headers: this.getHeaders() });
+
+            if (xmlRes.status === 200 && xmlRes.data) {
+                const parsedData = this.parseUblXml(xmlRes.data);
+                if (parsedData) {
+                    console.log(`[NilveraService] XML Parse Successful for Despatch ${uuid}`);
+                    return { success: true, data: parsedData };
+                }
+            }
+        } catch (xmlErr: any) {
+            console.error(`[NilveraService] Despatch XML Fallback failed: ${xmlErr.message}`);
+        }
+
         return { success: false, error: lastError?.message || "Detay bulunamadı" };
     }
 
@@ -685,10 +701,11 @@ export class NilveraInvoiceService {
             const jObj = parser.parse(xml);
 
             // Farklı UBL rootları olabilir ama genelde Invoice'dır
-            const invoice = jObj.Invoice || jObj.EInvoice || jObj;
+            const isDespatch = !!jObj.DespatchAdvice;
+            const invoice = jObj.Invoice || jObj.EInvoice || jObj.DespatchAdvice || jObj;
             if (!invoice) return null;
 
-            const supplier = invoice["cac:AccountingSupplierParty"]?.["cac:Party"];
+            const supplier = invoice[isDespatch ? "cac:DespatchSupplierParty" : "cac:AccountingSupplierParty"]?.["cac:Party"];
             const idListRaw = supplier?.["cac:PartyIdentification"];
             const idList = Array.isArray(idListRaw) ? idListRaw : [idListRaw];
 
@@ -702,7 +719,7 @@ export class NilveraInvoiceService {
                 this.extractText(supplier?.["cac:PartyLegalEntity"]?.["cbc:RegistrationName"]) ||
                 "Bilinmeyen Tedarikçi";
 
-            const linesRaw = invoice["cac:InvoiceLine"];
+            const linesRaw = invoice[isDespatch ? "cac:DespatchLine" : "cac:InvoiceLine"];
             const lines = Array.isArray(linesRaw) ? linesRaw : [linesRaw];
 
             const monetaryTotal = invoice["cac:LegalMonetaryTotal"];
@@ -731,12 +748,23 @@ export class NilveraInvoiceService {
                         const taxSubtotal = line["cac:TaxTotal"]?.["cac:TaxSubtotal"];
                         const taxObj = Array.isArray(taxSubtotal) ? taxSubtotal[0] : taxSubtotal;
 
+                        const itemInfo = line["cac:Item"];
+                        const qtyNode = isDespatch ? line["cbc:DeliveredQuantity"] : line["cbc:InvoicedQuantity"];
+                        
+                        let priceAmt = 0;
+                        if (isDespatch) {
+                             const invLine = line["cac:Shipment"]?.["cac:GoodsItem"]?.["cac:InvoiceLine"];
+                             priceAmt = Number(this.extractText(invLine?.["cac:Price"]?.["cbc:PriceAmount"]) || 0);
+                        } else {
+                             priceAmt = Number(this.extractText(line["cac:Price"]?.["cbc:PriceAmount"]) || 0);
+                        }
+
                         return {
-                            Name: this.extractText(line["cac:Item"]?.["cbc:Name"]),
-                            Quantity: Number(this.extractText(line["cbc:InvoicedQuantity"]) || 0),
-                            UnitPrice: Number(this.extractText(line["cac:Price"]?.["cbc:PriceAmount"]) || 0),
+                            Name: this.extractText(itemInfo?.["cbc:Name"]),
+                            Quantity: Number(this.extractText(qtyNode) || 0),
+                            UnitPrice: priceAmt,
                             VatRate: Number(this.extractText(taxObj?.["cbc:Percent"]) || 0),
-                            UnitCode: line["cbc:InvoicedQuantity"]?.["@_unitCode"] || "C62"
+                            UnitCode: qtyNode?.["@_unitCode"] || "C62"
                         };
                     })
                 }
