@@ -24,6 +24,27 @@ import {
     EnterpriseTable
 } from '@/components/ui/enterprise';
 
+const formatCurrencyInput = (val: string | number): string => {
+    if (val === undefined || val === null || val === '') return '';
+    let stringVal = val.toString();
+    let clean = stringVal.replace(/[^0-9,]/g, '');
+    const parts = clean.split(',');
+    if (parts.length > 2) {
+        clean = parts[0] + ',' + parts.slice(1).join('');
+    }
+    const [intPart, decPart] = clean.split(',');
+    if (!intPart && clean.includes(',')) return '0,';
+    if (!intPart) return '';
+    const formattedInt = parseInt(intPart, 10).toLocaleString('tr-TR');
+    return decPart !== undefined ? `${formattedInt},${decPart.slice(0, 2)}` : formattedInt;
+};
+
+const parseCurrencyToFloat = (val: string | number): number => {
+    if (val === undefined || val === null || val === '') return 0;
+    let str = val.toString();
+    return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+};
+
 export default function CustomerDetailClient({ customer, historyList }: { customer: any, historyList: any[] }) {
     const router = useRouter();
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
@@ -201,7 +222,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const handleOpenPlanModal = (item: any) => {
         setPlanData({
             title: item.desc || 'Vadeli Satış Planı',
-            totalAmount: Math.abs(item.amount).toString(),
+            totalAmount: formatCurrencyInput(Math.abs(item.amount).toFixed(2).replace('.', ',')),
             installmentCount: '3',
             startDate: new Date().toISOString().split('T')[0],
             type: 'Kredi',
@@ -221,7 +242,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             const res = await fetch('/api/financials/payment-plans', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...planData, branch: 'Merkez' })
+                body: JSON.stringify({ ...planData, totalAmount: parseCurrencyToFloat(planData.totalAmount), branch: 'Merkez' })
             });
             const data = await res.json();
             if (data.success) {
@@ -2144,9 +2165,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <label className="block text-xs font-bold text-slate-500 mb-2 tracking-wider">VADELENDİRMEK İSTEDİĞİNİZ TUTAR:</label>
                                     <div className="relative">
                                         <input
-                                            type="number"
+                                            type="text"
                                             value={customInstallAmount}
-                                            onChange={e => setCustomInstallAmount(e.target.value)}
+                                            onChange={e => setCustomInstallAmount(formatCurrencyInput(e.target.value))}
                                             className="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-blue-500 text-slate-900 dark:text-white text-lg font-bold font-mono outline-none focus:ring-2 focus:ring-blue-500/30 transition-shadow pr-10"
                                         />
                                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₺</span>
@@ -2161,7 +2182,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <EnterpriseButton
                                         variant="primary"
                                         onClick={() => {
-                                            const parsedAmount = parseFloat(customInstallAmount.replace(',', '.'));
+                                            const parsedAmount = parseCurrencyToFloat(customInstallAmount);
                                             if (isNaN(parsedAmount) || parsedAmount <= 0) {
                                                 showError("Hata", "Geçersiz bir tutar girdiniz.");
                                                 return;
@@ -2614,9 +2635,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <div>
                                         <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TOPLAM TUTAR (₺)</label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             value={planData.totalAmount}
-                                            onChange={e => setPlanData({ ...planData, totalAmount: e.target.value })}
+                                            onChange={e => setPlanData({ ...planData, totalAmount: formatCurrencyInput(e.target.value) })}
                                             className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-black text-base font-mono outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
                                         />
                                     </div>
@@ -2726,11 +2747,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <div className="flex-col gap-2">
                                     <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>TUTAR (₺)</label>
                                     <input 
-                                        type="number" 
+                                        type="text" 
                                         style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
                                         value={newCheckData.amount}
-                                        onChange={(e) => setNewCheckData({ ...newCheckData, amount: e.target.value })}
-                                        placeholder="0.00"
+                                        onChange={(e) => setNewCheckData({ ...newCheckData, amount: formatCurrencyInput(e.target.value) })}
+                                        placeholder="0,00"
                                     />
                                 </div>
                                 <div className="flex-col gap-2">
@@ -2810,7 +2831,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 number: newCheckData.number,
                                                 bank: newCheckData.bank || 'Bilinmiyor',
                                                 dueDate: newCheckData.dueDate,
-                                                amount: parseFloat(newCheckData.amount),
+                                                amount: parseCurrencyToFloat(newCheckData.amount),
                                                 customerId: id,
                                                 description: newCheckData.description,
                                                 branch: 'Merkez'

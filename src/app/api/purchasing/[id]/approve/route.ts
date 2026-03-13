@@ -229,10 +229,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     localItems.push({
                         productId: product?.id || null,
                         name: productName,
-                        qty: Number(line.Quantity || line.InvoicedQuantity || 0),
+                        qty: Number(line.Quantity || line.InvoicedQuantity || line.DeliveredQuantity || 0),
                         price: Number(line.UnitPrice || line.Price || line.Amount || 0),
                         vatRate: Number(line.VatRate || line.KDVPercent || line.TaxPercent || 0),
-                        unit: line.UnitType || line.UnitCode || "Adet"
+                        unit: line.UnitType || line.UnitCode || line.DeliveredUnitType || "Adet"
                     });
                 }
 

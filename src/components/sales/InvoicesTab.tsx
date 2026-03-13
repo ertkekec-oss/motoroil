@@ -54,7 +54,32 @@ export function InvoicesTab({
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
     const [wayslipType, setWayslipType] = useState<'gelen' | 'giden'>('giden');
 
-    const toggleExpand = (id: string) => setExpandedOrderId(expandedOrderId === id ? null : id);
+    const [expandedDetails, setExpandedDetails] = useState<Record<string, any>>({});
+    const [loadingDetails, setLoadingDetails] = useState<Record<string, boolean>>({});
+
+    const toggleExpand = async (id: string) => {
+        if (expandedOrderId === id) {
+            setExpandedOrderId(null);
+            return;
+        }
+        setExpandedOrderId(id);
+
+        const item = activeList.find((i: any) => i.id === id);
+        if (!item || !item.isFormal || (item.items && item.items.length > 0)) return;
+        if (expandedDetails[id]) return;
+
+        setLoadingDetails(prev => ({ ...prev, [id]: true }));
+        try {
+            const docType = item.documentType || (item.msg?.includes('İrsaliye') || item.type === 'Gelen' || item.formalType === 'EIRSALIYE' ? 'DESPATCH' : 'INVOICE');
+            const res = await fetch(`/api/purchasing/${id}/details?type=${docType}`);
+            const data = await res.json();
+            if (data.success) {
+                setExpandedDetails(prev => ({ ...prev, [id]: data.items }));
+            }
+        } finally {
+            setLoadingDetails(prev => ({ ...prev, [id]: false }));
+        }
+    };
 
     let activeList: any[] = [];
     if (invoiceSubTab === 'sales') activeList = realInvoices;
@@ -187,12 +212,14 @@ export function InvoicesTab({
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800'}`}>
-                                                                            {(inv.items as any[])?.map((item, idx) => (
+                                                                            {loadingDetails[inv.id] ? (
+                                                                                <tr><td colSpan={4} className="py-4 text-center text-[12px] opacity-70">İçerik yükleniyor...</td></tr>
+                                                                            ) : ((Array.isArray(expandedDetails[inv.id]) ? expandedDetails[inv.id] : inv.items) || [])?.map((item: any, idx: number) => (
                                                                                 <tr key={idx}>
-                                                                                    <td className={`py-2 ${textValueClass}`}>{item.name}</td>
-                                                                                    <td className={`py-2 text-center ${textValueClass}`}>{item.qty}</td>
-                                                                                    <td className={`py-2 text-right ${textValueClass}`}>{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                                                                    <td className={`py-2 text-right font-semibold ${textValueClass}`}>{(item.qty * item.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                                    <td className={`py-2 ${textValueClass}`}>{item.name || item.Name || 'Bilinmeyen Ürün'}</td>
+                                                                                    <td className={`py-2 text-center ${textValueClass}`}>{item.qty || item.Quantity || 0}</td>
+                                                                                    <td className={`py-2 text-right ${textValueClass}`}>{Number(item.price || item.Price || item.UnitPrice || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                                    <td className={`py-2 text-right font-semibold ${textValueClass}`}>{(Number(item.qty || item.Quantity || 0) * Number(item.price || item.Price || item.UnitPrice || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
                                                                                 </tr>
                                                                             ))}
                                                                         </tbody>
@@ -468,12 +495,14 @@ export function InvoicesTab({
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800'}`}>
-                                                                            {(Array.isArray(irs.items) ? irs.items : [])?.map((item: any, idx: number) => (
+                                                                            {loadingDetails[irs.id] ? (
+                                                                                <tr><td colSpan={4} className="py-4 text-center text-[12px] opacity-70">İçerik yükleniyor...</td></tr>
+                                                                            ) : ((Array.isArray(expandedDetails[irs.id]) ? expandedDetails[irs.id] : irs.items) || [])?.map((item: any, idx: number) => (
                                                                                 <tr key={idx}>
                                                                                     <td className={`py-2 ${textValueClass}`}>{item.name || item.Name || 'Bilinmeyen Ürün'}</td>
-                                                                                    <td className={`py-2 text-center ${textValueClass}`}>{item.qty || item.Quantity || 0} {item.unit || item.UnitType || 'Adet'}</td>
-                                                                                    <td className={`py-2 text-right ${textValueClass}`}>{Number(item.price || item.Price || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                                                                    <td className={`py-2 text-right font-semibold ${textValueClass}`}>{(Number(item.qty || item.Quantity || 0) * Number(item.price || item.Price || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                                    <td className={`py-2 text-center ${textValueClass}`}>{item.qty || item.Quantity || item.DeliveredQuantity || 0} {item.unit || item.UnitType || item.DeliveredUnitType || 'Adet'}</td>
+                                                                                    <td className={`py-2 text-right ${textValueClass}`}>{Number(item.price || item.Price || item.UnitPrice || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                                    <td className={`py-2 text-right font-semibold ${textValueClass}`}>{(Number(item.qty || item.Quantity || item.DeliveredQuantity || 0) * Number(item.price || item.Price || item.UnitPrice || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
                                                                                 </tr>
                                                                             ))}
                                                                         </tbody>
