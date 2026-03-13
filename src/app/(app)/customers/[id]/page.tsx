@@ -107,7 +107,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         // Prepare history data on server to keep client component clean and fast
         const txs = (customer.transactions || [])
             .map((t: any) => {
-                const isCollection = (t.type === 'income' || t.type === 'Collection');
+                const isCollection = (t.type === 'income' || t.type === 'Collection' || t.type === 'Senet' || t.type === 'Check');
                 const typeLabel = isCollection ? 'Tahsilat' :
                     t.type === 'Payment' ? 'Ödeme' :
                         t.type === 'Sales' ? 'Satış' :
@@ -229,7 +229,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             };
         });
 
-        const historyList = [...txs, ...invs, ...chkList, ...orderList]
+        const historyList = [...txs, ...invs, ...orderList]
             .sort((a: any, b: any) => {
                 const tA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
                 const tB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
