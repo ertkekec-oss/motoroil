@@ -61,7 +61,11 @@ export default function CustomersPage() {
 
         if (activeTab === 'borclular' && cust.balance <= 0) return false;
         if (activeTab === 'alacaklilar' && cust.balance >= 0) return false;
-        if (activeTab === 'eticaret' && cust.category !== 'E-ticaret') return false;
+        
+        // Filter by dynamic category class
+        if (activeTab !== 'all' && activeTab !== 'borclular' && activeTab !== 'alacaklilar') {
+            if (cust.customerClass !== activeTab && cust.category !== activeTab) return false;
+        }
 
         if (branchFilter !== 'all' && (cust.branch || 'Merkez') !== branchFilter) return false;
 
@@ -75,9 +79,7 @@ export default function CustomersPage() {
         { id: 'all', label: 'Tümü' },
         { id: 'borclular', label: 'Borçlular' },
         { id: 'alacaklilar', label: 'Alacaklılar' },
-        { id: 'eticaret', label: 'E-Ticaret' },
-        { id: 'kurumsal', label: 'Kurumsal' },
-        { id: 'vip', label: 'VIP' }
+        ...custClasses.map(c => ({ id: c, label: c }))
     ];
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -114,6 +116,9 @@ export default function CustomersPage() {
         branch: ''
     });
 
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isBulkCategoryModal, setIsBulkCategoryModal] = useState(false);
+    const [bulkCategory, setBulkCategory] = useState('');
     const handleAddCustomer = async () => {
         if (!newCustomer.name) {
             showWarning("Eksik Bilgi", "İsim zorunludur!");
@@ -251,6 +256,73 @@ export default function CustomersPage() {
 
     const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
     const textValueClass = isLight ? "text-slate-900" : "text-white";
+
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(paginatedCustomers.map(c => c.id as string));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelectOne = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
+        if (e.target.checked) {
+            setSelectedIds(prev => [...prev, id]);
+        } else {
+            setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!canDelete || selectedIds.length === 0) return;
+        
+        showConfirm(
+            'Toplu Silme',
+            `Seçili ${selectedIds.length} müşteriyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`,
+            async () => {
+                try {
+                    const res = await fetch('/api/customers/bulk', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', customerIds: selectedIds })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        showSuccess("Başarılı", data.message);
+                        setSelectedIds([]);
+                        window.location.reload();
+                    } else {
+                        showError("Hata", data.error);
+                    }
+                } catch {
+                    showError("Hata", "Toplu silme sırasında sistem hatası.");
+                }
+            }
+        );
+    };
+
+    const handleBulkCategoryUpdate = async () => {
+        if (!bulkCategory || selectedIds.length === 0) return;
+
+        try {
+            const res = await fetch('/api/customers/bulk', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update_category', customerIds: selectedIds, data: { categoryClass: bulkCategory } })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess("Başarılı", data.message);
+                setIsBulkCategoryModal(false);
+                setSelectedIds([]);
+                window.location.reload();
+            } else {
+                showError("Hata", data.error);
+            }
+        } catch {
+            showError("Hata", "Toplu kategori atama sırasında sistem hatası.");
+        }
+    };
 
     return (
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans" style={{ background: isLight ? '#FAFAFA' : undefined }}>
@@ -410,10 +482,46 @@ export default function CustomersPage() {
             {/* List View */}
             {viewMode === 'list' && (
                 <div className={`rounded-[16px] border p-0 overflow-hidden ${cardClass}`}>
+                    
+                    {/* Bulk Actions Banner */}
+                    {selectedIds.length > 0 && (
+                        <div className={`flex items-center justify-between px-6 py-3 border-b ${isLight ? 'bg-blue-50/50 border-slate-200' : 'bg-blue-900/10 border-slate-800'}`}>
+                            <div className="flex items-center gap-3">
+                                <span className={`text-[13px] font-semibold ${isLight ? 'text-blue-700' : 'text-blue-400'}`}>
+                                    {selectedIds.length} müşteri seçildi
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setIsBulkCategoryModal(true)}
+                                    className={`px-4 py-1.5 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-white border text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'}`}
+                                >
+                                    Sınıf Ata
+                                </button>
+                                {canDelete && (
+                                    <button
+                                        onClick={handleBulkDelete}
+                                        className={`px-4 py-1.5 rounded-[8px] text-[12px] font-medium transition-colors border ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'}`}
+                                    >
+                                        Toplu Sil
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-transparent border-b">
                             <tr className={isLight ? 'border-slate-200' : 'border-slate-800'}>
-                                <th className={`h-[48px] px-6 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Müşteri</th>
+                                <th className="w-[48px] px-6 text-center">
+                                    <input 
+                                        type="checkbox" 
+                                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                        checked={selectedIds.length > 0 && selectedIds.length === paginatedCustomers.length}
+                                        onChange={handleSelectAll}
+                                    />
+                                </th>
+                                <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Müşteri</th>
                                 <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İletişim</th>
                                 <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Kategori</th>
                                 <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Bakiye</th>
@@ -427,10 +535,19 @@ export default function CustomersPage() {
                                     .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
                                 const rawBalance = Number(cust.balance);
                                 const effectiveBalance = rawBalance + portfolioChecks;
+                                const isSelected = selectedIds.includes(cust.id as string);
 
                                 return (
-                                    <tr key={cust.id} className={`h-[60px] transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50'}`}>
-                                        <td className="px-6 py-3 align-middle">
+                                    <tr key={cust.id} className={`h-[60px] transition-colors ${isSelected ? (isLight ? 'bg-blue-50/30' : 'bg-blue-900/10') : (isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50')}`}>
+                                        <td className="px-6 py-3 align-middle text-center">
+                                            <input 
+                                                type="checkbox" 
+                                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                checked={isSelected}
+                                                onChange={(e) => handleSelectOne(e, cust.id as string)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-3 align-middle">
                                             <div className={`font-semibold text-[14px] ${textValueClass}`}>{cust.name}</div>
                                             <div className="flex items-center gap-2 mt-1">
                                                 <span className={`text-[11px] font-medium ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>⭐ {Number(cust.points || 0).toFixed(0)}</span>
@@ -722,6 +839,41 @@ export default function CustomersPage() {
                     </div>
                 </div>
             )}
+
+            {/* Bulk Category Assignment Modal */}
+            {isBulkCategoryModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+                    <div className={`w-full max-w-[400px] rounded-[16px] shadow-2xl animate-in fade-in zoom-in-95 ${cardClass}`}>
+                        <div className={`p-6 border-b flex justify-between items-center ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
+                            <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Toplu Sınıf Ata</h3>
+                            <button onClick={() => setIsBulkCategoryModal(false)} className={`text-[20px] leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
+                        </div>
+                        <div className="p-6 space-y-5">
+                            <div>
+                                <label className={`block text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${textLabelClass}`}>Cari Sınıfı Seçin</label>
+                                <select 
+                                    value={bulkCategory} 
+                                    onChange={e => setBulkCategory(e.target.value)} 
+                                    className={`w-full px-3 py-2.5 rounded-[8px] text-[13px] border outline-none ${isLight ? 'bg-white border-slate-300 text-slate-800' : 'bg-[#0f172a] border-slate-700 text-slate-200'}`}
+                                >
+                                    <option value="">Seçiniz...</option>
+                                    {(custClasses || []).map(cls => <option key={cls} value={cls}>{cls}</option>)}
+                                </select>
+                            </div>
+                            <div className="pt-2">
+                                <button 
+                                    onClick={handleBulkCategoryUpdate} 
+                                    disabled={!bulkCategory} 
+                                    className={`w-full py-3 rounded-[10px] text-[14px] font-semibold text-white transition-colors shadow-sm ${isLight ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-500'} ${!bulkCategory ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                >
+                                    {selectedIds.length} Müşteriyi Güncelle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
