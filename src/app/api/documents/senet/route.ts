@@ -34,6 +34,16 @@ export async function GET(req: NextRequest) {
             include: { installments: { orderBy: { installmentNo: 'asc' } } }
         });
 
+        const tr2en = (text: string) => {
+            if (!text) return '';
+            return text.replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
+                       .replace(/Ü/g, 'U').replace(/ü/g, 'u')
+                       .replace(/Ş/g, 'S').replace(/ş/g, 's')
+                       .replace(/İ/g, 'I').replace(/ı/g, 'i')
+                       .replace(/Ö/g, 'O').replace(/ö/g, 'o')
+                       .replace(/Ç/g, 'C').replace(/ç/g, 'c');
+        };
+
         // 1. Generate the PDF
         const pdfDoc = await PDFDocument.create();
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -44,10 +54,10 @@ export async function GET(req: NextRequest) {
             const page = pdfDoc.addPage([595.28, 841.89]); // A4
             page.drawText('PROMISSORY NOTE (SENET)', { x: 200, y: 800, size: 16, font: boldFont });
             page.drawText(`Date: ${new Date().toLocaleDateString('tr-TR')}`, { x: 50, y: 760, size: 12, font });
-            page.drawText(`Company: ${invoice.company.name}`, { x: 50, y: 740, size: 12, font });
-            page.drawText(`Customer: ${invoice.customer.name}`, { x: 50, y: 720, size: 12, font });
+            page.drawText(`Company: ${tr2en(invoice.company.name)}`, { x: 50, y: 740, size: 12, font });
+            page.drawText(`Customer: ${tr2en(invoice.customer.name)}`, { x: 50, y: 720, size: 12, font });
             page.drawText(`Amount: ${invoice.totalAmount} TL`, { x: 50, y: 700, size: 12, font });
-            page.drawText(`Invoice No: ${invoice.invoiceNo}`, { x: 50, y: 680, size: 12, font });
+            page.drawText(`Invoice No: ${tr2en(invoice.invoiceNo)}`, { x: 50, y: 680, size: 12, font });
             page.drawText(`This document serves as a promissory note for the invoice.`, { x: 50, y: 640, size: 12, font });
         } else {
             // Generate multiple pages (one per installment)
@@ -59,15 +69,15 @@ export async function GET(req: NextRequest) {
                 page.drawText(`Vade Tarihi (Due Date): ${new Date(inst.dueDate).toLocaleDateString('tr-TR')}`, { x: 50, y: 730, size: 12, font: boldFont, color: rgb(0.8, 0.1, 0.1) });
                 page.drawText(`Tutar (Amount): ${inst.amount.toLocaleString('tr-TR')} TL`, { x: 50, y: 710, size: 12, font: boldFont });
                 
-                page.drawText(`Alici (Debtor): ${invoice.customer.name}`, { x: 50, y: 670, size: 12, font });
+                page.drawText(`Alici (Debtor): ${tr2en(invoice.customer.name)}`, { x: 50, y: 670, size: 12, font });
                 page.drawText(`TCKN/VKN: ${invoice.customer.taxNumber || invoice.customer.identityNumber || '-'}`, { x: 50, y: 650, size: 12, font });
-                page.drawText(`Adres: ${invoice.customer.address || '-'}`, { x: 50, y: 630, size: 10, font });
+                page.drawText(`Adres: ${tr2en(invoice.customer.address || '-')}`, { x: 50, y: 630, size: 10, font });
                 
-                page.drawText(`Alacakli (Creditor): ${invoice.company.name}`, { x: 50, y: 590, size: 12, font: boldFont });
+                page.drawText(`Alacakli (Creditor): ${tr2en(invoice.company.name)}`, { x: 50, y: 590, size: 12, font: boldFont });
                 
                 // For PDF-lib you need multiple calls for line wraps.
                 const line1 = `Isbu emre muharrer senedimin vadesinde yukarida yazili olan ${inst.amount.toLocaleString('tr-TR')} TL`;
-                const line2 = `bedelini ${invoice.company.name}'e veya emrine odeyecegimi beyan`;
+                const line2 = `bedelini ${tr2en(invoice.company.name)}'e veya emrine odeyecegimi beyan`;
                 const line3 = `ve taahhut ederim. Ihtilaf halinde Istanbul Mahkemeleri yetkilidir.`;
                 page.drawText(line1, { x: 50, y: 540, size: 11, font });
                 page.drawText(line2, { x: 50, y: 524, size: 11, font });
@@ -77,7 +87,7 @@ export async function GET(req: NextRequest) {
                 page.drawText('(OTP/Digital Signature Pending)', { x: 340, y: 440, size: 10, font, color: rgb(0.5, 0.5, 0.5) });
                 
                 page.drawText(`Taksit No: ${inst.installmentNo} / ${paymentPlan.installmentCount}`, { x: 50, y: 100, size: 10, font });
-                page.drawText(`Fatura Ref: ${invoice.invoiceNo} (${invoice.id})`, { x: 50, y: 80, size: 10, font });
+                page.drawText(`Fatura Ref: ${tr2en(invoice.invoiceNo)} (${invoice.id})`, { x: 50, y: 80, size: 10, font });
             }
         }
 
