@@ -132,9 +132,23 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
                 })
                 .finally(() => {
                     setIsInitialLoading(false);
-                    // COLD START METRIC END (CRM)
-                    // performance.mark("crm_ready");
                 });
+
+            // Revalidate on focus/tab selection (like SWR) to fix stale data issues across tabs
+            const handleFocus = () => {
+                if (document.visibilityState === 'visible') {
+                    refreshCustomers();
+                    refreshSuppliers();
+                }
+            };
+            
+            document.addEventListener('visibilitychange', handleFocus);
+            window.addEventListener('focus', handleFocus);
+            
+            return () => {
+                document.removeEventListener('visibilitychange', handleFocus);
+                window.removeEventListener('focus', handleFocus);
+            };
         } else {
             setIsInitialLoading(false);
         }

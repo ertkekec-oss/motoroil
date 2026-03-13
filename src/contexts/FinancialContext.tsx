@@ -283,6 +283,21 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
                 .finally(() => {
                     setIsInitialLoading(false);
                 });
+
+            const handleFocus = () => {
+                if (document.visibilityState === 'visible') {
+                    refreshKasalar();
+                    refreshTransactions();
+                }
+            };
+            
+            document.addEventListener('visibilitychange', handleFocus);
+            window.addEventListener('focus', handleFocus);
+            
+            return () => {
+                document.removeEventListener('visibilitychange', handleFocus);
+                window.removeEventListener('focus', handleFocus);
+            };
         } else {
             setIsInitialLoading(false);
         }

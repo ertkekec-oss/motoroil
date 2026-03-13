@@ -219,6 +219,21 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
                 .finally(() => {
                     setIsInitialLoading(false);
                 });
+
+            const handleFocus = () => {
+                if (document.visibilityState === 'visible') {
+                    refreshProducts();
+                    refreshStockTransfers();
+                }
+            };
+            
+            document.addEventListener('visibilitychange', handleFocus);
+            window.addEventListener('focus', handleFocus);
+            
+            return () => {
+                document.removeEventListener('visibilitychange', handleFocus);
+                window.removeEventListener('focus', handleFocus);
+            };
         } else {
             setIsInitialLoading(false);
         }
