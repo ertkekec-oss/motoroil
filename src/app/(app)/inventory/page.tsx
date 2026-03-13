@@ -1485,10 +1485,10 @@ function InventoryContent() {
               if (isProcessing) return;
               setIsProcessing(true);
               try {
-                const res = await fetch("/api/products/bulk", {
-                  method: "PATCH",
+                const res = await fetch("/api/pricing/bulk-save", {
+                  method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ updates }),
+                  body: JSON.stringify(updates),
                 });
                 if (res.ok) {
                   const pRes = await fetch("/api/products");

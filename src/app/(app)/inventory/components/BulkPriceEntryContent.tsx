@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product } from '@/contexts/AppContext';
+import { toast } from 'sonner';
 
 interface BulkPriceEntryContentProps {
     products: Product[];
-    onSave: (updates: any[]) => Promise<void>;
+    onSave: (payload: any) => Promise<void>;
     isProcessing: boolean;
 }
 
@@ -12,85 +13,248 @@ export default function BulkPriceEntryContent({
     onSave,
     isProcessing
 }: BulkPriceEntryContentProps) {
+    const [activeTab, setActiveTab] = useState<'sync' | 'settings'>('sync');
+
+    return (
+        <div className="flex flex-col h-[calc(100vh-230px)] min-h-[500px]">
+             {/* Navigation Tabs */}
+             <div className="flex items-center gap-6 border-b border-slate-200 dark:border-white/10 px-4 pb-[0px] shrink-0">
+                <button 
+                    onClick={() => setActiveTab('sync')} 
+                    className={`pb-3 font-semibold text-[13px] relative transition-colors ${activeTab === 'sync' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                >
+                    Fiyat Senkronizasyon Konsolu
+                    {activeTab === 'sync' && <div className="absolute bottom-[0px] left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
+                </button>
+                <button 
+                    onClick={() => setActiveTab('settings')} 
+                    className={`pb-3 font-semibold text-[13px] relative transition-colors ${activeTab === 'settings' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                >
+                    Fiyat Listeleri & Kanal Yönetimi
+                    {activeTab === 'settings' && <div className="absolute bottom-[0px] left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
+                </button>
+            </div>
+
+            <div className="flex-1 mt-4 relative overflow-hidden flex flex-col">
+                {activeTab === 'sync' ? (
+                    <SyncView products={products} onSave={onSave} isProcessing={isProcessing} />
+                ) : (
+                    <SettingsView />
+                )}
+            </div>
+        </div>
+    );
+}
+
+// -------------------------------------------------------------------------------------
+// 1. SYNC VIEW (Spreadsheet and Rules)
+// -------------------------------------------------------------------------------------
+
+function SyncView({ products, onSave, isProcessing }: any) {
     const [priceData, setPriceData] = useState<Record<string, any>>({});
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
+    const [priceLists, setPriceLists] = useState<any[]>([]);
+    const [targetListId, setTargetListId] = useState<string>('default');
+    
+    // Rule Engine States
+    const [basePriceType, setBasePriceType] = useState<string>('buy_price');
+    const [operator, setOperator] = useState<string>('percent_plus');
+    const [modifierValue, setModifierValue] = useState<number>(0);
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
+
+    useEffect(() => {
+        fetch('/api/pricing/lists')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    setPriceLists(data.data);
+                }
+            })
+            .catch(err => console.error("Katalog yüklenemedi", err));
+    }, []);
 
     useEffect(() => {
         const initialData: Record<string, any> = {};
-        products.forEach(p => {
+        products.forEach((p: any) => {
+            let currentTargetPrice = p.price || 0; 
+            if (targetListId === 'buy_price') {
+                currentTargetPrice = p.buyPrice || 0;
+            } else if (targetListId !== 'default' && targetListId !== 'buy_price') {
+                const pPrices: any[] = p.prices || [];
+                const found = pPrices.find((pp: any) => pp.priceListId === targetListId);
+                if (found) {
+                    currentTargetPrice = parseFloat(found.price);
+                }
+            }
+
             initialData[p.id] = {
                 id: p.id,
                 buyPrice: p.buyPrice || 0,
-                price: p.price || 0,
-                newPrice: p.price || 0 // Initial new price same as current
+                defaultPrice: p.price || 0,
+                currentPrice: currentTargetPrice,
+                newPrice: currentTargetPrice
             };
         });
         setPriceData(initialData);
-    }, [products]);
+    }, [products, targetListId]);
 
     const handleUpdate = (id: string | number, field: string, value: any) => {
-        setPriceData(prev => ({
-            ...prev,
-            [id]: {
-                ...prev[id],
-                [field]: value
-            }
-        }));
+        setPriceData(prev => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+    };
+
+    const toggleRow = (id: string, checked: boolean) => {
+        setSelectedRows(prev => checked ? [...prev, id] : prev.filter(rId => rId !== id));
+    };
+
+    const toggleAll = (checked: boolean) => {
+        setSelectedRows(checked ? products.map((p: any) => String(p.id)) : []);
+    };
+
+    const calculateRules = () => {
+        const targetSelection = selectedRows.length > 0 ? selectedRows : products.map((p: any) => String(p.id));
+        if (targetSelection.length === 0) return;
+
+        setPriceData(prev => {
+            const nextData = { ...prev };
+            targetSelection.forEach(id => {
+                const row = nextData[id];
+                if (!row) return;
+
+                let baseValue = 0;
+                if (basePriceType === 'buy_price') baseValue = row.buyPrice;
+                else if (basePriceType === 'default_price') baseValue = row.defaultPrice;
+                else if (basePriceType === 'current_list') baseValue = row.currentPrice;
+
+                let finalValue = baseValue;
+                const val = parseFloat(modifierValue.toString()) || 0;
+
+                switch (operator) {
+                    case 'percent_plus': finalValue = baseValue + (baseValue * (val / 100)); break;
+                    case 'percent_minus': finalValue = baseValue - (baseValue * (val / 100)); break;
+                    case 'amount_plus': finalValue = baseValue + val; break;
+                    case 'amount_minus': finalValue = baseValue - val; break;
+                    case 'set_fixed': finalValue = val; break;
+                }
+
+                if (finalValue < 0) finalValue = 0;
+                nextData[id] = { ...row, newPrice: finalValue };
+            });
+            return nextData;
+        });
+        
+        if (selectedRows.length === 0) setSelectedRows(products.map((p: any) => String(p.id)));
     };
 
     const handleSaveList = async () => {
         if (selectedRows.length === 0) return;
-        const updates = selectedRows.map(id => priceData[id]);
-        await onSave(updates);
-    };
-
-    const toggleRow = (id: string, checked: boolean) => {
-        if (checked) {
-            setSelectedRows(prev => [...prev, id]);
-        } else {
-            setSelectedRows(prev => prev.filter(rId => rId !== id));
-        }
-    };
-
-    const toggleAll = (checked: boolean) => {
-        if (checked) {
-            setSelectedRows(products.map(p => String(p.id)));
-        } else {
-            setSelectedRows([]);
-        }
+        const pricesPayload: Record<string, number> = {};
+        selectedRows.forEach(id => { pricesPayload[id] = parseFloat(priceData[id]?.newPrice || 0); });
+        await onSave({ listId: targetListId, prices: pricesPayload });
     };
 
     return (
-        <div className="flex flex-col gap-4 animate-in fade-in h-[calc(100vh-240px)] min-h-[500px]">
+        <div className="flex flex-col gap-4 animate-in fade-in h-full flex-1 min-h-0">
             {/* Top Toolbar */}
-            <div className="bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm p-4 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-4">
-                    <h3 className="text-[14px] font-bold text-slate-900 dark:text-white">Fiyat Yönetim Çizelgesi</h3>
-                    <div className="h-6 w-px bg-slate-200"></div>
+            <div className="bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0">
+                <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">İşlem Yapılacak Liste:</label>
+                        <select 
+                            className="bg-slate-100 dark:bg-[#1e293b] font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 text-xs rounded-lg px-3 py-2 outline-none focus:ring-2 ring-blue-500"
+                            value={targetListId}
+                            onChange={e => { setTargetListId(e.target.value); setSelectedRows([]); }}
+                        >
+                            <option value="default" className="font-semibold">Ana Satış Fiyatı (Varsayılan)</option>
+                            <option value="buy_price" className="font-semibold text-rose-600">Ana Alış Fiyatı (Maliyet)</option>
+                            {priceLists.map(list => (
+                                <option key={list.id} value={list.id}>{list.name} Kanal Listesi</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
                     <span className="text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                        Seçilen: <strong className="text-blue-600">{selectedRows.length}</strong> / {products.length}
+                        Seçili Ürün: <strong className="text-blue-600">{selectedRows.length}</strong> / {products.length}
                     </span>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <button className="px-4 py-2 bg-slate-100 dark:bg-[#334155]/50 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition-colors">Yüzde/Tutar Uygula</button>
-                    <button className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors text-blue-400">Pazaryerlerine Gönder</button>
+                    <button 
+                        onClick={() => setIsPanelOpen(!isPanelOpen)}
+                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 border
+                            ${isPanelOpen ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 dark:bg-transparent dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'}
+                        `}
+                    >   
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Toplu Fiyat Kuralları
+                    </button>
                     <button
                         onClick={handleSaveList}
                         disabled={selectedRows.length === 0 || isProcessing}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm
-                            ${selectedRows.length === 0 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}
+                        className={`px-5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-sm
+                            ${selectedRows.length === 0 ? 'bg-slate-200 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'}
                         `}
                     >
-                        {isProcessing ? 'Kaydediliyor...' : 'Liste Olarak Kaydet'}
+                        {isProcessing ? 'Kaydediliyor...' : 'Değişimleri Kaydet'}
                     </button>
                 </div>
             </div>
 
-            {/* Price Table - Spreadsheet Style */}
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] flex-1 overflow-hidden shadow-sm flex flex-col">
-                <div className="flex-1 overflow-y-auto custom-scroll relative z-0">
-                    <table className="w-full text-left border-collapse text-[12px] relative">
+            {/* Rule Engine Panel */}
+            {isPanelOpen && (
+                <div className="bg-blue-50/50 dark:bg-[#1e293b]/50 border border-blue-100 dark:border-blue-900/30 rounded-[16px] p-4 animate-in slide-in-from-top-2 shrink-0">
+                    <div className="flex items-end gap-4 flex-wrap">
+                        <div className="flex flex-col gap-1.5 min-w-[180px]">
+                            <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Referans Fiyat (Neyin Üzerinden?)</label>
+                            <select 
+                                className="w-full bg-white dark:bg-[#0f172a] text-sm border-slate-200 dark:border-slate-700 outline-none rounded-lg p-2"
+                                value={basePriceType} onChange={e => setBasePriceType(e.target.value)}
+                            >
+                                <option value="buy_price">Alış Fiyatı (Maliyet)</option>
+                                <option value="default_price">Varsayılan Satış Fiyatı</option>
+                                <option value="current_list">Şuan ki {targetListId === 'default' ? 'Satış' : targetListId === 'buy_price' ? 'Alış' : 'Liste'} Fiyatı</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-1.5 min-w-[200px]">
+                            <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">İşlem Türü</label>
+                            <select 
+                                className="w-full bg-white dark:bg-[#0f172a] text-sm border-slate-200 dark:border-slate-700 outline-none rounded-lg p-2"
+                                value={operator} onChange={e => setOperator(e.target.value)}
+                            >
+                                <option value="percent_plus">Yüzde (%) Olarak Artır</option>
+                                <option value="percent_minus">Yüzde (%) Olarak Eksilt</option>
+                                <option value="amount_plus">Tutar (₺) Ekle</option>
+                                <option value="amount_minus">Tutar (₺) Çıkar</option>
+                                <option value="set_fixed">Sabit Bir Fiyata Eşitle</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-1.5 w-32">
+                            <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Değer</label>
+                            <input 
+                                type="number" 
+                                className="w-full bg-white dark:bg-[#0f172a] text-sm border-slate-200 dark:border-slate-700 outline-none rounded-lg p-2 tabular-nums font-bold text-blue-600"
+                                value={modifierValue}
+                                onChange={e => setModifierValue(parseFloat(e.target.value) || 0)}
+                            />
+                        </div>
+                        <div className="pb-0.5 pt-4">
+                            <button 
+                                onClick={calculateRules}
+                                className="h-[38px] px-6 bg-slate-900 dark:bg-slate-200 text-white dark:text-slate-900 rounded-lg text-sm font-bold shadow-sm hover:opacity-90 transition-opacity"
+                            >
+                                Kuralı Uygula / Önizle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Spreadsheet Table */}
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] flex-1 overflow-hidden shadow-sm flex flex-col relative z-0">
+                <div className="flex-1 overflow-y-auto custom-scroll relative">
+                    <table className="w-full text-left border-collapse text-[12px] relative min-w-[800px]">
                         <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 shadow-sm">
                             <tr>
                                 <th className="px-3 py-2 w-10 text-center">
@@ -102,36 +266,28 @@ export default function BulkPriceEntryContent({
                                     />
                                 </th>
                                 <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest min-w-[200px]">Ürün</th>
-                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-right w-28">Alış Fiyatı</th>
-                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-right w-28">KKM <span className="text-[10px] lowercase font-normal">(Tahmini)</span></th>
-                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-right w-28">Tavsiye Fiyat</th>
-                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-right w-28">Mevcut Fiyat</th>
-                                <th className="px-3 py-2 font-bold text-blue-600 uppercase tracking-widest text-right w-36 bg-blue-50/50">Yeni Fiyat</th>
-                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-center w-24">Marj Etkisi</th>
-                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-center w-20">Durum</th>
+                                <th className="px-3 py-2 font-bold text-slate-400 uppercase tracking-widest text-right w-28">Alış/Maliyet</th>
+                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-right w-32">Şu anki Fiyat</th>
+                                <th className="px-3 py-2 font-bold text-blue-600 uppercase tracking-widest text-right w-36 bg-blue-50/50 dark:bg-blue-900/10 border-l border-blue-100 dark:border-blue-900/20">Uygulanan Yeni Fiyat</th>
+                                <th className="px-3 py-2 font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest text-center w-24">Marj</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
                             {products.length === 0 ? (
                                 <tr>
-                                    <td colSpan={9} className="py-12 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-[#1e293b]/50">Listelenecek ürün bulanamadı.</td>
+                                    <td colSpan={6} className="py-12 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-[#1e293b]/50">Görüntülenecek ürün bulunamadı. Lütfen filtreleme panelinden bir filtre seçin.</td>
                                 </tr>
                             ) : (
-                                products.map(product => {
-                                    const current = priceData[product.id] || { buyPrice: 0, price: 0, newPrice: 0 };
+                                products.map((product: any) => {
+                                    const current = priceData[product.id] || { buyPrice: 0, defaultPrice: 0, currentPrice: 0, newPrice: 0 };
                                     const isSelected = selectedRows.includes(String(product.id));
 
-                                    // Mocks for spreadsheet metrics
-                                    const kkm = current.buyPrice * 1.05;
-                                    const suggested = kkm * 1.4;
-
-                                    const diff = current.newPrice - current.price;
-                                    const marginChange = current.price > 0 ? (diff / current.price) * 100 : 0;
-
-                                    const hasChange = current.newPrice !== current.price;
+                                    const diff = current.newPrice - current.currentPrice;
+                                    const marginChange = current.currentPrice > 0 ? (diff / current.currentPrice) * 100 : 0;
+                                    const hasChange = current.newPrice !== current.currentPrice;
 
                                     return (
-                                        <tr key={product.id} className={`h-[36px] hover:bg-slate-50 transition-colors group ${isSelected ? 'bg-blue-50/20' : ''}`}>
+                                        <tr key={product.id} className={`h-[38px] hover:bg-slate-50 dark:hover:bg-[#1e293b]/50 transition-colors group ${isSelected ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}`}>
                                             <td className="px-3 text-center border-r border-slate-100 dark:border-white/5">
                                                 <input
                                                     type="checkbox"
@@ -142,37 +298,31 @@ export default function BulkPriceEntryContent({
                                             </td>
                                             <td className="px-3 border-r border-slate-100 dark:border-white/5">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="font-bold text-slate-900 dark:text-white truncate max-w-[200px]">{product.name}</span>
-                                                    <span className="text-[10px] text-slate-400 font-mono ml-2">{product.code}</span>
+                                                    <span className="font-bold text-slate-900 dark:text-white truncate lg:max-w-xs">{product.name}</span>
+                                                    <span className="text-[10px] text-slate-400 font-mono ml-2 hidden sm:inline-block">{product.code}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-3 text-right border-r border-slate-100 dark:border-white/5">
-                                                <span className="font-semibold text-slate-600 dark:text-slate-400 tabular-nums">₺{Number(current.buyPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                            </td>
-                                            <td className="px-3 text-right border-r border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]/30">
-                                                <span className="font-bold text-indigo-600 tabular-nums">₺{Number(kkm).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                            </td>
-                                            <td className="px-3 text-right border-r border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]/30">
-                                                <span className="font-bold text-emerald-600 tabular-nums">₺{Number(suggested).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <td className="px-3 text-right border-r border-slate-100 dark:border-white/5 opacity-60 bg-slate-50/50 dark:bg-black/20">
+                                                <span className="font-medium text-slate-500 tabular-nums">₺{Number(current.buyPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </td>
                                             <td className="px-3 text-right border-r border-slate-100 dark:border-white/5">
-                                                <span className={`font-semibold tabular-nums ${hasChange ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
-                                                    ₺{Number(current.price).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                <span className={`font-semibold tabular-nums ${hasChange ? 'text-slate-400 line-through' : 'text-slate-900 dark:text-slate-200'}`}>
+                                                    ₺{Number(current.currentPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </span>
                                             </td>
-                                            <td className="p-0 border-r border-slate-100 dark:border-white/5 bg-blue-50/20 relative">
+                                            <td className="p-0 border-r border-slate-100 dark:border-white/5 bg-blue-50/20 dark:bg-blue-900/10 relative">
                                                 <input
                                                     type="number"
-                                                    className={`w-full h-[35px] text-right px-3 font-bold bg-transparent outline-none focus:bg-white focus:ring-1 focus:ring-inset focus:ring-blue-500 tabular-nums
-                                                        ${hasChange ? 'text-blue-600' : 'text-slate-900'}
+                                                    className={`w-full h-full min-h-[37px] text-right px-3 font-bold bg-transparent outline-none focus:bg-white dark:focus:bg-black focus:ring-1 focus:ring-inset focus:ring-blue-500 tabular-nums
+                                                        ${hasChange ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-slate-200'}
                                                     `}
                                                     value={current.newPrice === 0 ? '' : current.newPrice}
                                                     onChange={e => {
                                                         const val = parseFloat(e.target.value) || 0;
-                                                        handleUpdate(product.id, 'newPrice', val);
-                                                        if (val !== current.price && !isSelected) {
+                                                        handleUpdate(product.id, 'newPrice', Math.max(0, val));
+                                                        if (val !== current.currentPrice && !isSelected) {
                                                             toggleRow(String(product.id), true);
-                                                        } else if (val === current.price && isSelected) {
+                                                        } else if (val === current.currentPrice && isSelected) {
                                                             toggleRow(String(product.id), false);
                                                         }
                                                     }}
@@ -180,18 +330,11 @@ export default function BulkPriceEntryContent({
                                             </td>
                                             <td className="px-3 text-center border-r border-slate-100 dark:border-white/5">
                                                 {hasChange ? (
-                                                    <span className={`font-bold tabular-nums text-[11px] px-1.5 py-0.5 rounded ${marginChange > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                                                        {marginChange > 0 ? '+' : ''}{marginChange.toFixed(1)}%
+                                                    <span className={`font-bold tabular-nums text-[10px] px-1.5 py-0.5 rounded ${marginChange > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                                        {marginChange > 0 ? '+' : ''}{(marginChange !== Infinity && !isNaN(marginChange)) ? marginChange.toFixed(1) : '∞'}%
                                                     </span>
                                                 ) : (
-                                                    <span className="text-slate-300">-</span>
-                                                )}
-                                            </td>
-                                            <td className="px-3 text-center">
-                                                {hasChange ? (
-                                                    <div className="w-2 h-2 rounded-full bg-blue-500 mx-auto"></div>
-                                                ) : (
-                                                    <div className="w-2 h-2 rounded-full bg-slate-200 mx-auto"></div>
+                                                    <span className="text-slate-300 dark:text-slate-600">-</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -200,6 +343,178 @@ export default function BulkPriceEntryContent({
                             )}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// -------------------------------------------------------------------------------------
+// 2. SETTINGS VIEW (Channels & Categories Mappings)
+// -------------------------------------------------------------------------------------
+
+function SettingsView() {
+    const [lists, setLists] = useState<any[]>([]);
+    const [settings, setSettings] = useState<Record<string, string>>({});
+    const [newListName, setNewListName] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [resLists, resSettings] = await Promise.all([
+                fetch('/api/pricing/lists'),
+                fetch('/api/settings')
+            ]);
+            const dLists = await resLists.json();
+            const dSet = await resSettings.json();
+            
+            if (dLists.data) setLists(dLists.data);
+            if (dSet && !dSet.error) setSettings(dSet);
+        } catch (e) {
+            toast.error("Ayarlar yüklenirken hata oluştu.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchData(); }, []);
+
+    const handleCreateList = async () => {
+        if (!newListName.trim()) return;
+        try {
+            const res = await fetch('/api/pricing/lists', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newListName, isDefault: false })
+            });
+            const d = await res.json();
+            if (d.success || d.ok) {
+                toast.success("Yeni fiyat listesi başarıyla oluşturuldu.");
+                setNewListName('');
+                fetchData();
+            } else {
+                toast.error(d.error || "Liste oluşturulamadı.");
+            }
+        } catch {
+            toast.error("Sistem hatası");
+        }
+    };
+
+    const handleDeleteList = async (id: string, name: string) => {
+        if (!confirm(`"${name}" fiyat listesini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) return;
+        try {
+            const res = await fetch(`/api/pricing/lists/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                toast.success("Fiyat listesi silindi.");
+                fetchData();
+            } else {
+                toast.error("Silinemedi.");
+            }
+        } catch { toast.error("Sistem hatası"); }
+    };
+
+    const saveChannelMap = async (key: string, listId: string) => {
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [key]: listId || 'default' })
+            });
+            setSettings(prev => ({ ...prev, [key]: listId }));
+            toast.success("Kanal eşleştirmesi kaydedildi.");
+        } catch {
+            toast.error("Kayıt başarısız.");
+        }
+    };
+
+    return (
+        <div className="flex flex-col md:flex-row gap-6 animate-in fade-in h-full overflow-y-auto">
+            {/* L-Col: Channel Mappings */}
+            <div className="flex-1 min-w-[300px] flex flex-col gap-4">
+                <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Satış Kanalı Eşleştirmeleri</h3>
+                    <p className="text-sm text-slate-500 mb-6">Mevcut kanallarınızın öntanımlı fiyat yapılarını buradan bir listeye bağlayın.</p>
+                    
+                    <div className="space-y-4">
+                        {[
+                            { key: 'channel_terminal_list', name: 'Mağaza Satışı / Terminal', description: 'POS ekranından yapılan direkt kasadan satışlarda' },
+                            { key: 'channel_dealer_list', name: 'B2B Dealer (Bayiler)', description: 'Bayi Portalından yapılan online B2B toptan siparişlerde' },
+                            { key: 'channel_hub_list', name: 'B2B HUB', description: 'Bölge Satış Yönetimi / Dağıtım Ağında' },
+                            { key: 'channel_field_sales_list', name: 'Saha Satış (Plasiyer)', description: 'Saha ekipleri ve mobil sipariş ekranlarında' }
+                        ].map(c => (
+                            <div key={c.key} className="flex flex-col gap-1.5 pb-4 border-b border-slate-100 dark:border-slate-800/80 last:border-0 last:pb-0">
+                                <div className="flex justify-between items-center mb-1">
+                                    <div>
+                                        <div className="font-semibold text-slate-700 dark:text-slate-200 text-[13px]">{c.name}</div>
+                                        <div className="text-[11px] text-slate-400">{c.description}</div>
+                                    </div>
+                                </div>
+                                <select 
+                                    className="w-full bg-slate-50 dark:bg-[#1e293b] text-[13px] font-medium border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors"
+                                    value={settings[c.key] || 'default'}
+                                    onChange={e => saveChannelMap(c.key, e.target.value)}
+                                >
+                                    <option value="default">-- Ana Satış Fiyatı (Kanala Özel Liste Yok) --</option>
+                                    <option value="buy_price">Ana Alış Fiyatı (Maliyet)</option>
+                                    {lists.map(l => (
+                                        <option key={l.id} value={l.id}>{l.name} Listesi</option>
+                                    ))}
+                                </select>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl">
+                    <h4 className="font-bold text-amber-800 dark:text-amber-500 text-[13px] mb-1">Eşleştirme Neden Gerekli?</h4>
+                    <p className="text-amber-700/80 dark:text-amber-400/80 text-[11px] leading-relaxed">
+                        Farklı kanalların farklı kâr marjları ve operasyon maliyetleri vardır. Bayilere daha az kârlı toptan fiyatları sunarken, perakende Terminal ekranında varsayılan fiyatı gösterebilir, saha ekiplerinize özel pazarlık tavanları atayabilirsiniz.
+                    </p>
+                </div>
+            </div>
+
+            {/* R-Col: Create/Manage Lists */}
+            <div className="md:w-[400px] flex flex-col gap-4">
+                <div className="p-5 bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <h3 className="font-bold text-slate-800 dark:text-white text-base mb-1">Özel Fiyat Listeleri</h3>
+                    <p className="text-sm text-slate-500 mb-6">Yeni bir hedef liste oluşturun.</p>
+                    
+                    <div className="flex gap-2 mb-6">
+                        <input 
+                            className="flex-1 bg-slate-50 dark:bg-[#1e293b] text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                            placeholder="Yeni Liste Adı..."
+                            value={newListName}
+                            onChange={e => setNewListName(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleCreateList()}
+                        />
+                        <button 
+                            onClick={handleCreateList} 
+                            disabled={loading}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
+                        >
+                            Ekle
+                        </button>
+                    </div>
+
+                    <div className="space-y-2">
+                        {lists.map(list => (
+                            <div key={list.id} className="group flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-200 dark:hover:border-blue-900/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                                <span className="font-semibold text-slate-700 dark:text-slate-300 text-[13px]">{list.name} Listesi</span>
+                                <button 
+                                    onClick={() => handleDeleteList(list.id, list.name)}
+                                    className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        ))}
+                        {lists.length === 0 && !loading && (
+                            <div className="text-center py-6 text-slate-400 text-sm">Hiç özel fiyat listeniz bulunmuyor.</div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
