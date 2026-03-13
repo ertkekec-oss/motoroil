@@ -18,8 +18,10 @@ import AiCashierPanel from '@/components/terminal/AiCashierPanel';
 import CameraScanModal from '@/components/terminal/CameraScanModal';
 import OfflineBadge from '@/components/terminal/OfflineBadge';
 import { Clock, Tag, FileText, Gift, CreditCard } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function TerminalClient() {
+    const router = useRouter();
     const { products } = useInventory();
     const { kasalar } = useFinancials();
     const { customers } = useCRM();
@@ -237,10 +239,14 @@ export default function TerminalClient() {
                 return;
             }
 
+            const currentCustomerId = customer?.id;
             const success = await processSale(payload);
             if (success) {
                 showSuccess("Satış Başarıyla Tamamlandı", "");
                 resetTerminalState();
+                if (currentCustomerId) {
+                    router.push(`/customers/${currentCustomerId}`);
+                }
             } else {
                 showError("İşlem Reddedildi", "Satış kaydedilemedi.");
             }
