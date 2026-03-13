@@ -424,7 +424,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
 
 function SettingsView() {
     const [lists, setLists] = useState<any[]>([]);
-    const [settings, setSettings] = useState<Record<string, string>>({});
+    const [settings, setSettings] = useState<Record<string, any>>({});
     const [categories, setCategories] = useState<any[]>([]);
     
     // Create states
@@ -597,12 +597,16 @@ function SettingsView() {
                             <p className="text-sm text-slate-500 mb-6">Müşterileri ayırmak ve fiyat listeleri atamak için sınıflar oluşturun.</p>
                             
                             <div className="flex flex-col gap-2 mb-6">
-                                <input 
+                                <select 
                                     className="w-full bg-slate-50 dark:bg-[#1e293b] text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 outline-none focus:border-blue-500"
-                                    placeholder="Sınıf Adı (örn: B2B Bayi)"
                                     value={newCategoryName}
                                     onChange={e => setNewCategoryName(e.target.value)}
-                                />
+                                >
+                                    <option value="">Sistemden Bir Cari Sınıfı Seçin...</option>
+                                    {(settings.custClasses || []).map((cls: string) => (
+                                        <option key={cls} value={cls}>{cls}</option>
+                                    ))}
+                                </select>
                                 <div className="flex gap-2">
                                     <select 
                                         className="flex-1 bg-slate-50 dark:bg-[#1e293b] text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 outline-none focus:border-blue-500 truncate"
@@ -616,10 +620,10 @@ function SettingsView() {
                                     </select>
                                     <button 
                                         onClick={handleCreateCategory} 
-                                        disabled={loading}
+                                        disabled={loading || !newCategoryName}
                                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
                                     >
-                                        Ekle
+                                        Eşleştir
                                     </button>
                                 </div>
                             </div>

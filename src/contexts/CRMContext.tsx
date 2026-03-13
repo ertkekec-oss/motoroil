@@ -109,23 +109,26 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
 
     const refreshClasses = async () => {
         try {
-            const res = await apiFetch('/api/customers/categories');
-            if (!res.ok) throw new Error('Failed to fetch category data');
-            const responseData = await res.json();
-            const data = responseData.data || (Array.isArray(responseData) ? responseData : []);
+            const res = await apiFetch('/api/settings');
+            if (!res.ok) throw new Error('Failed to fetch settings data');
+            const data = await res.json();
             
-            if (data.length > 0) {
-                const dbClasses = data.map((c: any) => c.name);
-                setCustClasses(dbClasses);
+            if (data.custClasses && Array.isArray(data.custClasses) && data.custClasses.length > 0) {
+                setCustClasses(data.custClasses);
             } else {
                 setCustClasses(['A Sınıfı', 'B Sınıfı', 'C Sınıfı', 'VIP', 'Kurumsal']);
+            }
+            if (data.suppClasses && Array.isArray(data.suppClasses) && data.suppClasses.length > 0) {
+                setSuppClasses(data.suppClasses);
+            } else {
+                setSuppClasses(['Resmi', 'Spot', 'İthalatçı', 'Yerel']);
             }
         } catch (err) {
             console.warn('CRM Fetching Error (Classes): fallback to static definition', err);
             setCustClasses(['A Sınıfı', 'B Sınıfı', 'C Sınıfı', 'VIP', 'Kurumsal']);
+            setSuppClasses(['Resmi', 'Spot', 'İthalatçı', 'Yerel']);
         }
 
-        setSuppClasses(['Resmi', 'Spot', 'İthalatçı', 'Yerel']);
         setError(null);
     };
 

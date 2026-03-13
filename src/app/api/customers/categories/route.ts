@@ -29,17 +29,16 @@ export async function POST(req: NextRequest) {
         const ctx = await getRequestContext(req);
         const body = await req.json();
 
-        // Check duplicate name
-        const existing = await prisma.customerCategory.findUnique({
-            where: { companyId_name: { companyId: ctx.companyId!, name: body.name } }
-        });
-
-        if (existing) {
-            return apiError({ message: 'Category with this name already exists', status: 400 }, ctx.requestId);
-        }
-
-        const category = await prisma.customerCategory.create({
-            data: {
+        const category = await prisma.customerCategory.upsert({
+            where: {
+                companyId_name: { companyId: ctx.companyId!, name: body.name }
+            },
+            update: {
+                description: body.description,
+                priceListId: body.priceListId,
+                isDefault: body.isDefault !== undefined ? body.isDefault : undefined
+            },
+            create: {
                 companyId: ctx.companyId!,
                 name: body.name,
                 description: body.description,
