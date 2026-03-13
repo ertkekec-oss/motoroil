@@ -35,7 +35,7 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
 
         const effectiveCompanyId = invoice?.companyId || sessionCompanyId;
         if (!effectiveCompanyId) {
-            return new Response('Firma oturumu veya fatura bulunamadı.', { status: 400 });
+            return new Response(JSON.stringify({ error: 'Firma oturumu veya fatura bulunamadı.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
         }
 
         // Try new IntegratorSettings table first
@@ -82,7 +82,7 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
         const uuid = invoice?.formalUuid || (invoiceId.length > 20 ? invoiceId : null);
 
         if (!uuid) {
-            return new Response('Fatura henüz resmileşmemiş (UUID yok).', { status: 400 });
+            return new Response(JSON.stringify({ error: 'Fatura henüz resmileşmemiş (UUID yok).' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
         }
 
         const endpointsToTry = [];
@@ -105,7 +105,9 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
             `${baseUrl}/einvoice/Purchase/${uuid}/pdf`,
             `${baseUrl}/earchive/Invoices/${uuid}/pdf`,
             `${baseUrl}/earchive/Sale/${uuid}/pdf`,
-            `${baseUrl}/edespatch/Despatch/${uuid}/pdf`
+            `${baseUrl}/edespatch/Despatch/${uuid}/pdf`,
+            `${baseUrl}/edespatch/Purchase/${uuid}/pdf`,
+            `${baseUrl}/edespatch/Sale/${uuid}/pdf`
         ];
 
         for (const f of fallbacks) {
@@ -174,11 +176,11 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
             }
         }
 
-        return new Response('Fatura PDF dosyası Nilvera sunucularından alınamadı.', { status: 404 });
+        return new Response(JSON.stringify({ error: 'Fatura PDF dosyası Nilvera sunucularından alınamadı.' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
 
     } catch (error: any) {
         console.error("[PDF Proxy Critical Error]:", error);
-        return new Response('Sunucu hatası.', { status: 500 });
+        return new Response(JSON.stringify({ error: 'Sunucu hatası.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
 
