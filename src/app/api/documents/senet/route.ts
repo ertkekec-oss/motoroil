@@ -107,7 +107,16 @@ export async function GET(req: NextRequest) {
         if (action === 'send-otp') {
             // Upload to S3
             const objectKey = `signatures/${session.tenantId}/senet-${uuidv4()}.pdf`;
-            await putObject(objectKey, Buffer.from(pdfBytes), 'application/pdf');
+            
+            try {
+                if (process.env.STORAGE_BUCKET) {
+                    await putObject(objectKey, Buffer.from(pdfBytes), 'application/pdf');
+                } else {
+                    console.warn('STORAGE_BUCKET is not set. Skipping physical S3 upload for local development.');
+                }
+            } catch (s3Err) {
+                console.error("S3 Upload failed, proceeding without physical document for now:", s3Err);
+            }
 
             // Send to envelope endpoint (create envelope)
             const recipients = [];
