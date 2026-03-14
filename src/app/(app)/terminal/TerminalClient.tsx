@@ -68,12 +68,11 @@ export default function TerminalClient() {
 
     useEffect(() => {
         if (useForex && isOnline) {
-            // Fetch live rates. Free public API returning base TRY.
-            fetch('https://open.er-api.com/v6/latest/TRY')
+            // Fetch live rates via robust internal proxy (evades adblockers and CORS)
+            fetch('/api/forex')
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.rates) {
-                        // rates are 1 TRY = X USD. So 1 USD = 1 / X TRY
+                    if (data && data.success && data.rates) {
                         const ratesToTry: Record<string, number> = {};
                         Object.keys(data.rates).forEach(currency => {
                             ratesToTry[currency.toUpperCase()] = 1 / data.rates[currency];
@@ -83,7 +82,7 @@ export default function TerminalClient() {
                         setExchangeRates(ratesToTry);
                     }
                 })
-                .catch(err => console.error("Forex fetch failed", err));
+                .catch(err => console.error("Forex proxy fetch failed", err));
         }
     }, [useForex, isOnline]);
 
@@ -222,7 +221,7 @@ export default function TerminalClient() {
         }
 
         const payload = {
-            items: cart.map(i => ({ productId: i.id, qty: i.qty })),
+            items: cart.map(i => ({ productId: i.id, qty: i.qty, price: getPrice(i) })),
             total: finalTotal,
             customerName: selectedCustomer,
             description: referenceNote ? `REF: ${referenceNote}` : `POS: ${selectedCustomer}`,
