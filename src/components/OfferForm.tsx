@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCRM } from '@/contexts/CRMContext';
 import { useInventory } from '@/contexts/InventoryContext';
 
-export default function QuoteForm({ initialData, onSave, onCancel }: any) {
+export default function OfferForm({ initialData, onSave, onCancel }: any) {
     const { customers } = useCRM();
     const { products } = useInventory();
 
@@ -12,7 +12,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
         validUntil: '',
         description: '',
         items: [] as any[],
-        status: 'Pending'
+        status: 'DRAFT'
     });
     const [resolvedPriceList, setResolvedPriceList] = useState<any>(null);
     const [loadingPrice, setLoadingPrice] = useState(false);
@@ -21,11 +21,11 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
         if (initialData) {
             setFormData({
                 customerId: initialData.customerId || '',
-                date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                date: initialData.issueDate ? new Date(initialData.issueDate).toISOString().split('T')[0] : (initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]),
                 validUntil: initialData.validUntil ? new Date(initialData.validUntil).toISOString().split('T')[0] : '',
                 description: initialData.description || '',
-                items: Array.isArray(initialData.items) ? initialData.items : [],
-                status: initialData.status || 'Pending'
+                items: Array.isArray(initialData.lines) ? initialData.lines : (Array.isArray(initialData.items) ? initialData.items : []),
+                status: initialData.status || 'DRAFT'
             });
         }
     }, [initialData]);
@@ -200,11 +200,12 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
                             >
-                                <option value="Pending">Beklemede</option>
-                                <option value="Sent">Gönderildi</option>
-                                <option value="Accepted">Onaylandı</option>
-                                <option value="Rejected">Reddedildi</option>
-                                <option value="Converted">Faturalandı</option>
+                                <option value="DRAFT">Taslak</option>
+                                <option value="PENDING_APPROVAL">Onay Bekleyen</option>
+                                <option value="SENT">Gönderildi</option>
+                                <option value="ACCEPTED">Kabul Edildi</option>
+                                <option value="REJECTED">Reddedildi</option>
+                                <option value="CONVERTED_TO_ORDER">Siparişe Dönüştü</option>
                             </select>
                         </div>
                     )}

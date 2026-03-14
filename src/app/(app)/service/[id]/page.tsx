@@ -69,6 +69,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     // If labor is not in items, we can try to show it as the remainder if it makes sense
     // But usually it's better to just show "Parts" and "Total"
 
+    const [isActionsOpen, setIsActionsOpen] = useState(false);
+
     return (
         <div className="container p-8 max-w-[1400px] mx-auto min-h-screen">
 
@@ -93,9 +95,39 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                         <span>🖨️</span>
                         Yazdır
                     </button>
-                    <button className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-sm shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-                        E-Fatura Gönder
-                    </button>
+                    
+                    <div className="relative">
+                        <button 
+                            onClick={() => setIsActionsOpen(!isActionsOpen)} 
+                            className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-sm shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                        >
+                            EYLEMLER
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`w-3 h-3 transition-transform ${isActionsOpen ? 'rotate-180' : ''}`}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+
+                        {isActionsOpen && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setIsActionsOpen(false)}></div>
+                                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl shadow-lg z-50 overflow-hidden py-1">
+                                    <button 
+                                        className="w-full text-left px-4 py-2.5 text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                                    >
+                                        E-Fatura Gönder
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            router.push(`/offers?customerId=${service.customerId}&serviceId=${service.id}`);
+                                        }}
+                                        className="w-full text-left px-4 py-2.5 text-[13px] font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                                    >
+                                        Teklif Oluştur
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </header>
 

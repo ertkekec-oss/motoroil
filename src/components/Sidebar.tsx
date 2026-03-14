@@ -119,7 +119,7 @@ export default function Sidebar() {
             '/field-sales/intelligence': { perm: 'field_sales_access', feature: 'field_sales' },
             '/field-sales/admin/live': { perm: 'field_sales_admin', feature: 'field_sales' },
             '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'field_sales' },
-            '/quotes': { perm: 'offer_create', feature: 'quotes' },
+            '/offers': { perm: 'offer_create', feature: 'quotes' },
             '/reports': { perm: 'reports_view', feature: 'analytics' },
             '/reports/ceo': { perm: 'reports_view', feature: 'ceo_intel' },
             '/reports/daily': { perm: 'reports_view', feature: 'analytics' },
@@ -271,7 +271,7 @@ export default function Sidebar() {
                             { name: 'Reçeteler (BOM)', href: '/inventory/boms' },
                         ]
                     },
-                    { name: 'Teklifler', href: '/quotes', icon: FileText },
+                    { name: 'Teklifler', href: '/offers', icon: FileText },
                     { name: 'TechoPs', href: '/service', icon: Wrench },
                     {
                         name: 'SalesX',

@@ -48,7 +48,7 @@ const parseCurrencyToFloat = (val: string | number): number => {
 export default function CustomerDetailClient({ customer, historyList }: { customer: any, historyList: any[] }) {
     const router = useRouter();
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'all' | 'sales' | 'payments' | 'documents' | 'services' | 'warranties' | 'checks' | 'reconciliations'>('all');
+    const [activeTab, setActiveTab] = useState<'all' | 'sales' | 'payments' | 'documents' | 'services' | 'warranties' | 'checks' | 'reconciliations' | 'offers'>('all');
     const [documents, setDocuments] = useState<any[]>([]);
     const [services, setServices] = useState<any[]>([]);
     const [qrPlate, setQrPlate] = useState<string | null>(null);
@@ -984,7 +984,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2">
                     <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
                         {[
-                            { group: 'HAREKETLER', items: [{ id: 'all', label: 'Tüm Hareketler' }, { id: 'sales', label: 'Satışlar & Faturalar' }, { id: 'payments', label: 'Finansal İşlemler' }] },
+                            { group: 'HAREKETLER', items: [{ id: 'all', label: 'Tüm Hareketler' }, { id: 'sales', label: 'Satışlar & Faturalar' }, { id: 'payments', label: 'Finansal İşlemler' }, { id: 'offers', label: 'Teklifler' }] },
                             { group: 'EVRAKLAR', items: [{ id: 'documents', label: 'Dosyalar & Evraklar' }, { id: 'warranties', label: 'Garantiler' }] },
                             { group: 'SERVİS', items: [{ id: 'services', label: 'Servis Geçmişi' }] },
                             { group: 'FİNANS', items: [{ id: 'checks', label: 'Çek & Senetler' }, { id: 'reconciliations', label: 'Mutabakatlar' }] },
@@ -1149,6 +1149,73 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     </tr>
                                                 );
                                             })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    ) : activeTab === 'offers' ? (
+                        <div style={{ padding: '32px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Teklifler</h3>
+                                <Link href={`/offers?customerId=${customer.id}`} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '800', textDecoration: 'none' }}>Yeni Teklif</Link>
+                            </div>
+                            {(!customer.offers || customer.offers.length === 0) ? (
+                                <div style={{ padding: '40px', background: 'var(--bg-card, rgba(0,0,0,0.2))', borderRadius: '16px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
+                                    <div style={{ fontSize: '32px', marginBottom: '16px', opacity: 0.5 }}>📝</div>
+                                    <h4 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Teklif Bulunamadı</h4>
+                                    Müşteriye henüz bir teklif oluşturulmamış.
+                                </div>
+                            ) : (
+                                <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', background: 'var(--bg-surface, rgba(15, 23, 42, 0.6))' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                                        <thead>
+                                            <tr style={{ background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Tarih / No</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Açıklama</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800', textAlign: 'right' }}>Tutar</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Durum</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Detay</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {customer.offers.map((offer: any) => (
+                                                <tr key={offer.id} style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', transition: 'background 0.2s' }}>
+                                                    <td style={{ padding: '20px', verticalAlign: 'middle' }}>
+                                                        <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main, #fff)', marginBottom: '4px' }}>
+                                                            {new Date(offer.issueDate).toLocaleDateString('tr-TR')}
+                                                        </div>
+                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', fontWeight: '600' }}>{offer.offerNumber}</div>
+                                                    </td>
+                                                    <td style={{ padding: '20px', verticalAlign: 'middle' }}>
+                                                        <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--text-main, #e2e8f0)', whiteSpace: 'pre-wrap' }}>
+                                                            {(offer.terms && offer.terms[0]?.notes) || 'TEKLİF'}
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ padding: '20px', verticalAlign: 'middle', textAlign: 'right', fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #fff)', letterSpacing: '0.5px' }}>
+                                                        {Number(offer.grandTotal || 0).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+                                                    </td>
+                                                    <td style={{ padding: '20px', verticalAlign: 'middle' }}>
+                                                        <span style={{
+                                                            padding: '6px 10px',
+                                                            borderRadius: '8px',
+                                                            fontSize: '11px',
+                                                            fontWeight: 'bold',
+                                                            textTransform: 'uppercase',
+                                                            background: offer.status === 'ACCEPTED' || offer.status === 'CONVERTED_TO_ORDER' ? 'rgba(16, 185, 129, 0.1)' : offer.status === 'REJECTED' || offer.status === 'CANCELLED' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                                                            color: offer.status === 'ACCEPTED' || offer.status === 'CONVERTED_TO_ORDER' ? '#10b981' : offer.status === 'REJECTED' || offer.status === 'CANCELLED' ? '#ef4444' : '#3b82f6',
+                                                            border: `1px solid ${offer.status === 'ACCEPTED' || offer.status === 'CONVERTED_TO_ORDER' ? 'rgba(16, 185, 129, 0.2)' : offer.status === 'REJECTED' || offer.status === 'CANCELLED' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)'}`
+                                                        }}>
+                                                            {offer.status === 'DRAFT' ? 'TASLAK' : offer.status === 'PENDING_APPROVAL' ? 'ONAY BEKLİYOR' : offer.status === 'APPROVED' ? 'ONAYLANDI' : offer.status === 'SENT' ? 'GÖNDERİLDİ' : offer.status === 'VIEWED' ? 'GÖRÜNTÜLENDİ' : offer.status === 'NEGOTIATING' ? 'PAZARLIK' : offer.status === 'ACCEPTED' ? 'KABUL EDİLDİ' : offer.status === 'REJECTED' ? 'REDDEDİLDİ' : offer.status === 'EXPIRED' ? 'SÜRESİ DOLDU' : offer.status === 'CONVERTED_TO_ORDER' ? 'FATURALANDIRILDI' : 'İPTAL'}
+                                                        </span>
+                                                    </td>
+                                                    <td style={{ padding: '20px', verticalAlign: 'middle' }}>
+                                                        <Link href={`/offers?activeId=${offer.id}`} style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', textDecoration: 'none' }}>
+                                                            İncele
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>

@@ -55,6 +55,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 },
                 checks: {
                     orderBy: { dueDate: 'asc' }
+                },
+                offers: {
+                    orderBy: { createdAt: 'desc' },
+                    include: { lines: true, terms: true }
                 }
             }
         });

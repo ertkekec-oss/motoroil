@@ -5,14 +5,14 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { useSettings } from '@/contexts/SettingsContext';
 import { createPortal } from 'react-dom';
 
-interface QuotePreviewModalProps {
+interface OfferPreviewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    quote: any;
+    offer: any;
     branches?: any[];
 }
 
-export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [] }: QuotePreviewModalProps) {
+export default function OfferPreviewModal({ isOpen, onClose, offer, branches = [] }: OfferPreviewModalProps) {
     const [mounted, setMounted] = useState(false);
     const { appSettings } = useSettings();
 
@@ -26,19 +26,19 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
         return () => { document.body.style.overflow = 'unset'; };
     }, [isOpen]);
 
-    if (!isOpen || !quote || !mounted) return null;
+    if (!isOpen || !offer || !mounted) return null;
 
-    const items = Array.isArray(quote.items) ? quote.items : [];
+    const items = Array.isArray(offer.items) ? offer.items : (Array.isArray(offer.lines) ? offer.lines : []);
 
     // Find branch details
-    const branchName = quote.branch || 'Merkez';
+    const branchName = offer.branch || 'Merkez';
     const branchInfo = branches.find(b => b.name === branchName) || branches.find(b => b.type === 'Merkez') || branches[0];
 
-    const companyName = appSettings?.company_name || "MOTOROIL";
-    const companySlogan = appSettings?.company_slogan || "Profesyonel Oto Servis ve Bakım";
-    const address = branchInfo?.address || appSettings?.company_address || "İkitelli OSB, Dolapdere Sanayi Sitesi, 22. Ada No: 45 Başakşehir / İSTANBUL";
+    const companyName = appSettings?.company_name || "PERIODYA";
+    const companySlogan = appSettings?.company_slogan || "Gelişmiş B2B Çözümleri";
+    const address = branchInfo?.address || appSettings?.company_address || "İkitelli OSB / İSTANBUL";
     const phone = branchInfo?.phone || appSettings?.company_phone || "+90 (212) 549 00 00";
-    const email = appSettings?.company_email || "info@motoroil.com.tr";
+    const email = appSettings?.company_email || "info@periodya.com";
 
     const handlePrint = () => {
         window.print();
@@ -59,7 +59,7 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                         </div>
                         <div>
                             <h2 className="text-[16px] font-semibold text-slate-900 dark:text-white">Teklif Önizleme</h2>
-                            <p className="text-[12px] text-slate-500 font-medium">{quote.quoteNo} • {formatDate(quote.date)}</p>
+                            <p className="text-[12px] text-slate-500 font-medium">{offer.offerNumber || offer.quoteNo} • {formatDate(offer.issueDate || offer.date)}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -97,16 +97,16 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                                 <div className="space-y-1.5">
                                     <div className="flex justify-end gap-3">
                                         <span className="text-[10px] text-gray-400 font-bold uppercase">No:</span>
-                                        <span className="text-sm font-mono font-bold text-gray-900">{quote.quoteNo}</span>
+                                        <span className="text-sm font-mono font-bold text-gray-900">{offer.offerNumber || offer.quoteNo}</span>
                                     </div>
                                     <div className="flex justify-end gap-3">
                                         <span className="text-[10px] text-gray-400 font-bold uppercase">Tarih:</span>
-                                        <span className="text-sm font-bold text-gray-900">{formatDate(quote.date)}</span>
+                                        <span className="text-sm font-bold text-gray-900">{formatDate(offer.issueDate || offer.date)}</span>
                                     </div>
-                                    {quote.validUntil && (
+                                    {offer.validUntil && (
                                         <div className="flex justify-end gap-3">
                                             <span className="text-[10px] text-gray-400 font-bold uppercase">Geçerlilik:</span>
-                                            <span className="text-sm font-bold text-red-600">{formatDate(quote.validUntil)}</span>
+                                            <span className="text-sm font-bold text-red-600">{formatDate(offer.validUntil)}</span>
                                         </div>
                                     )}
                                 </div>
@@ -118,19 +118,19 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                                 <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">TEKLİF SUNULAN</h3>
                                 <div className="space-y-1">
-                                    <p className="text-lg font-black text-gray-900">{quote.customer?.name}</p>
-                                    <p className="text-sm text-gray-600 font-medium">{quote.customer?.phone || '—'}</p>
-                                    <p className="text-sm text-gray-600 font-medium">{quote.customer?.email || '—'}</p>
-                                    {quote.customer?.address && (
-                                        <p className="text-xs text-gray-500 mt-2 font-medium leading-relaxed italic">{quote.customer.address}</p>
+                                    <p className="text-lg font-black text-gray-900">{offer.customer?.name}</p>
+                                    <p className="text-sm text-gray-600 font-medium">{offer.customer?.phone || '—'}</p>
+                                    <p className="text-sm text-gray-600 font-medium">{offer.customer?.email || '—'}</p>
+                                    {offer.customer?.address && (
+                                        <p className="text-xs text-gray-500 mt-2 font-medium leading-relaxed italic">{offer.customer.address}</p>
                                     )}
                                 </div>
                             </div>
-                            {quote.description && (
+                            {offer.description && (
                                 <div className="p-6">
                                     <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">ÖZEL NOTLAR</h3>
                                     <p className="text-sm text-gray-700 italic leading-relaxed whitespace-pre-wrap font-medium">
-                                        {quote.description}
+                                        {offer.description}
                                     </p>
                                 </div>
                             )}
@@ -150,14 +150,14 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {items?.map((item: any, idx: number) => {
-                                    const lineTotal = Number(item.quantity) * Number(item.price);
+                                    const lineTotal = Number(item.quantity) * Number(item.price || item.unitPrice);
                                     return (
                                         <tr key={idx}>
                                             <td className="py-4 px-2 text-xs font-mono text-gray-400">{idx + 1}</td>
-                                            <td className="py-4 px-2 text-sm font-bold text-gray-900">{item.name}</td>
+                                            <td className="py-4 px-2 text-sm font-bold text-gray-900">{item.name || item.description}</td>
                                             <td className="py-4 px-2 text-center text-sm font-medium text-gray-600">{item.quantity}</td>
-                                            <td className="py-4 px-2 text-right text-sm font-medium text-gray-600">{formatCurrency(Number(item.price))}</td>
-                                            <td className="py-4 px-2 text-right text-xs font-medium text-gray-400">%{item.taxRate}</td>
+                                            <td className="py-4 px-2 text-right text-sm font-medium text-gray-600">{formatCurrency(Number(item.price || item.unitPrice))}</td>
+                                            <td className="py-4 px-2 text-right text-xs font-medium text-gray-400">%{(item.taxRate || 20)}</td>
                                             <td className="py-4 px-2 text-right text-sm font-black text-gray-900">{formatCurrency(lineTotal)}</td>
                                         </tr>
                                     );
@@ -170,15 +170,15 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                             <div className="w-full max-w-[300px] space-y-3">
                                 <div className="flex justify-between items-center text-sm font-medium text-gray-500">
                                     <span>Ara Toplam</span>
-                                    <span>{formatCurrency(Number(quote.totalAmount) - Number(quote.taxAmount))}</span>
+                                    <span>{formatCurrency(Number(offer.subtotal || offer.totalAmount) - Number(offer.taxTotal || offer.taxAmount || 0))}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm font-medium text-gray-500 border-b border-gray-100 pb-3">
                                     <span>Toplam KDV</span>
-                                    <span>{formatCurrency(Number(quote.taxAmount))}</span>
+                                    <span>{formatCurrency(Number(offer.taxTotal || offer.taxAmount))}</span>
                                 </div>
                                 <div className="flex justify-between items-center px-4 py-3 bg-primary text-white rounded-xl shadow-sm shadow-primary/20">
                                     <span className="text-[10px] font-black uppercase tracking-widest">Genel Toplam</span>
-                                    <span className="text-xl font-black">{formatCurrency(Number(quote.totalAmount))}</span>
+                                    <span className="text-xl font-black">{formatCurrency(Number(offer.grandTotal || offer.totalAmount))}</span>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +190,7 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                                 <div className="w-48 h-[1px] bg-gray-200"></div>
                             </div>
                             <div className="text-right">
-                                <p className="mb-8">{companyName} Servis Yetkilisi</p>
+                                <p className="mb-8">{companyName} Yetkilisi</p>
                                 <div className="w-48 h-[1px] bg-gray-200 ml-auto"></div>
                             </div>
                         </div>
