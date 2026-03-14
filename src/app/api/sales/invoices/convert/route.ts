@@ -21,13 +21,27 @@ export async function POST(request: Request) {
 
             // Calculate Totals based on items (Net -> OTV -> VAT)
             const subtotal = itemsToUse.reduce((acc: number, it: any) => acc + (Number(it.qty || 1) * Number(it.price || 0)), 0);
-            const totalOtv = itemsToUse.reduce((acc: number, it: any) => acc + (Number(it.qty || 1) * Number(it.price || 0) * (Number(it.otv || 0) / 100)), 0);
+            const totalOtv = itemsToUse.reduce((acc: number, it: any) => {
+                const lineNet = Number(it.qty || 1) * Number(it.price || 0);
+                if (it.otvType === 'maktu Ö.T.V') return acc + (Number(it.otv || 0) * Number(it.qty || 1));
+                return acc + (lineNet * (Number(it.otv || 0) / 100));
+            }, 0);
 
             // VAT is calculated on (Net + OTV)
             const totalVat = itemsToUse.reduce((acc: number, it: any) => {
                 const lineNet = Number(it.qty || 1) * Number(it.price || 0);
-                const lineOtv = lineNet * (Number(it.otv || 0) / 100);
-                return acc + (lineNet + lineOtv) * (Number(it.vat || 20) / 100);
+                let lineOtv = lineNet * (Number(it.otv || 0) / 100);
+                if (it.otvType === 'maktu Ö.T.V') lineOtv = Number(it.otv || 0) * Number(it.qty || 1);
+                const vatRate = it.vat !== undefined ? Number(it.vat) : 20;
+                return acc + (lineNet + lineOtv) * (vatRate / 100);
+            }, 0);
+
+            // OIV is calculated on (Net + OTV)
+            const totalOiv = itemsToUse.reduce((acc: number, it: any) => {
+                const lineNet = Number(it.qty || 1) * Number(it.price || 0);
+                let lineOtv = lineNet * (Number(it.otv || 0) / 100);
+                if (it.otvType === 'maktu Ö.T.V') lineOtv = Number(it.otv || 0) * Number(it.qty || 1);
+                return acc + (lineNet + lineOtv) * (Number(it.oiv || 0) / 100);
             }, 0);
 
             let discAmount = 0;
@@ -39,7 +53,7 @@ export async function POST(request: Request) {
                 }
             }
 
-            const grandTotal = subtotal + totalOtv + totalVat - discAmount;
+            const grandTotal = subtotal + totalOtv + totalVat + totalOiv - discAmount;
 
             const invoice = await tx.salesInvoice.create({
                 data: {
@@ -48,7 +62,7 @@ export async function POST(request: Request) {
                     customerId: customerId,
                     orderId: order.id,
                     amount: subtotal - discAmount,
-                    taxAmount: totalVat + totalOtv, // Total tax includes OTV
+                    taxAmount: totalVat + totalOtv + totalOiv, // Total tax includes OTV and OIV
                     totalAmount: grandTotal,
                     description: description || `POS Siparişi Faturalandırma: ${order.orderNumber}`,
                     items: itemsToUse as any,

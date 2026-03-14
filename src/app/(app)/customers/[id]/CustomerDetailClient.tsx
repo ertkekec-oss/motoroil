@@ -473,10 +473,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     // 1. Try to get price from order item (it.price or it.unitPrice)
                     // 2. If 0 and we found the product, use current product list price (realProduct.price)
                     let grossPrice = Number(it.price || it.unitPrice || 0);
+                    const isPromo = String(it.name || '').includes('(Bedelsiz Promosyon)') || it.isPromo;
 
-                    if (grossPrice === 0 && realProduct) {
+                    if (grossPrice === 0 && realProduct && !isPromo) {
                         grossPrice = Number(realProduct.price || 0);
                         console.log(`⚠️ Price missing in order for ${it.name}, using list price: ${grossPrice}`);
+                    }
+                    if (isPromo) {
+                        grossPrice = 0;
                     }
 
                     // Net Price calculation (Gross -> Net)
@@ -508,8 +512,40 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 console.log('✅ Mapped invoice items:', mappedItems);
 
                 setInvoiceItems(mappedItems);
-                setDiscountValue(0);
-                setDiscountType('percent');
+                setInvoiceItems(mappedItems);
+
+                // Map order discounts and campaign discounts
+                let mappedDiscount = 0;
+                let rawData = order.rawData;
+                if (typeof rawData === 'string') {
+                    try { rawData = JSON.parse(rawData); } catch(e){}
+                }
+
+                if (order.discountAmount) {
+                    mappedDiscount += Number(order.discountAmount);
+                }
+                if (rawData && rawData.dynamicEarnedPoints) {
+                    // This is not a discount, points are earned, but we shouldn't necessarily deduct it here unless they used points.
+                }
+
+                // Actually, the terminal sends discountAmount: totalDiscount. Let's see if we store it.
+                // In API route, Order doesn't have discountAmount natively, it's stored in rawData or not at all?
+                // Wait, Terminal sends discountAmount. If the user used a discount, it should be mapped to the order natively or rawData.
+                let inferredDiscount = (Number(order.totalAmount || 0) < Number(order.items?.reduce?.((a:any, b:any)=>a+(b.price*b.qty),0) || order.totalAmount)) 
+                 ? (mappedItems.reduce((acc:number, item:any) => acc + (item.price * item.qty), 0) - Number(order.totalAmount || 0)) 
+                 : 0;
+
+                // Let's just safely map any valid discount difference if there is one
+                // The safest is if we can't find it directly, just leave discount at 0 to not mess up the math, but the user explicitly requested it.
+                // Terminal payload has: `discountAmount: totalDiscount`. Is it saved in `rawData` in `api/sales/create/route.ts`? No, it wasn't.
+                
+                if (inferredDiscount > 1) { // 1 TL buffer
+                    setDiscountValue(Number(inferredDiscount.toFixed(2)));
+                    setDiscountType('amount');
+                } else {
+                    setDiscountValue(0);
+                    setDiscountType('percent');
+                }
 
                 // Open modal after state is set
                 setTimeout(() => {
@@ -1758,10 +1794,16 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             const otvRate = Number(it.otv || 0);
 
                                             const lineNetTotal = qty * netPrice;
-                                            const otvAmount = lineNetTotal * (otvRate / 100);
+                                            let otvAmount = 0;
+                                            if (it.otvType === 'yüzdesel Ö.T.V') {
+                                                otvAmount = lineNetTotal * (otvRate / 100);
+                                            } else if (it.otvType === 'maktu Ö.T.V') {
+                                                otvAmount = otvRate * qty;
+                                            }
                                             const vatMatrah = lineNetTotal + otvAmount;
                                             const vatAmount = vatMatrah * (vatRate / 100);
-                                            const lineGrossTotal = vatMatrah + vatAmount;
+                                            const oivAmount = vatMatrah * (Number(it.oiv || 0) / 100);
+                                            const lineGrossTotal = vatMatrah + vatAmount + oivAmount;
 
                                             const updateItem = (field: string, val: any) => {
                                                 const newItems = [...invoiceItems];
@@ -1771,7 +1813,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                                             const handleGrossChange = (newGross: number) => {
                                                 if (qty === 0) return;
-                                                const calculatedNet = newGross / (qty * (1 + otvRate / 100) * (1 + vatRate / 100));
+                                                const oivR = Number(it.oiv || 0);
+                                                let calculatedNet = 0;
+                                                if (it.otvType === 'yüzdesel Ö.T.V') {
+                                                    calculatedNet = newGross / (qty * (1 + otvRate / 100) * (1 + (vatRate + oivR) / 100));
+                                                } else if (it.otvType === 'maktu Ö.T.V') {
+                                                    calculatedNet = ((newGross / (1 + (vatRate + oivR) / 100)) - (otvRate * qty)) / qty;
+                                                } else {
+                                                    calculatedNet = newGross / (qty * (1 + (vatRate + oivR) / 100));
+                                                }
                                                 updateItem('price', calculatedNet);
                                             };
 

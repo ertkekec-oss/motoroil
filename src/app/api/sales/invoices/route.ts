@@ -343,13 +343,22 @@ export async function POST(request: Request) {
                 const invoiceLines = items.map(i => {
                     const qty = parseFloat(i.qty?.toString() || "1");
                     const price = parseFloat(i.price?.toString() || "0");
-                    const vatRate = parseFloat(i.vat?.toString() || "20");
+                    const vatRate = parseFloat(i.vat !== undefined ? i.vat.toString() : "20");
                     const otvRate = parseFloat(i.otv?.toString() || "0");
+                    const otvType = i.otvType || 'Ö.T.V yok';
+                    const oivRate = parseFloat(i.oiv?.toString() || "0");
 
                     const lineNet = Number((qty * price).toFixed(2));
-                    const lineOtv = Number((lineNet * (otvRate / 100)).toFixed(2));
+                    let lineOtv = 0;
+                    if (otvType === 'maktu Ö.T.V') {
+                        lineOtv = Number((qty * otvRate).toFixed(2));
+                    } else if (otvType === 'yüzdesel Ö.T.V') {
+                        lineOtv = Number((lineNet * (otvRate / 100)).toFixed(2));
+                    }
+
                     const lineVatBase = lineNet + lineOtv;
                     const lineVat = Number((lineVatBase * (vatRate / 100)).toFixed(2));
+                    const lineOiv = Number((lineVatBase * (oivRate / 100)).toFixed(2));
 
                     return {
                         Name: i.name || "URUN",
@@ -359,17 +368,21 @@ export async function POST(request: Request) {
                         VatRate: vatRate,
                         OtvRate: otvRate,
                         OtvCode: String(i.otvCode || '0071'),
+                        OtvType: otvType,
+                        OivRate: oivRate,
                         Description: i.description || "",
                         LineNet: lineNet,
                         LineVat: lineVat,
                         LineOtv: lineOtv,
-                        Total: Number((lineVatBase + lineVat).toFixed(2))
+                        LineOiv: lineOiv,
+                        Total: Number((lineVatBase + lineVat + lineOiv).toFixed(2))
                     };
                 });
 
                 const totalNet = invoiceLines.reduce((sum, l) => sum + l.LineNet, 0);
                 const totalVat = invoiceLines.reduce((sum, l) => sum + l.LineVat, 0);
                 const totalOtv = invoiceLines.reduce((sum, l) => sum + l.LineOtv, 0);
+                const totalOiv = invoiceLines.reduce((sum, l) => sum + l.LineOiv, 0);
                 const grandTotal = invoiceLines.reduce((sum, l) => sum + l.Total, 0);
 
                 let sendResult;
@@ -444,11 +457,13 @@ export async function POST(request: Request) {
                             VatRate: l.VatRate,
                             Description: l.Description,
                             OtvRate: l.OtvRate,
-                            OtvCode: l.OtvCode
+                            OtvCode: l.OtvCode,
+                            OtvType: l.OtvType,
+                            OivRate: l.OivRate
                         })),
                         amounts: {
                             base: Number(totalNet.toFixed(2)),
-                            tax: Number((totalVat + totalOtv).toFixed(2)),
+                            tax: Number((totalVat + totalOtv + totalOiv).toFixed(2)),
                             total: Number(grandTotal.toFixed(2))
                         },
                         isInternetSale: false,

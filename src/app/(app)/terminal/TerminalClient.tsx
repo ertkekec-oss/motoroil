@@ -638,8 +638,38 @@ export default function TerminalClient() {
                         <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-5 rounded-2xl mb-6 shadow-sm">
                             <div className="flex justify-between text-sm font-bold text-slate-500 mb-2"><span>Sepet Ara Toplam</span><span>₺{subtotal.toLocaleString()}</span></div>
                             {(appliedDiscount > 0 || pointsToUse > 0) && (
-                                <div className="flex justify-between text-sm font-bold text-emerald-500 mb-2"><span>İndirim / Puan</span><span>-₺{(appliedDiscount + (pointsToUse || 0)).toLocaleString()}</span></div>
+                                <div className="flex justify-between text-sm font-bold text-emerald-500 mb-2"><span>Manuel İndirim / Puan</span><span>-₺{(appliedDiscount + (pointsToUse || 0)).toLocaleString()}</span></div>
                             )}
+
+                            {/* Campaign Engine Rewards inside Checkout Summary */}
+                            {(computedCampaignDiscount > 0 || computedEarnedPoints > 0 || (computedPromoItems && computedPromoItems.length > 0)) && (
+                                <div className="mt-3 mb-3 p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
+                                    <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-widest flex items-center gap-1.5">
+                                        <Gift size={12} /> Otomatik Kazanımlar
+                                    </div>
+                                    <div className="space-y-1.5 text-xs">
+                                        {computedCampaignDiscount > 0 && (
+                                            <div className="flex justify-between font-medium text-emerald-600 dark:text-emerald-400">
+                                                <span>Kampanya İndirimi</span>
+                                                <span>-₺{computedCampaignDiscount.toLocaleString()}</span>
+                                            </div>
+                                        )}
+                                        {computedEarnedPoints > 0 && (
+                                            <div className="flex justify-between font-medium text-amber-600 dark:text-amber-400">
+                                                <span>Kazanılacak Parapuan</span>
+                                                <span>+{computedEarnedPoints.toLocaleString(undefined, { maximumFractionDigits: 2 })} Puan</span>
+                                            </div>
+                                        )}
+                                        {computedPromoItems?.map((pItem: any, i: number) => (
+                                            <div key={i} className="flex justify-between font-medium text-blue-600 dark:text-blue-400">
+                                                <span className="truncate pr-2">{pItem.qty}x {pItem.campName}</span>
+                                                <span>Bedelsiz Sepette</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-3"></div>
                             <div className="flex justify-between text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight"><span>Genel Toplam</span><span>₺{finalTotal.toLocaleString()}</span></div>
                         </div>

@@ -17,6 +17,8 @@ export interface InvoiceLine {
     Description?: string;
     OtvRate?: number;
     OtvCode?: string;
+    OtvType?: string;
+    OivRate?: number;
 }
 
 export interface CustomerInfo {
@@ -265,7 +267,27 @@ export class NilveraInvoiceService {
         // 4. Model Normalizasyonu (Tüm yedekli alan isimlerini dolduruyoruz)
         const invoiceLines = params.lines.map((line, idx) => {
             const lineExtensionAmount = Number((line.Quantity * line.Price).toFixed(2));
-            const vatAmount = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
+
+            const taxes = [];
+            let otvAmount = 0;
+
+            if (line.OtvRate && line.OtvRate > 0) {
+                if (line.OtvType === 'maktu Ö.T.V') {
+                    otvAmount = Number((line.OtvRate * line.Quantity).toFixed(2));
+                    taxes.push({ TaxCode: line.OtvCode || "0071", Total: otvAmount, Percent: 0 });
+                } else {
+                    otvAmount = Number((lineExtensionAmount * (line.OtvRate / 100)).toFixed(2));
+                    taxes.push({ TaxCode: line.OtvCode || "0071", Total: otvAmount, Percent: line.OtvRate });
+                }
+            }
+
+            const vatMatrah = lineExtensionAmount + otvAmount;
+            const vatAmount = Number((vatMatrah * (line.VatRate / 100)).toFixed(2));
+
+            if (line.OivRate && line.OivRate > 0) {
+                const oivAmount = Number((vatMatrah * (line.OivRate / 100)).toFixed(2));
+                taxes.push({ TaxCode: "0015", Total: oivAmount, Percent: line.OivRate });
+            }
 
             const baseLine: any = {
                 Index: idx + 1,
@@ -284,15 +306,8 @@ export class NilveraInvoiceService {
                 Notes: line.Description ? [line.Description] : undefined
             };
 
-            if (line.OtvRate && line.OtvRate > 0) {
-                const otvAmount = Number((lineExtensionAmount * (line.OtvRate / 100)).toFixed(2));
-                baseLine.Taxes = [
-                    {
-                        TaxCode: line.OtvCode || "0071",
-                        Total: otvAmount,
-                        Percent: line.OtvRate
-                    }
-                ];
+            if (taxes.length > 0) {
+                baseLine.Taxes = taxes;
             }
 
             const isExempt = line.VatRate === 0;

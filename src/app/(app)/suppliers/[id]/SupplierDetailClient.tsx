@@ -11,6 +11,7 @@ import { useFinancials } from '@/contexts/FinancialContext';
 import SupplierPurchaseModal from '@/components/modals/SupplierPurchaseModal';
 import TransactionDetailModal from '@/components/modals/TransactionDetailModal';
 import StatementModal from '@/components/modals/StatementModal';
+import SupplierInvoiceUploadModal from '@/components/modals/SupplierInvoiceUploadModal';
 import Pagination from '@/components/Pagination';
 
 export default function SupplierDetailClient({ supplierId, supplierData, displayHistory }: { supplierId: string, supplierData: any, displayHistory: any[] }) {
@@ -18,6 +19,7 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
     const { showSuccess, showError, showWarning } = useModal();
     const { collectCheck, kasalar } = useFinancials();
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
     // Check Collection States
     const [activeTab, setActiveTab] = useState<'all' | 'checks'>('all');
@@ -129,7 +131,8 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                             <button onClick={() => { setStatementType('summary'); setStatementOpen(true); }} className="btn btn-outline" style={{ fontSize: '10px', padding: '4px 8px', borderColor: '#555' }}>📄 Özet Ekstre</button>
                             <button onClick={() => { setStatementType('detailed'); setStatementOpen(true); }} className="btn btn-outline" style={{ fontSize: '10px', padding: '4px 8px', borderColor: '#555' }}>📑 Detaylı Ekstre</button>
                         </div>
-
+                        
+                        <button onClick={() => setIsUploadModalOpen(true)} className="btn btn-primary" style={{ background: '#6366f1', color: 'white', padding: '10px 16px', borderRadius: '8px', border: '1px solid #4f46e5', boxShadow: '0 4px 10px rgba(99, 102, 241, 0.3)' }}>🚀 Akıllı Fatura Yükle</button>
                         <button onClick={() => setIsPurchaseModalOpen(true)} className="btn btn-primary" style={{ background: '#3b82f6', color: 'white', padding: '10px 16px', borderRadius: '8px' }}>🛒 Alış Girişi</button>
                         <button onClick={() => setIsAdjustModalOpen(true)} className="btn btn-outline" style={{ background: 'transparent', border: '1px solid #555', color: '#ccc', padding: '10px 16px', borderRadius: '8px' }}>⚖️ Düzeltme</button>
                         <button
@@ -148,6 +151,14 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                 onClose={() => setIsPurchaseModalOpen(false)}
                 supplierId={supplierId}
                 supplierName={supplier.name}
+            />
+
+            <SupplierInvoiceUploadModal 
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+                supplierId={supplierId}
+                supplierName={supplier.name}
+                onSuccess={() => window.location.reload()}
             />
 
             <TransactionDetailModal

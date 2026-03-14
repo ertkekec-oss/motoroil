@@ -61,29 +61,36 @@ export default function CheckoutPanel({
                     </div>
                 </div>
 
-                {/* Campaigns Summary */}
+                {/* Smart Cashier Assistant (Campaigns Summary) */}
                 {(computedCampaignDiscount > 0 || computedEarnedPoints > 0 || (computedPromoItems && computedPromoItems.length > 0)) && (
-                    <div className="bg-indigo-50/50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
-                        <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                            <Gift size={12} /> Otomatik Kazanımlar
+                    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-rose-500/10 dark:from-indigo-900/40 dark:via-purple-900/20 dark:to-rose-900/30 p-4 rounded-xl border border-indigo-500/20 dark:border-indigo-400/20 shadow-inner group">
+                        {/* Decorative background glow */}
+                        <div className="absolute -top-10 -right-10 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl group-hover:bg-indigo-500/40 transition-all duration-500"></div>
+                        <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-rose-500/20 rounded-full blur-2xl group-hover:bg-rose-500/40 transition-all duration-500"></div>
+
+                        <div className="relative text-[10px] font-black text-indigo-700 dark:text-indigo-300 mb-3 uppercase tracking-widest flex items-center gap-1.5">
+                            <div className="p-1.5 bg-indigo-600 text-white rounded-md shadow-sm">
+                                <Gift size={12} className="animate-pulse" />
+                            </div>
+                            Akıllı Kasiyer Kazanımları
                         </div>
-                        <div className="space-y-1.5 text-xs">
+                        <div className="relative space-y-2.5 text-xs">
                             {computedCampaignDiscount > 0 && (
-                                <div className="flex justify-between font-medium text-emerald-600 dark:text-emerald-400">
-                                    <span>Seçili Ödeme İndirimi</span>
-                                    <span>-₺{computedCampaignDiscount.toLocaleString()}</span>
+                                <div className="flex justify-between items-center font-bold text-emerald-700 dark:text-emerald-400 bg-white/60 dark:bg-slate-900/60 p-2 rounded-lg border border-white/20 dark:border-white/5 backdrop-blur-sm">
+                                    <span className="flex items-center gap-1.5">🎁 Ödeme İndirimi</span>
+                                    <span className="text-sm">-₺{computedCampaignDiscount.toLocaleString()}</span>
                                 </div>
                             )}
                             {computedEarnedPoints > 0 && (
-                                <div className="flex justify-between font-medium text-amber-600 dark:text-amber-400">
-                                    <span>Kazanılacak Parapuan</span>
-                                    <span>+{computedEarnedPoints.toLocaleString(undefined, { maximumFractionDigits: 2 })} Puan</span>
+                                <div className="flex justify-between items-center font-bold text-amber-700 dark:text-amber-400 bg-white/60 dark:bg-slate-900/60 p-2 rounded-lg border border-white/20 dark:border-white/5 backdrop-blur-sm">
+                                    <span className="flex items-center gap-1.5">💎 Kazanılan Parapuan</span>
+                                    <span className="text-sm">+{computedEarnedPoints.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                                 </div>
                             )}
                             {computedPromoItems?.map((pItem: any, i: number) => (
-                                <div key={i} className="flex justify-between font-medium text-blue-600 dark:text-blue-400">
-                                    <span className="truncate pr-2">{pItem.qty}x {pItem.campName}</span>
-                                    <span>Bedelsiz Sepette</span>
+                                <div key={i} className="flex justify-between items-center font-bold text-blue-700 dark:text-blue-400 bg-white/60 dark:bg-slate-900/60 p-2 rounded-lg border border-white/20 dark:border-white/5 backdrop-blur-sm">
+                                    <span className="truncate pr-2 flex items-center gap-1.5 w-full">✨ <span className="truncate">{pItem.qty}x {pItem.campName}</span></span>
+                                    <span className="shrink-0 text-[10px] uppercase bg-blue-100 dark:bg-blue-500/20 px-2 py-0.5 rounded text-blue-600 dark:text-blue-300">BEDELSİZ</span>
                                 </div>
                             ))}
                         </div>
