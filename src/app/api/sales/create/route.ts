@@ -125,6 +125,88 @@ export async function POST(request: Request) {
                 }
             }
 
+            // --- CAMPAIGN ENGINE EVALUATION ---
+            let customerCategoryStr: string | null = null;
+            if (customerId) {
+                const customerRec = await tx.customer.findUnique({ where: { id: customerId } });
+                customerCategoryStr = customerRec?.category || null;
+            }
+
+            const activeCampaigns = companyId ? await tx.campaign.findMany({
+                where: {
+                    companyId: companyId,
+                    isActive: true,
+                    deletedAt: null,
+                    type: { in: ['buy_x_get_free', 'buy_x_get_discount', 'loyalty_points'] }
+                }
+            }) : [];
+
+            let dynamicEarnedPoints = earnedPoints ? Number(earnedPoints) : 0;
+
+            for (const camp of activeCampaigns) {
+                try {
+                    const isIsolated = camp.targetCustomerCategoryIds && camp.targetCustomerCategoryIds.length > 0;
+                    if (isIsolated && (!customerCategoryStr || !camp.targetCustomerCategoryIds.includes(customerCategoryStr))) {
+                        continue; // Kategorisi kampanyaya uymayan müşteriler es geçilir.
+                    }
+
+                    let conds: any = camp.conditions || {};
+                    if (typeof conds === 'string') conds = JSON.parse(conds);
+
+                    // 1. Puan Biriktir (loyalty_points)
+                    if (camp.type === 'loyalty_points') {
+                        const isPaymentMatch = !conds.paymentMethod || conds.paymentMethod === '' || conds.paymentMethod === effectivePaymentMode;
+                        if (isPaymentMatch) {
+                            const rate = camp.pointsRate || 0;
+                            if (rate > 0) dynamicEarnedPoints += (finalTotal * rate);
+                        }
+                    }
+
+                    // 2. Bedelsiz Ürün (buy_x_get_free)
+                    if (camp.type === 'buy_x_get_free' && enrichedItems.length > 0) {
+                        const originalItemsLength = enrichedItems.length;
+                        for (let i = 0; i < originalItemsLength; i++) {
+                            // Don't duplicate promotions loop
+                            if (enrichedItems[i].isPromotion) continue;
+
+                            const item = enrichedItems[i];
+                            const requiredQty = conds.buyQuantity || 1;
+                            const rewardQty = conds.rewardQuantity || 1;
+                            
+                            if (item.qty >= requiredQty) {
+                                const times = Math.floor(item.qty / requiredQty);
+                                const totalFreeQty = times * rewardQty;
+
+                                if (conds.rewardProductId) {
+                                  const rp = await tx.product.findUnique({ where: { id: conds.rewardProductId }, select: { id: true, name: true, price: true, salesVat: true } });
+                                  if (rp) {
+                                      enrichedItems.push({
+                                          productId: rp.id,
+                                          qty: totalFreeQty,
+                                          name: rp.name + " (Bedelsiz Promosyon)",
+                                          price: 0,
+                                          vat: rp.salesVat || 20,
+                                          isPromotion: true
+                                      });
+                                  }
+                                } else {
+                                  enrichedItems.push({
+                                      productId: item.productId,
+                                      qty: totalFreeQty,
+                                      name: item.name + " (Bedelsiz Promosyon)",
+                                      price: 0,
+                                      vat: item.vat,
+                                      isPromotion: true
+                                  });
+                                }
+                            }
+                        }
+                    }
+
+                } catch(e) { console.error("Campaign process error", e) }
+            }
+            // --- END CAMPAIGN ENGINE ---
+
             const order = await (tx as any).order.create({
                 data: {
                     marketplace: 'POS',
@@ -139,14 +221,15 @@ export async function POST(request: Request) {
                     orderDate: new Date(),
                     branch: branch || 'Merkez',
                     items: enrichedItems.length > 0 ? enrichedItems : items,
-                    rawData: { targetKasaId, description, paymentMode, referenceCode }
+                    rawData: { targetKasaId, description, paymentMode, referenceCode, dynamicEarnedPoints }
                 }
             });
 
             // B. Update Product Stocks (Parallelized)
-            if (Array.isArray(items) && items.length > 0) {
+            const resolvedItems = enrichedItems.length > 0 ? enrichedItems : items;
+            if (Array.isArray(resolvedItems) && resolvedItems.length > 0) {
                 const targetBranch = branch || 'Merkez';
-                const stockOps = items.filter(i => i.productId).map(async (item) => {
+                const stockOps = resolvedItems.filter(i => i.productId).map(async (item) => {
                     const qty = Number(item.qty || item.quantity || 1);
                     const prodId = String(item.productId);
                     const ops = [];
@@ -218,7 +301,7 @@ export async function POST(request: Request) {
                 if (effectivePaymentMode === 'account') {
                     updateData.balance = { increment: finalTotal };
                 }
-                const netPoints = (earnedPoints || 0) - (pointsUsed || 0);
+                const netPoints = dynamicEarnedPoints - (pointsUsed ? Number(pointsUsed) : 0);
                 if (netPoints !== 0) {
                     updateData.points = { increment: netPoints };
                 }

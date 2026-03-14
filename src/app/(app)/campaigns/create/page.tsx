@@ -16,33 +16,43 @@ export default function CreateCampaign() {
         stackingRule: "STACKABLE",
         discountRate: "",
         minOrderAmount: "",
-        minQuantity: "",
         validFrom: "",
         validUntil: "",
         description: "",
+        buyQuantity: 1,
+        rewardQuantity: 1,
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
+            const payload: any = {
+                name: formData.name,
+                campaignType: formData.campaignType,
+                type: formData.campaignType === "BUY_X_GET_Y" ? "buy_x_get_free" : (formData.campaignType === "LOYALTY_POINTS" ? "loyalty_points" : "percent_discount"),
+                channels: formData.channels,
+                priority: Number(formData.priority),
+                stackingRule: formData.stackingRule,
+                discountRate: formData.campaignType === "LOYALTY_POINTS" ? null : Number(formData.discountRate),
+                pointsRate: formData.campaignType === "LOYALTY_POINTS" ? Number(formData.discountRate) / 100 : null,
+                minOrderAmount: formData.minOrderAmount ? Number(formData.minOrderAmount) : null,
+                validFrom: formData.validFrom ? new Date(formData.validFrom) : null,
+                validUntil: formData.validUntil ? new Date(formData.validUntil) : null,
+                description: formData.description,
+            };
+
+            if (formData.campaignType === "BUY_X_GET_Y") {
+                payload.conditions = {
+                    buyQuantity: Number(formData.buyQuantity),
+                    rewardQuantity: Number(formData.rewardQuantity)
+                };
+            }
+
             const res = await fetch("/api/campaigns", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: formData.name,
-                    campaignType: formData.campaignType,
-                    type: "percent_discount", // fallback for legacy
-                    channels: formData.channels,
-                    priority: Number(formData.priority),
-                    stackingRule: formData.stackingRule,
-                    discountRate: Number(formData.discountRate),
-                    minOrderAmount: formData.minOrderAmount ? Number(formData.minOrderAmount) : null,
-                    minQuantity: formData.minQuantity ? Number(formData.minQuantity) : null,
-                    validFrom: formData.validFrom ? new Date(formData.validFrom) : null,
-                    validUntil: formData.validUntil ? new Date(formData.validUntil) : null,
-                    description: formData.description,
-                }),
+                body: JSON.stringify(payload),
             });
 
             if (res.ok) {
@@ -86,15 +96,30 @@ export default function CreateCampaign() {
                     <select value={formData.campaignType} onChange={e => setFormData({ ...formData, campaignType: e.target.value })} className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50">
                         <option value="PERCENT_DISCOUNT">Yüzde İndirimi</option>
                         <option value="FIXED_DISCOUNT">Miktar İndirimi (Sepet)</option>
-                        <option value="BUY_X_GET_Y">X Al Y Öde (Yakında)</option>
-                        <option value="FREE_SHIPPING">Kargo Bedava (Yakında)</option>
+                        <option value="BUY_X_GET_Y">X Al Y Öde</option>
+                        <option value="LOYALTY_POINTS">Puan Biriktir (Parapuan)</option>
                     </select>
                 </div>
 
                 <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">İndirim Oranı / Tutarı</label>
-                    <input required value={formData.discountRate} onChange={e => setFormData({ ...formData, discountRate: e.target.value })} type="number" step="0.01" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="10.00" />
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+                        {formData.campaignType === "LOYALTY_POINTS" ? "Kazanım Oranı (%)" : "İndirim Oranı / Tutarı"}
+                    </label>
+                    <input required={formData.campaignType !== "BUY_X_GET_Y"} disabled={formData.campaignType === "BUY_X_GET_Y"} value={formData.discountRate} onChange={e => setFormData({ ...formData, discountRate: e.target.value })} type="number" step="0.01" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50" placeholder="10.00" />
                 </div>
+
+                {formData.campaignType === "BUY_X_GET_Y" && (
+                    <>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Alış Adedi (Buy X)</label>
+                            <input required value={formData.buyQuantity} onChange={e => setFormData({ ...formData, buyQuantity: Number(e.target.value) })} type="number" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="2" />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Bedelsiz Adet (Get Y)</label>
+                            <input required value={formData.rewardQuantity} onChange={e => setFormData({ ...formData, rewardQuantity: Number(e.target.value) })} type="number" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="1" />
+                        </div>
+                    </>
+                )}
 
                 <div className="col-span-1 md:col-span-2 border-t pt-6 mt-2 border-slate-100 dark:border-slate-800">
                     <h4 className="font-bold text-slate-800 dark:text-white mb-4">Görünürlük ve Stack Kuralları</h4>
