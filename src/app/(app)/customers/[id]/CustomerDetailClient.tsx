@@ -731,15 +731,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
         .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
 
     const rawBalance = Number(val(customer?.balance, 0));
-    const balance = rawBalance + (rawBalance >= 0 ? portfolioChecks : portfolioChecks);
-    // Wait, if balance is negative (Customer Credited), adding check (Asset) should reduce the credit?
-    // No. 
-    // Scenario 1: Customer owes 1000. Balance = 1000. Check 1000 received. Balance becomes 0.
-    // Display should be 1000 (Risk/Open). So 0 + 1000 = 1000. Correct.
-    // Scenario 2: Customer balance 0. Check 1000 received. Balance = -1000 (Creditor)? No, usually Check receipt credits the customer account.
-    // If I invoice 1000, 120 Debt 1000. Balance 1000.
-    // Receive Check 1000. 120 Credit 1000. Balance 0.
-    // I want to see 1000. So Net Balance (0) + Portfolio Check (1000) = 1000. Correct.
+    const balance = rawBalance;
 
     const balanceColor = balance > 0 ? '#ef4444' : '#10b981'; // Borçlu: Red, Alacaklı: Green
 
