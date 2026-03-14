@@ -116,15 +116,18 @@ export default function TerminalClient() {
                     body: JSON.stringify({ customerId })
                 });
                 const data = await res.json();
-                if (data.success && data.data?.priceList) {
-                    const { id: listId, name: listName } = data.data.priceList;
+                
+                const resolvedList = data.priceList || data.data?.priceList;
+
+                if (data.success && resolvedList) {
+                    const { id: listId, name: listName } = resolvedList;
                     if (listId !== activePriceListId) {
                         setActivePriceListId(listId);
                         setActivePriceListName(listName);
                         const pRes = await fetch(`/api/pricing/lists/${listId}/prices`);
                         const pData = await pRes.json();
-                        if (pData.success) {
-                            const newPriceMap = pData.data.priceMap || {};
+                        if (pData.success || pData.ok) {
+                            const newPriceMap = pData.priceMap || pData.data?.priceMap || {};
                             setPriceMap(newPriceMap);
                             setCart(prevCart => prevCart.map(item => {
                                 if (newPriceMap[item.id] !== undefined) {
