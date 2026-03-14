@@ -64,6 +64,7 @@ export default function Sidebar() {
             'reports-parent': ['/reports', '/reports/ceo', '/reports/daily', '/reports/suppliers'],
             'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
+            'inventory-parent': ['/inventory', '/inventory/manufacturing', '/inventory/boms'],
             'staff-parent': ['/staff', '/staff/performance']
         };
 
@@ -259,7 +260,17 @@ export default function Sidebar() {
                             { name: 'Tedarikçiler', href: '/suppliers' },
                         ]
                     },
-                    { name: 'Envanter', href: '/inventory', icon: Box },
+                    {
+                        name: 'Envanter',
+                        icon: Box,
+                        isParent: true,
+                        id: 'inventory-parent',
+                        subItems: [
+                            { name: 'Envanter Genel', href: '/inventory' },
+                            { name: 'Üretim (MRP)', href: '/inventory/manufacturing' },
+                            { name: 'Reçeteler (BOM)', href: '/inventory/boms' },
+                        ]
+                    },
                     { name: 'Teklifler', href: '/quotes', icon: FileText },
                     { name: 'TechoPs', href: '/service', icon: Wrench },
                     {
