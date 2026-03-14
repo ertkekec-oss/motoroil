@@ -129,7 +129,7 @@ export async function POST(request: Request) {
             let customerCategoryStr: string | null = null;
             if (customerId) {
                 const customerRec = await tx.customer.findUnique({ where: { id: customerId } });
-                customerCategoryStr = customerRec?.category || null;
+                customerCategoryStr = customerRec?.customerClass || null;
             }
 
             const activeCampaigns = companyId ? await tx.campaign.findMany({
