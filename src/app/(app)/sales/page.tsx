@@ -481,31 +481,39 @@ export default function SalesPage() {
                 apiFetch('/api/sales/invoices').then(r => r.json())
             ]).then(([ordersData, invoicesData]) => {
                 let combined: any[] = [];
+                const orderIds = new Set<string>();
 
                 // 1. Orders (Fiş/Nakit)
                 if (ordersData.success) {
-                    const safeOrders = ordersData.orders.map((o: any) => ({
-                        ...o,
-                        sourceType: 'ORDER',
-                        items: typeof o.items === 'string' ? JSON.parse(o.items) : (Array.isArray(o.items) ? o.items : [])
-                    }));
+                    const safeOrders = ordersData.orders.map((o: any) => {
+                        orderIds.add(o.id);
+                        return {
+                            ...o,
+                            sourceType: 'ORDER',
+                            items: typeof o.items === 'string' ? JSON.parse(o.items) : (Array.isArray(o.items) ? o.items : [])
+                        };
+                    });
                     combined = [...combined, ...safeOrders];
                 }
 
                 // 2. Invoices (Cari/Fatura) -> Convert to Order format
                 if (invoicesData.success) {
-                    const safeInvoices = invoicesData.invoices.map((inv: any) => ({
-                        id: inv.id,
-                        orderNumber: inv.invoiceNo,
-                        orderDate: inv.createdAt, // CreatedAt for sorting
-                        customerName: inv.customer?.name || 'Bilinmeyen Cari',
-                        totalAmount: inv.totalAmount,
-                        status: inv.status,
-                        sourceType: 'INVOICE',
-                        rawData: { paymentMode: 'account' },
-                        items: typeof inv.items === 'string' ? JSON.parse(inv.items) : (Array.isArray(inv.items) ? inv.items : [])
-                    }));
-                    combined = [...combined, ...safeInvoices];
+                    const standaloneInvoices = invoicesData.invoices
+                        .filter((inv: any) => !inv.orderId || !orderIds.has(inv.orderId))
+                        .map((inv: any) => ({
+                            id: inv.id,
+                            orderNumber: inv.invoiceNo,
+                            orderDate: inv.createdAt, // CreatedAt for sorting
+                            customerName: inv.customer?.name || 'Bilinmeyen Cari',
+                            totalAmount: inv.totalAmount,
+                            status: inv.status,
+                            sourceType: 'INVOICE',
+                            rawData: { paymentMode: 'account' },
+                            items: typeof inv.items === 'string' ? JSON.parse(inv.items) : (Array.isArray(inv.items) ? inv.items : []),
+                            isFormal: inv.isFormal,
+                            formalUuid: inv.formalUuid
+                        }));
+                    combined = [...combined, ...standaloneInvoices];
                 }
 
                 // Sort by date descending

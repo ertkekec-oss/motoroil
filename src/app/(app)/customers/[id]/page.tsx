@@ -200,6 +200,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             };
         });
 
+        const txsByOrderId = new Map<string, any>();
+        (customer.transactions || []).forEach((t: any) => {
+            if (t.orderId) {
+                txsByOrderId.set(t.orderId, t);
+            }
+        });
+
         const orderList = marketplaceOrders.map((o: any) => {
             let safeItems = [];
             try {
@@ -208,9 +215,33 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 }
             } catch { safeItems = []; }
 
-            const mplace = o.marketplace === 'trendyol' ? 'Trendyol' : o.marketplace === 'n11' ? 'N11' : o.marketplace === 'hepsiburada' ? 'Hepsiburada' : o.marketplace === 'pazarama' ? 'Pazarama' : o.marketplace;
+            const mplace = o.marketplace === 'trendyol' ? 'Trendyol' : o.marketplace === 'n11' ? 'N11' : o.marketplace === 'hepsiburada' ? 'Hepsiburada' : o.marketplace === 'pazarama' ? 'Pazarama' : (o.marketplace === 'POS' ? 'POS' : o.marketplace);
             let currentDesc = `${mplace} Siparişi - #${o.orderNumber || '-'} (${o.status || '-'})`;
             
+            let paymentStr = "";
+            let parsedRaw: any = {};
+            try {
+                parsedRaw = typeof o.rawData === 'string' ? JSON.parse(o.rawData) : (o.rawData || {});
+            } catch(e) {}
+            
+            let pm = parsedRaw?.paymentMode;
+            if (!pm) {
+                const linkedTx = txsByOrderId.get(o.id);
+                if (linkedTx?.rawData) {
+                    try {
+                        const txRaw = typeof linkedTx.rawData === 'string' ? JSON.parse(linkedTx.rawData) : (linkedTx.rawData || {});
+                        pm = txRaw?.paymentMode;
+                    } catch(e) {}
+                }
+            }
+
+            if (pm === 'cash') paymentStr = ' [Nakit]';
+            else if (pm === 'card' || pm === 'credit_card') paymentStr = ' [Kredi Kartı]';
+            else if (pm === 'transfer' || pm === 'bank_transfer') paymentStr = ' [Havale/EFT]';
+            else if (pm === 'account' || pm === 'veresiye') paymentStr = ' [Veresiye]';
+
+            currentDesc += paymentStr;
+
             const linkedInvoice = invoiceByOrderId.get(o.id);
             if (linkedInvoice) {
                 currentDesc += ` | Fatura: ${linkedInvoice.invoiceNo || 'Taslak'}`;

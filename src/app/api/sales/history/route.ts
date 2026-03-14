@@ -52,7 +52,8 @@ export async function GET(request: Request) {
                     status: true,
                     orderDate: true,
                     items: true,
-                    branch: true
+                    branch: true,
+                    rawData: true
                 },
                 orderBy: {
                     orderDate: 'desc'

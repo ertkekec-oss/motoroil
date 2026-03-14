@@ -1,0 +1,10 @@
+﻿08606872 chore: push clean migration state
+525d4885 fix: resolve Prisma schema conflict (Offer vs Quote) & restore migrations for Vercel deployment
+a4d141e5 feat: show VAT percentage and line-item discount rate/amount dynamically on invoice modal
+a35c61b9 refactor: rename Quotes module to Offers module, update related UI components and database schema
+808e4fe1 refactor(quotes): simplify UI and remove draft status
+b7977203 fix(inventory): resolve MRP production start crash and add BOM detail view modals
+998e5f20 feat(inventory): Add Manufacturing (BOM and MRP) APIs and UIs
+68aaf06c Auto commit: Add Manufacturing (BOM and MRP) models to Prisma schema
+5990b199 Auto commit: User request
+85b6d06b fix(suppliers): Fix pdf-parse DOMMatrix error by properly mapping to CommonJS wrapper and explicitly forcing Node.js runtime
