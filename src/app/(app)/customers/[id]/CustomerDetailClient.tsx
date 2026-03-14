@@ -1848,6 +1848,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             { label: 'MALZEME / HİZMET' },
                                             { label: 'MİKTAR', alignRight: true },
                                             { label: 'BİRİM FİYAT (NET)', alignRight: true },
+                                            { label: 'İND. %', alignRight: true },
                                             { label: 'KDV %', alignRight: true },
                                             { label: 'KDV TUTARI', alignRight: true },
                                             { label: 'BRÜT TOPLAM', alignRight: true },
@@ -1859,8 +1860,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             const netPrice = Number(it.price || 0);
                                             const vatRate = Number(it.vat || 20);
                                             const otvRate = Number(it.otv || 0);
+                                            const discountRate = Number(it.discountRate || 0);
 
-                                            const lineNetTotal = qty * netPrice;
+                                            const lineNetBase = qty * netPrice;
+                                            const discountAmount = lineNetBase * (discountRate / 100);
+                                            const lineNetTotal = lineNetBase - discountAmount;
+
                                             let otvAmount = 0;
                                             if (it.otvType === 'yüzdesel Ö.T.V') {
                                                 otvAmount = lineNetTotal * (otvRate / 100);
@@ -1881,13 +1886,16 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             const handleGrossChange = (newGross: number) => {
                                                 if (qty === 0) return;
                                                 const oivR = Number(it.oiv || 0);
+                                                const factor = (1 - discountRate / 100);
+                                                if (factor <= 0) return; // avoid division by zero or negative discount inversions
+                                                
                                                 let calculatedNet = 0;
                                                 if (it.otvType === 'yüzdesel Ö.T.V') {
-                                                    calculatedNet = newGross / (qty * (1 + otvRate / 100) * (1 + (vatRate + oivR) / 100));
+                                                    calculatedNet = newGross / (qty * factor * (1 + otvRate / 100) * (1 + (vatRate + oivR) / 100));
                                                 } else if (it.otvType === 'maktu Ö.T.V') {
-                                                    calculatedNet = ((newGross / (1 + (vatRate + oivR) / 100)) - (otvRate * qty)) / qty;
+                                                    calculatedNet = ((newGross / (1 + (vatRate + oivR) / 100)) - (otvRate * qty)) / (qty * factor);
                                                 } else {
-                                                    calculatedNet = newGross / (qty * (1 + (vatRate + oivR) / 100));
+                                                    calculatedNet = newGross / (qty * factor * (1 + (vatRate + oivR) / 100));
                                                 }
                                                 updateItem('price', calculatedNet);
                                             };
@@ -1930,6 +1938,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                             otvCode: selectedProduct.otvCode || '0071',
                                                                             otvType: selectedProduct.otvType || 'Ö.T.V yok',
                                                                             oiv: Number(selectedProduct.salesOiv || 0),
+                                                                            discountRate: Number(selectedProduct.campaignDiscountRate || selectedProduct.discountRate || 0),
                                                                             description: selectedProduct.showDescriptionOnInvoice ? (selectedProduct.description || '') : '',
                                                                             showDesc: selectedProduct.showDescriptionOnInvoice ? true : false
                                                                         };
@@ -2012,6 +2021,20 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         <div className="relative inline-block ml-auto w-[64px]">
                                                             <input
                                                                 type="number"
+                                                                value={it.discountRate || 0}
+                                                                onChange={(e) => updateItem('discountRate', Number(e.target.value))}
+                                                                className="w-full h-9 pl-2 pr-6 text-center bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/50 rounded-lg text-sm text-rose-600 dark:text-rose-400 font-semibold outline-none focus:ring-1 focus:ring-rose-300"
+                                                            />
+                                                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-rose-400 pointer-events-none">%</span>
+                                                        </div>
+                                                        {discountAmount > 0 && (
+                                                            <div className="text-[10px] font-bold text-rose-500 mt-1">-{discountAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</div>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right">
+                                                        <div className="relative inline-block ml-auto w-[64px]">
+                                                            <input
+                                                                type="number"
                                                                 value={it.vat}
                                                                 onChange={(e) => updateItem('vat', Number(e.target.value))}
                                                                 className="w-full h-9 pl-2 pr-6 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300"
@@ -2056,7 +2079,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                                             invoiceItems.forEach(it => {
                                                 const lineQty = Number(it.qty || 1);
-                                                const lineNet = lineQty * Number(it.price || 0);
+                                                const lineNetBase = lineQty * Number(it.price || 0);
+                                                const lineDiscount = lineNetBase * (Number(it.discountRate || 0) / 100);
+                                                const lineNet = lineNetBase - lineDiscount;
+                                                
                                                 let lineOtv = 0;
                                                 if (it.otvType === 'yüzdesel Ö.T.V') {
                                                     lineOtv = lineNet * (Number(it.otv || 0) / 100);
@@ -2114,7 +2140,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     </div>
 
                                                     <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-semibold text-slate-500">KDV Toplam Katkısı</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm font-semibold text-slate-500">KDV Toplam Katkısı</span>
+                                                            {invoiceItems.length > 0 && invoiceItems.every((it: any) => it.vat === invoiceItems[0].vat) && (
+                                                                <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500 border border-slate-200 dark:border-slate-700">
+                                                                    %{invoiceItems[0].vat || 20}
+                                                                </span>
+                                                            )}
+                                                        </div>                                                        
                                                         <span className="font-mono font-bold text-[15px]">{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
 
