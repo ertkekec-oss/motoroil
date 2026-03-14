@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
-import pdf from 'pdf-parse';
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     try {
@@ -13,6 +11,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
+        
+        // Use require inside the function to avoid Next.js bundling issues
+        // @ts-ignore
+        const pdf = require('pdf-parse');
+        
         const data = await pdf(buffer);
         const text = data.text;
 
