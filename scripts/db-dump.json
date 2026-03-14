@@ -1,0 +1,76 @@
+{
+  "orders": [
+    {
+      "id": "cmmqxrss80002du66aitwow6z",
+      "orderNumber": "POS-20260314-3753",
+      "rawData": {
+        "description": "POS: EDİZ KEKEÇ",
+        "paymentMode": "cash",
+        "targetKasaId": "cmmqvo86d000214eqi0ho3lwh",
+        "dynamicEarnedPoints": 0
+      }
+    },
+    {
+      "id": "cmmqwdj42000r29vue0qgh5ad",
+      "orderNumber": "POS-20260314-9082",
+      "rawData": {
+        "description": "POS: EDİZ KEKEÇ",
+        "paymentMode": "cash",
+        "targetKasaId": "cmmqvo86d000214eqi0ho3lwh",
+        "dynamicEarnedPoints": 0
+      }
+    },
+    {
+      "id": "cmmqw9n9c0008pqrx943zlowm",
+      "orderNumber": "POS-20260314-8252",
+      "rawData": {
+        "description": "POS: EDİZ KEKEÇ",
+        "paymentMode": "account",
+        "targetKasaId": "cmmqw1leo0001un02dsv7v1xi",
+        "dynamicEarnedPoints": 0
+      }
+    },
+    {
+      "id": "cmmqw60qs000229vumtmufmin",
+      "orderNumber": "POS-20260314-4401",
+      "rawData": {
+        "description": "POS: Perakende Müşteri",
+        "paymentMode": "card",
+        "targetKasaId": "cmmqw1leo0001un02dsv7v1xi",
+        "dynamicEarnedPoints": 0
+      }
+    },
+    {
+      "id": "cmmqvyxup00mkjdzkdfppbrtw",
+      "orderNumber": "POS-20260314-5573",
+      "rawData": {
+        "description": "POS: Perakende Müşteri",
+        "paymentMode": "cash",
+        "targetKasaId": "cmmqvo86d000214eqi0ho3lwh",
+        "dynamicEarnedPoints": 0
+      }
+    }
+  ],
+  "txs": [
+    {
+      "id": "cmmqxrti80008du662zfn9a48",
+      "description": "POS: EDİZ KEKEÇ | REF:cmmqxrss80002du66aitwow6z"
+    },
+    {
+      "id": "cmmqwdju2000x29vuk0z0zjue",
+      "description": "POS: EDİZ KEKEÇ | REF:cmmqwdj42000r29vue0qgh5ad"
+    },
+    {
+      "id": "cmmqw9ntw000epqrxxitzzwo8",
+      "description": "POS: EDİZ KEKEÇ | REF:cmmqw9n9c0008pqrx943zlowm"
+    },
+    {
+      "id": "cmmqw61hc000829vu8v4kacfi",
+      "description": "POS: Perakende Müşteri | REF:cmmqw60qs000229vumtmufmin"
+    },
+    {
+      "id": "cmmqvyyko00mqjdzk1lm4pv9l",
+      "description": "POS: Perakende Müşteri | REF:cmmqvyxup00mkjdzkdfppbrtw"
+    }
+  ]
+}

@@ -274,11 +274,14 @@ export async function POST(request: Request) {
 
             // D. Create Transaction
             let transactionDesc = description;
-            if (!description || description.includes('POS Satışı')) {
-                const modeLabel = effectivePaymentMode === 'credit_card' ? 'Kredi Kartı' :
-                    effectivePaymentMode === 'account' ? 'Cari Hesap' :
-                        effectivePaymentMode === 'transfer' ? 'Havale/EFT' : 'Nakit';
+            const modeLabel = effectivePaymentMode === 'credit_card' ? 'Kredi Kartı' :
+                effectivePaymentMode === 'account' ? 'Cari Hesap' :
+                    effectivePaymentMode === 'transfer' ? 'Havale/EFT' : 'Nakit';
+
+            if (!description || description.includes('POS Satışı') || description.startsWith('POS:')) {
                 transactionDesc = `POS Satışı (${modeLabel}) - ${customerName || 'Perakende'}`;
+            } else if (!description.includes(modeLabel)) {
+                transactionDesc = `${description} (${modeLabel})`;
             }
 
             transactionDesc += ` | REF:${order.id}`;

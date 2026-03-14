@@ -1,0 +1,13 @@
+﻿LAST 5 ORDERS:
+- ID: cmmqxrss80002du66aitwow6z, Number: POS-20260314-3753, rawData: {"description":"POS: ED─░Z KEKE├ç","paymentMode":"cash","targetKasaId":"cmmqvo86d000214eqi0ho3lwh","dynamicEarnedPoints":0}
+- ID: cmmqwdj42000r29vue0qgh5ad, Number: POS-20260314-9082, rawData: {"description":"POS: ED─░Z KEKE├ç","paymentMode":"cash","targetKasaId":"cmmqvo86d000214eqi0ho3lwh","dynamicEarnedPoints":0}
+- ID: cmmqw9n9c0008pqrx943zlowm, Number: POS-20260314-8252, rawData: {"description":"POS: ED─░Z KEKE├ç","paymentMode":"account","targetKasaId":"cmmqw1leo0001un02dsv7v1xi","dynamicEarnedPoints":0}
+- ID: cmmqw60qs000229vumtmufmin, Number: POS-20260314-4401, rawData: {"description":"POS: Perakende M├╝┼şteri","paymentMode":"card","targetKasaId":"cmmqw1leo0001un02dsv7v1xi","dynamicEarnedPoints":0}
+- ID: cmmqvyxup00mkjdzkdfppbrtw, Number: POS-20260314-5573, rawData: {"description":"POS: Perakende M├╝┼şteri","paymentMode":"cash","targetKasaId":"cmmqvo86d000214eqi0ho3lwh","dynamicEarnedPoints":0}
+
+LAST 5 SALE TXS:
+- ID: cmmqxrti80008du662zfn9a48, Desc: POS: ED─░Z KEKE├ç | REF:cmmqxrss80002du66aitwow6z
+- ID: cmmqwdju2000x29vuk0z0zjue, Desc: POS: ED─░Z KEKE├ç | REF:cmmqwdj42000r29vue0qgh5ad
+- ID: cmmqw9ntw000epqrxxitzzwo8, Desc: POS: ED─░Z KEKE├ç | REF:cmmqw9n9c0008pqrx943zlowm
+- ID: cmmqw61hc000829vu8v4kacfi, Desc: POS: Perakende M├╝┼şteri | REF:cmmqw60qs000229vumtmufmin
+- ID: cmmqvyyko00mqjdzk1lm4pv9l, Desc: POS: Perakende M├╝┼şteri | REF:cmmqvyxup00mkjdzkdfppbrtw
