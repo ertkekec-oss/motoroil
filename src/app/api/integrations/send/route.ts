@@ -80,9 +80,16 @@ export async function POST(req: NextRequest) {
                 if (item.showDesc && item.description) {
                     itemDescription += item.description + "\n";
                 }
+                
+                // Add explicit KDV and ÖTV tags to the description so it appears on the printed PDF
+                const taxInfoList = [];
+                taxInfoList.push(`%${vatRate} KDV`);
+                
                 if (item.otvType && item.otvType !== 'Ö.T.V yok' && item.otv > 0) {
-                    itemDescription += `(ÖTV Katkısı: ${item.otvType === 'yüzdesel Ö.T.V' ? '%' + item.otv : item.otv + ' ₺'} - ÖTV Kodu: ${item.otvCode || '0071'})`;
+                    taxInfoList.push(`ÖTV: ${item.otvType === 'yüzdesel Ö.T.V' ? '%' + item.otv : item.otv + ' ₺'} (Kod: ${item.otvCode || '0071'})`);
                 }
+                
+                itemDescription += `(${taxInfoList.join(' | ')})`;
 
                 return {
                     Index: idx + 1,

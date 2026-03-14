@@ -1881,14 +1881,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 </div>
                                                             )}
                                                             <div className="flex flex-wrap items-center gap-2 pl-1">
+                                                                <span className="text-[10px] font-bold px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                                                    KDV %{it.vat ?? 20}
+                                                                </span>
                                                                 {(it.otvType && it.otvType !== 'Ö.T.V yok') && (
-                                                                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-500">
+                                                                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-500 shadow-sm border border-amber-200 dark:border-amber-500/20">
                                                                         {it.otvType === 'yüzdesel Ö.T.V' ? `ÖTV %${it.otv}` : `ÖTV ${it.otv} ₺`}
                                                                     </span>
                                                                 )}
                                                                 {(Number(it.oiv || 0) > 0) && (
-                                                                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-500">
-                                                                        ÖİV %${it.oiv}
+                                                                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-500 shadow-sm border border-blue-200 dark:border-blue-500/20">
+                                                                        ÖİV %{it.oiv}
                                                                     </span>
                                                                 )}
                                                                 <button
@@ -2044,7 +2047,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     </div>
 
                                                     <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-semibold text-slate-500">KDV Toplam</span>
+                                                        <span className="text-sm font-semibold text-slate-500">KDV Toplam Katkısı</span>
                                                         <span className="font-mono font-bold text-[15px]">{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
 
