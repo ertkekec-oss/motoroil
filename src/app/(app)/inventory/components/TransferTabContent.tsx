@@ -35,6 +35,7 @@ export default function TransferTabContent({
         from: activeBranchName !== 'Tümü' ? activeBranchName : 'Merkez',
         to: branches.find(b => b !== activeBranchName) || (branches[0] === 'Merkez' ? branches[1] : branches[0])
     });
+    const [viewMode, setViewMode] = useState<'cart' | 'products'>('products');
 
     const handleStartShipment = async () => {
         if (transferCart.length === 0) return;
@@ -175,120 +176,175 @@ export default function TransferTabContent({
                 </div>
             </div>
 
-            {/* SAĞ KOLON: YENİ TRANSFER MOTORU */}
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-[20px] flex flex-col p-6 h-[calc(100vh-200px)] sticky top-6">
-                <div className="mb-6 border-b border-slate-100 dark:border-white/5 pb-4">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                        <ArrowRightLeft className="w-5 h-5 text-indigo-600" />
-                        Yeni Transfer (Hızlı Sevkiyat)
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Ürün barkodu okutun veya listeden arayın.</p>
+            {/* SAĞ KOLON: YENİ TRANSFER MOTORU (ENTERPRISE REDESIGN) */}
+            <div className="bg-white dark:bg-[#0b1120] border border-slate-200 dark:border-slate-800 shadow-xl rounded-[24px] flex flex-col p-6 h-[calc(100vh-120px)] sticky top-6 overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <ArrowRightLeft className="w-5 h-5 text-indigo-500" />
+                            Yeni Transfer Motoru
+                        </h3>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-semibold uppercase tracking-wider">Hızlı ve Otonom Sevkiyat</p>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-6 bg-slate-50 dark:bg-[#1e293b] p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">ÇIKIŞ (KAYNAK)</label>
-                        <select className="w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 transition-colors shadow-sm cursor-pointer"
+                {/* Compact Source/Target Selection */}
+                <div className="flex items-center gap-3 mb-6 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                    <div className="flex-1">
+                        <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-2 block mb-1">KAYNAK DEPO</label>
+                        <select className="w-full bg-transparent border-none text-sm font-bold text-slate-900 dark:text-white outline-none px-2 cursor-pointer appearance-none"
                             value={transferData.from}
                             onChange={(e) => setTransferData({ ...transferData, from: e.target.value })}
                         >
-                            {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                            {branches.map(b => <option key={b} value={b} className="text-black">{b}</option>)}
                         </select>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">VARIŞ (HEDEF)</label>
-                        <select className="w-full h-10 px-3 bg-blue-50 border border-blue-200 rounded-xl text-xs font-bold text-blue-800 outline-none focus:border-blue-500 transition-colors shadow-sm cursor-pointer"
+                    <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-sm z-10">
+                        <ArrowRight className="w-4 h-4 text-slate-400" />
+                    </div>
+                    <div className="flex-1 text-right">
+                        <label className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest px-2 block mb-1">HEDEF DEPO</label>
+                        <select className="w-full bg-transparent border-none text-sm font-bold text-indigo-600 dark:text-indigo-400 outline-none px-2 cursor-pointer appearance-none text-right"
                             value={transferData.to}
                             onChange={(e) => setTransferData({ ...transferData, to: e.target.value })}
                         >
-                            {branches.filter(b => b !== transferData.from).map(b => <option key={b} value={b}>{b}</option>)}
+                            {branches.filter(b => b !== transferData.from).map(b => <option key={b} value={b} className="text-black">{b}</option>)}
                         </select>
                     </div>
                 </div>
 
-                <div className="relative mb-6">
-                    <input type="text" placeholder="Ürün Ara (Ad, Kod, Barkod)..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full h-12 pl-12 pr-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm placeholder-slate-400"
-                    />
-                    <div className="absolute left-4 top-3.5 text-slate-400">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </div>
-                </div>
-
-                {searchTerm && filteredProducts.length > 0 && (
-                    <div className="mb-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-xl max-h-60 overflow-y-auto z-20 absolute w-[calc(100%-48px)] top-[270px]">
-                        {filteredProducts.slice(0, 10).map(product => (
-                            <div key={product.id} className="flex justify-between items-center p-3 border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:bg-[#1e293b] cursor-pointer transition-colors"
-                                onClick={() => {
-                                    const exists = transferCart.find((item: any) => item.id === product.id);
-                                    if (exists) { showWarning('Zaten Ekli', 'Bu ürün zaten transfer listesinde.'); }
-                                    else if (product.stock <= 0) { showError('Stok Yok', 'Bu ürünün stoğu tükendiği için transfer edilemez.'); }
-                                    else { setTransferCart([...transferCart, { ...product, qty: 1 }]); setSearchTerm(''); }
-                                }}
-                            >
-                                <div>
-                                    <div className="text-[13px] font-bold text-slate-900 dark:text-white">{product.name}</div>
-                                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{product.code} • Mevcut: <span className="font-bold text-slate-700 dark:text-slate-300">{product.stock}</span></div>
-                                </div>
-                                <div className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 shadow-sm hover:bg-blue-100">Seç</div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                <div className="flex-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                    <div className="bg-slate-50 dark:bg-[#1e293b] px-5 py-3 border-b border-slate-200 dark:border-white/5 flex justify-between items-center h-[52px]">
-                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2"><div className="w-4 h-4 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px]">{transferCart.length}</div> Transfer Listesi</span>
-                        {transferCart.length > 0 && <button onClick={() => setTransferCart([])} className="text-[11px] font-bold text-red-500 uppercase hover:underline">Temizle</button>}
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll">
-                        {transferCart.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-[12px] font-semibold text-slate-400 gap-3 opacity-60">
-                                <PackageOpen className="w-10 h-10 text-slate-300" />
-                                <div className="text-center">
-                                    <p className="text-sm font-bold text-slate-600 dark:text-slate-400">Henüz ürün eklenmedi</p>
-                                    <p className="text-xs mt-1">Arama kutusundan ürün seçerek transfer listesini oluşturun.</p>
-                                </div>
-                            </div>
-                        ) : (
-                            transferCart.map((item: any, idx: number) => (
-                                <div key={idx} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 p-4 rounded-xl flex items-center justify-between shadow-sm hover:border-blue-300 transition-colors gap-3">
-                                    <div className="flex-1 overflow-hidden pr-3">
-                                        <div className="text-sm font-bold text-slate-900 dark:text-white truncate">{item.name}</div>
-                                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 uppercase">MAX DEPO: {item.stock} ADET</div>
-                                    </div>
-                                    <div className="flex items-center bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl p-1 shrink-0 shadow-sm">
-                                        <button onClick={() => {
-                                            const newCart = [...transferCart];
-                                            newCart[idx].qty = Math.max(1, item.qty - 1);
-                                            setTransferCart(newCart);
-                                        }} className="w-8 h-8 flex items-center justify-center hover:bg-white dark:bg-[#0f172a] rounded-lg text-slate-600 dark:text-slate-400 font-bold border border-transparent hover:border-slate-200 dark:border-white/5 shadow-sm transition-all">-</button>
-                                        <input type="number" className="w-12 bg-transparent text-center text-sm font-black text-slate-900 dark:text-white outline-none" value={item.qty} onChange={(e) => {
-                                            const val = Math.max(1, Math.min(item.stock, parseInt(e.target.value) || 1));
-                                            const newCart = [...transferCart];
-                                            newCart[idx].qty = val;
-                                            setTransferCart(newCart);
-                                        }} />
-                                        <button onClick={() => {
-                                            const newCart = [...transferCart];
-                                            newCart[idx].qty = Math.min(item.stock, item.qty + 1);
-                                            setTransferCart(newCart);
-                                        }} className="w-8 h-8 flex items-center justify-center hover:bg-white dark:bg-[#0f172a] rounded-lg text-slate-600 dark:text-slate-400 font-bold border border-transparent hover:border-slate-200 dark:border-white/5 shadow-sm transition-all">+</button>
-                                    </div>
-                                    <button onClick={() => setTransferCart(transferCart.filter((_, i) => i !== idx))} className="ml-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-rose-500 rounded-lg transition-colors font-black">✕</button>
-                                </div>
-                            ))
+                {/* Switcher Tabs */}
+                <div className="flex p-1 bg-slate-100 dark:bg-slate-800/60 rounded-xl mb-4 border border-slate-200 dark:border-slate-700/50">
+                    <button 
+                        onClick={() => setViewMode('products')}
+                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${viewMode === 'products' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                        Ürün Ekle
+                    </button>
+                    <button 
+                        onClick={() => setViewMode('cart')}
+                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${viewMode === 'cart' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                        Transfer Sepeti
+                        {transferCart.length > 0 && (
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] ${viewMode === 'cart' ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400'}`}>
+                                {transferCart.length}
+                            </span>
                         )}
-                    </div>
+                    </button>
                 </div>
 
-                <div className="mt-6">
+                {/* Active View */}
+                <div className="flex-1 bg-slate-50 dark:bg-[#0f172a]/50 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden flex flex-col">
+                    {viewMode === 'products' ? (
+                        <>
+                            <div className="relative border-b border-slate-200 dark:border-slate-800/80 bg-white dark:bg-transparent">
+                                <input type="text" placeholder="Ad, Kod veya Barkod ara..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full h-12 pl-11 pr-4 bg-transparent border-none text-sm font-semibold text-slate-900 dark:text-white outline-none placeholder-slate-400"
+                                />
+                                <div className="absolute left-4 top-3.5 text-slate-400">
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                </div>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2 custom-scroll">
+                                {filteredProducts.length === 0 ? (
+                                    <div className="h-full flex items-center justify-center text-sm font-medium text-slate-400">Sonuç bulunamadı</div>
+                                ) : (
+                                    filteredProducts.map(product => {
+                                        const exists = transferCart.find((item: any) => item.id === product.id);
+                                        return (
+                                            <div key={product.id} 
+                                                onClick={() => {
+                                                    if (exists) {
+                                                        setTransferCart(transferCart.filter((item: any) => item.id !== product.id));
+                                                    } else if (product.stock <= 0) {
+                                                        showError('Stok Yok', 'Bu ürünün stoğu tükendiği için transfer edilemez.');
+                                                    } else {
+                                                        setTransferCart([...transferCart, { ...product, qty: 1 }]);
+                                                        showSuccess('Eklendi', `${product.name} sepete eklendi.`);
+                                                    }
+                                                }}
+                                                className={`flex items-center justify-between p-3 rounded-xl border ${exists ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600'} cursor-pointer transition-all`}
+                                            >
+                                                <div>
+                                                    <div className={`text-[13px] font-bold ${exists ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-900 dark:text-white'}`}>{product.name}</div>
+                                                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">{product.code} • Stok: <span className={`font-bold ${product.stock > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{product.stock}</span></div>
+                                                </div>
+                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${exists ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-transparent'}`}>
+                                                    {exists && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                                                    {!exists && <span className="text-slate-400 text-sm font-black leading-none">+</span>}
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2 custom-scroll">
+                            {transferCart.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-[12px] font-medium text-slate-400 gap-3 opacity-80">
+                                    <PackageOpen className="w-12 h-12 text-slate-300 dark:text-slate-600" />
+                                    <div className="text-center">
+                                        <p className="text-sm font-bold text-slate-600 dark:text-slate-400">Sepetiniz Boş</p>
+                                        <p className="text-[11px] mt-1 text-slate-500">Ürün Ekle bölümünden listeye parça ekleyin.</p>
+                                    </div>
+                                    <button onClick={() => setViewMode('products')} className="mt-2 text-xs font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-500/20">Ürün Listesine Git</button>
+                                </div>
+                            ) : (
+                                transferCart.map((item: any, idx: number) => (
+                                    <div key={idx} className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-3 rounded-xl flex flex-col shadow-sm group hover:border-indigo-400 transition-colors gap-3">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1 overflow-hidden pr-2">
+                                                <div className="text-[13px] font-bold text-slate-900 dark:text-white truncate" title={item.name}>{item.name}</div>
+                                                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-1 uppercase">MAX DEPO: {item.stock} ADET</div>
+                                            </div>
+                                            <button onClick={() => setTransferCart(transferCart.filter((_, i) => i !== idx))} className="text-slate-400 hover:text-rose-500 bg-slate-50 hover:bg-rose-50 dark:bg-slate-900/50 dark:hover:bg-rose-500/20 p-1.5 rounded-lg transition-colors">
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                        </div>
+                                        <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 px-2 py-1.5 rounded-lg border border-slate-100 dark:border-slate-700/50">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase">MİKTAR:</span>
+                                            <div className="flex items-center">
+                                                <button onClick={() => {
+                                                    const newCart = [...transferCart];
+                                                    newCart[idx].qty = Math.max(1, item.qty - 1);
+                                                    setTransferCart(newCart);
+                                                }} className="w-7 h-7 flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-slate-600 dark:text-slate-300 font-bold shadow-sm">-</button>
+                                                <input type="number" className="w-12 bg-transparent text-center text-[13px] font-black text-slate-900 dark:text-white outline-none" value={item.qty} onChange={(e) => {
+                                                    const val = Math.max(1, Math.min(item.stock, parseInt(e.target.value) || 1));
+                                                    const newCart = [...transferCart];
+                                                    newCart[idx].qty = val;
+                                                    setTransferCart(newCart);
+                                                }} />
+                                                <button onClick={() => {
+                                                    const newCart = [...transferCart];
+                                                    newCart[idx].qty = Math.min(item.stock, item.qty + 1);
+                                                    setTransferCart(newCart);
+                                                }} className="w-7 h-7 flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-slate-600 dark:text-slate-300 font-bold shadow-sm">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Final Action */}
+                <div className="mt-5">
                     <button
                         onClick={handleStartShipment}
                         disabled={transferCart.length === 0}
-                        className={`w-full h-[52px] rounded-xl text-[13px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center justify-center gap-2 ${transferCart.length > 0 ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md hover:scale-[1.02]' : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'}`}
+                        className={`w-full h-[52px] rounded-2xl text-[13px] font-black uppercase tracking-widest transition-all outline-none flex items-center justify-center gap-2 ${transferCart.length > 0 ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-[0_8px_20px_-6px_rgba(79,70,229,0.5)] transform hover:-translate-y-0.5' : 'bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-600 cursor-not-allowed'}`}
                     >
-                        SEVKİYATI BAŞLAT <span className="text-white/70 bg-black/20 px-2 py-0.5 rounded-full ml-1">({transferCart.reduce((acc, i) => acc + i.qty, 0)})</span>
+                        SEVKİYATI BAŞLAT 
+                        {transferCart.length > 0 && (
+                            <span className="text-white/90 bg-black/20 px-2 py-0.5 rounded ml-1 text-[11px] font-bold">
+                                {transferCart.reduce((acc, i) => acc + i.qty, 0)} PÇ
+                            </span>
+                        )}
                     </button>
                 </div>
             </div>
