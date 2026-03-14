@@ -40,11 +40,11 @@ export default function QuotesPage() {
         fetchQuotes();
     }, []);
 
-    // Statistics
+    // Statistics (kept minimal for future use if needed, but not rendered)
     const stats = useMemo(() => {
         const total = quotes.length;
         const accepted = quotes.filter(q => q.status === 'Accepted' || q.status === 'Converted').length;
-        const pending = quotes.filter(q => q.status === 'Draft' || q.status === 'Sent').length;
+        const pending = quotes.filter(q => q.status === 'Pending' || q.status === 'Sent').length;
         const totalVal = quotes.reduce((acc, q) => acc + Number(q.totalAmount || 0), 0);
         const convRate = total > 0 ? (accepted / total) * 100 : 0;
 
@@ -88,27 +88,13 @@ export default function QuotesPage() {
 
     return (
         <div className="p-4 sm:p-6 pb-32 animate-fade-in-up">
-            {/* Minimal Header Strip & Stats Dashboard */}
+            {/* Minimal Header Strip */}
             <div className="flex flex-col lg:flex-row justify-between items-end gap-6 mb-6 pb-6 border-b border-slate-200 dark:border-white/10">
                 <div className="flex-1">
                     <h1 className="text-[20px] sm:text-[22px] font-semibold text-slate-900 dark:text-white mb-1 tracking-tight">
                         Teklif Yönetimi
                     </h1>
-                    <p className="text-[13px] text-slate-500 font-medium">Satış süreçlerinizi yönetin ve profesyonel finansal belgeler hazırlayın.</p>
-                </div>
-
-                <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-                    {[
-                        { label: 'TOPLAM', val: stats.total, color: 'text-slate-900 dark:text-white' },
-                        { label: 'ONAYLANAN', val: stats.accepted, color: 'text-green-600 dark:text-green-400' },
-                        { label: 'BEKLEYEN', val: stats.pending, color: 'text-blue-600 dark:text-blue-400' },
-                        { label: 'DÖNÜŞÜM', val: `%${stats.convRate.toFixed(1)}`, color: 'text-slate-700 dark:text-slate-300' }
-                    ].map((s, idx) => (
-                        <div key={idx} className="bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/10 h-[56px] px-4 rounded-[14px] min-w-[120px] flex flex-col justify-center">
-                            <div className="text-[11px] uppercase tracking-wider text-slate-500 font-medium mb-0.5">{s.label}</div>
-                            <div className={`text-[20px] font-semibold leading-none ${s.color}`}>{s.val}</div>
-                        </div>
-                    ))}
+                    <p className="text-[13px] text-slate-500 font-medium">Müşterilerinize hızlı ve profesyonel teklifler hazırlayın.</p>
                 </div>
             </div>
 
@@ -137,7 +123,7 @@ export default function QuotesPage() {
                                 onChange={(e) => setStatusFilter(e.target.value)}
                             >
                                 <option value="All">Tüm Durumlar</option>
-                                <option value="Draft">Taslak</option>
+                                <option value="Pending">Beklemede</option>
                                 <option value="Sent">Gönderildi</option>
                                 <option value="Accepted">Onaylandı</option>
                                 <option value="Rejected">Reddedildi</option>

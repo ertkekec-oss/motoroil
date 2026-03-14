@@ -89,7 +89,7 @@ export async function POST(req: Request) {
                 subTotal: Number(subTotal) || 0,
                 taxAmount: Number(taxAmount) || 0,
                 totalAmount: Number(totalAmount) || 0,
-                status: 'Draft',
+                status: 'Pending',
                 branch: branch,
                 companyId: companyId
             }

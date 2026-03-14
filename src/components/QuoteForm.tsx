@@ -12,7 +12,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
         validUntil: '',
         description: '',
         items: [] as any[],
-        status: 'Draft'
+        status: 'Pending'
     });
     const [resolvedPriceList, setResolvedPriceList] = useState<any>(null);
     const [loadingPrice, setLoadingPrice] = useState(false);
@@ -25,7 +25,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                 validUntil: initialData.validUntil ? new Date(initialData.validUntil).toISOString().split('T')[0] : '',
                 description: initialData.description || '',
                 items: Array.isArray(initialData.items) ? initialData.items : [],
-                status: initialData.status || 'Draft'
+                status: initialData.status || 'Pending'
             });
         }
     }, [initialData]);
@@ -200,7 +200,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
                             >
-                                <option value="Draft">Taslak</option>
+                                <option value="Pending">Beklemede</option>
                                 <option value="Sent">Gönderildi</option>
                                 <option value="Accepted">Onaylandı</option>
                                 <option value="Rejected">Reddedildi</option>

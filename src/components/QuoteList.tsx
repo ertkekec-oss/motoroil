@@ -59,7 +59,7 @@ export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading,
     const getStatusBadge = (status: string) => {
         const base = "px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider inline-flex items-center justify-center ";
         switch (status) {
-            case 'Draft': return <span className={base + "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300"}>Taslak</span>;
+            case 'Pending': return <span className={base + "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300"}>Beklemede</span>;
             case 'Sent': return <span className={base + "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"}>Gönderildi</span>;
             case 'Accepted': return <span className={base + "bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400"}>Onaylandı</span>;
             case 'Rejected': return <span className={base + "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400"}>Reddedildi</span>;
