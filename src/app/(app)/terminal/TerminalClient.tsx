@@ -76,9 +76,10 @@ export default function TerminalClient() {
                         // rates are 1 TRY = X USD. So 1 USD = 1 / X TRY
                         const ratesToTry: Record<string, number> = {};
                         Object.keys(data.rates).forEach(currency => {
-                            ratesToTry[currency] = 1 / data.rates[currency];
+                            ratesToTry[currency.toUpperCase()] = 1 / data.rates[currency];
                         });
                         ratesToTry['TRY'] = 1;
+                        ratesToTry['TL'] = 1;
                         setExchangeRates(ratesToTry);
                     }
                 })
@@ -91,9 +92,11 @@ export default function TerminalClient() {
         let basePrice = Number(product.price || 0);
         if (priceMap[product.id] !== undefined) basePrice = priceMap[product.id];
 
+        const currency = (product.currency || 'TRY').toUpperCase();
+
         // Apply Forex Exchange Rate Conversion if enabled and product is not TRY
-        if (useForex && product.currency && product.currency !== 'TRY' && exchangeRates[product.currency]) {
-            basePrice = basePrice * exchangeRates[product.currency];
+        if (useForex && currency !== 'TRY' && currency !== 'TL' && exchangeRates[currency]) {
+            basePrice = basePrice * exchangeRates[currency];
         }
 
         return basePrice;
@@ -129,12 +132,6 @@ export default function TerminalClient() {
                         if (pData.success || pData.ok) {
                             const newPriceMap = pData.priceMap || pData.data?.priceMap || {};
                             setPriceMap(newPriceMap);
-                            setCart(prevCart => prevCart.map(item => {
-                                if (newPriceMap[item.id] !== undefined) {
-                                    return { ...item, price: newPriceMap[item.id] };
-                                }
-                                return item;
-                            }));
                         }
                     }
                 } else {
@@ -173,12 +170,11 @@ export default function TerminalClient() {
         setCart((prev: any[]) => {
             const exist = prev.find(i => i.id === product.id);
             if (exist) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
-            const resolvedPrice = getPrice(product);
-            return [...prev, { ...product, price: resolvedPrice, qty: 1 }];
+            return [...prev, { ...product, qty: 1 }];
         });
         setSearchInput('');
         searchInputRef.current?.focus();
-    }, [getPrice]);
+    }, []);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -198,7 +194,7 @@ export default function TerminalClient() {
     };
 
     // Calculations
-    const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * item.qty), 0);
+    const subtotal = cart.reduce((sum, item) => sum + (Number(getPrice(item) || 0) * item.qty), 0);
     const totalDiscount = appliedDiscount || 0;
     const vatExcludedTotal = subtotal / 1.2;
     const finalTotal = Math.max(0, subtotal - totalDiscount - (pointsToUse || 0));
