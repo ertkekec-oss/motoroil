@@ -149,6 +149,8 @@ model Company {
   trustScoreRecalcJobs  TrustScoreRecalcJob[]
   users                 UserCompanyAccess[]
   exportReports         ExportReport[]
+  boms                  Bom[]
+  manufacturingOrders   ManufacturingOrder[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -388,22 +390,26 @@ model Product {
   tags                     String?  @db.Text
   gtin                     String?
 
-  b2bSuggestions     B2BSuggestion[]
-  companyProductMaps CompanyProductMap[]
-  marketplaceMaps    MarketplaceProductMap[]
-  marketplacePnls    MarketplaceProductPnl[]
-  networkListings    NetworkListing[]
-  company            Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  parent             Product?                @relation("ProductVariants", fields: [parentId], references: [id])
-  variants           Product[]               @relation("ProductVariants")
-  productPrices      ProductPrice[]
-  variantValues      ProductVariantValue[]
-  salesOrderItems    SalesOrderItem[]
-  pricingRules       SmartPricingRule[]
-  stocks             Stock[]
-  movements          StockMovement[]
-  dealerCartItems    DealerCartItem[]
-  dealerCatalogItems DealerCatalogItem[]
+  b2bSuggestions                    B2BSuggestion[]
+  companyProductMaps                CompanyProductMap[]
+  marketplaceMaps                   MarketplaceProductMap[]
+  marketplacePnls                   MarketplaceProductPnl[]
+  networkListings                   NetworkListing[]
+  company                           Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  parent                            Product?                 @relation("ProductVariants", fields: [parentId], references: [id])
+  variants                          Product[]                @relation("ProductVariants")
+  productPrices                     ProductPrice[]
+  variantValues                     ProductVariantValue[]
+  salesOrderItems                   SalesOrderItem[]
+  pricingRules                      SmartPricingRule[]
+  stocks                            Stock[]
+  movements                         StockMovement[]
+  dealerCartItems                   DealerCartItem[]
+  dealerCatalogItems                DealerCatalogItem[]
+  bomsAsProduct                     Bom[]                    @relation("ProductBom")
+  bomItemsAsMaterial                BomItem[]                @relation("ProductBomItem")
+  manufacturingOrdersAsProduct      ManufacturingOrder[]     @relation("ProductManufacturing")
+  manufacturingOrderItemsAsMaterial ManufacturingOrderItem[] @relation("ProductManufacturingItem")
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -9269,4 +9275,115 @@ model TenantContractSignature {
   @@index([tenantId])
   @@index([userId])
   @@index([contractId])
+}
+
+// -------------------------------------------------------------------------------------
+// PERIODYA ENTERPRISE: MANUFACTURING & BOM MODULE (FAZ 1)
+// -------------------------------------------------------------------------------------
+
+model Bom {
+  id            String   @id @default(cuid())
+  companyId     String
+  tenantId      String
+  productId     String
+  name          String
+  code          String?
+  description   String?  @db.Text
+  estimatedCost Decimal? @default(0) @db.Decimal(12, 2)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  company             Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product             Product              @relation("ProductBom", fields: [productId], references: [id], onDelete: Cascade)
+  items               BomItem[]
+  manufacturingOrders ManufacturingOrder[]
+
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@index([tenantId])
+  @@index([productId])
+}
+
+model BomItem {
+  id              String   @id @default(cuid())
+  bomId           String
+  productId       String // Hammadde / Yarı-Mamul (Raw material/component)
+  quantity        Decimal  @db.Decimal(10, 4)
+  unit            String?  @default("Adet")
+  wastePercentage Decimal? @default(0) @db.Decimal(5, 2) // Fire Oranı tahmini
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  bom     Bom     @relation(fields: [bomId], references: [id], onDelete: Cascade)
+  product Product @relation("ProductBomItem", fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([bomId])
+  @@index([productId])
+}
+
+enum ManufacturingOrderStatus {
+  DRAFT
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+model ManufacturingOrder {
+  id               String                   @id @default(cuid())
+  companyId        String
+  tenantId         String
+  orderNumber      String
+  productId        String // Üretilecek Hedef Mamul (Target product to produce)
+  bomId            String? // İsteğe bağlı Reçete linki
+  branch           String                   @default("Merkez")
+  status           ManufacturingOrderStatus @default(DRAFT)
+  plannedQuantity  Int                      @default(1)
+  producedQuantity Int                      @default(0)
+  wasteQuantity    Int                      @default(0)
+
+  plannedStartDate DateTime?
+  plannedEndDate   DateTime?
+  actualStartDate  DateTime?
+  actualEndDate    DateTime?
+
+  totalEstimatedCost Decimal @default(0) @db.Decimal(12, 2)
+  totalActualCost    Decimal @default(0) @db.Decimal(12, 2)
+  notes              String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product Product                  @relation("ProductManufacturing", fields: [productId], references: [id])
+  bom     Bom?                     @relation(fields: [bomId], references: [id])
+  items   ManufacturingOrderItem[]
+
+  @@unique([companyId, orderNumber])
+  @@index([companyId])
+  @@index([tenantId])
+  @@index([status])
+  @@index([productId])
+  @@index([bomId])
+  @@index([branch])
+}
+
+model ManufacturingOrderItem {
+  id                   String   @id @default(cuid())
+  manufacturingOrderId String
+  productId            String // Kullanılacak Hammadde (Raw material/component)
+  plannedQuantity      Decimal  @default(0) @db.Decimal(10, 4)
+  actualConsumed       Decimal  @default(0) @db.Decimal(10, 4)
+  unitCost             Decimal  @default(0) @db.Decimal(12, 2)
+  totalCost            Decimal  @default(0) @db.Decimal(12, 2)
+  isWaste              Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  order   ManufacturingOrder @relation(fields: [manufacturingOrderId], references: [id], onDelete: Cascade)
+  product Product            @relation("ProductManufacturingItem", fields: [productId], references: [id])
+
+  @@index([manufacturingOrderId])
+  @@index([productId])
 }
