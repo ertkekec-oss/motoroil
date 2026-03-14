@@ -28,7 +28,7 @@ export default function TerminalClient() {
     const { processSale, suspendedSales, suspendSale, removeSuspendedSale } = useSales();
     const { currentUser } = useApp();
     const { showSuccess, showError, showWarning } = useModal();
-    const { appSettings, updateAppSetting } = useSettings();
+    const { appSettings, updateAppSetting, campaigns } = useSettings();
 
     const searchInputRef = useRef<HTMLInputElement>(null);
     const checkoutPanelRef = useRef<HTMLDivElement>(null);
@@ -192,12 +192,76 @@ export default function TerminalClient() {
         else if (cmd.includes('iptal')) setCart([]);
     };
 
-    // Calculations
+    // Base Calculations
     const subtotal = cart.reduce((sum, item) => sum + (Number(getPrice(item) || 0) * item.qty), 0);
-    const totalDiscount = appliedDiscount || 0;
+    const customer = customers.find(c => c.name === selectedCustomer);
+
+    // Campaigns
+    const applicableCampaigns = useMemo(() => {
+        if (!campaigns || !Array.isArray(campaigns)) return [];
+        const active = campaigns.filter((c: any) => c.isActive && !c.deletedAt);
+        const customerRec = customers.find(c => c.name === selectedCustomer);
+        const custClass = customerRec?.customerClass || null;
+
+        return active.filter((camp: any) => {
+            const isIsolated = camp.targetCustomerCategoryIds && camp.targetCustomerCategoryIds.length > 0;
+            if (isIsolated && (!custClass || !camp.targetCustomerCategoryIds.includes(custClass))) return false;
+
+            let conds: any = camp.conditions || {};
+            if (typeof conds === 'string') {
+                try { conds = JSON.parse(conds); } catch (e) { conds = {}; }
+            }
+
+            if ((camp.type === 'payment_method_discount' || camp.type === 'loyalty_points') && paymentMode) {
+                if (conds.paymentMethod && conds.paymentMethod !== '' && conds.paymentMethod !== paymentMode) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }, [campaigns, selectedCustomer, customers, paymentMode]);
+
+    const { computedCampaignDiscount, computedPromoItems, computedEarnedPoints } = useMemo(() => {
+        let disc = 0;
+        let pItems: any[] = [];
+        let pts = 0;
+
+        for (const camp of applicableCampaigns) {
+            let conds: any = camp.conditions || {};
+            if (typeof conds === 'string') {
+                try { conds = JSON.parse(conds); } catch(e) { conds = {}; }
+            }
+
+            if (camp.type === 'payment_method_discount') {
+                const isPaymentMatch = !conds.paymentMethod || conds.paymentMethod === '' || conds.paymentMethod === paymentMode;
+                if (isPaymentMatch && paymentMode) {
+                    disc += subtotal * (camp.discountRate || 0);
+                }
+            }
+            else if (camp.type === 'buy_x_get_free') {
+                cart.forEach(item => {
+                    const reqQty = conds.buyQuantity || 1;
+                    const rwdQty = conds.rewardQuantity || 1;
+                    if (item.qty >= reqQty) {
+                        const times = Math.floor(item.qty / reqQty);
+                        pItems.push({ campName: camp.name, qty: times * rwdQty, prodId: conds.rewardProductId || item.id, originalName: item.name });
+                    }
+                });
+            }
+            else if (camp.type === 'loyalty_points') {
+                const isPaymentMatch = !conds.paymentMethod || conds.paymentMethod === '' || conds.paymentMethod === paymentMode;
+                if (isPaymentMatch) {
+                    pts += subtotal * (camp.pointsRate || 0);
+                }
+            }
+        }
+        return { computedCampaignDiscount: disc, computedPromoItems: pItems, computedEarnedPoints: pts };
+    }, [applicableCampaigns, cart, subtotal, paymentMode]);
+
+    // Final Calculations
+    const totalDiscount = (appliedDiscount || 0) + computedCampaignDiscount;
     const vatExcludedTotal = subtotal / 1.2;
     const finalTotal = Math.max(0, subtotal - totalDiscount - (pointsToUse || 0));
-    const customer = customers.find(c => c.name === selectedCustomer);
 
     // Finalize (Offline aware)
     const handleFinalize = async () => {
@@ -422,7 +486,11 @@ export default function TerminalClient() {
                         paymentMode={paymentMode}
                         setPaymentMode={setPaymentMode}
                         handleFinalize={handleFinalize}
-                        handleSuspend={() => setShowSuspendModal(true)}
+                        handleSuspend={() => {
+                            if (cart.length === 0) return;
+                            setSuspenseLabel('');
+                            setShowSuspendModal(true);
+                        }}
                         isProcessing={isProcessing}
                         isOnline={isOnline}
                         selectedTaksit={selectedTaksit}

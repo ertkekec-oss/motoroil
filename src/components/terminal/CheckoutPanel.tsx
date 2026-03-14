@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { CreditCard, Banknote, Landmark, ArrowRight, User, Clock } from 'lucide-react';
+import { CreditCard, Banknote, Landmark, ArrowRight, User, Clock, Gift } from 'lucide-react';
 
 export default function CheckoutPanel({
     cart, subtotal, finalTotal, vatExcludedTotal, totalDiscount,
     selectedCustomer, customers, activePriceListName, setIsCustomerModalOpen,
-    paymentMode, setPaymentMode, handleFinalize, handleSuspend, isProcessing, isOnline
+    paymentMode, setPaymentMode, handleFinalize, handleSuspend, isProcessing, isOnline,
+    applicableCampaigns, computedCampaignDiscount, computedPromoItems, computedEarnedPoints
 }: any) {
 
     return (
@@ -59,6 +60,35 @@ export default function CheckoutPanel({
                         <span className="text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight">₺{finalTotal.toLocaleString()}</span>
                     </div>
                 </div>
+
+                {/* Campaigns Summary */}
+                {(computedCampaignDiscount > 0 || computedEarnedPoints > 0 || (computedPromoItems && computedPromoItems.length > 0)) && (
+                    <div className="bg-indigo-50/50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
+                        <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-widest flex items-center gap-1.5">
+                            <Gift size={12} /> Otomatik Kazanımlar
+                        </div>
+                        <div className="space-y-1.5 text-xs">
+                            {computedCampaignDiscount > 0 && (
+                                <div className="flex justify-between font-medium text-emerald-600 dark:text-emerald-400">
+                                    <span>Seçili Ödeme İndirimi</span>
+                                    <span>-₺{computedCampaignDiscount.toLocaleString()}</span>
+                                </div>
+                            )}
+                            {computedEarnedPoints > 0 && (
+                                <div className="flex justify-between font-medium text-amber-600 dark:text-amber-400">
+                                    <span>Kazanılacak Parapuan</span>
+                                    <span>+{computedEarnedPoints.toLocaleString(undefined, { maximumFractionDigits: 2 })} Puan</span>
+                                </div>
+                            )}
+                            {computedPromoItems?.map((pItem: any, i: number) => (
+                                <div key={i} className="flex justify-between font-medium text-blue-600 dark:text-blue-400">
+                                    <span className="truncate pr-2">{pItem.qty}x {pItem.campName}</span>
+                                    <span>Bedelsiz Sepette</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Payment Methods */}
                 <div>
