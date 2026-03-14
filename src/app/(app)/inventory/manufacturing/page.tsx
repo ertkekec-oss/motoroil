@@ -35,6 +35,7 @@ export default function ManufacturingPage() {
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [newOrder, setNewOrder] = useState({
     bomId: "",
     plannedQuantity: 1,
@@ -287,6 +288,7 @@ export default function ManufacturingPage() {
                           </button>
                         )}
                         <button
+                          onClick={() => setSelectedOrder(o)}
                           className={`w-8 h-8 rounded-[6px] flex items-center justify-center transition-colors ${isLight ? "text-slate-400 hover:text-blue-600 hover:bg-blue-50" : "text-slate-500 hover:text-blue-400 hover:bg-blue-900/20"}`}
                         >
                           <ChevronRight className="w-4 h-4" />
@@ -394,6 +396,52 @@ export default function ManufacturingPage() {
               >
                 {isProcessing ? "İşleniyor..." : "Eşzamanlı Olarak Planla & Hammaddeleri Hazırla"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* DETAILS MODAL */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50">
+          <div className={`w-[600px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
+            <div className={`flex justify-between items-center px-6 py-4 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
+              <h2 className={`text-[16px] font-semibold flex items-center gap-2 ${textValueClass}`}><Factory className="w-5 h-5 text-blue-500" /> Üretim Emri Detayı</h2>
+              <button onClick={() => setSelectedOrder(null)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scroll flex flex-col gap-4">
+              <div className={`p-4 rounded-[10px] border ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-800/30 border-slate-700"}`}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${textLabelClass}`}>Emir No</div>
+                    <div className={`text-[14px] font-semibold ${textValueClass}`}>{selectedOrder.orderNumber}</div>
+                  </div>
+                  <div>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${textLabelClass}`}>Durum</div>
+                    <div>{getStatusBadge(selectedOrder.status)}</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${textLabelClass}`}>Hedef Mamul</div>
+                    <div className={`text-[14px] font-semibold ${textValueClass}`}>{selectedOrder.product?.name}</div>
+                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>Reçete: {selectedOrder.bom?.name} | {selectedOrder.plannedQuantity} Adet Planlandı</div>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className={`text-[14px] font-semibold mt-2 ${textValueClass}`}>Kullanılacak/Kullanılan Hammaddeler</h3>
+              <div className="space-y-2">
+                {selectedOrder.items?.map((item: any, idx: number) => (
+                  <div key={idx} className={`flex justify-between items-center p-3 rounded-[8px] border ${isLight ? "bg-white border-slate-100" : "bg-slate-800/50 border-slate-700"}`}>
+                    <div>
+                      <div className={`text-[13px] font-semibold ${textValueClass}`}>{item.product?.name}</div>
+                      <div className={`text-[11px] mt-0.5 ${textLabelClass}`}>Birim Maliyet: {formatCurrency(item.unitCost)}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-[13px] font-medium ${textValueClass}`}>{item.plannedQuantity} Adet Gerekli</div>
+                      <div className={`text-[11px] font-semibold mt-0.5 text-blue-500`}>T. Maliyet: {formatCurrency(item.totalCost)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

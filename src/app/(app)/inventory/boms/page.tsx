@@ -34,6 +34,7 @@ export default function BomsPage() {
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBom, setSelectedBom] = useState<any>(null);
   const [newBom, setNewBom] = useState({
     productId: "",
     name: "",
@@ -275,6 +276,7 @@ export default function BomsPage() {
 
               <div className={`flex items-center gap-2 mt-auto pt-4 border-t ${isLight ? "border-slate-100" : "border-slate-800/50"}`}>
                 <button
+                  onClick={() => setSelectedBom(bom)}
                   className={`flex-1 h-[36px] flex items-center justify-center gap-2 rounded-[8px] text-[13px] font-medium border transition-colors ${isLight ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50" : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800"}`}
                 >
                   <ListPlus className="w-4 h-4" /> Detaylar
@@ -423,6 +425,41 @@ export default function BomsPage() {
                 {isProcessing ? "Kaydediliyor..." : "Reçeteyi Kaydet ve Kapat"}
                 {!isProcessing && <ArrowRight className="w-4 h-4.border-t" />}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DETAILS MODAL */}
+      {selectedBom && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50">
+          <div className={`w-[600px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
+            <div className={`flex justify-between items-center px-6 py-4 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
+              <h2 className={`text-[16px] font-semibold ${textValueClass}`}>Reçete Detayı: {selectedBom.name || selectedBom.product?.name}</h2>
+              <button onClick={() => setSelectedBom(null)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scroll flex flex-col gap-4">
+              <div className={`p-4 rounded-[10px] border ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-800/30 border-slate-700"}`}>
+                <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${textLabelClass}`}>Hedef Ürün (Mamul)</div>
+                <div className={`text-[14px] font-semibold ${textValueClass}`}>{selectedBom.product?.name}</div>
+                <div className={`text-[12px] mt-1 ${textLabelClass}`}>Reçete Kodu: {selectedBom.code}</div>
+              </div>
+
+              <h3 className={`text-[14px] font-semibold mt-2 ${textValueClass}`}>Hammadde Karışımı</h3>
+              <div className="space-y-2">
+                {selectedBom.items?.map((item: any, idx: number) => (
+                  <div key={idx} className={`flex justify-between items-center p-3 rounded-[8px] border ${isLight ? "bg-white border-slate-100" : "bg-slate-800/50 border-slate-700"}`}>
+                    <div>
+                      <div className={`text-[13px] font-semibold ${textValueClass}`}>{item.product?.name}</div>
+                      <div className={`text-[11px] mt-0.5 ${textLabelClass}`}>Ürün Kodu: {item.product?.code || '-'}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-[13px] font-medium ${textValueClass}`}>{item.quantity} {item.unit}</div>
+                      {item.wastePercentage > 0 && <div className={`text-[11px] mt-0.5 text-red-500`}>+{item.wastePercentage}% Fire</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

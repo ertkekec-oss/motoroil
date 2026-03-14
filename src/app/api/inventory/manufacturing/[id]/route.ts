@@ -90,12 +90,13 @@ export async function PUT(request: Request, context: { params: { id: string } })
             // 1. If starting (WIP), deduct raw materials (INVENTORY REDUCTION)
             if (isStartingNow) {
                 for (const item of updatedOrder.items) {
+                    const qtyToDeduct = Math.round(parseFloat(String(item.plannedQuantity)));
                     await tx.stockMovement.create({
                         data: {
                             productId: item.productId,
                             companyId: updatedOrder.companyId,
                             branch: updatedOrder.branch,
-                            quantity: -parseFloat(String(item.plannedQuantity)), // Subtract from stock
+                            quantity: -qtyToDeduct, // Subtract from stock
                             price: parseFloat(String(item.unitCost)),
                             type: 'USAGE',
                             referenceId: `MRP_START_${updatedOrder.orderNumber}`
@@ -105,15 +106,15 @@ export async function PUT(request: Request, context: { params: { id: string } })
                     // Update explicit stock table
                     await tx.stock.upsert({
                         where: { productId_branch: { productId: item.productId, branch: updatedOrder.branch } },
-                        update: { quantity: { decrement: parseFloat(String(item.plannedQuantity)) } },
-                        create: { productId: item.productId, branch: updatedOrder.branch, quantity: -parseFloat(String(item.plannedQuantity)) }
+                        update: { quantity: { decrement: qtyToDeduct } },
+                        create: { productId: item.productId, branch: updatedOrder.branch, quantity: -qtyToDeduct }
                     });
                 }
             }
 
             // 2. If completing, add the final product to stock (INVENTORY ADDITION)
             if (isCompletingNow) {
-                const finalQty = updatedOrder.producedQuantity || updatedOrder.plannedQuantity;
+                const finalQty = Math.round(updatedOrder.producedQuantity || updatedOrder.plannedQuantity);
                 const finalUnitCost = updatedOrder.totalActualCost ? (parseFloat(String(updatedOrder.totalActualCost)) / finalQty) : 0;
 
                 await tx.stockMovement.create({
