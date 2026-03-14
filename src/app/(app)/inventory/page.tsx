@@ -600,7 +600,10 @@ function InventoryContent() {
         "showDescriptionOnInvoice",
         "shelfLocation",
         "tags",
-        "unit"
+        "unit",
+        "currency",
+        "purchaseCurrency",
+        "otvCode"
       ];
       const updateData: any = {};
       validFields.forEach((field) => {
@@ -625,6 +628,7 @@ function InventoryContent() {
         const pData = await pRes.json();
         if (pData.success) setProducts(pData.products);
         setIsEditing(false);
+        setSelectedProduct(null); // Auto-close modal
         showSuccess(
           "Güncelleme Başarılı",
           "Ürün bilgileri ve fiyatlandırma başarıyla güncellendi.",
