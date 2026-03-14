@@ -57,6 +57,33 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [uploading, setUploading] = useState(false);
     const [filePreview, setFilePreview] = useState<string | null>(null);
 
+    const [priceMap, setPriceMap] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        const fetchPricing = async () => {
+            if (!customer?.id) return;
+            try {
+                const res = await fetch('/api/pricing/resolve-customer', {
+                    method: 'POST',
+                    body: JSON.stringify({ customerId: customer.id })
+                });
+                const data = await res.json();
+                const resolvedList = data.priceList || data.data?.priceList;
+                if (data.success && resolvedList) {
+                    const listId = resolvedList.id;
+                    const pRes = await fetch(`/api/pricing/lists/${listId}/prices`);
+                    const pData = await pRes.json();
+                    if (pData.success || pData.ok) {
+                        setPriceMap(pData.priceMap || pData.data?.priceMap || {});
+                    }
+                }
+            } catch (e) {
+                console.error("Fiyat listesi çekilemedi:", e);
+            }
+        };
+        fetchPricing();
+    }, [customer?.id]);
+
     // PAGINATION
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -1759,12 +1786,28 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 onChange={(e) => {
                                                                     const selectedProduct = products.find(p => String(p.id) === e.target.value);
                                                                     if (selectedProduct) {
+                                                                        const rawPrice = priceMap[selectedProduct.id] ?? Number(selectedProduct.price || 0);
+                                                                        const vatRate = Number(selectedProduct.salesVat || 20);
+                                                                        const oivRate = Number(selectedProduct.salesOiv || 0);
+                                                                        const otvType = selectedProduct.otvType || 'Ö.T.V yok';
+                                                                        const otvRate = Number(selectedProduct.salesOtv || 0);
+                                                                        const effectiveVatOiv = (1 + (vatRate + oivRate) / 100);
+                                                                        
+                                                                        let netPrice = 0;
+                                                                        if (otvType === 'yüzdesel Ö.T.V') {
+                                                                            netPrice = rawPrice / ((1 + otvRate / 100) * effectiveVatOiv);
+                                                                        } else if (otvType === 'maktu Ö.T.V') {
+                                                                            netPrice = (rawPrice / effectiveVatOiv) - otvRate;
+                                                                        } else {
+                                                                            netPrice = rawPrice / effectiveVatOiv;
+                                                                        }
+
                                                                         const currentItems = JSON.parse(JSON.stringify(invoiceItems));
                                                                         currentItems[i] = {
                                                                             ...currentItems[i],
                                                                             productId: selectedProduct.id,
                                                                             name: selectedProduct.name,
-                                                                            price: Number(selectedProduct.price || 0),
+                                                                            price: netPrice,
                                                                             vat: Number(selectedProduct.salesVat || 20),
                                                                             otv: Number(selectedProduct.salesOtv || 0),
                                                                             otvCode: selectedProduct.otvCode || '0071',
@@ -2454,7 +2497,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     .filter(p => !productSearchTerm || p.name.toLocaleLowerCase('tr').includes(productSearchTerm.toLocaleLowerCase('tr')) || p.barcode?.includes(productSearchTerm) || p.code?.includes(productSearchTerm))
                                     .slice(0, 50)
                                     .map(p => {
-                                        const grossPrice = Number(p.price || 0);
+                                        const grossPrice = priceMap[p.id] ?? Number(p.price || 0);
                                         const vatRate = Number(p.salesVat || 20);
                                         const otvType = p.otvType || 'Ö.T.V yok';
                                         const otvRate = Number(p.salesOtv || 0);
