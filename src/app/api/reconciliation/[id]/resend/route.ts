@@ -30,9 +30,10 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
 
         await prisma.reconciliationAuditEvent.create({
             data: {
+                tenantId: recon.tenantId,
                 reconciliationId: reconId,
                 action: 'INVITE_RESENT',
-                createdByEmail: session.user?.email,
+                createdByEmail: session.user?.email || 'admin',
                 metaJson: { ip: req.headers.get("x-forwarded-for") }
             }
         });
