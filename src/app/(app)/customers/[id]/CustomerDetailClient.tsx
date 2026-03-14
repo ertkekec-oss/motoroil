@@ -1499,7 +1499,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         </span>
                                                     </td>
                                                     <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-muted, #aaa)', fontWeight: '500' }}>{item.desc}</td>
-                                                    <td style={{ padding: '24px', textAlign: 'right', fontWeight: '800', fontSize: '15px', color: item.amount > 0 ? '#ef4444' : '#10b981', fontFamily: 'monospace' }}>
+                                                    <td style={{ padding: '24px', textAlign: 'right', fontWeight: '800', fontSize: '15px', color: item.amount > 0 ? '#ef4444' : '#10b981', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
                                                         {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                     </td>
                                                     <td style={{ padding: '24px', textAlign: 'right' }}>

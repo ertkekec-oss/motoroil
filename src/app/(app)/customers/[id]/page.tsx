@@ -201,7 +201,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         });
 
         const txsByOrderId = new Map<string, any>();
-        (customer.transactions || []).forEach((t: any) => {
+        txs.forEach((t: any) => {
             if (t.orderId) {
                 txsByOrderId.set(t.orderId, t);
             }
@@ -227,11 +227,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             let pm = parsedRaw?.paymentMode;
             if (!pm) {
                 const linkedTx = txsByOrderId.get(o.id);
-                if (linkedTx?.rawData) {
-                    try {
-                        const txRaw = typeof linkedTx.rawData === 'string' ? JSON.parse(linkedTx.rawData) : (linkedTx.rawData || {});
-                        pm = txRaw?.paymentMode;
-                    } catch(e) {}
+                if (linkedTx) {
+                    const d = linkedTx.desc || '';
+                    if (d.includes('Kredi Kartı')) pm = 'card';
+                    else if (d.includes('Nakit')) pm = 'cash';
+                    else if (d.includes('Havale') || d.includes('EFT')) pm = 'transfer';
+                    else if (d.includes('Veresiye') || d.includes('Cari Hesap')) pm = 'account';
                 }
             }
 

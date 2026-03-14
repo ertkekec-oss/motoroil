@@ -87,15 +87,47 @@ export async function GET(request: Request) {
             })
         ]);
 
+        const txs = await prisma.transaction.findMany({
+            where: {
+                companyId: user.companyId,
+                type: 'Sales',
+            },
+            select: {
+                description: true,
+                date: true
+            },
+            take: 300,
+            orderBy: { date: 'desc' }
+        });
+        
         // Normalize Orders
-        const normalizedOrders = orders.map((o: any) => ({
-            ...o,
-            items: (Array.isArray(o.items) ? o.items : []).map((i: any) => ({
-                name: i.name || i.productName || 'Ürün',
-                qty: i.qty || i.quantity || 1,
-                price: Number(i.price || i.unitPrice || 0)
-            }))
-        }));
+        const normalizedOrders = orders.map((o: any) => {
+            let parsedRaw: any = {};
+            try { parsedRaw = typeof o.rawData === 'string' ? JSON.parse(o.rawData) : (o.rawData || {}); } catch(e){}
+            
+            let pm = parsedRaw?.paymentMode;
+            if (!pm && o.marketplace === 'POS') {
+               const linkedTx = txs.find(t => t.description && t.description.includes(`REF:${o.id}`));
+               if (linkedTx) {
+                    const d = linkedTx.description;
+                    if (d.includes('Kredi Kartı')) pm = 'credit_card';
+                    else if (d.includes('Nakit')) pm = 'cash';
+                    else if (d.includes('Havale') || d.includes('EFT')) pm = 'bank_transfer';
+                    else if (d.includes('Veresiye') || d.includes('Cari Hesap')) pm = 'account';
+               }
+            }
+            parsedRaw.paymentMode = pm || parsedRaw.paymentMode || 'cash';
+
+            return {
+                ...o,
+                rawData: parsedRaw,
+                items: (Array.isArray(o.items) ? o.items : []).map((i: any) => ({
+                    name: i.name || i.productName || 'Ürün',
+                    qty: i.qty || i.quantity || 1,
+                    price: Number(i.price || i.unitPrice || 0)
+                }))
+            };
+        });
 
         // Normalize SalesOrders to match Order structure
         const normalizedSalesOrders = salesOrders.map((so: any) => ({
