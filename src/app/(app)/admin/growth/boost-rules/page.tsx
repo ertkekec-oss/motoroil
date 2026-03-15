@@ -66,24 +66,23 @@ export default function AdminBoostRules() {
 
     const handleAction = async (id: string, action: 'disable' | 'expire-now') => {
         showPrompt("İşem Onayı", "İşlem nedenini giriniz (Audit log için zorunlu):", async (r) => {
-        if (!r || r.length < 5) return showError("Uyarı", "Geçerli bir sebep girilmeli (min 5 karakter).");
+            if (!r || r.length < 5) return showError("Uyarı", "Geçerli bir sebep girilmeli (min 5 karakter).");
 
-        try {
-            const res = await fetch(`/api/admin/growth/boost-rules/${id}/${action}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "x-idempotency-key": crypto.randomUUID() },
-                body: JSON.stringify({ reason: r })
-            });
-            if (res.ok) {
-                fetchRules();
-            } else {
-                const err = await res.json();
-                showError("Uyarı", `Hata: ${err.error}`);
+            try {
+                const res = await fetch(`/api/admin/growth/boost-rules/${id}/${action}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "x-idempotency-key": crypto.randomUUID() },
+                    body: JSON.stringify({ reason: r })
+                });
+                if (res.ok) {
+                    fetchRules();
+                } else {
+                    const err = await res.json();
+                    showError("Uyarı", `Hata: ${err.error}`);
+                }
+            } catch (e) {
+                console.error(e);
             }
-        } catch (e) {
-            console.error(e);
-        }
-        }
         });
     };
 

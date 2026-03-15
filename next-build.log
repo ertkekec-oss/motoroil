@@ -1,0 +1,26 @@
+⚠ `eslint` configuration in next.config.ts is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+⚠ Invalid next.config.ts options detected: 
+⚠     Unrecognized key(s) in object: 'eslint'
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+▲ Next.js 16.1.4 (Turbopack)
+- Environments: .env.production.local, .env.local, .env.production, .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/app/(app)/hub-dashboard/page.tsx:15:1
+Parsing ecmascript source code failed
+[0m [90m 13 |[39m
+ [90m 14 |[39m     [36mconst[39m isSystemAdmin [33m=[39m currentUser [33m===[39m [36mnull[39m [33m||[39m currentUser[33m?[39m[33m.[39mrole [33m===[39m [32m'SUPER_ADMIN'[39m [33m||[39m (currentUser[33m?[39m[33m.[39mrole [33m&&[39m (currentUser[33m.[39mrole[33m.[39mtoLowerCase()[33m.[39mincludes([32m'admin'[39m) [33m||[39m currentUser[33m.[39mrole[33m.[39mtoLowerCase()[33m.[39mincludes([32m'müdür'[39m)))[33m;[39m
+[31m[1m>[22m[39m[90m 15 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mTenantNetworkDashboard[39m() {
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 16 |[39m     [36mconst[39m { currentUser[33m,[39m hasPermission } [33m=[39m useApp()[33m;[39m
+ [90m 17 |[39m     [36mconst[39m router [33m=[39m useRouter()[33m;[39m
+ [90m 18 |[39m[0m
+
+'import', and 'export' cannot be used outside of module code
+
+
+    at <unknown> (./src/app/(app)/hub-dashboard/page.tsx:15:1)

@@ -17,7 +17,7 @@ export default function ForceReleaseLedgerButton({ paymentId }: { paymentId: str
                 setLoading(true);
                 try {
                     const res = await forceReleaseLedgerAction(paymentId);
-                    if (res.success) {
+                    if (res.ok) {
                         showSuccess("Başarılı", res.message || "Force release başarıyla tamamlandı.");
                     } else {
                         showError("Hata", res.message || "İşlem başarısız oldu.");

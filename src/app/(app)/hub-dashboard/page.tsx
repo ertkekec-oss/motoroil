@@ -18,6 +18,7 @@ export default function TenantNetworkDashboard() {
     // @ts-ignore
     const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';
 
+    const { showSuccess, showError, showWarning } = useModal();
     const [earningsData, setEarningsData] = useState<any>(null);
     const [billingData, setBillingData] = useState<any>(null);
     const [ordersData, setOrdersData] = useState<any>({ buyerPending: 0, buyerEscrow: 0, sellerPending: 0, sellerEscrow: 0 });
@@ -140,7 +141,6 @@ export default function TenantNetworkDashboard() {
                                             fetch(`/api/network/opportunities/${opp.id}/generate-rfq`, { method: 'POST' })
                                                 .then(res => res.json())
                                                 .then(data => {
-                                                    const { showSuccess, showError, showWarning } = useModal();
                                                     if (data.success) showSuccess("Bilgi", 'Auto RFQ Draft Generated!');
                                                     else showError("Uyarı", 'Error: ' + data.error);
                                                 });

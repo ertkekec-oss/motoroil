@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
+import { Gift, Edit, Trash2 } from "lucide-react";
 
 export default function ActiveCampaigns() {
     const { showConfirm, showError, showSuccess } = useModal();

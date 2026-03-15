@@ -1,0 +1,9 @@
+src/app/(app)/hub-dashboard/page.tsx(95,10): error TS17008: JSX element 'div' has no corresponding closing tag.
+src/app/(app)/hub-dashboard/page.tsx(97,14): error TS17008: JSX element 'div' has no corresponding closing tag.
+src/app/(app)/hub-dashboard/page.tsx(126,22): error TS17008: JSX element 'div' has no corresponding closing tag.
+src/app/(app)/hub-dashboard/page.tsx(130,26): error TS17008: JSX element 'div' has no corresponding closing tag.
+src/app/(app)/hub-dashboard/page.tsx(153,17): error TS1128: Declaration or statement expected.
+src/app/(app)/hub-dashboard/page.tsx(154,13): error TS1005: '}' expected.
+src/app/(app)/hub-dashboard/page.tsx(156,6): error TS1005: ')' expected.
+src/app/(app)/hub-dashboard/page.tsx(157,1): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/app/(app)/hub-dashboard/page.tsx(158,1): error TS1005: '</' expected.

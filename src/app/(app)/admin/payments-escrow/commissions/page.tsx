@@ -68,20 +68,19 @@ export default function CommissionsPage() {
 
     const handleArchive = async (id: string) => {
         showPrompt("Plan Arşivle", "Planı arşivlemek için bir sebep girin:", async (confirmReason) => {
-        if (!confirmReason || confirmReason.trim().length < 5) return;
+            if (!confirmReason || confirmReason.trim().length < 5) return;
 
-        try {
-            const res = await fetch(`/api/admin/payments-escrow/commissions/plans/${id}/archive`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reason: confirmReason }),
-            });
+            try {
+                const res = await fetch(`/api/admin/payments-escrow/commissions/plans/${id}/archive`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ reason: confirmReason }),
+                });
 
-            if (res.ok) fetchPlans();
-        } catch (e) {
-            showError("Uyarı", "Bağlantı hatası");
-        }
-        }
+                if (res.ok) fetchPlans();
+            } catch (e) {
+                showError("Uyarı", "Bağlantı hatası");
+            }
         });
     };
 

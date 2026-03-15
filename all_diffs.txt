@@ -1,3 +1,88 @@
+diff --git a/diff.txt b/diff.txt
+index b80e195e..69c23757 100644
+Binary files a/diff.txt and b/diff.txt differ
+diff --git a/src/app/(app)/admin/growth/boost-rules/page.tsx b/src/app/(app)/admin/growth/boost-rules/page.tsx
+index 662fe16c..47449d78 100644
+--- a/src/app/(app)/admin/growth/boost-rules/page.tsx
++++ b/src/app/(app)/admin/growth/boost-rules/page.tsx
+@@ -66,24 +66,23 @@ export default function AdminBoostRules() {
+ 
+     const handleAction = async (id: string, action: 'disable' | 'expire-now') => {
+         showPrompt("İşem Onayı", "İşlem nedenini giriniz (Audit log için zorunlu):", async (r) => {
+-        if (!r || r.length < 5) return showError("Uyarı", "Geçerli bir sebep girilmeli (min 5 karakter).");
++            if (!r || r.length < 5) return showError("Uyarı", "Geçerli bir sebep girilmeli (min 5 karakter).");
+ 
+-        try {
+-            const res = await fetch(`/api/admin/growth/boost-rules/${id}/${action}`, {
+-                method: "POST",
+-                headers: { "Content-Type": "application/json", "x-idempotency-key": crypto.randomUUID() },
+-                body: JSON.stringify({ reason: r })
+-            });
+-            if (res.ok) {
+-                fetchRules();
+-            } else {
+-                const err = await res.json();
+-                showError("Uyarı", `Hata: ${err.error}`);
++            try {
++                const res = await fetch(`/api/admin/growth/boost-rules/${id}/${action}`, {
++                    method: "POST",
++                    headers: { "Content-Type": "application/json", "x-idempotency-key": crypto.randomUUID() },
++                    body: JSON.stringify({ reason: r })
++                });
++                if (res.ok) {
++                    fetchRules();
++                } else {
++                    const err = await res.json();
++                    showError("Uyarı", `Hata: ${err.error}`);
++                }
++            } catch (e) {
++                console.error(e);
+             }
+-        } catch (e) {
+-            console.error(e);
+-        }
+-        }
+         });
+     };
+ 
+diff --git a/src/app/(app)/admin/payments-escrow/commissions/page.tsx b/src/app/(app)/admin/payments-escrow/commissions/page.tsx
+index e860d883..d85692ca 100644
+--- a/src/app/(app)/admin/payments-escrow/commissions/page.tsx
++++ b/src/app/(app)/admin/payments-escrow/commissions/page.tsx
+@@ -68,20 +68,19 @@ export default function CommissionsPage() {
+ 
+     const handleArchive = async (id: string) => {
+         showPrompt("Plan Arşivle", "Planı arşivlemek için bir sebep girin:", async (confirmReason) => {
+-        if (!confirmReason || confirmReason.trim().length < 5) return;
+-
+-        try {
+-            const res = await fetch(`/api/admin/payments-escrow/commissions/plans/${id}/archive`, {
+-                method: "POST",
+-                headers: { "Content-Type": "application/json" },
+-                body: JSON.stringify({ reason: confirmReason }),
+-            });
+-
+-            if (res.ok) fetchPlans();
+-        } catch (e) {
+-            showError("Uyarı", "Bağlantı hatası");
+-        }
+-        }
++            if (!confirmReason || confirmReason.trim().length < 5) return;
++
++            try {
++                const res = await fetch(`/api/admin/payments-escrow/commissions/plans/${id}/archive`, {
++                    method: "POST",
++                    headers: { "Content-Type": "application/json" },
++                    body: JSON.stringify({ reason: confirmReason }),
++                });
++
++                if (res.ok) fetchPlans();
++            } catch (e) {
++                showError("Uyarı", "Bağlantı hatası");
++            }
+         });
+     };
+ 
 diff --git a/src/app/(app)/hub-dashboard/page.tsx b/src/app/(app)/hub-dashboard/page.tsx
 index c7178b0f..f3a8d857 100644
 --- a/src/app/(app)/hub-dashboard/page.tsx
