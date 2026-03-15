@@ -277,6 +277,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 setShowPlanModal(false);
                 setVadelenenIds(prev => [...prev, planData.description]);
                 refreshTransactions(); // Refresh history
+                router.refresh(); // Fetch updated customer payment plans from the server
             } else {
                 showError('Hata', data.error || 'Plan oluşturulamadı');
             }
@@ -462,6 +463,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                 setSelectedOrder(order);
 
+                // Check if already deferred
+                const alreadyDeferred = vadelenenIds.includes(order.id) || customer?.paymentPlans?.some((p: any) => p.description === order.id && p.status !== 'İptal' && p.status !== 'Cancelled');
+                if (alreadyDeferred) {
+                    setIsInstallmentInvoice(false);
+                }
+
+
                 // Initialize editable items
                 let initialItems = [];
                 try {
@@ -611,20 +619,20 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             ? 'DİKKAT: Bu resmi bir faturadır! İptal ederseniz GİB portalından veya e-Logo üzerinden de faturayı resmen iptal veya iade etmelisiniz. Bu işlem stokları ve bakiyeyi geri alacaktır. Onaylıyor musunuz?'
             : 'Bu faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.';
 
-        if (window.confirm(msg)) {
+        showConfirm(title, msg, async () => {
             try {
                 const res = await fetch(`/api/sales/invoices/${invoiceId}`, { method: 'DELETE' });
                 const data = await res.json();
                 if (data.success) {
-                    alert('Başarılı: ' + (data.message || 'Fatura iptal edildi.'));
-                    window.location.reload();
+                    showSuccess('Başarılı', data.message || 'Fatura iptal edildi.');
+                    setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    alert('Hata: ' + data.error);
+                    showError('Hata', data.error);
                 }
             } catch (err) {
-                alert('Bağlantı hatası.');
+                showError('Hata', 'Bağlantı hatası.');
             }
-        }
+        });
     };
 
     const handlePrintInvoice = (invoiceId: string) => {
@@ -922,7 +930,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             }}
                                             style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(37, 211, 102, 0.1)', border: '1px solid rgba(37, 211, 102, 0.3)', color: '#25D366', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: '600' }}
                                         >
-                                            💬 WhatsApp'tan Karne Gönder
+                                            💬 WhatsApp&apos;tan Karne Gönder
                                         </button>
                                     </div>
                                 )}
@@ -1024,8 +1032,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         {[
                             { group: 'HAREKETLER', items: [{ id: 'all', label: 'Tüm Hareketler' }, { id: 'sales', label: 'Satışlar & Faturalar' }, { id: 'payments', label: 'Finansal İşlemler' }, { id: 'offers', label: 'Teklifler' }] },
                             { group: 'EVRAKLAR', items: [{ id: 'documents', label: 'Dosyalar & Evraklar' }, { id: 'warranties', label: 'Garantiler' }] },
-                            { group: 'SERVİS', items: [{ id: 'services', label: 'Servis Geçmişi' }] },
-                            { group: 'FİNANS', items: [{ id: 'checks', label: 'Çek & Senetler' }, { id: 'reconciliations', label: 'Mutabakatlar' }] },
+                            { group: 'SERVİS', items: [{ id: 'services', label: 'Servis' }] },
+                            { group: 'FİNANS', items: [{ id: 'checks', label: 'Evraklar & Vadeler' }, { id: 'reconciliations', label: 'Mutabakatlar' }] },
                         ].map((grp, i) => (
                             <div key={grp.group} className="flex items-center gap-3">
                                 {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
@@ -1396,142 +1404,180 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </button>
                             </div>
 
-                            <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)' }}>📥 Çek & Senet Portföyü</h4>
-                            {!customer.checks || customer.checks.length === 0 ? (
-                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
-                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📑</div>
-                                    <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Kayıtlı evrak bulunmuyor.</div>
-                                </div>
-                            ) : (
-                                <div style={{ overflowX: 'auto' }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                                        <thead>
-                                            <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                                <th style={{ padding: '16px 20px' }}>EVRAK TÜRÜ</th>
-                                                <th style={{ padding: '16px 20px' }}>VADE TARİHİ</th>
-                                                <th style={{ padding: '16px 20px' }}>BANKA / NO</th>
-                                                <th style={{ padding: '16px 20px' }}>DURUM</th>
-                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>TUTAR</th>
-                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>İŞLEM</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {customer.checks.map((c: any) => (
-                                                <tr key={c.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
-                                                    <td style={{ padding: '20px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.type}</td>
-                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
-                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{c.bank} - <span style={{ fontFamily: 'monospace' }}>{c.number}</span></td>
-                                                    <td style={{ padding: '20px' }}>
-                                                        <span style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontSize: '11px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.status}</span>
-                                                    </td>
-                                                    <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#3b82f6', fontSize: '14px' }}>{Number(c.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                                    <td style={{ textAlign: 'right', padding: '20px' }}>
-                                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
-                                                            {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
-                                                                <>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            setActiveCheck(c);
-                                                                            setTargetKasaId(String(kasalar[0]?.id || ''));
-                                                                            setShowCheckCollectModal(true);
-                                                                        }}
-                                                                        style={{ padding: '8px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
-                                                                        className="hover:bg-blue-500 hover:text-white"
-                                                                    >
-                                                                        {c.type.includes('Alınan') ? '💰 Tahsil Et' : '💸 Öde'}
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            showConfirm("Çek İptali", "Bu çeki/seneti silmek ve iptal etmek istediğinize emin misiniz? Bakiye düzeltilecektir.", async () => {
-                                                                                setProcessingIds(prev => [...prev, c.id]);
-                                                                                try {
-                                                                                    const res = await fetch(`/api/financials/checks/${c.id}`, { method: 'DELETE' });
-                                                                                    if (res.ok) {
-                                                                                        showSuccess("Başarılı", "Çek iptal edildi.");
-                                                                                        window.location.reload();
-                                                                                    } else {
-                                                                                        const data = await res.json();
-                                                                                        showError("Hata", data.error || "İşlem yapılamadı.");
-                                                                                    }
-                                                                                } catch (e) {
-                                                                                    showError("Hata", "Bağlantı hatası.");
-                                                                                } finally {
-                                                                                    setProcessingIds(prev => prev.filter(pid => pid !== c.id));
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                                {/* CHECK PORTFOLIO COLUMN */}
+                                <div>
+                                    <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ fontSize: '20px' }}>📥</span> Çek & Senet Portföyü
+                                    </h4>
+                                    {!customer.checks || customer.checks.length === 0 ? (
+                                        <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                            <div style={{ fontSize: '36px', marginBottom: '12px', opacity: 0.5 }}>📑</div>
+                                            <div style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '600' }}>Kayıtlı evrak bulunmuyor.</div>
+                                        </div>
+                                    ) : (
+                                        <div style={{ overflowX: 'auto', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+                                                <thead>
+                                                    <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                                        <th style={{ padding: '16px' }}>EVRAK DESTEĞİ & TARİH</th>
+                                                        <th style={{ textAlign: 'right', padding: '16px' }}>TUTAR & DURUM</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {customer.checks.map((c: any) => (
+                                                        <tr key={c.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
+                                                            <td style={{ padding: '16px' }}>
+                                                                <div style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)', marginBottom: '4px' }}>{c.type} - {c.bank}</div>
+                                                                <div style={{ color: 'var(--text-muted, #94a3b8)', fontWeight: '500', fontSize: '12px' }}>
+                                                                    🔖 {c.number} • 🕒 {new Date(c.dueDate).toLocaleDateString('tr-TR')}
+                                                                </div>
+                                                            </td>
+                                                            <td style={{ textAlign: 'right', padding: '16px' }}>
+                                                                <div style={{ fontWeight: '800', color: '#3b82f6', fontSize: '14px', marginBottom: '6px' }}>
+                                                                    {Number(c.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                                </div>
+                                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                                                    <span style={{ padding: '4px 8px', background: 'var(--bg-panel, rgba(255,255,255,0.05))', borderRadius: '4px', fontSize: '10px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.status}</span>
+                                                                    {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setActiveCheck(c);
+                                                                                setTargetKasaId(String(kasalar[0]?.id || ''));
+                                                                                setShowCheckCollectModal(true);
+                                                                            }}
+                                                                            style={{ padding: '4px 8px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '4px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
+                                                                            className="hover:bg-blue-500 hover:text-white"
+                                                                        >
+                                                                            Tahsil
+                                                                        </button>
+                                                                    )}
+                                                                    {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                if (!processingIds.includes(c.id)) {
+                                                                                    showConfirm("Çek İptali", "Bu çeki/seneti silmek ve iptal etmek istediğinize emin misiniz? Bakiye düzeltilecektir.", async () => {
+                                                                                        setProcessingIds(prev => [...prev, c.id]);
+                                                                                        try {
+                                                                                            const res = await fetch(`/api/financials/checks/${c.id}`, { method: 'DELETE' });
+                                                                                            if (res.ok) {
+                                                                                                showSuccess("Başarılı", "Çek iptal edildi.");
+                                                                                                window.location.reload();
+                                                                                            } else {
+                                                                                                const data = await res.json();
+                                                                                                showError("Hata", data.error || "İşlem yapılamadı.");
+                                                                                            }
+                                                                                        } catch (e) {
+                                                                                            showError("Hata", "Bağlantı hatası.");
+                                                                                        } finally {
+                                                                                            setProcessingIds(prev => prev.filter(pid => pid !== c.id));
+                                                                                        }
+                                                                                    });
                                                                                 }
-                                                                            });
+                                                                            }}
+                                                                            disabled={processingIds.includes(c.id)}
+                                                                            style={{ padding: '4px 8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', fontSize: '11px', fontWeight: '800', cursor: processingIds.includes(c.id) ? 'default' : 'pointer', transition: 'all 0.2s' }}
+                                                                            className="hover:bg-red-500 hover:text-white"
+                                                                        >
+                                                                            {processingIds.includes(c.id) ? '⏳' : 'İptal'}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* PAYMENT PLANS COLUMN */}
+                                <div>
+                                    <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ fontSize: '20px' }}>📅</span> Taksit & Vadelendirme Planları
+                                    </h4>
+                                    {!customer.paymentPlans || customer.paymentPlans.length === 0 ? (
+                                        <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                            <div style={{ fontSize: '36px', marginBottom: '12px', opacity: 0.5 }}>📅</div>
+                                            <div style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '600' }}>Aktif vadelendirme planı bulunmuyor.</div>
+                                        </div>
+                                    ) : (
+                                        <div style={{ overflowX: 'auto', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+                                                <thead>
+                                                    <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                                        <th style={{ padding: '16px' }}>SATIŞ/KONU & TARİH</th>
+                                                        <th style={{ textAlign: 'right', padding: '16px' }}>TUTAR & İŞLEM</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {customer.paymentPlans.filter((p:any)=>p.status!=='İptal'&&p.status!=='Cancelled').map((p: any) => (
+                                                        <Fragment key={p.id}>
+                                                        <tr onClick={() => setExpandedRowId(expandedRowId === p.id ? null : p.id)} style={{ borderBottom: expandedRowId === p.id ? 'none' : '1px solid var(--border-color, rgba(255,255,255,0.05))', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s', background: expandedRowId === p.id ? 'var(--bg-card, rgba(255,255,255,0.03))' : 'transparent' }} className="hover:bg-white/5">
+                                                            <td style={{ padding: '16px' }}>
+                                                                <div style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)', marginBottom: '4px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '180px' }}>{p.title}</div>
+                                                                <div style={{ color: 'var(--text-muted, #94a3b8)', fontWeight: '500', fontSize: '12px' }}>
+                                                                    🗓 {new Date(p.createdAt).toLocaleDateString('tr-TR')} • {p.installments?.length || 0} Taksit
+                                                                </div>
+                                                            </td>
+                                                            <td style={{ textAlign: 'right', padding: '16px' }}>
+                                                                <div style={{ fontWeight: '800', color: '#f59e0b', fontSize: '14px', marginBottom: '6px' }}>
+                                                                    {Number(p.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                                </div>
+                                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                                                    <span style={{ padding: '4px 8px', background: p.status === 'Ödendi' ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-panel, rgba(255,255,255,0.05))', borderRadius: '4px', fontSize: '10px', fontWeight: '700', color: p.status === 'Ödendi' ? '#10b981' : 'var(--text-main, #e2e8f0)' }}>{p.status}</span>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            if (!completedIds.includes(p.id) && !processingIds.includes(p.id)) {
+                                                                                handleCancelPlan(p.id);
+                                                                            }
                                                                         }}
-                                                                        disabled={processingIds.includes(c.id)}
-                                                                        style={{ padding: '8px 16px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: processingIds.includes(c.id) ? 'default' : 'pointer', transition: 'all 0.2s' }}
+                                                                        disabled={completedIds.includes(p.id) || processingIds.includes(p.id)}
+                                                                        style={{ padding: '4px 8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', fontSize: '11px', fontWeight: '800', cursor: processingIds.includes(p.id) ? 'default' : 'pointer', transition: 'all 0.2s' }}
                                                                         className="hover:bg-red-500 hover:text-white"
+                                                                        title="Vadelendirmeyi İptal Et"
                                                                     >
-                                                                        {processingIds.includes(c.id) ? '⏳' : '✖️ İptal'}
+                                                                        {processingIds.includes(p.id) ? '⏳' : 'İptal'}
                                                                     </button>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {expandedRowId === p.id && p.installments && p.installments.length > 0 && (
+                                                            <tr style={{ background: 'var(--bg-card, rgba(255,255,255,0.01))', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                <td colSpan={2} style={{ padding: '0 20px 20px 20px' }}>
+                                                                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Taksit Detayları</div>
+                                                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                                                                            {p.installments.map((inst: any) => {
+                                                                                const isPaid = inst.status === 'Ödendi' || inst.status === 'Paid';
+                                                                                const isOverdue = !isPaid && inst.dueDate && new Date(inst.dueDate) < new Date(new Date().setHours(0,0,0,0));
+                                                                                return (
+                                                                                    <div key={inst.id} style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: isOverdue ? '1px solid rgba(239,68,68,0.3)' : '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                                            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #94a3b8)' }}>{inst.installmentNo}. Taksit</span>
+                                                                                            <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: '800', background: isPaid ? 'rgba(16,185,129,0.1)' : isOverdue ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)', color: isPaid ? '#10b981' : isOverdue ? '#ef4444' : '#f59e0b' }}>{isPaid ? 'Ödendi' : isOverdue ? 'Gecikti' : 'Bekliyor'}</span>
+                                                                                        </div>
+                                                                                        <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-main, #fff)' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                                                                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #94a3b8)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}><span>🗓</span> {new Date(inst.dueDate).toLocaleDateString('tr-TR')}</div>
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                        </Fragment>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-
-                            <div style={{ marginTop: '48px', marginBottom: '16px' }}>
-                                <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)' }}>📅 Taksit & Vadelendirme Planları</h4>
                             </div>
-
-                            {!customer.paymentPlans || customer.paymentPlans.length === 0 ? (
-                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
-                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}> تق</div>
-                                    <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Aktif vadelendirme planı bulunmuyor.</div>
-                                </div>
-                            ) : (
-                                <div style={{ overflowX: 'auto' }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                                        <thead>
-                                            <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                                <th style={{ padding: '16px 20px' }}>SATIŞ/KONU</th>
-                                                <th style={{ padding: '16px 20px' }}>OLUŞTURULMA</th>
-                                                <th style={{ padding: '16px 20px' }}>DURUM</th>
-                                                <th style={{ padding: '16px 20px', textAlign: 'right' }}>TAKSİT</th>
-                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>TOPLAM</th>
-                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>İŞLEM</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {customer.paymentPlans.filter((p:any)=>p.status!=='İptal'&&p.status!=='Cancelled').map((p: any) => (
-                                                <tr key={p.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
-                                                    <td style={{ padding: '20px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{p.title}</td>
-                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{new Date(p.createdAt).toLocaleDateString('tr-TR')}</td>
-                                                    <td style={{ padding: '20px' }}>
-                                                        <span style={{ padding: '6px 12px', background: p.status === 'Ödendi' ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontSize: '11px', fontWeight: '700', color: p.status === 'Ödendi' ? '#10b981' : 'var(--text-main, #e2e8f0)' }}>{p.status}</span>
-                                                    </td>
-                                                    <td style={{ textAlign: 'right', padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{p.installments?.length || 0} Taksit</td>
-                                                    <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#f59e0b', fontSize: '14px' }}>{Number(p.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                                    <td style={{ textAlign: 'right', padding: '20px' }}>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                if (!completedIds.includes(p.id) && !processingIds.includes(p.id)) {
-                                                                    handleCancelPlan(p.id);
-                                                                }
-                                                            }}
-                                                            disabled={completedIds.includes(p.id) || processingIds.includes(p.id)}
-                                                            style={{ padding: '8px 16px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: processingIds.includes(p.id) ? 'default' : 'pointer', transition: 'all 0.2s' }}
-                                                            className="hover:bg-red-500 hover:text-white"
-                                                            title="Vadelendirmeyi İptal Et"
-                                                        >
-                                                            {processingIds.includes(p.id) ? '⏳' : '✖️ İptal'}
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-
                         </div>
                     ) : activeTab === 'reconciliations' ? (
                         <div style={{ padding: '32px' }}>
@@ -2052,15 +2098,21 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 </div>
                                             </label>
 
-                                            <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                                            <label className={`flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors ${selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? 'bg-slate-100 dark:bg-slate-900/10 opacity-60 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500/50'}`}>
                                                 <input
                                                     type="checkbox"
-                                                    checked={isInstallmentInvoice}
+                                                    disabled={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled'))}
+                                                    checked={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? false : isInstallmentInvoice}
                                                     onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
-                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500"
+                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500 disabled:opacity-50"
                                                 />
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Vade & Ödeme Planı</span>
+                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                                                        Vade & Ödeme Planı
+                                                        {selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) && (
+                                                            <span className="ml-2 text-[10px] bg-amber-500/20 text-amber-500 px-1 py-0.5 rounded uppercase">Zaten Vadelendi</span>
+                                                        )}
+                                                    </span>
                                                     <span className="text-[10px] text-slate-500">Plan ödeme notu faturaya yazılır</span>
                                                 </div>
                                             </label>
@@ -2534,7 +2586,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     }}
                                     className="w-full h-14 rounded-xl flex items-center justify-center gap-3 font-semibold text-white bg-green-500 hover:bg-green-600 shadow-sm shadow-green-500/30 transition-all hover:-translate-y-0.5"
                                 >
-                                    <span className="text-2xl">💬</span> Müşteriye WhatsApp'tan İlet
+                                    <span className="text-2xl">💬</span> Müşteriye WhatsApp&apos;tan İlet
                                 </button>
 
                                 <EnterpriseButton

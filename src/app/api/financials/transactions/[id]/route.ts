@@ -49,10 +49,21 @@ export async function PUT(
                         data: { balance: { decrement: diff } }
                     });
                 } else if (tx.type === 'Sales' || tx.type === 'Payment') {
-                    await prismaTx.customer.update({
-                        where: { id: tx.customerId },
-                        data: { balance: { increment: diff } }
-                    });
+                    let shouldUpdateBalance = true;
+                    if (tx.type === 'Sales' && tx.description) {
+                        if (tx.description.includes('POS Satışı') || tx.description.includes('REF:')) {
+                            if (!tx.description.includes('(Cari Hesap)')) {
+                                shouldUpdateBalance = false;
+                            }
+                        }
+                    }
+
+                    if (shouldUpdateBalance) {
+                        await prismaTx.customer.update({
+                            where: { id: tx.customerId },
+                            data: { balance: { increment: diff } }
+                        });
+                    }
                 }
             }
 
@@ -118,11 +129,21 @@ export async function DELETE(
                         data: { balance: { increment: tx.amount } }
                     });
                 } else if (tx.type === 'Sales' || tx.type === 'Payment') {
-                    // Sales/Payment increased debt, so delete decreases debt
-                    await prismaTx.customer.update({
-                        where: { id: tx.customerId },
-                        data: { balance: { decrement: tx.amount } }
-                    });
+                    let shouldReverseBalance = true;
+                    if (tx.type === 'Sales' && tx.description) {
+                        if (tx.description.includes('POS Satışı') || tx.description.includes('REF:')) {
+                            if (!tx.description.includes('(Cari Hesap)')) {
+                                shouldReverseBalance = false;
+                            }
+                        }
+                    }
+
+                    if (shouldReverseBalance) {
+                        await prismaTx.customer.update({
+                            where: { id: tx.customerId },
+                            data: { balance: { decrement: tx.amount } }
+                        });
+                    }
                 }
             }
 

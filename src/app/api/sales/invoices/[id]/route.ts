@@ -92,6 +92,24 @@ export async function DELETE(
             return NextResponse.json({ success: false, error: 'Fatura zaten iptal edilmiş' }, { status: 400 });
         }
 
+        // Prevent cancellation if an active PaymentPlan is attached
+        const activePlan = await prisma.paymentPlan.findFirst({
+            where: {
+                OR: [
+                    { description: invoice.orderId ?? undefined },
+                    { description: invoice.id }
+                ],
+                status: { not: 'İptal' }
+            }
+        });
+
+        if (activePlan) {
+            return NextResponse.json({ 
+                success: false, 
+                error: 'Bu faturaya/siparişe bağlı aktif bir vadelendirme planı bulunuyor. Önce işlemi geri almak için İptal butonunu kullanarak vadelendirmeyi iptal etmelisiniz.' 
+            }, { status: 400 });
+        }
+
         await prisma.$transaction(async (tx) => {
             // Update invoice status to 'İptal Edildi' rather than hard-deleting
             await tx.salesInvoice.update({
@@ -169,13 +187,22 @@ export async function DELETE(
                             }
                             
                             if (t.customerId && t.type === 'Sales') {
-                                const rawData: any = order.rawData || {};
+                                let rawData: any = order.rawData || {};
+                                if (typeof rawData === 'string') {
+                                    try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
+                                }
                                 if (rawData.paymentMode === 'account') {
                                     await tx.customer.update({
                                         where: { id: t.customerId },
                                         data: { balance: { decrement: t.amount } }
                                     });
                                 }
+                            } else if (t.customerId && t.type === 'Collection') {
+                                // Revert Collection -> Customer debt goes UP again
+                                await tx.customer.update({
+                                    where: { id: t.customerId },
+                                    data: { balance: { increment: t.amount } }
+                                });
                             }
                             await tx.transaction.update({
                                 where: { id: t.id },

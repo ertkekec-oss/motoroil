@@ -45,7 +45,7 @@ export async function GET(
         }
 
         try {
-            (customer as any).paymentPlans = await prisma.paymentPlan.findMany({
+            (customer as any).paymentPlans = await (prisma as any).paymentPlan.findMany({
                 where: { customerId: customer.id },
                 include: {
                     installments: {
@@ -55,6 +55,7 @@ export async function GET(
                 orderBy: { startDate: 'desc' }
             });
         } catch (e) {
+            console.error('PAYMENT_PLANS_ERROR:', e);
             (customer as any).paymentPlans = [];
         }
 

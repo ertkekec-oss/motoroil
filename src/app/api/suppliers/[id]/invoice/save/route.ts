@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { authorize } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id: supplierId } = await params;
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
     const session = auth.user.user || auth.user;
@@ -16,7 +17,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
-        const supplierId = params.id;
         const body = await req.json();
         const { invoiceNo, invoiceDate, items, totalAmount } = body;
 

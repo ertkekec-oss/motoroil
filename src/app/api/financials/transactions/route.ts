@@ -228,10 +228,21 @@ export async function DELETE(request: Request) {
                         data: { balance: { increment: amount } }
                     });
                 } else if (oldTransaction.type === 'Payment' || oldTransaction.type === 'Sales') {
-                    await tx.customer.update({
-                        where: { id: oldTransaction.customerId },
-                        data: { balance: { decrement: amount } }
-                    });
+                    let shouldReverseBalance = true;
+                    if (oldTransaction.type === 'Sales' && oldTransaction.description) {
+                        if (oldTransaction.description.includes('POS Satışı') || oldTransaction.description.includes('REF:')) {
+                            if (!oldTransaction.description.includes('(Cari Hesap)')) {
+                                shouldReverseBalance = false;
+                            }
+                        }
+                    }
+
+                    if (shouldReverseBalance) {
+                        await tx.customer.update({
+                            where: { id: oldTransaction.customerId },
+                            data: { balance: { decrement: amount } }
+                        });
+                    }
                 }
             }
 

@@ -2171,11 +2171,11 @@ export default function StaffManagementContent() {
                                     <button
                                         onClick={() => {
                                             if (addStaffStep === 1 && (!newStaff.name || !newStaff.username || !newStaff.password || !newStaff.email)) {
-                                                alert("Lütfen zorunlu alanları doldurun.");
+                                                showError('Eksik Bilgi', "Lütfen zorunlu alanları doldurun.");
                                                 return;
                                             }
                                             if (addStaffStep === 2 && (!newStaff.role || !newStaff.branch)) {
-                                                alert("Lütfen zorunlu alanları doldurun.");
+                                                showError('Eksik Bilgi', "Lütfen zorunlu alanları doldurun.");
                                                 return;
                                             }
                                             setAddStaffStep(addStaffStep + 1);

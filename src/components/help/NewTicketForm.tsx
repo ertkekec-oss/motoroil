@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EnterpriseCard, EnterpriseInput, EnterpriseSelect, EnterpriseButton, EnterpriseTextarea } from '@/components/ui/enterprise';
+import { useModal } from '@/contexts/ModalContext';
 
 export function NewTicketForm() {
+    const { showError } = useModal();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -43,11 +45,11 @@ export function NewTicketForm() {
                 const data = await res.json();
                 router.push(`/help/tickets/${data.ticket.id}`);
             } else {
-                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                showError('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
             }
         } catch (error) {
             console.error('Submit ticket error:', error);
-            alert('Ağ hatası oluştu.');
+            showError('Hata', 'Ağ hatası oluştu.');
         } finally {
             setLoading(false);
         }

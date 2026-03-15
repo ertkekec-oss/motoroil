@@ -3,6 +3,7 @@
 
 import { Fragment, useState } from 'react';
 import { apiFetch } from '@/lib/api-client';
+import { useModal } from '@/contexts/ModalContext';
 
 interface InvoiceMappingModalProps {
     selectedOrder: any;
@@ -49,6 +50,7 @@ export function InvoiceMappingModal({
 
     const [quickCreate, setQuickCreate] = useState<Record<string, QuickCreateState | null>>({});
     const [isCreating, setIsCreating] = useState<string | null>(null);
+    const { showError } = useModal();
 
     // Get the mapping status for a given item
     const getMappingInfo = (item: any) => {
@@ -83,10 +85,10 @@ export function InvoiceMappingModal({
                 setQuickCreate({ ...quickCreate, [itemName]: null }); // close form
                 inventoryProducts.push(data.product); // optimistic push
             } else {
-                alert('Ürün oluşturulamadı: ' + (data.error || 'Bilinmeyen hata'));
+                showError('Hata', 'Ürün oluşturulamadı: ' + (data.error || 'Bilinmeyen hata'));
             }
         } catch (e: any) {
-            alert('Hata: ' + e.message);
+            showError('Hata', 'İşlem Başarısız: ' + e.message);
         } finally {
             setIsCreating(null);
         }

@@ -39,6 +39,21 @@ export async function DELETE(
 
         const targetBranch = order.branch || 'Merkez';
 
+        // Prevent cancellation if an active PaymentPlan is attached
+        const activePlan = await prisma.paymentPlan.findFirst({
+            where: {
+                description: order.id,
+                status: { not: 'İptal' }
+            }
+        });
+
+        if (activePlan) {
+            return NextResponse.json({ 
+                success: false, 
+                error: 'Bu siparişe bağlı aktif bir vadelendirme planı bulunuyor. Önce işlemi geri almak için İptal butonunu kullanarak vadelendirmeyi iptal etmelisiniz.' 
+            }, { status: 400 });
+        }
+
         // Reversal logic for POS
         await prisma.$transaction(async (tx) => {
             // 1. Revert Stocks
@@ -106,13 +121,22 @@ export async function DELETE(
 
                 // Revert Customer Balance if it was an 'account' sale
                 if (t.customerId && t.type === 'Sales') {
-                    const rawData: any = order.rawData || {};
+                    let rawData: any = order.rawData || {};
+                    if (typeof rawData === 'string') {
+                        try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
+                    }
                     if (rawData.paymentMode === 'account') {
                         await tx.customer.update({
                             where: { id: t.customerId },
                             data: { balance: { decrement: t.amount } }
                         });
                     }
+                } else if (t.customerId && t.type === 'Collection') {
+                    // Revert Collection -> Customer debt goes UP again
+                    await tx.customer.update({
+                        where: { id: t.customerId },
+                        data: { balance: { increment: t.amount } }
+                    });
                 }
 
                 // SOFT DELETE Transaction

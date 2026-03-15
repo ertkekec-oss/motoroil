@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import pdf from '@/lib/pdf-parse-wrapper';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const formData = await req.formData();
         const file = formData.get('file') as File;
 
@@ -16,6 +17,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
         const buffer = Buffer.from(await file.arrayBuffer());
         
+        // @ts-ignore
         const data = await pdf(buffer);
         const text = data.text;
 

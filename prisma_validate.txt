@@ -1,0 +1,60 @@
+﻿Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Error: Prisma schema validati
+on - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mThe mod
+el "SignatureEnvelope" cannot
+ be defined because a model w
+ith that name already exists.
+[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:9103[0m
+[1;94m   | [0m
+[1;94m9102 | [0m
+[1;94m9103 | [0mmodel [1;9
+1mSignatureEnvelope[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mThe mod
+el "SignatureRecipient" canno
+t be defined because a model 
+with that name already exists
+.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:9123[0m
+[1;94m   | [0m
+[1;94m9122 | [0m
+[1;94m9123 | [0mmodel [1;9
+1mSignatureRecipient[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mThe mod
+el "SignatureAuditEvent" cann
+ot be defined because a model
+ with that name already exist
+s.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:9139[0m
+[1;94m   | [0m
+[1;94m9138 | [0m
+[1;94m9139 | [0mmodel [1;9
+1mSignatureAuditEvent[0m {
+[1;94m   | [0m
+
+Validation Error Count: 3
+[Context: validate]
+
+Prisma CLI Version : 5.22.0

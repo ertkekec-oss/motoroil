@@ -2,11 +2,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EnterpriseTextarea, EnterpriseButton } from '@/components/ui/enterprise';
+import { useModal } from '@/contexts/ModalContext';
 
 export function TicketCommentForm({ ticketId, initialStatus }: { ticketId: string, initialStatus: string }) {
     const router = useRouter();
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const { showError } = useModal();
 
     // If resolved or closed, disable
     const isClosed = initialStatus === 'CLOSED' || initialStatus === 'RESOLVED';
@@ -26,11 +28,11 @@ export function TicketCommentForm({ ticketId, initialStatus }: { ticketId: strin
                 setMessage('');
                 router.refresh();
             } else {
-                alert('Yorum gönderilemedi, lütfen tekrar deneyin.');
+                showError('Hata', 'Yorum gönderilemedi, lütfen tekrar deneyin.');
             }
         } catch (error) {
             console.error('Comment Post Error:', error);
-            alert('Ağ hatası.');
+            showError('Hata', 'Ağ hatası.');
         } finally {
             setLoading(false);
         }

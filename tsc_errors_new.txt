@@ -1,11 +1,4 @@
-﻿.next/types/validator.ts(6120,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/inventory/boms/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/inventory/boms/[id]">'.
-  Types of property 'GET' are incompatible.
-    Type '(request: Request, context: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; bom: any; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
-      Types of parameters 'context' and 'context' are incompatible.
-        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
-          Types of property 'params' are incompatible.
-            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
-.next/types/validator.ts(6138,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/inventory/manufacturing/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/inventory/manufacturing/[id]">'.
+﻿.next/types/validator.ts(6138,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/inventory/manufacturing/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/inventory/manufacturing/[id]">'.
   Types of property 'GET' are incompatible.
     Type '(request: Request, context: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; order: any; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
       Types of parameters 'context' and 'context' are incompatible.
@@ -62,5 +55,8 @@ scripts/test_tenant_isolation_under_load.ts(24,65): error TS2353: Object literal
 scripts/test_tenant_isolation_under_load.ts(25,65): error TS2353: Object literal may only specify known properties, and 'tenantId' does not exist in type 'CustomerWhereInput'.
 scripts/test_tenant_isolation_under_load.ts(29,43): error TS2339: Property 'tenantId' does not exist on type '{ id: string; companyId: string; branch: string; name: string; deletedAt: Date; createdAt: Date; updatedAt: Date; balance: Decimal; iban: string; phone: string; email: string; ... 17 more ...; locationPinnedAt: Date; }'.
 scripts/test_tenant_isolation_under_load.ts(32,43): error TS2339: Property 'tenantId' does not exist on type '{ id: string; companyId: string; branch: string; name: string; deletedAt: Date; createdAt: Date; updatedAt: Date; balance: Decimal; iban: string; phone: string; email: string; ... 17 more ...; locationPinnedAt: Date; }'.
+src/app/api/inventory/boms/[id]/route.ts(7,36): error TS2304: Cannot find name 'NextRequest'.
+src/app/api/inventory/boms/[id]/route.ts(43,36): error TS2304: Cannot find name 'NextRequest'.
+src/app/api/inventory/boms/[id]/route.ts(128,39): error TS2304: Cannot find name 'NextRequest'.
 src/app/api/suppliers/[id]/invoice/parse/route.ts(19,28): error TS2349: This expression is not callable.
   Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/node_modules/pdf-parse/dist/pdf-parse/cjs/index")' has no call signatures.
