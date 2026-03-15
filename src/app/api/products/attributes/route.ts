@@ -37,24 +37,13 @@ export async function GET() {
 
         let attributes;
         try {
-            // First attempt: Try to get attributes for this specific company + branch
             attributes = await prisma.variantAttribute.findMany({
                 where: whereClause,
                 include: { values: true }
             });
         } catch (primaError: any) {
-            // Fallback: If schema doesn't support companyId or query fails
-            console.warn("Retrying attributes fetch without companyId filter. Error:", primaError.message);
-
-            // 3) CRITICAL: Remove ALL potential company-related filters
-            delete whereClause.company;
-            delete whereClause.companyId;
-
-            // Retry search globally for the branch
-            attributes = await prisma.variantAttribute.findMany({
-                where: whereClause,
-                include: { values: true }
-            });
+            console.warn("Attributes fetch failed:", primaError.message);
+            attributes = [];
         }
 
         return NextResponse.json({ success: true, attributes });
@@ -74,8 +63,11 @@ export async function POST(request: Request) {
 
         if (!name) return NextResponse.json({ error: 'İsim gerekli' }, { status: 400 });
 
+        const companyId = session.companyId;
+
         const attribute = await prisma.variantAttribute.create({
             data: {
+                companyId,
                 name,
                 branch,
                 values: {

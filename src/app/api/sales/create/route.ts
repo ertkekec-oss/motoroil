@@ -221,7 +221,7 @@ export async function POST(request: Request) {
                     orderDate: new Date(),
                     branch: branch || 'Merkez',
                     items: enrichedItems.length > 0 ? enrichedItems : items,
-                    rawData: { targetKasaId, description, paymentMode, referenceCode, dynamicEarnedPoints }
+                    rawData: { targetKasaId, description, paymentMode, referenceCode, dynamicEarnedPoints, pointsUsed, couponCode }
                 }
             });
 

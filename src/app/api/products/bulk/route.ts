@@ -1,20 +1,26 @@
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
+import { getSession, hasPermission } from '@/lib/auth';
 
 export async function PUT(request: Request) {
     try {
+        const session: any = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        if (!hasPermission(session, 'inventory_manage')) return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+
+        const companyId = session.companyId;
         const body = await request.json();
         const { ids, updates, mode, individualUpdates } = body;
 
         if (mode === 'category') {
             await prisma.product.updateMany({
-                where: { id: { in: ids } },
+                where: { id: { in: ids }, companyId },
                 data: { category: updates.category }
             });
         } else if (mode === 'vat') {
             await prisma.product.updateMany({
-                where: { id: { in: ids } },
+                where: { id: { in: ids }, companyId },
                 data: {
                     salesVat: updates.salesVat,
                     purchaseVat: updates.purchaseVat
@@ -23,8 +29,8 @@ export async function PUT(request: Request) {
         } else if (mode === 'barcode' || mode === 'price') {
             await prisma.$transaction(
                 Object.keys(individualUpdates).map(id =>
-                    prisma.product.update({
-                        where: { id },
+                    prisma.product.updateMany({ // Use updateMany to safely update with companyId
+                        where: { id, companyId },
                         data: individualUpdates[id]
                     })
                 )
@@ -39,6 +45,11 @@ export async function PUT(request: Request) {
 
 export async function PATCH(request: Request) {
     try {
+        const session: any = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        if (!hasPermission(session, 'inventory_manage')) return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+
+        const companyId = session.companyId;
         const body = await request.json();
         const { updates } = body;
 
@@ -49,8 +60,8 @@ export async function PATCH(request: Request) {
         await prisma.$transaction(
             updates.map((item: any) => {
                 const { id, ...data } = item;
-                return prisma.product.update({
-                    where: { id: id },
+                return prisma.product.updateMany({ // UpdateMany for safety with composite where
+                    where: { id: id, companyId },
                     data: data
                 });
             })
@@ -65,6 +76,11 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
+        const session: any = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        if (!hasPermission(session, 'delete_records')) return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+
+        const companyId = session.companyId;
         const body = await request.json();
         const { ids } = body;
 
@@ -88,7 +104,7 @@ export async function DELETE(request: Request) {
         // Soft Delete is better practice -> update deletedAt = now()
 
         await prisma.product.updateMany({
-            where: { id: { in: ids } },
+            where: { id: { in: ids }, companyId },
             data: { deletedAt: new Date() }
         });
 

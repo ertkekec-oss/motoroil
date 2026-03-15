@@ -146,6 +146,39 @@ export async function DELETE(
                 });
             }
 
+            // 2.5 Revert Points and Coupons
+            const customerId = transactions.find((tr) => tr.customerId)?.customerId;
+            let rawData: any = order.rawData || {};
+            if (typeof rawData === 'string') {
+                try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
+            }
+
+            if (customerId) {
+                const earnedPoints = Number(rawData.dynamicEarnedPoints || 0);
+                const usedPoints = Number(rawData.pointsUsed || 0);
+                const netPointsToRevert = earnedPoints - usedPoints;
+
+                if (netPointsToRevert !== 0) {
+                    await tx.customer.update({
+                        where: { id: customerId },
+                        data: { points: { decrement: netPointsToRevert } }
+                    });
+                }
+            }
+
+            if (rawData.couponCode) {
+                const coupon = await tx.coupon.findUnique({ where: { code: rawData.couponCode } }) as any;
+                if (coupon) {
+                    await tx.coupon.update({
+                        where: { code: rawData.couponCode },
+                        data: {
+                            usedCount: Math.max(0, (coupon.usedCount || 0) - 1),
+                            isUsed: (coupon.usedCount || 0) <= 1 ? false : true
+                        }
+                    });
+                }
+            }
+
             // 4. Handle Accounting Reversal (Storno)
             try {
                 const journal = await tx.journal.findFirst({
