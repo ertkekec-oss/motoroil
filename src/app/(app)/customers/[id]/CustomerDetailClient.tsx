@@ -1739,29 +1739,6 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         );
                                                                     })()
                                                                 )}
-                                                                {(() => {
-                                                                    const isVadelendi = vadelenenIds.includes(item.id) || vadelenenIds.includes(item.orderId || '') || customer?.paymentPlans?.some((p: any) => (p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId)) && p.status !== 'İptal' && p.status !== 'Cancelled');
-                                                                    const isPaidSale = item.type === 'Satış' && item.rawData?.paymentMode && !['account', 'veresiye'].includes(item.rawData.paymentMode);
-                                                                    const isDisabled = isVadelendi || isPaidSale;
-                                                                    let buttonText = '📅 Vadelendir';
-                                                                    if (isVadelendi) buttonText = '✅ Vadelendi';
-                                                                    else if (isPaidSale) buttonText = '🔒 Nakit/K.K. İle Ödenmiş';
-
-                                                                    return (
-                                                                        <button
-                                                                            onClick={(e) => { 
-                                                                                e.stopPropagation(); 
-                                                                                if (!isDisabled) handleOpenPlanModal(item); 
-                                                                            }}
-                                                                            disabled={isDisabled}
-                                                                            style={{ padding: '6px 12px', background: isDisabled ? 'var(--bg-card, rgba(255,255,255,0.05))' : 'rgba(245, 158, 11, 0.1)', color: isDisabled ? 'var(--text-muted, #888)' : '#f59e0b', border: isDisabled ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: isDisabled ? 'default' : 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', opacity: isDisabled ? 0.7 : 1 }}
-                                                                            className={isDisabled ? "" : "hover:bg-amber-500 hover:text-white"}
-                                                                            title={isPaidSale ? "Nakit veya Kredi Kartı ile ödenmiş satışlar doğrudan vadelendirilemez. Vadelendirmek için önce İade/İptal butonunu kullanarak tahsilatı geri almalısınız." : ""}
-                                                                        >
-                                                                            {buttonText}
-                                                                        </button>
-                                                                    );
-                                                                })()}
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
@@ -1793,6 +1770,16 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         )}
                                                         {(item.type === 'Fatura' || item.type === 'İrsaliye') && (
                                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                                {(item.status === 'Proforma' || item.status === 'Taslak') && !item.isFormal && item.orderId && (
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                        style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                        className="hover:bg-blue-500 hover:text-white box-shadow-blue"
+                                                                        title="Proformayı Düzenle ve Resmileştir"
+                                                                    >
+                                                                        📝 Dönüştür
+                                                                    </button>
+                                                                )}
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
@@ -2098,44 +2085,56 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 </div>
                                             </label>
 
-                                            <label className={`flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors ${selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? 'bg-slate-100 dark:bg-slate-900/10 opacity-60 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500/50'}`}>
-                                                <input
-                                                    type="checkbox"
-                                                    disabled={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled'))}
-                                                    checked={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? false : isInstallmentInvoice}
-                                                    onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
-                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500 disabled:opacity-50"
-                                                />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
-                                                        Vade & Ödeme Planı
-                                                        {selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) && (
-                                                            <span className="ml-2 text-[10px] bg-amber-500/20 text-amber-500 px-1 py-0.5 rounded uppercase">Zaten Vadelendi</span>
-                                                        )}
-                                                    </span>
-                                                    <span className="text-[10px] text-slate-500">Plan ödeme notu faturaya yazılır</span>
-                                                </div>
-                                            </label>
-                                        </div>
+                                        {(() => {
+                                            const pmRaw = selectedOrder?.rawData ? (typeof selectedOrder.rawData === 'string' ? JSON.parse(selectedOrder.rawData)?.paymentMode : selectedOrder.rawData.paymentMode) : null;
+                                            const isVeresiye = !pmRaw || ['account', 'veresiye'].includes(pmRaw);
+                                            
+                                            // VADELENDİRME SADECE VERESİYE SATIŞLARDA GÖZÜKMELİ
+                                            if (!isVeresiye) return null;
 
-                                        {isInstallmentInvoice && (
-                                            <div className="p-3 bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-200 dark:border-emerald-500/20 rounded-xl flex items-end gap-3 animate-in fade-in zoom-in-95 duration-200">
-                                                <div className="flex-1">
-                                                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">TÜR</label>
-                                                    <select id="inv_installment_type" defaultValue="Açık Hesap" className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white">
-                                                        <option value="Açık Hesap">Açık Hesap</option>
-                                                        <option value="Çek">Çek Alınacak</option>
-                                                        <option value="Senet">Senet (Periodya İmza)</option>
-                                                    </select>
+                                            return (
+                                                <div className="flex flex-col gap-2 pt-3 mt-3 border-t border-slate-200 dark:border-slate-800">
+                                                    <label className={`flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors ${selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? 'bg-slate-100 dark:bg-slate-900/10 opacity-60 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500/50'}`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            disabled={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled'))}
+                                                            checked={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? false : isInstallmentInvoice}
+                                                            onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
+                                                            className="w-4 h-4 rounded text-emerald-500 accent-emerald-500 disabled:opacity-50"
+                                                        />
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                                                                Vade & Ödeme Planı (Sadece Veresiye)
+                                                                {selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) && (
+                                                                    <span className="ml-2 text-[10px] bg-amber-500/20 text-amber-500 px-1 py-0.5 rounded uppercase">Zaten Vadelendi</span>
+                                                                )}
+                                                            </span>
+                                                            <span className="text-[10px] text-slate-500">Plan ödeme notu faturaya yazılır</span>
+                                                        </div>
+                                                    </label>
+
+                                                    {isInstallmentInvoice && (
+                                                        <div className="p-3 bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-200 dark:border-emerald-500/20 rounded-xl flex items-end gap-3 animate-in fade-in zoom-in-95 duration-200">
+                                                            <div className="flex-1">
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">TÜR</label>
+                                                                <select id="inv_installment_type" defaultValue="Açık Hesap" className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white">
+                                                                    <option value="Açık Hesap">Açık Hesap</option>
+                                                                    <option value="Çek">Çek Alınacak</option>
+                                                                    <option value="Senet">Senet (Periodya İmza)</option>
+                                                                </select>
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">VADE</label>
+                                                                <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-bold text-slate-900 dark:text-white">
+                                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <div className="flex-1">
-                                                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">VADE</label>
-                                                    <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-bold text-slate-900 dark:text-white">
-                                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        )}
+                                            );
+                                        })()}
+                                        </div>
                                     </EnterpriseCard>
                                 </div>
 

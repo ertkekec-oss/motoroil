@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { updateDisputeStatusAction } from "@/services/finance/reconciliation/actions";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,11 @@ export default function DisputesClient({ disputes }: { disputes: any[] }) {
     const { showSuccess, showError, showWarning } = useModal();
     const [filter, setFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED' | 'REJECTED'>('ALL');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [currentTime, setCurrentTime] = useState<number | null>(null);
+
+    useEffect(() => {
+        setCurrentTime(Date.now());
+    }, []);
 
     const filtered = disputes.filter(d => filter === 'ALL' || d.status === filter);
 
@@ -51,9 +56,9 @@ export default function DisputesClient({ disputes }: { disputes: any[] }) {
     };
 
     const getAgingBadge = (createdAt: string, status: string) => {
-        if (status !== 'OPEN') return null;
+        if (status !== 'OPEN' || !currentTime) return null;
 
-        const diffMs = Date.now() - new Date(createdAt).getTime();
+        const diffMs = currentTime - new Date(createdAt).getTime();
         const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
         if (diffDays >= 7) return <span style={{ padding: '2px 6px', background: 'rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '4px', fontSize: '10px', marginLeft: '6px', fontWeight: 'bold' }}>{diffDays} Gün Gecikti</span>;

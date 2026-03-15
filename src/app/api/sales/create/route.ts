@@ -44,6 +44,13 @@ export async function POST(request: Request) {
 
         // 1. Kasa ID Güvenli Seçim
         let targetKasaId = (kasaId === 'CashKasa' || !kasaId) ? undefined : kasaId;
+        
+        if (targetKasaId && companyId) {
+             const verifyKasa = await prisma.kasa.findFirst({ where: { id: targetKasaId, companyId } });
+             if (!verifyKasa) {
+                 return NextResponse.json({ success: false, error: 'Kasa bulunamadı veya erişim yetkiniz yok.' }, { status: 403 });
+             }
+        }
 
         // Normalize payment mode
         const effectivePaymentMode = (paymentMode === 'card' || paymentMode === 'credit_card') ? 'credit_card' : paymentMode;
@@ -128,7 +135,8 @@ export async function POST(request: Request) {
             // --- CAMPAIGN ENGINE EVALUATION ---
             let customerCategoryStr: string | null = null;
             if (customerId) {
-                const customerRec = await tx.customer.findUnique({ where: { id: customerId } });
+                const customerRec = await tx.customer.findFirst({ where: { id: customerId, companyId } });
+                if (!customerRec) throw new Error("Müşteri bulunamadı veya erişim yetkiniz yok.");
                 customerCategoryStr = customerRec?.customerClass || null;
             }
 
@@ -315,7 +323,7 @@ export async function POST(request: Request) {
 
             // F. Coupon
             if (couponCode) {
-                const coupon = await tx.coupon.findUnique({ where: { code: couponCode } }) as any;
+                const coupon = await tx.coupon.findFirst({ where: { code: couponCode, companyId } }) as any;
                 if (coupon) {
                     await tx.coupon.update({
                         where: { code: couponCode },

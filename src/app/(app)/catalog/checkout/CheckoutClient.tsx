@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function CheckoutClient({ previewData }: { previewData: any }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const [attemptKey, setAttemptKey] = useState("");
@@ -21,7 +22,6 @@ export default function CheckoutClient({ previewData }: { previewData: any }) {
         if (!attemptKey) return;
 
         startTransition(async () => {
-            const { showSuccess, showError, showWarning } = useModal();
             try {
                 await createOrdersFromCartAction(attemptKey);
                 showSuccess("Bilgi", "Order placed successfully via ESCROW mock payment!");

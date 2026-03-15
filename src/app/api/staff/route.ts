@@ -208,13 +208,17 @@ export async function DELETE(req: Request) {
         const user = (auth as any).user;
         const isPlatformAdmin = user.tenantId === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN';
 
+        const staffToDel = await prisma.staff.findFirst({
+            where: { id, tenantId: isPlatformAdmin ? undefined : user.tenantId }
+        });
+
+        if (!staffToDel) {
+            return NextResponse.json({ success: false, error: 'Personel kaydı bulunamadı veya erişim yetkiniz yok.' }, { status: 403 });
+        }
+
         // Soft delete
         await prisma.staff.update({
-            where: {
-                id,
-                // Security: Ensure user belongs to same tenant unless platform admin
-                tenantId: isPlatformAdmin ? undefined : user.tenantId
-            },
+            where: { id },
             data: { deletedAt: new Date() }
         });
 
@@ -258,6 +262,17 @@ export async function PUT(req: Request) {
 
         // Remove undefined fields
         Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
+        const user = (auth as any).user;
+        const isPlatformAdmin = user.tenantId === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN';
+
+        const existingStaff = await prisma.staff.findFirst({
+            where: { id, tenantId: isPlatformAdmin ? undefined : user.tenantId }
+        });
+
+        if (!existingStaff) {
+            return NextResponse.json({ success: false, error: 'Personel kaydı bulunamadı veya erişim yetkiniz yok.' }, { status: 403 });
+        }
 
         const updatedStaff = await prisma.staff.update({
             where: { id },

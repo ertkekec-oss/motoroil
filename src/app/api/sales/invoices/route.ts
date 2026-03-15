@@ -33,10 +33,15 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
             }
         }
 
-        const effectiveCompanyId = invoice?.companyId || sessionCompanyId;
-        if (!effectiveCompanyId) {
-            return new Response(JSON.stringify({ error: 'Firma oturumu veya fatura bulunamadı.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+        if (!invoice) {
+            return new Response(JSON.stringify({ error: 'Fatura bulunamadı.' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
         }
+
+        if (sessionCompanyId && invoice.companyId !== sessionCompanyId) {
+            return new Response(JSON.stringify({ error: 'Bu faturaya erişim yetkiniz yok.' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        }
+
+        const effectiveCompanyId = invoice.companyId;
 
         // Try new IntegratorSettings table first
         let apiKey = '';
@@ -199,8 +204,11 @@ export async function GET(request: Request) {
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const branch = searchParams.get('branch');
+        const companyId = (session as any).companyId;
 
-        const where: any = { deletedAt: null };
+        if (!companyId) return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 400 });
+
+        const where: any = { deletedAt: null, companyId };
         if (branch && branch !== 'Tümü' && branch !== 'all') {
             where.branch = branch;
         }
@@ -250,7 +258,9 @@ export async function POST(request: Request) {
                     include: { customer: true }
                 });
 
-                if (!invoice) return NextResponse.json({ success: false, error: 'Fatura bulunamadı' }, { status: 200 });
+                if (!invoice || invoice.companyId !== (session as any).companyId) {
+                    return NextResponse.json({ success: false, error: 'Fatura bulunamadı veya yetkiniz yok' }, { status: 200 });
+                }
 
                 // Fetch company info (VKN, name, address etc.)
                 const company = await prisma.company.findUnique({
@@ -575,13 +585,18 @@ export async function POST(request: Request) {
 
         const createResult = await prisma.$transaction(async (tx) => {
             const customer = await tx.customer.findUnique({ where: { id: customerId } });
-            const targetBranch = branch || customer?.branch || session.branch || 'Merkez';
+            
+            if (!customer || customer.companyId !== (session as any).companyId) {
+                throw new Error("Müşteri bulunamadı veya erişim yetkiniz yok.");
+            }
+
+            const targetBranch = branch || customer.branch || session.branch || 'Merkez';
 
             const invoice = await tx.salesInvoice.create({
                 data: {
                     invoiceNo: `INV-${Date.now()}`,
                     customerId,
-                    companyId: customer?.companyId || (session as any).companyId,
+                    companyId: (session as any).companyId,
                     amount,
                     taxAmount,
                     totalAmount,

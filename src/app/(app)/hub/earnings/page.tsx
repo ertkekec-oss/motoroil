@@ -12,7 +12,6 @@ export default function NetworkEarningsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
         fetch("/api/network/earnings")
             .then(res => {
                 if (!res.ok) throw new Error("Failed to fetch earnings");

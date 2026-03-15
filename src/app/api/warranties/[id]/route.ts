@@ -1,20 +1,28 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize, resolveCompanyId } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
+        const companyId = await resolveCompanyId(auth.user);
+        if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+
         const { id } = await params;
         const warranty = await prisma.warranty.findUnique({
             where: { id },
             include: { customer: true }
         });
 
-        if (!warranty) {
-            return NextResponse.json({ success: false, error: 'Garanti kaydı bulunamadı' }, { status: 404 });
+        if (!warranty || warranty.customer.companyId !== companyId) {
+            return NextResponse.json({ success: false, error: 'Garanti kaydı bulunamadı veya yetkiniz yok.' }, { status: 404 });
         }
 
         return NextResponse.json({ success: true, warranty });
@@ -28,9 +36,24 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
+        const companyId = await resolveCompanyId(auth.user);
+        if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+
         const { id } = await params;
         const body = await request.json();
         const { productName, serialNo, startDate, endDate, period, status, invoiceNo } = body;
+
+        const warranty = await prisma.warranty.findUnique({
+            where: { id },
+            include: { customer: true }
+        });
+
+        if (!warranty || warranty.customer.companyId !== companyId) {
+            return NextResponse.json({ success: false, error: 'Kayıt bulunamadı veya yetkiniz yok.' }, { status: 404 });
+        }
 
         const updatedWarranty = await prisma.warranty.update({
             where: { id },
@@ -56,7 +79,22 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
+        const companyId = await resolveCompanyId(auth.user);
+        if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+
         const { id } = await params;
+
+        const warranty = await prisma.warranty.findUnique({
+            where: { id },
+            include: { customer: true }
+        });
+
+        if (!warranty || warranty.customer.companyId !== companyId) {
+            return NextResponse.json({ success: false, error: 'Kayıt bulunamadı veya yetkiniz yok.' }, { status: 404 });
+        }
 
         await prisma.warranty.delete({
             where: { id }

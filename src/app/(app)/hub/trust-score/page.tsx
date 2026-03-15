@@ -8,7 +8,6 @@ export default function TrustScorePage() {
     const [scoreData, setScoreData] = useState<any>(null);
 
     useEffect(() => {
-        setLoading(true);
         fetch("/api/company/trust")
             .then(res => res.ok ? res.json() : null)
             .then(data => {

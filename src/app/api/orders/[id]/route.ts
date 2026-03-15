@@ -147,7 +147,7 @@ export async function DELETE(
             }
 
             // 2.5 Revert Points and Coupons
-            const customerId = transactions.find((tr) => tr.customerId)?.customerId;
+            const customerId = order.customerId || transactions.find((tr) => tr.customerId)?.customerId;
             let rawData: any = order.rawData || {};
             if (typeof rawData === 'string') {
                 try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }

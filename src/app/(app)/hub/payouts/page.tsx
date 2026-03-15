@@ -10,7 +10,6 @@ export default function PayoutsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
         Promise.all([
             fetch("/api/network/payouts/summary").then(r => r.ok ? r.json() : {} as any),
             fetch("/api/network/payouts/destinations").then(r => r.ok ? r.json() : []),

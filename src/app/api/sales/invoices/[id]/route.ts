@@ -216,14 +216,17 @@ export async function DELETE(
                             try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
                         }
 
-                        if (order.customerId) {
+                        // Find customerId from transactions since Order schema doesn't have it natively
+                        const customerId = invoice.customerId || transactions.find((tr) => tr.customerId)?.customerId;
+
+                        if (customerId) {
                             const earnedPoints = Number(rawData.dynamicEarnedPoints || 0);
                             const usedPoints = Number(rawData.pointsUsed || 0);
                             const netPointsToRevert = earnedPoints - usedPoints;
 
                             if (netPointsToRevert !== 0) {
                                 await tx.customer.update({
-                                    where: { id: order.customerId },
+                                    where: { id: customerId },
                                     data: { points: { decrement: netPointsToRevert } }
                                 });
                             }

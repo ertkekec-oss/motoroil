@@ -8,7 +8,6 @@ export default function PaymentsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
         fetch('/api/hub/payments')
             .then(res => res.json())
             .then(data => {

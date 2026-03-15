@@ -10,7 +10,6 @@ export function BoostInvoicesClient() {
     const [graceDaysRemaining, setGraceDaysRemaining] = useState<number>(0);
 
     useEffect(() => {
-        setLoading(true);
         fetch("/api/billing/boost-invoices")
             .then(res => res.ok ? res.json() : { items: [], health: { status: "CURRENT", graceEndsAt: null, overdueSince: null } })
             .then(data => {

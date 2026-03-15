@@ -1,0 +1,1702 @@
+﻿
+  eslint_report.txt:58:> 14 |
+         { id: 'wh_evt_0981bA
+', provider: 'DocuSign', even
+tType: 'envelope.completed', 
+status: 'PROCESSED', createdA
+t: new Date(Date.now() - 1000
+ * 60 * 5).toISOString(), pay
+loadSum: 'Envelope 9182C fina
+lized' },
+  eslint_report.txt:59:     |
+                             
+                             
+                             
+                             
+            ^^^^^^^^^^ Cannot
+ call impure function
+  eslint_report.txt:60:  15 |
+         { id: 'wh_evt_4419xC
+', provider: 'Netgsm', eventT
+ype: 'sms.delivered', status:
+ 'IGNORED', createdAt: new Da
+te(Date.now() - 1000 * 60 * 6
+0).toISOString(), payloadSum:
+ 'MsgId: 1982245' },
+  eslint_report.txt:61:  16 |
+         { id: 'wh_evt_1155gT
+', provider: 'DocuSign', even
+tType: 'envelope.declined', s
+tatus: 'FAILED', createdAt: n
+ew Date(Date.now() - 1000 * 6
+0 * 120).toISOString(), paylo
+adSum: 'User signature refuse
+d' },
+> eslint_report.txt:62:  17 |
+         { id: 'wh_evt_9987kZ
+', provider: 'E-Guven', event
+Type: 'timestamp.issued', sta
+tus: 'PROCESSED', createdAt: 
+new Date(Date.now() - 1000 * 
+60 * 400).toISOString(), payl
+oadSum: 'TSR generated for do
+c_91A' },  react-hooks/purity
+  eslint_report.txt:63:  15:1
+19  error  Error: Cannot call
+ impure function during rende
+r
+  eslint_report.txt:64:
+  eslint_report.txt:65:`Date.
+now` is an impure function. C
+alling an impure function can
+ produce unstable results tha
+t update unpredictably when t
+he component happens to re-re
+nder. (https://react.dev/refe
+rence/rules/components-and-ho
+oks-must-be-pure#components-a
+nd-hooks-must-be-idempotent).
+  eslint_report.txt:66:
+  eslint_report.txt:70:> 15 |
+         { id: 'wh_evt_4419xC
+', provider: 'Netgsm', eventT
+ype: 'sms.delivered', status:
+ 'IGNORED', createdAt: new Da
+te(Date.now() - 1000 * 60 * 6
+0).toISOString(), payloadSum:
+ 'MsgId: 1982245' },
+  eslint_report.txt:71:     |
+                             
+                             
+                             
+                             
+   ^^^^^^^^^^ Cannot call imp
+ure function
+  eslint_report.txt:72:  16 |
+         { id: 'wh_evt_1155gT
+', provider: 'DocuSign', even
+tType: 'envelope.declined', s
+tatus: 'FAILED', createdAt: n
+ew Date(Date.now() - 1000 * 6
+0 * 120).toISOString(), paylo
+adSum: 'User signature refuse
+d' },
+  eslint_report.txt:73:  17 |
+         { id: 'wh_evt_9987kZ
+', provider: 'E-Guven', event
+Type: 'timestamp.issued', sta
+tus: 'PROCESSED', createdAt: 
+new Date(Date.now() - 1000 * 
+60 * 400).toISOString(), payl
+oadSum: 'TSR generated for do
+c_91A' },
+> eslint_report.txt:74:  18 |
+     ];                      
+                             
+             react-hooks/puri
+ty
+  eslint_report.txt:75:  16:1
+24  error  Error: Cannot call
+ impure function during rende
+r
+  eslint_report.txt:76:
+  eslint_report.txt:77:`Date.
+now` is an impure function. C
+alling an impure function can
+ produce unstable results tha
+t update unpredictably when t
+he component happens to re-re
+nder. (https://react.dev/refe
+rence/rules/components-and-ho
+oks-must-be-pure#components-a
+nd-hooks-must-be-idempotent).
+  eslint_report.txt:78:
+  eslint_report.txt:82:> 16 |
+         { id: 'wh_evt_1155gT
+', provider: 'DocuSign', even
+tType: 'envelope.declined', s
+tatus: 'FAILED', createdAt: n
+ew Date(Date.now() - 1000 * 6
+0 * 120).toISOString(), paylo
+adSum: 'User signature refuse
+d' },
+  eslint_report.txt:83:     |
+                             
+                             
+                             
+                             
+        ^^^^^^^^^^ Cannot cal
+l impure function
+  eslint_report.txt:84:  17 |
+         { id: 'wh_evt_9987kZ
+', provider: 'E-Guven', event
+Type: 'timestamp.issued', sta
+tus: 'PROCESSED', createdAt: 
+new Date(Date.now() - 1000 * 
+60 * 400).toISOString(), payl
+oadSum: 'TSR generated for do
+c_91A' },
+  eslint_report.txt:85:  18 |
+     ];
+> eslint_report.txt:86:  19 |
+                             
+                             
+                        react
+-hooks/purity
+  eslint_report.txt:87:  17:1
+25  error  Error: Cannot call
+ impure function during rende
+r
+  eslint_report.txt:88:
+  eslint_report.txt:89:`Date.
+now` is an impure function. C
+alling an impure function can
+ produce unstable results tha
+t update unpredictably when t
+he component happens to re-re
+nder. (https://react.dev/refe
+rence/rules/components-and-ho
+oks-must-be-pure#components-a
+nd-hooks-must-be-idempotent).
+  eslint_report.txt:90:
+  eslint_report.txt:94:> 17 |
+         { id: 'wh_evt_9987kZ
+', provider: 'E-Guven', event
+Type: 'timestamp.issued', sta
+tus: 'PROCESSED', createdAt: 
+new Date(Date.now() - 1000 * 
+60 * 400).toISOString(), payl
+oadSum: 'TSR generated for do
+c_91A' },
+  eslint_report.txt:95:     |
+                             
+                             
+                             
+                             
+         ^^^^^^^^^^ Cannot ca
+ll impure function
+  eslint_report.txt:96:  18 |
+     ];
+  eslint_report.txt:97:  19 |
+> eslint_report.txt:98:  20 |
+     return (                
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+   react-hooks/purity
+  eslint_report.txt:99:
+  eslint_report.txt:100:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(admin)\admin\system\
+tasks\page.tsx
+  eslint_report.txt:101:  29:
+70  error  `'` can be escaped
+ with `&apos;`, `&lsquo;`, `&
+#39;`, `&rsquo;`  react/no-un
+escaped-entities
+  eslint_report.txt:102:
+  eslint_report.txt:114:> 56 
+|         const diffMs = Date
+.now() - new Date(createdAt).
+getTime();
+  eslint_report.txt:115:     
+|                        ^^^^
+^^^^^^ Cannot call impure fun
+ction
+  eslint_report.txt:116:  57 
+|         const diffDays = Ma
+th.floor(diffMs / (1000 * 60 
+* 60 * 24));
+  eslint_report.txt:117:  58 
+|
+> eslint_report.txt:118:  59 
+|         if (diffDays >= 7) 
+return <span style={{ padding
+: '2px 6px', background: 'rgb
+a(239,68,68,0.2)', color: '#e
+f4444', borderRadius: '4px', 
+fontSize: '10px', marginLeft:
+ '6px', fontWeight: 'bold' }}
+>{diffDays} Gün Gecikti</span
+>;  react-hooks/purity
+  eslint_report.txt:119:  75:
+118  error  `"` can be escape
+d with `&quot;`, `&ldquo;`, `
+&#34;`, `&rdquo;`            
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+        react/no-unescaped-en
+tities
+  eslint_report.txt:120:  75:
+134  error  `"` can be escape
+d with `&quot;`, `&ldquo;`, `
+&#34;`, `&rdquo;`            
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+        react/no-unescaped-en
+tities
+  eslint_report.txt:121:
+  eslint_report.txt:122:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\admin\b2b\polic
+ies\page.tsx
+  eslint_report.txt:165:> 21 
+|     };
+  eslint_report.txt:166:     
+| ^^^^^^^ `fetchProviders` is
+ declared here
+  eslint_report.txt:167:  22 
+|
+  eslint_report.txt:168:  23 
+|     const triggerReconcile 
+= async (providerName: string
+) => {
+> eslint_report.txt:169:  24 
+|         const idempotencyKe
+y = crypto.randomUUID();  rea
+ct-hooks/immutability
+  eslint_report.txt:170:
+  eslint_report.txt:171:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\admin\platform-
+finance\page.tsx
+  eslint_report.txt:172:  98:
+110  error  `'` can be escape
+d with `&apos;`, `&lsquo;`, `
+&#39;`, `&rsquo;`  react/no-u
+nescaped-entities
+  eslint_report.txt:173:
+  eslint_report.txt:215:> 13 
+|         setLoading(true);
+  eslint_report.txt:216:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:217:  14 
+|         fetch("/api/billing
+/boost-invoices")
+  eslint_report.txt:218:  15 
+|             .then(res => re
+s.ok ? res.json() : { items: 
+[], health: { status: "CURREN
+T", graceEndsAt: null, overdu
+eSince: null } })
+> eslint_report.txt:219:  16 
+|             .then(data => {
+  react-hooks/set-state-in-ef
+fect
+  eslint_report.txt:220:
+  eslint_report.txt:221:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\billing\checkou
+t\page.tsx
+  eslint_report.txt:222:  85:
+110  error  `"` can be escape
+d with `&quot;`, `&ldquo;`, `
+&#34;`, `&rdquo;`  react/no-u
+nescaped-entities
+  eslint_report.txt:223:  85:
+121  error  `"` can be escape
+d with `&quot;`, `&ldquo;`, `
+&#34;`, `&rdquo;`  react/no-u
+nescaped-entities
+  eslint_report.txt:237:> 40 
+|     useEffect(() => { setRe
+ferralSettings(contextReferra
+lSettings || {}); }, [context
+ReferralSettings]);
+  eslint_report.txt:238:     
+|                       ^^^^^
+^^^^^^^^^^^^^^ Avoid calling 
+setState() directly within an
+ effect
+  eslint_report.txt:239:  41 
+|
+  eslint_report.txt:240:  42 
+|     const saveReferralSetti
+ngs = async () => {
+> eslint_report.txt:241:  43 
+|         await updateReferra
+lSettings(referralSettings); 
+ react-hooks/set-state-in-eff
+ect
+  eslint_report.txt:242:
+  eslint_report.txt:243:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\catalog\checkou
+t\CheckoutClient.tsx
+> eslint_report.txt:244:  24:
+61  error  React Hook "useMod
+al" cannot be called inside a
+ callback. React Hooks must b
+e called in a React function 
+component or a custom React H
+ook function  react-hooks/rul
+es-of-hooks
+  eslint_report.txt:245:
+  eslint_report.txt:246:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\contracts\build
+er\page.tsx
+  eslint_report.txt:247:  141
+:74  error  `'` can be escape
+d with `&apos;`, `&lsquo;`, `
+&#39;`, `&rsquo;`  react/no-u
+nescaped-entities
+  eslint_report.txt:248:
+  eslint_report.txt:261:> 36 
+|                 </div>
+  eslint_report.txt:262:     
+| ^^^^^^^^^^^^^^^^^^^^^^^ Avo
+id constructing JSX within tr
+y/catch
+  eslint_report.txt:263:  37 
+|             );
+  eslint_report.txt:264:  38 
+|         }
+> eslint_report.txt:265:  39 
+|                         rea
+ct-hooks/error-boundaries
+  eslint_report.txt:266:   35
+:21  error  Error: Avoid cons
+tructing JSX within try/catch
+  eslint_report.txt:267:
+  eslint_report.txt:268:React
+ does not immediately render 
+components when JSX is render
+ed, so any errors from this c
+omponent will not be caught b
+y the try/catch. To catch err
+ors in rendering a given comp
+onent, wrap that component in
+ an error boundary. (https://
+react.dev/reference/react/Com
+ponent#catching-rendering-err
+ors-with-an-error-boundary).
+  eslint_report.txt:269:
+  eslint_report.txt:273:> 35 
+|                     <h1>Hat
+a: Müşteri Kimliği Eksik</h1>
+  eslint_report.txt:274:     
+|                     ^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ Avoid constructing JSX withi
+n try/catch
+  eslint_report.txt:275:  36 
+|                 </div>
+  eslint_report.txt:276:  37 
+|             );
+> eslint_report.txt:277:  38 
+|         }                  
+                             
+                             
+                             
+                             
+                             
+                             
+            react-hooks/error
+-boundaries
+  eslint_report.txt:278:  312
+:16  error  Error: Avoid cons
+tructing JSX within try/catch
+  eslint_report.txt:279:
+  eslint_report.txt:280:React
+ does not immediately render 
+components when JSX is render
+ed, so any errors from this c
+omponent will not be caught b
+y the try/catch. To catch err
+ors in rendering a given comp
+onent, wrap that component in
+ an error boundary. (https://
+react.dev/reference/react/Com
+ponent#catching-rendering-err
+ors-with-an-error-boundary).
+  eslint_report.txt:281:
+  eslint_report.txt:285:> 312
+ |         return <CustomerDe
+tailClient customer={serializ
+eData(customer)} historyList=
+{serializeData(historyList)} 
+/>;
+  eslint_report.txt:286:     
+ |                ^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^ Avoid constructing JSX wit
+hin try/catch
+  eslint_report.txt:287:  313
+ |     } catch (err: any) {
+  eslint_report.txt:288:  314
+ |         // If notFound() w
+as called, its error should b
+ubble up to Next.js handled p
+roperly
+> eslint_report.txt:289:  315
+ |         if (err.digest ===
+ 'NEXT_NOT_FOUND' || err.mess
+age?.includes('NEXT_NOT_FOUND
+')) {  react-hooks/error-boun
+daries
+  eslint_report.txt:290:
+  eslint_report.txt:291:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\data-import\Dat
+aImportClient.tsx
+  eslint_report.txt:292:  425
+:177  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:293:  425
+:195  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:313:> 124
+ |     useEffect(() => { load
+() }, [])
+  eslint_report.txt:314:     
+ |                       ^^^^
+ Avoid calling setState() dir
+ectly within an effect
+  eslint_report.txt:315:  125
+ |
+  eslint_report.txt:316:  126
+ |     return (
+> eslint_report.txt:317:  127
+ |         <div className="mi
+n-h-screen bg-background px-4
+ py-10">  react-hooks/set-sta
+te-in-effect
+  eslint_report.txt:318:
+  eslint_report.txt:319:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\dealer-network\
+refunds\page.tsx
+  eslint_report.txt:320:   49
+:9   error  Error: Calling se
+tState synchronously within a
+n effect can trigger cascadin
+g renders
+  eslint_report.txt:321:
+  eslint_report.txt:331:> 49 
+|         setCursor(null);
+  eslint_report.txt:332:     
+|         ^^^^^^^^^ Avoid cal
+ling setState() directly with
+in an effect
+  eslint_report.txt:333:  50 
+|         load(true);
+  eslint_report.txt:334:  51 
+|          
+> eslint_report.txt:335:  52 
+|     }, [status]);          
+                             
+react-hooks/set-state-in-effe
+ct
+  eslint_report.txt:336:  145
+:13  error  Error: Calling se
+tState synchronously within a
+n effect can trigger cascadin
+g renders
+  eslint_report.txt:337:
+  eslint_report.txt:338:Effec
+ts are intended to synchroniz
+e state between React and ext
+ernal systems such as manuall
+y updating the DOM, state man
+agement libraries, or other p
+latform APIs. In general, the
+ body of an effect should do 
+one or both of the following:
+  eslint_report.txt:339:* Upd
+ate external systems with the
+ latest state from React.
+  eslint_report.txt:347:> 145
+ |             setData(null);
+  eslint_report.txt:348:     
+ |             ^^^^^^^ Avoid 
+calling setState() directly w
+ithin an effect
+  eslint_report.txt:349:  146
+ |             return;
+  eslint_report.txt:350:  147
+ |         }
+> eslint_report.txt:351:  148
+ |         (async () => {  re
+act-hooks/set-state-in-effect
+  eslint_report.txt:352:
+  eslint_report.txt:353:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\dealer-network\
+settings\page.tsx
+  eslint_report.txt:354:  130
+:124  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:355:  130
+:146  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:394:> 15 
+|         setLoading(true);
+  eslint_report.txt:395:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:396:  16 
+|         fetch("/api/network
+/earnings")
+  eslint_report.txt:397:  17 
+|             .then(res => {
+> eslint_report.txt:398:  18 
+|                 if (!res.ok
+) throw new Error("Failed to 
+fetch earnings");  react-hook
+s/set-state-in-effect
+  eslint_report.txt:399:
+  eslint_report.txt:400:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\hub\payments\pa
+ge.tsx
+  eslint_report.txt:401:  11:
+9  error  Error: Calling setS
+tate synchronously within an 
+effect can trigger cascading 
+renders
+  eslint_report.txt:402:
+  eslint_report.txt:412:> 11 
+|         setLoading(true);
+  eslint_report.txt:413:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:414:  12 
+|         fetch('/api/hub/pay
+ments')
+  eslint_report.txt:415:  13 
+|             .then(res => re
+s.json())
+> eslint_report.txt:416:  14 
+|             .then(data => {
+  react-hooks/set-state-in-ef
+fect
+  eslint_report.txt:417:
+  eslint_report.txt:418:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\hub\payouts\pag
+e.tsx
+  eslint_report.txt:419:  13:
+9    error  Error: Calling se
+tState synchronously within a
+n effect can trigger cascadin
+g renders
+  eslint_report.txt:420:
+  eslint_report.txt:430:> 13 
+|         setLoading(true);
+  eslint_report.txt:431:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:432:  14 
+|         Promise.all([
+  eslint_report.txt:433:  15 
+|             fetch("/api/net
+work/payouts/summary").then(r
+ => r.ok ? r.json() : {} as a
+ny),
+> eslint_report.txt:434:  16 
+|             fetch("/api/net
+work/payouts/destinations").t
+hen(r => r.ok ? r.json() : []
+),  react-hooks/set-state-in-
+effect
+  eslint_report.txt:435:  56:
+148  error  `'` can be escape
+d with `&apos;`, `&lsquo;`, `
+&#39;`, `&rsquo;`            
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+              react/no-unesca
+ped-entities
+  eslint_report.txt:436:
+  eslint_report.txt:437:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\hub\stock-risks
+\page.tsx
+  eslint_report.txt:438:  42:
+106  error  `'` can be escape
+d with `&apos;`, `&lsquo;`, `
+&#39;`, `&rsquo;`  react/no-u
+nescaped-entities
+  eslint_report.txt:453:> 11 
+|         setLoading(true);
+  eslint_report.txt:454:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:455:  12 
+|         fetch("/api/company
+/trust")
+  eslint_report.txt:456:  13 
+|             .then(res => re
+s.ok ? res.json() : null)
+> eslint_report.txt:457:  14 
+|             .then(data => {
+  react-hooks/set-state-in-ef
+fect
+  eslint_report.txt:458:  223
+:129  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                       react/
+no-unescaped-entities
+  eslint_report.txt:459:  223
+:131  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                       react/
+no-unescaped-entities
+  eslint_report.txt:460:  223
+:136  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                       react/
+no-unescaped-entities
+  eslint_report.txt:461:  223
+:138  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                       react/
+no-unescaped-entities
+  eslint_report.txt:481:> 103
+ |         setPriceData(initi
+alData);
+  eslint_report.txt:482:     
+ |         ^^^^^^^^^^^^ Avoid
+ calling setState() directly 
+within an effect
+  eslint_report.txt:483:  104
+ |     }, [products, targetLi
+stId]);
+  eslint_report.txt:484:  105
+ |
+> eslint_report.txt:485:  106
+ |     const handleUpdate = (
+id: string | number, field: s
+tring, value: any) => {  reac
+t-hooks/set-state-in-effect
+  eslint_report.txt:486:
+  eslint_report.txt:487:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\inventory\compo
+nents\InventoryBulkEditModal.
+tsx
+  eslint_report.txt:488:  34:
+13  error  Error: Calling set
+State synchronously within an
+ effect can trigger cascading
+ renders
+  eslint_report.txt:489:
+  eslint_report.txt:499:> 34 
+|             setBulkValues({
+});
+  eslint_report.txt:500:     
+|             ^^^^^^^^^^^^^ A
+void calling setState() direc
+tly within an effect
+  eslint_report.txt:501:  35 
+|             setAdjValue(0);
+  eslint_report.txt:502:  36 
+|         }
+> eslint_report.txt:503:  37 
+|     }, [isOpen]);  react-ho
+oks/set-state-in-effect
+  eslint_report.txt:504:
+  eslint_report.txt:505:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\inventory\compo
+nents\InventoryDetailModal.ts
+x
+  eslint_report.txt:506:  147
+:157  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:507:  147
+:178  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:523:> 42 
+|             setTransferData
+({
+  eslint_report.txt:524:     
+|             ^^^^^^^^^^^^^^^
+ Avoid calling setState() dir
+ectly within an effect
+  eslint_report.txt:525:  43 
+|                 productId: 
+0,
+  eslint_report.txt:526:  44 
+|                 from: branc
+hes[0] || '',
+> eslint_report.txt:527:  45 
+|                 to: branche
+s[1] || branches[0] || '',  r
+eact-hooks/set-state-in-effec
+t
+  eslint_report.txt:528:
+  eslint_report.txt:529:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\inventory\compo
+nents\ProductWizardModal.tsx
+  eslint_report.txt:530:  262
+:43   error  `'` can be escap
+ed with `&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:531:  884
+:69   error  `'` can be escap
+ed with `&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:551:> 50 
+|         setLabelsToPrint(fi
+ltered);
+  eslint_report.txt:552:     
+|         ^^^^^^^^^^^^^^^^ Av
+oid calling setState() direct
+ly within an effect
+  eslint_report.txt:553:  51 
+|     }, [products, targetTyp
+e, selectedProductId, selecte
+dCategory, selectedBrand]);
+  eslint_report.txt:554:  52 
+|
+> eslint_report.txt:555:  53 
+|     const handlePrint = () 
+=> {  react-hooks/set-state-i
+n-effect
+  eslint_report.txt:556:
+  eslint_report.txt:557:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\inventory\manuf
+acturing\page.tsx
+  eslint_report.txt:558:  329
+:36   error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:559:  329
+:50   error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:603:> 55 
+|             if (defaultKasa
+) setSelectedAccount(defaultK
+asa.id.toString());
+  eslint_report.txt:604:     
+|                            
+  ^^^^^^^^^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:605:  56 
+|             else if (kasala
+r.length > 0) setSelectedAcco
+unt(kasalar[0].id.toString())
+;
+  eslint_report.txt:606:  57 
+|         }
+> eslint_report.txt:607:  58 
+|     }, [paymentMethod, kasa
+lar]);  react-hooks/set-state
+-in-effect
+  eslint_report.txt:608:
+  eslint_report.txt:609:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\reconciliation\
+[id]\ReconDetailClient.tsx
+  eslint_report.txt:610:  134
+:49  error  `"` can be escape
+d with `&quot;`, `&ldquo;`, `
+&#34;`, `&rdquo;`  react/no-u
+nescaped-entities
+  eslint_report.txt:611:  134
+:66  error  `"` can be escape
+d with `&quot;`, `&ldquo;`, `
+&#34;`, `&rdquo;`  react/no-u
+nescaped-entities
+  eslint_report.txt:628:> 55 
+|         start: new Date(Dat
+e.now() - 30 * 24 * 60 * 60 *
+ 1000).toISOString().split('T
+')[0],
+  eslint_report.txt:629:     
+|                         ^^^
+^^^^^^^ Cannot call impure fu
+nction
+  eslint_report.txt:630:  56 
+|         end: new Date().toI
+SOString().split('T')[0]
+  eslint_report.txt:631:  57 
+|     });
+> eslint_report.txt:632:  58 
+|     // Performance Optimiza
+tion: Debounce date changes  
+react-hooks/purity
+  eslint_report.txt:633:
+  eslint_report.txt:634:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\rfq\page.tsx
+  eslint_report.txt:635:  128
+:139  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:636:  128
+:148  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:646:> 54 
+|         const weekAgo = new
+ Date(Date.now() - 7 * 24 * 6
+0 * 60 * 1000);
+  eslint_report.txt:647:     
+|                            
+      ^^^^^^^^^^ Cannot call 
+impure function
+  eslint_report.txt:648:  55 
+|
+  eslint_report.txt:649:  56 
+|         return {
+> eslint_report.txt:650:  57 
+|             today: events.f
+ilter(e => new Date(e.timesta
+mp).toDateString() === today)
+.length,  react-hooks/purity
+  eslint_report.txt:651:  213
+:158  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                    react/no-
+unescaped-entities
+  eslint_report.txt:652:  213
+:181  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                    react/no-
+unescaped-entities
+  eslint_report.txt:653:
+  eslint_report.txt:654:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\seller\automati
+on\page.tsx
+  eslint_report.txt:672:> 20 
+|         setLoading(true);
+  eslint_report.txt:673:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:674:  21 
+|         fetch("/api/seller/
+boost/analytics")
+  eslint_report.txt:675:  22 
+|             .then(res => re
+s.ok ? res.json() : null)
+> eslint_report.txt:676:  23 
+|             .then(data => {
+  react-hooks/set-state-in-ef
+fect
+  eslint_report.txt:677:
+  eslint_report.txt:678:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\seller\boost\pa
+ge.tsx
+  eslint_report.txt:679:   12
+:9    error  Error: Calling s
+etState synchronously within 
+an effect can trigger cascadi
+ng renders
+  eslint_report.txt:680:
+  eslint_report.txt:690:> 12 
+|         setLoading(true);
+  eslint_report.txt:691:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:692:  13 
+|         fetch("/api/seller/
+boost")
+  eslint_report.txt:693:  14 
+|             .then(res => re
+s.ok ? res.json() : null)
+> eslint_report.txt:694:  15 
+|             .then(data => {
+  react-hooks/set-state-in-ef
+fect
+  eslint_report.txt:695:  113
+:100  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                   react/no-u
+nescaped-entities
+  eslint_report.txt:696:  113
+:118  error  `"` can be escap
+ed with `&quot;`, `&ldquo;`, 
+`&#34;`, `&rdquo;`           
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                   react/no-u
+nescaped-entities
+  eslint_report.txt:697:
+  eslint_report.txt:698:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\service\[id]\pa
+ge.tsx
+> eslint_report.txt:699:  72:
+47  error  React Hook "useSta
+te" is called conditionally. 
+React Hooks must be called in
+ the exact same order in ever
+y component render. Did you a
+ccidentally call a React Hook
+ after an early return?  reac
+t-hooks/rules-of-hooks
+  eslint_report.txt:700:
+  eslint_report.txt:701:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\settings\_compo
+nents\forms\CampaignPointsPan
+el.tsx
+  eslint_report.txt:702:  378
+:131  error  `'` can be escap
+ed with `&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`  react/no-
+unescaped-entities
+  eslint_report.txt:703:
+  eslint_report.txt:735:> 14 
+|         setLoading(true);
+  eslint_report.txt:736:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:737:  15 
+|         fetch(`/api/support
+/tickets?status=${filterStatu
+s}&type=${filterType}`)
+  eslint_report.txt:738:  16 
+|             .then(res => re
+s.ok ? res.json() : { items: 
+[] })
+> eslint_report.txt:739:  17 
+|             .then(data => {
+  react-hooks/set-state-in-ef
+fect
+  eslint_report.txt:740:
+  eslint_report.txt:741:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\theme-test\page
+.tsx
+  eslint_report.txt:742:  45:
+42  error  `'` can be escaped
+ with `&apos;`, `&lsquo;`, `&
+#39;`, `&rsquo;`  react/no-un
+escaped-entities
+  eslint_report.txt:743:  47:
+43  error  `'` can be escaped
+ with `&apos;`, `&lsquo;`, `&
+#39;`, `&rsquo;`  react/no-un
+escaped-entities
+  eslint_report.txt:744:
+  eslint_report.txt:745:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\treasury\page.t
+sx
+> eslint_report.txt:746:  37:
+39  error  React Hook "useSta
+te" is called conditionally. 
+React Hooks must be called in
+ the exact same order in ever
+y component render  react-hoo
+ks/rules-of-hooks
+  eslint_report.txt:747:
+  eslint_report.txt:748:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\(app)\vehicle\[plate]
+\page.tsx
+  eslint_report.txt:749:  46:
+46  error  `"` can be escaped
+ with `&quot;`, `&ldquo;`, `&
+#34;`, `&rdquo;`  react/no-un
+escaped-entities
+  eslint_report.txt:750:  46:
+77  error  `"` can be escaped
+ with `&quot;`, `&ldquo;`, `&
+#34;`, `&rdquo;`  react/no-un
+escaped-entities
+  eslint_report.txt:764:> 64 
+|         fetchToken();
+  eslint_report.txt:765:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:766:  65 
+|         const interval = se
+tInterval(fetchToken, 4000); 
+// 4 saniyede bir kontrol et 
+(8s TTL için güvenli)
+  eslint_report.txt:767:  66 
+|         return () => clearI
+nterval(interval);
+> eslint_report.txt:768:  67 
+|     }, [fetchToken]);  reac
+t-hooks/set-state-in-effect
+  eslint_report.txt:769:
+  eslint_report.txt:770:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\ClientShell.tsx
+  eslint_report.txt:771:  172
+:13  error  Error: Calling se
+tState synchronously within a
+n effect can trigger cascadin
+g renders
+  eslint_report.txt:772:
+  eslint_report.txt:782:> 172
+ |             setShowContent
+(true);
+  eslint_report.txt:783:     
+ |             ^^^^^^^^^^^^^^
+ Avoid calling setState() dir
+ectly within an effect
+  eslint_report.txt:784:  173
+ |         }
+  eslint_report.txt:785:  174
+ |     }, [isInitialLoading])
+;
+> eslint_report.txt:786:  175
+ |                           
+                 react-hooks/
+set-state-in-effect
+  eslint_report.txt:787:  258
+:9   error  Error: Calling se
+tState synchronously within a
+n effect can trigger cascadin
+g renders
+  eslint_report.txt:788:
+  eslint_report.txt:789:Effec
+ts are intended to synchroniz
+e state between React and ext
+ernal systems such as manuall
+y updating the DOM, state man
+agement libraries, or other p
+latform APIs. In general, the
+ body of an effect should do 
+one or both of the following:
+  eslint_report.txt:790:* Upd
+ate external systems with the
+ latest state from React.
+  eslint_report.txt:798:> 258
+ |         setReady(true);
+  eslint_report.txt:799:     
+ |         ^^^^^^^^ Avoid cal
+ling setState() directly with
+in an effect
+  eslint_report.txt:800:  259
+ |         const checkStyles 
+= () => {
+  eslint_report.txt:801:  260
+ |             const styles =
+ Array.from(document.styleShe
+ets);
+> eslint_report.txt:802:  261
+ |             if (styles.len
+gth > 0) {  react-hooks/set-s
+tate-in-effect
+  eslint_report.txt:803:
+  eslint_report.txt:804:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\api\notifications\sum
+mary\route.ts
+  eslint_report.txt:805:  18:
+13  error  Use "@ts-expect-er
+ror" instead of "@ts-ignore",
+ as "@ts-ignore" will do noth
+ing if the following line is 
+error-free  @typescript-eslin
+t/ban-ts-comment
+  eslint_report.txt:806:  28:
+9   error  Use "@ts-expect-er
+ror" instead of "@ts-ignore",
+ as "@ts-ignore" will do noth
+ing if the following line is 
+error-free  @typescript-eslin
+t/ban-ts-comment
+  eslint_report.txt:829:> 60 
+|         load()
+  eslint_report.txt:830:     
+|         ^^^^ Avoid calling 
+setState() directly within an
+ effect
+  eslint_report.txt:831:  61 
+|     }, [])
+  eslint_report.txt:832:  62 
+|
+> eslint_report.txt:833:  63 
+|     const grandTotal = cart
+?.summary?.grandTotal || 0   
+                             
+                             
+                   react-hook
+s/set-state-in-effect
+  eslint_report.txt:834:  69:
+13  error  Error: Calling set
+State synchronously within an
+ effect can trigger cascading
+ renders
+  eslint_report.txt:835:
+  eslint_report.txt:836:Effec
+ts are intended to synchroniz
+e state between React and ext
+ernal systems such as manuall
+y updating the DOM, state man
+agement libraries, or other p
+latform APIs. In general, the
+ body of an effect should do 
+one or both of the following:
+  eslint_report.txt:837:* Upd
+ate external systems with the
+ latest state from React.
+  eslint_report.txt:845:> 69 
+|             setPaymentMode(
+"CARD")
+  eslint_report.txt:846:     
+|             ^^^^^^^^^^^^^^ 
+Avoid calling setState() dire
+ctly within an effect
+  eslint_report.txt:847:  70 
+|         }
+  eslint_report.txt:848:  71 
+|     }, [limitExceeded, paym
+entMode])
+> eslint_report.txt:849:  72 
+|  react-hooks/set-state-in-e
+ffect
+  eslint_report.txt:850:
+  eslint_report.txt:851:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\network\layout.tsx
+  eslint_report.txt:852:  16:
+9  error  Error: Calling setS
+tate synchronously within an 
+effect can trigger cascading 
+renders
+  eslint_report.txt:853:
+  eslint_report.txt:863:> 16 
+|         setMounted(true)
+  eslint_report.txt:864:     
+|         ^^^^^^^^^^ Avoid ca
+lling setState() directly wit
+hin an effect
+  eslint_report.txt:865:  17 
+|     }, [])
+  eslint_report.txt:866:  18 
+|
+> eslint_report.txt:867:  19 
+|     // Public sayfalar için
+ minimal topbar veya gizli  r
+eact-hooks/set-state-in-effec
+t
+  eslint_report.txt:868:
+  eslint_report.txt:869:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\network\orders\[id]\p
+age.tsx
+  eslint_report.txt:870:  84:
+42  error  `'` can be escaped
+ with `&apos;`, `&lsquo;`, `&
+#39;`, `&rsquo;`  react/no-un
+escaped-entities
+  eslint_report.txt:871:
+  eslint_report.txt:884:> 86 
+|     useEffect(() => { loadF
+irst() }, [])
+  eslint_report.txt:885:     
+|                       ^^^^^
+^^^^ Avoid calling setState()
+ directly within an effect
+  eslint_report.txt:886:  87 
+|
+  eslint_report.txt:887:  88 
+|     return (
+> eslint_report.txt:888:  89 
+|         <div className="fon
+t-sans min-h-[calc(100vh-64px
+)] bg-slate-50">  react-hooks
+/set-state-in-effect
+  eslint_report.txt:889:  109
+:38  error  `'` can be escape
+d with `&apos;`, `&lsquo;`, `
+&#39;`, `&rsquo;`            
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                          rea
+ct/no-unescaped-entities
+  eslint_report.txt:890:
+  eslint_report.txt:891:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\network\select-suppli
+er\page.tsx
+  eslint_report.txt:892:  40:
+23  error  Error: Cannot acce
+ss variable before it is decl
+ared
+  eslint_report.txt:917:> 62 
+|     }
+  eslint_report.txt:918:     
+| ^^^^^^ `switchMembership` i
+s declared here
+  eslint_report.txt:919:  63 
+|
+  eslint_report.txt:920:  64 
+|     return (
+> eslint_report.txt:921:  65 
+|         <div className="min
+-h-screen flex items-center j
+ustify-center px-4 py-12 bg-b
+ackground">  react-hooks/immu
+tability
+  eslint_report.txt:922:
+  eslint_report.txt:923:C:\Us
+ers\ertke\OneDrive\Masaüstü\p
+eriodya\muhasebeapp\motoroil\
+src\app\portal\login\page.tsx
+  eslint_report.txt:924:  91:
+21  error  Do not use an `<a>
+` element to navigate to `/`.
+ Use `<Link />` from `next/li
+nk` instead. See: https://nex
+tjs.org/docs/messages/no-html
+-link-for-pages  @next/next/n
+o-html-link-for-pages
+  eslint_report.txt:925:
+
+

@@ -1,0 +1,927 @@
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\ops\inbox-replay\page.tsx
+  42:120  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\ops\journal-corrections\page.tsx
+  73:108  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  73:115  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  73:198  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  83:125  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\ops\provider-reconcile\page.tsx
+  54:86   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  54:95   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  54:103  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  54:111  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  54:163  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  54:204  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  54:226  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\ops\queue-health\page.tsx
+  20:44  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  20:50  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\ops\secret-rotate\page.tsx
+   75:161  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   75:171  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  113:45   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\ops\settlement-health\page.tsx
+  36:108  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\ops\system-config\page.tsx
+  50:151  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\reconciliation\disputes\page.tsx
+  87:49   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  87:116  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\page.tsx
+  42:196  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  42:201  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\policies\page.tsx
+  121:213  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\providers\page.tsx
+  50:91   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  50:103  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\webhooks\page.tsx
+  14:128  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\webhooks\page.tsx:14:128
+  12 |     // In production, this would query a WebhookEvent tabme
+  13 |     const mockLogs = [
+> 14 |         { id: 'wh_evt_0981bA', provider: 'DocuSign', eventType: 'envelope.completed', status: 'PROCESSED', createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), payloadSum: 'Envelope 9182C finalized' },
+     |                                                                                                                                ^^^^^^^^^^ Cannot call impure function
+  15 |         { id: 'wh_evt_4419xC', provider: 'Netgsm', eventType: 'sms.delivered', status: 'IGNORED', createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), payloadSum: 'MsgId: 1982245' },
+  16 |         { id: 'wh_evt_1155gT', provider: 'DocuSign', eventType: 'envelope.declined', status: 'FAILED', createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), payloadSum: 'User signature refused' },
+  17 |         { id: 'wh_evt_9987kZ', provider: 'E-Guven', eventType: 'timestamp.issued', status: 'PROCESSED', createdAt: new Date(Date.now() - 1000 * 60 * 400).toISOString(), payloadSum: 'TSR generated for doc_91A' },  react-hooks/purity
+  15:119  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\webhooks\page.tsx:15:119
+  13 |     const mockLogs = [
+  14 |         { id: 'wh_evt_0981bA', provider: 'DocuSign', eventType: 'envelope.completed', status: 'PROCESSED', createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), payloadSum: 'Envelope 9182C finalized' },
+> 15 |         { id: 'wh_evt_4419xC', provider: 'Netgsm', eventType: 'sms.delivered', status: 'IGNORED', createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), payloadSum: 'MsgId: 1982245' },
+     |                                                                                                                       ^^^^^^^^^^ Cannot call impure function
+  16 |         { id: 'wh_evt_1155gT', provider: 'DocuSign', eventType: 'envelope.declined', status: 'FAILED', createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), payloadSum: 'User signature refused' },
+  17 |         { id: 'wh_evt_9987kZ', provider: 'E-Guven', eventType: 'timestamp.issued', status: 'PROCESSED', createdAt: new Date(Date.now() - 1000 * 60 * 400).toISOString(), payloadSum: 'TSR generated for doc_91A' },
+  18 |     ];                                                                react-hooks/purity
+  16:124  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\webhooks\page.tsx:16:124
+  14 |         { id: 'wh_evt_0981bA', provider: 'DocuSign', eventType: 'envelope.completed', status: 'PROCESSED', createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), payloadSum: 'Envelope 9182C finalized' },
+  15 |         { id: 'wh_evt_4419xC', provider: 'Netgsm', eventType: 'sms.delivered', status: 'IGNORED', createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), payloadSum: 'MsgId: 1982245' },
+> 16 |         { id: 'wh_evt_1155gT', provider: 'DocuSign', eventType: 'envelope.declined', status: 'FAILED', createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), payloadSum: 'User signature refused' },
+     |                                                                                                                            ^^^^^^^^^^ Cannot call impure function
+  17 |         { id: 'wh_evt_9987kZ', provider: 'E-Guven', eventType: 'timestamp.issued', status: 'PROCESSED', createdAt: new Date(Date.now() - 1000 * 60 * 400).toISOString(), payloadSum: 'TSR generated for doc_91A' },
+  18 |     ];
+  19 |                                                                                  react-hooks/purity
+  17:125  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\signatures\webhooks\page.tsx:17:125
+  15 |         { id: 'wh_evt_4419xC', provider: 'Netgsm', eventType: 'sms.delivered', status: 'IGNORED', createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), payloadSum: 'MsgId: 1982245' },
+  16 |         { id: 'wh_evt_1155gT', provider: 'DocuSign', eventType: 'envelope.declined', status: 'FAILED', createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), payloadSum: 'User signature refused' },
+> 17 |         { id: 'wh_evt_9987kZ', provider: 'E-Guven', eventType: 'timestamp.issued', status: 'PROCESSED', createdAt: new Date(Date.now() - 1000 * 60 * 400).toISOString(), payloadSum: 'TSR generated for doc_91A' },
+     |                                                                                                                             ^^^^^^^^^^ Cannot call impure function
+  18 |     ];
+  19 |
+  20 |     return (                                                                                                                                                                                                                                                                                        react-hooks/purity
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(admin)\admin\system\tasks\page.tsx
+  29:70  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\HomeClient.tsx
+  472:63  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\accounting\reconciliations\disputes\DisputesClient.tsx
+  56:24   error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\accounting\reconciliations\disputes\DisputesClient.tsx:56:24
+  54 |         if (status !== 'OPEN') return null;
+  55 |
+> 56 |         const diffMs = Date.now() - new Date(createdAt).getTime();
+     |                        ^^^^^^^^^^ Cannot call impure function
+  57 |         const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  58 |
+  59 |         if (diffDays >= 7) return <span style={{ padding: '2px 6px', background: 'rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '4px', fontSize: '10px', marginLeft: '6px', fontWeight: 'bold' }}>{diffDays} Gün Gecikti</span>;  react-hooks/purity
+  75:118  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react/no-unescaped-entities
+  75:134  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\b2b\policies\page.tsx
+  129:148  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  129:159  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\growth\boost-rules\page.tsx
+  256:180  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  256:182  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  256:366  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  256:375  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\growth\revenue\page.tsx
+  39:102  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  39:112  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\payments-escrow\providers\page.tsx
+  12:9  error  Error: Cannot access variable before it is declared
+
+`fetchProviders` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\payments-escrow\providers\page.tsx:12:9
+  10 |
+  11 |     useEffect(() => {
+> 12 |         fetchProviders();
+     |         ^^^^^^^^^^^^^^ `fetchProviders` accessed before it is declared
+  13 |     }, []);
+  14 |
+  15 |     const fetchProviders = async () => {
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\payments-escrow\providers\page.tsx:15:5
+  13 |     }, []);
+  14 |
+> 15 |     const fetchProviders = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 16 |         const res = await fetch("/api/admin/payments-escrow/providers/status");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 17 |         if (res.ok) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 18 |             setProviders((await res.json()).providers);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 19 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 20 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |     };
+     | ^^^^^^^ `fetchProviders` is declared here
+  22 |
+  23 |     const triggerReconcile = async (providerName: string) => {
+  24 |         const idempotencyKey = crypto.randomUUID();  react-hooks/immutability
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\platform-finance\page.tsx
+  98:110  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\settings\mail\page.tsx
+  179:57  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  179:63  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\support\[id]\page.tsx
+  123:138  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  123:162  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\support\tickets\[id]\page.tsx
+  70:32  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\system\doctor\page.tsx
+  181:106  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\tenants\[id]\help\HelpManager.tsx
+  128:175  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  128:191  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  141:100  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\tenants\[id]\help\page.tsx
+  41:173  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  41:181  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\admin\website\page.tsx
+  1252:187  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                            react/no-unescaped-entities
+  1252:201  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                            react/no-unescaped-entities
+  1306:81   warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+  1327:81   warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\billing\boost-invoices\BoostInvoicesClient.tsx
+  13:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\billing\boost-invoices\BoostInvoicesClient.tsx:13:9
+  11 |
+  12 |     useEffect(() => {
+> 13 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |         fetch("/api/billing/boost-invoices")
+  15 |             .then(res => res.ok ? res.json() : { items: [], health: { status: "CURRENT", graceEndsAt: null, overdueSince: null } })
+  16 |             .then(data => {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\billing\checkout\page.tsx
+  85:110  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  85:121  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\campaigns\loyalty\page.tsx
+  40:23  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\campaigns\loyalty\page.tsx:40:23
+  38 |     const [campaignSubTab, setCampaignSubTab] = useState('loyalty');
+  39 |     const [referralSettings, setReferralSettings] = useState(contextReferralSettings || {});
+> 40 |     useEffect(() => { setReferralSettings(contextReferralSettings || {}); }, [contextReferralSettings]);
+     |                       ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  41 |
+  42 |     const saveReferralSettings = async () => {
+  43 |         await updateReferralSettings(referralSettings);  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\catalog\checkout\CheckoutClient.tsx
+  24:61  error  React Hook "useModal" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\contracts\builder\page.tsx
+  141:74  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\customers\[id]\page.tsx
+   34:17  error  Error: Avoid constructing JSX within try/catch
+
+React does not immediately render components when JSX is rendered, so any errors from this component will not be caught by the try/catch. To catch errors in rendering a given component, wrap that component in an error boundary. (https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\customers\[id]\page.tsx:34:17
+  32 |         if (!id) {
+  33 |             return (
+> 34 |                 <div style={{ padding: '40px', background: '#0f0f12', height: '100vh', color: '#ff4444' }}>
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |                     <h1>Hata: Müşteri Kimliği Eksik</h1>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 36 |                 </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^ Avoid constructing JSX within try/catch
+  37 |             );
+  38 |         }
+  39 |                         react-hooks/error-boundaries
+   35:21  error  Error: Avoid constructing JSX within try/catch
+
+React does not immediately render components when JSX is rendered, so any errors from this component will not be caught by the try/catch. To catch errors in rendering a given component, wrap that component in an error boundary. (https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\customers\[id]\page.tsx:35:21
+  33 |             return (
+  34 |                 <div style={{ padding: '40px', background: '#0f0f12', height: '100vh', color: '#ff4444' }}>
+> 35 |                     <h1>Hata: Müşteri Kimliği Eksik</h1>
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid constructing JSX within try/catch
+  36 |                 </div>
+  37 |             );
+  38 |         }                                                                                                                                                                                                            react-hooks/error-boundaries
+  312:16  error  Error: Avoid constructing JSX within try/catch
+
+React does not immediately render components when JSX is rendered, so any errors from this component will not be caught by the try/catch. To catch errors in rendering a given component, wrap that component in an error boundary. (https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\customers\[id]\page.tsx:312:16
+  310 |
+  311 |         // Use deep serialization for safety
+> 312 |         return <CustomerDetailClient customer={serializeData(customer)} historyList={serializeData(historyList)} />;
+      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid constructing JSX within try/catch
+  313 |     } catch (err: any) {
+  314 |         // If notFound() was called, its error should bubble up to Next.js handled properly
+  315 |         if (err.digest === 'NEXT_NOT_FOUND' || err.message?.includes('NEXT_NOT_FOUND')) {  react-hooks/error-boundaries
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\data-import\DataImportClient.tsx
+  425:177  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  425:195  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  439:70   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  439:87   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  449:95   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  449:108  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  449:154  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  449:180  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\dealer-network\orders\approvals\page.tsx
+  124:23  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\dealer-network\orders\approvals\page.tsx:124:23
+  122 |     }
+  123 |
+> 124 |     useEffect(() => { load() }, [])
+      |                       ^^^^ Avoid calling setState() directly within an effect
+  125 |
+  126 |     return (
+  127 |         <div className="min-h-screen bg-background px-4 py-10">  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\dealer-network\refunds\page.tsx
+   49:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\dealer-network\refunds\page.tsx:49:9
+  47 |
+  48 |     useEffect(() => {
+> 49 |         setCursor(null);
+     |         ^^^^^^^^^ Avoid calling setState() directly within an effect
+  50 |         load(true);
+  51 |          
+  52 |     }, [status]);                                       react-hooks/set-state-in-effect
+  145:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\dealer-network\refunds\page.tsx:145:13
+  143 |     useEffect(() => {
+  144 |         if (!id) {
+> 145 |             setData(null);
+      |             ^^^^^^^ Avoid calling setState() directly within an effect
+  146 |             return;
+  147 |         }
+  148 |         (async () => {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\dealer-network\settings\page.tsx
+  130:124  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  130:146  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  148:146  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  148:160  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  183:145  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  183:170  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\desktop\ClientDashboard.tsx
+  512:66  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\field-sales\admin\config\page.tsx
+  102:126  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  102:138  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\fintech\control-tower\page.tsx
+  132:177  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  276:32   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  276:136  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub-dashboard\page.tsx
+   16:5    error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   18:5    error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  192:143  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                      react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\buyer\orders\[id]\ConfirmDeliveryAction.tsx
+  43:111  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  43:125  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\earnings\page.tsx
+  15:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\earnings\page.tsx:15:9
+  13 |
+  14 |     useEffect(() => {
+> 15 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  16 |         fetch("/api/network/earnings")
+  17 |             .then(res => {
+  18 |                 if (!res.ok) throw new Error("Failed to fetch earnings");  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\payments\page.tsx
+  11:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\payments\page.tsx:11:9
+   9 |
+  10 |     useEffect(() => {
+> 11 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  12 |         fetch('/api/hub/payments')
+  13 |             .then(res => res.json())
+  14 |             .then(data => {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\payouts\page.tsx
+  13:9    error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\payouts\page.tsx:13:9
+  11 |
+  12 |     useEffect(() => {
+> 13 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |         Promise.all([
+  15 |             fetch("/api/network/payouts/summary").then(r => r.ok ? r.json() : {} as any),
+  16 |             fetch("/api/network/payouts/destinations").then(r => r.ok ? r.json() : []),  react-hooks/set-state-in-effect
+  56:148  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\stock-risks\page.tsx
+  42:106  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  42:119  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\trust-score\page.tsx
+   11:9    error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\hub\trust-score\page.tsx:11:9
+   9 |
+  10 |     useEffect(() => {
+> 11 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  12 |         fetch("/api/company/trust")
+  13 |             .then(res => res.ok ? res.json() : null)
+  14 |             .then(data => {  react-hooks/set-state-in-effect
+  223:129  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+  223:131  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+  223:136  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+  223:138  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+  235:212  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+  235:214  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\boms\page.tsx
+  394:98   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  394:109  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\BulkPriceEntryContent.tsx
+  103:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\BulkPriceEntryContent.tsx:103:9
+  101 |             };
+  102 |         });
+> 103 |         setPriceData(initialData);
+      |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  104 |     }, [products, targetListId]);
+  105 |
+  106 |     const handleUpdate = (id: string | number, field: string, value: any) => {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\InventoryBulkEditModal.tsx
+  34:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\InventoryBulkEditModal.tsx:34:13
+  32 |     useEffect(() => {
+  33 |         if (isOpen) {
+> 34 |             setBulkValues({});
+     |             ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  35 |             setAdjValue(0);
+  36 |         }
+  37 |     }, [isOpen]);  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\InventoryDetailModal.tsx
+  147:157  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  147:178  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  147:201  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  147:216  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\InventoryTransferModal.tsx
+  42:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\InventoryTransferModal.tsx:42:13
+  40 |     useEffect(() => {
+  41 |         if (isOpen) {
+> 42 |             setTransferData({
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  43 |                 productId: 0,
+  44 |                 from: branches[0] || '',
+  45 |                 to: branches[1] || branches[0] || '',  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\components\ProductWizardModal.tsx
+  262:43   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  884:69   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  884:75   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  884:100  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  884:247  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  884:272  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  884:282  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  884:298  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\labels\page.tsx
+  50:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\labels\page.tsx:50:9
+  48 |         }
+  49 |
+> 50 |         setLabelsToPrint(filtered);
+     |         ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  51 |     }, [products, targetType, selectedProductId, selectedCategory, selectedBrand]);
+  52 |
+  53 |     const handlePrint = () => {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\inventory\manufacturing\page.tsx
+  329:36   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  329:50   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  329:117  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  329:125  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\invoices\page.tsx
+  196:77  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  197:54  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  197:62  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\network\invitations\page.tsx
+  154:49  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  154:64  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\network\supplier\settlements\page.tsx
+  112:42   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  112:60   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  112:211  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  112:219  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  112:258  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  112:266  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  112:293  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  112:302  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\onboarding\page.tsx
+  206:137  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  206:149  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  206:154  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  206:163  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  284:140  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  284:149  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  284:193  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\payment\page.tsx
+  55:30  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\payment\page.tsx:55:30
+  53 |             else if (paymentMethod === 'iban') defaultKasa = kasalar.find(k => k.type === 'Banka');
+  54 |
+> 55 |             if (defaultKasa) setSelectedAccount(defaultKasa.id.toString());
+     |                              ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  56 |             else if (kasalar.length > 0) setSelectedAccount(kasalar[0].id.toString());
+  57 |         }
+  58 |     }, [paymentMethod, kasalar]);  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\reconciliation\[id]\ReconDetailClient.tsx
+  134:49  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  134:66  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\reconciliation\disputes\page.tsx
+  87:49   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  87:116  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\reconciliation\new\page.tsx
+  72:90  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\reports\page.tsx
+  55:25  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\reports\page.tsx:55:25
+  53 |     const [selectedBranch, setSelectedBranch] = useState(currentUser?.branch || 'Merkez');
+  54 |     const [dateRange, setDateRange] = useState({
+> 55 |         start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+     |                         ^^^^^^^^^^ Cannot call impure function
+  56 |         end: new Date().toISOString().split('T')[0]
+  57 |     });
+  58 |     // Performance Optimization: Debounce date changes  react-hooks/purity
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\rfq\page.tsx
+  128:139  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  128:148  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\security\suspicious\page.tsx
+   54:34   error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\security\suspicious\page.tsx:54:34
+  52 |     const stats = useMemo(() => {
+  53 |         const today = new Date().toDateString();
+> 54 |         const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+     |                                  ^^^^^^^^^^ Cannot call impure function
+  55 |
+  56 |         return {
+  57 |             today: events.filter(e => new Date(e.timestamp).toDateString() === today).length,  react-hooks/purity
+  213:158  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    react/no-unescaped-entities
+  213:181  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\seller\automation\page.tsx
+  75:76   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  75:85   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  97:115  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  97:126  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\seller\boost\analytics\page.tsx
+  20:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\seller\boost\analytics\page.tsx:20:9
+  18 |
+  19 |     useEffect(() => {
+> 20 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  21 |         fetch("/api/seller/boost/analytics")
+  22 |             .then(res => res.ok ? res.json() : null)
+  23 |             .then(data => {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\seller\boost\page.tsx
+   12:9    error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\seller\boost\page.tsx:12:9
+  10 |
+  11 |     useEffect(() => {
+> 12 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  13 |         fetch("/api/seller/boost")
+  14 |             .then(res => res.ok ? res.json() : null)
+  15 |             .then(data => {  react-hooks/set-state-in-effect
+  113:100  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react/no-unescaped-entities
+  113:118  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\service\[id]\page.tsx
+  72:47  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\settings\_components\forms\CampaignPointsPanel.tsx
+  378:131  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\settings\_components\forms\CloudBackupPanel.tsx
+   89:167  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  125:50   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\settings\_components\forms\DefinitionsListPanel.tsx
+  197:162  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  197:186  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\settings\_components\forms\MailSettingsPanel.tsx
+  122:57  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  122:63  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\settings\_components\forms\NotificationSettingsPanel.tsx
+  68:176  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\settings\_components\forms\SalesExpensesPanel.tsx
+  139:74  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  139:89  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\support\tickets\page.tsx
+  14:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\support\tickets\page.tsx:14:9
+  12 |
+  13 |     useEffect(() => {
+> 14 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  15 |         fetch(`/api/support/tickets?status=${filterStatus}&type=${filterType}`)
+  16 |             .then(res => res.ok ? res.json() : { items: [] })
+  17 |             .then(data => {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\theme-test\page.tsx
+  45:42  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  47:43  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\treasury\page.tsx
+  37:39  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(app)\vehicle\[plate]\page.tsx
+  46:46  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  46:77  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(public)\pdks\display\page.tsx
+  64:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\(public)\pdks\display\page.tsx:64:9
+  62 |     // İlk yükleme ve periyodik çekim
+  63 |     useEffect(() => {
+> 64 |         fetchToken();
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  65 |         const interval = setInterval(fetchToken, 4000); // 4 saniyede bir kontrol et (8s TTL için güvenli)
+  66 |         return () => clearInterval(interval);
+  67 |     }, [fetchToken]);  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx
+  172:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:172:13
+  170 |     useEffect(() => {
+  171 |         if (!isInitialLoading) {
+> 172 |             setShowContent(true);
+      |             ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  173 |         }
+  174 |     }, [isInitialLoading]);
+  175 |                                            react-hooks/set-state-in-effect
+  258:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:258:9
+  256 |
+  257 |     useEffect(() => {
+> 258 |         setReady(true);
+      |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  259 |         const checkStyles = () => {
+  260 |             const styles = Array.from(document.styleSheets);
+  261 |             if (styles.length > 0) {  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\api\notifications\summary\route.ts
+  18:13  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  28:9   error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  56:9   error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  66:9   error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\api\suppliers\[id]\invoice\parse\route.ts
+  38:9  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\field-mobile\visits\page.tsx
+  170:41  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  170:55  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\cart\page.tsx
+  60:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\cart\page.tsx:60:9
+  58 |
+  59 |     useEffect(() => {
+> 60 |         load()
+     |         ^^^^ Avoid calling setState() directly within an effect
+  61 |     }, [])
+  62 |
+  63 |     const grandTotal = cart?.summary?.grandTotal || 0                                                                                react-hooks/set-state-in-effect
+  69:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\cart\page.tsx:69:13
+  67 |     useEffect(() => {
+  68 |         if (limitExceeded && paymentMode === "ON_ACCOUNT") {
+> 69 |             setPaymentMode("CARD")
+     |             ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  70 |         }
+  71 |     }, [limitExceeded, paymentMode])
+  72 |  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\layout.tsx
+  16:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\layout.tsx:16:9
+  14 |     const [mounted, setMounted] = useState(false)
+  15 |     useEffect(() => {
+> 16 |         setMounted(true)
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |     }, [])
+  18 |
+  19 |     // Public sayfalar için minimal topbar veya gizli  react-hooks/set-state-in-effect
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\orders\[id]\page.tsx
+  84:42  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\orders\page.tsx
+   86:23  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\orders\page.tsx:86:23
+  84 |     }
+  85 |
+> 86 |     useEffect(() => { loadFirst() }, [])
+     |                       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  87 |
+  88 |     return (
+  89 |         <div className="font-sans min-h-[calc(100vh-64px)] bg-slate-50">  react-hooks/set-state-in-effect
+  109:38  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react/no-unescaped-entities
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\select-supplier\page.tsx
+  40:23  error  Error: Cannot access variable before it is declared
+
+`switchMembership` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\select-supplier\page.tsx:40:23
+  38 |             if ((data.memberships || []).length === 1) {
+  39 |                 const m = data.memberships[0]
+> 40 |                 await switchMembership(m.id)
+     |                       ^^^^^^^^^^^^^^^^ `switchMembership` accessed before it is declared
+  41 |             }
+  42 |         })()
+  43 |          
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\network\select-supplier\page.tsx:46:5
+  44 |     }, [])
+  45 |
+> 46 |     async function switchMembership(membershipId: string) {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |         setBusyId(membershipId)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |         const res = await fetch("/api/network/context/switch", {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |         router.push(getPath("/network/dashboard"))
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 62 |     }
+     | ^^^^^^ `switchMembership` is declared here
+  63 |
+  64 |     return (
+  65 |         <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background">  react-hooks/immutability
+
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\portal\login\page.tsx
+  91:21  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+✖ 207 problems (205 errors, 2 warnings)
+

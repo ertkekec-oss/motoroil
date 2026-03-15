@@ -100,6 +100,16 @@ export async function PUT(request: Request) {
             return NextResponse.json({ success: false, error: 'ID zorunludur.' }, { status: 400 });
         }
 
+        const companyId = await resolveCompanyId(auth.user);
+        if (!companyId) {
+            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 400 });
+        }
+
+        const existing = await prisma.supplier.findFirst({ where: { id, companyId } });
+        if (!existing) {
+            return NextResponse.json({ success: false, error: 'Tedarikçi bulunamadı veya erişim yetkiniz yok.' }, { status: 403 });
+        }
+
         const email = (rawEmail && rawEmail.trim() !== '') ? rawEmail.trim() : null;
 
         const updatedSupplier = await prisma.supplier.update({
@@ -137,6 +147,16 @@ export async function DELETE(request: Request) {
 
         if (!id) {
             return NextResponse.json({ success: false, error: 'ID zorunludur.' }, { status: 400 });
+        }
+
+        const companyId = await resolveCompanyId(auth.user);
+        if (!companyId) {
+            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 400 });
+        }
+
+        const existing = await prisma.supplier.findFirst({ where: { id, companyId } });
+        if (!existing) {
+            return NextResponse.json({ success: false, error: 'Tedarikçi bulunamadı veya erişim yetkiniz yok.' }, { status: 403 });
         }
 
         await prisma.supplier.update({

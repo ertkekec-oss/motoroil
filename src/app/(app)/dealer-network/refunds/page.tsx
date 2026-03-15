@@ -32,6 +32,7 @@ export default function RefundsPage() {
     }, [status, q, cursor]);
 
     async function load(reset = false) {
+        if (reset) setCursor(null);
         setLoading(true);
         const res = await fetch(queryUrl, { cache: "no-store" });
         const data = await res.json().catch(() => null);
@@ -46,9 +47,7 @@ export default function RefundsPage() {
     }
 
     useEffect(() => {
-        setCursor(null);
         load(true);
-         
     }, [status]);
 
     return (
@@ -142,7 +141,7 @@ function RefundDetail({ id }: { id: string | null }) {
 
     useEffect(() => {
         if (!id) {
-            setData(null);
+            Promise.resolve().then(() => setData(null));
             return;
         }
         (async () => {
