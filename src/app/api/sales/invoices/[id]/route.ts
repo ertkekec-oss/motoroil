@@ -110,6 +110,57 @@ export async function DELETE(
             }, { status: 400 });
         }
 
+        // --- NILVERA E-ARSIV CANCELLATION CHECK ---
+        const invoiceAny = invoice as any;
+        if (invoice.isFormal && invoiceAny.formalUuid) {
+            const formalType = invoiceAny.formalType || 'EARSIV';
+
+            if (formalType === 'EARSIV') {
+                const settings = await prisma.appSettings.findFirst({
+                    where: { key: 'erecordConfig', companyId: auth.user.companyId }
+                });
+
+                if (settings && settings.value) {
+                    const config = settings.value as any;
+                    const apiKey = config.apiKey;
+                    const isTest = config.isTestEnvironment || false;
+                    const baseUrl = isTest ? 'https://apitest.nilvera.com' : 'https://api.nilvera.com';
+
+                    if (apiKey) {
+                        try {
+                            const { NilveraInvoiceService } = await import('@/services/nilveraService');
+                            const nilvera = new NilveraInvoiceService({ apiKey, baseUrl });
+                            
+                            // 1. İptal isteği gönder
+                            const cancelResult = await nilvera.cancelEArchiveInvoice(invoiceAny.formalUuid);
+
+                            if (!cancelResult.success) {
+                                return NextResponse.json({ 
+                                    success: false, 
+                                    error: `Fatura e-Arşiv (Nilvera) sisteminde iptal edilemediği için GİB'e iletildiğinden sistemimizde de iptali durduruldu. (Hata: ${cancelResult.error})`
+                                }, { status: 400 });
+                            }
+                        } catch(e: any) {
+                            return NextResponse.json({ 
+                                success: false, 
+                                error: 'Nilvera e-Arşiv iptal işlemi sırasında beklenmeyen hata oluştu: ' + e.message 
+                            }, { status: 500 });
+                        }
+                    } else {
+                        return NextResponse.json({ success: false, error: 'e-Belge ayarları eksik. Lütfen şirket entegrasyon API anahtarını kontrol edin.' }, { status: 400 });
+                    }
+                } else {
+                    return NextResponse.json({ success: false, error: 'e-Belge yapılandırması (Anahtar/Şifre) bulunamadı.' }, { status: 400 });
+                }
+            } else if (formalType === 'EFATURA') {
+                return NextResponse.json({ 
+                    success: false, 
+                    error: 'Bu bir e-Fatura (Ticari/Temel). e-Faturalar buradan iptal edilemez. Alıcının reddetmesi veya GİB/KEP portalinden iptal işlemi yapmanız gereklidir.' 
+                }, { status: 400 });
+            }
+        }
+        // --- END NILVERA CANCELLATION CHECK ---
+
         await prisma.$transaction(async (tx) => {
             // Update invoice status to 'İptal Edildi' rather than hard-deleting
             await tx.salesInvoice.update({

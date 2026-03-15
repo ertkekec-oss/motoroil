@@ -820,4 +820,35 @@ export class NilveraInvoiceService {
             return { success: false, error: error.message };
         }
     }
+
+    /**
+     * e-Arşiv Fatura İptali
+     */
+    async cancelEArchiveInvoice(uuid: string, notes: string = "İptal/İade") {
+        try {
+            console.log(`[NilveraService] Canceling EArchive Invoice: UUID=${uuid}`);
+            const res = await axios.post(
+                `${this.config.baseUrl}/EArchive/Invoice/Cancel`,
+                [{
+                    UUID: uuid,
+                    Notes: notes
+                }],
+                {
+                    headers: this.getHeaders(),
+                    validateStatus: () => true
+                }
+            );
+
+            if (res.status >= 400) {
+                console.warn("[NilveraService] EArchive Cancel Error:", res.data);
+                return { success: false, status: res.status, error: JSON.stringify(res.data) };
+            }
+
+            console.log("[NilveraService] EArchive Cancel Success:", res.data);
+            return { success: true, data: res.data };
+        } catch (error: any) {
+            console.error("[NilveraService] EArchive Cancel Exception:", error.message);
+            return { success: false, error: error.message };
+        }
+    }
 }
