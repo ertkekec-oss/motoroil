@@ -212,20 +212,28 @@ export function InvoicesTab({
                                                         </td>
                                                         <td className="px-4 align-middle text-center">
                                                             <div className="flex gap-2 items-center justify-center" onClick={e => e.stopPropagation()}>
-                                                                {!inv.isFormal ? (
-                                                                    <button
-                                                                        onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
-                                                                        className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
-                                                                    >
-                                                                        Faturalandır
-                                                                    </button>
-                                                                ) : (
+                                                                {inv.status !== 'İptal Edildi' && (
                                                                     <>
+                                                                        {!inv.isFormal ? (
+                                                                            <button
+                                                                                onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
+                                                                                className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                                            >
+                                                                                Faturalandır
+                                                                            </button>
+                                                                        ) : (
+                                                                            <button
+                                                                                onClick={() => handleViewPDF(inv.id)}
+                                                                                className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                                            >
+                                                                                İndir (PDF)
+                                                                            </button>
+                                                                        )}
                                                                         <button
-                                                                            onClick={() => handleViewPDF(inv.id)}
-                                                                            className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                                            onClick={() => handleDeleteInvoice(inv.id)}
+                                                                            className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-slate-800 border-red-900/50 text-red-400 hover:bg-red-900/20'}`}
                                                                         >
-                                                                            İndir (PDF)
+                                                                            İptal Et
                                                                         </button>
                                                                     </>
                                                                 )}

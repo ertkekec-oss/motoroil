@@ -68,12 +68,12 @@ export default function SalesPage() {
     const [isLoadingWayslips, setIsLoadingWayslips] = useState(false);
 
     const handleDeleteInvoice = async (id: string) => {
-        showConfirm('Fatura Silinecek', 'Bu faturayı silmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALMAYABİLİR (Onaylanmış faturalar için manuel kontrol önerilir).', async () => {
+        showConfirm('Fatura İptal Edilecek', 'Bu faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.', async () => {
             try {
                 const res = await apiFetch(`/api/sales/invoices/${id}`, { method: 'DELETE' });
                 const data = await res.json();
                 if (data.success) {
-                    showSuccess('Başarılı', 'Fatura silindi.');
+                    showSuccess('İptal Başarılı', data.message || 'Fatura ve finansal etkileri iptal edildi.');
                     fetchInvoices();
                     if (activeTab === 'store') {
                         // Refresh store tab if we are there
@@ -82,7 +82,7 @@ export default function SalesPage() {
                         });
                     }
                 } else {
-                    showError('Hata', data.error || 'Silinemedi.');
+                    showError('Hata', data.error || 'İptal edilemedi.');
                 }
             } catch (e) {
                 showError('Hata', 'Bağlantı hatası.');

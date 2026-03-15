@@ -2159,10 +2159,50 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                             </div>
 
-                            {/* Footer Actions */}
                             <div className="px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 mt-auto shrink-0">
                                 <EnterpriseButton variant="secondary" onClick={() => setInvoiceModalOpen(false)} className="w-32">
                                     İPTAL
+                                </EnterpriseButton>
+                                <EnterpriseButton
+                                    variant="secondary"
+                                    disabled={isConverting}
+                                    onClick={() => {
+                                        const data = {
+                                            taxNumber: (document.getElementById('inv_tax_no') as HTMLInputElement).value,
+                                            taxOffice: (document.getElementById('inv_tax_office') as HTMLInputElement).value,
+                                            address: (document.getElementById('inv_address') as HTMLTextAreaElement).value,
+                                            phone: (document.getElementById('inv_phone') as HTMLInputElement).value,
+                                            name: (document.getElementById('inv_name') as HTMLInputElement).value,
+                                            isFormal: false,
+                                            status: 'Proforma',
+                                            createWayslip: (document.getElementById('inv_create_wayslip') as HTMLInputElement)?.checked || false,
+                                            isInstallment: isInstallmentInvoice,
+                                            installments: invoiceInstallmentCount,
+                                            installmentType: (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap',
+                                            description: (() => {
+                                                if (isInstallmentInvoice) {
+                                                    const dates = [];
+                                                    const baseDate = new Date();
+                                                    for (let i = 1; i <= invoiceInstallmentCount; i++) {
+                                                        const d = new Date(baseDate);
+                                                        d.setMonth(d.getMonth() + i);
+                                                        dates.push(d.toLocaleDateString('tr-TR'));
+                                                    }
+                                                    const instType = (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap';
+                                                    return `VADE SAYISI: ${invoiceInstallmentCount} | ÖDEME TİPİ: ${instType} | VADE TARİHLERİ: ${dates.join(', ')}`;
+                                                }
+                                                return '';
+                                            })()
+                                        };
+                                        triggerInvoiceConversion(data);
+                                    }}
+                                    className="min-w-[200px]"
+                                >
+                                    {isConverting ? (
+                                        <><div className="w-4 h-4 border-2 border-slate-600 border-t-slate-800 rounded-full animate-spin"></div></>
+                                    ) : (
+                                        <>PROFORMA OLUŞTUR</>
+                                    )}
                                 </EnterpriseButton>
                                 <EnterpriseButton
                                     variant="primary"
