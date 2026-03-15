@@ -1687,6 +1687,25 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         const statusColor = isProforma ? '#f59e0b' : (item.linkedInvoiceStatus === 'İrsaliye' ? '#8b5cf6' : '#10b981');
                                                                         const statusBg = isProforma ? 'rgba(245, 158, 11, 0.1)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)');
                                                                         
+                                                                        const isVadelendi = vadelenenIds.includes(item.orderId) || customer?.paymentPlans?.some((p: any) => p.description === item.orderId || p.description === item.id || (item.formalInvoiceId && p.description === item.formalInvoiceId));
+                                                                        const vadelendiBadge = isVadelendi ? (
+                                                                            <span style={{
+                                                                                padding: '6px 10px',
+                                                                                background: 'rgba(139, 92, 246, 0.1)',
+                                                                                color: '#8b5cf6',
+                                                                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                                                                borderRadius: '8px',
+                                                                                fontSize: '11px',
+                                                                                fontWeight: '800',
+                                                                                whiteSpace: 'nowrap',
+                                                                                display: 'inline-flex',
+                                                                                alignItems: 'center',
+                                                                                gap: '4px'
+                                                                            }}>
+                                                                                📅 Vadelendi
+                                                                            </span>
+                                                                        ) : null;
+
                                                                         return hasInvoice ? (
                                                                             <>
                                                                                 <span style={{
@@ -1704,6 +1723,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                 }}>
                                                                                     {statusIcon} {statusLabel}
                                                                                 </span>
+                                                                                {vadelendiBadge}
                                                                                 {isProforma && !isReallyFormal && (
                                                                                     <button
                                                                                         onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
@@ -1729,13 +1749,16 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                 )}
                                                                             </>
                                                                         ) : (
-                                                                            <button
-                                                                                onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
-                                                                                style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-                                                                                className="hover:bg-blue-500 hover:text-white box-shadow-blue"
-                                                                            >
-                                                                                🧾 Faturalandır
-                                                                            </button>
+                                                                            <>
+                                                                                {vadelendiBadge}
+                                                                                <button
+                                                                                    onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                                    style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                                    className="hover:bg-blue-500 hover:text-white box-shadow-blue"
+                                                                                >
+                                                                                    🧾 Faturalandır
+                                                                                </button>
+                                                                            </>
                                                                         );
                                                                     })()
                                                                 )}
@@ -1770,6 +1793,29 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         )}
                                                         {(item.type === 'Fatura' || item.type === 'İrsaliye') && (
                                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                                {(() => {
+                                                                    const isVadelendi = vadelenenIds.includes(item.id) || customer?.paymentPlans?.some((p: any) => p.description === item.id || (item.orderId && p.description === item.orderId));
+                                                                    if (isVadelendi) {
+                                                                        return (
+                                                                            <span style={{
+                                                                                padding: '6px 10px',
+                                                                                background: 'rgba(139, 92, 246, 0.1)',
+                                                                                color: '#8b5cf6',
+                                                                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                                                                borderRadius: '8px',
+                                                                                fontSize: '11px',
+                                                                                fontWeight: '800',
+                                                                                whiteSpace: 'nowrap',
+                                                                                display: 'inline-flex',
+                                                                                alignItems: 'center',
+                                                                                gap: '4px'
+                                                                            }}>
+                                                                                📅 Vadelendi
+                                                                            </span>
+                                                                        );
+                                                                    }
+                                                                    return null;
+                                                                })()}
                                                                 {(item.status === 'Proforma' || item.status === 'Taslak') && !item.isFormal && item.orderId && (
                                                                     <button
                                                                         onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
@@ -1951,7 +1997,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     </div>
 
                                                                     {(() => {
-                                                                        const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId));
+                                                                        const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
                                                                         if (!attachedPlan) return null;
                                                                         return (
                                                                             <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
