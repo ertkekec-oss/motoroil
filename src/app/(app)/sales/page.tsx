@@ -67,8 +67,12 @@ export default function SalesPage() {
     const [wayslips, setWayslips] = useState<any[]>([]);
     const [isLoadingWayslips, setIsLoadingWayslips] = useState(false);
 
-    const handleDeleteInvoice = async (id: string) => {
-        showConfirm('Fatura İptal Edilecek', 'Bu faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.', async () => {
+    const handleDeleteInvoice = async (id: string, isFormal?: boolean) => {
+        const warningMessage = isFormal 
+            ? 'DİKKAT: Bu resmi bir faturadır! İptal ederseniz GİB portaldan veya e-Logo üzerinden de faturayı reddetmeli/iptal etmelisiniz. Sistemden sildiğinizde bakiye ve stoklar GERİ ALINACAKTIR. Emin misiniz?'
+            : 'Bu faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.';
+
+        showConfirm(isFormal ? 'Resmi Fatura İptali' : 'Fatura İptal Edilecek', warningMessage, async () => {
             try {
                 const res = await apiFetch(`/api/sales/invoices/${id}`, { method: 'DELETE' });
                 const data = await res.json();

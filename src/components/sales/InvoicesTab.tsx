@@ -16,7 +16,7 @@ interface InvoicesTabProps {
     purchaseInvoices: any[];
     wayslips: any[];
     handleApproveInvoice: (id: string) => Promise<void>;
-    handleDeleteInvoice: (id: string) => Promise<void>;
+    handleDeleteInvoice: (id: string, isFormal?: boolean) => Promise<void>;
     handleSendToELogo: (id: string, type: any) => Promise<void>;
     handleViewPDF: (id: string) => Promise<void>;
     handleAcceptPurchaseInvoice: (id: string, documentType?: 'INVOICE' | 'DESPATCH') => Promise<void>;
@@ -214,23 +214,24 @@ export function InvoicesTab({
                                                             <div className="flex gap-2 items-center justify-center" onClick={e => e.stopPropagation()}>
                                                                 {inv.status !== 'İptal Edildi' && (
                                                                     <>
-                                                                        {!inv.isFormal ? (
+                                                                        {!inv.isFormal && (
                                                                             <button
                                                                                 onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
                                                                                 className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                                                title="Proformayı veya taslak faturayı GİB'e göndererek resmileştirin"
                                                                             >
-                                                                                Faturalandır
-                                                                            </button>
-                                                                        ) : (
-                                                                            <button
-                                                                                onClick={() => handleViewPDF(inv.id)}
-                                                                                className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
-                                                                            >
-                                                                                İndir (PDF)
+                                                                                Resmileştir
                                                                             </button>
                                                                         )}
                                                                         <button
-                                                                            onClick={() => handleDeleteInvoice(inv.id)}
+                                                                            onClick={() => handleViewPDF(inv.id)}
+                                                                            className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                                        >
+                                                                            İndir (PDF)
+                                                                        </button>
+
+                                                                        <button
+                                                                            onClick={() => handleDeleteInvoice(inv.id, inv.isFormal)}
                                                                             className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-slate-800 border-red-900/50 text-red-400 hover:bg-red-900/20'}`}
                                                                         >
                                                                             İptal Et
@@ -548,7 +549,7 @@ export function InvoicesTab({
                                                                                 </button>
                                                                             )}
                                                                             {!irs.isFormal && irs.type === 'Giden' && (
-                                                                                <button onClick={() => handleDeleteInvoice(irs.id)} className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/30'}`}>
+                                                                                <button onClick={() => handleDeleteInvoice(irs.id, irs.isFormal)} className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/30'}`}>
                                                                                     🗑️ Sil
                                                                                 </button>
                                                                             )}

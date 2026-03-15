@@ -584,6 +584,32 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     });
     const [isSavingCheck, setIsSavingCheck] = useState(false);
 
+    const handleCancelInvoice = async (invoiceId: string, isFormal: boolean) => {
+        const title = isFormal ? 'Resmi Fatura İptali' : 'Fatura İptal Edilecek';
+        const msg = isFormal 
+            ? 'DİKKAT: Bu resmi bir faturadır! İptal ederseniz GİB portalından veya e-Logo üzerinden de faturayı resmen iptal veya iade etmelisiniz. Bu işlem stokları ve bakiyeyi geri alacaktır. Onaylıyor musunuz?'
+            : 'Bu faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.';
+
+        if (window.confirm(msg)) {
+            try {
+                const res = await fetch(`/api/sales/invoices/${invoiceId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Başarılı: ' + (data.message || 'Fatura iptal edildi.'));
+                    window.location.reload();
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            } catch (err) {
+                alert('Bağlantı hatası.');
+            }
+        }
+    };
+
+    const handlePrintInvoice = (invoiceId: string) => {
+        window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${invoiceId}`, '_blank');
+    };
+
     const [otpModalOpen, setOtpModalOpen] = useState(false);
     const [isSendingOtp, setIsSendingOtp] = useState(false);
 
@@ -1500,13 +1526,18 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 {item.orderId && (
                                                                     (() => {
                                                                         const isReallyFormal = item.isFormal || invoicedOrderIds.includes(item.orderId);
+                                                                        const statusLabel = item.linkedInvoiceStatus === 'Proforma' ? 'Taslak (Proforma)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'İrsaliye' : 'Faturalandı');
+                                                                        const statusIcon = item.linkedInvoiceStatus === 'Proforma' ? '📝' : (item.linkedInvoiceStatus === 'İrsaliye' ? '🚚' : '✅');
+                                                                        const statusColor = item.linkedInvoiceStatus === 'Proforma' ? '#f59e0b' : (item.linkedInvoiceStatus === 'İrsaliye' ? '#8b5cf6' : '#10b981');
+                                                                        const statusBg = item.linkedInvoiceStatus === 'Proforma' ? 'rgba(245, 158, 11, 0.1)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)');
+                                                                        
                                                                         return isReallyFormal ? (
                                                                             <>
                                                                                 <span style={{
                                                                                     padding: '6px 10px',
-                                                                                    background: 'rgba(16,185,129,0.1)',
-                                                                                    color: '#10b981',
-                                                                                    border: '1px solid rgba(16,185,129,0.2)',
+                                                                                    background: statusBg,
+                                                                                    color: statusColor,
+                                                                                    border: `1px solid ${statusBg.replace('0.1', '0.2')}`,
                                                                                     borderRadius: '8px',
                                                                                     fontSize: '11px',
                                                                                     fontWeight: '800',
@@ -1515,16 +1546,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                     alignItems: 'center',
                                                                                     gap: '6px'
                                                                                 }}>
-                                                                                    ✅ Faturalandı
+                                                                                    {statusIcon} {statusLabel}
                                                                                 </span>
                                                                                 {item.formalInvoiceId && (
                                                                                     <button
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
-                                                                                            window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
+                                                                                            handlePrintInvoice(item.formalInvoiceId);
                                                                                         }}
                                                                                         style={{ padding: '6px 10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                                                                                         className="hover:bg-indigo-500 hover:text-white transition-colors"
+                                                                                        title="Faturayı veya İrsaliyeyi Görüntüle / Yazdır"
                                                                                     >
                                                                                         🖨️ Yazdır
                                                                                     </button>
@@ -1591,6 +1623,45 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 >
                                                                     {processingIds.includes(item.id) ? '⏳' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İptal')}
                                                                 </button>
+                                                            </div>
+                                                        )}
+                                                        {(item.type === 'Fatura' || item.type === 'İrsaliye') && (
+                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handlePrintInvoice(item.id);
+                                                                    }}
+                                                                    style={{ padding: '6px 10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                                                    className="hover:bg-indigo-500 hover:text-white transition-colors"
+                                                                >
+                                                                    📄 PDF
+                                                                </button>
+                                                                {item.status !== 'İptal Edildi' && (
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleCancelInvoice(item.id, item.isFormal);
+                                                                        }}
+                                                                        style={{
+                                                                            padding: '6px 12px',
+                                                                            background: 'rgba(239, 68, 68, 0.1)',
+                                                                            color: '#ef4444',
+                                                                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                                                                            borderRadius: '8px',
+                                                                            fontSize: '11px',
+                                                                            fontWeight: '800',
+                                                                            cursor: 'pointer',
+                                                                            whiteSpace: 'nowrap',
+                                                                            display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                                                            transition: 'all 0.2s'
+                                                                        }}
+                                                                        className="hover:bg-red-500 hover:text-white"
+                                                                        title="Faturayı veya İrsaliyeyi İptal Et"
+                                                                    >
+                                                                        İptal Et
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </td>

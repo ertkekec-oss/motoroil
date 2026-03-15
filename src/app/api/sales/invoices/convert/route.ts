@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { orderId, customerId, invoiceNo, taxNumber, taxOffice, address, phone, name, isFormal, description, items: customItems, discount, createWayslip, cancelPreviousPayment } = body;
+        const { orderId, customerId, invoiceNo, taxNumber, taxOffice, address, phone, name, isFormal, status, description, items: customItems, discount, createWayslip, cancelPreviousPayment } = body;
 
         // 1. Fetch the original order
         const order = await prisma.order.findUnique({
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
                     description: description || `POS Siparişi Faturalandırma: ${order.orderNumber}`,
                     items: itemsToUse as any,
                     isFormal: isFormal || false,
-                    status: 'Onaylandı'
+                    status: status || 'Onaylandı'
                 }
             });
 

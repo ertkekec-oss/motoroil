@@ -160,19 +160,25 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 }
             } catch { safeItems = []; }
 
+            const isWayslip = inv.status === 'İrsaliye' || (inv.invoiceNo && inv.invoiceNo.startsWith('IRS'));
+            const typeLabel = isWayslip ? 'İrsaliye' : 'Fatura';
+            // Show status (İptal Edildi, İrsaliye, Proforma, Onaylandı, etc) or Fallback
+            const statusLabel = inv.status || (inv.isFormal ? 'Resmi' : 'Taslak');
+
             return {
                 id: inv.id,
                 date: new Date(inv.invoiceDate).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                 rawDate: inv.invoiceDate,
-                type: 'Fatura',
-                desc: `${inv.invoiceNo || 'Fatura'} - ${inv.isFormal ? 'Resmi' : 'Taslak'}`,
+                type: typeLabel,
+                desc: `${inv.invoiceNo || typeLabel} - ${statusLabel}`,
                 amount: Number(inv.totalAmount || 0),
-                color: '#3b82f6',
+                color: isWayslip ? '#8b5cf6' : '#3b82f6',
                 items: safeItems,
                 isFormal: inv.isFormal || false,
                 formalUuid: inv.formalUuid || null,
                 formalType: inv.formalType || null,
-                orderId: inv.orderId || null
+                orderId: inv.orderId || null,
+                status: inv.status || ''
             };
         })
         .filter((inv: any) => {
@@ -259,9 +265,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 items: safeItems,
                 orderId: o.id,
                 isMarketplaceOrder: true,
-                isFormal: !!linkedInvoice,
+                isFormal: !!linkedInvoice, // We keep this to indicate an invoice exists
+                realIsFormal: linkedInvoice?.isFormal || false,
                 formalUuid: linkedInvoice?.formalUuid || null,
-                formalInvoiceId: linkedInvoice?.id || null
+                formalInvoiceId: linkedInvoice?.id || null,
+                linkedInvoiceStatus: linkedInvoice?.status || null
             };
         });
 
