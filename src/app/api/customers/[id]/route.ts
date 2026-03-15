@@ -36,22 +36,26 @@ export async function GET(
                 invoices: {
                     where: { deletedAt: null },
                     orderBy: { invoiceDate: 'desc' }
-                },
-                paymentPlans: {
-                    include: {
-                        installments: {
-                            orderBy: { installmentNo: 'asc' }
-                        }
-                    },
-                    orderBy: {
-                        startDate: 'desc'
-                    }
                 }
             }
         });
 
         if (!customer) {
             return NextResponse.json({ success: false, error: 'Müşteri bulunamadı' }, { status: 404 });
+        }
+
+        try {
+            (customer as any).paymentPlans = await prisma.paymentPlan.findMany({
+                where: { customerId: customer.id },
+                include: {
+                    installments: {
+                        orderBy: { installmentNo: 'asc' }
+                    }
+                },
+                orderBy: { startDate: 'desc' }
+            });
+        } catch (e) {
+            (customer as any).paymentPlans = [];
         }
 
         await logActivity({

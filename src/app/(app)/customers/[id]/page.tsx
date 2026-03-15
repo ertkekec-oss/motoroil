@@ -45,10 +45,6 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     orderBy: { date: 'desc' },
                     take: 50
                 },
-                paymentPlans: {
-                    include: { installments: true },
-                    orderBy: { createdAt: 'desc' }
-                },
                 invoices: {
                     where: { deletedAt: null },
                     orderBy: { invoiceDate: 'desc' },
@@ -69,6 +65,17 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
         if (!customer) {
             return notFound();
+        }
+
+        try {
+            customer.paymentPlans = await prisma.paymentPlan.findMany({
+                where: { customerId: customer.id },
+                include: { installments: true },
+                orderBy: { createdAt: 'desc' }
+            });
+        } catch (e) {
+            console.warn("Could not fetch payment plans:", e);
+            customer.paymentPlans = [];
         }
 
         // Fetch Marketplace Orders specifically for this Customer
