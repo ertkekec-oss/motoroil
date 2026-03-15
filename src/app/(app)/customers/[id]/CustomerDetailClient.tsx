@@ -1386,7 +1386,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     ) : activeTab === 'checks' ? (
                         <div style={{ padding: '32px' }}>
                             <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Çek & Senetleri</h3>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Evraklar & Vadeler</h3>
                                 <button
                                     onClick={() => setCheckAddModalOpen(true)}
                                     className="btn btn-primary"
@@ -1395,6 +1395,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     ➕ Yeni Evrak Ekle
                                 </button>
                             </div>
+
+                            <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)' }}>📥 Çek & Senet Portföyü</h4>
                             {!customer.checks || customer.checks.length === 0 ? (
                                 <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
                                     <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📑</div>
@@ -1424,19 +1426,49 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     </td>
                                                     <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#3b82f6', fontSize: '14px' }}>{Number(c.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
                                                     <td style={{ textAlign: 'right', padding: '20px' }}>
-                                                        {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
-                                                            <button
-                                                                onClick={() => {
-                                                                    setActiveCheck(c);
-                                                                    setTargetKasaId(String(kasalar[0]?.id || ''));
-                                                                    setShowCheckCollectModal(true);
-                                                                }}
-                                                                style={{ padding: '8px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
-                                                                className="hover:bg-blue-500 hover:text-white"
-                                                            >
-                                                                {c.type.includes('Alınan') ? '💰 Tahsil Et' : '💸 Öde'}
-                                                            </button>
-                                                        )}
+                                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                                            {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setActiveCheck(c);
+                                                                            setTargetKasaId(String(kasalar[0]?.id || ''));
+                                                                            setShowCheckCollectModal(true);
+                                                                        }}
+                                                                        style={{ padding: '8px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
+                                                                        className="hover:bg-blue-500 hover:text-white"
+                                                                    >
+                                                                        {c.type.includes('Alınan') ? '💰 Tahsil Et' : '💸 Öde'}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            showConfirm("Çek İptali", "Bu çeki/seneti silmek ve iptal etmek istediğinize emin misiniz? Bakiye düzeltilecektir.", async () => {
+                                                                                setProcessingIds(prev => [...prev, c.id]);
+                                                                                try {
+                                                                                    const res = await fetch(`/api/financials/checks/${c.id}`, { method: 'DELETE' });
+                                                                                    if (res.ok) {
+                                                                                        showSuccess("Başarılı", "Çek iptal edildi.");
+                                                                                        window.location.reload();
+                                                                                    } else {
+                                                                                        const data = await res.json();
+                                                                                        showError("Hata", data.error || "İşlem yapılamadı.");
+                                                                                    }
+                                                                                } catch (e) {
+                                                                                    showError("Hata", "Bağlantı hatası.");
+                                                                                } finally {
+                                                                                    setProcessingIds(prev => prev.filter(pid => pid !== c.id));
+                                                                                }
+                                                                            });
+                                                                        }}
+                                                                        disabled={processingIds.includes(c.id)}
+                                                                        style={{ padding: '8px 16px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: processingIds.includes(c.id) ? 'default' : 'pointer', transition: 'all 0.2s' }}
+                                                                        className="hover:bg-red-500 hover:text-white"
+                                                                    >
+                                                                        {processingIds.includes(c.id) ? '⏳' : '✖️ İptal'}
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -1444,6 +1476,62 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     </table>
                                 </div>
                             )}
+
+                            <div style={{ marginTop: '48px', marginBottom: '16px' }}>
+                                <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)' }}>📅 Taksit & Vadelendirme Planları</h4>
+                            </div>
+
+                            {!customer.paymentPlans || customer.paymentPlans.length === 0 ? (
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}> تق</div>
+                                    <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Aktif vadelendirme planı bulunmuyor.</div>
+                                </div>
+                            ) : (
+                                <div style={{ overflowX: 'auto' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                                        <thead>
+                                            <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                                <th style={{ padding: '16px 20px' }}>SATIŞ/KONU</th>
+                                                <th style={{ padding: '16px 20px' }}>OLUŞTURULMA</th>
+                                                <th style={{ padding: '16px 20px' }}>DURUM</th>
+                                                <th style={{ padding: '16px 20px', textAlign: 'right' }}>TAKSİT</th>
+                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>TOPLAM</th>
+                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>İŞLEM</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {customer.paymentPlans.filter((p:any)=>p.status!=='İptal'&&p.status!=='Cancelled').map((p: any) => (
+                                                <tr key={p.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
+                                                    <td style={{ padding: '20px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{p.title}</td>
+                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{new Date(p.createdAt).toLocaleDateString('tr-TR')}</td>
+                                                    <td style={{ padding: '20px' }}>
+                                                        <span style={{ padding: '6px 12px', background: p.status === 'Ödendi' ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontSize: '11px', fontWeight: '700', color: p.status === 'Ödendi' ? '#10b981' : 'var(--text-main, #e2e8f0)' }}>{p.status}</span>
+                                                    </td>
+                                                    <td style={{ textAlign: 'right', padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{p.installments?.length || 0} Taksit</td>
+                                                    <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#f59e0b', fontSize: '14px' }}>{Number(p.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                    <td style={{ textAlign: 'right', padding: '20px' }}>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (!completedIds.includes(p.id) && !processingIds.includes(p.id)) {
+                                                                    handleCancelPlan(p.id);
+                                                                }
+                                                            }}
+                                                            disabled={completedIds.includes(p.id) || processingIds.includes(p.id)}
+                                                            style={{ padding: '8px 16px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: processingIds.includes(p.id) ? 'default' : 'pointer', transition: 'all 0.2s' }}
+                                                            className="hover:bg-red-500 hover:text-white"
+                                                            title="Vadelendirmeyi İptal Et"
+                                                        >
+                                                            {processingIds.includes(p.id) ? '⏳' : '✖️ İptal'}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
                         </div>
                     ) : activeTab === 'reconciliations' ? (
                         <div style={{ padding: '32px' }}>
@@ -1694,6 +1782,37 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         İptal Et
                                                                     </button>
                                                                 )}
+                                                            </div>
+                                                        )}
+                                                        {(item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider') && (
+                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        if (!completedIds.includes(item.id) && !processingIds.includes(item.id) && item.status !== 'İptal Edildi' && item.desc?.indexOf('İptal') === -1) {
+                                                                            handleReturnTransaction(item.id, item.type);
+                                                                        }
+                                                                    }}
+                                                                    disabled={completedIds.includes(item.id) || processingIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1}
+                                                                    style={{
+                                                                        padding: '6px 12px',
+                                                                        background: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+                                                                        color: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? 'var(--text-muted, #666)' : '#ef4444',
+                                                                        border: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(239, 68, 68, 0.3)',
+                                                                        borderRadius: '8px',
+                                                                        fontSize: '11px',
+                                                                        fontWeight: '800',
+                                                                        cursor: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? 'default' : 'pointer',
+                                                                        whiteSpace: 'nowrap',
+                                                                        opacity: processingIds.includes(item.id) ? 0.5 : 1,
+                                                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                    className={!(completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) && !processingIds.includes(item.id) ? "hover:bg-red-500 hover:text-white" : ""}
+                                                                    title="İşlemi İade Al / İptal Et"
+                                                                >
+                                                                    {processingIds.includes(item.id) ? '⏳' : ((completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? '✅ İptal Edildi' : '✖️ İptal Et')}
+                                                                </button>
                                                             </div>
                                                         )}
                                                         {item.type === 'Vadelendirme' && (
