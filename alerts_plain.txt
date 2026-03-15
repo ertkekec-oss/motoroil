@@ -1,0 +1,12 @@
+src\app\api\admin\marketplace\queue\health\route.ts:            logger.alert('Marketplace System Health CRITICAL', {
+src\app\api\admin\ops\alerts\[id]\ack\route.ts:        const res = await ackAlert({
+src\app\api\admin\ops\alerts\[id]\resolve\route.ts:        const res = await resolveIntegrityAlert({
+src\components\AnomalyAlert.tsx:export default function AnomalyAlert() {
+src\services\marketplaces\actions\canary.ts:            logger.alert("Canary Failed: No company with trendyol config found", { alertType: 'CANARY_FAILURE' });
+src\services\marketplaces\actions\canary.ts:            logger.alert("Canary Failed: No order found for test company", { alertType: 'CANARY_FAILURE', companyId: company.id });
+src\services\marketplaces\actions\canary.ts:            logger.alert(`Canary Failed: Action returned FAILED status`, {
+src\services\marketplaces\actions\canary.ts:        logger.alert("Canary Crash", { alertType: 'CANARY_FAILURE', error: error.message });
+src\services\ops\alerts.ts:export async function ackAlert(params: {
+src\services\ops\alerts.ts:export async function resolveIntegrityAlert(params: {
+src\services\ops\__tests__\opsKit.test.ts:        const ackRes = await ackAlert({
+src\services\ops\__tests__\opsKit.test.ts:        const resolveRes = await resolveIntegrityAlert({

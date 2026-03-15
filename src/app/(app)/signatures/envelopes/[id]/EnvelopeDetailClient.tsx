@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useModal } from "@/contexts/ModalContext";
 
 export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { envelope: any, currentUserEmail?: string }) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showConfirm, showSuccess, showError, showWarning } = useModal();
     const [docUrl, setDocUrl] = useState('');
     const [loadingDoc, setLoadingDoc] = useState(false);
     const [signing, setSigning] = useState(false);
@@ -13,22 +13,27 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
     const isMyTurn = envelope.recipients?.find((r: any) => r.email === currentUserEmail && ['PENDING', 'VIEWED'].includes(r.status));
 
     const handleSign = async () => {
-        if (!confirm('Bu belgeyi dijital olarak imzalamayı onaylıyor musunuz?')) return;
-        setSigning(true);
-        try {
-            const res = await fetch(`/api/signatures/envelopes/${envelope.id}/sign`, { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess("Bilgi", 'Belge başarıyla imzalandı!');
-                window.location.reload();
-            } else {
-                showError("Uyarı", data.error || 'İmzalama başarısız oldu.');
+        showConfirm(
+            "Belgeyi İmzala",
+            "Bu belgeyi dijital olarak imzalamayı onaylıyor musunuz?",
+            async () => {
+                setSigning(true);
+                try {
+                    const res = await fetch(`/api/signatures/envelopes/${envelope.id}/sign`, { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        showSuccess("Bilgi", 'Belge başarıyla imzalandı!');
+                        window.location.reload();
+                    } else {
+                        showError("Uyarı", data.error || 'İmzalama başarısız oldu.');
+                    }
+                } catch (e) {
+                    showError("Uyarı", 'Bağlantı hatası.');
+                } finally {
+                    setSigning(false);
+                }
             }
-        } catch (e) {
-            showError("Uyarı", 'Bağlantı hatası.');
-        } finally {
-            setSigning(false);
-        }
+        );
     };
 
     const handleViewDocument = async () => {
@@ -70,20 +75,25 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
     };
 
     const handleCancel = async () => {
-        if (!confirm('Bu zarfı iptal etmek (geri çekmek) istediğinize emin misiniz?')) return;
-        try {
-            const res = await fetch(`/api/signatures/envelopes/${envelope.id}/cancel`, { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess("Bilgi", 'Zarf başarıyla iptal edildi.');
-                window.location.reload();
-            } else {
-                showError("Uyarı", data.error || 'İptal işlemi başarısız.');
+        showConfirm(
+            "Zarfı İptal Et",
+            "Bu zarfı iptal etmek (geri çekmek) istediğinize emin misiniz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/signatures/envelopes/${envelope.id}/cancel`, { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        showSuccess("Bilgi", 'Zarf başarıyla iptal edildi.');
+                        window.location.reload();
+                    } else {
+                        showError("Uyarı", data.error || 'İptal işlemi başarısız.');
+                    }
+                } catch (e) {
+                    showError("Uyarı", 'Ağ hatası oluştu, işlem yapılamadı.');
+                }
             }
-        } catch (e) {
-            showError("Uyarı", 'Ağ hatası oluştu, işlem yapılamadı.');
-        }
-    }
+        );
+    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -213,7 +223,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                     </div>
                 </div>
 
-                {/* Right Column - Audit Trail */}
+                {/* Audit Trail */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                     <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '32px', border: '1px solid var(--border-color)' }}>
                         <h2 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '24px', letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Sistem İz Haritası</h2>

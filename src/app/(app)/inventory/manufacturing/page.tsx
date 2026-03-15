@@ -287,6 +287,14 @@ export default function ManufacturingPage() {
                             Tamamla
                           </button>
                         )}
+                        {canManage && (o.status === 'PLANNED' || o.status === 'IN_PROGRESS') && (
+                          <button
+                            onClick={() => handleUpdateStatus(o.id, o.status, 'CANCELED')}
+                            className={`px-3 py-1.5 rounded-[6px] text-[11px] font-semibold border transition-colors ${isLight ? "bg-red-50 text-red-700 border-red-200 hover:bg-red-100" : "bg-red-900/20 text-red-400 border-red-800/50 hover:bg-red-900/40"}`}
+                          >
+                            İptal Et
+                          </button>
+                        )}
                         <button
                           onClick={() => setSelectedOrder(o)}
                           className={`w-8 h-8 rounded-[6px] flex items-center justify-center transition-colors ${isLight ? "text-slate-400 hover:text-blue-600 hover:bg-blue-50" : "text-slate-500 hover:text-blue-400 hover:bg-blue-900/20"}`}

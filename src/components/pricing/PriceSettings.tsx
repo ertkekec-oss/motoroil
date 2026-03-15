@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Plus, Trash2, Edit } from 'lucide-react';
+import { useModal } from '@/contexts/ModalContext';
 
 export function PriceSettings() {
     const [lists, setLists] = useState<any[]>([]);
@@ -63,6 +64,7 @@ export function PriceSettings() {
 }
 
 function PriceListsManager({ lists, onRefresh }: { lists: any[], onRefresh: () => void }) {
+    const { showConfirm } = useModal();
     const [newName, setNewName] = useState("");
 
     const handleAdd = async () => {
@@ -85,12 +87,18 @@ function PriceListsManager({ lists, onRefresh }: { lists: any[], onRefresh: () =
 
     const handleDelete = async (id: string, isDefault: boolean) => {
         if (isDefault) return toast.error("Varsayılan liste silinemez.");
-        if (!confirm("Emin misiniz?")) return;
-        try {
-            const res = await fetch(`/api/pricing/lists/${id}`, { method: "DELETE" });
-            if (res.ok) { onRefresh(); toast.success("Silindi."); }
-            else toast.error("Silinemedi.");
-        } catch { toast.error("Hata."); }
+        
+        showConfirm(
+            "Liste Silme",
+            "Bu fiyat listesini silmek istediğinize emin misiniz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/pricing/lists/${id}`, { method: "DELETE" });
+                    if (res.ok) { onRefresh(); toast.success("Silindi."); }
+                    else toast.error("Silinemedi.");
+                } catch { toast.error("Hata."); }
+            }
+        );
     };
 
     const toggleDefault = async (id: string) => {
@@ -191,6 +199,7 @@ function CustomerCategoriesManager({ categories, lists, onRefresh }: { categorie
 }
 
 function BulkPriceUpdater({ lists }: { lists: any[] }) {
+    const { showConfirm } = useModal();
     const [targetList, setTargetList] = useState("");
     const [opType, setOpType] = useState("FORMULA");
     const [val, setVal] = useState("0");
@@ -203,32 +212,36 @@ function BulkPriceUpdater({ lists }: { lists: any[] }) {
         if (opType === 'FORMULA' && !sourceList) return toast.error("Kaynak liste seçin.");
         if (opType === 'FORMULA' && targetList === sourceList) return toast.error("Kaynak ve hedef aynı olamaz.");
 
-        if (!confirm("Bu işlem seçili listedeki TÜM fiyatları güncelleyecektir. Onaylıyor musunuz?")) return;
+        showConfirm(
+            "Toplu Güncelleme Onayı",
+            "Bu işlem seçili listedeki TÜM fiyatları güncelleyecektir. Onaylıyor musunuz?",
+            async () => {
+                setLoading(true);
+                try {
+                    const payload: any = {
+                        scope: { targetPriceListId: targetList, all: true },
+                        operation: { type: opType === 'FORMULA' ? 'PERCENT' : opType, value: parseFloat(val) }
+                    };
 
-        setLoading(true);
-        try {
-            const payload: any = {
-                scope: { targetPriceListId: targetList, all: true },
-                operation: { type: opType === 'FORMULA' ? 'PERCENT' : opType, value: parseFloat(val) } // Formula logic handled via applyFormula payload
-            };
+                    if (opType === 'FORMULA') {
+                        payload.applyFormula = {
+                            sourcePriceListId: sourceList,
+                            markupBps: parseFloat(val) * 100,
+                            roundMode: 'NONE',
+                            respectManualOverride: overrideMode
+                        };
+                    }
 
-            if (opType === 'FORMULA') {
-                payload.applyFormula = {
-                    sourcePriceListId: sourceList,
-                    markupBps: parseFloat(val) * 100, // % to BPS (e.g. 5% -> 500)
-                    roundMode: 'NONE',
-                    respectManualOverride: overrideMode
-                };
+                    const res = await fetch('/api/pricing/bulk-update', {
+                        method: "POST",
+                        body: JSON.stringify(payload)
+                    });
+                    const d = await res.json();
+                    if (d.ok) toast.success(`${d.data.count} kayıt güncellendi.`);
+                    else toast.error(d.error);
+                } catch { toast.error("Hata."); } finally { setLoading(false); }
             }
-
-            const res = await fetch('/api/pricing/bulk-update', {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-            const d = await res.json();
-            if (d.ok) toast.success(`${d.data.count} kayıt güncellendi.`);
-            else toast.error(d.error);
-        } catch { toast.error("Hata."); } finally { setLoading(false); }
+        );
     };
 
     return (

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function WebsiteManagerPage() {
-    const { showSuccess, showError, showConfirm } = useModal();
+    const { showSuccess, showError, showConfirm, showPrompt } = useModal();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any>({ pages: [], settings: {}, menus: [] });
     const [activeTab, setActiveTab] = useState<'general' | 'pages' | 'menus'>('general');
@@ -170,26 +170,28 @@ export default function WebsiteManagerPage() {
     };
 
     const createPage = async () => {
-        const title = prompt('Sayfa Başlığı:');
-        if (!title) return;
-        const slug = prompt('Sayfa URL (Slug):', title.toLowerCase().replace(/ /g, '-'));
-        if (!slug) return;
+        showPrompt('Yeni Sayfa', 'Sayfa Başlığı:', (title) => {
+            if (!title) return;
+            showPrompt('Yeni Sayfa', 'Sayfa URL (Slug):', async (slug) => {
+                if (!slug) return;
 
-        setSaving(true);
-        try {
-            const res = await fetch('/api/admin/website/pages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, slug })
-            });
-            if (res.ok) {
-                fetchCmsData();
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setSaving(false);
-        }
+                setSaving(true);
+                try {
+                    const res = await fetch('/api/admin/website/pages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, slug })
+                    });
+                    if (res.ok) {
+                        fetchCmsData();
+                    }
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    setSaving(false);
+                }
+            }, title.toLowerCase().replace(/ /g, '-'));
+        });
     };
 
     const deletePage = async (id: string) => {

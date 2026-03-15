@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
+import { useModal } from "@/contexts/ModalContext";
 import {
     ShieldCheck,
     RefreshCw,
@@ -24,6 +25,7 @@ import {
 export default function AdminPdksPage() {
     const { theme } = useTheme();
     const isLight = theme === 'light';
+    const { showConfirm } = useModal();
 
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -122,17 +124,22 @@ export default function AdminPdksPage() {
     };
 
     const handleDeleteDisplay = async (id: string) => {
-        if (!confirm("Bu tableti silmek istediğinize emin misiniz?")) return;
-        try {
-            const res = await fetch(`/api/admin/pdks/displays?id=${id}`, { method: "DELETE" });
-            const data = await res.json();
-            if (data.success) {
-                toast.success("Tablet silindi");
-                fetchData();
+        showConfirm(
+            "Terminali Kaldır",
+            "Bu tableti silmek istediğinize emin misiniz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/admin/pdks/displays?id=${id}`, { method: "DELETE" });
+                    const data = await res.json();
+                    if (data.success) {
+                        toast.success("Tablet silindi");
+                        fetchData();
+                    }
+                } catch (error) {
+                    toast.error("Silme işlemi başarısız");
+                }
             }
-        } catch (error) {
-            toast.error("Silme işlemi başarısız");
-        }
+        );
     };
 
     // Styling constants

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function AdminBoostRules() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showPrompt } = useModal();
     const [rules, setRules] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -65,7 +65,7 @@ export default function AdminBoostRules() {
     };
 
     const handleAction = async (id: string, action: 'disable' | 'expire-now') => {
-        const r = prompt("İşlem nedenini giriniz (Audit log için zorunlu):");
+        showPrompt("İşem Onayı", "İşlem nedenini giriniz (Audit log için zorunlu):", async (r) => {
         if (!r || r.length < 5) return showError("Uyarı", "Geçerli bir sebep girilmeli (min 5 karakter).");
 
         try {
@@ -83,6 +83,8 @@ export default function AdminBoostRules() {
         } catch (e) {
             console.error(e);
         }
+        }
+        });
     };
 
     const stats = {

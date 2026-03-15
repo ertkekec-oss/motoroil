@@ -181,11 +181,22 @@ export async function DELETE(
 
             // 4. Handle Accounting Reversal (Storno)
             try {
-                const journal = await tx.journal.findFirst({
+                // Main Order Journal
+                const mainJournal = await tx.journal.findFirst({
                     where: { sourceId: id, sourceType: 'Order' }
                 });
-                if (journal) {
-                    await stornoJournalEntry(journal.id, 'Satış İptal Edildi (POS)');
+                if (mainJournal) {
+                    await stornoJournalEntry(mainJournal.id, 'Satış İptal Edildi (POS)');
+                }
+
+                // Related Transaction Journals (e.g., POS Commissions)
+                for (const t of transactions) {
+                    const tJournal = await tx.journal.findFirst({
+                        where: { sourceId: t.id, sourceType: 'Transaction' }
+                    });
+                    if (tJournal) {
+                        await stornoJournalEntry(tJournal.id, `İşlem İptal Edildi (REF:${id})`);
+                    }
                 }
             } catch (err) {
                 console.error('[Accounting Reversal Error]:', err);

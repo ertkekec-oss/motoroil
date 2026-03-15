@@ -18,6 +18,7 @@ import {
     ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useModal } from "@/contexts/ModalContext";
 import { safeJson } from "@/lib/safeJson";
 
 // Runbook / Troubleshooting Mapping
@@ -41,6 +42,7 @@ const RUNBOOK: Record<string, { steps: string[], priority: 'low' | 'high' | 'cri
 };
 
 export function MarketplaceOpsPanel() {
+    const { showConfirm, showPrompt, showAlert } = useModal();
     const [data, setData] = useState<any>(null);
     const [health, setHealth] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -134,6 +136,12 @@ export function MarketplaceOpsPanel() {
 
 
     useEffect(() => {
+        if (health?.status === 'CRITICAL') {
+            showAlert("KRİTİK SİSTEM HATASI", "Marketplace yönetim sistemi veya kuyruk yapısı şu anda kritik durumda. Kuyruklar çalışmıyor olabilir. Lütfen infra ekiplerine haber verin.");
+        }
+    }, [health?.status, showAlert]);
+
+    useEffect(() => {
         fetchData();
         const start = () => { pollingRef.current = setInterval(fetchData, 10000); };
         const stop = () => { if (pollingRef.current) clearInterval(pollingRef.current); };
@@ -144,14 +152,32 @@ export function MarketplaceOpsPanel() {
     }, [fetchData]);
 
     const handleAction = async (auditIdOrJobId: string, action: "RETRY" | "UNLOCK" | "REPLAY_DLQ") => {
-        let reason = "";
         if (action === "REPLAY_DLQ") {
-            const userInput = window.prompt("REPLAY SEBEBİ (Mecburi):\nNeden bu işlemi tekrar çalıştırıyorsunuz? (Min 5 karakter)");
-            if (!userInput || userInput.length < 5) return toast.error("Geçerli bir sebep girilmedi.");
-            if (!window.confirm("Bu işlem mükerrer kayda yol açabilir. Emin misiniz?")) return;
-            reason = userInput;
+            showPrompt(
+                "REPLAY SEBEBİ (Mecburi)",
+                "Neden bu işlemi tekrar çalıştırıyorsunuz? (Min 5 karakter)",
+                (userInput) => {
+                    if (!userInput || userInput.length < 5) {
+                        toast.error("Geçerli bir sebep girilmedi.");
+                        return;
+                    }
+
+                    showConfirm(
+                        "Emin misiniz?",
+                        "Bu işlem mükerrer kayda yol açabilir. Emin misiniz?",
+                        async () => {
+                            await executeAction(auditIdOrJobId, action, userInput);
+                        }
+                    );
+                }
+            );
+            return;
         }
 
+        await executeAction(auditIdOrJobId, action, "");
+    };
+
+    const executeAction = async (auditIdOrJobId: string, action: "RETRY" | "UNLOCK" | "REPLAY_DLQ", reason: string) => {
         setProcessingId(auditIdOrJobId);
         try {
             const endpoint = action === "REPLAY_DLQ" ? "/api/admin/marketplace/queue/replay" : "/api/admin/marketplace/ops";

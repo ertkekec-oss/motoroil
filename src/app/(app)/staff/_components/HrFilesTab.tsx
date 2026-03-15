@@ -10,7 +10,7 @@ interface HrFilesTabProps {
 }
 
 export default function HrFilesTab({ staff, setSelectedStaff }: HrFilesTabProps) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showConfirm, showSuccess, showError, showWarning } = useModal();
     const [documents, setDocuments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -36,16 +36,24 @@ export default function HrFilesTab({ staff, setSelectedStaff }: HrFilesTabProps)
     };
 
     const handleDeleteDocument = async (id: string) => {
-        if (!window.confirm('Bu dosyayı silmek istediğinize emin misiniz?')) return;
-
-        try {
-            const res = await fetch(`/api/staff/documents?id=${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                setDocuments(prev => prev.filter(d => d.id !== id));
+        showConfirm(
+            "Dosyayı Sil",
+            "Bu dosyayı silmek istediğinize emin misiniz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/staff/documents?id=${id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        setDocuments(prev => prev.filter(d => d.id !== id));
+                        showSuccess("Bilgi", "Dosya başarıyla silindi.");
+                    } else {
+                        showError("Uyarı", "Dosya silinirken bir hata oluştu.");
+                    }
+                } catch (error) {
+                    console.error('Error deleting document:', error);
+                    showError("Hata", "Sistem hatası oluştu.");
+                }
             }
-        } catch (error) {
-            console.error('Error deleting document:', error);
-        }
+        );
     };
 
     const formatBytes = (bytes: number, decimals = 2) => {
@@ -65,8 +73,6 @@ export default function HrFilesTab({ staff, setSelectedStaff }: HrFilesTabProps)
     });
 
     const triggerUploadForStaff = () => {
-        // Personel Listesi veya Modal aracılığıyla belge eklenebilir. 
-        // Şimdilik sadece yönlendirme veya mesaj.
         showError("Uyarı", 'Yeni dosya yüklemek için lütfen Personel Listesi üzerinden ilgili personelin detay (Düzenle) paneline gidin ve Belgeler sekmesini kullanın.');
     };
 

@@ -16,7 +16,7 @@ import { Server, Settings, Plus, Key, Link2, CreditCard, Trash2, Edit2, ShieldCh
 import { useModal } from "@/contexts/ModalContext";
 
 export default function GatewaysPage() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const [gateways, setGateways] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
@@ -64,24 +64,33 @@ export default function GatewaysPage() {
 
             const data = await res.json();
             if (data.success) {
+                showSuccess("Başarılı", "Gateway yapılandırması kaydedildi.");
                 setModalOpen(false);
                 fetchGateways();
             } else {
-                showError("Uyarı", data.error || 'Kaydetme başarısız');
+                showError("Hata", data.error || 'Kaydetme başarısız');
             }
         } catch (error) {
             console.error(error);
+            showError("Hata", "İşlem sırasında sunucu hatası oluştu.");
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!window.confirm('Bu ağ geçidini kalıcı olarak silmek istediğinize emin misiniz? (Ödemeler durabilir)')) return;
-        try {
-            await fetch(`/api/admin/gateways?id=${id}`, { method: 'DELETE' });
-            fetchGateways();
-        } catch (error) {
-            console.error(error);
-        }
+    const handleDelete = (id: string) => {
+        showConfirm("Gateway Silme", "Bu ağ geçidini kalıcı olarak silmek istediğinize emin misiniz? (Ödemeler durabilir)", async () => {
+            try {
+                const res = await fetch(`/api/admin/gateways?id=${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showSuccess("Bilgi", "Gateway başarıyla silindi.");
+                    fetchGateways();
+                } else {
+                    showError("Hata", "Gateway silinemedi.");
+                }
+            } catch (error) {
+                console.error(error);
+                showError("Hata", "Silme işlemi sırasında hata oluştu.");
+            }
+        });
     };
 
     const toggleSupportedType = (type: string) => {

@@ -38,7 +38,7 @@ export default function ProductWizardModal({
     const totalSteps = 5;
     
     const router = useRouter();
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showPrompt } = useModal();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -649,6 +649,7 @@ function StepVariantsPriceLists({
     useVariants, setUseVariants, variantAttributes, selectedAttributes, setSelectedAttributes,
     generatedVariants, setGeneratedVariants, generateCombinations
 }: any) {
+    const { showSuccess, showPrompt } = useModal();
 
     return (
         <div className="animate-in fade-in duration-300 space-y-8">
@@ -750,7 +751,7 @@ function StepVariantsPriceLists({
                                 
                                 <button
                                     onClick={() => {
-                                        const name = window.prompt("Yeni Variant Özelliği Adı (Örn: Renk, Beden, Malzeme):");
+                                        showPrompt("Yeni Özellik Ekle", "Yeni Variant Özelliği Adı (Örn: Renk, Beden, Malzeme):", (name) => {
                                         if (name) {
                                             fetch('/api/products/attributes', {
                                                 method: 'POST',
@@ -759,7 +760,7 @@ function StepVariantsPriceLists({
                                             })
                                             .then(res => res.json())
                                             .then(data => {
-                                                const { showSuccess, showError, showWarning } = useModal();
+
                                                 if(data.success && window.location.reload) {
                                                     showSuccess("Bilgi", "Varyant Özelliği eklendi! Sisteme işlenmesi için sayfa yenileniyor...");
                                                     window.location.reload();
@@ -768,6 +769,7 @@ function StepVariantsPriceLists({
                                                 }
                                             });
                                         }
+                                        });
                                     }}
                                     className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-dashed border-slate-300 dark:border-white/20 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center gap-1"
                                 >

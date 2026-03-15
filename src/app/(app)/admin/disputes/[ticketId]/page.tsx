@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useModal } from "@/contexts/ModalContext";
 
 export default function DisputeDetailPage() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
     const params = useParams();
     const router = useRouter();
     const ticketId = params.ticketId as string;
@@ -26,7 +26,7 @@ export default function DisputeDetailPage() {
             if (res.ok) {
                 setData(await res.json());
             } else {
-                showError("Uyarı", "Uyarı: Dosya bulunamadı veya yetkisiz erişim.");
+                showError("Hata", "Dosya bulunamadı veya yetkisiz erişim.");
                 router.push("/admin/disputes");
             }
         } finally {
@@ -34,68 +34,79 @@ export default function DisputeDetailPage() {
         }
     };
 
-    const handleAction = async (e: React.FormEvent) => {
+    const handleAction = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!actionState.reason || actionState.reason.length < 5) return showSuccess("Bilgi", "Sebebini giriniz.");
+        if (!actionState.reason || actionState.reason.length < 5) {
+            showWarning("Uyarı", "Lütfen işlem sebebini en az 5 karakter olarak giriniz.");
+            return;
+        }
 
         const confirmMsg = `Bu işlem YAPILACAKTIR:\nİşlem: ${actionState.type}\nTutar: ${actionState.amount || 'Tümü'}\nOnaylıyor musunuz (Finans Denetimine Kaydedilecektir)?`;
-        if (!window.confirm(confirmMsg)) return;
+        
+        showConfirm("Denetim Onayı", confirmMsg, async () => {
+            setSaving(true);
+            try {
+                const payload = {
+                    actionType: actionState.type,
+                    amount: actionState.amount ? parseFloat(actionState.amount) : undefined,
+                    reason: actionState.reason,
+                    resolutionCode: actionState.code || undefined
+                };
 
-        setSaving(true);
-        try {
-            const payload = {
-                actionType: actionState.type,
-                amount: actionState.amount ? parseFloat(actionState.amount) : undefined,
-                reason: actionState.reason,
-                resolutionCode: actionState.code || undefined
-            };
+                const res = await fetch(`/api/admin/disputes/${ticketId}/actions`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-idempotency-key": crypto.randomUUID()
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-            const res = await fetch(`/api/admin/disputes/${ticketId}/actions`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-idempotency-key": crypto.randomUUID()
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                showSuccess("Bilgi", "Aksiyon uygulandı ve Finans Denetim Defterine kaydedildi.");
-                setActionState({ type: '', amount: '', reason: '', code: '' });
-                fetchDetail();
-            } else {
-                const errResult = await res.json();
-                showError("Uyarı", `İşlem Hatası: ${errResult.error}`);
+                if (res.ok) {
+                    showSuccess("Bilgi", "Aksiyon uygulandı ve Finans Denetim Defterine kaydedildi.");
+                    setActionState({ type: '', amount: '', reason: '', code: '' });
+                    fetchDetail();
+                } else {
+                    const errResult = await res.json();
+                    showError("Hata", `İşlem Hatası: ${errResult.error}`);
+                }
+            } catch (err) {
+                showError("Hata", "İşlem sırasında sunucu hatası oluştu.");
+            } finally {
+                setSaving(false);
             }
-        } finally {
-            setSaving(false);
-        }
+        });
     };
 
-    const handleRequestInfo = async () => {
-        const fields = prompt("Alıcıdan / Satıcıdan istenecek bilgileri aralarına virgül koyarak yazın (örn: Teslimat Tutanağı, Fotoğraf):");
-        if (!fields) return;
+    const handleRequestInfo = () => {
+        showPrompt(
+            "Bilgi & Belge Talebi",
+            "Alıcıdan / Satıcıdan istenecek bilgileri aralarına virgül koyarak yazın (örn: Teslimat Tutanağı, Fotoğraf):",
+            async (fields) => {
+                if (!fields) return;
 
-        setSaving(true);
-        try {
-            const res = await fetch(`/api/admin/disputes/${ticketId}/request-info`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-idempotency-key": crypto.randomUUID()
-                },
-                body: JSON.stringify({ fieldsRequested: fields.split(',')?.map(s => s.trim()) })
-            });
+                setSaving(true);
+                try {
+                    const res = await fetch(`/api/admin/disputes/${ticketId}/request-info`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-idempotency-key": crypto.randomUUID()
+                        },
+                        body: JSON.stringify({ fieldsRequested: fields.split(',')?.map(s => s.trim()) })
+                    });
 
-            if (res.ok) {
-                showSuccess("Bilgi", "Bilgi talebi oluşturuldu.");
-                fetchDetail();
-            } else {
-                showError("Uyarı", "Hata oluştu.");
+                    if (res.ok) {
+                        showSuccess("Bilgi", "Bilgi talebi oluşturuldu.");
+                        fetchDetail();
+                    } else {
+                        showError("Hata", "Bilgi talebi oluşturulurken hata oluştu.");
+                    }
+                } finally {
+                    setSaving(false);
+                }
             }
-        } finally {
-            setSaving(false);
-        }
+        );
     };
 
     if (loading || !data) return <div className="p-8">Yükleniyor...</div>;

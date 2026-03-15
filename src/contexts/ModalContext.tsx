@@ -26,7 +26,9 @@ interface ModalContextType {
     showSuccess: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
     showError: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
     showWarning: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
+    showAlert: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
     showConfirm: (title: string, message: string, onConfirm: () => void, confirmText?: string, cancelText?: string, onCancel?: () => void) => void;
+    showPrompt: (title: string, message: string, onConfirm: (value: string) => void, defaultValue?: string, placeholder?: string) => void;
     showQuotaExceeded: () => void;
     closeModal: () => void;
 }
@@ -58,8 +60,35 @@ export function ModalProvider({ children }: { children: ReactNode }) {
         showModal({ title, message, type: 'warning', onConfirm, confirmText });
     };
 
+    const showAlert = (title: string, message: string, onConfirm?: () => void, confirmText?: string) => {
+        showModal({ title, message, type: 'info', onConfirm, confirmText });
+    };
+
     const showConfirm = (title: string, message: string, onConfirm: () => void, confirmText?: string, cancelText?: string, onCancel?: () => void) => {
         showModal({ title, message, type: 'confirm', onConfirm, confirmText, cancelText, onCancel });
+    };
+
+    const showPrompt = (title: string, message: string, onConfirm: (value: string) => void, defaultValue: string = '', placeholder: string = 'Açıklama...') => {
+        let val = defaultValue;
+        showModal({
+            title,
+            message,
+            type: 'confirm',
+            content: (
+                <div className="mt-4">
+                    <textarea
+                        autoFocus
+                        defaultValue={defaultValue}
+                        onChange={(e) => val = e.target.value}
+                        placeholder={placeholder}
+                        className="w-full p-3 text-sm border-2 border-slate-200 rounded-xl focus:border-slate-900 focus:outline-none transition-colors min-h-[100px] resize-none"
+                    />
+                </div>
+            ),
+            onConfirm: () => onConfirm(val),
+            confirmText: 'Kaydet',
+            cancelText: 'Vazgeç'
+        });
     };
 
     const showQuotaExceeded = () => {
@@ -88,7 +117,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <ModalContext.Provider value={{ showModal, showSuccess, showError, showWarning, showConfirm, showQuotaExceeded, closeModal }}>
+        <ModalContext.Provider value={{ showModal, showSuccess, showError, showWarning, showAlert, showConfirm, showPrompt, showQuotaExceeded, closeModal }}>
             {children}
             <CustomModal
                 isOpen={modal.isOpen}

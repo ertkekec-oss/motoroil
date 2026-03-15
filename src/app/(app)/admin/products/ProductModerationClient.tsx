@@ -4,22 +4,46 @@ import { useTransition } from "react";
 import { approveProductAction, rejectProductAction } from "@/actions/adminGovernanceActions";
 import { ProductStatus } from "@prisma/client";
 
+import { useModal } from "@/contexts/ModalContext";
+
 export default function ProductModerationClient({ productId, currentStatus }: { productId: string; currentStatus: ProductStatus }) {
     const [isPending, startTransition] = useTransition();
+    const { showConfirm, showPrompt, showError, showWarning } = useModal();
 
     const handleApprove = () => {
-        if (!confirm("Approve this product and make it public in the catalog?")) return;
-        startTransition(async () => {
-            await approveProductAction(productId);
-        });
+        showConfirm(
+            "Product Approval",
+            "Are you sure you want to approve this product and make it public in the catalog?",
+            () => {
+                startTransition(async () => {
+                    try {
+                        await approveProductAction(productId);
+                    } catch (error: any) {
+                        showError("Action Failed", error.message || "Failed to approve product.");
+                    }
+                });
+            }
+        );
     };
 
     const handleReject = () => {
-        const reason = prompt("Enter rejection reason:");
-        if (!reason) return;
-        startTransition(async () => {
-            await rejectProductAction(productId, reason);
-        });
+        showPrompt(
+            "Rejection Reason",
+            "Please enter the reason for rejecting this product:",
+            (reason) => {
+                if (!reason || reason.length < 5) {
+                    showWarning("Invalid Input", "Please provide a detailed rejection reason (at least 5 characters).");
+                    return;
+                }
+                startTransition(async () => {
+                    try {
+                        await rejectProductAction(productId, reason);
+                    } catch (error: any) {
+                        showError("Action Failed", error.message || "Failed to reject product.");
+                    }
+                });
+            }
+        );
     };
 
     if (currentStatus !== ProductStatus.PENDING) return null;

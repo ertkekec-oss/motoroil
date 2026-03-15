@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Gift, Trash2, Edit } from "lucide-react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ActiveCampaigns() {
+    const { showConfirm, showError, showSuccess } = useModal();
     const [campaigns, setCampaigns] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -26,14 +26,24 @@ export default function ActiveCampaigns() {
         loadCampaigns();
     }, []);
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Kampanyayı pasife almak istediğinize emin misiniz?')) return;
-        try {
-            await fetch(`/api/campaigns?id=${id}`, { method: 'DELETE' });
-            loadCampaigns();
-        } catch (error) {
-            console.error(error);
-        }
+    const handleDelete = (id: string) => {
+        showConfirm(
+            "Kampanyayı Pasife Al",
+            "Kampanyayı pasife almak istediğinize emin misiniz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/campaigns?id=${id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        showSuccess("Başarılı", "Kampanya pasife alındı.");
+                        loadCampaigns();
+                    } else {
+                        showError("Hata", "Kampanya pasife alınırken bir hata oluştu.");
+                    }
+                } catch (error) {
+                    showError("Hata", "İşlem sırasında sunucu hatası oluştu.");
+                }
+            }
+        );
     };
 
     if (loading) return <div className="text-sm text-slate-500">Yükleniyor...</div>;

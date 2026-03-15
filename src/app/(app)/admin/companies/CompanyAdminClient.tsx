@@ -1,17 +1,20 @@
 "use client";
 
 import { useTransition } from "react";
+import { useModal } from "@/contexts/ModalContext";
 import { updateCompanyStatusAction, updateCompanyTypeAction } from "@/actions/adminGovernanceActions";
 import { CompanyStatus, CompanyType } from "@prisma/client";
 
 export default function CompanyAdminClient({ companyId, currentStatus, currentType }: { companyId: string; currentStatus: CompanyStatus; currentType: CompanyType }) {
     const [isPending, startTransition] = useTransition();
+    const { showConfirm } = useModal();
 
     const toggleStatus = () => {
         const nextStatus = currentStatus === CompanyStatus.ACTIVE ? CompanyStatus.SUSPENDED : CompanyStatus.ACTIVE;
-        if (!confirm(`Change status to ${nextStatus}?`)) return;
-        startTransition(async () => {
-            await updateCompanyStatusAction(companyId, nextStatus);
+        showConfirm("Durum Değiştir", `Şirket durumunu ${nextStatus} olarak değiştirmek istediğinize emin misiniz?`, () => {
+            startTransition(async () => {
+                await updateCompanyStatusAction(companyId, nextStatus);
+            });
         });
     };
 

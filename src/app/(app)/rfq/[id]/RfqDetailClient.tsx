@@ -11,12 +11,13 @@ import { useModal } from "@/contexts/ModalContext";
 export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, items: any[], offers: any[] }) {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
+    const { showSuccess, showError, showConfirm } = useModal();
 
     const handleSubmit = () => {
-        if (!confirm("Submit this RFQ to all selected suppliers?")) return;
+        showConfirm("Confirm Submission", "Submit this RFQ to all selected suppliers?", () => {
 
         startTransition(async () => {
-            const { showSuccess, showError, showWarning } = useModal();
+            // const { showSuccess, showError, showWarning } = useModal();
             try {
                 await submitRfqAction(rfq.id);
                 showSuccess("Bilgi", "RFQ sent successfully.");
@@ -24,13 +25,14 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
                 showError("Uyarı", err.message || "Failed to submit RFQ.");
             }
         });
+        });
     };
 
     const handleAcceptOffer = (offerId: string) => {
-        if (!confirm("Are you sure you want to ACCEPT this offer? It will create an immediate Network Order.")) return;
+        showConfirm("Confirm Acceptance", "Are you sure you want to ACCEPT this offer? It will create an immediate Network Order.", () => {
 
         startTransition(async () => {
-            const { showSuccess, showError, showWarning } = useModal();
+            // const { showSuccess, showError, showWarning } = useModal();
             try {
                 await acceptOfferAction(offerId);
                 showSuccess("Bilgi", "Offer accepted! Order created. Proceed to Buyer Orders to checkout.");
@@ -38,6 +40,7 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
             } catch (err: any) {
                 showError("Uyarı", err.message || "Failed to accept offer.");
             }
+        });
         });
     };
 

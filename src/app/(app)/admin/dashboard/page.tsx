@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function ExecutiveDashboard() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
     const [range, setRange] = useState('30d');
     const [data, setData] = useState<any>(null);
     const [actionsLoading, setActionsLoading] = useState<string | null>(null);
@@ -27,13 +27,25 @@ export default function ExecutiveDashboard() {
 
     useEffect(() => { fetchData(); }, [range]);
 
-    const handleAction = async (actionType: string) => {
-        if (!confirm(`Bu işlem sistem durumunu değiştirecektir: ${actionType}\nDevam etmek istiyor musunuz?`)) return;
+    const handleAction = (actionType: string) => {
+        showConfirm("Sistem Aksiyonu", `Bu işlem sistem durumunu değiştirecektir: ${actionType}\nDevam etmek istiyor musunuz?`, () => {
+            showPrompt(
+                "Audit Log Açıklaması",
+                "Lütfen bu işlem için bir gerekçe giriniz (Min 10 karakter):",
+                (reason) => {
+                    if (!reason || reason.length < 10) {
+                        showWarning("Uyarı", "Hata: Açıklama en az 10 karakter olmalı.");
+                        return;
+                    }
 
-        const reason = prompt(`Lütfen Audit Log için açıklama giriniz (Min 10 karakter):`);
-        if (!reason || reason.length < 10) return showError("Uyarı", "Hata: Açıklama en az 10 karakter olmalı.");
+                    setActionsLoading(actionType);
+                    performAction(actionType, reason);
+                }
+            );
+        });
+    };
 
-        setActionsLoading(actionType);
+    const performAction = async (actionType: string, reason: string) => {
         try {
             const res = await fetch('/api/admin/dashboard/actions', {
                 method: "POST",
@@ -46,8 +58,11 @@ export default function ExecutiveDashboard() {
                 fetchData();
             } else {
                 const err = await res.json();
-                showError("Uyarı", `Hata: ${err.error || 'Yetkisiz erişim / İşlem başarısız.'}`);
+                showError("Hata", `Hata: ${err.error || 'Yetkisiz erişim / İşlem başarısız.'}`);
             }
+        } catch (e) {
+            console.error(e);
+            showError("Hata", "İşlem sırasında bir hata oluştu.");
         } finally {
             setActionsLoading(null);
         }

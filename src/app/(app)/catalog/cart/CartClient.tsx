@@ -17,6 +17,7 @@ type CartItemDisplay = {
 };
 
 export default function CartClient({ initialItems }: { initialItems: CartItemDisplay[] }) {
+    const { showConfirm, showSuccess, showError, showWarning } = useModal();
     const [items, setItems] = useState(initialItems);
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
@@ -37,11 +38,16 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
         router.refresh();
     };
 
-    const handleClear = async () => {
-        if (!confirm("Are you sure you want to empty your cart?")) return;
-        setItems([]);
-        await clearCartAction();
-        router.refresh();
+    const handleClear = () => {
+        showConfirm(
+            "Empty Cart",
+            "Are you sure you want to empty your cart?",
+            async () => {
+                setItems([]);
+                await clearCartAction();
+                router.refresh();
+            }
+        );
     };
 
     const handleCheckout = () => {
@@ -159,7 +165,6 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
                                 onClick={async () => {
                                     if (items.length === 0) return;
                                     startTransition(async () => {
-                                        const { showSuccess, showError, showWarning } = useModal();
                                         try {
                                             const { createRfqFromCartAction } = await import("@/actions/rfqActions");
                                             const res = await createRfqFromCartAction();

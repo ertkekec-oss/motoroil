@@ -17,6 +17,7 @@ export default function ConfirmDeliveryAction({
 }) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { showSuccess, showError, showConfirm } = useModal();
 
     if (alreadyConfirmed) {
         return (
@@ -44,9 +45,9 @@ export default function ConfirmDeliveryAction({
                 ) : null}
 
                 <button
-                    onClick={async () => {
-                        const { showSuccess, showError, showWarning } = useModal();
-                        if (!confirm("Teslimatı onayladığınızda satıcıya ödeme geçilir. Geri alınamaz. Emin misiniz?")) return;
+                    onClick={() => {
+                        showConfirm("Teslimat Onayı", "Teslimatı onayladığınızda satıcıya ödeme geçilir. Geri alınamaz. Emin misiniz?", async () => {
+
                         setLoading(true);
                         try {
                             await confirmDeliveryAction(orderId);
@@ -56,6 +57,7 @@ export default function ConfirmDeliveryAction({
                         } finally {
                             setLoading(false);
                         }
+                        });
                     }}
                     disabled={!allShipmentsDelivered || loading}
                     className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all flex justify-center items-center gap-2

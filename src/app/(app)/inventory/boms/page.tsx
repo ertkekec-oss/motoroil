@@ -36,6 +36,7 @@ export default function BomsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBom, setSelectedBom] = useState<any>(null);
   const [newBom, setNewBom] = useState({
+    id: "", // Added for editing
     productId: "",
     name: "",
     code: "",
@@ -98,6 +99,23 @@ export default function BomsPage() {
     });
   };
 
+  const handleEditBom = (bom: any) => {
+    setNewBom({
+      id: bom.id,
+      productId: bom.productId,
+      name: bom.name || "",
+      code: bom.code || "",
+      description: bom.description || "",
+      items: bom.items.map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unit: item.unit,
+        wastePercentage: item.wastePercentage
+      }))
+    });
+    setIsModalOpen(true);
+  };
+
   const handleSaveBom = async () => {
     if (!newBom.productId || newBom.items.length === 0) {
       showWarning("Hata", "Hedef Mamul ve en az bir hammadde seçmelisiniz.");
@@ -125,17 +143,20 @@ export default function BomsPage() {
         code: newBom.code || `BOM-${Date.now()}`
       };
 
-      const res = await fetch("/api/inventory/boms", {
-        method: "POST",
+      const url = newBom.id ? `/api/inventory/boms/${newBom.id}` : "/api/inventory/boms";
+      const method = newBom.id ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bomData),
       });
 
       const data = await res.json();
       if (data.success) {
-        showSuccess("Başarılı", "Yeni Reçete başarıyla kaydedildi.");
+        showSuccess("Başarılı", newBom.id ? "Reçete güncellendi." : "Yeni Reçete başarıyla kaydedildi.");
         setIsModalOpen(false);
-        setNewBom({ productId: "", name: "", code: "", description: "", items: [] });
+        setNewBom({ id: "", productId: "", name: "", code: "", description: "", items: [] });
         fetchBoms();
       } else {
         showError("Hata", data.error || "Beklenmedik bir hata oluştu.");
@@ -194,7 +215,10 @@ export default function BomsPage() {
         <div className="flex gap-3">
           {canManage && (
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setNewBom({ id: "", productId: "", name: "", code: "", description: "", items: [] });
+                setIsModalOpen(true);
+              }}
               className={`h-[40px] px-5 flex items-center gap-2 rounded-[12px] font-medium text-[13px] transition-all shadow-sm ${isLight ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-600 text-white hover:bg-blue-500"}`}
             >
               <Plus className="w-4 h-4" />
@@ -282,12 +306,20 @@ export default function BomsPage() {
                   <ListPlus className="w-4 h-4" /> Detaylar
                 </button>
                 {canManage && (
-                  <button
-                    onClick={() => handleDeleteBom(bom.id, bom.name || bom.code)}
-                    className={`h-[36px] px-3 rounded-[8px] border flex items-center justify-center transition-colors ${isLight ? "bg-red-50 border-red-200 text-red-600 hover:bg-red-100" : "bg-red-900/20 border-red-800/50 text-red-400 hover:bg-red-900/40"}`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <>
+                    <button
+                      onClick={() => handleEditBom(bom)}
+                      className={`h-[36px] px-3 rounded-[8px] border flex items-center justify-center transition-colors ${isLight ? "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700"}`}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBom(bom.id, bom.name || bom.code)}
+                      className={`h-[36px] px-3 rounded-[8px] border flex items-center justify-center transition-colors ${isLight ? "bg-red-50 border-red-200 text-red-600 hover:bg-red-100" : "bg-red-900/20 border-red-800/50 text-red-400 hover:bg-red-900/40"}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -300,8 +332,16 @@ export default function BomsPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50">
           <div className={`w-[800px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
             <div className={`flex justify-between items-center px-6 py-4 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
-              <h2 className={`text-[16px] font-semibold ${textValueClass}`}>Yeni Üretim Reçetesi (BOM)</h2>
-              <button onClick={() => setIsModalOpen(false)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
+              <h2 className={`text-[16px] font-semibold ${textValueClass}`}>{newBom.id ? "Reçete Düzenle" : "Yeni Üretim Reçetesi (BOM)"}</h2>
+              <button 
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setNewBom({ id: "", productId: "", name: "", code: "", description: "", items: [] });
+                }} 
+                className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}
+              >
+                &times;
+              </button>
             </div>
             
             <div className="p-6 overflow-y-auto custom-scroll flex flex-col gap-6">

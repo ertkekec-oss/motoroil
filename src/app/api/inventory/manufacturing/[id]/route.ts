@@ -67,76 +67,148 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         const body = await request.json();
         const { status, notes, producedQuantity, actualStartDate, actualEndDate } = body;
 
-        // If transitioning to COMPLETED, we must do Transactional Stock Management
+        // If transitioning status, we must do Transactional Stock Management
         const order = await prisma.$transaction(async (tx) => {
+            // Re-fetch inside transaction for latest state
+            const current = await tx.manufacturingOrder.findUnique({
+                where: { id },
+                include: { items: true }
+            });
 
-            // Check if status is updated to "COMPLETED" and wasn't before
-            const isCompletingNow = status === 'COMPLETED' && existingOrder.status !== 'COMPLETED';
-            
-            // Check if status is updated to "IN_PROGRESS" and wasn't before
-            const isStartingNow = status === 'IN_PROGRESS' && existingOrder.status !== 'IN_PROGRESS';
+            if (!current) throw new Error('Emir bulunamadı');
 
+            // 1. Protection: If COMPLETED, no further modification allowed except maybe notes (but status is final)
+            if (current.status === 'COMPLETED' && status && status !== 'COMPLETED') {
+                throw new Error('Tamamlanmış bir üretim emrinin durumu değiştirilemez.');
+            }
+
+            // 2. Determine Transitions
+            const isStartingNow = status === 'IN_PROGRESS' && current.status !== 'IN_PROGRESS';
+            const isCompletingNow = status === 'COMPLETED' && current.status !== 'COMPLETED';
+            const isCancellingFromInProgress = status === 'CANCELED' && current.status === 'IN_PROGRESS';
+
+            // 3. Update Order metadata
             const updatedOrder = await tx.manufacturingOrder.update({
                 where: { id },
                 data: {
-                    status: status || existingOrder.status,
-                    notes: notes !== undefined ? notes : existingOrder.notes,
-                    producedQuantity: producedQuantity !== undefined ? parseInt(producedQuantity) : existingOrder.producedQuantity,
-                    actualStartDate: actualStartDate ? new Date(actualStartDate) : existingOrder.actualStartDate,
-                    actualEndDate: actualEndDate ? new Date(actualEndDate) : existingOrder.actualEndDate,
-                    totalActualCost: isCompletingNow ? existingOrder.totalEstimatedCost : undefined // Basic assumption: actual = estimated initially
+                    status: status || current.status,
+                    notes: notes !== undefined ? notes : current.notes,
+                    producedQuantity: producedQuantity !== undefined ? parseInt(producedQuantity) : current.producedQuantity,
+                    actualStartDate: actualStartDate ? new Date(actualStartDate) : current.actualStartDate,
+                    actualEndDate: actualEndDate ? new Date(actualEndDate) : current.actualEndDate,
+                    totalActualCost: isCompletingNow ? current.totalEstimatedCost : undefined
                 },
                 include: { items: true, product: true, bom: true }
             });
 
-            // 1. If starting (WIP), deduct raw materials (INVENTORY REDUCTION)
+            const branch = updatedOrder.branch || 'Merkez';
+
+            // 4. ACTION: Starting (WIP) -> Deduct Raw Materials
             if (isStartingNow) {
                 for (const item of updatedOrder.items) {
                     const qtyToDeduct = Math.round(parseFloat(String(item.plannedQuantity)));
+                    if (qtyToDeduct <= 0) continue;
+
+                    // A. Stock Movement
                     await tx.stockMovement.create({
                         data: {
                             productId: item.productId,
                             companyId: updatedOrder.companyId,
-                            branch: updatedOrder.branch,
-                            quantity: -qtyToDeduct, // Subtract from stock
+                            branch: branch,
+                            quantity: -qtyToDeduct,
                             price: parseFloat(String(item.unitCost)),
                             type: 'USAGE',
-                            referenceId: `MRP_START_${updatedOrder.orderNumber}`
+                            referenceId: updatedOrder.id,
+                            idempotencyKey: `MRP_DEDUCT_${updatedOrder.id}_${item.productId}`
                         }
                     });
 
-                    // Update explicit stock table
+                    // B. Branch Stock Update
                     await tx.stock.upsert({
-                        where: { productId_branch: { productId: item.productId, branch: updatedOrder.branch } },
+                        where: { productId_branch: { productId: item.productId, branch: branch } },
                         update: { quantity: { decrement: qtyToDeduct } },
-                        create: { productId: item.productId, branch: updatedOrder.branch, quantity: -qtyToDeduct }
+                        create: { productId: item.productId, branch: branch, quantity: -qtyToDeduct }
                     });
+
+                    // C. Global Product Stock Update (if Merkez)
+                    if (branch === 'Merkez') {
+                        await tx.product.update({
+                            where: { id: item.productId },
+                            data: { stock: { decrement: qtyToDeduct } }
+                        });
+                    }
                 }
             }
 
-            // 2. If completing, add the final product to stock (INVENTORY ADDITION)
+            // 5. ACTION: Completing (DONE) -> Add Finished Product
             if (isCompletingNow) {
                 const finalQty = Math.round(updatedOrder.producedQuantity || updatedOrder.plannedQuantity);
                 const finalUnitCost = updatedOrder.totalActualCost ? (parseFloat(String(updatedOrder.totalActualCost)) / finalQty) : 0;
 
-                await tx.stockMovement.create({
-                    data: {
-                        productId: updatedOrder.productId,
-                        companyId: updatedOrder.companyId,
-                        branch: updatedOrder.branch,
-                        quantity: finalQty, // Positive, adding to stock
-                        price: finalUnitCost,
-                        type: 'PRODUCTION',
-                        referenceId: `MRP_DONE_${updatedOrder.orderNumber}`
-                    }
-                });
+                if (finalQty > 0) {
+                    // A. Stock Movement
+                    await tx.stockMovement.create({
+                        data: {
+                            productId: updatedOrder.productId,
+                            companyId: updatedOrder.companyId,
+                            branch: branch,
+                            quantity: finalQty,
+                            price: finalUnitCost,
+                            type: 'PRODUCTION',
+                            referenceId: updatedOrder.id,
+                            idempotencyKey: `MRP_DONE_${updatedOrder.id}`
+                        }
+                    });
 
-                // Update explicit stock table
-                await tx.stock.upsert({
-                    where: { productId_branch: { productId: updatedOrder.productId, branch: updatedOrder.branch } },
-                    update: { quantity: { increment: finalQty } },
-                    create: { productId: updatedOrder.productId, branch: updatedOrder.branch, quantity: finalQty }
-                });
+                    // B. Branch Stock Update
+                    await tx.stock.upsert({
+                        where: { productId_branch: { productId: updatedOrder.productId, branch: branch } },
+                        update: { quantity: { increment: finalQty } },
+                        create: { productId: updatedOrder.productId, branch: branch, quantity: finalQty }
+                    });
+
+                    // C. Global Product Stock Update (if Merkez)
+                    if (branch === 'Merkez') {
+                        await tx.product.update({
+                            where: { id: updatedOrder.productId },
+                            data: { stock: { increment: finalQty } }
+                        });
+                    }
+                }
+            }
+
+            // 6. ACTION: Cancelling from IN_PROGRESS -> Refund Raw Materials
+            if (isCancellingFromInProgress) {
+                for (const item of updatedOrder.items) {
+                    const qtyToRefund = Math.round(parseFloat(String(item.plannedQuantity)));
+                    if (qtyToRefund <= 0) continue;
+
+                    await tx.stockMovement.create({
+                        data: {
+                            productId: item.productId,
+                            companyId: updatedOrder.companyId,
+                            branch: branch,
+                            quantity: qtyToRefund,
+                            price: parseFloat(String(item.unitCost)),
+                            type: 'RETURN',
+                            referenceId: updatedOrder.id,
+                            idempotencyKey: `MRP_REFUND_${updatedOrder.id}_${item.productId}`
+                        }
+                    });
+
+                    await tx.stock.upsert({
+                        where: { productId_branch: { productId: item.productId, branch: branch } },
+                        update: { quantity: { increment: qtyToRefund } },
+                        create: { productId: item.productId, branch: branch, quantity: qtyToRefund }
+                    });
+
+                    if (branch === 'Merkez') {
+                        await tx.product.update({
+                            where: { id: item.productId },
+                            data: { stock: { increment: qtyToRefund } }
+                        });
+                    }
+                }
             }
 
             return updatedOrder;
@@ -145,7 +217,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         return NextResponse.json({ success: true, order });
     } catch (error: any) {
         console.error('MRP Order update error:', error);
-        return NextResponse.json({ success: false, error: 'İşlem Başarısız. Hammadde stoklarında bir hata var.' }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'İşlem Başarısız: ' + error.message }, { status: 500 });
     }
 }
 

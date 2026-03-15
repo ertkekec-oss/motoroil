@@ -6,7 +6,7 @@ import { counterRfqAction } from "@/actions/rfqResponseActions";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function CounterClient({ rfq, items, offer }: { rfq: any, items: any[], offer: any }) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showConfirm, showSuccess, showError, showWarning } = useModal();
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
@@ -22,18 +22,21 @@ export default function CounterClient({ rfq, items, offer }: { rfq: any, items: 
             return;
         }
 
-        if (!confirm("Are you sure you want to submit this offer to the buyer? Prices cannot be changed once submitted.")) return;
-
-        startTransition(async () => {
-            const { showSuccess, showError, showWarning } = useModal();
-            try {
-                await counterRfqAction(formData);
-                showSuccess("Bilgi", "Offer submitted successfully.");
-                router.push("/seller/rfqs");
-            } catch (err: any) {
-                showError("Uyarı", err.message || "Failed to submit offer.");
+        showConfirm(
+            "Submit Offer",
+            "Are you sure you want to submit this offer to the buyer? Prices cannot be changed once submitted.",
+            () => {
+                startTransition(async () => {
+                    try {
+                        await counterRfqAction(formData);
+                        showSuccess("Bilgi", "Offer submitted successfully.");
+                        router.push("/seller/rfqs");
+                    } catch (err: any) {
+                        showError("Uyarı", err.message || "Failed to submit offer.");
+                    }
+                });
             }
-        });
+        );
     };
 
     return (

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function HelpManager({ initialCategories, tenantId }: { initialCategories: any[], tenantId: string }) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const router = useRouter();
     const [categories, setCategories] = useState(initialCategories);
 
@@ -88,16 +88,21 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
         }
     };
 
-    const deleteTopic = async (id: string) => {
-        if (!confirm('Bu makaleyi silmek istediğinize emin misiniz?')) return;
-        try {
-            const res = await fetch(`/api/admin/help/topics/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error();
-            router.refresh();
-            window.location.reload();
-        } catch {
-            showError("Uyarı", 'Silme işlemi başarısız.');
-        }
+    const deleteTopic = (id: string) => {
+        showConfirm(
+            "Makaleyi Sil",
+            "Bu makaleyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+            async () => {
+                try {
+                    const res = await fetch(`/api/admin/help/topics/${id}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error();
+                    router.refresh();
+                    window.location.reload();
+                } catch {
+                    showError("Hata", 'Silme işlemi başarısız oldu.');
+                }
+            }
+        );
     };
 
     return (
@@ -142,7 +147,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
                             ) : (
                                 <ul className="divide-y divide-slate-100">
                                     {cat.topics?.map((topic: any) => (
-                                        <li key={topic.id} className="px-6 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors">
+                                         <li key={topic.id} className="px-6 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors">
                                             <div>
                                                 <div className="font-bold text-slate-800 mb-1">{topic.title}</div>
                                                 <div className="text-xs text-slate-500 truncate max-w-xl">{topic.excerpt || 'Özet girilmedi.'}</div>
@@ -216,7 +221,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
                                     <div>
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kategori</label>
                                         <select value={topicForm.categoryId} onChange={e => setTopicForm({ ...topicForm, categoryId: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-4 text-slate-900 rounded-xl mt-1 outline-none focus:border-orange-500/50 transition-colors">
-                                            {categories?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                            {categories?.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                                         </select>
                                     </div>
                                     <div>

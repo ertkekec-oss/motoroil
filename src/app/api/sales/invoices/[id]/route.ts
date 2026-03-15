@@ -170,7 +170,7 @@ export async function DELETE(
 
                         // 2. Revert Kasa & Financial Transaction
                         const transactions = await tx.transaction.findMany({
-                            where: { description: { contains: `REF:${order.id}` }, deletedAt: null }
+                            where: { description: { contains: `REF:${order.id}` } }
                         });
 
                         for (const t of transactions) {
@@ -210,7 +210,62 @@ export async function DELETE(
                             });
                         }
 
-                        // 3. Mark Order as deleted
+                        // 2.5 Revert Points and Coupons
+                        let rawData: any = order.rawData || {};
+                        if (typeof rawData === 'string') {
+                            try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
+                        }
+
+                        if (order.customerId) {
+                            const earnedPoints = Number(rawData.dynamicEarnedPoints || 0);
+                            const usedPoints = Number(rawData.pointsUsed || 0);
+                            const netPointsToRevert = earnedPoints - usedPoints;
+
+                            if (netPointsToRevert !== 0) {
+                                await tx.customer.update({
+                                    where: { id: order.customerId },
+                                    data: { points: { decrement: netPointsToRevert } }
+                                });
+                            }
+                        }
+
+                        if (rawData.couponCode) {
+                            const coupon = await tx.coupon.findUnique({ where: { code: rawData.couponCode } }) as any;
+                            if (coupon) {
+                                await tx.coupon.update({
+                                    where: { code: rawData.couponCode },
+                                    data: {
+                                        usedCount: Math.max(0, (coupon.usedCount || 0) - 1),
+                                        isUsed: (coupon.usedCount || 0) <= 1 ? false : true
+                                    }
+                                });
+                            }
+                        }
+
+                        // 3. Accounting Reversal (Storno)
+                        try {
+                            const { stornoJournalEntry } = await import('@/lib/accounting');
+                            const journal = await tx.journal.findFirst({
+                                where: { sourceId: order.id, sourceType: 'Order' }
+                            });
+                            if (journal) {
+                                await stornoJournalEntry(journal.id, 'Fatura İptal Edildi (Bağlı POS Siparişi)');
+                            }
+
+                            // Also storno journals of related transactions (Commissions, etc)
+                            for (const t of transactions) {
+                                const tJournal = await tx.journal.findFirst({
+                                    where: { sourceId: t.id, sourceType: 'Transaction' }
+                                });
+                                if (tJournal) {
+                                    await stornoJournalEntry(tJournal.id, `İşlem İptal Edildi (Fatura İptali REF:${order.id})`);
+                                }
+                            }
+                        } catch (err) {
+                            console.error('[Accounting Reversal Error]:', err);
+                        }
+
+                        // 4. Mark Order as deleted
                         await tx.order.update({
                             where: { id: order.id },
                             data: {
@@ -227,15 +282,16 @@ export async function DELETE(
                         data: { balance: { decrement: invoice.totalAmount } }
                     });
 
-                    // 2. Remove related Transaction
-                    await tx.transaction.deleteMany({
+                    // 2. Soft Delete related Transaction
+                    await tx.transaction.updateMany({
                         where: {
                             customerId: invoice.customerId,
                             companyId: invoice.companyId,
                             type: 'SalesInvoice',
                             amount: invoice.totalAmount,
                             description: { contains: invoice.invoiceNo }
-                        }
+                        },
+                        data: { deletedAt: new Date() }
                     });
 
                     // 3. Revert Inventory / Stocks
@@ -274,6 +330,34 @@ export async function DELETE(
                                 }
                             }
                         }
+                    }
+
+                    // 4. Accounting Reversal (Storno)
+                    try {
+                        const { stornoJournalEntry } = await import('@/lib/accounting');
+                        
+                        // Check for journals tied to the invoice itself
+                        const invJournal = await tx.journal.findFirst({
+                            where: { sourceId: invoice.id, sourceType: { in: ['Invoice', 'SalesInvoice'] } }
+                        });
+                        if (invJournal) {
+                            await stornoJournalEntry(invJournal.id, `Fatura İptal Edildi (${invoice.invoiceNo})`);
+                        }
+
+                        // Check for journals tied to related transactions
+                        const relatedTrxs = await tx.transaction.findMany({
+                            where: { description: { contains: invoice.invoiceNo }, companyId: invoice.companyId }
+                        });
+                        for (const tr of relatedTrxs) {
+                            const trJournal = await tx.journal.findFirst({
+                                where: { sourceId: tr.id, sourceType: 'Transaction' }
+                            });
+                            if (trJournal) {
+                                await stornoJournalEntry(trJournal.id, `Fatura İptal Edildi REF:${invoice.invoiceNo}`);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('[Standalone Accounting Reversal Error]:', err);
                     }
                 }
             }

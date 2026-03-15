@@ -11,6 +11,7 @@ import { useModal } from '@/contexts/ModalContext';
 import DailyReportContent from '@/components/DailyReportContent';
 import SupplierReportContent from '@/components/SupplierReportContent';
 import ExportReportsContent from '@/components/ExportReportsContent';
+import ManufacturingReportContent from '@/components/ManufacturingReportContent';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, Legend
@@ -47,7 +48,7 @@ export default function ReportsPage() {
     const canViewAll = isSystemAdmin || !hasPermission('branch_isolation');
 
     // States
-    const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'finance' | 'inventory' | 'customers' | 'cashflow' | 'daily' | 'suppliers' | 'exports'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'finance' | 'inventory' | 'customers' | 'cashflow' | 'daily' | 'suppliers' | 'exports' | 'manufacturing'>('overview');
     const [reportScope, setReportScope] = useState<'all' | 'single'>(canViewAll ? 'all' : 'single');
     const [selectedBranch, setSelectedBranch] = useState(currentUser?.branch || 'Merkez');
     const [dateRange, setDateRange] = useState({
@@ -418,6 +419,7 @@ export default function ReportsPage() {
                             { id: 'overview', icon: '📈', label: 'Genel Bakış' },
                             { id: 'daily', icon: '📅', label: 'Gün Sonu Raporu' },
                             { id: 'suppliers', icon: '🚚', label: 'Tedarikçi Raporları' },
+                            { id: 'manufacturing', icon: '🏭', label: 'Üretim Maliyet Analizi' },
                             { id: 'sales', icon: '💰', label: 'Satış Analizi' },
                             { id: 'finance', icon: '💎', label: 'Finansal Durum' },
                             { id: 'inventory', icon: '📦', label: 'Envanter' },
@@ -797,6 +799,11 @@ export default function ReportsPage() {
                     {/* Daily Report Tab */}
                     {activeTab === 'daily' && (
                         <DailyReportContent />
+                    )}
+
+                    {/* Manufacturing Tab */}
+                    {activeTab === 'manufacturing' && (
+                        <ManufacturingReportContent />
                     )}
 
                     {/* Suppliers Report Tab */}

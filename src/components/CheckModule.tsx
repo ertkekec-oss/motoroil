@@ -7,7 +7,7 @@ import { useCRM } from '@/contexts/CRMContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 
 export default function CheckModule() {
-    const { showSuccess, showError, showConfirm, showWarning } = useModal();
+    const { showSuccess, showError, showConfirm, showWarning, showPrompt } = useModal();
     const { customers, suppliers } = useCRM();
     const { kasalar, refreshChecks: refreshFinancialChecks } = useFinancials();
 
@@ -90,17 +90,33 @@ export default function CheckModule() {
 
             // Simple selection for now, could be a modal
             const kasaOptions = banks?.map(b => `${b.name}`).join(', ');
-            const selectedKasaName = prompt(`Tahsilat/Ödeme yapılacak kasayı yazınız:\n(${kasaOptions})`, banks[0].name);
+            showPrompt(
+                'Kasa Seçimi',
+                `Tahsilat/Ödeme yapılacak kasayı yazınız:\n(${kasaOptions})`,
+                (selectedKasaName) => {
+                    if (!selectedKasaName) return;
 
-            if (!selectedKasaName) return;
+                    const selectedKasa = banks.find(b => b.name.toLowerCase() === selectedKasaName.toLowerCase());
+                    if (!selectedKasa) {
+                        showError('Hata', 'Geçersiz kasa seçimi.');
+                        return;
+                    }
 
-            const selectedKasa = banks.find(b => b.name.toLowerCase() === selectedKasaName.toLowerCase());
-            if (!selectedKasa) {
-                showError('Hata', 'Geçersiz kasa seçimi.');
-                return;
-            }
+                    updateStatus(id, newStatus, String(selectedKasa.id));
+                },
+                banks[0].name
+            );
+            return;
 
-            updateStatus(id, newStatus, String(selectedKasa.id));
+
+
+
+
+
+
+
+
+
         } else {
             updateStatus(id, newStatus);
         }

@@ -6,18 +6,25 @@ import { RotateCcw } from "lucide-react";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function ForceReleaseButton({ orderId }: { orderId: string }) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showConfirm } = useModal();
     const [loading, setLoading] = useState(false);
 
-    const handleForceRelease = async () => {
-        if (!confirm("Are you sure you want to force release the escrow payout? This will hit the mock API again and sync ledgers.")) return;
-        setLoading(true);
-        try {
-            await forceReleaseAction(orderId);
-        } catch (e: any) {
-            showError("Uyarı", e.message || "Force release failed");
-            setLoading(false);
-        }
+    const handleForceRelease = () => {
+        showConfirm(
+            "Force Release Onayı",
+            "Are you sure you want to force release the escrow payout? This will hit the mock API again and sync ledgers.",
+            async () => {
+                setLoading(true);
+                try {
+                    await forceReleaseAction(orderId);
+                    showSuccess("Başarılı", "Force release işlemi başarıyla tetiklendi.");
+                } catch (e: any) {
+                    showError("Hata", e.message || "Force release failed");
+                } finally {
+                    setLoading(false);
+                }
+            }
+        );
     };
 
     return (

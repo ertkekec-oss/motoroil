@@ -1,0 +1,6 @@
+"Path","LineNumber","Line"
+"C:\Users\ertke\OneDrive\Masa?st?\periodya\muhasebeapp\motoroil\src\app\api\admin\marketplace\queue\health\route.ts","91","            logger.alert('Marketplace System Health CRITICAL', {"
+"C:\Users\ertke\OneDrive\Masa?st?\periodya\muhasebeapp\motoroil\src\services\marketplaces\actions\canary.ts","16","            logger.alert(""Canary Failed: No company with trendyol config found"", { alertType: 'CANARY_FAILURE' });"
+"C:\Users\ertke\OneDrive\Masa?st?\periodya\muhasebeapp\motoroil\src\services\marketplaces\actions\canary.ts","27","            logger.alert(""Canary Failed: No order found for test company"", { alertType: 'CANARY_FAILURE', companyId: company.id });"
+"C:\Users\ertke\OneDrive\Masa?st?\periodya\muhasebeapp\motoroil\src\services\marketplaces\actions\canary.ts","44","            logger.alert(`Canary Failed: Action returned FAILED status`, {"
+"C:\Users\ertke\OneDrive\Masa?st?\periodya\muhasebeapp\motoroil\src\services\marketplaces\actions\canary.ts","56","        logger.alert(""Canary Crash"", { alertType: 'CANARY_FAILURE', error: error.message });"

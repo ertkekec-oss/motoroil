@@ -1,21 +1,12 @@
 import { EnterprisePageShell, EnterpriseCard, EnterpriseTable, EnterpriseButton, EnterpriseSectionHeader } from "@/components/ui/enterprise";
-import { getQueueMetrics, performQueueAction } from "@/services/ops/queueMetrics";
-import { AlertTriangle, Power, Pause, Play, Trash2 } from "lucide-react";
-import { revalidatePath } from "next/cache";
+import { getQueueMetrics } from "@/services/ops/queueMetrics";
+import { AlertTriangle } from "lucide-react";
+import { QueueActions } from "./QueueActions";
 
 export const dynamic = "force-dynamic";
 
 export default async function OpsQueueHealthPage() {
     const metrics = await getQueueMetrics();
-
-    const handleAction = async (formData: FormData) => {
-        "use server";
-        const qName = formData.get("qName") as string;
-        const action = formData.get("action") as "pause" | "resume" | "drain";
-
-        await performQueueAction(qName, action);
-        revalidatePath('/admin/ops/queue-health');
-    };
 
     return (
         <EnterprisePageShell
@@ -26,7 +17,7 @@ export default async function OpsQueueHealthPage() {
                 <AlertTriangle className="w-6 h-6 mt-1 shrink-0" />
                 <div>
                     <h4 className="font-bold mb-1 text-orange-900">Drain (Boşaltma) Uyarısı</h4>
-                    <p className="text-sm">"Drain" komutu, kuyrukta bekleyen (waiting) tüm işleri kalıcı olarak siler ve işlenmesini engeller. Sadece stuck-loop (açık döngü) halinde veya manuel telafi edilebilecek idempotency durumlarında kullanın.</p>
+                    <p className="text-sm">"Drain" komutu, kuyrukta bekleyen (waiting) tüm işleri kalıcı olarak siler ve işlenmesini engeller. Sadece stuck-loop (açık döngü) halinde veya manuel telafi edilebileceği durumlarda kullanın.</p>
                 </div>
             </div>
 
@@ -48,23 +39,7 @@ export default async function OpsQueueHealthPage() {
                                 {m.oldestJobAgeMs ? `${Math.floor(m.oldestJobAgeMs / 1000)}s` : "-"}
                             </td>
                             <td className="px-4 py-3 text-right">
-                                <form action={handleAction} className="flex items-center gap-2 justify-end isolate">
-                                    <input type="hidden" name="qName" value={m.name} />
-
-                                    {m.isPaused ? (
-                                        <button name="action" value="resume" type="submit" className="text-[10px] bg-green-100 text-green-800 px-2 py-1 rounded flex items-center hover:bg-green-200">
-                                            <Play className="w-3 h-3 mr-1" /> Resume
-                                        </button>
-                                    ) : (
-                                        <button name="action" value="pause" type="submit" className="text-[10px] bg-orange-100 text-orange-800 px-2 py-1 rounded flex items-center hover:bg-orange-200">
-                                            <Pause className="w-3 h-3 mr-1" /> Pause
-                                        </button>
-                                    )}
-
-                                    <button name="action" value="drain" type="submit" onClick={e => !confirm('Tüm bekleyen işleri silmek istediğinize emin misiniz? (Geri alınamaz)') && e.preventDefault()} className="text-[10px] bg-red-100 text-red-800 px-2 py-1 flex items-center rounded hover:bg-red-200">
-                                        <Trash2 className="w-3 h-3 mr-1" /> Drain All
-                                    </button>
-                                </form>
+                                <QueueActions qName={m.name} isPaused={m.isPaused} />
                             </td>
                         </tr>
                     ))}

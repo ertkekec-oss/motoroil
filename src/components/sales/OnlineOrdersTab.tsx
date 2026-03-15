@@ -48,6 +48,7 @@ export function OnlineOrdersTab({
     showError,
     posTheme = 'dark'
 }: OnlineOrdersTabProps) {
+    const { showConfirm, showSuccess: modalSuccess, showError: modalError, showWarning: modalWarning } = useModal();
     const isLight = posTheme === 'light';
 
     const [statusFilter, setStatusFilter] = useState('NEW');
@@ -301,84 +302,81 @@ export function OnlineOrdersTab({
                         <button
                             disabled={!!bulkInvoiceStatus || isGeneratingBulk}
                             onClick={async () => {
-                                const { showSuccess, showError, showWarning } = useModal();
+
                                 const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id));
                                 
                                 if (selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length === 0) {
-                                     showError("Hata", "Seçili siparişler zaten faturalandırılmış.");
+                                     modalError("Hata", "Seçili siparişler zaten faturalandırılmış.");
                                      return;
                                 }
 
-                                if (!confirm(`${selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length} adet sipariş otomatik olarak faturalandırılıp resmileştirilecektir (e-Fatura/e-Arşiv gönderimi). Devam etmek istiyor musunuz?`)) {
-                                    return;
-                                }
-                                
-                                setBulkInvoiceStatus(`Hazırlanıyor...`);
-                                let successCount = 0;
-                                let failCount = 0;
+                                showConfirm("Toplu Faturalandırma", `${selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length} adet sipariş otomatik olarak faturalandırılıp resmileştirilecektir (e-Fatura/e-Arşiv gönderimi). Devam etmek istiyor musunuz?`, async () => {
+                                    setBulkInvoiceStatus(`Hazırlanıyor...`);
+                                    let successCount = 0;
+                                    let failCount = 0;
 
-                                try {
-                                    const mappingRes = await fetch('/api/integrations/marketplace/get-mapping');
-                                    const mappingData = await mappingRes.json();
-                                    const rawMappings = mappingData.mappings || [];
+                                    try {
+                                        const mappingRes = await fetch('/api/integrations/marketplace/get-mapping');
+                                        const mappingData = await mappingRes.json();
+                                        const rawMappings = mappingData.mappings || [];
 
-                                    for(let i = 0; i < selectedOrderData.length; i++) {
-                                        const o = selectedOrderData[i];
-                                        
-                                        // Zaten faturalıysa atla
-                                        if (['Faturalandırıldı', 'Tamamlandı'].includes(o.status)) {
-                                            continue;
-                                        }
+                                        for(let i = 0; i < selectedOrderData.length; i++) {
+                                            const o = selectedOrderData[i];
+                                            
+                                            // Zaten faturalıysa atla
+                                            if (['Faturalandırıldı', 'Tamamlandı'].includes(o.status)) {
+                                                continue;
+                                            }
 
-                                        setBulkInvoiceStatus(`Faturalandırılıyor: ${i+1}/${selectedOrderData.length}`);
-                                        
-                                        const saleItems = o.items?.map((item: any) => {
-                                            const code = item.code || item.barcode || item.name;
-                                            const mapMatch = rawMappings.find((m: any) => m.marketplace?.toLowerCase() === o.marketplace?.toLowerCase() && m.marketplaceCode === code);
-                                            return {
-                                                productId: mapMatch ? mapMatch.productId : undefined,
-                                                qty: item.qty || item.quantity || 1,
-                                                name: item.name,
-                                                price: item.price || 0,
-                                                vat: item.vat || 20,
-                                                otv: item.otv || 0
-                                            };
-                                        }) || [];
+                                            setBulkInvoiceStatus(`Faturalandırılıyor: ${i+1}/${selectedOrderData.length}`);
+                                            
+                                            const saleItems = o.items?.map((item: any) => {
+                                                const code = item.code || item.barcode || item.name;
+                                                const mapMatch = rawMappings.find((m: any) => m.marketplace?.toLowerCase() === o.marketplace?.toLowerCase() && m.marketplaceCode === code);
+                                                return {
+                                                    productId: mapMatch ? mapMatch.productId : undefined,
+                                                    qty: item.qty || item.quantity || 1,
+                                                    name: item.name,
+                                                    price: item.price || 0,
+                                                    vat: item.vat || 20,
+                                                    otv: item.otv || 0
+                                                };
+                                            }) || [];
 
-                                        const convRes = await fetch('/api/sales/invoices/ecommerce-convert', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ orderId: o.id, items: saleItems })
-                                        });
-                                        const convData = await convRes.json();
-                                        
-                                        if (convData.success && convData.invoice) {
-                                            const sendRes = await fetch('/api/sales/invoices', {
+                                            const convRes = await fetch('/api/sales/invoices/ecommerce-convert', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ action: 'formal-send', invoiceId: convData.invoice.id })
+                                                body: JSON.stringify({ orderId: o.id, items: saleItems })
                                             });
-                                            if (sendRes.ok) successCount++;
-                                            else failCount++;
-                                        } else {
-                                            failCount++;
+                                            const convData = await convRes.json();
+                                            
+                                            if (convData.success && convData.invoice) {
+                                                const sendRes = await fetch('/api/sales/invoices', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ action: 'formal-send', invoiceId: convData.invoice.id })
+                                                });
+                                                if (sendRes.ok) successCount++;
+                                                else failCount++;
+                                            } else {
+                                                failCount++;
+                                            }
                                         }
-                                    }
 
-                                    if (failCount > 0) {
-                                        showError("Kısmi Başarı / Hata", `${successCount} fatura başarıyla oluşturuldu ve gönderildi. ${failCount} siparişte hata oluştu.`);
-                                    } else {
-                                        // Wait, periodya usually uses showWarning for custom alerts when it's not an error.
-                                        showSuccess("Bilgi", `Başarılı: Tüm faturalar başarıyla oluşturuldu ve gönderildi. (${successCount} adet)`);
+                                        if (failCount > 0) {
+                                            modalError("Kısmi Başarı / Hata", `${successCount} fatura başarıyla oluşturuldu ve gönderildi. ${failCount} siparişte hata oluştu.`);
+                                        } else {
+                                            modalSuccess("Bilgi", `Başarılı: Tüm faturalar başarıyla oluşturuldu ve gönderildi. (${successCount} adet)`);
+                                        }
+                                        
+                                    } catch(e: any) {
+                                        modalError("İşlem Başarısız", e.message || "Bilinmeyen bir hata oluştu.");
+                                    } finally {
+                                        setBulkInvoiceStatus(null);
+                                        setSelectedOrders([]);
+                                        fetchOnlineOrders();
                                     }
-                                    
-                                } catch(e: any) {
-                                    showError("İşlem Başarısız", e.message || "Bilinmeyen bir hata oluştu.");
-                                } finally {
-                                    setBulkInvoiceStatus(null);
-                                    setSelectedOrders([]);
-                                    fetchOnlineOrders();
-                                }
+                                });
                             }}
                             className={`h-[40px] px-4 rounded-[12px] font-medium text-[13px] transition-colors flex items-center justify-center gap-2 ${isLight ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} ${(!!bulkInvoiceStatus || isGeneratingBulk) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >

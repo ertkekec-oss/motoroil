@@ -27,23 +27,33 @@ export function MarketplaceActionButton({
     size = "sm",
     onSuccess,
 }: Props) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showPrompt } = useModal();
     const [status, setStatus] = useState<"IDLE" | "PENDING" | "POLLING" | "SUCCESS" | "FAILED">("IDLE");
     const [auditId, setAuditId] = useState<string | null>(null);
     const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const isLabel = actionKey === "PRINT_LABEL_A4";
 
-    const handleAction = async () => {
+    const handleAction = async (providerCodeOverride?: string) => {
         if (status === "PENDING" || status === "POLLING") return;
 
         let payload: any = {};
 
-        if (actionKey === "CHANGE_CARGO") {
-            const providerCode = window.prompt("Yeni kargo firması kodunu girin (örn: Trendyol Express, Aras, Yurtiçi):");
-            if (!providerCode) return;
-            payload = { cargoProviderCode: providerCode, shipmentPackageId };
+        if (actionKey === "CHANGE_CARGO" && !providerCodeOverride) {
+            showPrompt("Kargo Firması Değiştir", "Yeni kargo firması kodunu girin (örn: Trendyol Express, Aras, Yurtiçi):", (code) => {
+                if (code) handleAction(code);
+            });
+            return;
         }
+
+        if (providerCodeOverride) {
+            payload = { cargoProviderCode: providerCodeOverride, shipmentPackageId };
+        }
+
+
+
+
+
 
         if (isLabel && shipmentPackageId) {
             payload = {
@@ -125,7 +135,7 @@ export function MarketplaceActionButton({
 
     // Polling Logic with Exponential Backoff + Jitter
     useEffect(() => {
-        const { showSuccess, showError, showWarning } = useModal();
+
         if (status !== "POLLING" || !auditId) return;
 
         let attempt = 0;
@@ -180,6 +190,8 @@ export function MarketplaceActionButton({
         };
     }, [status, auditId, marketplace, orderId, actionKey, isLabel, shipmentPackageId, onSuccess]);
 
+    const isLoading = status === "PENDING" || status === "POLLING";
+
     const getIcon = () => {
         if (isLoading) return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
         if (actionKey === "PRINT_LABEL_A4") return <Printer className="h-4 w-4" />;
@@ -187,8 +199,6 @@ export function MarketplaceActionButton({
         if (actionKey === "CHANGE_CARGO") return <Truck className="h-4 w-4 text-blue-500" />;
         return <RefreshCw className="h-4 w-4" />;
     };
-
-    const isLoading = status === "PENDING" || status === "POLLING";
 
     // Check if shipmentPackageId is required but missing
     const requiresShipmentId = actionKey === "PRINT_LABEL_A4" || actionKey === "CHANGE_CARGO";

@@ -4,46 +4,55 @@ import Link from 'next/link';
 import { useModal } from "@/contexts/ModalContext";
 
 export default function ReconDetailClient({ reconciliation: recon }: { reconciliation: any }) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showConfirm, showPrompt, showSuccess, showError, showWarning } = useModal();
     const isDisputed = recon.status === 'DISPUTED';
     const isOk = recon.status === 'SIGNED';
 
     const handleResend = async () => {
-        if (!confirm('Mutabakat davetini tekrar göndermek istiyor musunuz?')) return;
-        try {
-            const res = await fetch(`/api/reconciliation/${recon.id}/resend`, { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess("Bilgi", 'Davet başarıyla yeniden gönderildi.');
-                window.location.reload();
-            } else {
-                showError("Uyarı", data.error || 'Gönderim başarısız oldu.');
+        showConfirm(
+            "Yeniden Davet Gönder",
+            "Mutabakat davetini tekrar göndermek istiyor musunuz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/reconciliation/${recon.id}/resend`, { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        showSuccess("Bilgi", 'Davet başarıyla yeniden gönderildi.');
+                        window.location.reload();
+                    } else {
+                        showError("Uyarı", data.error || 'Gönderim başarısız oldu.');
+                    }
+                } catch (e) {
+                    showError("Uyarı", 'Ağ hatası.');
+                }
             }
-        } catch (e) {
-            showError("Uyarı", 'Ağ hatası.');
-        }
+        );
     };
 
     const handleResolveDispute = async (disputeId: string) => {
-        const resolutionNote = prompt('Bu uyuşmazlığı çözümlemek için notunuz:');
-        if (resolutionNote === null) return; // user cancelled
-
-        try {
-            const res = await fetch(`/api/reconciliation/${recon.id}/disputes/${disputeId}/resolve`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resolutionNote })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess("Bilgi", 'Uyuşmazlık çözüldü olarak işaretlendi.');
-                window.location.reload();
-            } else {
-                showError("Uyarı", data.error || 'İşlem başarısız.');
+        showPrompt(
+            "Uyuşmazlığı Çözümle",
+            "Bu uyuşmazlığı çözümlemek için notunuz:",
+            async (resolutionNote) => {
+                if (!resolutionNote) return;
+                try {
+                    const res = await fetch(`/api/reconciliation/${recon.id}/disputes/${disputeId}/resolve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ resolutionNote })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        showSuccess("Bilgi", 'Uyuşmazlık çözüldü olarak işaretlendi.');
+                        window.location.reload();
+                    } else {
+                        showError("Uyarı", data.error || 'İşlem başarısız.');
+                    }
+                } catch (e) {
+                    showError("Uyarı", 'Ağ hatası.');
+                }
             }
-        } catch (e) {
-            showError("Uyarı", 'Ağ hatası.');
-        }
+        );
     };
 
     return (

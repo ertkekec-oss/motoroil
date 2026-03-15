@@ -5,7 +5,7 @@ import { setupRecurringOrderAction, activateContractAction } from "@/actions/con
 import { useModal } from "@/contexts/ModalContext";
 
 export default function ContractDetailClient({ contract, items }: { contract: any, items: any[] }) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const [isPending, startTransition] = useTransition();
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -85,19 +85,24 @@ export default function ContractDetailClient({ contract, items }: { contract: an
         }
     };
 
-    const handleDeleteDocument = async (docId: string) => {
-        if (!confirm("Belgeyi silmek istediğinize emin misiniz?")) return;
-        try {
-            const res = await fetch(`/api/contracts/documents/${docId}`, { method: 'DELETE' });
-            if (res.ok) {
-                await fetchDocuments();
-            } else {
-                showSuccess("Bilgi", "Belge silinemedi.");
+    const handleDeleteDocument = (docId: string) => {
+        showConfirm(
+            "Belgeyi Sil",
+            "Belgeyi silmek istediğinize emin misiniz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/contracts/documents/${docId}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        await fetchDocuments();
+                    } else {
+                        showSuccess("Bilgi", "Belge silinemedi.");
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showError("Uyarı", "Silme sırasında bir hata oluştu.");
+                }
             }
-        } catch (e) {
-            console.error(e);
-            showError("Uyarı", "Silme sırasında bir hata oluştu.");
-        }
+        );
     };
 
     const handleRecurring = (e: React.FormEvent) => {
@@ -109,30 +114,37 @@ export default function ContractDetailClient({ contract, items }: { contract: an
 
         if (!freq || !day) return;
 
-        if (!confirm("Are you sure you want to setup an automatic recurring order via this contract? Orders will be placed automatically.")) return;
-
-        startTransition(async () => {
-            const { showSuccess, showError, showWarning } = useModal();
-            try {
-                await setupRecurringOrderAction(contract.id, freq, day);
-                showSuccess("Bilgi", "Recurring schedule configured successfully.");
-            } catch (err: any) {
-                showError("Uyarı", err.message || "Failed to setup schedule");
+        showConfirm(
+            "Setup Recurring Order",
+            "Are you sure you want to setup an automatic recurring order via this contract? Orders will be placed automatically.",
+            () => {
+                startTransition(async () => {
+                    try {
+                        await setupRecurringOrderAction(contract.id, freq, day);
+                        showSuccess("Bilgi", "Recurring schedule configured successfully.");
+                    } catch (err: any) {
+                        showError("Uyarı", err.message || "Failed to setup schedule");
+                    }
+                });
             }
-        });
+        );
     };
 
     const handleActivate = () => {
-        if (!confirm("Activate this contract? (Normally an admin/seller step)")) return;
-        startTransition(async () => {
-            const { showSuccess, showError, showWarning } = useModal();
-            try {
-                await activateContractAction(contract.id);
-                showSuccess("Bilgi", "Activated");
-            } catch (err: any) {
-                showSuccess("Bilgi", err.message);
+        showConfirm(
+            "Activate Contract",
+            "Activate this contract? (Normally an admin/seller step)",
+            () => {
+                startTransition(async () => {
+                    try {
+                        await activateContractAction(contract.id);
+                        showSuccess("Bilgi", "Activated");
+                    } catch (err: any) {
+                        showSuccess("Bilgi", err.message);
+                    }
+                });
             }
-        });
+        );
     };
 
     return (

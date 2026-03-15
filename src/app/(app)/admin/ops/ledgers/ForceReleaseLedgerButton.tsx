@@ -3,23 +3,32 @@
 import { useState } from "react";
 import { forceReleaseLedgerAction } from "@/actions/forceReleaseLedgerAction";
 import { Zap } from "lucide-react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ForceReleaseLedgerButton({ paymentId }: { paymentId: string }) {
+    const { showConfirm, showSuccess, showError } = useModal();
     const [loading, setLoading] = useState(false);
-    const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-    const handleForceRelease = async () => {
-        if (!confirm("Initiating force release. This will bypass buyer confirmation and release escrow directly. Continue?")) return;
-        setLoading(true);
-        setToastMsg(null);
-        try {
-            const res = await forceReleaseLedgerAction(paymentId);
-            setToastMsg(res.message);
-        } catch (e: any) {
-            setToastMsg("Force release execution failed.");
-        } finally {
-            setLoading(false);
-        }
+    const handleForceRelease = () => {
+        showConfirm(
+            "Force Release Onayı",
+            "Initiating force release. This will bypass buyer confirmation and release escrow directly. Continue?",
+            async () => {
+                setLoading(true);
+                try {
+                    const res = await forceReleaseLedgerAction(paymentId);
+                    if (res.success) {
+                        showSuccess("Başarılı", res.message || "Force release başarıyla tamamlandı.");
+                    } else {
+                        showError("Hata", res.message || "İşlem başarısız oldu.");
+                    }
+                } catch (e: any) {
+                    showError("Hata", "Force release execution failed.");
+                } finally {
+                    setLoading(false);
+                }
+            }
+        );
     };
 
     return (
@@ -32,7 +41,6 @@ export default function ForceReleaseLedgerButton({ paymentId }: { paymentId: str
                 {loading ? <span className="animate-spin border-[1.5px] border-red-600 border-t-transparent rounded-full w-3 h-3" /> : <Zap className="w-3 h-3" />}
                 Force Release
             </button>
-            {toastMsg && <span className="text-[9px] text-gray-500 font-mono mt-1 w-24 truncate text-center" title={toastMsg}>{toastMsg}</span>}
         </div>
     );
 }

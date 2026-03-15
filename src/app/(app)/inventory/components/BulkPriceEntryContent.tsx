@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '@/contexts/AppContext';
 import { toast } from 'sonner';
+import { useModal } from '@/contexts/ModalContext';
 
 interface BulkPriceEntryContentProps {
     products: Product[];
@@ -423,6 +424,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
 // -------------------------------------------------------------------------------------
 
 function SettingsView() {
+    const { showConfirm } = useModal();
     const [lists, setLists] = useState<any[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
     const [categories, setCategories] = useState<any[]>([]);
@@ -480,16 +482,17 @@ function SettingsView() {
     };
 
     const handleDeleteList = async (id: string, name: string) => {
-        if (!confirm(`"${name}" fiyat listesini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) return;
-        try {
-            const res = await fetch(`/api/pricing/lists/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                toast.success("Fiyat listesi silindi.");
-                fetchData();
-            } else {
-                toast.error("Silinemedi.");
-            }
-        } catch { toast.error("Sistem hatası"); }
+        showConfirm('Listeyi Sil', `"${name}" fiyat listesini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`, async () => {
+            try {
+                const res = await fetch(`/api/pricing/lists/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    toast.success("Fiyat listesi silindi.");
+                    fetchData();
+                } else {
+                    toast.error("Silinemedi.");
+                }
+            } catch { toast.error("Sistem hatası"); }
+        });
     };
 
     const handleCreateCategory = async () => {
@@ -513,16 +516,17 @@ function SettingsView() {
     };
 
     const handleDeleteCategory = async (id: string, name: string) => {
-        if (!confirm(`"${name}" sınıfını silmek istediğinize emin misiniz?`)) return;
-        try {
-            const res = await fetch(`/api/customers/categories/${id}`, { method: 'DELETE' });
-            if (res.ok || (await res.json()).ok) {
-                toast.success("Sınıf silindi.");
-                fetchData();
-            } else {
-                toast.error("Silinemedi.");
-            }
-        } catch { toast.error("Sistem hatası"); }
+        showConfirm('Sınıfı Sil', `"${name}" sınıfını silmek istediğinize emin misiniz?`, async () => {
+            try {
+                const res = await fetch(`/api/customers/categories/${id}`, { method: 'DELETE' });
+                if (res.ok || (await res.json()).ok) {
+                    toast.success("Sınıf silindi.");
+                    fetchData();
+                } else {
+                    toast.error("Silinemedi.");
+                }
+            } catch { toast.error("Sistem hatası"); }
+        });
     };
 
     const saveChannelMap = async (key: string, listId: string) => {

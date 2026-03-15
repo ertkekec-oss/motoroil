@@ -1,9 +1,10 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function AdminGrowthSubscriptions() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
     const [subs, setSubs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -21,13 +22,25 @@ export default function AdminGrowthSubscriptions() {
         } finally { setLoading(false); }
     };
 
-    const handleAction = async (id: string, action: string) => {
+    const handleAction = (id: string, action: string) => {
         const confirmMsg = `Bu işlem YAPILACAKTIR: Abonelik ${action} (Mali Denetime Bildirilecektir). Devam edilsin mi?`;
-        if (!window.confirm(confirmMsg)) return;
+        
+        showConfirm("Abonelik İşlemi", confirmMsg, () => {
+            showPrompt(
+                "İşlem Gerekçesi",
+                "İptal / Askı / Kilit Açma sebebi (Audit Log için zorunlu, Min 5 karakter):",
+                (reason) => {
+                    if (!reason || reason.length < 5) {
+                        showWarning("Uyarı", "Lütfen en az 5 karakterlik bir sebep giriniz.");
+                        return;
+                    }
+                    executeAction(id, action, reason);
+                }
+            );
+        });
+    };
 
-        const reason = prompt("İptal / Askı / Kilit Açma sebebi (Audit Log):");
-        if (!reason || reason.length < 5) return showSuccess("Bilgi", "Sebep en az 5 karakter girmelisiniz.");
-
+    const executeAction = async (id: string, action: string, reason: string) => {
         setSaving(true);
         try {
             const res = await fetch(`/api/admin/growth/subscriptions/${id}/${action}`, {
@@ -36,13 +49,17 @@ export default function AdminGrowthSubscriptions() {
                 body: JSON.stringify({ reason })
             });
             if (res.ok) {
-                showSuccess("Bilgi", "Başarılı");
+                showSuccess("Bilgi", "İşlem başarıyla tamamlandı.");
                 fetchSubs();
             } else {
                 const err = await res.json();
-                showError("Uyarı", `Hata: ${err.error}`);
+                showError("Hata", `Hata: ${err.error}`);
             }
-        } finally { setSaving(false); }
+        } catch (err) {
+            showError("Hata", "Sunucu hatası oluştu.");
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (

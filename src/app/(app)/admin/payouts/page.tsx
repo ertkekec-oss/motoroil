@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function PayoutsPage() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
     const [reqs, setReqs] = useState<any[]>([]);
     const [kpis, setKpis] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -24,15 +24,31 @@ export default function PayoutsPage() {
         } finally { setLoading(false); }
     };
 
-    const handleAction = async (id: string, action: 'approve' | 'reject') => {
-        let reason = "Otomatik Onay";
+    const handleAction = (id: string, action: 'approve' | 'reject') => {
         if (action === 'reject') {
-            reason = prompt("Reddetme / İptal sebebi girin:") || "";
-            if (reason.length < 5) return showSuccess("Bilgi", "Sebebi daha detaylı yazın.");
+            showPrompt(
+                "Reddetme Gerekçesi",
+                "Lütfen bu ödeme talebini reddetme veya iptal etme sebebinizi giriniz (Min 5 karakter):",
+                async (reason) => {
+                    if (!reason || reason.length < 5) {
+                        showWarning("Uyarı", "Lütfen geçerli bir sebep giriniz (En az 5 karakter).");
+                        return;
+                    }
+                    await executeAction(id, action, reason);
+                }
+            );
         } else {
-            if (!confirm(`Tutar transferi IYZICO banka hesaplarına iletilecektir. Emin misiniz?`)) return;
+            showConfirm(
+                "Transfer Onayı",
+                "Tutar transferi IYZICO banka hesaplarına iletilecektir. Emin misiniz?",
+                async () => {
+                    await executeAction(id, action, "Otomatik Onay");
+                }
+            );
         }
+    };
 
+    const executeAction = async (id: string, action: string, reason: string) => {
         setActioning(id);
         try {
             const res = await fetch(`/api/admin/payouts/queue/${id}/${action}`, {
@@ -42,11 +58,11 @@ export default function PayoutsPage() {
             });
 
             if (res.ok) {
-                showSuccess("Bilgi", `İşlem Onaylandı: ${action}`);
+                showSuccess("Bilgi", `İşlem Başarılı: ${action === 'approve' ? 'Onaylandı' : 'Reddedildi'}`);
                 fetchReqs(filter);
             } else {
                 const err = await res.json();
-                showError("Uyarı", `Hata: ${err.error}`);
+                showError("Hata", `Hata: ${err.error || 'İşlem başarısız oldu.'}`);
             }
         } finally { setActioning(null); }
     };

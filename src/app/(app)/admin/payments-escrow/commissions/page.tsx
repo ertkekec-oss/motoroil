@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function CommissionsPage() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showPrompt } = useModal();
     const [plans, setPlans] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -67,7 +67,7 @@ export default function CommissionsPage() {
     };
 
     const handleArchive = async (id: string) => {
-        const confirmReason = prompt("Planı arşivlemek için bir sebep girin:");
+        showPrompt("Plan Arşivle", "Planı arşivlemek için bir sebep girin:", async (confirmReason) => {
         if (!confirmReason || confirmReason.trim().length < 5) return;
 
         try {
@@ -81,6 +81,8 @@ export default function CommissionsPage() {
         } catch (e) {
             showError("Uyarı", "Bağlantı hatası");
         }
+        }
+        });
     };
 
     if (loading && !plans.length) return <div className="p-8">Yükleniyor...</div>;

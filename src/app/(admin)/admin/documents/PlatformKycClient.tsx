@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { FileText, ShieldCheck, FileSignature, CheckCircle, XCircle, Clock, Link as LinkIcon, RefreshCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function PlatformKycClient() {
+    const { showPrompt } = useModal();
     const [activeTab, setActiveTab] = useState<'rules' | 'submissions' | 'signatures'>('rules');
 
     const [requirements, setRequirements] = useState<any[]>([]);
@@ -100,22 +102,36 @@ export default function PlatformKycClient() {
     };
 
     const reviewSubmission = async (id: string, action: 'APPROVE' | 'REJECT') => {
-        let reason = '';
         if (action === 'REJECT') {
-            const result = prompt('Reddetme sebebini yazınız (Kullanıcıya gösterilecek):');
-            if (result === null) return;
-            reason = result;
+            showPrompt('Başvuruyu Reddet', 'Reddetme sebebini yazınız (Kullanıcıya gösterilecek):', async (reason) => {
+                if (!reason) return;
+                try {
+                    const res = await fetch(`/api/admin/kyc/submissions/${id}/review`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action, reason })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        toast.success(`Başvuru reddedildi.`);
+                        fetchData();
+                    } else throw new Error(data.error);
+                } catch (e: any) {
+                    toast.error(e.message);
+                }
+            });
+            return;
         }
 
         try {
             const res = await fetch(`/api/admin/kyc/submissions/${id}/review`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action, reason })
+                body: JSON.stringify({ action, reason: '' })
             });
             const data = await res.json();
             if (data.success) {
-                toast.success(`Başvuru ${action === 'APPROVE' ? 'onaylandı' : 'reddedildi'}.`);
+                toast.success(`Başvuru onaylandı.`);
                 fetchData();
             } else throw new Error(data.error);
         } catch (e: any) {

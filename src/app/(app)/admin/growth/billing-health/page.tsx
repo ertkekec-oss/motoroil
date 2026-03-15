@@ -1,9 +1,10 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 
 export default function AdminGrowthBillingHealth() {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -21,15 +22,27 @@ export default function AdminGrowthBillingHealth() {
         } finally { setLoading(false); }
     };
 
-    const handleAction = async (action: 'run-collection-guard' | 'snapshot') => {
+    const handleAction = (action: 'run-collection-guard' | 'snapshot') => {
         const confirmMsg = action === 'run-collection-guard'
             ? 'Bu işlem Collection Guard (Tahsilat Koruyucu) altyapısını manuel çalıştırır (gecikmişleri kilitleyebilir).'
             : 'Mali tabloyu (Outstanding AR) BUGÜN itibarıyla finans denetimi için dondur (Snapshot)';
-        if (!window.confirm(confirmMsg + '\n\nDEVAM EDILSIN MI?')) return;
+        
+        showConfirm("İşlem Onayı", `${confirmMsg}\n\nDevam etmek istediğinize emin misiniz?`, () => {
+            showPrompt(
+                "İşlem Sebebi",
+                "Lütfen bu işlem için bir gerekçe giriniz (Audit Log için zorunlu, Min 5 karakter):",
+                (reason) => {
+                    if (!reason || reason.length < 5) {
+                        showWarning("Uyarı", "Lütfen en az 5 karakterlik bir sebep giriniz.");
+                        return;
+                    }
+                    executeAction(action, reason);
+                }
+            );
+        });
+    };
 
-        const reason = prompt("İşlem Sebebi (Audit Log için zorunlu):");
-        if (!reason || reason.length < 5) return showSuccess("Bilgi", "Sebep en az 5 karakter girmelisiniz.");
-
+    const executeAction = async (action: string, reason: string) => {
         setSaving(true);
         try {
             const res = await fetch(`/api/admin/growth/billing-health/${action}`, {
@@ -43,9 +56,13 @@ export default function AdminGrowthBillingHealth() {
                 fetchHealth(filter);
             } else {
                 const err = await res.json();
-                showError("Uyarı", `Hata: ${err.error}`);
+                showError("Hata", `İşlem Başarısız: ${err.error}`);
             }
-        } finally { setSaving(false); }
+        } catch (err) {
+            showError("Hata", "Sunucu hatası oluştu.");
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (loading && !data) return <div className="p-8">Yükleniyor...</div>;
@@ -156,7 +173,6 @@ export default function AdminGrowthBillingHealth() {
                     </tbody>
                 </table>
             </div>
-
         </div>
     );
 }

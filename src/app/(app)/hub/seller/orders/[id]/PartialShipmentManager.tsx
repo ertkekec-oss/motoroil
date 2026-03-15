@@ -13,7 +13,7 @@ export default function PartialShipmentManager({
     orderId: string,
     originalItems: any[]
 }) {
-    const { showSuccess, showError, showWarning } = useModal();
+    const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -30,7 +30,7 @@ export default function PartialShipmentManager({
             return;
         }
 
-        if (!confirm(`Seçili ${payloadItems.length} kalem ürün kargo çıkışı yapılacak ve stoktan otomatik düşülecektir. Onaylıyor musunuz?`)) return;
+        showConfirm('Kargo Başlat', `Seçili ${payloadItems.length} kalem ürün kargo çıkışı yapılacak ve stoktan otomatik düşülecektir. Onaylıyor musunuz?`, async () => {
 
         setLoading(true);
         try {
@@ -45,6 +45,7 @@ export default function PartialShipmentManager({
         } finally {
             setLoading(false);
         }
+        });
     };
 
     return (

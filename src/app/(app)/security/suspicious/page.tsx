@@ -17,7 +17,7 @@ export default function SuspiciousActivityPage() {
         approveProduct,
         rejectProduct,
     } = useInventory();
-    const { showSuccess, showError } = useModal();
+    const { showSuccess, showError, showConfirm } = useModal();
     const [filter, setFilter] = useState<'all' | 'today' | 'week'>('today');
     const [branchFilter, setBranchFilter] = useState('all');
     const [activeSecurityTab, setActiveSecurityTab] = useState<'suspicious' | 'approvals'>('suspicious');
@@ -173,10 +173,10 @@ export default function SuspiciousActivityPage() {
                             <div className="md:col-span-4 flex justify-end">
                                 <button
                                     onClick={() => {
-                                        if (confirm('Tüm olay kayıtlarını silmek istediğinize emin misiniz?')) {
+                                        showConfirm('Emin Misiniz?', 'Tüm olay kayıtlarını silmek istediğinize emin misiniz?', () => {
                                             clearSuspiciousEvents();
-                                            showSuccess('Bşarılı', 'Tüm olaylar temizlendi.');
-                                        }
+                                            showSuccess('Başarılı', 'Tüm olaylar temizlendi.');
+                                        });
                                     }}
                                     className="px-6 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 rounded-xl text-xs font-bold transition-all"
                                 >
