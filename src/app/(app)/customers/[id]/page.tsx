@@ -45,6 +45,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     orderBy: { date: 'desc' },
                     take: 50
                 },
+                paymentPlans: {
+                    include: { installments: true },
+                    orderBy: { createdAt: 'desc' }
+                },
                 invoices: {
                     where: { deletedAt: null },
                     orderBy: { invoiceDate: 'desc' },
@@ -273,7 +277,24 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             };
         });
 
-        const historyList = [...txs, ...invs, ...orderList]
+        const planList = (customer.paymentPlans || []).map((p: any) => {
+            const isCanceled = p.status === 'İptal' || p.status === 'Cancelled'; 
+            return {
+                id: p.id,
+                date: new Date(p.createdAt || p.startDate).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                rawDate: p.createdAt || p.startDate,
+                type: 'Vadelendirme',
+                desc: `${p.title || 'Ödeme Planı'} ${isCanceled ? '(İptal Edildi)' : ''} - ${p.installmentCount || p.installments?.length || 0} Taksit`,
+                amount: Number(p.totalAmount || 0),
+                color: isCanceled ? '#ef4444' : '#8b5cf6', // purple 
+                items: null,
+                orderId: p.description || null,
+                isPlan: true,
+                status: p.status
+            };
+        });
+
+        const historyList = [...txs, ...invs, ...orderList, ...planList]
             .sort((a: any, b: any) => {
                 const tA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
                 const tB = b.rawDate ? new Date(b.rawDate).getTime() : 0;

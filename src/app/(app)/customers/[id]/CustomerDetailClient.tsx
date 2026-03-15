@@ -252,7 +252,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             totalAmount: formatCurrencyInput(Math.abs(item.amount).toFixed(2).replace('.', ',')),
             installmentCount: '3',
             startDate: new Date().toISOString().split('T')[0],
-            type: 'Kredi',
+            type: 'Açık Hesap',
             direction: 'IN', // Müşteri için
             customerId: customer.id,
             supplierId: '',
@@ -316,17 +316,38 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [processingIds, setProcessingIds] = useState<string[]>([]);
     const [completedIds, setCompletedIds] = useState<string[]>([]);
 
-    const handleReturnTransaction = (id: string) => {
+    const handleReturnTransaction = (id: string, type: string) => {
         showConfirm("İade/İptal Onayı", "Bu işlemi iptal etmek ve iade almak istediğinize emin misiniz?\n\nBu işlem:\n• Stokları geri yükler\n• Bakiyeyi günceller\n• Kasa işlemini tersine çevirir", async () => {
             setProcessingIds(prev => [...prev, id]);
             try {
-                const res = await fetch(`/api/financials/transactions?id=${id}`, { method: 'DELETE' });
+                const endpoint = type === 'Satış' ? `/api/orders/${id}` : `/api/financials/transactions?id=${id}`;
+                const res = await fetch(endpoint, { method: 'DELETE' });
                 const data = await res.json();
                 if (data.success) {
                     showSuccess("Başarılı", "İşlem iade alındı/iptal edildi.");
                     setCompletedIds(prev => [...prev, id]);
                     // Don't refresh immediately to show locked state
                     // router.refresh();
+                } else {
+                    showError("Hata", data.error || "İşlem yapılamadı.");
+                }
+            } catch (e) {
+                showError("Hata", "Bağlantı hatası.");
+            } finally {
+                setProcessingIds(prev => prev.filter(pid => pid !== id));
+            }
+        });
+    };
+
+    const handleCancelPlan = (id: string) => {
+        showConfirm("Vadelendirme İptali", "Bu vadelendirme planını iptal etmek istediğinize emin misiniz?\n\nNot: Bu işlem taksitleri iptal eder ancak önceden alınmış fatura veya siparişi geri almaz.", async () => {
+            setProcessingIds(prev => [...prev, id]);
+            try {
+                const res = await fetch(`/api/financials/payment-plans/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess("Başarılı", "Vadelendirme planı iptal edildi.");
+                    setCompletedIds(prev => [...prev, id]);
                 } else {
                     showError("Hata", data.error || "İşlem yapılamadı.");
                 }
@@ -761,11 +782,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
     const balanceColor = balance > 0 ? '#ef4444' : '#10b981'; // Borçlu: Red, Alacaklı: Green
 
-    // Filter History
     const filteredHistory = historyList.filter(item => {
         if (activeTab === 'all') return true;
-        if (activeTab === 'sales') return item.type === 'Fatura' || item.type === 'Satış';
-        if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider';
+        if (activeTab === 'sales') return item.type === 'Fatura' || item.type === 'Satış' || item.type === 'İrsaliye' || item.type === 'Vadelendirme';
+        if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider' || item.type === 'Vadelendirme';
         return true;
     });
 
@@ -1525,13 +1545,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
                                                                 {item.orderId && (
                                                                     (() => {
-                                                                        const isReallyFormal = item.isFormal || invoicedOrderIds.includes(item.orderId);
-                                                                        const statusLabel = item.linkedInvoiceStatus === 'Proforma' ? 'Taslak (Proforma)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'İrsaliye' : 'Faturalandı');
-                                                                        const statusIcon = item.linkedInvoiceStatus === 'Proforma' ? '📝' : (item.linkedInvoiceStatus === 'İrsaliye' ? '🚚' : '✅');
-                                                                        const statusColor = item.linkedInvoiceStatus === 'Proforma' ? '#f59e0b' : (item.linkedInvoiceStatus === 'İrsaliye' ? '#8b5cf6' : '#10b981');
-                                                                        const statusBg = item.linkedInvoiceStatus === 'Proforma' ? 'rgba(245, 158, 11, 0.1)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)');
+                                                                        const hasInvoice = item.isFormal || invoicedOrderIds.includes(item.orderId);
+                                                                        const isReallyFormal = item.realIsFormal || invoicedOrderIds.includes(item.orderId);
+                                                                        const isProforma = ['Proforma', 'Taslak'].includes(item.linkedInvoiceStatus);
+                                                                        const statusLabel = isProforma ? 'Taslak (Proforma)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'İrsaliye' : 'Faturalandı');
+                                                                        const statusIcon = isProforma ? '📝' : (item.linkedInvoiceStatus === 'İrsaliye' ? '🚚' : '✅');
+                                                                        const statusColor = isProforma ? '#f59e0b' : (item.linkedInvoiceStatus === 'İrsaliye' ? '#8b5cf6' : '#10b981');
+                                                                        const statusBg = isProforma ? 'rgba(245, 158, 11, 0.1)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)');
                                                                         
-                                                                        return isReallyFormal ? (
+                                                                        return hasInvoice ? (
                                                                             <>
                                                                                 <span style={{
                                                                                     padding: '6px 10px',
@@ -1548,6 +1570,16 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                 }}>
                                                                                     {statusIcon} {statusLabel}
                                                                                 </span>
+                                                                                {isProforma && !isReallyFormal && (
+                                                                                    <button
+                                                                                        onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                                        style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                                        className="hover:bg-blue-500 hover:text-white box-shadow-blue"
+                                                                                        title="Proformayı Düzenle ve Resmileştir"
+                                                                                    >
+                                                                                        📝 Dönüştür
+                                                                                    </button>
+                                                                                )}
                                                                                 {item.formalInvoiceId && (
                                                                                     <button
                                                                                         onClick={(e) => {
@@ -1574,7 +1606,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     })()
                                                                 )}
                                                                 {(() => {
-                                                                    const isVadelendi = vadelenenIds.includes(item.id) || vadelenenIds.includes(item.orderId || '') || customer?.paymentPlans?.some((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
+                                                                    const isVadelendi = vadelenenIds.includes(item.id) || vadelenenIds.includes(item.orderId || '') || customer?.paymentPlans?.some((p: any) => (p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId)) && p.status !== 'İptal' && p.status !== 'Cancelled');
                                                                     const isPaidSale = item.type === 'Satış' && item.rawData?.paymentMode && !['account', 'veresiye'].includes(item.rawData.paymentMode);
                                                                     const isDisabled = isVadelendi || isPaidSale;
                                                                     let buttonText = '📅 Vadelendir';
@@ -1600,7 +1632,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
-                                                                            handleReturnTransaction(item.id);
+                                                                            handleReturnTransaction(item.id, item.type);
                                                                         }
                                                                     }}
                                                                     disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
@@ -1664,6 +1696,37 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 )}
                                                             </div>
                                                         )}
+                                                        {item.type === 'Vadelendirme' && (
+                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        if (!completedIds.includes(item.id) && !processingIds.includes(item.id) && item.status !== 'İptal' && item.status !== 'Cancelled') {
+                                                                            handleCancelPlan(item.id);
+                                                                        }
+                                                                    }}
+                                                                    disabled={completedIds.includes(item.id) || processingIds.includes(item.id) || item.status === 'İptal' || item.status === 'Cancelled'}
+                                                                    style={{
+                                                                        padding: '6px 12px',
+                                                                        background: (completedIds.includes(item.id) || item.status === 'İptal' || item.status === 'Cancelled') ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+                                                                        color: (completedIds.includes(item.id) || item.status === 'İptal' || item.status === 'Cancelled') ? 'var(--text-muted, #666)' : '#ef4444',
+                                                                        border: (completedIds.includes(item.id) || item.status === 'İptal' || item.status === 'Cancelled') ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(239, 68, 68, 0.3)',
+                                                                        borderRadius: '8px',
+                                                                        fontSize: '11px',
+                                                                        fontWeight: '800',
+                                                                        cursor: (completedIds.includes(item.id) || item.status === 'İptal' || item.status === 'Cancelled') ? 'default' : 'pointer',
+                                                                        whiteSpace: 'nowrap',
+                                                                        opacity: processingIds.includes(item.id) ? 0.5 : 1,
+                                                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                    className={!(completedIds.includes(item.id) || item.status === 'İptal' || item.status === 'Cancelled') && !processingIds.includes(item.id) ? "hover:bg-red-500 hover:text-white" : ""}
+                                                                    title="Vadelendirme Planını İptal Et"
+                                                                >
+                                                                    {processingIds.includes(item.id) ? '⏳' : ((completedIds.includes(item.id) || item.status === 'İptal' || item.status === 'Cancelled') ? '✅ İptal Edildi' : '✖️ İptal Et')}
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </td>
                                                     <td style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #666)' }}>{item.items ? (expandedRowId === item.id ? '▲' : '▼') : ''}</td>
                                                 </tr>
@@ -1683,7 +1746,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                 <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.items.length} Kalem Listeleniyor</div>
                                                                             </div>
                                                                         </div>
-                                                                        <span style={{ fontSize: '11px', fontWeight: '800', padding: '6px 12px', borderRadius: '20px', background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>{item.isFormal ? 'Faturalandı' : 'Sipariş'}</span>
+                                                                        <span style={{ fontSize: '11px', fontWeight: '800', padding: '6px 12px', borderRadius: '20px', background: ['Proforma', 'Taslak'].includes(item.linkedInvoiceStatus) ? 'rgba(245, 158, 11, 0.1)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'rgba(139, 92, 246, 0.1)' : (item.isFormal ? 'rgba(16,185,129,0.1)' : 'rgba(100,100,100,0.1)')), color: ['Proforma', 'Taslak'].includes(item.linkedInvoiceStatus) ? '#f59e0b' : (item.linkedInvoiceStatus === 'İrsaliye' ? '#8b5cf6' : (item.isFormal ? '#10b981' : '#aaa')) }}>
+                                                                            {['Proforma', 'Taslak'].includes(item.linkedInvoiceStatus) ? 'Taslak (Proforma)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'İrsaliye' : (item.isFormal ? 'Faturalandı' : 'Sipariş'))}
+                                                                        </span>
                                                                     </div>
 
                                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1744,9 +1809,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                 </div>
                                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                                                     {attachedPlan.installments?.map((inst: any) => (
-                                                                                        <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                                                                                            <span style={{ color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '600' }}>{inst.installmentNo}. Taksit ({new Date(inst.dueDate).toLocaleDateString('tr-TR')})</span>
-                                                                                            <span style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '800', fontFamily: 'monospace' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                                        <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', opacity: inst.status === 'Cancelled' ? 0.5 : 1 }}>
+                                                                                            <span style={{ color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '600', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>
+                                                                                                {inst.installmentNo}. Taksit ({new Date(inst.dueDate).toLocaleDateString('tr-TR')})
+                                                                                                {inst.status === 'Cancelled' && <span style={{ color: '#ef4444', marginLeft: '6px' }}>(İptal Edildi)</span>}
+                                                                                            </span>
+                                                                                            <span style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '800', fontFamily: 'monospace', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
                                                                                         </div>
                                                                                     ))}
                                                                                 </div>
@@ -1769,10 +1837,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                                                                             {item.isFormal && (
                                                                                 <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1 }}>
-                                                                                    <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#10b981', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
+                                                                                    <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: item.linkedInvoiceStatus === 'Proforma' ? '#f59e0b' : '#10b981', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
                                                                                     <div>
-                                                                                        <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Resmileştirildi (Faturalandı)</div>
-                                                                                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>Sistem tarafından E-Arşive eklendi</div>
+                                                                                        <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>
+                                                                                            {item.linkedInvoiceStatus === 'Proforma' ? 'Taslak (Proforma Oluşturuldu)' : 'Resmileştirildi (Faturalandı)'}
+                                                                                        </div>
+                                                                                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>
+                                                                                            {item.linkedInvoiceStatus === 'Proforma' ? 'Taslak olarak sisteme eklendi' : 'Sistem tarafından E-Arşive eklendi'}
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             )}
@@ -2937,8 +3009,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-5">
-                                    <div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div className="md:col-span-2">
                                         <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TOPLAM TUTAR (₺)</label>
                                         <input
                                             type="text"
@@ -2948,13 +3020,26 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         />
                                     </div>
                                     <div>
+                                        <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TÜR</label>
+                                        <select
+                                            value={planData.type}
+                                            onChange={e => setPlanData({ ...planData, type: e.target.value })}
+                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                                        >
+                                            <option value="Açık Hesap">Açık Hesap</option>
+                                            <option value="Çek">Çek Alınacak</option>
+                                            <option value="Senet">Senet (Periodya İmza)</option>
+                                        </select>
+                                    </div>
+                                    <div>
                                         <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TAKSİT / VADE SAYISI</label>
-                                        <input
-                                            type="number"
+                                        <select
                                             value={planData.installmentCount}
                                             onChange={e => setPlanData({ ...planData, installmentCount: e.target.value })}
-                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm text-center outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
-                                        />
+                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                                        >
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
+                                        </select>
                                     </div>
                                 </div>
                                 <div>

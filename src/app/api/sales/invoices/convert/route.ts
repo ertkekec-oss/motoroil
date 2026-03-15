@@ -55,21 +55,45 @@ export async function POST(request: Request) {
 
             const grandTotal = subtotal + totalOtv + totalVat + totalOiv - discAmount;
 
-            const invoice = await tx.salesInvoice.create({
-                data: {
-                    companyId: order.companyId,
-                    invoiceNo: invoiceNo || `INV-${Date.now()}`,
-                    customerId: customerId,
+            // Check if an existing draft/proforma invoice exists for this order
+            const existingDraft = await tx.salesInvoice.findFirst({
+                where: { 
                     orderId: order.id,
-                    amount: subtotal - discAmount,
-                    taxAmount: totalVat + totalOtv + totalOiv, // Total tax includes OTV and OIV
-                    totalAmount: grandTotal,
-                    description: description || `POS Siparişi Faturalandırma: ${order.orderNumber}`,
-                    items: itemsToUse as any,
-                    isFormal: isFormal || false,
-                    status: status || 'Onaylandı'
+                    isFormal: false
                 }
             });
+
+            let invoice;
+            if (existingDraft) {
+                invoice = await tx.salesInvoice.update({
+                    where: { id: existingDraft.id },
+                    data: {
+                        amount: subtotal - discAmount,
+                        taxAmount: totalVat + totalOtv + totalOiv,
+                        totalAmount: grandTotal,
+                        description: description || existingDraft.description,
+                        items: itemsToUse as any,
+                        isFormal: isFormal || false,
+                        status: status || 'Onaylandı'
+                    }
+                });
+            } else {
+                invoice = await tx.salesInvoice.create({
+                    data: {
+                        companyId: order.companyId,
+                        invoiceNo: invoiceNo || `INV-${Date.now()}`,
+                        customerId: customerId,
+                        orderId: order.id,
+                        amount: subtotal - discAmount,
+                        taxAmount: totalVat + totalOtv + totalOiv, // Total tax includes OTV and OIV
+                        totalAmount: grandTotal,
+                        description: description || `POS Siparişi Faturalandırma: ${order.orderNumber}`,
+                        items: itemsToUse as any,
+                        isFormal: isFormal || false,
+                        status: status || 'Onaylandı'
+                    }
+                });
+            }
 
             // If user requested a tied Wayslip
             let createdWayslip = null;

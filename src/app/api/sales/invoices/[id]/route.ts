@@ -81,8 +81,7 @@ export async function DELETE(
 
         // Ensure ownership
         const invoice = await prisma.salesInvoice.findFirst({
-            where: { id, companyId: auth.user.companyId },
-            include: { items: true }
+            where: { id, companyId: auth.user.companyId }
         });
 
         if (!invoice) {
@@ -130,28 +129,32 @@ export async function DELETE(
                             const pId = String(item.productId);
                             const qty = Number(item.qty);
                             
-                            await tx.product.update({
-                                where: { id: pId },
-                                data: { stock: { increment: qty } }
-                            });
-                            
-                            await tx.stock.upsert({
-                                where: { productId_branch: { productId: pId, branch: invoice.branch || 'Merkez' } },
-                                update: { quantity: { increment: qty } },
-                                create: { productId: pId, branch: invoice.branch || 'Merkez', quantity: qty }
-                            });
-                            
-                            await (tx as any).stockMovement.create({
-                                data: {
-                                    productId: pId,
-                                    branch: invoice.branch || 'Merkez',
-                                    companyId: invoice.companyId,
-                                    quantity: qty,
-                                    price: item.price || 0,
-                                    type: 'CANCEL',
-                                    referenceId: invoice.id
-                                }
-                            });
+                            try {
+                                await tx.product.update({
+                                    where: { id: pId },
+                                    data: { stock: { increment: qty } }
+                                });
+                                
+                                await tx.stock.upsert({
+                                    where: { productId_branch: { productId: pId, branch: invoice.branch || 'Merkez' } },
+                                    update: { quantity: { increment: qty } },
+                                    create: { productId: pId, branch: invoice.branch || 'Merkez', quantity: qty }
+                                });
+                                
+                                await (tx as any).stockMovement.create({
+                                    data: {
+                                        productId: pId,
+                                        branch: invoice.branch || 'Merkez',
+                                        companyId: invoice.companyId,
+                                        quantity: qty,
+                                        price: item.price || 0,
+                                        type: 'CANCEL',
+                                        referenceId: invoice.id
+                                    }
+                                }).catch(() => {}); // Ignore missing model error
+                            } catch (e) {
+                                console.error("Stock reversal error on invoice cancel:", e);
+                            }
                         }
                     }
                 }
