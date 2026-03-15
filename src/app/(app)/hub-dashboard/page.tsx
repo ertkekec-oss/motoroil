@@ -5,6 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useRouter } from 'next/navigation';
 import { ShoppingCart, Package, CreditCard, ShieldCheck, Zap, AlertTriangle, FileText, Landmark } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function TenantNetworkDashboard() {
     const { currentUser, hasPermission } = useApp();
@@ -139,8 +140,9 @@ export default function TenantNetworkDashboard() {
                                             fetch(`/api/network/opportunities/${opp.id}/generate-rfq`, { method: 'POST' })
                                                 .then(res => res.json())
                                                 .then(data => {
-                                                    if (data.success) alert('Auto RFQ Draft Generated!');
-                                                    else alert('Error: ' + data.error);
+                                                    const { showSuccess, showError, showWarning } = useModal();
+                                                    if (data.success) showSuccess("Bilgi", 'Auto RFQ Draft Generated!');
+                                                    else showError("Uyarı", 'Error: ' + data.error);
                                                 });
                                         }}>Auto RFQ</button>
                                     </div>

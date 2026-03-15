@@ -6,6 +6,7 @@ import { Command } from 'cmdk';
 import { useApp } from '@/contexts/AppContext';
 import { tenantRoutes, tenantActions, adminRoutes, adminActions, NavRoute } from '@/lib/nav/catalog';
 import { Search, Compass, Zap, ArrowRight, Home, ShoppingCart, ShoppingBag, Package, DollarSign, CreditCard, FileText, Activity, ShieldCheck, FileSignature, LifeBuoy, PlusCircle, Eye, BarChart, AlertTriangle, CheckCircle, Building, Server, FileSearch, Camera } from 'lucide-react';
+import { useModal } from "@/contexts/ModalContext";
 
 const iconMap: Record<string, React.ReactNode> = {
     Home: <Home className="w-4 h-4" />,
@@ -38,6 +39,7 @@ interface CommandPaletteProps {
 }
 
 export default function CommandPalette({ isAdmin = false }: CommandPaletteProps) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [apiResults, setApiResults] = useState<{ type: string; id: string; title: string; subtitle?: string; href: string }[]>([]);
@@ -113,7 +115,7 @@ export default function CommandPalette({ isAdmin = false }: CommandPaletteProps)
             router.push(action);
         } else {
             // It's a real API call action like 'SNAPSHOT_BILLING'
-            alert(`Executing action: ${action} - Requires Idempotency Configured API Route`);
+            showSuccess("Bilgi", `Executing action: ${action} - Requires Idempotency Configured API Route`);
         }
     };
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, Printer, Truck } from "lucide-react";
 import { toast } from "sonner";
+import { useModal } from "@/contexts/ModalContext";
 
 interface Props {
     marketplace: string;
@@ -26,6 +27,7 @@ export function MarketplaceActionButton({
     size = "sm",
     onSuccess,
 }: Props) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [status, setStatus] = useState<"IDLE" | "PENDING" | "POLLING" | "SUCCESS" | "FAILED">("IDLE");
     const [auditId, setAuditId] = useState<string | null>(null);
     const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -104,7 +106,7 @@ export function MarketplaceActionButton({
                 } else {
                     try {
                         const parsed = JSON.parse(data.errorMessage);
-                        alert("Hata Detayı (İnceleme İçin):\n\n" + JSON.stringify(parsed.debug || parsed, null, 2));
+                        showError("Uyarı", "Hata Detayı (İnceleme İçin):\n\n" + JSON.stringify(parsed.debug || parsed, null, 2));
                         throw new Error(parsed.message || "İşlem başlatılamadı");
                     } catch (e: any) {
                         if (e.message !== "Unexpected token" && !e.message.includes("JSON")) {
@@ -123,6 +125,7 @@ export function MarketplaceActionButton({
 
     // Polling Logic with Exponential Backoff + Jitter
     useEffect(() => {
+        const { showSuccess, showError, showWarning } = useModal();
         if (status !== "POLLING" || !auditId) return;
 
         let attempt = 0;
@@ -152,7 +155,7 @@ export function MarketplaceActionButton({
                     setStatus("FAILED");
                     try {
                         const parsed = JSON.parse(data.errorMessage);
-                        alert("Hata Detayı (İnceleme İçin):\n\n" + JSON.stringify(parsed.debug || parsed, null, 2));
+                        showError("Uyarı", "Hata Detayı (İnceleme İçin):\n\n" + JSON.stringify(parsed.debug || parsed, null, 2));
                         toast.error(parsed.message || "İşlem başarısız oldu");
                     } catch (e: any) {
                         toast.error(data.errorMessage || "İşlem başarısız oldu");

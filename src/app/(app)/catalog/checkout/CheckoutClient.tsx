@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createOrdersFromCartAction } from "@/actions/createOrdersFromCartAction";
 import { v4 as uuidv4 } from "uuid";
 import { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CheckoutClient({ previewData }: { previewData: any }) {
     const [isPending, startTransition] = useTransition();
@@ -20,12 +21,13 @@ export default function CheckoutClient({ previewData }: { previewData: any }) {
         if (!attemptKey) return;
 
         startTransition(async () => {
+            const { showSuccess, showError, showWarning } = useModal();
             try {
                 await createOrdersFromCartAction(attemptKey);
-                alert("Order placed successfully via ESCROW mock payment!");
+                showSuccess("Bilgi", "Order placed successfully via ESCROW mock payment!");
                 router.push("/hub/buyer/orders");
             } catch (err: any) {
-                alert(err.message || "Checkout failed");
+                showError("Uyarı", err.message || "Checkout failed");
             }
         });
     };

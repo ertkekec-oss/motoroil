@@ -13,6 +13,7 @@ import {
 } from '@/components/icons/PremiumIcons';
 import BankIntegrationOnboarding from '@/components/Banking/BankIntegrationOnboarding';
 import { BANK_FORM_DEFINITIONS } from '@/services/banking/bank-definitions';
+import { useModal } from "@/contexts/ModalContext";
 
 // Simple Arrow components
 const ArrowUpRight = ({ className }: any) => <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19L19 5M19 5H10M19 5V14" /></svg>;
@@ -22,6 +23,7 @@ const Search = ({ className }: any) => <svg className={className} fill="none" vi
 const ExternalLink = ({ className }: any) => <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>;
 
 export default function OpenBankingDashboard() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [loading, setLoading] = useState(true);
     const [connections, setConnections] = useState<any[]>([]);
     const [syncing, setSyncing] = useState(false);
@@ -63,7 +65,7 @@ export default function OpenBankingDashboard() {
             const res = await fetch('/api/fintech/banking/sync', { method: 'POST' });
             const json = await res.json();
             if (json.success) {
-                alert('Tüm banka hareketleri başarıyla senkronize edildi!');
+                showSuccess("Bilgi", 'Tüm banka hareketleri başarıyla senkronize edildi!');
                 refreshConnections();
             }
         } catch (err) {
@@ -84,7 +86,7 @@ export default function OpenBankingDashboard() {
             });
             const json = await res.json();
             if (json.success) {
-                alert(`${bankName} başarıyla bağlandı!`);
+                showSuccess("Bilgi", `${bankName} başarıyla bağlandı!`);
                 setSelectingBank(false);
                 refreshConnections();
             }

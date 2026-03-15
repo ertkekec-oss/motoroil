@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function HelpManager({ initialCategories, tenantId }: { initialCategories: any[], tenantId: string }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const router = useRouter();
     const [categories, setCategories] = useState(initialCategories);
 
@@ -94,7 +96,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
             router.refresh();
             window.location.reload();
         } catch {
-            alert('Silme işlemi başarısız.');
+            showError("Uyarı", 'Silme işlemi başarısız.');
         }
     };
 

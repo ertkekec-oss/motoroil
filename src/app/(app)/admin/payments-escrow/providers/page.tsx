@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ProvidersPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [providers, setProviders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -31,12 +33,12 @@ export default function ProvidersPage() {
             });
 
             if (res.ok) {
-                alert(`${providerName} Mutabakat Sağlama süreci kuyruğa alındı.`);
+                showSuccess("Bilgi", `${providerName} Mutabakat Sağlama süreci kuyruğa alındı.`);
             } else {
-                alert("İşlem reddedildi.");
+                showSuccess("Bilgi", "İşlem reddedildi.");
             }
         } catch (error) {
-            alert("Sistem hatası");
+            showError("Uyarı", "Sistem hatası");
         }
     };
 

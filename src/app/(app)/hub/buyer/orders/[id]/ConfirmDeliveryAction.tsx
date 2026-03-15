@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { confirmDeliveryAction } from '@/actions/confirmDeliveryAction';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, Truck, PackageCheck } from 'lucide-react'; // Ensure lucide-react is installed
+import { CheckCircle, Truck, PackageCheck } from 'lucide-react';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ConfirmDeliveryAction({
     orderId,
@@ -44,13 +45,14 @@ export default function ConfirmDeliveryAction({
 
                 <button
                     onClick={async () => {
+                        const { showSuccess, showError, showWarning } = useModal();
                         if (!confirm("Teslimatı onayladığınızda satıcıya ödeme geçilir. Geri alınamaz. Emin misiniz?")) return;
                         setLoading(true);
                         try {
                             await confirmDeliveryAction(orderId);
                             router.refresh();
                         } catch (e: any) {
-                            alert(e.message || "Bir hata oluştu");
+                            showError("Uyarı", e.message || "Bir hata oluştu");
                         } finally {
                             setLoading(false);
                         }

@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ProductDiscoveryAdminPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [loading, setLoading] = useState(false);
     const [stats, setStats] = useState({
         canonicalCount: 0,
@@ -16,10 +18,10 @@ export default function ProductDiscoveryAdminPage() {
         try {
             setLoading(true);
             await fetch("/api/admin/product-discovery/reindex", { method: "POST" });
-            alert("Reindex process started in background!");
+            showSuccess("Bilgi", "Reindex process started in background!");
         } catch (error) {
             console.error("Failed to start reindex", error);
-            alert("Failed to start reindex");
+            showError("Uyarı", "Failed to start reindex");
         } finally {
             setLoading(false);
         }

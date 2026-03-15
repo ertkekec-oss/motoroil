@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { saveOtpConfig, testOtpProvider } from '@/services/otp/actions';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function NetgsmClient({ config }: { config: any }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [formData, setFormData] = useState({
         isEnabled: config?.isEnabled || false,
         apiUsername: config?.apiUsername || '',
@@ -26,12 +28,12 @@ export default function NetgsmClient({ config }: { config: any }) {
         try {
             const res = await saveOtpConfig('NETGSM', formData);
             if (res.success) {
-                alert('Netgsm ayarları başarıyla kaydedildi.');
+                showSuccess("Bilgi", 'Netgsm ayarları başarıyla kaydedildi.');
             } else {
-                alert('Hata: ' + res.error);
+                showError("Uyarı", 'Hata: ' + res.error);
             }
         } catch (error) {
-            alert('Ağ hatası oluştu.');
+            showError("Uyarı", 'Ağ hatası oluştu.');
         } finally {
             setSaving(false);
         }
@@ -39,7 +41,7 @@ export default function NetgsmClient({ config }: { config: any }) {
 
     const handleTest = async () => {
         if (!formData.testPhone) {
-            alert('Lütfen test numarası giriniz (Örn: 905XXXXXXXXX)');
+            showError("Uyarı", 'Lütfen test numarası giriniz (Örn: 905XXXXXXXXX)');
             return;
         }
 

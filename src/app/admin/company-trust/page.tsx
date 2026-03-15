@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CompanyTrustAdminPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [profiles, setProfiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -27,7 +29,7 @@ export default function CompanyTrustAdminPage() {
     const handleRecalculateAll = async () => {
         try {
             await fetch("/api/admin/company-trust/recalculate-all", { method: "POST" });
-            alert("Batch recalculation started. Check back later.");
+            showSuccess("Bilgi", "Batch recalculation started. Check back later.");
         } catch (error) {
             console.error("Failed to trigger recalculation", error);
         }

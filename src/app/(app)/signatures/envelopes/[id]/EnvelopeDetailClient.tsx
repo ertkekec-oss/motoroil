@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { envelope: any, currentUserEmail?: string }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [docUrl, setDocUrl] = useState('');
     const [loadingDoc, setLoadingDoc] = useState(false);
     const [signing, setSigning] = useState(false);
@@ -17,13 +19,13 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
             const res = await fetch(`/api/signatures/envelopes/${envelope.id}/sign`, { method: 'POST' });
             const data = await res.json();
             if (data.success) {
-                alert('Belge başarıyla imzalandı!');
+                showSuccess("Bilgi", 'Belge başarıyla imzalandı!');
                 window.location.reload();
             } else {
-                alert(data.error || 'İmzalama başarısız oldu.');
+                showError("Uyarı", data.error || 'İmzalama başarısız oldu.');
             }
         } catch (e) {
-            alert('Bağlantı hatası.');
+            showError("Uyarı", 'Bağlantı hatası.');
         } finally {
             setSigning(false);
         }
@@ -38,10 +40,10 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
             if (data.success && data.url) {
                 setDocUrl(data.url);
             } else {
-                alert(data.error || 'Belge yüklenemedi.');
+                showError("Uyarı", data.error || 'Belge yüklenemedi.');
             }
         } catch (e) {
-            alert('Belge yüklenirken bağlantı hatası oluştu.');
+            showError("Uyarı", 'Belge yüklenirken bağlantı hatası oluştu.');
         } finally {
             setLoadingDoc(false);
         }
@@ -58,10 +60,10 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                 // Open raw URL in new tab directly for download
                 window.open(data.url, '_blank');
             } else {
-                alert(data.error || 'Final belge yüklenemedi.');
+                showError("Uyarı", data.error || 'Final belge yüklenemedi.');
             }
         } catch (e) {
-            alert('Belge yüklenirken bağlantı hatası oluştu.');
+            showError("Uyarı", 'Belge yüklenirken bağlantı hatası oluştu.');
         } finally {
             setLoadingDoc(false);
         }
@@ -73,13 +75,13 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
             const res = await fetch(`/api/signatures/envelopes/${envelope.id}/cancel`, { method: 'POST' });
             const data = await res.json();
             if (data.success) {
-                alert('Zarf başarıyla iptal edildi.');
+                showSuccess("Bilgi", 'Zarf başarıyla iptal edildi.');
                 window.location.reload();
             } else {
-                alert(data.error || 'İptal işlemi başarısız.');
+                showError("Uyarı", data.error || 'İptal işlemi başarısız.');
             }
         } catch (e) {
-            alert('Ağ hatası oluştu, işlem yapılamadı.');
+            showError("Uyarı", 'Ağ hatası oluştu, işlem yapılamadı.');
         }
     }
 

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from 'next/link';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ReconDetailClient({ reconciliation: recon }: { reconciliation: any }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const isDisputed = recon.status === 'DISPUTED';
     const isOk = recon.status === 'SIGNED';
 
@@ -12,13 +14,13 @@ export default function ReconDetailClient({ reconciliation: recon }: { reconcili
             const res = await fetch(`/api/reconciliation/${recon.id}/resend`, { method: 'POST' });
             const data = await res.json();
             if (data.success) {
-                alert('Davet başarıyla yeniden gönderildi.');
+                showSuccess("Bilgi", 'Davet başarıyla yeniden gönderildi.');
                 window.location.reload();
             } else {
-                alert(data.error || 'Gönderim başarısız oldu.');
+                showError("Uyarı", data.error || 'Gönderim başarısız oldu.');
             }
         } catch (e) {
-            alert('Ağ hatası.');
+            showError("Uyarı", 'Ağ hatası.');
         }
     };
 
@@ -34,13 +36,13 @@ export default function ReconDetailClient({ reconciliation: recon }: { reconcili
             });
             const data = await res.json();
             if (data.success) {
-                alert('Uyuşmazlık çözüldü olarak işaretlendi.');
+                showSuccess("Bilgi", 'Uyuşmazlık çözüldü olarak işaretlendi.');
                 window.location.reload();
             } else {
-                alert(data.error || 'İşlem başarısız.');
+                showError("Uyarı", data.error || 'İşlem başarısız.');
             }
         } catch (e) {
-            alert('Ağ hatası.');
+            showError("Uyarı", 'Ağ hatası.');
         }
     };
 

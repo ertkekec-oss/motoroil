@@ -5,8 +5,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { fieldDb } from '@/lib/field-db';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function MobileCreateOrderPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const router = useRouter();
     const searchParams = useSearchParams();
     const visitId = searchParams.get('visitId');
@@ -68,11 +70,11 @@ export default function MobileCreateOrderPage() {
 
     const handleSaveOrder = async () => {
         if (!visitId || !customerId) {
-            alert('Ziyaret bilgisi eksik. Lütfen tekrar deneyin.');
+            showError("Uyarı", 'Ziyaret bilgisi eksik. Lütfen tekrar deneyin.');
             return;
         }
         if (cart.length === 0) {
-            alert('Sepet boş.');
+            showSuccess("Bilgi", 'Sepet boş.');
             return;
         }
 
@@ -112,11 +114,11 @@ export default function MobileCreateOrderPage() {
                 }
             }
 
-            alert('Sipariş kaydedildi.');
+            showSuccess("Bilgi", 'Sipariş kaydedildi.');
             router.back();
         } catch (e) {
             console.error(e);
-            alert('Kaydetme başarısız.');
+            showError("Uyarı", 'Kaydetme başarısız.');
         } finally {
             setSaving(false);
         }

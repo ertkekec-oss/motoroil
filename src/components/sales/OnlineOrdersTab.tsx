@@ -3,6 +3,7 @@
 import { useState, Fragment, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import { MarketplaceActionButton } from '@/components/marketplaces/MarketplaceActionButton';
+import { useModal } from "@/contexts/ModalContext";
 
 interface OnlineOrdersTabProps {
     onlineOrders: any[];
@@ -300,6 +301,7 @@ export function OnlineOrdersTab({
                         <button
                             disabled={!!bulkInvoiceStatus || isGeneratingBulk}
                             onClick={async () => {
+                                const { showSuccess, showError, showWarning } = useModal();
                                 const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id));
                                 
                                 if (selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length === 0) {
@@ -367,7 +369,7 @@ export function OnlineOrdersTab({
                                         showError("Kısmi Başarı / Hata", `${successCount} fatura başarıyla oluşturuldu ve gönderildi. ${failCount} siparişte hata oluştu.`);
                                     } else {
                                         // Wait, periodya usually uses showWarning for custom alerts when it's not an error.
-                                        alert(`Başarılı: Tüm faturalar başarıyla oluşturuldu ve gönderildi. (${successCount} adet)`);
+                                        showSuccess("Bilgi", `Başarılı: Tüm faturalar başarıyla oluşturuldu ve gönderildi. (${successCount} adet)`);
                                     }
                                     
                                 } catch(e: any) {

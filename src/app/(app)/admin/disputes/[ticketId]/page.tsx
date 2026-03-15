@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from 'next/navigation';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function DisputeDetailPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const params = useParams();
     const router = useRouter();
     const ticketId = params.ticketId as string;
@@ -24,7 +26,7 @@ export default function DisputeDetailPage() {
             if (res.ok) {
                 setData(await res.json());
             } else {
-                alert("Uyarı: Dosya bulunamadı veya yetkisiz erişim.");
+                showError("Uyarı", "Uyarı: Dosya bulunamadı veya yetkisiz erişim.");
                 router.push("/admin/disputes");
             }
         } finally {
@@ -34,7 +36,7 @@ export default function DisputeDetailPage() {
 
     const handleAction = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!actionState.reason || actionState.reason.length < 5) return alert("Sebebini giriniz.");
+        if (!actionState.reason || actionState.reason.length < 5) return showSuccess("Bilgi", "Sebebini giriniz.");
 
         const confirmMsg = `Bu işlem YAPILACAKTIR:\nİşlem: ${actionState.type}\nTutar: ${actionState.amount || 'Tümü'}\nOnaylıyor musunuz (Finans Denetimine Kaydedilecektir)?`;
         if (!window.confirm(confirmMsg)) return;
@@ -58,12 +60,12 @@ export default function DisputeDetailPage() {
             });
 
             if (res.ok) {
-                alert("Aksiyon uygulandı ve Finans Denetim Defterine kaydedildi.");
+                showSuccess("Bilgi", "Aksiyon uygulandı ve Finans Denetim Defterine kaydedildi.");
                 setActionState({ type: '', amount: '', reason: '', code: '' });
                 fetchDetail();
             } else {
                 const errResult = await res.json();
-                alert(`İşlem Hatası: ${errResult.error}`);
+                showError("Uyarı", `İşlem Hatası: ${errResult.error}`);
             }
         } finally {
             setSaving(false);
@@ -86,10 +88,10 @@ export default function DisputeDetailPage() {
             });
 
             if (res.ok) {
-                alert("Bilgi talebi oluşturuldu.");
+                showSuccess("Bilgi", "Bilgi talebi oluşturuldu.");
                 fetchDetail();
             } else {
-                alert("Hata oluştu.");
+                showError("Uyarı", "Hata oluştu.");
             }
         } finally {
             setSaving(false);

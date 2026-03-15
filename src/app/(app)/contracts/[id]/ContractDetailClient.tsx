@@ -2,8 +2,10 @@
 
 import { useTransition, useRef, useState, useEffect } from "react";
 import { setupRecurringOrderAction, activateContractAction } from "@/actions/contractActions";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ContractDetailClient({ contract, items }: { contract: any, items: any[] }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [isPending, startTransition] = useTransition();
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -31,7 +33,7 @@ export default function ContractDetailClient({ contract, items }: { contract: an
         if (!file) return;
 
         if (file.size > 10 * 1024 * 1024) {
-            alert("Dosya boyutu 10MB'dan küçük olmalıdır.");
+            showError("Uyarı", "Dosya boyutu 10MB'dan küçük olmalıdır.");
             return;
         }
 
@@ -48,14 +50,14 @@ export default function ContractDetailClient({ contract, items }: { contract: an
 
             if (res.ok) {
                 await fetchDocuments();
-                alert("Belge başarıyla yüklendi.");
+                showSuccess("Bilgi", "Belge başarıyla yüklendi.");
             } else {
                 const err = await res.json();
-                alert(err.error || "Dosya yüklenemedi.");
+                showError("Uyarı", err.error || "Dosya yüklenemedi.");
             }
         } catch (e) {
             console.error(e);
-            alert("Dosya yüklenirken bir sorun oluştu.");
+            showSuccess("Bilgi", "Dosya yüklenirken bir sorun oluştu.");
         } finally {
             setIsUploading(false);
             e.target.value = '';
@@ -75,11 +77,11 @@ export default function ContractDetailClient({ contract, items }: { contract: an
                 link.click();
                 link.parentNode?.removeChild(link);
             } else {
-                alert(data.error || "İndirme bağlantısı alınamadı");
+                showError("Uyarı", data.error || "İndirme bağlantısı alınamadı");
             }
         } catch (e) {
             console.error(e);
-            alert("İndirme sırasında bir hata oluştu");
+            showError("Uyarı", "İndirme sırasında bir hata oluştu");
         }
     };
 
@@ -90,11 +92,11 @@ export default function ContractDetailClient({ contract, items }: { contract: an
             if (res.ok) {
                 await fetchDocuments();
             } else {
-                alert("Belge silinemedi.");
+                showSuccess("Bilgi", "Belge silinemedi.");
             }
         } catch (e) {
             console.error(e);
-            alert("Silme sırasında bir hata oluştu.");
+            showError("Uyarı", "Silme sırasında bir hata oluştu.");
         }
     };
 
@@ -110,11 +112,12 @@ export default function ContractDetailClient({ contract, items }: { contract: an
         if (!confirm("Are you sure you want to setup an automatic recurring order via this contract? Orders will be placed automatically.")) return;
 
         startTransition(async () => {
+            const { showSuccess, showError, showWarning } = useModal();
             try {
                 await setupRecurringOrderAction(contract.id, freq, day);
-                alert("Recurring schedule configured successfully.");
+                showSuccess("Bilgi", "Recurring schedule configured successfully.");
             } catch (err: any) {
-                alert(err.message || "Failed to setup schedule");
+                showError("Uyarı", err.message || "Failed to setup schedule");
             }
         });
     };
@@ -122,11 +125,12 @@ export default function ContractDetailClient({ contract, items }: { contract: an
     const handleActivate = () => {
         if (!confirm("Activate this contract? (Normally an admin/seller step)")) return;
         startTransition(async () => {
+            const { showSuccess, showError, showWarning } = useModal();
             try {
                 await activateContractAction(contract.id);
-                alert("Activated");
+                showSuccess("Bilgi", "Activated");
             } catch (err: any) {
-                alert(err.message);
+                showSuccess("Bilgi", err.message);
             }
         });
     };

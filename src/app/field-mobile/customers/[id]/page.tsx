@@ -3,8 +3,10 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const { id } = use(params);
     const [customer, setCustomer] = useState<any>(null);
     const [statement, setStatement] = useState<any[]>([]);
@@ -60,11 +62,11 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                     setActiveVisit(data);
                 } else {
                     const error = await res.json();
-                    alert(error.error || 'Ziyaret başlatılamadı.');
+                    showError("Uyarı", error.error || 'Ziyaret başlatılamadı.');
                 }
             } catch (e) {
                 console.error(e);
-                alert('Bağlantı hatası.');
+                showError("Uyarı", 'Bağlantı hatası.');
             } finally {
                 setActionLoading(false);
             }

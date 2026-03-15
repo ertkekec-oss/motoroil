@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function DemandSignalsAdminPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [signals, setSignals] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -26,7 +28,7 @@ export default function DemandSignalsAdminPage() {
     const handleAction = async (action: string) => {
         try {
             await fetch(`/api/admin/liquidity/${action}`, { method: "POST" });
-            alert(`${action} job started in background.`);
+            showSuccess("Bilgi", `${action} job started in background.`);
         } catch (error) {
             console.error(`Failed to execute ${action}`, error);
         }

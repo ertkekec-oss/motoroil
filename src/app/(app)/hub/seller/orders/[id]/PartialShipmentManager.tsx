@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { initiateShipmentAction } from '@/actions/initiateShipmentAction';
 import { PackageOpen, FileText } from 'lucide-react';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function PartialShipmentManager({
     orderId,
@@ -12,6 +13,7 @@ export default function PartialShipmentManager({
     orderId: string,
     originalItems: any[]
 }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -24,7 +26,7 @@ export default function PartialShipmentManager({
         const payloadItems = selectedItems.filter(i => i.qty > 0)?.map(i => ({ productId: i.productId, qty: i.qty }));
 
         if (payloadItems.length === 0) {
-            alert("Gönderilecek en az 1 miktar belirtmelisiniz.");
+            showSuccess("Bilgi", "Gönderilecek en az 1 miktar belirtmelisiniz.");
             return;
         }
 
@@ -39,7 +41,7 @@ export default function PartialShipmentManager({
             });
             router.refresh();
         } catch (e: any) {
-            alert(e.message || "Bir hata oluştu");
+            showError("Uyarı", e.message || "Bir hata oluştu");
         } finally {
             setLoading(false);
         }

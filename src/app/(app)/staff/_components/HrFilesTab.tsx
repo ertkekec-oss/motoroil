@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Staff } from '@/contexts/AppContext';
+import { useModal } from "@/contexts/ModalContext";
 
 interface HrFilesTabProps {
     staff: Staff[];
@@ -9,6 +10,7 @@ interface HrFilesTabProps {
 }
 
 export default function HrFilesTab({ staff, setSelectedStaff }: HrFilesTabProps) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [documents, setDocuments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -65,7 +67,7 @@ export default function HrFilesTab({ staff, setSelectedStaff }: HrFilesTabProps)
     const triggerUploadForStaff = () => {
         // Personel Listesi veya Modal aracılığıyla belge eklenebilir. 
         // Şimdilik sadece yönlendirme veya mesaj.
-        window.alert('Yeni dosya yüklemek için lütfen Personel Listesi üzerinden ilgili personelin detay (Düzenle) paneline gidin ve Belgeler sekmesini kullanın.');
+        showError("Uyarı", 'Yeni dosya yüklemek için lütfen Personel Listesi üzerinden ilgili personelin detay (Düzenle) paneline gidin ve Belgeler sekmesini kullanın.');
     };
 
     return (

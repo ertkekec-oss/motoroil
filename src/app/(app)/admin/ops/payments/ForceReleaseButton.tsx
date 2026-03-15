@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { forceReleaseAction } from "@/actions/forceReleaseAction";
 import { RotateCcw } from "lucide-react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ForceReleaseButton({ orderId }: { orderId: string }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [loading, setLoading] = useState(false);
 
     const handleForceRelease = async () => {
@@ -13,7 +15,7 @@ export default function ForceReleaseButton({ orderId }: { orderId: string }) {
         try {
             await forceReleaseAction(orderId);
         } catch (e: any) {
-            alert(e.message || "Force release failed");
+            showError("Uyarı", e.message || "Force release failed");
             setLoading(false);
         }
     };

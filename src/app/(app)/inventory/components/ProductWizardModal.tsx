@@ -759,11 +759,12 @@ function StepVariantsPriceLists({
                                             })
                                             .then(res => res.json())
                                             .then(data => {
+                                                const { showSuccess, showError, showWarning } = useModal();
                                                 if(data.success && window.location.reload) {
-                                                    alert("Varyant Özelliği eklendi! Sisteme işlenmesi için sayfa yenileniyor...");
+                                                    showSuccess("Bilgi", "Varyant Özelliği eklendi! Sisteme işlenmesi için sayfa yenileniyor...");
                                                     window.location.reload();
                                                 } else {
-                                                    alert("Eklenirken bir sorun oluştu.");
+                                                    showSuccess("Bilgi", "Eklenirken bir sorun oluştu.");
                                                 }
                                             });
                                         }

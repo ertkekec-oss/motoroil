@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ExecutiveDashboard() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [range, setRange] = useState('30d');
     const [data, setData] = useState<any>(null);
     const [actionsLoading, setActionsLoading] = useState<string | null>(null);
@@ -29,7 +31,7 @@ export default function ExecutiveDashboard() {
         if (!confirm(`Bu işlem sistem durumunu değiştirecektir: ${actionType}\nDevam etmek istiyor musunuz?`)) return;
 
         const reason = prompt(`Lütfen Audit Log için açıklama giriniz (Min 10 karakter):`);
-        if (!reason || reason.length < 10) return alert("Hata: Açıklama en az 10 karakter olmalı.");
+        if (!reason || reason.length < 10) return showError("Uyarı", "Hata: Açıklama en az 10 karakter olmalı.");
 
         setActionsLoading(actionType);
         try {
@@ -40,11 +42,11 @@ export default function ExecutiveDashboard() {
             });
 
             if (res.ok) {
-                alert(`İşlem Başarılı!`);
+                showSuccess("Bilgi", `İşlem Başarılı!`);
                 fetchData();
             } else {
                 const err = await res.json();
-                alert(`Hata: ${err.error || 'Yetkisiz erişim / İşlem başarısız.'}`);
+                showError("Uyarı", `Hata: ${err.error || 'Yetkisiz erişim / İşlem başarısız.'}`);
             }
         } finally {
             setActionsLoading(null);

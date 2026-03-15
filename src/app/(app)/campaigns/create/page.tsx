@@ -4,8 +4,10 @@ import { useState } from "react";
 import { MoveLeft, Save, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CreateCampaign() {
+    const { showSuccess, showError, showWarning } = useModal();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -58,7 +60,7 @@ export default function CreateCampaign() {
             if (res.ok) {
                 router.push("/campaigns/active");
             } else {
-                alert("Hata oluştu.");
+                showError("Uyarı", "Hata oluştu.");
             }
         } catch (error) {
             console.error(error);

@@ -4,8 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { updateDisputeStatusAction } from "@/services/finance/reconciliation/actions";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function DisputesClient({ disputes }: { disputes: any[] }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [filter, setFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED' | 'REJECTED'>('ALL');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -24,11 +26,11 @@ export default function DisputesClient({ disputes }: { disputes: any[] }) {
                 link.click();
                 link.parentNode?.removeChild(link);
             } else {
-                alert(data.error || "İndirme bağlantısı alınamadı");
+                showError("Uyarı", data.error || "İndirme bağlantısı alınamadı");
             }
         } catch (e) {
             console.error(e);
-            alert("İndirme sırasında bir hata oluştu");
+            showError("Uyarı", "İndirme sırasında bir hata oluştu");
         }
     };
 
@@ -41,7 +43,7 @@ export default function DisputesClient({ disputes }: { disputes: any[] }) {
                 setRefreshTrigger(prev => prev + 1);
                 router.refresh();
             } else {
-                alert(res.error || "Durum güncellenemedi.");
+                showError("Uyarı", res.error || "Durum güncellenemedi.");
             }
         } catch (e) {
             console.error(e);

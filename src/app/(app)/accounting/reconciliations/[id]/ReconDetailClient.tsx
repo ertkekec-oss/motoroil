@@ -208,7 +208,7 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                             <button onClick={handleDispute} disabled={!!processing} className="btn" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
                                 ⚠️ İtiraz (Dispute) Aç
                             </button>
-                            <button onClick={() => alert('Future-ready: İmzaya Gönder V1 Katmanı')} disabled={!!processing} className="btn hover:bg-emerald-500/20" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: 'bold' }}>
+                            <button onClick={() => showSuccess("Bilgi", 'Future-ready: İmzaya Gönder V1 Katmanı')} disabled={!!processing} className="btn hover:bg-emerald-500/20" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: 'bold' }}>
                                 ✍️ İmzaya Gönder
                             </button>
                         </div>

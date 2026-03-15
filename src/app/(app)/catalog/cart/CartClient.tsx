@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { updateCartItemQtyAction, clearCartAction } from "@/actions/cartActions";
 import { processCheckoutAction } from "@/actions/checkoutAction";
 import Link from "next/link";
+import { useModal } from "@/contexts/ModalContext";
 
 type CartItemDisplay = {
     productId: string;
@@ -158,13 +159,14 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
                                 onClick={async () => {
                                     if (items.length === 0) return;
                                     startTransition(async () => {
+                                        const { showSuccess, showError, showWarning } = useModal();
                                         try {
                                             const { createRfqFromCartAction } = await import("@/actions/rfqActions");
                                             const res = await createRfqFromCartAction();
-                                            alert("RFQ Created successfully!");
+                                            showSuccess("Bilgi", "RFQ Created successfully!");
                                             router.push(`/rfq/${res.rfqId}`);
                                         } catch (e: any) {
-                                            alert(e.message || "Failed to create RFQ");
+                                            showError("Uyarı", e.message || "Failed to create RFQ");
                                         }
                                     });
                                 }}

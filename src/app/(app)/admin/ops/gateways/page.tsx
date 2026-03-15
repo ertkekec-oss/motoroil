@@ -13,8 +13,10 @@ import {
     EnterpriseField
 } from "@/components/ui/enterprise";
 import { Server, Settings, Plus, Key, Link2, CreditCard, Trash2, Edit2, ShieldCheck, Activity } from 'lucide-react';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function GatewaysPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [gateways, setGateways] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
@@ -65,7 +67,7 @@ export default function GatewaysPage() {
                 setModalOpen(false);
                 fetchGateways();
             } else {
-                alert(data.error || 'Kaydetme başarısız');
+                showError("Uyarı", data.error || 'Kaydetme başarısız');
             }
         } catch (error) {
             console.error(error);

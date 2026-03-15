@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CommissionsPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [plans, setPlans] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -35,7 +37,7 @@ export default function CommissionsPage() {
 
     const handleSave = async (isNew: boolean) => {
         if (!reason || reason.trim().length < 5) {
-            alert("Sebep girmek zorunludur.");
+            showSuccess("Bilgi", "Sebep girmek zorunludur.");
             return;
         }
 
@@ -52,12 +54,12 @@ export default function CommissionsPage() {
             });
 
             if (res.ok) {
-                alert("Komisyon planı kaydedildi.");
+                showSuccess("Bilgi", "Komisyon planı kaydedildi.");
                 setReason("");
                 setSelectedPlan(null);
                 fetchPlans();
             } else {
-                alert(`Hata: ${(await res.json()).error}`);
+                showError("Uyarı", `Hata: ${(await res.json()).error}`);
             }
         } finally {
             setSaving(false);
@@ -77,7 +79,7 @@ export default function CommissionsPage() {
 
             if (res.ok) fetchPlans();
         } catch (e) {
-            alert("Bağlantı hatası");
+            showError("Uyarı", "Bağlantı hatası");
         }
     };
 

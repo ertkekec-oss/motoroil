@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader } from "@/components/ui/enterprise";
 import { useApp } from '@/contexts/AppContext';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function TenantBillingPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const { currentUser } = useApp();
     const [credits, setCredits] = useState<any>(null);
     const [products, setProducts] = useState<any[]>([]);
@@ -54,11 +56,11 @@ export default function TenantBillingPage() {
                 // Navigate to the simulated gateway URL or integrate gateway script
                 window.location.href = data.checkoutUrl;
             } else {
-                alert('Checkout hatası: ' + data.error);
+                showError("Uyarı", 'Checkout hatası: ' + data.error);
             }
         } catch (error) {
             console.error(error);
-            alert('Ödeme başlatılırken bir hata oluştu.');
+            showError("Uyarı", 'Ödeme başlatılırken bir hata oluştu.');
         } finally {
             setCheckingOut(false);
         }

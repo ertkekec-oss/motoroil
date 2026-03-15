@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/enterprise";
 import { ShieldAlert, Info, Edit2, Play, Lock } from "lucide-react";
 import { format } from "date-fns";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function AdminB2BPoliciesPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [policies, setPolicies] = useState<any[]>([]);
     const [totalVisible, setTotalVisible] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ export default function AdminB2BPoliciesPage() {
                 ));
                 setEditingPolicy(null);
             } else {
-                alert('Güncelleme başarısız oldu. Yetkiniz yok veya sunucu hatası.');
+                showError("Uyarı", 'Güncelleme başarısız oldu. Yetkiniz yok veya sunucu hatası.');
             }
         } catch (err) {
             console.error(err);

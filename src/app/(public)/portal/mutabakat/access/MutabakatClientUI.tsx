@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function MutabakatClientUI({ recon, token }: { recon: any, token: string }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const router = useRouter();
     const [actionState, setActionState] = useState<'IDLE' | 'LOADING' | 'DISPUTE_FORM'>('IDLE');
     const [note, setNote] = useState("");
@@ -57,7 +59,7 @@ export default function MutabakatClientUI({ recon, token }: { recon: any, token:
             router.refresh();
 
         } catch (e: any) {
-            alert(e.message || "Bir hata oluştu.");
+            showError("Uyarı", e.message || "Bir hata oluştu.");
             setActionState(action === 'DISPUTE' ? 'DISPUTE_FORM' : 'IDLE');
         }
     };

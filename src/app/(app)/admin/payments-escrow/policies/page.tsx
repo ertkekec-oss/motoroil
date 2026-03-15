@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function PoliciesPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [config, setConfig] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [reason, setReason] = useState("");
@@ -27,7 +29,7 @@ export default function PoliciesPage() {
 
     const handleSave = async (payload: any) => {
         if (!reason || reason.trim().length < 5) {
-            alert("Lütfen geçerli bir değişiklik nedeni (en az 5 karakter) giriniz.");
+            showError("Uyarı", "Lütfen geçerli bir değişiklik nedeni (en az 5 karakter) giriniz.");
             return;
         }
 
@@ -40,12 +42,12 @@ export default function PoliciesPage() {
             });
 
             if (res.ok) {
-                alert("Ayarlar güncellendi (Audit Log oluşturuldu).");
+                showSuccess("Bilgi", "Ayarlar güncellendi (Audit Log oluşturuldu).");
                 setReason("");
                 fetchConfig();
             } else {
                 const err = await res.json();
-                alert(`Hata: ${err.error}`);
+                showError("Uyarı", `Hata: ${err.error}`);
             }
         } finally {
             setSaving(false);

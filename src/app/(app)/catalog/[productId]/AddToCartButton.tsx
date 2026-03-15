@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addToCartAction } from "@/actions/cartActions";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function AddToCartButton({
     productId,
@@ -14,6 +15,7 @@ export default function AddToCartButton({
     maxQty: number;
     disabled?: boolean;
 }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [qty, setQty] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -21,9 +23,9 @@ export default function AddToCartButton({
         setLoading(true);
         try {
             await addToCartAction({ productId, sellerCompanyId, qty });
-            alert("Added to cart!");
+            showSuccess("Bilgi", "Added to cart!");
         } catch (e) {
-            alert("Failed to add to cart");
+            showError("Uyarı", "Failed to add to cart");
         } finally {
             setLoading(false);
         }

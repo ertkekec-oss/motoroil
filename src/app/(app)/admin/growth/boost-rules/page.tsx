@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function AdminBoostRules() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [rules, setRules] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -50,12 +52,12 @@ export default function AdminBoostRules() {
             });
 
             if (res.ok) {
-                alert("Kural başarıyla oluşturuldu.");
+                showSuccess("Bilgi", "Kural başarıyla oluşturuldu.");
                 setShowModal(false);
                 fetchRules();
             } else {
                 const err = await res.json();
-                alert(`Hata: ${err.error}`);
+                showError("Uyarı", `Hata: ${err.error}`);
             }
         } finally {
             setSaving(false);
@@ -64,7 +66,7 @@ export default function AdminBoostRules() {
 
     const handleAction = async (id: string, action: 'disable' | 'expire-now') => {
         const r = prompt("İşlem nedenini giriniz (Audit log için zorunlu):");
-        if (!r || r.length < 5) return alert("Geçerli bir sebep girilmeli (min 5 karakter).");
+        if (!r || r.length < 5) return showError("Uyarı", "Geçerli bir sebep girilmeli (min 5 karakter).");
 
         try {
             const res = await fetch(`/api/admin/growth/boost-rules/${id}/${action}`, {
@@ -76,7 +78,7 @@ export default function AdminBoostRules() {
                 fetchRules();
             } else {
                 const err = await res.json();
-                alert(`Hata: ${err.error}`);
+                showError("Uyarı", `Hata: ${err.error}`);
             }
         } catch (e) {
             console.error(e);

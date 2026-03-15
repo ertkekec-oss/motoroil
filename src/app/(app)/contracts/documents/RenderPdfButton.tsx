@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { EnterpriseButton } from '@/components/ui/enterprise';
 import { useRouter } from 'next/navigation';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function RenderPdfButton({ documentId, initialPdfReady, documentVersionId }: { documentId: string, initialPdfReady: boolean, documentVersionId?: string }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [status, setStatus] = useState<'idle' | 'queued' | 'ready'>(initialPdfReady ? 'ready' : 'idle');
     const router = useRouter();
 
@@ -23,7 +25,7 @@ export default function RenderPdfButton({ documentId, initialPdfReady, documentV
         } else {
             console.error(await res.text());
             setStatus('idle');
-            alert("Render queue failed.");
+            showError("Uyarı", "Render queue failed.");
         }
     };
 

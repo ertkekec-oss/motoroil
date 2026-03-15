@@ -3,8 +3,10 @@
 import { useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { counterRfqAction } from "@/actions/rfqResponseActions";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CounterClient({ rfq, items, offer }: { rfq: any, items: any[], offer: any }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
@@ -16,19 +18,20 @@ export default function CounterClient({ rfq, items, offer }: { rfq: any, items: 
         const formData = new FormData(formRef.current);
         const tp = formData.get("totalPrice");
         if (!tp || Number(tp) <= 0) {
-            alert("Please provide a valid total price offer.");
+            showSuccess("Bilgi", "Please provide a valid total price offer.");
             return;
         }
 
         if (!confirm("Are you sure you want to submit this offer to the buyer? Prices cannot be changed once submitted.")) return;
 
         startTransition(async () => {
+            const { showSuccess, showError, showWarning } = useModal();
             try {
                 await counterRfqAction(formData);
-                alert("Offer submitted successfully.");
+                showSuccess("Bilgi", "Offer submitted successfully.");
                 router.push("/seller/rfqs");
             } catch (err: any) {
-                alert(err.message || "Failed to submit offer.");
+                showError("Uyarı", err.message || "Failed to submit offer.");
             }
         });
     };

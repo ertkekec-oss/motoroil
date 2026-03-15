@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function AdminGrowthBillingHealth() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -26,7 +28,7 @@ export default function AdminGrowthBillingHealth() {
         if (!window.confirm(confirmMsg + '\n\nDEVAM EDILSIN MI?')) return;
 
         const reason = prompt("İşlem Sebebi (Audit Log için zorunlu):");
-        if (!reason || reason.length < 5) return alert("Sebep en az 5 karakter girmelisiniz.");
+        if (!reason || reason.length < 5) return showSuccess("Bilgi", "Sebep en az 5 karakter girmelisiniz.");
 
         setSaving(true);
         try {
@@ -37,11 +39,11 @@ export default function AdminGrowthBillingHealth() {
             });
             if (res.ok) {
                 const out = await res.json();
-                alert(`İşlem Başarılı. OpsLog'a kaydedildi.\n\nSonuç: ${JSON.stringify(out.result)}`);
+                showSuccess("Bilgi", `İşlem Başarılı. OpsLog'a kaydedildi.\n\nSonuç: ${JSON.stringify(out.result)}`);
                 fetchHealth(filter);
             } else {
                 const err = await res.json();
-                alert(`Hata: ${err.error}`);
+                showError("Uyarı", `Hata: ${err.error}`);
             }
         } finally { setSaving(false); }
     };

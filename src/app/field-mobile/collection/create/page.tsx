@@ -9,7 +9,7 @@ import { fieldDb } from '@/lib/field-db';
 export default function MobileCreateCollectionPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { showError } = useModal();
+    const { showError, showSuccess, showWarning } = useModal();
 
     const visitId = searchParams.get('visitId');
     const customerId = searchParams.get('customerId');
@@ -44,11 +44,11 @@ export default function MobileCreateCollectionPage() {
 
     const handleSave = async () => {
         if (!amount || Number(amount) <= 0) {
-            alert('Lütfen geçerli bir tutar girin.');
+            showError("Uyarı", 'Lütfen geçerli bir tutar girin.');
             return;
         }
         if (!selectedKasa) {
-            alert('Lütfen bir kasa/hesap seçin.');
+            showError("Uyarı", 'Lütfen bir kasa/hesap seçin.');
             return;
         }
 
@@ -74,18 +74,18 @@ export default function MobileCreateCollectionPage() {
             if (res.ok) {
                 // Success: record as synced in local DB too
                 await (fieldDb as any).collections.add({ ...colData, synced: true });
-                alert('Tahsilat başarıyla kaydedildi.');
+                showSuccess("Bilgi", 'Tahsilat başarıyla kaydedildi.');
                 router.back();
             } else {
                 // Server error: save to offline queue
                 await (fieldDb as any).collections.add(colData);
-                alert('Tahsilat kuyruğa eklendi (Çevrimdışı kaydedilecek).');
+                showSuccess("Bilgi", 'Tahsilat kuyruğa eklendi (Çevrimdışı kaydedilecek).');
                 router.back();
             }
         } catch (e) {
             // Network error: save to offline queue
             await (fieldDb as any).collections.add(colData);
-            alert('Bağlantı yok. Tahsilat çevrimdışı kaydedildi.');
+            showSuccess("Bilgi", 'Bağlantı yok. Tahsilat çevrimdışı kaydedildi.');
             router.back();
         } finally {
             setSaving(false);

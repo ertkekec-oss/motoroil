@@ -6,6 +6,7 @@ import { submitRfqAction } from "@/actions/rfqActions";
 import { acceptOfferAction } from "@/actions/rfqResponseActions";
 
 import RoutingWidget from "./RoutingWidget";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, items: any[], offers: any[] }) {
     const [isPending, startTransition] = useTransition();
@@ -15,11 +16,12 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
         if (!confirm("Submit this RFQ to all selected suppliers?")) return;
 
         startTransition(async () => {
+            const { showSuccess, showError, showWarning } = useModal();
             try {
                 await submitRfqAction(rfq.id);
-                alert("RFQ sent successfully.");
+                showSuccess("Bilgi", "RFQ sent successfully.");
             } catch (err: any) {
-                alert(err.message || "Failed to submit RFQ.");
+                showError("Uyarı", err.message || "Failed to submit RFQ.");
             }
         });
     };
@@ -28,12 +30,13 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
         if (!confirm("Are you sure you want to ACCEPT this offer? It will create an immediate Network Order.")) return;
 
         startTransition(async () => {
+            const { showSuccess, showError, showWarning } = useModal();
             try {
                 await acceptOfferAction(offerId);
-                alert("Offer accepted! Order created. Proceed to Buyer Orders to checkout.");
+                showSuccess("Bilgi", "Offer accepted! Order created. Proceed to Buyer Orders to checkout.");
                 router.push("/hub/buyer/orders");
             } catch (err: any) {
-                alert(err.message || "Failed to accept offer.");
+                showError("Uyarı", err.message || "Failed to accept offer.");
             }
         });
     };

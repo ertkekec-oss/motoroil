@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { syncShipmentAction } from "@/actions/syncShipmentAction";
 import { RefreshCw } from "lucide-react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function ManualSyncButton({ shipmentId, disabled }: { shipmentId: string, disabled: boolean }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [loading, setLoading] = useState(false);
 
     const handleSync = async () => {
@@ -12,7 +14,7 @@ export default function ManualSyncButton({ shipmentId, disabled }: { shipmentId:
         try {
             await syncShipmentAction(shipmentId);
         } catch (e: any) {
-            alert(e.message || "Manual sync enqueue failed");
+            showError("Uyarı", e.message || "Manual sync enqueue failed");
             setLoading(false);
         }
     };

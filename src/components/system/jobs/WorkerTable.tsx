@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useModal } from "@/contexts/ModalContext";
 
 export function WorkerTable() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [workers, setWorkers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -18,7 +20,7 @@ export function WorkerTable() {
 
     const purgeZombies = async () => {
         await fetch('/api/admin/system/workers/health', { method: 'POST' });
-        alert('Zombie workers purged');
+        showSuccess("Bilgi", 'Zombie workers purged');
         window.location.reload();
     };
 

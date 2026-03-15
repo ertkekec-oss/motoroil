@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function RoutingWidget({ rfqId }: { rfqId: string }) {
+    const { showSuccess, showError, showWarning } = useModal();
     const [loading, setLoading] = useState(false);
     const [session, setSession] = useState<any>(null);
     const [candidates, setCandidates] = useState<any[]>([]);
@@ -37,7 +39,7 @@ export default function RoutingWidget({ rfqId }: { rfqId: string }) {
             });
             await fetchData();
         } catch (e) {
-            alert("Error preparing routing");
+            showError("Uyarı", "Error preparing routing");
         } finally {
             setLoading(false);
         }
@@ -52,10 +54,10 @@ export default function RoutingWidget({ rfqId }: { rfqId: string }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ sessionId: session.id, waveNumber })
             });
-            alert("Wave routed successfully!");
+            showSuccess("Bilgi", "Wave routed successfully!");
             await fetchData();
         } catch (e) {
-            alert("Error routing wave");
+            showError("Uyarı", "Error routing wave");
         } finally {
             setLoading(false);
         }

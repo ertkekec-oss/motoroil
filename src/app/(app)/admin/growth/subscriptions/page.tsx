@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function AdminGrowthSubscriptions() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [subs, setSubs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -24,7 +26,7 @@ export default function AdminGrowthSubscriptions() {
         if (!window.confirm(confirmMsg)) return;
 
         const reason = prompt("İptal / Askı / Kilit Açma sebebi (Audit Log):");
-        if (!reason || reason.length < 5) return alert("Sebep en az 5 karakter girmelisiniz.");
+        if (!reason || reason.length < 5) return showSuccess("Bilgi", "Sebep en az 5 karakter girmelisiniz.");
 
         setSaving(true);
         try {
@@ -34,11 +36,11 @@ export default function AdminGrowthSubscriptions() {
                 body: JSON.stringify({ reason })
             });
             if (res.ok) {
-                alert("Başarılı");
+                showSuccess("Bilgi", "Başarılı");
                 fetchSubs();
             } else {
                 const err = await res.json();
-                alert(`Hata: ${err.error}`);
+                showError("Uyarı", `Hata: ${err.error}`);
             }
         } finally { setSaving(false); }
     };

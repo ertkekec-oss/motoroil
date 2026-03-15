@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function PayoutsPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [reqs, setReqs] = useState<any[]>([]);
     const [kpis, setKpis] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ export default function PayoutsPage() {
         let reason = "Otomatik Onay";
         if (action === 'reject') {
             reason = prompt("Reddetme / İptal sebebi girin:") || "";
-            if (reason.length < 5) return alert("Sebebi daha detaylı yazın.");
+            if (reason.length < 5) return showSuccess("Bilgi", "Sebebi daha detaylı yazın.");
         } else {
             if (!confirm(`Tutar transferi IYZICO banka hesaplarına iletilecektir. Emin misiniz?`)) return;
         }
@@ -40,11 +42,11 @@ export default function PayoutsPage() {
             });
 
             if (res.ok) {
-                alert(`İşlem Onaylandı: ${action}`);
+                showSuccess("Bilgi", `İşlem Onaylandı: ${action}`);
                 fetchReqs(filter);
             } else {
                 const err = await res.json();
-                alert(`Hata: ${err.error}`);
+                showError("Uyarı", `Hata: ${err.error}`);
             }
         } finally { setActioning(null); }
     };

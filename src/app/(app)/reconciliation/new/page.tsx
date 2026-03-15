@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useModal } from "@/contexts/ModalContext";
 
 export default function NewReconciliationPage() {
+    const { showSuccess, showError, showWarning } = useModal();
     const [accountId, setAccountId] = useState('');
     const [customers, setCustomers] = useState<{ id: string, name: string }[]>([]);
     const [type, setType] = useState('CURRENT_ACCOUNT');
@@ -45,13 +47,13 @@ export default function NewReconciliationPage() {
             });
             const data = await res.json();
             if (data.success) {
-                alert('Mutabakat başarıyla oluşturuldu ve gönderildi.');
+                showSuccess("Bilgi", 'Mutabakat başarıyla oluşturuldu ve gönderildi.');
                 window.location.href = `/reconciliation/${data.reconciliation.id}`;
             } else {
-                alert(data.error || 'Mutabakat oluşturulamadı.');
+                showError("Uyarı", data.error || 'Mutabakat oluşturulamadı.');
             }
         } catch (error) {
-            alert('Ağ hatası.');
+            showError("Uyarı", 'Ağ hatası.');
         } finally {
             setLoading(false);
         }
