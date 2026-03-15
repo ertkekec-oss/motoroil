@@ -251,7 +251,7 @@ export async function POST(request: Request) {
                                         companyId: order.companyId,
                                         type: 'Expense',
                                         amount: commissionAmount,
-                                        description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) - Sipariş (Fatura): ${order.orderNumber}`,
+                                        description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) - Sipariş (Fatura): ${order.orderNumber} | REF:${order.id}`,
                                         kasaId: rawData?.targetKasaId || (await tx.kasa.findFirst())?.id || '',
                                         date: new Date()
                                     }

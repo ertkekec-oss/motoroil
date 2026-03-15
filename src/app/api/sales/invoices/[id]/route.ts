@@ -104,56 +104,147 @@ export async function DELETE(
 
             // Make sure we only reverse financials if the invoice was actually finalized (formal or approved/proforma that affected stock)
             if (invoice.isFormal || invoice.status === 'Onaylandı') {
-                // 1. Revert Customer Balance
-                await tx.customer.update({
-                    where: { id: invoice.customerId },
-                    data: { balance: { decrement: invoice.totalAmount } }
-                });
+                if (invoice.orderId) {
+                    // This invoice is tied to a POS Order! 
+                    // The POS Order originally decremented stock and handled Kasa / Customer Balance.
+                    // We must cancel the POS Order to properly revert everything.
+                    
+                    const order = await tx.order.findUnique({ where: { id: invoice.orderId } });
+                    if (order && order.deletedAt === null) {
+                        // 1. Revert Stocks (from Order items)
+                        const orderItems = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+                        const targetBranch = order.branch || 'Merkez';
+                        if (Array.isArray(orderItems)) {
+                            for (const item of orderItems) {
+                                if (item.productId) {
+                                    const qty = Number(item.qty || item.quantity || 1);
+                                    try {
+                                        await tx.stock.upsert({
+                                            where: { productId_branch: { productId: String(item.productId), branch: targetBranch } },
+                                            update: { quantity: { increment: qty } },
+                                            create: { productId: String(item.productId), branch: targetBranch, quantity: qty }
+                                        });
 
-                // 2. Remove related Transaction
-                await tx.transaction.deleteMany({
-                    where: {
-                        customerId: invoice.customerId,
-                        companyId: invoice.companyId,
-                        type: 'SalesInvoice',
-                        amount: invoice.totalAmount,
-                        description: { contains: invoice.invoiceNo }
-                    }
-                });
+                                        await (tx as any).stockMovement.create({
+                                            data: {
+                                                productId: String(item.productId),
+                                                branch: targetBranch,
+                                                companyId: order.companyId,
+                                                quantity: qty,
+                                                type: 'RETURN',
+                                                referenceId: order.id,
+                                                price: Number(item.price || 0)
+                                            }
+                                        }).catch(() => {});
 
-                // 3. Revert Inventory / Stocks
-                const items: any = typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items;
-                if (items && Array.isArray(items)) {
-                    for (const item of items) {
-                        if (item.productId) {
-                            const pId = String(item.productId);
-                            const qty = Number(item.qty);
-                            
-                            try {
-                                await tx.product.update({
-                                    where: { id: pId },
-                                    data: { stock: { increment: qty } }
-                                });
-                                
-                                await tx.stock.upsert({
-                                    where: { productId_branch: { productId: pId, branch: invoice.branch || 'Merkez' } },
-                                    update: { quantity: { increment: qty } },
-                                    create: { productId: pId, branch: invoice.branch || 'Merkez', quantity: qty }
-                                });
-                                
-                                await (tx as any).stockMovement.create({
-                                    data: {
-                                        productId: pId,
-                                        branch: invoice.branch || 'Merkez',
-                                        companyId: invoice.companyId,
-                                        quantity: qty,
-                                        price: item.price || 0,
-                                        type: 'CANCEL',
-                                        referenceId: invoice.id
+                                        if (targetBranch === 'Merkez') {
+                                            await tx.product.update({
+                                                where: { id: String(item.productId) },
+                                                data: { stock: { increment: qty } }
+                                            });
+                                        }
+                                    } catch (e) {
+                                        console.error("Stock reversal error:", e);
                                     }
-                                }).catch(() => {}); // Ignore missing model error
-                            } catch (e) {
-                                console.error("Stock reversal error on invoice cancel:", e);
+                                }
+                            }
+                        }
+
+                        // 2. Revert Kasa & Financial Transaction
+                        const transactions = await tx.transaction.findMany({
+                            where: { description: { contains: `REF:${order.id}` }, deletedAt: null }
+                        });
+
+                        for (const t of transactions) {
+                            if (t.type === 'Sales' || t.type === 'Collection') {
+                                await tx.kasa.update({
+                                    where: { id: t.kasaId },
+                                    data: { balance: { decrement: t.amount } }
+                                });
+                            } else if (t.type === 'Expense') {
+                                await tx.kasa.update({
+                                    where: { id: t.kasaId },
+                                    data: { balance: { increment: t.amount } }
+                                });
+                            }
+                            
+                            if (t.customerId && t.type === 'Sales') {
+                                const rawData: any = order.rawData || {};
+                                if (rawData.paymentMode === 'account') {
+                                    await tx.customer.update({
+                                        where: { id: t.customerId },
+                                        data: { balance: { decrement: t.amount } }
+                                    });
+                                }
+                            }
+                            await tx.transaction.update({
+                                where: { id: t.id },
+                                data: { deletedAt: new Date() }
+                            });
+                        }
+
+                        // 3. Mark Order as deleted
+                        await tx.order.update({
+                            where: { id: order.id },
+                            data: {
+                                deletedAt: new Date(),
+                                status: 'İptal Edildi'
+                            }
+                        });
+                    }
+                } else {
+                    // STANDALONE INVOICE Reversal Logic
+                    // 1. Revert Customer Balance
+                    await tx.customer.update({
+                        where: { id: invoice.customerId },
+                        data: { balance: { decrement: invoice.totalAmount } }
+                    });
+
+                    // 2. Remove related Transaction
+                    await tx.transaction.deleteMany({
+                        where: {
+                            customerId: invoice.customerId,
+                            companyId: invoice.companyId,
+                            type: 'SalesInvoice',
+                            amount: invoice.totalAmount,
+                            description: { contains: invoice.invoiceNo }
+                        }
+                    });
+
+                    // 3. Revert Inventory / Stocks
+                    const items: any = typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items;
+                    if (items && Array.isArray(items)) {
+                        for (const item of items) {
+                            if (item.productId) {
+                                const pId = String(item.productId);
+                                const qty = Number(item.qty);
+                                
+                                try {
+                                    await tx.product.update({
+                                        where: { id: pId },
+                                        data: { stock: { increment: qty } }
+                                    });
+                                    
+                                    await tx.stock.upsert({
+                                        where: { productId_branch: { productId: pId, branch: invoice.branch || 'Merkez' } },
+                                        update: { quantity: { increment: qty } },
+                                        create: { productId: pId, branch: invoice.branch || 'Merkez', quantity: qty }
+                                    });
+                                    
+                                    await (tx as any).stockMovement.create({
+                                        data: {
+                                            productId: pId,
+                                            branch: invoice.branch || 'Merkez',
+                                            companyId: invoice.companyId,
+                                            quantity: qty,
+                                            price: item.price || 0,
+                                            type: 'CANCEL',
+                                            referenceId: invoice.id
+                                        }
+                                    }).catch(() => {});
+                                } catch (e) {
+                                    console.error("Stock reversal error on invoice cancel:", e);
+                                }
                             }
                         }
                     }

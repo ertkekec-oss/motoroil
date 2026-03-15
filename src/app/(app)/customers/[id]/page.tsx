@@ -85,6 +85,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 companyId: customer.companyId,
                 deletedAt: null,
                 OR: [
+                    { customerId: customer.id },
                     ...(customer.email ? [{ customerEmail: customer.email }] : []),
                     { customerName: customer.name }
                 ]

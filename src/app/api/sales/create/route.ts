@@ -395,7 +395,7 @@ export async function POST(request: Request) {
                                     companyId: companyId,
                                     type: 'Expense',
                                     amount: commissionAmount,
-                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,
+                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) | REF:${result.id}`,
                                     kasaId: targetKasaId,
                                     date: new Date(),
                                     branch: branch || 'Merkez'

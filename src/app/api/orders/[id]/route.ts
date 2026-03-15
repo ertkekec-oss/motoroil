@@ -97,6 +97,11 @@ export async function DELETE(
                         where: { id: t.kasaId },
                         data: { balance: { decrement: t.amount } }
                     });
+                } else if (t.type === 'Expense') {
+                    await tx.kasa.update({
+                        where: { id: t.kasaId },
+                        data: { balance: { increment: t.amount } }
+                    });
                 }
 
                 // Revert Customer Balance if it was an 'account' sale
@@ -135,6 +140,15 @@ export async function DELETE(
                 data: {
                     deletedAt: new Date(),
                     status: 'İptal Edildi'
+                }
+            });
+
+            // SOFT DELETE TIED INVOICE
+            await tx.salesInvoice.updateMany({
+                where: { orderId: id, companyId: order.companyId },
+                data: {
+                    status: 'İptal Edildi',
+                    deletedAt: new Date()
                 }
             });
 
