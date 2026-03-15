@@ -133,6 +133,69 @@ export async function POST(request: Request) {
                 await tx.kasa.update({ where: { id: String(targetKasaId) }, data: { balance: { increment: amount } } });
             }
 
+            // --- POS COMMISSION LOGIC ---
+            if (type === 'Collection' && kasaId) {
+                try {
+                    const kasa = await tx.kasa.findUnique({ where: { id: String(kasaId) } });
+                    if (kasa && (kasa.type === 'POS' || kasa.type === 'Kredi Kartı Tahsilat' || kasa.type === 'Banka' || (description && description.includes('(Kredi Kartı')))) {
+                        const isCreditCard = description?.includes('(Kredi Kartı');
+                        if (isCreditCard) {
+                            const settingsRes = await tx.appSettings.findUnique({
+                                where: { companyId_key: { companyId: company.id, key: 'salesExpenses' } }
+                            });
+                            const salesExpenses = settingsRes?.value as any;
+                            
+                            if (salesExpenses?.posCommissions) {
+                                // Extract installment from description "Tahsilat-Kişi (Kredi Kartı - 6 TAKSİT)" or simple "POS ..."
+                                let instLabelRaw = 'Tek Çekim';
+                                const match = description.match(/\(Kredi Kartı - ([^\)]+)\)/);
+                                if (match && match[1]) {
+                                    instLabelRaw = match[1].trim(); 
+                                }
+
+                                const instCount = parseInt(instLabelRaw) || 1;
+                                const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
+
+                                let commissionConfig;
+                                if (instLabelRaw !== 'Tek Çekim') {
+                                    commissionConfig = salesExpenses.posCommissions.find((c: any) => c.installment === instLabelRaw);
+                                }
+                                if (!commissionConfig) {
+                                    commissionConfig = salesExpenses.posCommissions.find((c: any) =>
+                                        c.installment === instLabelFallback || (instCount === 1 && c.installment === 'Tek Çekim')
+                                    );
+                                }
+
+                                if (commissionConfig && Number(commissionConfig.rate) > 0) {
+                                    const rate = Number(commissionConfig.rate);
+                                    const commissionAmount = (amount * rate) / 100;
+
+                                    const commTrx = await tx.transaction.create({
+                                        data: {
+                                            companyId: company.id,
+                                            type: 'Expense',
+                                            amount: commissionAmount,
+                                            description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) | REF:${transaction.id}`,
+                                            kasaId: kasaId,
+                                            date: new Date(),
+                                            branch: branch || 'Merkez'
+                                        }
+                                    });
+
+                                    await tx.kasa.update({
+                                        where: { id: kasaId },
+                                        data: { balance: { decrement: commissionAmount } }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Commission mapping error in transaction:', e);
+                }
+            }
+            // --- END POS COMMISSION LOGIC ---
+
             return transaction;
         });
 
@@ -263,6 +326,40 @@ export async function DELETE(request: Request) {
                     await stornoJournalEntry(journal.id, 'Finansal İşlem Silindi');
                 }
             } catch (err) { console.error(err); }
+
+            // 4.5 Reverse & Delete Associated Commission Expenses
+            try {
+                const commissionTrx = await tx.transaction.findFirst({
+                    where: {
+                        description: { contains: `Banka POS Komisyon Gideri` },
+                        AND: { description: { endsWith: `| REF:${id}` } },
+                        companyId: company.id,
+                        deletedAt: null
+                    }
+                });
+
+                if (commissionTrx && commissionTrx.kasaId) {
+                    // Revert Kasa for the expense (increment back)
+                    await tx.kasa.update({
+                        where: { id: commissionTrx.kasaId },
+                        data: { balance: { increment: Number(commissionTrx.amount) } }
+                    });
+
+                    // Storno journal for commission
+                    const commJournal = await tx.journal.findFirst({
+                        where: { sourceId: commissionTrx.id, sourceType: 'Transaction' }
+                    });
+                    if (commJournal) {
+                        await stornoJournalEntry(commJournal.id, 'POS Komisyon İptali');
+                    }
+
+                    // Delete the commission transaction
+                    await tx.transaction.update({
+                        where: { id: commissionTrx.id },
+                        data: { deletedAt: new Date() }
+                    });
+                }
+            } catch (err) { console.error('Commission Reversal Error:', err); }
 
             // 5. Mark Deleted
             return await tx.transaction.update({
