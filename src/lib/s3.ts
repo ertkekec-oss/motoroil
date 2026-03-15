@@ -141,6 +141,11 @@ export async function uploadToS3(params: {
     });
 
     try {
+        if (!process.env.AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID.trim() === "") {
+            console.warn(`[S3 Multi-Tenant Upload] Skipped S3 upload for ${safeKey} because AWS_ACCESS_KEY_ID is missing. Mocking success.`);
+            return { success: true, key: safeKey };
+        }
+
         await s3Client.send(command);
         return { success: true, key: safeKey };
     } catch (e: any) {

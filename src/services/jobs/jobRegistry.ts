@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import { SystemJobDefinition } from './jobRegistryTypes';
 
 // Placeholder imports for module logic

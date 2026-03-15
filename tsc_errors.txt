@@ -1,39 +1,4 @@
-﻿.next/types/validator.ts(6120,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/inventory/boms/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/inventory/boms/[id]">'.
-  Types of property 'GET' are incompatible.
-    Type '(request: Request, context: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; bom: any; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
-      Types of parameters 'context' and 'context' are incompatible.
-        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
-          Types of property 'params' are incompatible.
-            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
-.next/types/validator.ts(6138,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/inventory/manufacturing/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/inventory/manufacturing/[id]">'.
-  Types of property 'GET' are incompatible.
-    Type '(request: Request, context: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; order: any; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
-      Types of parameters 'context' and 'context' are incompatible.
-        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
-          Types of property 'params' are incompatible.
-            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
-.next/types/validator.ts(8136,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/suppliers/[id]/invoice/parse/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/suppliers/[id]/invoice/parse">'.
-  Types of property 'POST' are incompatible.
-    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ success: boolean; error: string; }> | NextResponse<{ success: boolean; parsedData: { invoiceNo: string; date: string; totalAmount: any; items: any[]; }; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
-      Types of parameters '__1' and 'context' are incompatible.
-        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
-          Types of property 'params' are incompatible.
-            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
-.next/types/validator.ts(8145,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/suppliers/[id]/invoice/save/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/suppliers/[id]/invoice/save">'.
-  Types of property 'POST' are incompatible.
-    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<Response>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
-      Types of parameters '__1' and 'context' are incompatible.
-        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
-          Types of property 'params' are incompatible.
-            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
-old_file.tsx(1616,45): error TS2322: Type '{ id: string; checked: boolean; onChange: (e: ChangeEvent<HTMLInputElement>) => void; label: string; description: string; }' is not assignable to type 'IntrinsicAttributes & { checked: boolean; onChange: (e: ChangeEvent<HTMLInputElement>) => void; label?: string; description?: string; className?: string; }'.
-  Property 'id' does not exist on type 'IntrinsicAttributes & { checked: boolean; onChange: (e: ChangeEvent<HTMLInputElement>) => void; label?: string; description?: string; className?: string; }'.
-old_file.tsx(2772,61): error TS2304: Cannot find name 'id'.
-old_file.tsx(2794,41): error TS2304: Cannot find name 'fetchCustomer'.
-old_file_2.tsx(2748,61): error TS2304: Cannot find name 'id'.
-old_file_2.tsx(2770,41): error TS2304: Cannot find name 'fetchCustomer'.
-old_hb.ts(1,74): error TS2307: Cannot find module './types' or its corresponding type declarations.
-scripts/run-sync-route.ts(2,22): error TS2307: Cannot find module './src/app/api/integrations/marketplace/sync/route' or its corresponding type declarations.
+﻿scripts/run-sync-route.ts(2,22): error TS2307: Cannot find module './src/app/api/integrations/marketplace/sync/route' or its corresponding type declarations.
 scripts/test-aws-url.ts(2,38): error TS2307: Cannot find module './src/lib/s3' or its corresponding type declarations.
 scripts/test-despatch.ts(2,39): error TS2307: Cannot find module './src/services/nilveraService' or its corresponding type declarations.
 scripts/test-despatch.ts(3,25): error TS2307: Cannot find module './src/lib/encryption' or its corresponding type declarations.
@@ -62,5 +27,3 @@ scripts/test_tenant_isolation_under_load.ts(24,65): error TS2353: Object literal
 scripts/test_tenant_isolation_under_load.ts(25,65): error TS2353: Object literal may only specify known properties, and 'tenantId' does not exist in type 'CustomerWhereInput'.
 scripts/test_tenant_isolation_under_load.ts(29,43): error TS2339: Property 'tenantId' does not exist on type '{ id: string; companyId: string; branch: string; name: string; deletedAt: Date; createdAt: Date; updatedAt: Date; balance: Decimal; iban: string; phone: string; email: string; ... 17 more ...; locationPinnedAt: Date; }'.
 scripts/test_tenant_isolation_under_load.ts(32,43): error TS2339: Property 'tenantId' does not exist on type '{ id: string; companyId: string; branch: string; name: string; deletedAt: Date; createdAt: Date; updatedAt: Date; balance: Decimal; iban: string; phone: string; email: string; ... 17 more ...; locationPinnedAt: Date; }'.
-src/app/api/suppliers/[id]/invoice/parse/route.ts(19,28): error TS2349: This expression is not callable.
-  Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/node_modules/pdf-parse/dist/pdf-parse/cjs/index")' has no call signatures.

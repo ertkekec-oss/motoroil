@@ -77,7 +77,7 @@ export default function StaffManagementContent() {
 
     function getMonday(d: Date) {
         d = new Date(d);
-        var day = d.getDay(),
+        let day = d.getDay(),
             diff = d.getDate() - day + (day == 0 ? -6 : 1);
         return new Date(d.setDate(diff));
     }

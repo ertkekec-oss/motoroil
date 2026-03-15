@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export async function GET(req: NextRequest) {
     try {
         const plans = await prisma.plan.findMany({
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json(formattedPlans);
 
-    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {  
         console.error('Billing Plans API Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, plan });
 
-    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {  
         console.error('Billing Plans POST Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

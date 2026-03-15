@@ -1,13 +1,31 @@
 import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import pdf from '@/lib/pdf-parse-wrapper';
+import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const session: any = await getSession();
+        if (!session) return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });
+
         const { id } = await params;
+        const companyId = session.companyId || session.tenantId;
+
+        if (!companyId) {
+            return NextResponse.json({ success: false, error: 'Firma kimliği bulunamadı' }, { status: 403 });
+        }
+
+        const supplier = await prisma.supplier.findFirst({
+            where: { id, companyId }
+        });
+
+        if (!supplier) {
+            return NextResponse.json({ success: false, error: 'Yetkisiz işlem veya tedarikçi bulunamadı.' }, { status: 403 });
+        }
+
         const formData = await req.formData();
         const file = formData.get('file') as File;
 

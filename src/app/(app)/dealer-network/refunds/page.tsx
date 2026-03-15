@@ -48,7 +48,7 @@ export default function RefundsPage() {
     useEffect(() => {
         setCursor(null);
         load(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [status]);
 
     return (

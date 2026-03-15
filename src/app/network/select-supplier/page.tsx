@@ -40,7 +40,7 @@ export default function SelectSupplierPage() {
                 await switchMembership(m.id)
             }
         })()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [])
 
     async function switchMembership(membershipId: string) {

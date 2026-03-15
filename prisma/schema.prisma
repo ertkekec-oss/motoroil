@@ -355,7 +355,7 @@ model Product {
   documentName                      String?                  @db.VarChar(1024)
   minStock                          Int                      @default(5)
   brand                             String?
-  type                              String?                  @default("Ürün")
+  type                              String?                  @default("ÃœrÃ¼n")
   branch                            String?                  @default("Merkez")
   salesVat                          Decimal?                 @default(20) @db.Decimal(5, 2)
   salesVatIncluded                  Boolean?                 @default(true)
@@ -363,7 +363,7 @@ model Product {
   purchaseVatIncluded               Boolean?                 @default(true)
   salesOiv                          Decimal?                 @default(0) @db.Decimal(10, 2)
   salesOtv                          Decimal?                 @default(0) @db.Decimal(10, 2)
-  otvType                           String?                  @default("Ö.T.V yok")
+  otvType                           String?                  @default("Ã–.T.V yok")
   gtip                              String?
   purchaseDiscount                  Decimal?                 @default(0) @db.Decimal(5, 2)
   purchaseOtv                       Decimal?                 @default(0) @db.Decimal(10, 2)
@@ -840,7 +840,7 @@ model ServiceRecord {
   vehicleBrand  String?
   vehicleSerial String?
   notes         String?
-  status        String    @default("Tamamlandı")
+  status        String    @default("TamamlandÄ±")
   totalAmount   Decimal   @db.Decimal(10, 2)
   items         Json
   deletedAt     DateTime?
@@ -1052,7 +1052,7 @@ model LoginAttempt {
 model Branch {
   id        Int              @id @default(autoincrement())
   name      String
-  type      String           @default("Şube")
+  type      String           @default("Åube")
   city      String?
   address   String?
   phone     String?
@@ -1106,7 +1106,7 @@ model Staff {
   role                   String?
   branch                 String?                   @default("Merkez")
   type                   String?                   @default("service")
-  status                 String?                   @default("Boşta")
+  status                 String?                   @default("BoÅŸta")
   currentJob             String?
   permissions            String[]                  @default([])
   performance            Int?                      @default(100)
