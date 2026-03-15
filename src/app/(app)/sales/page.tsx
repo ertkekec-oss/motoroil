@@ -351,9 +351,8 @@ export default function SalesPage() {
         description: ''
     });
 
-    const { products: inventoryProducts } = useInventory();
-    const { customers } = useCRM();
-    const { suppliers } = useCRM();
+    const { products: inventoryProducts, refreshProducts } = useInventory();
+    const { customers, refreshSuppliers, suppliers } = useCRM();
 
     const handleSaveWayslip = async () => {
         if (newWayslipData.type === 'Giden' && !newWayslipData.customerId) {
@@ -430,6 +429,11 @@ export default function SalesPage() {
                     showSuccess('Başarılı', successMsg);
                     fetchPurchaseInvoices();
                     if (invoiceSubTab === 'wayslips' || setInvoiceSubTab) fetchWayslips(); // Refresh wayslips as well
+                    
+                    // Force refresh cache on global scale instantly without needing F5
+                    refreshSuppliers();
+                    refreshProducts();
+                    router.refresh();
                 } else { showError('Hata', data.error || 'İşlem başarısız.'); }
             } catch (e) { showError('Hata', 'Bağlantı hatası.'); }
             finally { setIsProcessingAction(null); }
