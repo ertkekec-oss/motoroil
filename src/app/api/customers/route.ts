@@ -41,6 +41,19 @@ export async function GET(request: Request) {
             where.categoryId = { in: assignedCategoryIds };
         }
 
+        // Apply Branch Isolation (Personel İzolasyon)
+        if (isStaff && user.branch && user.branch !== 'all') {
+            const branchCond = user.branch === 'Merkez' 
+                ? { OR: [{ branch: 'Merkez' }, { branch: null }, { branch: '' }] }
+                : { branch: user.branch };
+                
+            if (where.AND) {
+                where.AND.push(branchCond);
+            } else {
+                where.AND = [branchCond];
+            }
+        }
+
         // Optimize: Use select to fetch only necessary fields instead of full include
         const customers = await prisma.customer.findMany({
             where: where,

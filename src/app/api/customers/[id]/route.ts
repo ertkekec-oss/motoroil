@@ -26,6 +26,19 @@ export async function GET(
             where.categoryId = { in: assignedCategoryIds };
         }
 
+        // Apply Branch Isolation (Personel İzolasyon)
+        if (isStaff && session.branch && session.branch !== 'all') {
+            const branchCond = session.branch === 'Merkez' 
+                ? { OR: [{ branch: 'Merkez' }, { branch: null }, { branch: '' }] }
+                : { branch: session.branch };
+                
+            if (where.AND) {
+                where.AND.push(branchCond);
+            } else {
+                where.AND = [branchCond];
+            }
+        }
+
         const customer = await prisma.customer.findFirst({
             where: where,
             include: {
@@ -91,9 +104,29 @@ export async function PUT(
         const companyId = session.companyId;
         const body = await request.json();
 
-        // Verify ownership
+        // Verify ownership and Staff Isolation
+        const isStaff = session.role !== 'ADMIN' && session.role !== 'SUPER_ADMIN';
+        const assignedCategoryIds = session.assignedCategoryIds || [];
+        const whereCond: any = { id, companyId };
+
+        if (isStaff && assignedCategoryIds.length > 0) {
+            whereCond.categoryId = { in: assignedCategoryIds };
+        }
+
+        if (isStaff && session.branch && session.branch !== 'all') {
+            const branchCond = session.branch === 'Merkez' 
+                ? { OR: [{ branch: 'Merkez' }, { branch: null }, { branch: '' }] }
+                : { branch: session.branch };
+                
+            if (whereCond.AND) {
+                whereCond.AND.push(branchCond);
+            } else {
+                whereCond.AND = [branchCond];
+            }
+        }
+
         const oldCustomer = await prisma.customer.findFirst({
-            where: { id, companyId }
+            where: whereCond
         });
         if (!oldCustomer) return NextResponse.json({ success: false, error: 'Müşteri bulunamadı' }, { status: 404 });
 
@@ -161,9 +194,29 @@ export async function DELETE(
         const { id } = await params;
         const companyId = session.companyId;
 
-        // Verify ownership
+        // Verify ownership and Staff Isolation
+        const isStaff = session.role !== 'ADMIN' && session.role !== 'SUPER_ADMIN';
+        const assignedCategoryIds = session.assignedCategoryIds || [];
+        const whereCond: any = { id, companyId };
+
+        if (isStaff && assignedCategoryIds.length > 0) {
+            whereCond.categoryId = { in: assignedCategoryIds };
+        }
+
+        if (isStaff && session.branch && session.branch !== 'all') {
+            const branchCond = session.branch === 'Merkez' 
+                ? { OR: [{ branch: 'Merkez' }, { branch: null }, { branch: '' }] }
+                : { branch: session.branch };
+                
+            if (whereCond.AND) {
+                whereCond.AND.push(branchCond);
+            } else {
+                whereCond.AND = [branchCond];
+            }
+        }
+
         const oldCustomer = await prisma.customer.findFirst({
-            where: { id, companyId }
+            where: whereCond
         });
         if (!oldCustomer) return NextResponse.json({ success: false, error: 'Müşteri bulunamadı' }, { status: 404 });
 

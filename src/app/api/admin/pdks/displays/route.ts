@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 
     try {
         const displays = await prisma.pdksDisplay.findMany({
-            where: { tenantId: effectiveTenantId },
+            where: (!isPlatformAdmin || auth.user.impersonateTenantId) ? { tenantId: effectiveTenantId } : {},
             orderBy: { createdAt: "desc" }
         });
 
@@ -75,15 +75,29 @@ export async function PATCH(req: Request) {
 
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
 
+    const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
+
+    if (!isPlatformAdmin &&
+        auth.user.role?.toLowerCase() !== 'admin' &&
+        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !auth.user.permissions?.includes('staff_manage')) {
+        return NextResponse.json({ success: false, error: "Tablet düzenleme yetkiniz bulunmamaktadır." }, { status: 403 });
+    }
+
     try {
         const { id, announcement, isActive, name } = await req.json();
 
         if (!id) return NextResponse.json({ success: false, error: "ID gerekli" }, { status: 400 });
 
+        const existing = await prisma.pdksDisplay.findUnique({ where: { id } });
+        if (!existing) return NextResponse.json({ success: false, error: "Bulunamadı" }, { status: 404 });
+        if (!isPlatformAdmin && existing.tenantId !== effectiveTenantId && !auth.user.impersonateTenantId) {
+            return NextResponse.json({ success: false, error: "Erişim reddedildi" }, { status: 403 });
+        }
+
         const display = await prisma.pdksDisplay.update({
             where: {
-                id,
-                tenantId: effectiveTenantId
+                id
             },
             data: {
                 announcement,
@@ -104,16 +118,30 @@ export async function DELETE(req: Request) {
 
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
 
+    const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
+
+    if (!isPlatformAdmin &&
+        auth.user.role?.toLowerCase() !== 'admin' &&
+        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !auth.user.permissions?.includes('staff_manage')) {
+        return NextResponse.json({ success: false, error: "Tablet silme yetkiniz bulunmamaktadır." }, { status: 403 });
+    }
+
     try {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
 
         if (!id) return NextResponse.json({ success: false, error: "ID gerekli" }, { status: 400 });
 
+        const existing = await prisma.pdksDisplay.findUnique({ where: { id } });
+        if (!existing) return NextResponse.json({ success: false, error: "Bulunamadı" }, { status: 404 });
+        if (!isPlatformAdmin && existing.tenantId !== effectiveTenantId && !auth.user.impersonateTenantId) {
+            return NextResponse.json({ success: false, error: "Erişim reddedildi" }, { status: 403 });
+        }
+
         await prisma.pdksDisplay.delete({
             where: {
-                id,
-                tenantId: effectiveTenantId
+                id
             }
         });
 

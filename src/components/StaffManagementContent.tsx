@@ -1405,16 +1405,32 @@ export default function StaffManagementContent() {
             )}
 
             {/* --- LEAVE MANAGEMENT TAB (İZİNLER) --- */}
-            {activeTab === 'leaves' && (
+            {activeTab === 'leaves' && (() => {
+                const pendingLeaves = leaves.filter(l => l.status === 'Bekliyor' || l.status === 'Beklemede');
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const activeLeavesToday = leaves.filter(l => {
+                    if (l.status !== 'Onaylandı') return false;
+                    const start = new Date(l.startDate);
+                    start.setHours(0, 0, 0, 0);
+                    const end = new Date(l.endDate);
+                    end.setHours(23, 59, 59, 999);
+                    return start <= today && end >= today;
+                });
+
+                return (
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Aktif İzinliler */}
                         <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-6 flex flex-col justify-between">
                             <h4 className="text-[11px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> BUGÜN İZİNLİLER</h4>
-                            <div className="text-[32px] font-black text-slate-900 dark:text-white mt-3">2 <span className="text-[14px] font-medium text-slate-500 dark:text-slate-400 ml-1">Kişi</span></div>
+                            <div className="text-[32px] font-black text-slate-900 dark:text-white mt-3">{activeLeavesToday.length} <span className="text-[14px] font-medium text-slate-500 dark:text-slate-400 ml-1">Kişi</span></div>
                             <div className="flex -space-x-2 mt-3">
-                                <div className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400">A</div>
-                                <div className="w-7 h-7 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-700 dark:text-slate-300">M</div>
+                                {activeLeavesToday.slice(0, 5).map(l => (
+                                    <div key={l.id} title={l.staff?.name} className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                                        {l.staff?.name?.charAt(0)?.toUpperCase()}
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
@@ -1423,8 +1439,8 @@ export default function StaffManagementContent() {
                             <div className="flex items-center justify-between">
                                 <h4 className="text-[11px] font-bold tracking-widest text-amber-700 flex items-center gap-1.5 uppercase"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div> BEKLEYEN ONAYLAR</h4>
                             </div>
-                            <div className="text-[32px] font-black text-slate-900 dark:text-white mt-3">5 <span className="text-[14px] font-medium text-slate-500 dark:text-slate-400 ml-1">Talep</span></div>
-                            <p className="text-[11px] text-slate-400 font-semibold mt-3">Son talep 2 saat önce geldi.</p>
+                            <div className="text-[32px] font-black text-slate-900 dark:text-white mt-3">{pendingLeaves.length} <span className="text-[14px] font-medium text-slate-500 dark:text-slate-400 ml-1">Talep</span></div>
+                            <p className="text-[11px] text-slate-400 font-semibold mt-3">Yönetici onayı bekliyor.</p>
                         </div>
 
                         {/* Aksiyon */}
@@ -1514,11 +1530,12 @@ export default function StaffManagementContent() {
                                         </tr>
                                     )}
                                 </tbody>
-                            </table>
+                             </table>
                         </div>
                     </div>
                 </div>
-            )}
+                );
+            })()}
 
             {/* --- PAYROLL TAB --- */}
             {/* --- PAYROLL TAB (BORDRO) --- */}

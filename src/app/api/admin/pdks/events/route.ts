@@ -22,9 +22,10 @@ export async function GET(req: Request) {
         const status = searchParams.get("status");
         const mode = searchParams.get("mode");
 
-        const where: any = {
-            tenantId: effectiveTenantId
-        };
+        const where: any = {};
+        if (!isPlatformAdmin || auth.user.impersonateTenantId) {
+            where.tenantId = effectiveTenantId;
+        }
 
         if (status) where.status = status;
         if (mode) where.mode = mode;

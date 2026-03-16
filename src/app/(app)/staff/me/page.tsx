@@ -203,8 +203,81 @@ const DashboardView = ({
     </div>
 );
 
-const LeaveRequestView = () => {
-    const [type, setType] = useState('YILLIK');
+const LeaveRequestView = ({ user }: any) => {
+    const [type, setType] = useState('Yıllık İzin');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [reason, setReason] = useState('');
+    const [leaves, setLeaves] = useState<any[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchLeaves = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch(`/api/staff/leaves?staffId=${user?.id}`);
+            if (res.ok) {
+                const data = await res.json();
+                setLeaves(data);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (user?.id) fetchLeaves();
+    }, [user?.id]);
+
+    const handleSubmit = async () => {
+        if (!startDate || !endDate) {
+            toast.error("Lütfen tarihleri eksiksiz doldurun.");
+            return;
+        }
+        
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (start > end) {
+            toast.error("Başlangıç tarihi bitiş tarihinden sonra olamaz.");
+            return;
+        }
+
+        const diffTime = Math.abs(end.getTime() - start.getTime());
+        const _days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+        setIsSubmitting(true);
+        try {
+            const res = await fetch('/api/staff/leaves', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    staffId: user.id,
+                    type,
+                    startDate,
+                    endDate,
+                    days: _days,
+                    reason
+                })
+            });
+
+            if (res.ok) {
+                toast.success("İzin talebi gönderildi.");
+                setStartDate('');
+                setEndDate('');
+                setReason('');
+                setType('Yıllık İzin');
+                fetchLeaves();
+            } else {
+                toast.error("İzin talebi gönderilemedi.");
+            }
+        } catch (error) {
+            toast.error("İşlem başarısız oldu.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
@@ -217,24 +290,42 @@ const LeaveRequestView = () => {
                             value={type} 
                             onChange={(e) => setType(e.target.value)}
                         >
-                            <option value="YILLIK">Yıllık Ücretli İzin</option>
-                            <option value="MAZARET">Mazeret İzni</option>
-                            <option value="HASTALIK">Hastalık / Sağlık Raporu</option>
+                            <option value="Yıllık İzin">Yıllık Ücretli İzin</option>
+                            <option value="Mazeret İzni">Mazeret İzni</option>
+                            <option value="Sağlık İzni">Hastalık / Sağlık Raporu</option>
+                            <option value="Ücretsiz İzin">Ücretsiz İzin</option>
                         </EnterpriseSelect>
                         
                         <div className="grid grid-cols-2 gap-4">
-                            <EnterpriseInput label="Başlangıç Tarihi" type="date" />
-                            <EnterpriseInput label="Bitiş Tarihi" type="date" />
+                            <EnterpriseInput 
+                                label="Başlangıç Tarihi" 
+                                type="date" 
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                            />
+                            <EnterpriseInput 
+                                label="Bitiş Tarihi" 
+                                type="date" 
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
                         </div>
                         
                         <EnterpriseTextarea 
                             label="Not / Açıklama" 
                             placeholder="İzin nedeninizi kısaca belirtin..." 
                             rows={4}
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
                         />
                         
-                        <EnterpriseButton variant="primary" className="w-full mt-2">
-                            TALEBİ GÖNDER
+                        <EnterpriseButton 
+                            variant="primary" 
+                            className="w-full mt-2"
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? "GÖNDERİLİYOR..." : "TALEBİ GÖNDER"}
                         </EnterpriseButton>
                     </div>
                 </EnterpriseCard>
@@ -255,11 +346,43 @@ const LeaveRequestView = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td colSpan={4} className="px-4 py-12 text-center text-sm font-semibold text-slate-400 bg-slate-50/50 dark:bg-slate-800/20">
-                                            Geçmiş izin talebi kaydı bulunamadı.
-                                        </td>
-                                    </tr>
+                                    {isLoading ? (
+                                        <tr>
+                                            <td colSpan={4} className="px-4 py-8 text-center text-sm font-semibold text-slate-400">
+                                                Yükleniyor...
+                                            </td>
+                                        </tr>
+                                    ) : leaves.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} className="px-4 py-12 text-center text-sm font-semibold text-slate-400 bg-slate-50/50 dark:bg-slate-800/20">
+                                                Geçmiş izin talebi kaydı bulunamadı.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        leaves.map((leave, i) => (
+                                            <tr key={i} className="border-b border-slate-100 dark:border-slate-800/50 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                                <td className="px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                                    {leave.type}
+                                                    <div className="text-[10px] text-slate-400 font-normal mt-0.5">{leave.days} Gün</div>
+                                                </td>
+                                                <td className="px-4 py-3 text-[12px] font-medium text-slate-500">
+                                                    {new Date(leave.startDate).toLocaleDateString('tr-TR')} - {new Date(leave.endDate).toLocaleDateString('tr-TR')}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md ${
+                                                        leave.status === 'Onaylandı' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' :
+                                                        leave.status === 'Reddedildi' ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400' :
+                                                        'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
+                                                    }`}>
+                                                        {leave.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-[12px] font-medium text-slate-500">
+                                                    {leave.approvedBy || '-'}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -490,7 +613,7 @@ export default function PersonelPanel() {
                         onQrScan={onQrScan}
                     />
                 )}
-                {activeTab === 'leave' && <LeaveRequestView />}
+                {activeTab === 'leave' && <LeaveRequestView user={currentUser} />}
                 {activeTab === 'profile' && <ProfileSettingsView user={currentUser} />}
 
             </div>

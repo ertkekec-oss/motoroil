@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         }
 
         const event = await prisma.pdksEvent.update({
-            where: { id: eventId, tenantId: effectiveTenantId },
+            where: { id: eventId },
             data: {
                 status: status as any,
                 notes: notes || undefined

@@ -142,6 +142,41 @@ export async function POST(req: NextRequest) {
             });
         }
 
+        // --- ENTEGRASYON: ANA PDKS (ATTENDANCE) TABLOSUNA İŞLEME ---
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Mevcut bir günlük giriş olup olmadığını kontrol et
+            const existingAttendance = await prisma.attendance.findFirst({
+                where: {
+                    staffId: userId,
+                    date: { gte: today }
+                }
+            });
+
+            if (!existingAttendance) {
+                await prisma.attendance.create({
+                    data: {
+                        staffId: userId,
+                        date: new Date(),
+                        checkIn: new Date(clientTime),
+                        locationIn: mode === "FIELD_GPS" 
+                            ? (location ? `${location.lat}, ${location.lng}` : "Saha Girişi")
+                            : "Ofis QR Girişi",
+                        deviceInfo: deviceFp,
+                        status: status === "PENDING" ? "LATE" : "ON_TIME",
+                        notes: mode === "FIELD_GPS" ? "Saha Girişi (GPS) Üzerinden Otomatik" : "Ofis QR Üzerinden Otomatik"
+                    }
+                });
+            } else if (!existingAttendance.checkOut && status === "APPROVED") {
+                // Eğer zaten bir giriş varsa ve personel tekrar giriş deniyorsa veya
+                // bir çıkış(check-out) mekanizması tetiklenecekse burası doldurulur.
+            }
+        } catch (attErr) {
+            console.error("[PDKS Check-in Attendance Integration Error]:", attErr);
+        }
+
         return NextResponse.json({
             success: true,
             eventId: event.id,
