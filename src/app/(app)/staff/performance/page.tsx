@@ -7,23 +7,23 @@ import { Target, TrendingUp, Award, Zap, Trophy, TrendingDown, Info, ShieldCheck
 export default function StaffPerformanceDashboard() {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any>(null);
+    const [standardTargets, setStandardTargets] = useState<any[]>([]);
 
     useEffect(() => {
         // Fetch current staff's theoretical performance data 
-        fetch('/api/hr/performance/dashboard')
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    setData(res.data);
-                }
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
+        Promise.all([
+            fetch('/api/hr/performance/dashboard').then(r => r.json()),
+            fetch('/api/staff/targets?mine=true').then(r => r.json())
+        ]).then(([hrRes, targetsData]) => {
+            if (hrRes.success) setData(hrRes.data);
+            if (Array.isArray(targetsData)) setStandardTargets(targetsData);
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }, []);
 
     if (loading) return <div className="p-10 text-center text-slate-500 font-medium">Performans verileri yükleniyor...</div>;
 
-    if (!data || !data.assignments || data.assignments.length === 0) {
+    if ((!data || !data.assignments || data.assignments.length === 0) && (!standardTargets || standardTargets.length === 0)) {
         return (
             <EnterprisePageShell
                 title="Sales Performance Engine"
@@ -38,7 +38,7 @@ export default function StaffPerformanceDashboard() {
         );
     }
 
-    const displayData = data;
+    const displayData = data || { stats: { target: 0, actual: 0, achievement: 0, bonus: 0 }, achievements: [], leaderboard: {}, aiSuggested: {} };
 
     return (
         <EnterprisePageShell
@@ -116,41 +116,80 @@ export default function StaffPerformanceDashboard() {
                     </EnterpriseCard>
                 </div>
 
-                {/* AI Targets Area */}
-                <div className="md:col-span-2">
-                    <EnterpriseCard className="h-full">
-                        <EnterpriseSectionHeader title="Periodya AI Hedef Önerileri" subtitle="Geçmiş büyüme frekansınıza göre hesaplanan simülasyon hedefleri." icon={<Info />} />
-
-                        <div className="space-y-4">
-                            <div className="p-4 border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl flex justify-between items-center">
-                                <div>
-                                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase">SAFE (GÜVENLİ)</p>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">%5 Doğal Büyüme</p>
-                                </div>
-                                <span className="text-lg font-bold text-slate-900 dark:text-white">{displayData.aiSuggested.safe}</span>
+                {/* Standard Targets Area */}
+                {standardTargets && standardTargets.length > 0 && (
+                    <div className="md:col-span-4 mt-6">
+                        <EnterpriseCard>
+                            <EnterpriseSectionHeader title="Aktif Operasyonel Hedefler" subtitle="Dönemlik atanmış olan mağaza veya saha operasyon performansı." icon={<Target />} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                {standardTargets.map((t: any) => {
+                                    const progress = t.targetValue > 0 ? Math.min((t.currentValue / t.targetValue) * 100, 100) : 0;
+                                    return (
+                                        <div key={t.id} className="p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900 shadow-sm flex flex-col justify-between">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="font-bold text-[13px] uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                                                    {t.type === 'TURNOVER' ? '💰 CİRO HEDEFİ' : '📍 ZİYARET HEDEFİ'}
+                                                </div>
+                                                <div className="text-[11px] font-bold text-slate-500 uppercase">
+                                                    %{progress.toFixed(0)}
+                                                </div>
+                                            </div>
+                                            <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-3">
+                                                <div className="h-full bg-blue-600 rounded-full transition-all" style={{ width: `${progress}%` }} />
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs font-semibold text-slate-500">
+                                                <span>Gerçekleşen: {t.type === 'TURNOVER' ? `₺${Number(t.currentValue).toLocaleString()}` : `${t.currentValue} Adet`}</span>
+                                                <span className="text-slate-700 dark:text-slate-300 font-black">Hedef: {t.type === 'TURNOVER' ? `₺${Number(t.targetValue).toLocaleString()}` : `${t.targetValue} Adet`}</span>
+                                            </div>
+                                            {t.estimatedBonus > 0 && (
+                                                <div className="mt-2 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 flex justify-center w-full rounded">
+                                                    Tahmini Prim/Bonus: ₺{Number(t.estimatedBonus).toLocaleString()}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
+                        </EnterpriseCard>
+                    </div>
+                )}
+                
+                {data?.assignments?.length > 0 && (
+                    <div className="md:col-span-2">
+                        {/* AI Targets Area */}
+                        <EnterpriseCard className="h-full">
+                            <EnterpriseSectionHeader title="Periodya AI Hedef Önerileri" subtitle="Geçmiş büyüme frekansınıza göre hesaplanan simülasyon hedefleri." icon={<Info />} />
 
-                            <div className="p-4 border border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl flex justify-between items-center">
-                                <div>
-                                    <p className="text-xs font-bold text-blue-600 dark:text-blue-500 uppercase">BALANCED (DENGELİ)</p>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">%12 Dengeli Büyüme</p>
+                            <div className="space-y-4">
+                                <div className="p-4 border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl flex justify-between items-center">
+                                    <div>
+                                        <p className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase">SAFE (GÜVENLİ)</p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">%5 Doğal Büyüme</p>
+                                    </div>
+                                    <span className="text-lg font-bold text-slate-900 dark:text-white">{displayData.aiSuggested.safe}</span>
                                 </div>
-                                <span className="text-lg font-bold text-slate-900 dark:text-white">{displayData.aiSuggested.balanced}</span>
-                            </div>
 
-                            <div className="p-4 border border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-900/10 rounded-xl border-l-4 border-l-rose-500 flex justify-between items-center">
-                                <div>
-                                    <p className="text-xs font-bold text-rose-600 dark:text-rose-500 uppercase flex items-center gap-1">
-                                        <Zap className="w-3 h-3" /> AGGRESSIVE (YIKICI)
-                                    </p>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">%25 Yüksek Perf.</p>
+                                <div className="p-4 border border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl flex justify-between items-center">
+                                    <div>
+                                        <p className="text-xs font-bold text-blue-600 dark:text-blue-500 uppercase">BALANCED (DENGELİ)</p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">%12 Dengeli Büyüme</p>
+                                    </div>
+                                    <span className="text-lg font-bold text-slate-900 dark:text-white">{displayData.aiSuggested.balanced}</span>
                                 </div>
-                                <span className="text-lg font-bold text-slate-900 dark:text-white">{displayData.aiSuggested.aggressive}</span>
-                            </div>
-                        </div>
-                    </EnterpriseCard>
-                </div>
 
+                                <div className="p-4 border border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-900/10 rounded-xl border-l-4 border-l-rose-500 flex justify-between items-center">
+                                    <div>
+                                        <p className="text-xs font-bold text-rose-600 dark:text-rose-500 uppercase flex items-center gap-1">
+                                            <Zap className="w-3 h-3" /> AGGRESSIVE (YIKICI)
+                                        </p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">%25 Yüksek Perf.</p>
+                                    </div>
+                                    <span className="text-lg font-bold text-slate-900 dark:text-white">{displayData.aiSuggested.aggressive}</span>
+                                </div>
+                            </div>
+                        </EnterpriseCard>
+                    </div>
+                )}
             </div>
         </EnterprisePageShell>
     );

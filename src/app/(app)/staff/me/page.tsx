@@ -56,169 +56,198 @@ const DashboardView = ({
     setIsScannerOpen,
     onQrScan,
     pdksStatus,
-    handleCheckout
-}: any) => (
-    <div className="space-y-6 animate-in fade-in duration-500">
-        {/* Top Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#3b82f6">
-                <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Performans Skoru</h4>
-                    <IconActivity className="w-5 h-5 text-blue-500" />
-                </div>
-                <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0.0</p>
-                <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-500/10 w-fit px-2 py-1 rounded">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Hesaplanıyor...
-                </div>
-            </EnterpriseCard>
-
-            <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#8b5cf6">
-                <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Hedef Gerçekleşme</h4>
-                    <IconTrendingUp className="w-5 h-5 text-purple-500" />
-                </div>
-                <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">%0</p>
-                <p className="text-[11px] font-semibold text-slate-400 mt-2">Bu ayki hedefler</p>
-            </EnterpriseCard>
-
-            <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#f59e0b">
-                <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kalan İzin</h4>
-                    <IconClock className="w-5 h-5 text-amber-500" />
-                </div>
-                <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0 <span className="text-lg text-slate-400 font-bold">Gün</span></p>
-                <p className="text-[11px] font-semibold text-slate-400 mt-2">Kullanılabilir bakiye</p>
-            </EnterpriseCard>
-
-            <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#ef4444">
-                <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Aylık Mesai</h4>
-                    <IconZap className="w-5 h-5 text-red-500" />
-                </div>
-                <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">0 <span className="text-lg text-slate-400 font-bold">Saat</span></p>
-                <p className="text-[11px] font-semibold text-slate-400 mt-2">Ekstradan çalışılan süre</p>
-            </EnterpriseCard>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Targets & Performance */}
-            <div className="lg:col-span-2">
-                <EnterpriseCard className="h-full">
-                    <EnterpriseSectionHeader title="Hedefler & Performans" icon="📈" />
-                    <div className="p-6 space-y-8">
-                        <ProgressBar label="Satış Kotası Gerçekleşme" value={0} max={1000000} color="#3b82f6" />
-                        <ProgressBar label="Müşteri Memnuniyeti (NPS)" value={0} max={5} color="#8b5cf6" />
-                        <ProgressBar label="Rota Uyumluluk Oranı" value={0} max={100} color="#10b981" />
-                        <ProgressBar label="Tahsilat Hedefi" value={0} max={600000} color="#f59e0b" />
-                        
-                        <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-700/50">
-                            <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <span className="text-lg">📋</span> Aktif Görevler
-                            </h4>
-                            <div className="text-center text-sm font-semibold text-slate-400 py-6 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
-                                Bekleyen görev bulunmamaktadır.
-                            </div>
-                        </div>
+    handleCheckout,
+    targets = [],
+    statsData,
+    user
+}: any) => {
+    return (
+        <div className="space-y-6 animate-in fade-in duration-500">
+            {/* Top Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#3b82f6">
+                    <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Performans Skoru</h4>
+                        <IconActivity className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.leaderboard?.scoreValue || '0.0'}</p>
+                    <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-500/10 w-fit px-2 py-1 rounded">
+                        Global Sıra: #{statsData?.leaderboard?.rankGlobal || ' -'}
                     </div>
                 </EnterpriseCard>
-            </div>
 
-            {/* Shift & Calendar */}
-            <div>
-                <EnterpriseCard className="h-full">
-                    <EnterpriseSectionHeader title="Vardiya & Çalışma" icon="⏰" />
-                    <div className="p-6 space-y-6">
-                        <div className="p-6 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-center">
-                            <p className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Şu Anki Vardiya</p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{pdksStatus?.staff?.shiftTemplate || 'Belirsiz'}</p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Haftalık Akış</h4>
-                            <div className="text-center text-sm font-semibold text-slate-400 py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
-                                Vardiya planı tanımlanmamış.
-                            </div>
-                        </div>
+                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#8b5cf6">
+                    <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Hedef Gerçekleşme</h4>
+                        <IconTrendingUp className="w-5 h-5 text-purple-500" />
                     </div>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.achievement || '%0'}</p>
+                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Bu ayki hedefler (Matris)</p>
                 </EnterpriseCard>
-            </div>
-        </div>
 
-        {/* Payroll Summary & PDKS */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <EnterpriseCard>
-                <EnterpriseSectionHeader title="Son Bordro Özetleri" icon="🛡️" />
-                <div className="p-6">
-                    <div className="py-12 text-sm font-semibold text-slate-400 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/30">
-                        Geçmiş bordro kaydı bulunamadı.
+                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#f59e0b">
+                    <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kazanılan Prim</h4>
+                        <IconClock className="w-5 h-5 text-amber-500" />
                     </div>
-                </div>
-            </EnterpriseCard>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.bonus || '₺0'}</p>
+                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Dönem biriken tutar</p>
+                </EnterpriseCard>
 
-            <EnterpriseCard>
-                <EnterpriseSectionHeader title="PDKS İşlemleri" icon="⚡" />
-                <div className="p-6 space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        {!pdksStatus?.isWorking ? (
-                            <>
-                                <button
-                                    onClick={handleQrCheckin}
-                                    className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group"
-                                >
-                                    <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
-                                        <span className="text-2xl">📱</span>
-                                    </div>
-                                    <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
-                                </button>
-
-                                <button
-                                    onClick={handleGpsCheckin}
-                                    className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group"
-                                >
-                                    <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
-                                        <span className="text-2xl">📍</span>
-                                    </div>
-                                    <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
-                                </button>
-                            </>
-                        ) : (
-                            <button
-                                onClick={handleCheckout}
-                                className="col-span-2 flex flex-col items-center gap-3 p-6 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group"
-                            >
-                                <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
-                                    <span className="text-2xl">🏁</span>
-                                </div>
-                                <span className="text-[12px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest text-center">MESAİYİ BİTİR (ÇIKIŞ YAP)</span>
-                            </button>
-                        )}
+                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#10b981">
+                    <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Aylık Ziyaretler</h4>
+                        <IconZap className="w-5 h-5 text-emerald-500" />
                     </div>
-
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-                            <div>
-                                <h4 className="text-[10px] font-bold text-slate-500 uppercase leading-none mb-1">Cihaz Durumu</h4>
-                                <p className="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">GÜVENLİ & EŞLEŞMİŞ</p>
-                            </div>
-                        </div>
-                        <button className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:underline bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">Senkronize Et</button>
-                    </div>
-
-                    <p className="text-[10px] text-slate-400 text-center uppercase font-bold tracking-widest opacity-80">
-                        🔒 Loglar uçtan uca şifreli olarak saklanır.
+                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                        {targets?.filter((t: any) => t.type === 'VISIT').reduce((acc: number, t: any) => acc + t.currentValue, 0) || 0} <span className="text-lg text-slate-400 font-bold">Adet</span>
                     </p>
-                </div>
-            </EnterpriseCard>
+                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Saha ziyaretleri toplamı</p>
+                </EnterpriseCard>
+            </div>
 
-            <BarcodeScanner
-                isOpen={isScannerOpen}
-                onClose={() => setIsScannerOpen(false)}
-                onScan={onQrScan}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Targets & Performance */}
+                <div className="lg:col-span-2">
+                    <EnterpriseCard className="h-full">
+                        <EnterpriseSectionHeader title="Hedefler & Performans" icon="📈" />
+                        <div className="p-6 space-y-8">
+                            {(!targets || targets.length === 0) && (!statsData?.assignments || statsData?.assignments?.length === 0) ? (
+                                <div className="text-center text-sm font-semibold text-slate-400 py-6 border border-dashed border-slate-300 dark:border-slate-700/50 rounded-lg">
+                                    Size atanmış aktif bir personel hedefi bulunmamaktadır.
+                                </div>
+                            ) : (
+                                <>
+                                    {targets?.map((t: any) => (
+                                        <ProgressBar 
+                                            key={t.id} 
+                                            label={t.type === 'TURNOVER' ? `💰 Ciro Hedefi (₺${Number(t.targetValue).toLocaleString()})` : `📍 Ziyaret Hedefi (${t.targetValue} Adet)`} 
+                                            value={t.currentValue} 
+                                            max={t.targetValue} 
+                                            color={t.type === 'TURNOVER' ? "#3b82f6" : "#10b981"} 
+                                        />
+                                    ))}
+                                    {statsData?.assignments?.map((ass: any) => (
+                                        <ProgressBar 
+                                            key={ass.id} 
+                                            label={`🎯 Matrix Şirket Hedefi (${ass.period?.name})`} 
+                                            value={ass.performances?.[0]?.actual || 0} 
+                                            max={ass.target} 
+                                            color="#8b5cf6" 
+                                        />
+                                    ))}
+                                </>
+                            )}
+                            
+                            <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                                <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <span className="text-lg">📋</span> Aktif Görevler
+                                </h4>
+                                <div className="text-center text-sm font-semibold text-slate-400 py-6 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
+                                    Bekleyen görev bulunmamaktadır. Lütfen "Görevlerim" sekmesini kontrol edin.
+                                </div>
+                            </div>
+                        </div>
+                    </EnterpriseCard>
+                </div>
+
+                {/* Shift & Calendar */}
+                <div>
+                    <EnterpriseCard className="h-full">
+                        <EnterpriseSectionHeader title="Vardiya & Çalışma" icon="⏰" />
+                        <div className="p-6 space-y-6">
+                            <div className="p-6 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-center">
+                                <p className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Şu Anki Vardiya</p>
+                                <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{pdksStatus?.staff?.shiftTemplate || 'Belirsiz'}</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Haftalık Akış</h4>
+                                <div className="text-center text-sm font-semibold text-slate-400 py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
+                                    Vardiya planı tanımlanmamış.
+                                </div>
+                            </div>
+                        </div>
+                    </EnterpriseCard>
+                </div>
+            </div>
+
+            {/* Payroll Summary & PDKS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <EnterpriseCard>
+                    <EnterpriseSectionHeader title="Son Bordro Özetleri" icon="🛡️" />
+                    <div className="p-6">
+                        <div className="py-12 text-sm font-semibold text-slate-400 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/30">
+                            Geçmiş bordro kaydı bulunamadı.
+                        </div>
+                    </div>
+                </EnterpriseCard>
+
+                <EnterpriseCard>
+                    <EnterpriseSectionHeader title="PDKS İşlemleri" icon="⚡" />
+                    <div className="p-6 space-y-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            {!pdksStatus?.isWorking ? (
+                                <>
+                                    <button
+                                        onClick={handleQrCheckin}
+                                        className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group"
+                                    >
+                                        <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                                            <span className="text-2xl">📱</span>
+                                        </div>
+                                        <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
+                                    </button>
+
+                                    <button
+                                        onClick={handleGpsCheckin}
+                                        className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group"
+                                    >
+                                        <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                                            <span className="text-2xl">📍</span>
+                                        </div>
+                                        <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={handleCheckout}
+                                    className="col-span-2 flex flex-col items-center gap-3 p-6 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group"
+                                >
+                                    <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
+                                        <span className="text-2xl">🏁</span>
+                                    </div>
+                                    <span className="text-[12px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest text-center">MESAİYİ BİTİR (ÇIKIŞ YAP)</span>
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+                                <div>
+                                    <h4 className="text-[10px] font-bold text-slate-500 uppercase leading-none mb-1">Cihaz Durumu</h4>
+                                    <p className="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">GÜVENLİ & EŞLEŞMİŞ</p>
+                                </div>
+                            </div>
+                            <button className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:underline bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">Senkronize Et</button>
+                        </div>
+
+                        <p className="text-[10px] text-slate-400 text-center uppercase font-bold tracking-widest opacity-80">
+                            🔒 Loglar uçtan uca şifreli olarak saklanır.
+                        </p>
+                    </div>
+                </EnterpriseCard>
+
+                <BarcodeScanner
+                    isOpen={isScannerOpen}
+                    onClose={() => setIsScannerOpen(false)}
+                    onScan={onQrScan}
+                />
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const LeaveRequestView = ({ user }: any) => {
     const [type, setType] = useState('Yıllık İzin');
@@ -925,7 +954,7 @@ export default function PersonelPanel() {
                         isScannerOpen={isScannerOpen}
                         setIsScannerOpen={setIsScannerOpen}
                         onQrScan={onQrScan}
-                    />
+                     targets={targets} statsData={statsData} user={currentUser} />
                 )}
                 {activeTab === 'tasks' && <MyTasksView user={currentUser} />}
                 {activeTab === 'leave' && <LeaveRequestView user={currentUser} />}
