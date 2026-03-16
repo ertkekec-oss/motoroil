@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { IconRefresh, IconTrash } from '@/components/icons/PremiumIcons';
 import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle } from 'lucide-react';
 import {
     IconActivity,
