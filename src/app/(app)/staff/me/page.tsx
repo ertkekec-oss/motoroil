@@ -53,7 +53,9 @@ const DashboardView = ({
     handleGpsCheckin,
     isScannerOpen,
     setIsScannerOpen,
-    onQrScan
+    onQrScan,
+    pdksStatus,
+    handleCheckout
 }: any) => (
     <div className="space-y-6 animate-in fade-in duration-500">
         {/* Top Summary */}
@@ -127,7 +129,7 @@ const DashboardView = ({
                     <div className="p-6 space-y-6">
                         <div className="p-6 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-center">
                             <p className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Şu Anki Vardiya</p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Belirsiz</p>
+                            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{pdksStatus?.staff?.shiftTemplate || 'Belirsiz'}</p>
                         </div>
 
                         <div className="space-y-4">
@@ -156,25 +158,39 @@ const DashboardView = ({
                 <EnterpriseSectionHeader title="PDKS İşlemleri" icon="⚡" />
                 <div className="p-6 space-y-6">
                     <div className="grid grid-cols-2 gap-4">
-                        <button
-                            onClick={handleQrCheckin}
-                            className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group"
-                        >
-                            <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
-                                <span className="text-2xl">📱</span>
-                            </div>
-                            <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
-                        </button>
+                        {!pdksStatus?.isWorking ? (
+                            <>
+                                <button
+                                    onClick={handleQrCheckin}
+                                    className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group"
+                                >
+                                    <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                                        <span className="text-2xl">📱</span>
+                                    </div>
+                                    <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
+                                </button>
 
-                        <button
-                            onClick={handleGpsCheckin}
-                            className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group"
-                        >
-                            <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
-                                <span className="text-2xl">📍</span>
-                            </div>
-                            <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
-                        </button>
+                                <button
+                                    onClick={handleGpsCheckin}
+                                    className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group"
+                                >
+                                    <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                                        <span className="text-2xl">📍</span>
+                                    </div>
+                                    <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                onClick={handleCheckout}
+                                className="col-span-2 flex flex-col items-center gap-3 p-6 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group"
+                            >
+                                <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
+                                    <span className="text-2xl">🏁</span>
+                                </div>
+                                <span className="text-[12px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest text-center">MESAİYİ BİTİR (ÇIKIŞ YAP)</span>
+                            </button>
+                        )}
                     </div>
 
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
@@ -447,6 +463,21 @@ export default function PersonelPanel() {
     const [loading, setLoading] = useState(true);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
 
+    const [pdksStatus, setPdksStatus] = useState<any>(null);
+    const [scanMode, setScanMode] = useState<'IN' | 'OUT'>('IN');
+
+    const fetchPdksStatus = async () => {
+        try {
+            const res = await fetch("/api/staff/me/pdks-status");
+            const data = await res.json();
+            if (data.success) {
+                setPdksStatus(data);
+            }
+        } catch (e) {
+            console.error("pdks status failed", e);
+        }
+    };
+
     // PDKS Fonksiyonları
     const getFingerprint = () => {
         return btoa(navigator.userAgent + screen.width + screen.height).slice(0, 32);
@@ -459,7 +490,7 @@ export default function PersonelPanel() {
     const onQrScan = async (token: string) => {
         toast.loading("Konum ve cihaz doğrulanıyor...", { id: "pdks" });
         try {
-            const res = await fetch("/api/v1/pdks/check-in", {
+            const res = await fetch(scanMode === 'IN' ? "/api/v1/pdks/check-in" : "/api/v1/pdks/check-out", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -472,10 +503,12 @@ export default function PersonelPanel() {
             });
             const data = await res.json();
             if (data.success) {
-                toast.success("Mesai Başlatıldı!", { id: "pdks" });
+                toast.success(scanMode === 'IN' ? "Mesai Başlatıldı!" : "Çıkış Yapıldı!", { id: "pdks" });
                 if (data.status === "PENDING") toast.warning("Risk uyarısı: Yönetici onayı bekleniyor.");
+                setIsScannerOpen(false);
+                fetchPdksStatus();
             } else {
-                toast.error(data.error || "Giriş başarısız", { id: "pdks" });
+                toast.error(data.error || "İşlem başarısız", { id: "pdks" });
             }
         } catch (err) {
             toast.error("Bağlantı hatası", { id: "pdks" });
@@ -509,6 +542,7 @@ export default function PersonelPanel() {
                 const data = await res.json();
                 if (data.success) {
                     toast.success("Saha Girişi Yapıldı!", { id: "gps" });
+                    fetchPdksStatus();
                 } else {
                     toast.error(data.error || "Giriş başarısız", { id: "gps" });
                 }
@@ -520,7 +554,52 @@ export default function PersonelPanel() {
         }, { enableHighAccuracy: true });
     };
 
+    const handleCheckout = () => {
+        // Active session how did it check in? GPS or QR? We don't necessarily know exactly which is easier,
+        // let's do a prompt to let them select or just simply do GPS checkout if they clicked this directly.
+        // Or open QR scanner in OUT mode
+        showCheckoutOptions();
+    };
+
+    const showCheckoutOptions = () => {
+        toast((t) => (
+            <div>
+                <p className="font-semibold text-slate-900 mb-3">Çıkış yöntemini seçin:</p>
+                <div className="flex gap-2">
+                    <button onClick={() => { toast.dismiss(t.id); setScanMode('OUT'); setIsScannerOpen(true); }} className="px-3 py-1.5 bg-indigo-500 text-white rounded font-medium text-xs">Ofis Çıkışı (QR)</button>
+                    <button onClick={() => { toast.dismiss(t.id); exactGpsCheckout(); }} className="px-3 py-1.5 bg-emerald-500 text-white rounded font-medium text-xs">Saha Çıkışı (GPS)</button>
+                </div>
+            </div>
+        ), { duration: 10000 });
+    };
+
+    const exactGpsCheckout = () => {
+        if (!navigator.geolocation) return toast.error("Tarayıcınız desteklemiyor.");
+        toast.loading("Konum alınıyor...", { id: "gps_out" });
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const res = await fetch("/api/v1/pdks/check-out", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        mode: "FIELD_GPS",
+                        deviceFp: getFingerprint(),
+                        clientTime: new Date().toISOString(),
+                        location: { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy },
+                        offlineId: uuidv4()
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    toast.success("Çıkış Yapıldı!", { id: "gps_out" });
+                    fetchPdksStatus();
+                } else toast.error(data.error || "Başarısız", { id: "gps_out" });
+            } catch (err) { toast.error("Bağlantı hatası", { id: "gps_out" }); }
+        }, () => toast.error("Konum izni alınamadı", { id: "gps_out" }), { enableHighAccuracy: true });
+    };
+
     useEffect(() => {
+        fetchPdksStatus();
         setTimeout(() => setLoading(false), 800);
     }, []);
 
@@ -553,12 +632,19 @@ export default function PersonelPanel() {
                     <div className="flex items-center gap-6">
                         <div className="flex flex-col items-end px-5 border-r border-slate-200 dark:border-slate-800">
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Mesai Durumu</span>
-                            <span className="text-xs font-black text-emerald-500 mt-0.5 flex items-center gap-1.5 hover:text-emerald-400 transition-colors cursor-default">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                AKTİF ÇALIŞIYOR
-                            </span>
+                            {pdksStatus?.isWorking ? (
+                                <span className="text-xs font-black text-emerald-500 mt-0.5 flex items-center gap-1.5 hover:text-emerald-400 transition-colors cursor-default">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    AKTİF ÇALIŞIYOR
+                                </span>
+                            ) : (
+                                <span className="text-xs font-black text-slate-400 mt-0.5 flex items-center gap-1.5 cursor-default">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                    MESAİDE DEĞİL
+                                </span>
+                            )}
                         </div>
-                        <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" title="Verileri Yenile">
+                        <button onClick={fetchPdksStatus} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" title="Verileri Yenile">
                             <IconRefresh className="w-5 h-5" />
                         </button>
                     </div>

@@ -58,6 +58,35 @@ export async function POST(req: NextRequest) {
             });
         }
 
+        try {
+            const activeAtt = await prisma.attendance.findFirst({
+                where: {
+                    staffId: userId,
+                    checkOut: null
+                },
+                orderBy: { checkIn: 'desc' }
+            });
+
+            if (activeAtt) {
+                const checkOutTime = new Date(clientTime);
+                const diffMs = checkOutTime.getTime() - activeAtt.checkIn.getTime();
+                const workingHours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
+
+                await prisma.attendance.update({
+                    where: { id: activeAtt.id },
+                    data: {
+                        checkOut: checkOutTime,
+                        locationOut: mode === "FIELD_GPS" 
+                            ? (location ? `${location.lat}, ${location.lng}` : "Saha Çıkışı")
+                            : "Ofis QR Çıkışı",
+                        workingHours: workingHours > 0 ? workingHours : 0
+                    }
+                });
+            }
+        } catch (attErr) {
+             console.error("[PDKS Check-out Attendance Integration Error]:", attErr);
+        }
+
         return NextResponse.json({
             success: true,
             eventId: event.id,
