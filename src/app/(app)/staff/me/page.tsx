@@ -712,6 +712,21 @@ export default function PersonelPanel() {
 
     const [pdksStatus, setPdksStatus] = useState<any>(null);
     const [scanMode, setScanMode] = useState<'IN' | 'OUT'>('IN');
+    const [targets, setTargets] = useState<any[]>([]);
+    const [statsData, setStatsData] = useState<any>(null);
+
+    const fetchPerformanceData = async () => {
+        try {
+            const [hrRes, targetsRes] = await Promise.all([
+                fetch('/api/hr/performance/dashboard').then(r => r.json()),
+                fetch('/api/staff/targets?mine=true').then(r => r.json())
+            ]);
+            if (hrRes.success) setStatsData(hrRes.data);
+            if (Array.isArray(targetsRes)) setTargets(targetsRes);
+        } catch (e) {
+            console.error("Perf verisi alınamadı", e);
+        }
+    };
 
     const fetchPdksStatus = async () => {
         try {
@@ -847,6 +862,7 @@ export default function PersonelPanel() {
 
     useEffect(() => {
         fetchPdksStatus();
+        fetchPerformanceData();
         setTimeout(() => setLoading(false), 800);
     }, []);
 
