@@ -113,6 +113,13 @@ function POSContent() {
   // Auto Focus
   useEffect(() => { inputRef.current?.focus(); }, []);
 
+  // Re-fetch customers when branch changes to pick up branch-specific customers
+  useEffect(() => {
+    if (isAuthenticated) {
+        refreshCustomers();
+    }
+  }, [activeBranchName, isAuthenticated]);
+
   // Auto Select Kasa
   useEffect(() => {
     if (!paymentMode || paymentMode === 'account') { setSelectedKasa(''); return; }

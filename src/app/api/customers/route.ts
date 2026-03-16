@@ -41,11 +41,15 @@ export async function GET(request: Request) {
             where.categoryId = { in: assignedCategoryIds };
         }
 
-        // Apply Branch Isolation (Personel İzolasyon)
-        if (isStaff && user.branch && user.branch !== 'all') {
-            const branchCond = user.branch === 'Merkez' 
-                ? { OR: [{ branch: { equals: 'Merkez', mode: 'insensitive' } }, { branch: null }, { branch: '' }] }
-                : { branch: { equals: user.branch, mode: 'insensitive' } };
+        // Apply Branch Isolation / Context
+        // Priority 1: Use active branch from header/context (Manager selection)
+        // Priority 2: Use user's permanent branch (Staff assignment)
+        const effectiveBranch = user.activeBranch || user.branch;
+
+        if (effectiveBranch && effectiveBranch !== 'all' && effectiveBranch !== 'Tümü' && effectiveBranch !== 'Global') {
+            const branchCond = effectiveBranch === 'Merkez' 
+                ? { OR: [{ branch: { equals: 'Merkez', mode: 'insensitive' } }, { branch: null }, { branch: '' }, { branch: 'Global' }, { branch: 'Ortak' }] }
+                : { OR: [{ branch: { equals: effectiveBranch, mode: 'insensitive' } }, { branch: 'Global' }, { branch: 'Ortak' }] };
                 
             if (where.AND) {
                 where.AND.push(branchCond);

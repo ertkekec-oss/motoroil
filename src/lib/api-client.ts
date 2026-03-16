@@ -24,6 +24,14 @@ export const apiFetch = async (url: string, options: any = {}) => {
         headers['x-target-tenant-id'] = tenantId;
     }
 
+    // Inject Active Branch Context if present in localStorage
+    if (typeof window !== 'undefined') {
+        const activeBranch = localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch');
+        if (activeBranch) {
+            headers['x-active-branch'] = decodeURIComponent(activeBranch);
+        }
+    }
+
     return fetch(url, {
         ...options,
         headers

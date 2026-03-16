@@ -130,6 +130,12 @@ export const getSession = async () => {
             }
         }
 
+        // Support for Branch Impersonation or Selection (Used for POS and UI context)
+        const activeBranch = headersList?.get('x-active-branch');
+        if (activeBranch) {
+            session.user.activeBranch = activeBranch;
+        }
+
         return session;
     } catch {
         return null;
