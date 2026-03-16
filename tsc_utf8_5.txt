@@ -1,0 +1,8 @@
+﻿scripts/migrate-merkez.ts(25,16): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'StockWhereInput'.
+scripts/migrate-merkez.ts(33,18): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'StockWhereInput'.
+scripts/migrate-merkez.ts(62,44): error TS2339: Property 'waySlip' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+scripts/migrate-merkez.ts(70,44): error TS2339: Property 'invoice' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/components/StaffManagementContent.tsx(1588,46): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/components/StaffManagementContent.tsx(1590,91): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'number' is not assignable to type 'SetStateAction<string>'.
+src/components/StaffManagementContent.tsx(1686,47): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.

@@ -1,0 +1,9 @@
+﻿src/components/StaffManagementContent.tsx(1280,38): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1281,35): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1282,29): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1283,25): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(1284,21): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(1285,17): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(1286,13): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2461,9): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(2462,5): error TS1109: Expression expected.

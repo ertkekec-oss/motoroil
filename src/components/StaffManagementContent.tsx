@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
-
+import React, { useState, useEffect, useMemo, Fragment } from 'react';
 
 import HrOverviewTab from '@/app/(app)/staff/_components/HrOverviewTab';
 import HrTargetsTab from '@/app/(app)/staff/_components/HrTargetsTab';
@@ -76,6 +75,8 @@ export default function StaffManagementContent() {
     const [newTarget, setNewTarget] = useState({
         staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: '', commissionRate: '', bonusAmount: ''
     });
+
+    const [expandedPdksStaffId, setExpandedPdksStaffId] = useState<string | null>(null);
 
     function getMonday(d: Date) {
         d = new Date(d);
@@ -1564,42 +1565,126 @@ export default function StaffManagementContent() {
 
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden">
                         <div className="p-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-white dark:bg-[#0f172a]">
-                            <h3 className="text-[16px] font-black text-slate-900 dark:text-white flex items-center gap-2"><span>📍</span> Günlük Giriş-Çıkış Takibi</h3>
+                            <h3 className="text-[16px] font-black text-slate-900 dark:text-white flex items-center gap-2"><span>📍</span> PDKS (Personel Devam Kontrol Sistemi) Takibi</h3>
                         </div>
-                        <div className="overflow-x-auto">
+                        <div className="overflow-x-auto pb-10">
                             <table className="w-full text-left">
                                 <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                     <tr>
-                                        <th className="p-4 pl-6 font-bold">Personel</th>
-                                        <th className="p-4 font-bold">Tarih</th>
-                                        <th className="p-4 font-bold">Giriş</th>
-                                        <th className="p-4 font-bold">Çıkış</th>
-                                        <th className="p-4 font-bold">Süre</th>
-                                        <th className="p-4 pr-6 font-bold text-right">Konum</th>
+                                        <th className="p-4 pl-6 font-bold w-12">Detay</th>
+                                        <th className="p-4 font-bold">Personel</th>
+                                        <th className="p-4 font-bold">Aylık Toplam Kayıt</th>
+                                        <th className="p-4 font-bold">Durum</th>
+                                        <th className="p-4 pr-6 font-bold text-right">Aksiyon</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {attendance.length > 0 ? (
-                                        attendance?.map(a => (
-                                            <tr key={a.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[56px]">
-                                                <td className="p-4 pl-6 align-middle font-bold text-slate-900 dark:text-white text-[13px]">{a.staff?.name}</td>
-                                                <td className="p-4 align-middle text-[12px] text-slate-500 dark:text-slate-400 font-medium">{new Date(a.date).toLocaleDateString('tr-TR')}</td>
-                                                <td className="p-4 align-middle font-mono text-emerald-600 font-bold text-[13px]">{new Date(a.checkIn).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</td>
-                                                <td className="p-4 align-middle font-mono text-blue-600 font-bold text-[13px]">{a.checkOut ? new Date(a.checkOut).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-                                                <td className="p-4 align-middle font-black text-slate-900 dark:text-white text-[13px]">{a.workingHours || 0} Sa</td>
-                                                <td className="p-4 pr-6 align-middle text-right text-[11px] text-slate-500 dark:text-slate-400">{a.locationIn || '—'}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={6} className="p-16 text-center">
-                                                <div className="flex flex-col items-center justify-center gap-3">
-                                                    <span className="text-3xl opacity-50">🕑</span>
-                                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Bugün henüz giriş yapan personel yok.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
+                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                    {staff?.map(person => {
+                                        const personLogs = attendance.filter(a => a.staffId === person.id);
+                                        const isWorkingNow = personLogs.some(a => !a.checkOut);
+                                        const isExpanded = expandedPdksStaffId === person.id;
+                                        return (
+                                            <Fragment key={person.id}>
+                                                <tr 
+                                                    onClick={() => setExpandedPdksStaffId(isExpanded ? null : String(person.id))}
+                                                    className={`hover:bg-slate-50 dark:hover:bg-[#1e293b]/70 transition-colors h-[64px] cursor-pointer group select-none ${isExpanded ? 'bg-slate-50/50 dark:bg-[#1e293b]/50' : ''}`}
+                                                >
+                                                    <td className="p-4 pl-6 align-middle">
+                                                        <div className={`w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center transition-transform ${isExpanded ? 'rotate-180 bg-slate-200 text-slate-600' : 'bg-white text-slate-400'}`}>
+                                                            <span className="text-[10px]">▼</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 align-middle font-bold text-slate-900 dark:text-white text-[13px]">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-[12px]">
+                                                                {person.name.charAt(0)}
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-[13px] font-bold">{person.name}</div>
+                                                                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">{person.role}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 align-middle text-[14px] font-black text-slate-700 dark:text-slate-300">
+                                                        {personLogs.length} İşlem
+                                                    </td>
+                                                    <td className="p-4 align-middle">
+                                                        {isWorkingNow ? (
+                                                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-600 border-emerald-200">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> ŞU AN MESAİDE
+                                                            </span>
+                                                        ) : (
+                                                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border inline-flex items-center gap-1.5 bg-slate-50 text-slate-500 border-slate-200">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> DIŞARIDA
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="p-4 pr-6 align-middle text-right">
+                                                        <button 
+                                                            className="text-[11px] font-bold text-blue-600 hover:text-blue-800 uppercase tracking-widest"
+                                                        >
+                                                            {isExpanded ? 'Gizle' : 'Günlük Hareketler'}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                
+                                                {/* Expanded Details Row */}
+                                                {isExpanded && (
+                                                    <tr>
+                                                        <td colSpan={5} className="p-0 border-none bg-slate-50/50 dark:bg-[#0f172a]">
+                                                            <div className="py-6 px-16 border-t border-slate-100 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
+                                                                <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                                                    <span>🕒</span> {person.name} - Son Hareket Geçmişi
+                                                                </h4>
+                                                                {personLogs.length > 0 ? (
+                                                                    <div className="bg-white dark:bg-[#1e293b]/30 border border-slate-200 dark:border-white/5 rounded-xl overflow-hidden shadow-sm">
+                                                                        <table className="w-full text-left text-[12px]">
+                                                                            <thead className="bg-slate-50 dark:bg-[#1e293b]/50 border-b border-slate-100 dark:border-white/5">
+                                                                                <tr>
+                                                                                    <th className="py-3 px-4 font-semibold text-slate-500">Tarih</th>
+                                                                                    <th className="py-3 px-4 font-semibold text-slate-500">Giriş Saati</th>
+                                                                                    <th className="py-3 px-4 font-semibold text-slate-500">Çıkış Saati</th>
+                                                                                    <th className="py-3 px-4 font-semibold text-slate-500">Toplam Süre</th>
+                                                                                    <th className="py-3 px-4 font-semibold text-slate-500">Giriş Konumu / Durum</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                                                                {personLogs.sort((a,b)=>new Date(b.date).getTime() - new Date(a.date).getTime()).map(log => (
+                                                                                    <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-white/5">
+                                                                                        <td className="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">
+                                                                                            {new Date(log.date).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                                                                        </td>
+                                                                                        <td className="py-3 px-4 font-mono font-bold text-emerald-600">
+                                                                                            {new Date(log.checkIn).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                                                                        </td>
+                                                                                        <td className="py-3 px-4 font-mono font-bold text-blue-600">
+                                                                                            {log.checkOut ? new Date(log.checkOut).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : (
+                                                                                                <span className="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md">DEVAM EDİYOR</span>
+                                                                                            )}
+                                                                                        </td>
+                                                                                        <td className="py-3 px-4 font-black text-slate-900 dark:text-white">
+                                                                                            {log.workingHours ? `${log.workingHours} Sa` : '-'}
+                                                                                        </td>
+                                                                                        <td className="py-3 px-4 text-slate-500">
+                                                                                            {log.deviceInfo || log.locationIn || 'Ofis / Geçiş Noktası'}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                ))}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="text-center py-8 text-[12px] font-medium text-slate-400 border border-dashed border-slate-300 dark:border-white/10 rounded-xl">
+                                                                        Bu personelin henüz herhangi bir PDKS kaydı bulunmuyor.
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </Fragment>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>
