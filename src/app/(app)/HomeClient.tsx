@@ -196,9 +196,16 @@ function POSContent() {
 
   // Customer Filter
   const filteredCustomers = useMemo(() => {
-    if (!customerSearch) return (customers || []).slice(0, 20);
-    return (customers || []).filter(c => c.name?.toLowerCase().includes(customerSearch.toLowerCase()));
-  }, [customers, customerSearch]);
+    let list = customers || [];
+    
+    // Şube bazlı filtreleme
+    if (activeBranchName && activeBranchName !== 'Tümü' && activeBranchName !== 'Global') {
+        list = list.filter(c => !c.branch || c.branch === 'Global' || c.branch === 'Ortak' || c.branch === activeBranchName);
+    }
+
+    if (!customerSearch) return list.slice(0, 20);
+    return list.filter(c => c.name?.toLowerCase().includes(customerSearch.toLowerCase()));
+  }, [customers, customerSearch, activeBranchName]);
 
   const addToCart = useCallback((product: any) => {
     setCart(prev => {
