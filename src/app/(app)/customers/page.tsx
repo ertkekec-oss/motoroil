@@ -173,7 +173,7 @@ export default function CustomersPage() {
             if (data.success) {
                 showSuccess("Başarılı", "Müşteri başarıyla güncellendi.");
                 setIsEditModalOpen(false);
-                setEditCustomer({ id: '', name: '', phone: '', email: '', address: '', city: '', district: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '' });
+                setEditCustomer({ id: '', name: '', phone: '', email: '', address: '', city: '', district: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '', branch: '' });
                 window.location.reload();
             } else {
                 showError("Hata", data.error || "Beklenmedik bir hata oluştu.");
@@ -205,7 +205,8 @@ export default function CustomersPage() {
                     contactPerson: (customerToEdit as any).contactPerson || '',
                     iban: (customerToEdit as any).iban || '',
                     customerClass: (customerToEdit as any).customerClass || '',
-                    referredByCode: (customerToEdit as any).referredByCode || ''
+                    referredByCode: (customerToEdit as any).referredByCode || '',
+                    branch: (customerToEdit as any).branch || ''
                 });
                 setIsEditModalOpen(true);
                 window.history.replaceState({}, '', '/customers');
@@ -699,6 +700,7 @@ export default function CustomersPage() {
                             <div className="md:col-span-1">
                                 <label className={`block text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${textLabelClass}`}>Şube <span className="text-red-500">*</span></label>
                                 <select value={newCustomer.branch} onChange={e => setNewCustomer({ ...newCustomer, branch: e.target.value })} className={`w-full px-3 py-2.5 rounded-[8px] text-[13px] border outline-none ${isLight ? 'bg-white border-slate-300 text-slate-800 focus:border-blue-500' : 'bg-[#0f172a] border-slate-700 text-slate-200 focus:border-blue-500'}`}>
+                                    <option value="">-- Şube Seçiniz --</option>
                                     {(branches || []).map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                                 </select>
                             </div>
@@ -783,6 +785,7 @@ export default function CustomersPage() {
                             <div className="md:col-span-1">
                                 <label className={`block text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${textLabelClass}`}>Şube <span className="text-red-500">*</span></label>
                                 <select value={editCustomer.branch || ''} onChange={e => setEditCustomer({ ...editCustomer, branch: e.target.value })} className={`w-full px-3 py-2.5 rounded-[8px] text-[13px] border outline-none ${isLight ? 'bg-white border-slate-300 text-slate-800 focus:border-blue-500' : 'bg-[#0f172a] border-slate-700 text-slate-200 focus:border-blue-500'}`}>
+                                    <option value="">-- Şube Seçiniz --</option>
                                     {(branches || []).map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                                 </select>
                             </div>
