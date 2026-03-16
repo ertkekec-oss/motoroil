@@ -1,0 +1,25 @@
+ORDERS:
+ID | OrderNo | Status | CompanyID | CreatedAt
+cmmt3fexe000ocbaf7ym4kpge | POS-20260316-9843 | İptal Edildi | cmmt2dfu0000eilryobrus9iy | 2026-03-16T11:21:38.643Z
+cmmt3een10008cbafc9jkjq31 | POS-20260316-8151 | Tamamlandı | cmmt2dfu0000eilryobrus9iy | 2026-03-16T11:20:51.614Z
+cmmt2vx3l000pki88g6gj5bw9 | POS-20260316-6908 | İptal Edildi | cmmt2dfu0000eilryobrus9iy | 2026-03-16T11:06:29.074Z
+cmmsgsi0w0002w5991g672qqr | POS-20260316-7776 | Tamamlandı | cmmqvlxis0005ips96a93jf0h | 2026-03-16T00:47:58.017Z
+cmmsg4xxs0002lpzkl1ymq4pz | POS-20260316-2262 | İptal Edildi | cmmqvlxis0005ips96a93jf0h | 2026-03-16T00:29:38.896Z
+cmmsg2sg50002wflwpw20zepv | POS-20260316-2346 | İptal Edildi | cmmqvlxis0005ips96a93jf0h | 2026-03-16T00:27:58.469Z
+cmmse4twb0002k81zyxw76b15 | POS-20260315-1340 | İptal Edildi | cmmqvlxis0005ips96a93jf0h | 2026-03-15T23:33:34.428Z
+cmmse2f7c0002rh11jajcfqh3 | POS-20260315-8048 | İptal Edildi | cmmqvlxis0005ips96a93jf0h | 2026-03-15T23:31:42.073Z
+cmmsdyytu00026o4fuupl9ivd | POS-20260315-0511 | İptal Edildi | cmmqvlxis0005ips96a93jf0h | 2026-03-15T23:29:00.882Z
+cmmsdl2u1000213g3zi31hr4k | POS-20260315-8592 | İptal Edildi | cmmqvlxis0005ips96a93jf0h | 2026-03-15T23:18:12.889Z
+
+TRANSACTIONS:
+ID | Amount | Desc | CompanyID | KasaID | CreatedAt
+cmmt3ffng000ucbafkfxrorau | 472799.65 | POS Satışı (Nakit) - meryem kekec | REF:cmmt3fexe000ocbaf7ym4kpge | cmmt2dfu0000eilryobrus9iy | cmmt2ocx50002gyvzcfv6c0b0 | 2026-03-16T11:21:39.581Z
+cmmt3efd1000ecbafa8bhfky8 | 472799.65 | POS Satışı (Nakit) - Perakende Müşteri | REF:cmmt3een10008cbafc9jkjq31 | cmmt2dfu0000eilryobrus9iy | cmmt2ocx50002gyvzcfv6c0b0 | 2026-03-16T11:20:52.550Z
+cmmt2vxgp000vki88zpnzo6eg | 10690 | POS Satışı (Nakit) - Perakende Müşteri | REF:cmmt2vx3l000pki88g6gj5bw9 | cmmt2dfu0000eilryobrus9iy | cmmt2ocx50002gyvzcfv6c0b0 | 2026-03-16T11:06:29.545Z
+cmmsgsilo0008w599elgo4kzz | 371263.05 | POS Satışı (Cari Hesap) - SEMA SEVİNÇ | REF:cmmsgsi0w0002w5991g672qqr | cmmqvlxis0005ips96a93jf0h | cmmqw1leo0001un02dsv7v1xi | 2026-03-16T00:47:58.764Z
+cmmsg4yil0008lpzkow5sy63e | 371263.05 | POS Satışı (Cari Hesap) - SEMA SEVİNÇ | REF:cmmsg4xxs0002lpzkl1ymq4pz | cmmqvlxis0005ips96a93jf0h | cmmsed6s30002o6w5x0adv59k | 2026-03-16T00:29:39.646Z
+cmmsg2t0u0008wflw333klecf | 371263.05 | POS Satışı (Cari Hesap) - SEMA SEVİNÇ | REF:cmmsg2sg50002wflwpw20zepv | cmmqvlxis0005ips96a93jf0h | cmmqvo91v000614eqas9osvxz | 2026-03-16T00:27:59.215Z
+cmmse4uh70008k81z5w3t89o1 | 371263.05 | POS Satışı (Cari Hesap) - SEMA SEVİNÇ | REF:cmmse4twb0002k81zyxw76b15 | cmmqvlxis0005ips96a93jf0h | cmmqw1leo0001un02dsv7v1xi | 2026-03-15T23:33:35.179Z
+cmmse2fs00008rh118u1qevv1 | 371263.05 | POS Satışı (Cari Hesap) - SEMA SEVİNÇ | REF:cmmse2f7c0002rh11jajcfqh3 | cmmqvlxis0005ips96a93jf0h | cmmqw1leo0001un02dsv7v1xi | 2026-03-15T23:31:42.817Z
+cmmsdyzed00086o4fhlp1nbj0 | 371263.05 | POS Satışı (Cari Hesap) - SEMA SEVİNÇ | REF:cmmsdyytu00026o4fuupl9ivd | cmmqvlxis0005ips96a93jf0h | cmmqw1leo0001un02dsv7v1xi | 2026-03-15T23:29:01.621Z
+cmmsdl3jw000813g3vdjitsxo | 371263.05 | POS Satışı (Nakit) - SEMA SEVİNÇ | REF:cmmsdl2u1000213g3zi31hr4k | cmmqvlxis0005ips96a93jf0h | cmmqvo86d000214eqi0ho3lwh | 2026-03-15T23:18:13.821Z

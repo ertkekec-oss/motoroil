@@ -106,13 +106,19 @@ export async function DELETE(
             });
 
             for (const t of transactions) {
+                let rawData: any = order.rawData || {};
+                if (typeof rawData === 'string') {
+                    try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
+                }
+                const isAccountSale = t.type === 'Sales' && rawData.paymentMode === 'account';
+
                 // Revert Kasa Balance
-                if (t.type === 'Sales' || t.type === 'Collection') {
+                if (!isAccountSale && (t.type === 'Sales' || t.type === 'Collection')) {
                     await tx.kasa.update({
                         where: { id: t.kasaId },
                         data: { balance: { decrement: t.amount } }
                     });
-                } else if (t.type === 'Expense') {
+                } else if (!isAccountSale && t.type === 'Expense') {
                     await tx.kasa.update({
                         where: { id: t.kasaId },
                         data: { balance: { increment: t.amount } }
@@ -121,10 +127,6 @@ export async function DELETE(
 
                 // Revert Customer Balance if it was an 'account' sale
                 if (t.customerId && t.type === 'Sales') {
-                    let rawData: any = order.rawData || {};
-                    if (typeof rawData === 'string') {
-                        try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
-                    }
                     if (rawData.paymentMode === 'account') {
                         await tx.customer.update({
                             where: { id: t.customerId },

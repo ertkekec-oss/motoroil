@@ -306,6 +306,14 @@ export async function POST(request: Request) {
                 }
             });
 
+            // E. Update Kasa Balance
+            // Satış yapıldığında (nakit veya kredi kartı fark etmeksizin POS üzerinden fiilen geçiyorsa) kasanın bakiyesi artmalıdır.
+            if (targetKasaId && effectivePaymentMode !== 'account') {
+                await tx.kasa.update({
+                    where: { id: targetKasaId },
+                    data: { balance: { increment: finalTotal } }
+                });
+            }
             // E. Update Customer Balance
             if (customerId) {
                 const updateData: any = {};

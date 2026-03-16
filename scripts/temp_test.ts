@@ -2,14 +2,27 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    const configs = await prisma.otpProviderConfig.findMany();
-    console.log("OtpProviderConfigs:", configs);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const sales = await prisma.order.findMany({
+        where: {
+            marketplace: 'POS',
+            orderDate: { gte: today }
+        },
+        orderBy: { orderDate: 'desc' },
+        take: 5
+    });
+    console.log("Bugünkü satışlar:", JSON.stringify(sales, null, 2));
 
-    const envs = await prisma.signatureEnvelope.findMany({ take: 3, orderBy: { createdAt: 'desc' }, select: { id: true, tenantId: true, recipients: { select: { phone: true } } }});
-    console.log("Envelopes:", JSON.stringify(envs, null, 2));
-
-    const events = await prisma.signatureAuditEvent.findMany({ take: 5, orderBy: { createdAt: 'desc' }, where: { action: 'OTP_SENT' }});
-    console.log("Recent Audit Events for OTP_SENT:", JSON.stringify(events, null, 2));
+    const transactions = await prisma.transaction.findMany({
+        where: {
+            type: 'Sales',
+            date: { gte: today }
+        },
+        orderBy: { date: 'desc' },
+        take: 5
+    });
+    console.log("Bugünkü Transactionlar:", JSON.stringify(transactions, null, 2));
 }
 
 main().catch(e => console.error(e)).finally(() => prisma.$disconnect());
