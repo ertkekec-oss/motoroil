@@ -5,7 +5,8 @@ import { Staff } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { 
     Search, UserCircle, Briefcase, Calendar, CheckCircle2, 
-    XCircle, FileText, MessageSquare, Flag, Plus
+    XCircle, FileText, MessageSquare, Flag, Plus, LayoutList,
+    Inbox, ListTodo, ShieldCheck, User, Users
 } from 'lucide-react';
 
 interface StaffTask {
@@ -218,7 +219,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
             <div className="lg:col-span-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col h-[600px] lg:h-[calc(100vh-180px)] min-h-[600px] overflow-hidden">
                 <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
                     <h3 className="text-[13px] font-black flex items-center gap-2 mb-3">
-                        <UserCircle className="w-4 h-4 text-blue-600" /> Personel Listesi
+                        <Users className="w-4 h-4 text-blue-600" /> Personel Listesi
                     </h3>
                     <div className="relative">
                         <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -238,7 +239,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                         className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all border ${selectedPerson?.id === 'ALL' ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20' : 'hover:bg-slate-50 dark:hover:bg-white/5 border-transparent'}`}
                     >
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 flex items-center justify-center font-black text-[12px]">📋</div>
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 flex items-center justify-center font-black text-[12px]"><LayoutList className="w-4 h-4" /></div>
                             <div className="text-left">
                                 <div className="text-[12px] font-bold">Tüm Görevler</div>
                                 <div className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Genel Görünüm</div>
@@ -320,7 +321,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                          <div className="p-8 text-center text-slate-400 text-[11px] font-medium">Yükleniyor...</div>
                     ) : paginatedStaffTasks.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-32 opacity-60">
-                            <Briefcase className="w-8 h-8 text-slate-400 mb-2" />
+                            <ListTodo className="w-8 h-8 text-slate-400 mb-2" />
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Görev bulunamadı.</p>
                         </div>
                     ) : (
@@ -339,7 +340,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                                         <Flag className="w-2.5 h-2.5" /> {task.priority}
                                     </span>
                                     <span className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[120px]">
-                                        <UserCircle className="w-3 h-3" /> {task.staff?.name.split(' ')[0]}
+                                        <User className="w-3 h-3" /> {task.staff?.name.split(' ')[0]}
                                     </span>
                                 </div>
                             </button>
@@ -360,7 +361,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
             <div className="lg:col-span-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col h-[600px] lg:h-[calc(100vh-180px)] min-h-[600px] overflow-hidden">
                 {!isCreatingTask && !activeTask ? (
                     <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-[#0f172a] opacity-50">
-                        <Briefcase className="w-16 h-16 text-slate-400 mb-4" />
+                        <Inbox className="w-16 h-16 text-slate-400 mb-4" />
                         <p className="font-bold text-slate-500 uppercase tracking-widest text-[13px]">Detayları görmek için listeden görev seçin.</p>
                     </div>
                 ) : isCreatingTask ? (
@@ -423,7 +424,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                                         </span>
                                     )}
                                     <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-slate-500 bg-white dark:bg-[#0f172a] text-[10px] font-bold uppercase tracking-widest">
-                                        <UserCircle className="w-3 h-3" /> Atanmış: {activeTask?.staff?.name}
+                                        <User className="w-3 h-3" /> Atanmış: {activeTask?.staff?.name}
                                     </span>
                                 </div>
                             </div>
@@ -460,7 +461,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                                         activeTask?.feedbacks?.map((fb: any) => (
                                             <div key={fb.id} className="relative pl-5">
                                                 <div className={`absolute left-[-29px] top-0 w-8 h-8 rounded-full border-[3px] border-slate-50 dark:border-[#0f172a] shadow-sm flex items-center justify-center text-white ${fb.isFromStaff ? 'bg-amber-500' : 'bg-blue-600'}`}>
-                                                    {fb.isFromStaff ? <UserCircle className="w-4 h-4" /> : <Briefcase className="w-4 h-4" />}
+                                                    {fb.isFromStaff ? <User className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
                                                 </div>
                                                 <div className="bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-white/5 p-3 md:p-4 rounded-xl shadow-sm">
                                                     <div className="flex justify-between items-center mb-1.5">

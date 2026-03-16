@@ -1,0 +1,5 @@
+﻿src/app/(app)/staff/_components/HrTasksTab.tsx(217,10): error TS17008: JSX element 'div' has no corresponding closing tag.
+src/app/(app)/staff/_components/HrTasksTab.tsx(486,18): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/app/(app)/staff/_components/HrTasksTab.tsx(488,9): error TS1005: ')' expected.
+src/app/(app)/staff/_components/HrTasksTab.tsx(490,1): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/app/(app)/staff/_components/HrTasksTab.tsx(491,1): error TS1005: '</' expected.

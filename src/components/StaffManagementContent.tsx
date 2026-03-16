@@ -1718,7 +1718,7 @@ export default function StaffManagementContent() {
                             <thead>
                                 <tr className="bg-slate-50 dark:bg-[#1e293b] text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest border-b border-slate-200 dark:border-white/5">
                                     <th className="p-4 pl-6 sticky left-0 bg-slate-50 dark:bg-[#1e293b] z-10 w-[180px] border-r border-slate-200 dark:border-white/5">Personel</th>
-                                    {[...Array(31)]?.map((_, i) => (
+                                    {[...Array(new Date(Number(selectedPeriod.split('-')[0]), Number(selectedPeriod.split('-')[1]), 0).getDate())]?.map((_, i) => (
                                         <th key={i} className="py-4 text-center w-8 border-l border-slate-200 dark:border-white/5/50">{i + 1}</th>
                                     ))}
                                     <th className="p-4 pr-6 text-center border-l border-slate-200 dark:border-white/5">Toplam</th>
