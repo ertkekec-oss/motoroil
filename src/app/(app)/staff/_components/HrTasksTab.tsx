@@ -213,9 +213,9 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
     const paginatedStaffTasks = filteredTasks.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage);
 
     return (
-        <div className="flex flex-col xl:flex-row gap-4 h-[calc(100vh-140px)] min-h-[600px] animate-fade-in text-slate-900 dark:text-white">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-[600px] animate-in fade-in duration-500 text-slate-900 dark:text-white">
             {/* COLUMN 1: AKILLI PERSONEL LİSTESİ */}
-            <div className="w-full xl:w-[280px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm flex flex-col shrink-0 overflow-hidden">
+            <div className="lg:col-span-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col h-[600px] lg:h-[calc(100vh-180px)] min-h-[600px] overflow-hidden">
                 <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
                     <h3 className="text-[13px] font-black flex items-center gap-2 mb-3">
                         <UserCircle className="w-4 h-4 text-blue-600" /> Personel Listesi
@@ -283,7 +283,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
             </div>
 
             {/* COLUMN 2: GÖREV LİSTESİ */}
-            <div className="w-full xl:w-[320px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm flex flex-col shrink-0 overflow-hidden">
+            <div className="lg:col-span-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col h-[600px] lg:h-[calc(100vh-180px)] min-h-[600px] overflow-hidden">
                 <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
                     <div className="flex justify-between items-center mb-3">
                         <div className="truncate pr-2">
@@ -357,7 +357,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
             </div>
 
             {/* COLUMN 3: GÖREV DETAY / FORM */}
-            <div className="flex-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm flex flex-col overflow-hidden">
+            <div className="lg:col-span-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col h-[600px] lg:h-[calc(100vh-180px)] min-h-[600px] overflow-hidden">
                 {!isCreatingTask && !activeTask ? (
                     <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-[#0f172a] opacity-50">
                         <Briefcase className="w-16 h-16 text-slate-400 mb-4" />
