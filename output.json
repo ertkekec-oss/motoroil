@@ -1,0 +1,19 @@
+[
+  {
+    "id": "cmmseww12000112cc7wd1xghv",
+    "title": "Vadeli Satış: Test User",
+    "totalAmount": "1000",
+    "installmentCount": 3,
+    "startDate": "2026-03-15T00:00:00.000Z",
+    "description": "Test Desc",
+    "type": "Açık Hesap",
+    "status": "Active",
+    "branch": "Merkez",
+    "createdAt": "2026-03-15T23:55:23.558Z",
+    "updatedAt": "2026-03-15T23:55:23.558Z",
+    "customerId": "cmmr307fg0002cv3qj2shhsaa",
+    "direction": "IN",
+    "supplierId": null,
+    "companyId": "cmmqvlxis0005ips96a93jf0h"
+  }
+]

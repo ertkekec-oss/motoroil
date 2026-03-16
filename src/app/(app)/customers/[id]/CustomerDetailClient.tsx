@@ -228,6 +228,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [isConverting, setIsConverting] = useState(false);
+    const [proformaOrderIds, setProformaOrderIds] = useState<string[]>([]);
+    const [formalOrderIds, setFormalOrderIds] = useState<string[]>([]);
 
     // Invoice Share State
     const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -239,28 +241,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [targetKasaId, setTargetKasaId] = useState('');
     const [isProcessingCollection, setIsProcessingCollection] = useState(false);
 
-    // PLAN MODAL STATE
-    const [showPlanModal, setShowPlanModal] = useState(false);
-    const [planData, setPlanData] = useState({
-        title: '', totalAmount: '', installmentCount: '3', startDate: new Date().toISOString().split('T')[0],
-        type: 'Kredi', direction: 'IN', customerId: '', supplierId: '', isExisting: true, description: ''
-    });
-
-    const handleOpenPlanModal = (item: any) => {
-        setPlanData({
-            title: item.desc || 'Vadeli Satış Planı',
-            totalAmount: formatCurrencyInput(Math.abs(item.amount).toFixed(2).replace('.', ',')),
-            installmentCount: '3',
-            startDate: new Date().toISOString().split('T')[0],
-            type: 'Açık Hesap',
-            direction: 'IN', // Müşteri için
-            customerId: customer.id,
-            supplierId: '',
-            isExisting: true, // Default: Mevcut bakiyeden
-            description: item.orderId || item.id
-        });
-        setShowPlanModal(true);
-    };
+    // REMOVED DEAD PLAN MODAL CODE
 
     const handleSavePlan = async () => {
         if (!planData.title || !planData.totalAmount || !planData.installmentCount) return;
@@ -713,7 +694,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             if (data.success) {
                 if (invoiceData.isInstallment) {
                     try {
-                        await fetch('/api/financials/payment-plans', {
+                        const ppRes = await fetch('/api/financials/payment-plans', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -729,10 +710,23 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 description: data.invoice?.id || selectedOrder?.id || ''
                             })
                         });
-                        setVadelenenIds(prev => [...prev, data.invoice?.id, selectedOrder?.id].filter(Boolean) as string[]);
-                    } catch (e) {
+                        const ppData = await ppRes.json();
+                        if (ppData.success) {
+                            setVadelenenIds(prev => [...prev, data.invoice?.id, selectedOrder?.id].filter(Boolean) as string[]);
+                        } else {
+                            showError('Vadelendirme Hatası', ppData.error || 'Vadelendirme sırasında bilinmeyen bir hata oluştu');
+                        }
+                    } catch (e: any) {
                         console.error('Payment plan auto-creation failed', e);
+                        showError('Bağlantı Hatası', 'Vadelendirme servisine ulaşılamadı. Fatura oluşturuldu ancak vadelendirme eksik.');
                     }
+                }
+
+                // OPTIMISTIC UI UPDATES
+                if (!invoiceData.isFormal) {
+                    setProformaOrderIds(prev => [...prev, selectedOrder.id]);
+                } else {
+                    setFormalOrderIds(prev => [...prev, selectedOrder.id]);
                 }
 
                 // If it's formal, we need to call the "formal-send" action
@@ -1679,15 +1673,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
                                                                 {item.orderId && (
                                                                     (() => {
-                                                                        const hasInvoice = item.isFormal || invoicedOrderIds.includes(item.orderId);
-                                                                        const isReallyFormal = item.realIsFormal || invoicedOrderIds.includes(item.orderId);
-                                                                        const isProforma = ['Proforma', 'Taslak'].includes(item.linkedInvoiceStatus);
-                                                                        const statusLabel = isProforma ? 'Taslak (Proforma)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'İrsaliye' : 'Faturalandı');
-                                                                        const statusIcon = isProforma ? '📝' : (item.linkedInvoiceStatus === 'İrsaliye' ? '🚚' : '✅');
-                                                                        const statusColor = isProforma ? '#f59e0b' : (item.linkedInvoiceStatus === 'İrsaliye' ? '#8b5cf6' : '#10b981');
-                                                                        const statusBg = isProforma ? 'rgba(245, 158, 11, 0.1)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)');
+                                                                        const hasInvoice = item.isFormal || invoicedOrderIds.includes(item.orderId) || formalOrderIds.includes(item.orderId);
+                                                                        const isReallyFormal = item.realIsFormal || invoicedOrderIds.includes(item.orderId) || formalOrderIds.includes(item.orderId);
+                                                                        const isProforma = ['Proforma', 'Taslak'].includes(item.linkedInvoiceStatus) || proformaOrderIds.includes(item.orderId);
+                                                                        const statusLabel = isProforma && !isReallyFormal ? 'Taslak (Proforma)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'İrsaliye' : 'Faturalandı');
+                                                                        const statusIcon = isProforma && !isReallyFormal ? '📝' : (item.linkedInvoiceStatus === 'İrsaliye' ? '🚚' : '✅');
+                                                                        const statusColor = isProforma && !isReallyFormal ? '#f59e0b' : (item.linkedInvoiceStatus === 'İrsaliye' ? '#8b5cf6' : '#10b981');
+                                                                        const statusBg = isProforma && !isReallyFormal ? 'rgba(245, 158, 11, 0.1)' : (item.linkedInvoiceStatus === 'İrsaliye' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)');
                                                                         
-                                                                        const isVadelendi = vadelenenIds.includes(item.orderId) || customer?.paymentPlans?.some((p: any) => p.description === item.orderId || p.description === item.id || (item.formalInvoiceId && p.description === item.formalInvoiceId));
+                                                                        const isVadelendi = vadelenenIds.includes(item.orderId) || customer?.paymentPlans?.some((p: any) => (p.description === item.orderId || p.description === item.id || (item.formalInvoiceId && p.description === item.formalInvoiceId)) && p.status !== 'İptal' && p.status !== 'Cancelled');
                                                                         const vadelendiBadge = isVadelendi ? (
                                                                             <span style={{
                                                                                 padding: '6px 10px',
@@ -1794,7 +1788,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         {(item.type === 'Fatura' || item.type === 'İrsaliye') && (
                                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
                                                                 {(() => {
-                                                                    const isVadelendi = vadelenenIds.includes(item.id) || customer?.paymentPlans?.some((p: any) => p.description === item.id || (item.orderId && p.description === item.orderId));
+                                                                    const isVadelendi = vadelenenIds.includes(item.id) || customer?.paymentPlans?.some((p: any) => (p.description === item.id || (item.orderId && p.description === item.orderId)) && p.status !== 'İptal' && p.status !== 'Cancelled');
                                                                     if (isVadelendi) {
                                                                         return (
                                                                             <span style={{
@@ -3198,104 +3192,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 )
             }
 
-            {/* PLAN MODAL */}
-            {
-                showPlanModal && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[4000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-lg p-0 overflow-hidden animate-in zoom-in-95 duration-200 shadow-2xl border-amber-500/30 ring-1 ring-amber-500/10">
-                            <div className="px-8 py-6 border-b border-amber-500/10 dark:border-amber-500/10 flex justify-between items-center bg-gradient-to-br from-amber-500/10 to-amber-600/5">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                                    <span className="p-2 bg-amber-500 text-white rounded-xl text-lg shadow-[0_4px_12px_rgba(245,158,11,0.4)]">📅</span>
-                                    Vadeli Satış Planı Oluştur
-                                </h3>
-                                <button
-                                    onClick={() => setShowPlanModal(false)}
-                                    className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 flex items-center justify-center text-xl transition-colors shrink-0"
-                                >
-                                    &times;
-                                </button>
-                            </div>
-                            
-                            <div className="p-8 flex flex-col gap-5 bg-white dark:bg-slate-900">
-                                <div>
-                                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">ÖDEME PLANI BAŞLIĞI</label>
-                                    <input
-                                        value={planData.title}
-                                        onChange={e => setPlanData({ ...planData, title: e.target.value })}
-                                        className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div className="md:col-span-2">
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TOPLAM TUTAR (₺)</label>
-                                        <input
-                                            type="text"
-                                            value={planData.totalAmount}
-                                            onChange={e => setPlanData({ ...planData, totalAmount: formatCurrencyInput(e.target.value) })}
-                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-black text-base font-mono outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TÜR</label>
-                                        <select
-                                            value={planData.type}
-                                            onChange={e => setPlanData({ ...planData, type: e.target.value })}
-                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
-                                        >
-                                            <option value="Açık Hesap">Açık Hesap</option>
-                                            <option value="Çek">Çek Alınacak</option>
-                                            <option value="Senet">Senet (Periodya İmza)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">TAKSİT / VADE SAYISI</label>
-                                        <select
-                                            value={planData.installmentCount}
-                                            onChange={e => setPlanData({ ...planData, installmentCount: e.target.value })}
-                                            className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
-                                        >
-                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">PLANI BAŞLATMA TARİHİ</label>
-                                    <input
-                                        type="date"
-                                        value={planData.startDate}
-                                        onChange={e => setPlanData({ ...planData, startDate: e.target.value })}
-                                        className="w-full p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl font-bold text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all [color-scheme:light_dark]"
-                                    />
-                                </div>
-
-                                <div className="p-4 bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-xl mt-2">
-                                    <label className="flex items-center gap-3 text-sm text-amber-600 dark:text-amber-500 cursor-pointer font-bold select-none cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={planData.isExisting}
-                                            onChange={e => setPlanData({ ...planData, isExisting: e.target.checked })}
-                                            className="w-5 h-5 rounded accent-amber-500 cursor-pointer"
-                                        />
-                                        <span>Mevcut Bakiyeden Dönüştür (Re-Scheduling)</span>
-                                    </label>
-                                    <div className="text-xs text-amber-600/70 dark:text-amber-500/70 mt-2 ml-8 font-medium leading-relaxed">
-                                        Bu seçenek aktifken cari hesap bakiyesine ekstra borç eklenmez, işlemi mevcut açık risk üzerinden planlar.
-                                    </div>
-                                </div>
-
-                                <button
-                                    onClick={handleSavePlan}
-                                    className="mt-4 w-full p-4 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white font-black text-sm tracking-wide border-none shadow-[0_8px_24px_rgba(245,158,11,0.3)] hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 uppercase"
-                                >
-                                    <span>✅</span> ÖDEME PLANINI OLUŞTUR
-                                </button>
-                            </div>
-                        </EnterpriseCard>
-                    </div>
-                )
-            }
-
-            {/* STATEMENT MODAL */}
+            {/* MODAL REMOVED */}
             <StatementModal
                 isOpen={statementOpen}
                 onClose={() => setStatementOpen(false)}

@@ -1,0 +1,2 @@
+Found fetch in: src\app\(app)\customers\[id]\CustomerDetailClient.tsx
+Found fetch in: src\app\(app)\reports\page.tsx

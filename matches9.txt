@@ -1,0 +1,66 @@
+Line 299: const [completedIds, setCompletedIds] = useState<string[]>([]);
+Line 300: 
+Line 301: const handleReturnTransaction = (id: string, type: string) => {
+Line 302: showConfirm("İade/İptal Onayı", "Bu işlemi iptal etmek ve iade almak istediğinize emin misiniz?\n\nBu işlem:\n• Stokları geri yükler\n• Bakiyeyi günceller\n• Kasa işlemini tersine çevirir", async () => {
+Line 303: setProcessingIds(prev => [...prev, id]);
+Line 304: try {
+Line 305: const endpoint = type === 'Satış' ? `/api/orders/${id}` : `/api/financials/transactions?id=${id}`;
+Line 306: const res = await fetch(endpoint, { method: 'DELETE' });
+Line 307: const data = await res.json();
+Line 308: if (data.success) {
+Line 309: showSuccess("Başarılı", "İşlem iade alındı/iptal edildi.");
+Line 310: setCompletedIds(prev => [...prev, id]);
+Line 311: // Don't refresh immediately to show locked state
+Line 312: // router.refresh();
+Line 313: } else {
+Line 314: showError("Hata", data.error || "İşlem yapılamadı.");
+Line 315: }
+Line 316: } catch (e) {
+Line 317: showError("Hata", "Bağlantı hatası.");
+Line 318: } finally {
+Line 319: setProcessingIds(prev => prev.filter(pid => pid !== id));
+Line 320: }
+Line 1761: e.stopPropagation();
+Line 1762: if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
+Line 1763: handleReturnTransaction(item.id, item.type);
+Line 1764: }
+Line 1765: }}
+Line 1766: disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
+Line 1767: style={{
+Line 1768: padding: '6px 12px',
+Line 1769: background: completedIds.includes(item.id) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+Line 1770: color: completedIds.includes(item.id) ? 'var(--text-muted, #666)' : '#ef4444',
+Line 1771: border: completedIds.includes(item.id) ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(239, 68, 68, 0.3)',
+Line 1772: borderRadius: '8px',
+Line 1773: fontSize: '11px',
+Line 1774: fontWeight: '800',
+Line 1775: cursor: completedIds.includes(item.id) ? 'default' : 'pointer',
+Line 1776: whiteSpace: 'nowrap',
+Line 1777: opacity: processingIds.includes(item.id) ? 0.5 : 1,
+Line 1778: display: 'inline-flex', alignItems: 'center', gap: '6px',
+Line 1779: transition: 'all 0.2s'
+Line 1780: }}
+Line 1781: className={!completedIds.includes(item.id) && !processingIds.includes(item.id) ? "hover:bg-red-500 hover:text-white" : ""}
+Line 1782: title="İşlemi İade Al / İptal Et"
+Line 1864: e.stopPropagation();
+Line 1865: if (!completedIds.includes(item.id) && !processingIds.includes(item.id) && item.status !== 'İptal Edildi' && item.desc?.indexOf('İptal') === -1) {
+Line 1866: handleReturnTransaction(item.id, item.type);
+Line 1867: }
+Line 1868: }}
+Line 1869: disabled={completedIds.includes(item.id) || processingIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1}
+Line 1870: style={{
+Line 1871: padding: '6px 12px',
+Line 1872: background: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+Line 1873: color: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? 'var(--text-muted, #666)' : '#ef4444',
+Line 1874: border: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(239, 68, 68, 0.3)',
+Line 1875: borderRadius: '8px',
+Line 1876: fontSize: '11px',
+Line 1877: fontWeight: '800',
+Line 1878: cursor: (completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) ? 'default' : 'pointer',
+Line 1879: whiteSpace: 'nowrap',
+Line 1880: opacity: processingIds.includes(item.id) ? 0.5 : 1,
+Line 1881: display: 'inline-flex', alignItems: 'center', gap: '6px',
+Line 1882: transition: 'all 0.2s'
+Line 1883: }}
+Line 1884: className={!(completedIds.includes(item.id) || item.status === 'İptal Edildi' || item.desc?.indexOf('İptal') !== -1) && !processingIds.includes(item.id) ? "hover:bg-red-500 hover:text-white" : ""}
+Line 1885: title="İşlemi İade Al / İptal Et"

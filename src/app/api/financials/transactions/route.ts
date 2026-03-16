@@ -150,21 +150,31 @@ export async function POST(request: Request) {
                                 let instLabelRaw = 'Tek Çekim';
                                 const match = description.match(/\(Kredi Kartı - ([^\)]+)\)/);
                                 if (match && match[1]) {
-                                    instLabelRaw = match[1].trim(); 
+                                    instLabelRaw = String(match[1].trim());
                                 }
-
                                 const instCount = parseInt(instLabelRaw) || 1;
                                 const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
 
-                                let commissionConfig;
-                                if (instLabelRaw !== 'Tek Çekim') {
-                                    commissionConfig = salesExpenses.posCommissions.find((c: any) => c.installment === instLabelRaw);
-                                }
-                                if (!commissionConfig) {
-                                    commissionConfig = salesExpenses.posCommissions.find((c: any) =>
-                                        c.installment === instLabelFallback || (instCount === 1 && c.installment === 'Tek Çekim')
-                                    );
-                                }
+                                const lookups = [
+                                    instLabelRaw.toLowerCase().trim(),
+                                    instLabelFallback.toLowerCase().trim(),
+                                    (instCount === 1 ? 'tek çekim' : ''),
+                                    (instCount === 1 ? 'nakit' : ''),
+                                    (instCount === 1 ? 'peşin' : '')
+                                ].filter(Boolean);
+
+                                let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
+                                    if (!c || typeof c !== 'object') return false;
+                                    const configLabel = String(c.installment || '').toLowerCase().trim();
+                                    const configNum = parseInt(configLabel.replace(/\D/g, ''), 10);
+
+                                    if (lookups.includes(configLabel)) return true;
+                                    if (instCount > 1 && !isNaN(configNum) && configNum === instCount) return true;
+                                    if (instCount === 1) {
+                                        return ['tek', 'tek çekim', 'peşin', 'nakit', '1', '1 taksit'].includes(configLabel);
+                                    }
+                                    return false;
+                                });
 
                                 if (commissionConfig && Number(commissionConfig.rate) > 0) {
                                     const rate = Number(commissionConfig.rate);

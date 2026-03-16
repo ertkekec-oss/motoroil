@@ -1,0 +1,5 @@
+Line 434: const handleOpenInvoicing = async (orderId: string) => {
+Line 566: console.error("handleOpenInvoicing failed:", e);
+Line 1714: onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+Line 1740: onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+Line 1806: onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}

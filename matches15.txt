@@ -1,0 +1,6 @@
+Line 273: showSuccess("Başarılı", `${activeCheck.type.includes('Alınan') ? 'Tahsilat' : 'Ödeme'} işlemi tamamlandı.`);
+Line 789: if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider' || item.type === 'Vadelendirme';
+Line 989: <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
+Line 1859: {(item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider') && (
+Line 2739: <span className="text-base font-bold text-amber-600 dark:text-amber-500">2. Eski Tahsilatı İptal Et & Tümünü Vadelendir</span>
+Line 3133: {activeCheck.type.includes('Alınan') ? 'Tahsilat Onayı' : 'Ödeme Çıkış Onayı'}

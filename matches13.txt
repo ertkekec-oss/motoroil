@@ -1,0 +1,1 @@
+Line 304: const endpoint = type === 'Satış' ? `/api/orders/${id}` : `/api/financials/transactions?id=${id}`;

@@ -1,0 +1,5 @@
+Line 2172: <select id="inv_installment_type" defaultValue="Açık Hesap" className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white">
+Line 2546: installmentType: (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap',
+Line 2556: const instType = (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap';
+Line 2586: installmentType: (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap',
+Line 2596: const instType = (document.getElementById('inv_installment_type') as HTMLSelectElement)?.value || 'Açık Hesap';

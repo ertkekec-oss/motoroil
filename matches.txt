@@ -1,0 +1,15 @@
+Line 344: showConfirm("Vadelendirme İptali", "Bu vadelendirme planını iptal etmek istediğinize emin misiniz?\n\nNot: Bu işlem taksitleri iptal eder ancak önceden alınmış fatura veya siparişi geri almaz.", async () => {
+Line 350: showSuccess("Başarılı", "Vadelendirme planı iptal edildi.");
+Line 795: if (activeTab === 'sales') return item.type === 'Fatura' || item.type === 'Satış' || item.type === 'İrsaliye' || item.type === 'Vadelendirme';
+Line 796: if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider' || item.type === 'Vadelendirme';
+Line 1499: <span style={{ fontSize: '20px' }}>📅</span> Taksit & Vadelendirme Planları
+Line 1504: <div style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '600' }}>Aktif vadelendirme planı bulunmuyor.</div>
+Line 1541: title="Vadelendirmeyi İptal Et"
+Line 1897: {item.type === 'Vadelendirme' && (
+Line 1922: title="Vadelendirme Planını İptal Et"
+Line 2681: <span className="text-2xl">💼</span> Vadelendirme Seçimi
+Line 2697: Eğer bu işleme yinede vade yapmak istiyorsanız Vadelendir&apos;e basarak önceki tahsilatı iptal edip tüm bakiyeyi vadelendirebilirsiniz.
+Line 2734: <span className="text-base font-bold text-blue-600 dark:text-blue-500">1. Sadece Kalanı Vadelendir</span>
+Line 2735: <span className="text-sm text-slate-500 dark:text-slate-400">Sadece yeni eklenen/kalan tutar ({installmentPrompt.difference?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
+Line 2746: <span className="text-base font-bold text-amber-600 dark:text-amber-500">2. Eski Tahsilatı İptal Et & Tümünü Vadelendir</span>
+Line 2747: <span className="text-sm text-slate-500 dark:text-slate-400">Önceki tahsilat iptal edilecek ve tüm tutar ({installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
