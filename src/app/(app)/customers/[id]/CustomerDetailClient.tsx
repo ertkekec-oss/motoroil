@@ -243,27 +243,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
     // REMOVED DEAD PLAN MODAL CODE
 
-    const handleSavePlan = async () => {
-        if (!planData.title || !planData.totalAmount || !planData.installmentCount) return;
-
-        try {
-            const res = await fetch('/api/financials/payment-plans', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...planData, totalAmount: parseCurrencyToFloat(planData.totalAmount), branch: 'Merkez' })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess('Başarılı', 'Ödeme planı oluşturuldu.');
-                setShowPlanModal(false);
-                setVadelenenIds(prev => [...prev, planData.description]);
-                refreshTransactions(); // Refresh history
-                router.refresh(); // Fetch updated customer payment plans from the server
-            } else {
-                showError('Hata', data.error || 'Plan oluşturulamadı');
-            }
-        } catch (e) { showError('Hata', 'İşlem sırasında hata oluştu'); }
-    };
+    // REMOVED DEAD PLAN MODAL CODE
 
     const handleExecuteCheckCollect = async () => {
         if (!activeCheck || !targetKasaId) return;

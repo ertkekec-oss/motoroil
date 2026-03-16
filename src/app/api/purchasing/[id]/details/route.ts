@@ -65,13 +65,41 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
         }
 
         const data = result.data;
-        let items = [];
+        let items: any[] = [];
         
-        if (data.EDespatch?.DespatchLines) items = data.EDespatch.DespatchLines;
-        else if (data.DespatchLines) items = data.DespatchLines;
-        else if (data.InvoiceLines) items = data.InvoiceLines;
-        else if (data.Model?.DespatchLines) items = data.Model.DespatchLines;
-        else if (data.Model?.InvoiceLines) items = data.Model.InvoiceLines;
+        let nilveraLines = [];
+        if (data.EDespatch?.DespatchLines) nilveraLines = data.EDespatch.DespatchLines;
+        else if (data.DespatchLines) nilveraLines = data.DespatchLines;
+        else if (data.InvoiceLines) nilveraLines = data.InvoiceLines;
+        else if (data.Model?.DespatchLines) nilveraLines = data.Model.DespatchLines;
+        else if (data.Model?.InvoiceLines) nilveraLines = data.Model.InvoiceLines;
+
+        // Map and check DB
+        for (const line of nilveraLines) {
+            const productName = line.Name || line.Description || "Bilinmeyen Ürün";
+            const productCode = line.SellerItemCode || line.BuyerItemCode || line.ItemCode || line.Name || productName;
+            const buyPrice = Number(line.UnitPrice || line.Price || line.Amount || 0);
+
+            const product = await prisma.product.findFirst({
+                where: {
+                    companyId,
+                    OR: [
+                        { code: String(productCode) },
+                        { name: String(productName) }
+                    ]
+                }
+            });
+
+            items.push({
+                productName,
+                productCode,
+                buyPrice,
+                vatRate: Number(line.VatRate || line.KDVPercent || line.TaxPercent || 0),
+                qty: Number(line.Quantity || line.InvoicedQuantity || line.DeliveredQuantity || 0),
+                isNew: !product,
+                productId: product?.id || null
+            });
+        }
         
         return NextResponse.json({ success: true, items });
     } catch (e: any) {

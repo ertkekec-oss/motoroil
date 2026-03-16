@@ -11,7 +11,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         const { id } = await context.params;
         const body = await request.json().catch(() => ({}));
-        let { skipStockUpdate = false, skipFinanceUpdate = false } = body;
+        let { skipStockUpdate = false, skipFinanceUpdate = false, pricingConfig = {} } = body;
         const companyId = session.user?.companyId || (session as any).companyId;
         let relatedDespatches: string[] = [];
 
@@ -213,14 +213,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
                     if (!product) {
                         console.log(`[PurchaseApprove] Product not found, creating: ${productName} (${productCode})`);
+                        const defaultPrice = Number(line.UnitPrice || line.Price || 0);
+                        const assignedPrice = pricingConfig[productCode] !== undefined 
+                            ? Number(pricingConfig[productCode]) 
+                            : defaultPrice;
+
                         product = await prisma.product.create({
                             data: {
                                 companyId,
                                 name: String(productName),
                                 code: String(productCode),
                                 stock: 0,
-                                buyPrice: Number(line.UnitPrice || line.Price || 0),
-                                price: Number(line.UnitPrice || line.Price || 0), // Default sales price to buy price
+                                buyPrice: defaultPrice,
+                                price: assignedPrice, // User assigned sales price or default to buy price
                                 unit: line.UnitType || line.UnitCode || "Adet"
                             }
                         });

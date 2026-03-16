@@ -19,6 +19,7 @@ import { InvoicesTab } from '@/components/sales/InvoicesTab';
 import { InvoiceMappingModal } from '@/components/sales/InvoiceMappingModal';
 import { NewWayslipModal } from '@/components/sales/NewWayslipModal';
 import { DespatchModal } from '@/components/sales/DespatchModal';
+import { IncomingInvoicePricingModal } from '@/components/sales/IncomingInvoicePricingModal';
 
 export default function SalesPage() {
     const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
@@ -66,6 +67,8 @@ export default function SalesPage() {
     const [isLoadingPurchaseInvoices, setIsLoadingPurchaseInvoices] = useState(false);
     const [wayslips, setWayslips] = useState<any[]>([]);
     const [isLoadingWayslips, setIsLoadingWayslips] = useState(false);
+
+    const [incomingPricingData, setIncomingPricingData] = useState<any>({ isOpen: false, invoiceId: '', documentType: 'INVOICE', newItems: [], skipStock: false, skipFinance: false });
 
     const handleDeleteInvoice = async (id: string, isFormal?: boolean) => {
         const warningMessage = isFormal 
@@ -413,31 +416,61 @@ export default function SalesPage() {
 
             setIsProcessingAction(id);
             try {
-                const res = await apiFetch(`/api/purchasing/${id}/approve`, { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ skipStockUpdate: skipStock, skipFinanceUpdate: skipFinance })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    let successMsg = '✅ Belge başarıyla işlendi.';
-                    // If the backend detected it automatically, data.message might have more info, 
-                    // or we just trust the backend logic
-                    if (data.autoSkippedStock) successMsg += ' (Stoklar atlandı, sadece Cari Kayıt yapıldı)';
-                    else if (skipFinance && isDespatch) successMsg += ' (Stoklar eklendi, Cari Kayıt atlandı)';
+                // PREFLIGHT: Check if there are NEW products missing from DB
+                const preflightRes = await apiFetch(`/api/purchasing/${id}/details?type=${documentType}`);
+                const preflightData = await preflightRes.json();
+                
+                let newItems = [];
+                if (preflightData.success && preflightData.items) {
+                    newItems = preflightData.items.filter((item: any) => item.isNew);
+                }
 
-                    showSuccess('Başarılı', successMsg);
-                    fetchPurchaseInvoices();
-                    if (invoiceSubTab === 'wayslips' || setInvoiceSubTab) fetchWayslips(); // Refresh wayslips as well
-                    
-                    // Force refresh cache on global scale instantly without needing F5
-                    refreshSuppliers();
-                    refreshProducts();
-                    router.refresh();
-                } else { showError('Hata', data.error || 'İşlem başarısız.'); }
-            } catch (e) { showError('Hata', 'Bağlantı hatası.'); }
-            finally { setIsProcessingAction(null); }
+                if (newItems.length > 0) {
+                    setIncomingPricingData({
+                        isOpen: true,
+                        invoiceId: id,
+                        documentType,
+                        newItems,
+                        skipStock,
+                        skipFinance
+                    });
+                    setIsProcessingAction(null);
+                    return; // Stop here, wait for modal
+                }
+
+                await confirmPurchaseInvoiceWithPricing(id, skipStock, skipFinance, {});
+            } catch (e) { 
+                showError('Hata', 'Ön kontrol sırasında bağlantı hatası oluştu.'); 
+                setIsProcessingAction(null);
+            }
         });
+    };
+
+    const confirmPurchaseInvoiceWithPricing = async (id: string, skipStock: boolean, skipFinance: boolean, pricingConfig: Record<string, number>) => {
+        setIsProcessingAction(id);
+        try {
+            const res = await apiFetch(`/api/purchasing/${id}/approve`, { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ skipStockUpdate: skipStock, skipFinanceUpdate: skipFinance, pricingConfig })
+            });
+            const data = await res.json();
+            if (data.success) {
+                let successMsg = '✅ Belge başarıyla işlendi.';
+                if (data.autoSkippedStock) successMsg += ' (Stoklar atlandı, sadece Cari Kayıt yapıldı)';
+                else if (skipFinance && skipStock === false) successMsg += ' (Stoklar eklendi, Cari Kayıt atlandı)';
+
+                showSuccess('Başarılı', successMsg);
+                fetchPurchaseInvoices();
+                if (invoiceSubTab === 'wayslips' || setInvoiceSubTab) fetchWayslips();
+                
+                refreshSuppliers();
+                refreshProducts();
+                router.refresh();
+                setIncomingPricingData(prev => ({ ...prev, isOpen: false }));
+            } else { showError('Hata', data.error || 'İşlem başarısız.'); }
+        } catch (e) { showError('Hata', 'Bağlantı hatası.'); }
+        finally { setIsProcessingAction(null); }
     };
 
     const handleRejectPurchaseInvoice = async (id: string) => {
@@ -1032,6 +1065,23 @@ export default function SalesPage() {
                     </div>
                 )}
             </div>
+            
+            <IncomingInvoicePricingModal
+                isOpen={incomingPricingData.isOpen}
+                onClose={() => setIncomingPricingData(prev => ({ ...prev, isOpen: false }))}
+                invoiceId={incomingPricingData.invoiceId}
+                documentType={incomingPricingData.documentType}
+                newItems={incomingPricingData.newItems}
+                posTheme={theme}
+                onConfirm={async (pricingConfig) => {
+                    await confirmPurchaseInvoiceWithPricing(
+                        incomingPricingData.invoiceId, 
+                        incomingPricingData.skipStock, 
+                        incomingPricingData.skipFinance, 
+                        pricingConfig
+                    );
+                }}
+            />
         </div>
     );
 }
