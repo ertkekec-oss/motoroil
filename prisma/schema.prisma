@@ -1162,6 +1162,7 @@ model Staff {
   documents              StaffDocument[]
   targets                StaffTarget[]
   targetAssignments      TargetAssignment[]
+  tasks                  StaffTask[]
 
   @@index([tenantId])
   @@index([companyId])
@@ -1180,6 +1181,46 @@ model Message {
 
   @@index([senderId])
   @@index([receiverId])
+}
+
+model StaffTask {
+  id          String   @id @default(cuid())
+  staffId     String
+  tenantId    String
+  companyId   String?
+  title       String
+  description String?
+  status      String   @default("Bekliyor") // Bekliyor, Devam Ediyor, Tamamlandı, İptal, İncelemede
+  priority    String   @default("Orta") // Düşük, Orta, Yüksek, Kritik
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  staff       Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  feedbacks   StaffTaskFeedback[]
+
+  @@index([staffId])
+  @@index([tenantId])
+  @@index([companyId])
+}
+
+model StaffTaskFeedback {
+  id          String   @id @default(cuid())
+  taskId      String
+  tenantId    String
+  companyId   String?
+  content     String
+  fileKey     String?
+  fileName    String?
+  isFromStaff Boolean  @default(true) // true: personelin yorumu/cevabı, false: yöneticinin yorumu/cevabı
+  createdAt   DateTime @default(now())
+
+  task        StaffTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([tenantId])
+  @@index([companyId])
 }
 
 model StaffDocument {
