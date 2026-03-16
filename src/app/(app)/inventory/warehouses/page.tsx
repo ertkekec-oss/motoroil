@@ -1,0 +1,293 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
+import { useApp } from "@/contexts/AppContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useModal } from "@/contexts/ModalContext";
+import { formatCurrency } from "@/lib/utils";
+import {
+  Package,
+  Layers,
+  ArrowRightLeft,
+  Search,
+  CheckCircle2,
+  Box,
+  MapPin,
+  TrendingUp,
+  History,
+  AlertCircle
+} from "lucide-react";
+import InventoryTransferModal from "../components/InventoryTransferModal";
+
+export default function WarehouseManagementPage() {
+  const { theme } = useTheme();
+  const { hasPermission, branches, currentUser } = useApp();
+  const { showSuccess, showError } = useModal();
+  const isLight = theme === "light";
+
+  const [products, setProducts] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedBranch, setSelectedBranch] = useState<string>("Tümü");
+
+  // Transfer Modal
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [transferData, setTransferData] = useState({
+    productId: 0,
+    from: "Merkez",
+    to: "Kadıköy",
+    qty: 0,
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/products");
+      const data = await res.json();
+      if (data.success) {
+         setProducts(data.products);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const approveTransferDirectly = async (data: any) => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      const res = await fetch("/api/inventory/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (result.success) {
+        showSuccess("Transfer Başarılı", "Ürün transferi başarıyla gerçekleştirildi.");
+        fetchProducts();
+      } else {
+        showError("Transfer Başarısız", result.error || "Bilinmeyen hata");
+      }
+    } catch (error) {
+      showError("Hata", "Transfer işlemi sırasında bir hata oluştu.");
+    } finally {
+      setIsProcessing(false);
+      setShowTransferModal(false);
+    }
+  };
+
+  const getBranchStock = (product: any, branchName: string) => {
+    if (!product.stocks || !Array.isArray(product.stocks)) return 0;
+    if (branchName === "Tümü") {
+      return product.stocks.reduce((acc: number, s: any) => acc + (s.quantity || 0), 0);
+    }
+    const entry = product.stocks.find((s: any) => s.branch === branchName);
+    return entry ? entry.quantity || 0 : 0;
+  };
+
+  // UI Class Generators
+  const cardClass = isLight ? "bg-white border border-slate-200 shadow-sm" : "bg-slate-900 border border-slate-800";
+  const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
+  const textValueClass = isLight ? "text-slate-900" : "text-white";
+  const inputClass = isLight
+    ? "h-[40px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
+    : "h-[40px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
+
+  const totalBranches = branches?.length || 0;
+  
+  // Calculate analytics
+  const branchAnalytics = useMemo(() => {
+    if (!products) return {};
+    const analytics: any = { "Tümü": { totalQuantity: 0, totalValue: 0 } };
+    
+    products.forEach(p => {
+        const globalQty = getBranchStock(p, "Tümü");
+        analytics["Tümü"].totalQuantity += globalQty;
+        analytics["Tümü"].totalValue += globalQty * (p.price || 0);
+
+        if (p.stocks) {
+            p.stocks.forEach((s: any) => {
+                if (!analytics[s.branch]) analytics[s.branch] = { totalQuantity: 0, totalValue: 0 };
+                analytics[s.branch].totalQuantity += (s.quantity || 0);
+                analytics[s.branch].totalValue += (s.quantity || 0) * (p.price || 0);
+            });
+        }
+    });
+    return analytics;
+  }, [products]);
+
+  const displayProducts = products
+    .filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()) || p.code?.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(p => {
+       const qty = getBranchStock(p, selectedBranch);
+       return qty > 0 || selectedBranch === "Tümü"; // If filtering by branch, only show items that have stock in it (or all if "Tümü")
+    })
+    .sort((a,b) => getBranchStock(b, selectedBranch) - getBranchStock(a, selectedBranch));
+
+  return (
+    <div data-pos-theme={theme} className={`w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans ${isLight ? "bg-[#FAFAFA]" : ""}`}>
+      {/* HEADER */}
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          <h1 className={`text-[24px] font-semibold tracking-tight flex items-center gap-3 ${textValueClass}`}>
+             <Layers className="w-6 h-6 text-indigo-500" /> Depo ve Stok Yönetimi
+          </h1>
+          <p className={`text-[13px] mt-1 font-medium ${textLabelClass}`}>
+            Şubeler arası stokları izleyin, depo transferlerini gerçekleştirin ve envanteri yönetin.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowTransferModal(true)}
+            className={`h-[40px] px-5 flex items-center gap-2 rounded-[12px] font-medium text-[13px] transition-all shadow-sm ${isLight ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-indigo-600 text-white hover:bg-indigo-500"}`}
+          >
+            <ArrowRightLeft className="w-4 h-4" />
+            Depolar Arası Transfer
+          </button>
+        </div>
+      </div>
+
+      {/* KPI Banner */}
+      <div className={`flex rounded-[14px] border overflow-hidden ${cardClass}`}>
+        <div className={`flex-1 p-5 border-r ${isLight ? "border-slate-200" : "border-slate-800"}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <MapPin className={`w-4 h-4 ${isLight ? "text-indigo-500" : "text-indigo-400"}`} />
+            <span className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Toplam Şube/Depo</span>
+          </div>
+          <div className={`text-[28px] font-semibold tracking-tight ${textValueClass}`}>{totalBranches}</div>
+        </div>
+        <div className={`flex-1 p-5 border-r ${isLight ? "border-slate-200" : "border-slate-800"}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <Package className={`w-4 h-4 text-emerald-500`} />
+            <span className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Aktif Toplam Stok</span>
+          </div>
+          <div className={`text-[28px] font-semibold tracking-tight text-emerald-500`}>{branchAnalytics["Tümü"]?.totalQuantity || 0} Adet</div>
+        </div>
+        <div className={`flex-1 p-5 border-r ${isLight ? "border-slate-200" : "border-slate-800"}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className={`w-4 h-4 text-blue-500`} />
+            <span className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Envanter Satış Değeri</span>
+          </div>
+          <div className={`text-[28px] font-semibold tracking-tight text-blue-500`}>{formatCurrency(branchAnalytics["Tümü"]?.totalValue || 0)}</div>
+        </div>
+      </div>
+
+      <div className="flex gap-6">
+          {/* LEFT SIDEBAR - WAREHOUSE LIST */}
+          <div className="w-[300px] flex-shrink-0 space-y-4">
+              <h3 className={`text-[14px] font-bold uppercase tracking-wider ${textLabelClass}`}>Filtrele</h3>
+              <div className={`rounded-[14px] border overflow-hidden flex flex-col ${cardClass}`}>
+                 <button 
+                    onClick={() => setSelectedBranch("Tümü")}
+                    className={`w-full text-left p-4 flex flex-col border-b last:border-0 transition-colors ${selectedBranch === "Tümü" ? (isLight ? "bg-indigo-50 border-l-4 border-l-indigo-500" : "bg-indigo-900/20 border-l-4 border-l-indigo-500") : (isLight ? "hover:bg-slate-50" : "hover:bg-slate-800/50")} ${isLight ? "border-slate-100" : "border-slate-800"}`}
+                 >
+                     <span className={`text-[14px] font-bold ${selectedBranch === "Tümü" ? "text-indigo-600 dark:text-indigo-400" : textValueClass}`}>Tüm Depolar (Genel)</span>
+                     <span className={`text-[12px] font-medium mt-1 ${textLabelClass}`}>Toplam: {branchAnalytics["Tümü"]?.totalQuantity || 0} Adet</span>
+                 </button>
+                 {branches?.map(b => (
+                     <button 
+                        key={b.name}
+                        onClick={() => setSelectedBranch(b.name)}
+                        className={`w-full text-left p-4 flex flex-col border-b last:border-0 transition-colors ${selectedBranch === b.name ? (isLight ? "bg-indigo-50 border-l-4 border-l-indigo-500" : "bg-indigo-900/20 border-l-4 border-l-indigo-500") : (isLight ? "hover:bg-slate-50" : "hover:bg-slate-800/50")} ${isLight ? "border-slate-100" : "border-slate-800"}`}
+                     >
+                        <span className={`text-[14px] font-bold ${selectedBranch === b.name ? "text-indigo-600 dark:text-indigo-400" : textValueClass}`}>{b.name} Şubesi</span>
+                        <span className={`text-[12px] font-medium mt-1 ${textLabelClass}`}>Toplam: {branchAnalytics[b.name]?.totalQuantity || 0} Adet</span>
+                     </button>
+                 ))}
+              </div>
+          </div>
+
+          {/* RIGHT SIDE - STOCK LIST */}
+          <div className="flex-1 space-y-4">
+             <div className="flex items-center gap-4">
+                <div className="relative flex-1 max-w-[500px]">
+                <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? "text-slate-400" : "text-slate-500"}`} />
+                <input
+                    type="text"
+                    placeholder="Stok Kodu veya Ürün adı ile depo içi arama..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={`w-full pl-[38px] ${inputClass}`}
+                />
+                </div>
+            </div>
+
+            {isLoading ? (
+                <div className="py-20 text-center">Yükleniyor...</div>
+            ) : displayProducts.length === 0 ? (
+                <div className={`flex flex-col items-center justify-center py-20 rounded-[14px] border border-dashed ${cardClass}`}>
+                <Box className={`w-12 h-12 mb-4 opacity-20 ${textLabelClass}`} />
+                <h3 className={`text-[16px] font-semibold ${textValueClass}`}>Depo Boş veya Kayıt Bulunamadı</h3>
+                <p className={`text-[13px] mt-1 ${textLabelClass}`}>Seçili depoda mevcut stok kaydı bulunmamaktadır.</p>
+                </div>
+            ) : (
+                <div className={`rounded-[14px] border overflow-hidden ${cardClass}`}>
+                <div className="overflow-x-auto custom-scroll max-h-[calc(100vh-320px)]">
+                    <table className="w-full text-left border-collapse relative">
+                    <thead className="sticky top-0 z-10 backdrop-blur-md">
+                        <tr className={isLight ? "bg-slate-50/90 border-b border-slate-200" : "bg-slate-900/90 border-b border-slate-800"}>
+                        <th className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Stok Kodu / Barkod</th>
+                        <th className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Ürün Adı</th>
+                        <th className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Kategori</th>
+                        <th className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Bulunduğu Depo(lar)</th>
+                        <th className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-right ${textLabelClass}`}>Sahip Olunan Stok</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                        {displayProducts.map((p) => {
+                           const qtyInSelected = getBranchStock(p, selectedBranch);
+                           
+                           return (
+                        <tr key={p.id} className={`transition-colors ${isLight ? "hover:bg-slate-50" : "hover:bg-slate-800/50"}`}>
+                            <td className="px-5 py-3">
+                            <div className={`text-[12px] font-bold ${textValueClass}`}>{p.code || p.productCode}</div>
+                            <div className={`text-[11px] mt-0.5 ${textLabelClass}`}>{p.barcode || "-"}</div>
+                            </td>
+                            <td className="px-5 py-3">
+                              <div className={`text-[13px] font-semibold ${textValueClass}`}>{p.name}</div>
+                            </td>
+                            <td className="px-5 py-3">
+                               <span className={`inline-flex px-2 py-0.5 rounded-[6px] text-[10px] font-bold uppercase ${isLight ? "bg-slate-100 text-slate-600" : "bg-slate-800 text-slate-300"}`}>{p.category}</span>
+                            </td>
+                            <td className="px-5 py-3">
+                              <div className="flex flex-wrap gap-1">
+                                  {p.stocks?.filter((s:any) => s.quantity > 0).map((s:any) => (
+                                      <span key={s.id} className={`inline-flex items-center px-1.5 py-0.5 border rounded-[4px] text-[10px] font-semibold ${selectedBranch === s.branch ? "border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10" : "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400"}`}>
+                                           {s.branch}: {s.quantity}
+                                      </span>
+                                  ))}
+                              </div>
+                            </td>
+                            <td className="px-5 py-3 text-right">
+                               <div className={`text-[15px] font-black ${qtyInSelected <= 0 ? "text-red-500" : qtyInSelected < 10 ? "text-amber-500" : "text-emerald-500"}`}>{qtyInSelected} Adet</div>
+                            </td>
+                        </tr>
+                        )})}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            )}
+          </div>
+      </div>
+
+      <InventoryTransferModal
+          isOpen={showTransferModal}
+          onClose={() => setShowTransferModal(false)}
+          products={products}
+          filteredProducts={products}
+          onTransfer={approveTransferDirectly}
+          isProcessing={isProcessing}
+          branches={branches?.map(b => b.name) || ["Merkez", "Kadıköy"]}
+          isSystemAdmin={true} // Simplify logic for now
+      />
+    </div>
+  );
+}
