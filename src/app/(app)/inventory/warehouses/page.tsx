@@ -181,6 +181,33 @@ export default function WarehouseManagementPage() {
                         <span className={`text-[12px] font-medium mt-1 ${textLabelClass}`}>Toplam: {branchAnalytics[b.name]?.totalQuantity || 0} Adet</span>
                      </button>
                  ))}
+                 
+                 {/* Migration Button if Merkez exists */}
+                 {branchAnalytics["Merkez"]?.totalQuantity > 0 && (
+                     <button 
+                        onClick={async () => {
+                           const btn = document.getElementById('migrate-merkez-btn');
+                           if(btn) btn.innerHTML = 'Taşınıyor... Bekleyin';
+                           try {
+                               const r = await fetch('/api/public/migrate-merkez?secret=periodya_migrate_123');
+                               const data = await r.json();
+                               if (data.success) {
+                                   fetchProducts();
+                                   if(btn) btn.innerHTML = 'Taşıma Başarılı! (✓)';
+                                   setTimeout(() => { if(btn) btn.style.display = 'none'; }, 2000);
+                               } else {
+                                   if(btn) btn.innerHTML = 'Hata: ' + (data.error || 'Bilinmiyor');
+                               }
+                           } catch (e: any) {
+                               if(btn) btn.innerHTML = 'Hata: Bağlantı sorunu';
+                           }
+                        }}
+                        id="migrate-merkez-btn"
+                        className={`w-full text-center p-3 flex flex-col items-center justify-center transition-colors bg-red-50 hover:bg-red-100 border-t border-red-200 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:border-red-900`}
+                     >
+                        <span className="text-[12px] font-bold text-red-600 dark:text-red-400">Hayalet (Merkez) Stoklarını Taşı</span>
+                     </button>
+                 )}
               </div>
           </div>
 
