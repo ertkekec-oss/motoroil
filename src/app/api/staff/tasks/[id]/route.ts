@@ -14,15 +14,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
             updateData.status = data.status;
             if (data.status === 'Tamamlandı') {
                 updateData.completedAt = new Date();
-                
-                // Fetch to see who staff was, and set their status back if this was their active job
-                const task = await prisma.staffTask.findUnique({ where: { id }});
-                if (task) {
-                    await prisma.staff.update({
-                        where: { id: task.staffId },
-                        data: { currentJob: null, status: 'Boşta' }
-                    });
-                }
             }
         }
         if (data.priority) updateData.priority = data.priority;

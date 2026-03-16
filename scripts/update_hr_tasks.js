@@ -1,4 +1,6 @@
-"use client";
+const fs = require('fs');
+
+const tsxContent = `"use client";
 
 import React, { useState, useEffect } from 'react';
 import { Staff } from '@/contexts/AppContext';
@@ -141,7 +143,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
     const handleUpdateTaskStatus = async (taskId: string, newStatus: string) => {
         setIsUpdating(true);
         try {
-            const res = await fetch(`/api/staff/tasks/${taskId}`, {
+            const res = await fetch(\`/api/staff/tasks/\${taskId}\`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
@@ -165,7 +167,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
 
         setIsUpdating(true);
         try {
-            const res = await fetch(`/api/staff/tasks/${activeTask.id}/feedback`, {
+            const res = await fetch(\`/api/staff/tasks/\${activeTask.id}/feedback\`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -235,7 +237,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                 <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
                     <button
                         onClick={() => { setSelectedPerson({ id: 'ALL', name: 'Tüm Görevler', role: 'Genel Bakış' } as any); setActiveTask(null); setIsCreatingTask(false); setCurrentPage(1); }}
-                        className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all border ${selectedPerson?.id === 'ALL' ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20' : 'hover:bg-slate-50 dark:hover:bg-white/5 border-transparent'}`}
+                        className={\`w-full flex items-center justify-between p-2.5 rounded-xl transition-all border \${selectedPerson?.id === 'ALL' ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20' : 'hover:bg-slate-50 dark:hover:bg-white/5 border-transparent'}\`}
                     >
                         <div className="flex items-center gap-2.5">
                             <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 flex items-center justify-center font-black text-[12px]">📋</div>
@@ -256,11 +258,11 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                                     setIsCreatingTask(false);
                                     setCurrentPage(1);
                                 }}
-                                className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all ${
+                                className={\`w-full flex items-center justify-between p-2.5 rounded-xl transition-all \${
                                     selectedPerson?.id === person.id
                                     ? 'bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20'
                                     : 'hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent'
-                                }`}
+                                }\`}
                             >
                                 <div className="flex items-center gap-2.5">
                                     <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center font-black text-[12px]">
@@ -303,14 +305,14 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                             <button
                                 key={status}
                                 onClick={() => { setFilterStatus(status); setCurrentPage(1); setActiveTask(null); }}
-                                className={`flex-1 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-md transition-all ${filterStatus === status ? 'bg-white dark:bg-[#1e293b] text-blue-600 shadow-sm border border-slate-200 dark:border-white/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                className={\`flex-1 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-md transition-all \${filterStatus === status ? 'bg-white dark:bg-[#1e293b] text-blue-600 shadow-sm border border-slate-200 dark:border-white/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}\`}
                             >
                                 {status.substring(0,10)}
                             </button>
                         ))}
                         <button
                             onClick={() => { setFilterStatus('Tümü'); setCurrentPage(1); setActiveTask(null); }}
-                            className={`px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-md transition-all ${filterStatus === 'Tümü' ? 'bg-white dark:bg-[#1e293b] text-blue-600 shadow-sm border border-slate-200 dark:border-white/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                            className={\`px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-md transition-all \${filterStatus === 'Tümü' ? 'bg-white dark:bg-[#1e293b] text-blue-600 shadow-sm border border-slate-200 dark:border-white/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}\`}
                         >Tümü</button>
                     </div>
                 </div>
@@ -328,14 +330,14 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                             <button
                                 key={task.id}
                                 onClick={() => { setActiveTask(task); setIsCreatingTask(false); }}
-                                className={`w-full text-left p-3 rounded-xl border transition-all ${activeTask?.id === task.id ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20' : 'bg-white dark:bg-[#1e293b] border-slate-200 dark:border-white/5 hover:border-blue-400'}`}
+                                className={\`w-full text-left p-3 rounded-xl border transition-all \${activeTask?.id === task.id ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20' : 'bg-white dark:bg-[#1e293b] border-slate-200 dark:border-white/5 hover:border-blue-400'}\`}
                             >
                                 <div className="flex justify-between items-start mb-1.5">
                                     <h3 className="text-[12px] font-black line-clamp-1 pr-2">{task.title}</h3>
-                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest shrink-0 ${getStatusColor(task.status)}`}>{task.status === 'Devam Ediyor' ? 'Devam' : task.status}</span>
+                                    <span className={\`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest shrink-0 \${getStatusColor(task.status)}\`}>{task.status === 'Devam Ediyor' ? 'Devam' : task.status}</span>
                                 </div>
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-widest ${getPriorityColor(task.priority)}`}>
+                                    <span className={\`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-widest \${getPriorityColor(task.priority)}\`}>
                                         <Flag className="w-2.5 h-2.5" /> {task.priority}
                                     </span>
                                     <span className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[120px]">
@@ -391,7 +393,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                                     <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Öncelik Seviyesi</label>
                                     <div className="grid grid-cols-3 gap-2">
                                         {['Düşük', 'Orta', 'Yüksek'].map(p => (
-                                            <button key={p} onClick={() => setNewTaskPriority(p)} className={`h-10 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all border ${newTaskPriority === p ? getPriorityColor(p) : 'bg-white border-slate-200 hover:bg-slate-50 dark:bg-[#0f172a] text-slate-500'}`}>{p}</button>
+                                            <button key={p} onClick={() => setNewTaskPriority(p)} className={\`h-10 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all border \${newTaskPriority === p ? getPriorityColor(p) : 'bg-white border-slate-200 hover:bg-slate-50 dark:bg-[#0f172a] text-slate-500'}\`}>{p}</button>
                                         ))}
                                     </div>
                                 </div>
@@ -415,8 +417,8 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                                     <h2 className="text-[16px] md:text-[18px] font-black">{activeTask?.title}</h2>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <span className={`px-2.5 py-1 rounded-md border text-[10px] font-bold uppercase tracking-widest ${getStatusColor(activeTask?.status || '')}`}>{activeTask?.status}</span>
-                                    <span className={`px-2.5 py-1 rounded-md border text-[10px] font-bold uppercase tracking-widest ${getPriorityColor(activeTask?.priority || '')}`}>{activeTask?.priority} ÖNCELİK</span>
+                                    <span className={\`px-2.5 py-1 rounded-md border text-[10px] font-bold uppercase tracking-widest \${getStatusColor(activeTask?.status || '')}\`}>{activeTask?.status}</span>
+                                    <span className={\`px-2.5 py-1 rounded-md border text-[10px] font-bold uppercase tracking-widest \${getPriorityColor(activeTask?.priority || '')}\`}>{activeTask?.priority} ÖNCELİK</span>
                                     {activeTask?.dueDate && (
                                         <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-slate-600 bg-white text-[10px] font-bold uppercase tracking-widest">
                                             <Calendar className="w-3 h-3" /> Teslim: {new Date(activeTask.dueDate).toLocaleDateString()}
@@ -459,7 +461,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
                                     ) : (
                                         activeTask?.feedbacks?.map((fb: any) => (
                                             <div key={fb.id} className="relative pl-5">
-                                                <div className={`absolute left-[-29px] top-0 w-8 h-8 rounded-full border-[3px] border-slate-50 dark:border-[#0f172a] shadow-sm flex items-center justify-center text-white ${fb.isFromStaff ? 'bg-amber-500' : 'bg-blue-600'}`}>
+                                                <div className={\`absolute left-[-29px] top-0 w-8 h-8 rounded-full border-[3px] border-slate-50 dark:border-[#0f172a] shadow-sm flex items-center justify-center text-white \${fb.isFromStaff ? 'bg-amber-500' : 'bg-blue-600'}\`}>
                                                     {fb.isFromStaff ? <UserCircle className="w-4 h-4" /> : <Briefcase className="w-4 h-4" />}
                                                 </div>
                                                 <div className="bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-white/5 p-3 md:p-4 rounded-xl shadow-sm">
@@ -488,3 +490,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/staff/_components/HrTasksTab.tsx', tsxContent);
+console.log("Written successfully");
