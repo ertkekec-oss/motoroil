@@ -17,7 +17,7 @@ import {
   History,
   AlertCircle
 } from "lucide-react";
-import InventoryTransferModal from "../components/InventoryTransferModal";
+import TransferTabContent from "../components/TransferTabContent";
 
 export default function WarehouseManagementPage() {
   const { theme } = useTheme();
@@ -30,15 +30,8 @@ export default function WarehouseManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBranch, setSelectedBranch] = useState<string>("Tümü");
 
-  // Transfer Modal
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [transferData, setTransferData] = useState({
-    productId: 0,
-    from: "Merkez",
-    to: "Kadıköy",
-    qty: 0,
-  });
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [activeTab, setActiveTab] = useState("general");
+  const isSystemAdmin = !currentUser || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || currentUser.role?.toLowerCase().includes('admin');
 
   useEffect(() => {
     fetchProducts();
@@ -56,30 +49,6 @@ export default function WarehouseManagementPage() {
       console.error(e);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const approveTransferDirectly = async (data: any) => {
-    if (isProcessing) return;
-    setIsProcessing(true);
-    try {
-      const res = await fetch("/api/inventory/transfer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      if (result.success) {
-        showSuccess("Transfer Başarılı", "Ürün transferi başarıyla gerçekleştirildi.");
-        fetchProducts();
-      } else {
-        showError("Transfer Başarısız", result.error || "Bilinmeyen hata");
-      }
-    } catch (error) {
-      showError("Hata", "Transfer işlemi sırasında bir hata oluştu.");
-    } finally {
-      setIsProcessing(false);
-      setShowTransferModal(false);
     }
   };
 
@@ -143,19 +112,30 @@ export default function WarehouseManagementPage() {
             Şubeler arası stokları izleyin, depo transferlerini gerçekleştirin ve envanteri yönetin.
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowTransferModal(true)}
-            className={`h-[40px] px-5 flex items-center gap-2 rounded-[12px] font-medium text-[13px] transition-all shadow-sm ${isLight ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-indigo-600 text-white hover:bg-indigo-500"}`}
-          >
-            <ArrowRightLeft className="w-4 h-4" />
-            Depolar Arası Transfer
-          </button>
-        </div>
       </div>
 
-      {/* KPI Banner */}
-      <div className={`flex rounded-[14px] border overflow-hidden ${cardClass}`}>
+      <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-[#0f172a]/60 p-1.5 rounded-xl border border-slate-200/50 dark:border-white/5 shadow-sm w-max mb-6">
+          <button
+            onClick={() => setActiveTab("general")}
+            className={activeTab === "general"
+              ? "px-5 py-2.5 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#1e293b] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[8px] transition-all tracking-wide"
+              : "px-5 py-2.5 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all rounded-[8px] tracking-wide"}
+          >
+            Depo Yönetimi
+          </button>
+          <button
+            onClick={() => setActiveTab("transfers")}
+            className={activeTab === "transfers"
+              ? "px-5 py-2.5 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#1e293b] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[8px] transition-all tracking-wide"
+              : "px-5 py-2.5 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all rounded-[8px] tracking-wide"}
+          >
+            Transfer İşlemleri
+          </button>
+      </div>
+
+      {activeTab === "general" && (
+        <>
+        <div className={`flex rounded-[14px] border overflow-hidden ${cardClass}`}>
         <div className={`flex-1 p-5 border-r ${isLight ? "border-slate-200" : "border-slate-800"}`}>
           <div className="flex items-center gap-2 mb-2">
             <MapPin className={`w-4 h-4 ${isLight ? "text-indigo-500" : "text-indigo-400"}`} />
@@ -277,17 +257,20 @@ export default function WarehouseManagementPage() {
             )}
           </div>
       </div>
+      </>
+      )}
 
-      <InventoryTransferModal
-          isOpen={showTransferModal}
-          onClose={() => setShowTransferModal(false)}
-          products={products}
-          filteredProducts={products}
-          onTransfer={approveTransferDirectly}
-          isProcessing={isProcessing}
-          branches={branches?.map(b => b.name) || ["Merkez", "Kadıköy"]}
-          isSystemAdmin={true} // Simplify logic for now
-      />
+      {activeTab === "transfers" && (
+        <TransferTabContent
+          isSystemAdmin={isSystemAdmin}
+          products={products || []}
+          filteredProducts={displayProducts}
+          branches={branches?.map((b) => b.name) || ["Merkez", "Kadıköy"]}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
+      )}
+
     </div>
   );
 }

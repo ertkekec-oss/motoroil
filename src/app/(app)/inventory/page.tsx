@@ -16,7 +16,6 @@ import InventoryTable from "./components/InventoryTable";
 import InventoryTransferModal from "./components/InventoryTransferModal";
 import InventoryBulkEditModal from "./components/InventoryBulkEditModal";
 import InventoryFilterBar from "./components/InventoryFilterBar";
-import TransferTabContent from "./components/TransferTabContent";
 import ProductWizardModal from "./components/ProductWizardModal";
 import { DailyBriefPanel, WeeklyHealthReport, FocusQueueTab, ExecutiveSummaryMode, ExcessStockB2BButton, RiskScoreIndicator } from "./components/AutonomousInventory";
 import CriticalStockBanner from "./components/CriticalStockBanner";
@@ -1346,7 +1345,7 @@ function InventoryContent() {
              <div className="flex w-full xl:w-max whitespace-nowrap items-center gap-6 px-1 select-none pb-2">
                 {[
                   { group: 'GÖRÜNÜM', items: [{ id: 'all', label: 'Envanter Listesi' }, { id: 'focus', label: 'Focus Queue' }, { id: 'strategic', label: 'Stratejik Görünüm' }] },
-                  { group: 'OPERASYON', items: [{ id: 'transfers', label: 'Transfer & Sevkiyat' }, { id: 'bulk-price', label: 'Fiyat Yönetimi' }] }
+                  { group: 'OPERASYON', items: [{ id: 'bulk-price', label: 'Fiyat Yönetimi' }] }
                 ].map((grp, i) => (
                   <div key={grp.group} className="flex items-center gap-3">
                     {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
@@ -1468,17 +1467,6 @@ function InventoryContent() {
               onPageChange={setCurrentPage}
             />
           </>
-        )}
-
-        {activeTab === "transfers" && (
-          <TransferTabContent
-            isSystemAdmin={isSystemAdmin}
-            products={products || []}
-            filteredProducts={filteredProducts}
-            branches={branches}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
         )}
 
         {activeTab === "bulk-price" && (
