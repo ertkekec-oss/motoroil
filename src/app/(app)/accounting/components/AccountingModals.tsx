@@ -37,7 +37,8 @@ export default function AccountingModals({
         currency: 'TRY',
         // CRM Relations
         customerId: '',
-        supplierId: ''
+        supplierId: '',
+        targetKasaId: ''
     });
 
     // Statement Import State
@@ -53,20 +54,27 @@ export default function AccountingModals({
 
         try {
             let res;
-            if (type === 'transaction' || type === 'debt' || type === 'collection' || type === 'expense') {
+            if (type === 'transaction' || type === 'debt' || type === 'collection' || type === 'expense' || type === 'transfer') {
                 // Adjust type based on modal context
-                const txType = type === 'debt' ? 'Payment' : type === 'collection' ? 'Collection' : formData.type;
+                const txType = type === 'debt' ? 'Payment' : type === 'collection' ? 'Collection' : type === 'transfer' ? 'Transfer' : formData.type;
 
                 // Prepare Data
                 const payload = {
                     ...formData,
                     type: txType,
-                    amount: Number(formData.amount)
+                    amount: Math.abs(Number(formData.amount))
                 };
 
                 // Clear unused relations based on type
                 if (type === 'collection') payload.supplierId = undefined; // Income usually from customer
                 if (type === 'debt') payload.customerId = undefined; // Expense usually to supplier (or general)
+                if (type === 'transfer') {
+                    payload.customerId = undefined;
+                    payload.supplierId = undefined;
+                    if (payload.kasaId === payload.targetKasaId) {
+                        return showError('Hata', 'Çıkış kasası ile hedef kasa aynı olamaz.');
+                    }
+                }
 
                 res = await addFinancialTransaction(payload);
             } else if (type === 'check') {
@@ -203,6 +211,7 @@ export default function AccountingModals({
                     {type === 'account' && 'Yeni Hesap Ekle'}
                     {type === 'statement' && 'Ekstre Yükle'}
                     {type === 'expense' && 'Gider Ekle'}
+                    {type === 'transfer' && 'Kasalar Arası Virman (Transfer)'}
                 </h2>
 
                 {type === 'statement' ? (
@@ -441,6 +450,23 @@ export default function AccountingModals({
                                             required
                                         >
                                             <option value="">Seçiniz</option>
+                                            {kasalar.map(k => (
+                                                <option key={k.id} value={k.id}>{k.name} ({k.balance} ₺)</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
+                                {type === 'transfer' && (
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">Hedef Kasa / Başka Hesap</label>
+                                        <select
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.targetKasaId}
+                                            onChange={e => setFormData({ ...formData, targetKasaId: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">Hedef Kasa Seçiniz</option>
                                             {kasalar.map(k => (
                                                 <option key={k.id} value={k.id}>{k.name} ({k.balance} ₺)</option>
                                             ))}

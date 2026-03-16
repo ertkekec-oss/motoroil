@@ -308,6 +308,9 @@ export default function AccountingPage() {
                     )}
                     {activeTab === 'banks' && (
                         <div className="flex gap-3">
+                            <button onClick={() => setModalType('transfer')} className="h-[44px] px-6 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-[14px] font-medium text-[14px] shadow-sm transition-colors flex items-center justify-center gap-2">
+                                🔄 Virman
+                            </button>
                             <button onClick={() => syncAccount()} disabled={syncStates['GLOBAL'] === 'SYNCING'} className={`h-[44px] px-6 rounded-[14px] font-medium text-[14px] border transition-colors flex items-center justify-center gap-2 ${theme === 'light' ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}>
                                 {syncStates['GLOBAL'] === 'SYNCING' ? 'Güncelleniyor...' : 'Senkronize Et'}
                             </button>
@@ -458,8 +461,8 @@ export default function AccountingPage() {
                                 {activeTab === 'banks' && (
                                     <>
                                         {kasalar.map((kasa, i) => (
-                                            <tr key={`bn-${i}`} className={`h-[56px] transition-colors ${theme === 'light' ? 'hover:bg-slate-50/50' : 'hover:bg-blue-500/5'}`}>
-                                                {renderCell(kasa.name)}
+                                            <tr key={`bn-${i}`} onClick={() => window.location.href = `/accounting/kasalar/${kasa.id}`} className={`h-[56px] cursor-pointer transition-colors ${theme === 'light' ? 'hover:bg-slate-50/50' : 'hover:bg-blue-500/5'}`}>
+                                                {renderCell(<span className="font-bold">{kasa.name}</span>)}
                                                 {renderCell(renderBadge(kasa.type === 'bank' ? 'Banka' : 'Nakit', 'bg-slate-500/10 text-slate-600 dark:text-slate-400'))}
                                                 {renderCell(kasa.branch || 'Merkez', "text-left opacity-60")}
                                                 {renderCell(formatCurrency(kasa.balance), "text-right", "font-semibold")}
