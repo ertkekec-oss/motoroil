@@ -647,7 +647,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     setInstallmentPrompt({ isOpen: true, type: 'PARTIAL_PAYMENT', invoiceData, paidAmount, newTotalAmount, difference });
                 }
             } else {
-                setCustomInstallAmount(newTotalAmount.toString());
+                setCustomInstallAmount(formatCurrencyInput(newTotalAmount.toFixed(2).replace('.', ',')));
                 setInstallmentPrompt({ isOpen: true, type: 'NO_PAYMENT', invoiceData, paidAmount: 0, newTotalAmount, difference: 0 });
             }
         } else {
@@ -779,9 +779,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     next30DaysDate.setDate(next30DaysDate.getDate() + 30);
     const next30DaysStr = next30DaysDate.toISOString().split('T')[0];
 
-    const todayInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] === todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
-    const overdueInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] < todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
-    const upcomingInstallments = customer?.paymentPlans?.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] > todayStr && i.dueDate.split('T')[0] <= next30DaysStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
+    const validPaymentPlans = customer?.paymentPlans?.filter((p: any) => p.status !== 'İptal' && p.status !== 'İptal Edildi' && p.status !== 'Cancelled' && p.status !== 'Draft') || [];
+
+    const todayInstallments = validPaymentPlans.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] === todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
+    const overdueInstallments = validPaymentPlans.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] < todayStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
+    const upcomingInstallments = validPaymentPlans.flatMap((p: any) => p.installments || []).filter((i: any) => i.dueDate && i.dueDate.split('T')[0] > todayStr && i.dueDate.split('T')[0] <= next30DaysStr && i.status !== 'Paid' && i.status !== 'Ödendi') || [];
 
     const overdueAmount = overdueInstallments.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
     const upcomingAmount = upcomingInstallments.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
