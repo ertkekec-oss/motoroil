@@ -83,7 +83,7 @@ export async function POST(req: Request) {
             password, birthDate, maritalStatus, bloodType, militaryStatus, reference,
             hasDriverLicense, educationLevel, city, district, relativeName,
             relativePhone, healthReport, certificate, notes, address,
-            assignedCategoryIds
+            assignedCategoryIds, salaryType, entryDate, leaveDate
         } = body;
 
         // Basic validation
@@ -145,7 +145,10 @@ export async function POST(req: Request) {
                 healthReport,
                 certificate,
                 notes,
-                assignedCategoryIds: assignedCategoryIds || []
+                assignedCategoryIds: assignedCategoryIds || [],
+                salaryType: salaryType || 'NET',
+                entryDate: entryDate ? new Date(entryDate) : null,
+                leaveDate: leaveDate ? new Date(leaveDate) : null
             }
         });
 
@@ -240,7 +243,7 @@ export async function PUT(req: Request) {
             birthDate, maritalStatus, bloodType, militaryStatus, reference,
             hasDriverLicense, educationLevel, city, district, relativeName,
             relativePhone, healthReport, certificate, notes, address, permissions,
-            assignedCategoryIds, status, currentJob
+            assignedCategoryIds, status, currentJob, salaryType, entryDate, leaveDate
         } = body;
 
         if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
@@ -254,11 +257,14 @@ export async function PUT(req: Request) {
             assignedCategoryIds,
             status,
             currentJob,
+            salaryType,
             hasDriverLicense: hasDriverLicense !== undefined ? !!hasDriverLicense : undefined
         };
 
         if (salary !== undefined) updateData.salary = parseFloat(salary);
         if (birthDate) updateData.birthDate = new Date(birthDate);
+        if (entryDate !== undefined) updateData.entryDate = entryDate ? new Date(entryDate) : null;
+        if (leaveDate !== undefined) updateData.leaveDate = leaveDate ? new Date(leaveDate) : null;
 
         // Remove undefined fields
         Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);

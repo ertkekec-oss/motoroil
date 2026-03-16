@@ -40,6 +40,7 @@ export default function StaffManagementContent() {
         birthDate: '', maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '',
         hasDriverLicense: false, reference: '', relativeName: '', relativePhone: '',
         city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: '',
+        salaryType: 'NET', entryDate: '', leaveDate: '',
         assignedCategoryIds: [] as string[]
     });
 
@@ -47,7 +48,8 @@ export default function StaffManagementContent() {
         name: '', email: '', role: '', branch: '', type: 'service', birthDate: '', address: '', salary: '',
         maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '', hasDriverLicense: false,
         reference: '', relativeName: '', relativePhone: '', city: '', district: '', notes: '',
-        healthReport: '', certificate: '', assignedCategoryIds: []
+        healthReport: '', certificate: '', assignedCategoryIds: [],
+        salaryType: 'NET', entryDate: '', leaveDate: ''
     });
 
     const fetchCustomerCategories = async () => {
@@ -360,6 +362,7 @@ export default function StaffManagementContent() {
                     birthDate: '', maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '',
                     hasDriverLicense: false, reference: '', relativeName: '', relativePhone: '',
                     city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: '',
+                    salaryType: 'NET', entryDate: '', leaveDate: '',
                     assignedCategoryIds: []
                 });
                 showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı. Şifre mail olarak gönderildi.");
@@ -2054,14 +2057,34 @@ export default function StaffManagementContent() {
                                                 </select>
                                             </div>
 
-                                            <div className="bg-slate-50 dark:bg-[#1e293b] p-5 rounded-[16px] border border-slate-100 dark:border-white/5 space-y-4">
-                                                <div className="flex items-center gap-2">
+                                            <div className="bg-slate-50 dark:bg-[#1e293b] p-5 rounded-[16px] border border-slate-100 dark:border-white/5 space-y-5">
+                                                <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/5 pb-3">
                                                     <span className="text-xl">💵</span>
-                                                    <h4 className="text-[13px] font-black text-slate-900 dark:text-white">Aylık Net Sabit Ücret</h4>
+                                                    <h4 className="text-[13px] font-black text-slate-900 dark:text-white">Maaş & Bordro Tanımlamaları</h4>
                                                 </div>
-                                                <div className="relative">
-                                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₺</span>
-                                                    <input type="number" className="w-full h-14 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] pl-10 pr-4 text-[20px] font-black text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 shadow-sm transition-all text-right" placeholder="17.002,00" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Brüt / Net Anlaşma *</label>
+                                                        <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500 shadow-sm transition-all" value={newStaff.salaryType} onChange={(e) => setNewStaff({ ...newStaff, salaryType: e.target.value })}>
+                                                            <option value="NET">Net Maaş Anlaşması</option>
+                                                            <option value="GROSS">Brüt Maaş Anlaşması</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Kök / Taban Ücret *</label>
+                                                        <div className="relative">
+                                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black">₺</span>
+                                                            <input type="number" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl pl-8 pr-4 text-[15px] font-black text-slate-900 dark:text-white outline-none focus:border-emerald-500 shadow-sm transition-all text-right" placeholder="17002" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Resmi İşe Giriş Tarihi</label>
+                                                        <input type="date" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-emerald-500 shadow-sm transition-all" value={newStaff.entryDate} onChange={(e) => setNewStaff({ ...newStaff, entryDate: e.target.value })} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block text-rose-500">İşten Çıkış Tarihi</label>
+                                                        <input type="date" className="w-full h-11 bg-rose-50/50 dark:bg-rose-900/10 border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-rose-700 dark:text-rose-400 outline-none focus:border-rose-500 shadow-sm transition-all" value={newStaff.leaveDate} onChange={(e) => setNewStaff({ ...newStaff, leaveDate: e.target.value })} />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -2309,6 +2332,36 @@ export default function StaffManagementContent() {
                                                 <div className="group">
                                                     <label className="text-[11px] font-bold tracking-widest text-slate-600 dark:text-slate-400 uppercase pb-1 block">Tam Adres</label>
                                                     <textarea className="w-full h-24 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl p-3 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all outline-none resize-none" value={editStaff.address || ''} onChange={(e) => setEditStaff({ ...editStaff, address: e.target.value })} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <h3 className="text-[11px] font-black text-rose-600 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-rose-100 pb-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-rose-600" /> FİNANS & BORDRO BİLGİLERİ (GİZLİ)
+                                            </h3>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Sözleşme Tipi</label>
+                                                    <select className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-bold text-slate-900 dark:text-white outline-none focus:border-rose-500 shadow-sm transition-all" value={editStaff.salaryType || 'NET'} onChange={(e) => setEditStaff({ ...editStaff, salaryType: e.target.value })}>
+                                                        <option value="NET">Net Maaş Anlaşması</option>
+                                                        <option value="GROSS">Brüt Maaş Anlaşması</option>
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">Aylık Kök Ücret</label>
+                                                    <div className="relative">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black">₺</span>
+                                                        <input type="number" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl pl-8 pr-4 text-[15px] font-black text-slate-900 dark:text-white outline-none focus:border-rose-500 shadow-sm transition-all text-right" placeholder="0.00" value={editStaff.salary || ''} onChange={(e) => setEditStaff({ ...editStaff, salary: e.target.value })} />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block">İşe Giriş Tarihi</label>
+                                                    <input type="date" className="w-full h-11 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-slate-900 dark:text-white outline-none focus:border-rose-500 shadow-sm transition-all" value={editStaff.entryDate ? new Date(editStaff.entryDate).toISOString().split('T')[0] : ''} onChange={(e) => setEditStaff({ ...editStaff, entryDate: e.target.value })} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1 block text-rose-500">İşten Çıkış Tarihi</label>
+                                                    <input type="date" className="w-full h-11 bg-rose-50/50 dark:bg-rose-900/10 border border-slate-200 dark:border-white/5 rounded-xl px-4 text-[13px] font-semibold text-rose-700 dark:text-rose-400 outline-none focus:border-rose-500 shadow-sm transition-all" value={editStaff.leaveDate ? new Date(editStaff.leaveDate).toISOString().split('T')[0] : ''} onChange={(e) => setEditStaff({ ...editStaff, leaveDate: e.target.value })} />
                                                 </div>
                                             </div>
                                         </div>
@@ -2690,7 +2743,7 @@ export default function StaffManagementContent() {
                                 <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-3">
                                     <span className="text-xl">ℹ️</span>
                                     <p className="text-[11px] font-bold tracking-widest text-blue-700 leading-relaxed uppercase">
-                                        ONAYLANDIKTAN SONRA BU TUTAR GİDERLERE "PERSONEL MAAŞ ÖDEMESİ" OLARAK İŞLENECEKTİR.
+                                        ONAYLANDIKTAN SONRA BU TUTAR GİDERLERE &quot;PERSONEL MAAŞ ÖDEMESİ&quot; OLARAK İŞLENECEKTİR.
                                     </p>
                                 </div>
 
