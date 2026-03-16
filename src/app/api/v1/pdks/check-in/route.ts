@@ -147,18 +147,33 @@ export async function POST(req: NextRequest) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Mevcut bir günlük giriş olup olmadığını kontrol et
-            const existingAttendance = await prisma.attendance.findFirst({
+            // Find the actual Staff record associated with the logged-in User
+            const staffRecord = await prisma.staff.findFirst({
                 where: {
-                    staffId: userId,
+                    OR: [
+                        { userId: userId },
+                        { username: user.username || user.email },
+                        { email: user.email }
+                    ].filter(Boolean) as any,
+                    deletedAt: null
+                }
+            });
+
+            // If a Staff record is found, use its ID. Otherwise, fallback to the User ID (for admins without Staff record logging in for test).
+            const targetStaffId = staffRecord ? staffRecord.id : userId;
+
+            // Mevcut bir günlük giriş olup olmadığını kontrol et
+            const existingAttendance = await (prisma as any).attendance.findFirst({
+                where: {
+                    staffId: targetStaffId,
                     date: { gte: today }
                 }
             });
 
             if (!existingAttendance) {
-                await prisma.attendance.create({
+                await (prisma as any).attendance.create({
                     data: {
-                        staffId: userId,
+                        staffId: targetStaffId,
                         date: new Date(),
                         checkIn: new Date(clientTime),
                         locationIn: mode === "FIELD_GPS" 
@@ -170,8 +185,26 @@ export async function POST(req: NextRequest) {
                     }
                 });
             } else if (!existingAttendance.checkOut && status === "APPROVED") {
-                // Eğer zaten bir giriş varsa ve personel tekrar giriş deniyorsa veya
-                // bir çıkış(check-out) mekanizması tetiklenecekse burası doldurulur.
+                // Çıkış (Check-out) işlemi: Tek giriş/çıkış butonu varsa ve personel tekrar tetiklerse
+                const currentTime = new Date(clientTime).getTime();
+                const checkInTime = new Date(existingAttendance.checkIn).getTime();
+                const diffMins = (currentTime - checkInTime) / (1000 * 60);
+
+                // Eğer girişin üzerinden 5 dakikadan az geçmişse ignore et (yanlışlıkla basma)
+                if (diffMins > 5) {
+                    const workingHours = parseFloat((diffMins / 60).toFixed(2));
+                    await (prisma as any).attendance.update({
+                        where: { id: existingAttendance.id },
+                        data: {
+                            checkOut: new Date(clientTime),
+                            locationOut: mode === "FIELD_GPS" 
+                                ? (location ? `${location.lat}, ${location.lng}` : "Saha Çıkışı")
+                                : "Ofis QR Çıkışı",
+                            workingHours: workingHours,
+                            notes: existingAttendance.notes ? existingAttendance.notes + ' | Çıkış yapıldı' : 'Çıkış yapıldı'
+                        }
+                    });
+                }
             }
         } catch (attErr) {
             console.error("[PDKS Check-in Attendance Integration Error]:", attErr);
