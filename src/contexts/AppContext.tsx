@@ -202,6 +202,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const handleSetActiveBranchName = (name: string) => {
         setActiveBranchName(name);
         localStorage.setItem('periodya_activeBranch', name);
+        localStorage.setItem('motoroil_activeBranch', name);
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     };
 
     // 2. STAFF & USER STATE

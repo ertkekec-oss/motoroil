@@ -28,10 +28,14 @@ export async function GET(request: Request) {
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
+        const activeBranch = request.headers.get('x-active-branch') || searchParams.get('branch');
+        const branchFilter = (activeBranch && activeBranch !== 'Tümü' && activeBranch !== 'Global') ? { branch: decodeURIComponent(activeBranch) } : {};
+
         const transactions = await prisma.transaction.findMany({
             where: {
                 deletedAt: null,
-                ...(company ? { companyId: company.id } : {}) // Skip filter for platform admin
+                ...(company ? { companyId: company.id } : {}), // Skip filter for platform admin
+                ...branchFilter
             },
             orderBy: {
                 date: 'desc'

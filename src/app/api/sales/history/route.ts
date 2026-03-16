@@ -32,13 +32,25 @@ export async function GET(request: Request) {
         // Resolve Company ID from session
         const authResult = await authorize();
         if (!authResult.authorized) return authResult.response;
-        const user = authResult.user;
+        const session = authResult.user.user || authResult.user;
 
-        if (!user.companyId) {
-            return NextResponse.json({ success: true, orders: [] });
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId || 'PLATFORM_ADMIN' }
+        });
+
+        if (!company && session.tenantId !== 'PLATFORM_ADMIN') {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı' }, { status: 400 });
         }
 
-        whereClause.companyId = user.companyId;
+        if (company) {
+            whereClause.companyId = company.id;
+        }
+
+        // Branch filter
+        const activeBranch = request.headers.get('x-active-branch') || searchParams.get('branch');
+        if (activeBranch && activeBranch !== 'Tümü' && activeBranch !== 'Global') {
+            whereClause.branch = decodeURIComponent(activeBranch);
+        }
 
         const [orders, salesOrders] = await Promise.all([
             prisma.order.findMany({
@@ -89,8 +101,9 @@ export async function GET(request: Request) {
 
         const txs = await prisma.transaction.findMany({
             where: {
-                companyId: user.companyId,
+                ...(company ? { companyId: company.id } : {}),
                 type: 'Sales',
+                ...(whereClause.branch ? { branch: whereClause.branch } : {})
             },
             select: {
                 description: true,
