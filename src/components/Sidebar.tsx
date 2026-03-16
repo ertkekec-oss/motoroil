@@ -268,8 +268,7 @@ export default function Sidebar() {
                         subItems: [
                             { name: 'Envanter Genel', href: '/inventory' },
                             { name: 'Depo & Stoklar', href: '/inventory/warehouses' },
-                            { name: 'Üretim (MRP)', href: '/inventory/manufacturing' },
-                            { name: 'Reçeteler (BOM)', href: '/inventory/boms' },
+                            { name: 'Üretim Kontrol Merkezi', href: '/inventory/manufacturing' },
                         ]
                     },
                     { name: 'Teklifler', href: '/offers', icon: FileText },
