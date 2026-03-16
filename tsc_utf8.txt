@@ -1,0 +1,8 @@
+﻿scripts/migrate-merkez.ts(25,16): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'StockWhereInput'.
+scripts/migrate-merkez.ts(33,18): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'StockWhereInput'.
+scripts/migrate-merkez.ts(62,44): error TS2339: Property 'waySlip' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+scripts/migrate-merkez.ts(70,44): error TS2339: Property 'invoice' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/app/(app)/staff/me/page.tsx(166,34): error TS2304: Cannot find name 'shifts'.
+src/app/(app)/staff/me/page.tsx(168,42): error TS2304: Cannot find name 'shifts'.
+src/app/(app)/staff/me/page.tsx(201,26): error TS2304: Cannot find name 'payrolls'.
+src/app/(app)/staff/me/page.tsx(203,34): error TS2304: Cannot find name 'payrolls'.

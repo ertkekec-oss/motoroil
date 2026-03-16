@@ -59,7 +59,9 @@ const DashboardView = ({
     handleCheckout,
     targets = [],
     statsData,
-    user
+    user,
+    shifts = [],
+    payrolls = []
 }: any) => {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
@@ -163,9 +165,30 @@ const DashboardView = ({
 
                             <div className="space-y-4">
                                 <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Haftalık Akış</h4>
-                                <div className="text-center text-sm font-semibold text-slate-400 py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
-                                    Vardiya planı tanımlanmamış.
-                                </div>
+                                {shifts.length > 0 ? (
+                                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 modern-scrollbar">
+                                        {shifts.map((shift, idx) => (
+                                            <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs ${shift.type === 'İzinli' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
+                                                        {new Date(shift.start).toLocaleDateString('tr-TR', { weekday: 'short' })}
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <div className="text-[13px] font-bold text-slate-900 dark:text-white">{new Date(shift.start).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+                                                        <div className="text-[11px] font-semibold text-slate-500 uppercase">{shift.type}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-[13px] font-black text-slate-700 dark:text-slate-300">
+                                                    {shift.type === 'İzinli' ? 'Tüm Gün' : `${new Date(shift.start).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} - ${new Date(shift.end).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-sm font-semibold text-slate-400 py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
+                                        Bu hafta için vardiya planı tanımlanmamış.
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </EnterpriseCard>
@@ -177,9 +200,32 @@ const DashboardView = ({
                 <EnterpriseCard>
                     <EnterpriseSectionHeader title="Son Bordro Özetleri" icon="🛡️" />
                     <div className="p-6">
-                        <div className="py-12 text-sm font-semibold text-slate-400 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/30">
-                            Geçmiş bordro kaydı bulunamadı.
-                        </div>
+                        {payrolls.length > 0 ? (
+                            <div className="space-y-3">
+                                {payrolls.slice(0, 3).map((pr, idx) => (
+                                    <div key={idx} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 flex flex-col gap-2">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[12px] font-bold text-slate-900 dark:text-white flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Dönem: {pr.period}</span>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${pr.status === 'Ödendi' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{pr.status || 'Bekliyor'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-end mt-1">
+                                            <div>
+                                                <div className="text-[10px] uppercase font-bold text-slate-400">Net Hakediş</div>
+                                                <div className="text-[16px] font-black text-slate-900 dark:text-white mt-0.5">₺{Number(pr.netPay).toLocaleString()}</div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-[10px] uppercase font-bold text-slate-400">Prim</div>
+                                                <div className="text-[12px] font-bold text-emerald-600">+₺{Number(pr.bonus).toLocaleString()}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="py-12 text-sm font-semibold text-slate-400 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/30">
+                                Geçmiş bordro kaydı bulunamadı.
+                            </div>
+                        )}
                     </div>
                 </EnterpriseCard>
 
@@ -716,17 +762,49 @@ export default function PersonelPanel() {
     const [scanMode, setScanMode] = useState<'IN' | 'OUT'>('IN');
     const [targets, setTargets] = useState<any[]>([]);
     const [statsData, setStatsData] = useState<any>(null);
+    const [shifts, setShifts] = useState<any[]>([]);
+    const [payrolls, setPayrolls] = useState<any[]>([]);
 
     const fetchPerformanceData = async () => {
         try {
+            const userId = currentUser?.id;
             const [hrRes, targetsRes] = await Promise.all([
                 fetch('/api/hr/performance/dashboard').then(r => r.json()),
-                fetch('/api/staff/targets?mine=true').then(r => r.json())
+                fetch(`/api/staff/targets?staffId=${userId}`).then(r => r.json())
             ]);
             if (hrRes.success) setStatsData(hrRes.data);
-            if (Array.isArray(targetsRes)) setTargets(targetsRes);
+            
+            if (Array.isArray(targetsRes)) {
+                setTargets(targetsRes);
+            } else if (targetsRes?.targets && Array.isArray(targetsRes.targets)) {
+                setTargets(targetsRes.targets);
+            }
         } catch (e) {
             console.error("Perf verisi alınamadı", e);
+        }
+    };
+
+    const fetchPersonalData = async () => {
+        try {
+            const userId = currentUser?.id;
+            if (!userId) return;
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Pzt
+            startOfWeek.setHours(0,0,0,0);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6); // Paz
+            endOfWeek.setHours(23,59,59,999);
+
+            const [shiftsRes, payrollRes] = await Promise.all([
+                fetch(`/api/staff/shifts?staffId=${userId}&start=${startOfWeek.toISOString()}&end=${endOfWeek.toISOString()}`).then(r => r.json()),
+                fetch(`/api/staff/payroll?staffId=${userId}`).then(r => r.json())
+            ]);
+            
+            if (Array.isArray(shiftsRes)) setShifts(shiftsRes);
+            if (payrollRes?.payrolls) setPayrolls(payrollRes.payrolls.filter((p: any) => p.staffId === userId));
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -826,12 +904,12 @@ export default function PersonelPanel() {
     };
 
     const showCheckoutOptions = () => {
-        toast((t) => (
-            <div>
-                <p className="font-semibold text-slate-900 mb-3">Çıkış yöntemini seçin:</p>
-                <div className="flex gap-2">
-                    <button onClick={() => { toast.dismiss(t.id); setScanMode('OUT'); setIsScannerOpen(true); }} className="px-3 py-1.5 bg-indigo-500 text-white rounded font-medium text-xs">Ofis Çıkışı (QR)</button>
-                    <button onClick={() => { toast.dismiss(t.id); exactGpsCheckout(); }} className="px-3 py-1.5 bg-emerald-500 text-white rounded font-medium text-xs">Saha Çıkışı (GPS)</button>
+        toast.custom((t: any) => (
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xl max-w-[300px]">
+                <p className="font-bold text-slate-900 mb-3 flex items-center gap-2"><span>👋</span> Çıkış yöntemini seçin</p>
+                <div className="grid grid-cols-2 gap-2">
+                    <button onClick={() => { toast.dismiss(t); setScanMode('OUT'); setIsScannerOpen(true); }} className="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg font-bold text-xs transition-colors text-center">Ofis Çıkışı (QR)</button>
+                    <button onClick={() => { toast.dismiss(t); exactGpsCheckout(); }} className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg font-bold text-xs transition-colors text-center">Saha Çıkışı (GPS)</button>
                 </div>
             </div>
         ), { duration: 10000 });
@@ -864,9 +942,13 @@ export default function PersonelPanel() {
 
     useEffect(() => {
         fetchPdksStatus();
-        fetchPerformanceData();
-        setTimeout(() => setLoading(false), 800);
-    }, []);
+        if (currentUser?.id) {
+            fetchPerformanceData();
+            fetchPersonalData();
+        }
+        const timer = setTimeout(() => setLoading(false), 800);
+        return () => clearTimeout(timer);
+    }, [currentUser?.id]);
 
     if (loading) return (
         <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-pulse text-indigo-400/50">
@@ -972,7 +1054,7 @@ export default function PersonelPanel() {
                         isScannerOpen={isScannerOpen}
                         setIsScannerOpen={setIsScannerOpen}
                         onQrScan={onQrScan}
-                     targets={targets} statsData={statsData} user={currentUser} />
+                     targets={targets} statsData={statsData} user={currentUser} shifts={shifts} payrolls={payrolls} />
                 )}
                 {activeTab === 'tasks' && <MyTasksView user={currentUser} />}
                 {activeTab === 'leave' && <LeaveRequestView user={currentUser} />}

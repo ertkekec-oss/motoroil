@@ -5,9 +5,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const period = searchParams.get('period'); // e.g. "2024-02"
     const branch = searchParams.get('branch');
+    const staffId = searchParams.get('staffId');
 
     const where: any = {};
     if (period) where.period = period;
+    if (staffId) where.staffId = staffId;
 
     // Filter by staff branch if needed, but payroll links to staff. 
     // If branch param exists, we filter staff.

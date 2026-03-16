@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 
 
 import HrOverviewTab from '@/app/(app)/staff/_components/HrOverviewTab';
+import HrTargetsTab from '@/app/(app)/staff/_components/HrTargetsTab';
 import HrTasksTab from '@/app/(app)/staff/_components/HrTasksTab';
 import HrFilesTab from '@/app/(app)/staff/_components/HrFilesTab';
 import { useApp } from '@/contexts/AppContext';
@@ -1209,119 +1210,9 @@ export default function StaffManagementContent() {
             )}
 
             {/* --- PERFORMANCE TAB (KPI KARTLARI + TABLO) --- */}
-            {activeTab === 'performance' && (() => {
-                const totalTarget = targets.reduce((sum, t) => sum + Number(t.targetValue), 0);
-                const totalActual = targets.reduce((sum, t) => sum + Number(t.currentValue), 0);
-                const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
-
-                return (
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {/* KPI 1 */}
-                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-5 border-l-4 border-l-blue-600 flex flex-col justify-between">
-                                <h4 className="text-[11px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div> Ortalama Görev</h4>
-                                <div className="text-[28px] font-black text-slate-900 dark:text-white mt-3">24 <span className="text-[13px] font-medium text-slate-400">Saat</span></div>
-                            </div>
-                            {/* KPI 2 */}
-                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-5 border-l-4 border-l-emerald-500 flex flex-col justify-between">
-                                <h4 className="text-[11px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Tamamlanma Oranı</h4>
-                                <div className="text-[28px] font-black text-slate-900 dark:text-white mt-3">%92</div>
-                            </div>
-                            {/* KPI 3 */}
-                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-5 border-l-4 border-l-emerald-500 flex flex-col justify-between">
-                                <div className="flex items-center justify-between">
-                                    <h4 className="text-[11px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Genel Ciro Hedefi</h4>
-                                    <div className="group/tt relative inline-flex items-center justify-center">
-                                        <span className="w-[16px] h-[16px] rounded-full border border-slate-300 dark:border-white/10 text-slate-400 flex items-center justify-center cursor-help text-[9px] font-bold">?</span>
-                                        <div className="opacity-0 invisible group-hover/tt:opacity-100 group-hover/tt:visible absolute bottom-full right-0 mb-2 w-[240px] p-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg shadow-lg text-slate-700 dark:text-slate-300 text-[11px] z-50 text-left">Ciro hedeflerinin toplam gerçekleşme yüzdesi.</div>
-                                    </div>
-                                </div>
-                                <div className="text-[28px] font-black text-slate-900 dark:text-white mt-3">%{overallProgress}</div>
-                                <div className="w-full h-1.5 bg-slate-100 dark:bg-[#334155]/50 rounded-full mt-3 overflow-hidden">
-                                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
-                                </div>
-                            </div>
-                            {/* KPI 4 / Action */}
-                            <button
-                                onClick={() => setShowTargetModal(true)}
-                                className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-5 border-2 border-dashed hover:border-blue-500 hover:bg-blue-50 transition-all text-center flex flex-col items-center justify-center gap-3 w-full h-full min-h-[110px]"
-                            >
-                                <span className="text-2xl">🎯</span>
-                                <span className="font-bold text-sm text-blue-600">YENİ HEDEF TANIMLA</span>
-                            </button>
-                        </div>
-
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden mt-6">
-                            <div className="p-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
-                                <h3 className="text-[16px] font-black text-slate-900 dark:text-white">Personel Bazlı Hedef Takibi</h3>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                                        <tr>
-                                            <th className="p-4 pl-6 font-bold">Personel</th>
-                                            <th className="p-4 font-bold">Hedef Türü</th>
-                                            <th className="p-4 font-bold">Hedef</th>
-                                            <th className="p-4 font-bold">Gerçekleşen</th>
-                                            <th className="p-4 font-bold">Beklenen Prim</th>
-                                            <th className="p-4 font-bold">İlerleme</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        {targets.length > 0 ? (
-                                            targets?.map((t, idx) => {
-                                                const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
-                                                return (
-                                                    <tr key={t.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[56px]">
-                                                        <td className="p-4 pl-6 align-middle font-bold text-slate-900 dark:text-white text-[13px]">{t.staff?.name}</td>
-                                                        <td className="p-4 align-middle">
-                                                            <span className="text-[11px] font-bold bg-slate-100 dark:bg-[#334155]/50 border border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded-md uppercase tracking-wider">
-                                                                {t.type === 'TURNOVER' ? '💰 CİRO' : '📍 ZİYARET'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-4 align-middle text-[13px] font-medium text-slate-600 dark:text-slate-400">
-                                                            {t.type === 'TURNOVER' ? `₺ ${Number(t.targetValue).toLocaleString()}` : `${t.targetValue} Adet`}
-                                                        </td>
-                                                        <td className="p-4 align-middle text-[13px] font-black text-emerald-600">
-                                                            {t.type === 'TURNOVER' ? `₺ ${Number(t.currentValue).toLocaleString()}` : `${t.currentValue} Adet`}
-                                                        </td>
-                                                        <td className="p-4 align-middle">
-                                                            <div className="flex flex-col gap-0.5">
-                                                                <span className="text-[13px] font-black text-blue-600">₺ {Number(t.estimatedBonus || 0).toLocaleString()}</span>
-                                                                {t.commissionRate > 0 && <span className="text-[10px] font-semibold text-slate-400">%{t.commissionRate} Pr.</span>}
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-4 align-middle">
-                                                            <div className="flex items-center gap-3 w-32">
-                                                                <div className="w-full h-1.5 bg-slate-100 dark:bg-[#334155]/50 rounded-full overflow-hidden">
-                                                                    <div
-                                                                        className={`h-full rounded-full ${progress >= 100 ? 'bg-emerald-500' : 'bg-blue-600'}`}
-                                                                        style={{ width: `${Math.min(progress, 100)}%` }}
-                                                                    ></div>
-                                                                </div>
-                                                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 w-8 text-right">%{progress}</span>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
-                                        ) : (
-                                            <tr>
-                                                <td colSpan={6} className="p-16 text-center">
-                                                    <div className="flex flex-col items-center justify-center gap-3">
-                                                        <span className="text-3xl opacity-50">📉</span>
-                                                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Henüz personel hedefi tanımlanmamış.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                );
-            })()}
+            {activeTab === 'performance' && (
+                <HrTargetsTab staff={staff} targets={targets} fetchTargets={fetchTargets} setShowTargetModal={setShowTargetModal} />
+            )}
 
             {/* --- SHIFT MANAGEMENT TAB (VARDİYA) --- */}
             {activeTab === 'shifts' && (

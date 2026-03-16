@@ -43,20 +43,58 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { staffId, start, end, type, branch, notes } = body;
 
-        const shift = await prisma.shift.create({
-            data: {
+        const startDate = new Date(start);
+        let endDate = new Date(end);
+
+        const startHour = startDate.getHours();
+        const startMin = startDate.getMinutes();
+        const endHour = endDate.getHours();
+        const endMin = endDate.getMinutes();
+
+        // Calculate how many days to loop over based on date parts alone (ignoring time)
+        const sDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        const eDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+        const daysDiff = Math.round((eDateOnly.getTime() - sDateOnly.getTime()) / (1000 * 60 * 60 * 24));
+        const shiftsData = [];
+
+        // Determine if end time is next day visually (e.g. 22:00 to 06:00)
+        let isNextDayEnd = false;
+        if (endHour < startHour || (endHour === startHour && endMin < startMin)) {
+            isNextDayEnd = true;
+        }
+
+        // Loop from 0 to daysDiff
+        for (let i = 0; i <= Math.max(0, daysDiff); i++) {
+            const shiftStart = new Date(sDateOnly);
+            shiftStart.setDate(shiftStart.getDate() + i);
+            shiftStart.setHours(startHour, startMin, 0, 0);
+
+            const shiftEnd = new Date(sDateOnly);
+            shiftEnd.setDate(shiftEnd.getDate() + i);
+            if (isNextDayEnd) {
+                shiftEnd.setDate(shiftEnd.getDate() + 1);
+            }
+            shiftEnd.setHours(endHour, endMin, 0, 0);
+
+            shiftsData.push({
                 staffId,
-                start: new Date(start),
-                end: new Date(end),
+                start: shiftStart,
+                end: shiftEnd,
                 type,
                 branch,
                 notes
-            }
-        });
+            });
+        }
 
-        return NextResponse.json(shift);
+        const createdShifts = await prisma.$transaction(
+            shiftsData.map(data => prisma.shift.create({ data }))
+        );
+
+        return NextResponse.json(createdShifts);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to create shift' }, { status: 500 });
+        console.error("Shift creation error:", error);
+        return NextResponse.json({ error: 'Failed to create shift(s)' }, { status: 500 });
     }
 }
 

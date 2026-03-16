@@ -196,7 +196,7 @@ export default function HrTasksTab({ staff, setSelectedStaff }: HrTasksTabProps)
         s.status !== 'Pasif'
     );
 
-    const getStaffTaskCount = (staffId: string) => {
+    const getStaffTaskCount = (staffId: string | number) => {
         return tasks.filter(t => t.staff.name === staff.find(s => s.id === staffId)?.name && t.status !== 'Tamamlandı').length;
     };
 
