@@ -28,7 +28,9 @@ export const apiFetch = async (url: string, options: any = {}) => {
     if (typeof window !== 'undefined') {
         const activeBranch = localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch');
         if (activeBranch) {
-            headers['x-active-branch'] = decodeURIComponent(activeBranch);
+            // Encode to prevent "TypeError: Invalid character in header content" 
+            // if branch name contains non-ASCII (e.g., "Şube", "Merkez")
+            headers['x-active-branch'] = encodeURIComponent(activeBranch);
         }
     }
 
