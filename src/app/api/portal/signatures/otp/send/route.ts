@@ -69,7 +69,7 @@ export async function POST(req: Request) {
                 data: {
                     tenantId: envelope.tenantId,
                     envelopeId: envelope.id,
-                    action: 'OTP_SENT_SIMULATED',
+                    action: 'OTP_SENT',
                     actorId: session.recipientId,
                     metaJson: { phone: resolvedPhone, code_simulated: '123456' } as any
                 }
