@@ -182,8 +182,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const data = await res.json();
             if (data.success) {
                 setBranches(data.branches || []);
+                return data.branches || [];
             }
         } catch (error) { console.error('Branches fetch failed', error); }
+        return [];
     };
 
     const refreshTenants = async () => {
@@ -252,19 +254,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             }
 
             // Load all core requirements in parallel
-            Promise.all([refreshBranches(), refreshStaff(), refreshSubscription(), refreshTenants()]).finally(() => {
+            Promise.all([refreshBranches(), refreshStaff(), refreshSubscription(), refreshTenants()]).then(([fetchedBranches]) => {
                 const savedBranch = localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch');
 
                 if (!activeBranchName) {
                     if (savedBranch) {
                         setActiveBranchName(savedBranch);
-                    } else if (authUser?.branch) {
+                    } else if (authUser?.branch && authUser.branch !== 'Merkez') {
                         setActiveBranchName(authUser.branch);
+                    } else if (fetchedBranches && fetchedBranches.length > 0) {
+                        setActiveBranchName(fetchedBranches[0].name);
                     } else {
-                        setActiveBranchName('Merkez');
+                        setActiveBranchName('Merkez'); // absolute last resort fallback
                     }
                 }
 
+                setIsInitialLoading(false);
+            }).catch(() => {
                 setIsInitialLoading(false);
             });
         } else if (!authLoading) {
