@@ -417,6 +417,11 @@ const MyTasksView = ({ user }: any) => {
     const [loading, setLoading] = useState(true);
     const [feedback, setFeedback] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
+    
+    // Filters & Pagination
+    const [filterStatus, setFilterStatus] = useState('Devam Edenler'); // 'Tümü', 'Devam Edenler', 'Tamamlandı'
+    const [currentPage, setCurrentPage] = useState(1);
+    const tasksPerPage = 10;
 
     const fetchTasks = async () => {
         setLoading(true);
@@ -455,7 +460,7 @@ const MyTasksView = ({ user }: any) => {
             toast.success("Bilgiler iletildi!");
             setFeedback('');
             fetchTasks();
-            setSelectedTask(null); // Return to list after submit
+            setSelectedTask(null);
         } catch(e) {
             toast.error("İşlem başarısız.");
         } finally {
@@ -463,22 +468,47 @@ const MyTasksView = ({ user }: any) => {
         }
     };
 
+    const filteredTasks = tasks.filter(t => {
+        if (filterStatus === 'Tümü') return true;
+        if (filterStatus === 'Tamamlandı') return t.status === 'Tamamlandı';
+        // 'Devam Edenler' means any task that is NOT Tamamlandı or İptal
+        return t.status !== 'Tamamlandı' && t.status !== 'İptal';
+    });
+
+    const totalPages = Math.ceil(filteredTasks.length / tasksPerPage) || 1;
+    const paginatedTasks = filteredTasks.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 min-h-[500px]">
             <div className="lg:col-span-1">
                 <EnterpriseCard className="h-full flex flex-col">
                     <EnterpriseSectionHeader title="Atanan Görevlerim" icon="📋" />
+                    
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/10">
+                        <div className="flex bg-slate-200/50 dark:bg-slate-800 p-1 rounded-lg">
+                            {['Devam Edenler', 'Tamamlandı', 'Tümü'].map((status) => (
+                                <button
+                                    key={status}
+                                    onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }}
+                                    className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${filterStatus === status ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                >
+                                    {status}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                         {loading ? (
                             <p className="text-center text-sm font-semibold text-slate-400 p-8">Yükleniyor...</p>
-                        ) : tasks.length === 0 ? (
-                            <p className="text-center text-sm font-semibold text-slate-400 p-8">Sizi bekleyen görev yok.</p>
+                        ) : paginatedTasks.length === 0 ? (
+                            <p className="text-center text-sm font-semibold text-slate-400 p-8">Bu filtreye uygun görev yok.</p>
                         ) : (
-                            tasks.map(task => (
+                            paginatedTasks.map(task => (
                                 <button
                                     key={task.id}
                                     onClick={() => setSelectedTask(task)}
-                                    className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTask?.id === task.id ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20' : 'bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700 hover:border-blue-400'}`}
+                                    className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTask?.id === task.id ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20 shadow-sm' : 'bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700 hover:border-blue-400'}`}
                                 >
                                     <h4 className="text-[14px] font-black text-slate-900 dark:text-white mb-2 line-clamp-1">{task.title}</h4>
                                     <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -492,6 +522,22 @@ const MyTasksView = ({ user }: any) => {
                             ))
                         )}
                     </div>
+                    
+                    {totalPages > 1 && (
+                        <div className="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] font-bold text-slate-500 bg-slate-50/50 dark:bg-slate-800/20 shrink-0">
+                            <button 
+                                disabled={currentPage === 1} 
+                                onClick={() => setCurrentPage(p => p - 1)}
+                                className="px-3 py-1.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 disabled:opacity-50"
+                            >GERİ</button>
+                            <span>Sayfa {currentPage} / {totalPages}</span>
+                            <button 
+                                disabled={currentPage === totalPages} 
+                                onClick={() => setCurrentPage(p => p + 1)}
+                                className="px-3 py-1.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 disabled:opacity-50"
+                            >İLERİ</button>
+                        </div>
+                    )}
                 </EnterpriseCard>
             </div>
 
@@ -543,13 +589,13 @@ const MyTasksView = ({ user }: any) => {
                             <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
                                 {selectedTask.status === 'Tamamlandı' ? (
                                     <div className="bg-emerald-50 text-emerald-600 font-bold text-[12px] p-4 text-center rounded-lg border border-emerald-200 uppercase tracking-widest flex items-center justify-center gap-2">
-                                        <CheckCircle2 className="w-5 h-5"/> BU GÖREV YÖNETİCİ ONAYIYLA KAPATILMIŞTIR.
+                                        <CheckCircle2 className="w-5 h-5"/> BU GÖREV TAMAMLANDI.
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
                                         <textarea
                                             className="w-full h-20 bg-slate-50 dark:bg-slate-800 rounded-xl p-3 text-[13px] font-medium outline-none border border-slate-200 dark:border-slate-700 focus:border-blue-500 transition-all resize-none shadow-inner text-slate-900 dark:text-white"
-                                            placeholder="Yöneticinize görev hakkında durum bildirimi veya not yazın..."
+                                            placeholder="Görev hakkında durum bildirimi veya not yazın..."
                                             value={feedback}
                                             onChange={e => setFeedback(e.target.value)}
                                         />
@@ -562,11 +608,11 @@ const MyTasksView = ({ user }: any) => {
                                                 Sadece Yorum Gönder
                                             </button>
                                             <button 
-                                                onClick={() => handleSendFeedback('İncelemede')}
-                                                disabled={isUpdating || selectedTask.status === 'İncelemede'}
+                                                onClick={() => handleSendFeedback('Tamamlandı')}
+                                                disabled={isUpdating}
                                                 className="flex-1 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white py-3 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2"
                                             >
-                                                <CheckCircle2 className="w-4 h-4"/> TAMAMLADIM / ONAYA GÖNDER
+                                                <CheckCircle2 className="w-4 h-4"/> TAMAMLADIM (KAPAT)
                                             </button>
                                         </div>
                                     </div>

@@ -13,11 +13,10 @@ try {
 
     // Now replace the entire Roles view
     const rolesTabStart = "{/* --- ROLES TAB (BÖLÜNMÜŞ GÖRÜNÜM / MATRİS) --- */}";
-    const targetNextTabMatch = content.match(/\{\/\* --- (TASKS|GÖREVLER) TAB/);
-    const tasksTabStart = targetNextTabMatch ? targetNextTabMatch[0] : "{/* --- TASKS TAB --- */}";
+    const performanceTabStart = "{/* --- PERFORMANCE TAB (KPI KARTLARI + TABLO) --- */}";
 
     const startIdx = content.indexOf(rolesTabStart);
-    const endIdx = content.indexOf(tasksTabStart, startIdx);
+    const endIdx = content.indexOf(performanceTabStart, startIdx);
 
     const newRolesCode = `
             {/* --- ROLES TAB (BÖLÜNMÜŞ GÖRÜNÜM / MATRİS) --- */}
@@ -25,7 +24,7 @@ try {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 min-h-[600px]">
                     {/* Sol Panel: Rol Listesi */}
                     <div className="lg:col-span-1 flex flex-col gap-4">
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm p-6 flex flex-col h-full">
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm p-6 flex flex-col h-[600px]">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Mevcut Kurumsal Roller</h3>
                                 <div className="group/tt relative inline-flex items-center justify-center">
@@ -40,14 +39,14 @@ try {
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
                                 <input type="text" placeholder="Rol ara..." className="w-full h-11 pl-10 pr-3 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] outline-none focus:border-blue-500 transition-all font-medium" />
                             </div>
-                            <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-1 pb-4">
+                            <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-1 pb-4 pr-2">
                                 {Object.keys(roleTemplates)?.map((roleName, idx) => {
                                     const isSelected = selectedRoleForPermissions === roleName;
                                     return (
                                         <button 
                                             key={idx} 
                                             onClick={() => setSelectedRoleForPermissions(roleName)}
-                                            className={\`flex items-center justify-between p-4 rounded-xl border transition-all text-left \${isSelected ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20 shadow-sm' : 'bg-white dark:bg-[#0f172a] border-slate-100 dark:border-slate-800 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-[#1e293b]'}\`}
+                                            className={\`flex items-center justify-between p-4 rounded-xl border transition-all text-left w-full \${isSelected ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20 shadow-sm' : 'bg-white dark:bg-[#0f172a] border-slate-100 dark:border-slate-800 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-[#1e293b]'}\`}
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className={\`w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner \${isSelected ? 'bg-blue-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}\`}>
@@ -70,20 +69,20 @@ try {
                     </div>
                     {/* Sağ Panel: Yetki Matrisi */}
                     <div className="lg:col-span-2 flex flex-col h-full">
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex-1 flex flex-col overflow-hidden">
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex-1 flex flex-col overflow-hidden h-[600px]">
                             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between bg-slate-50 dark:bg-[#1e293b] gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl shadow-lg border-2 border-slate-50 dark:border-slate-900">
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl shadow-lg border-2 border-slate-50 dark:border-slate-900 shrink-0">
                                         🛡️
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight">{selectedRoleForPermissions} Rolü Yetkileri</h3>
-                                        <p className="text-[11px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400 mt-1">
+                                        <h3 className="text-[18px] sm:text-lg font-black text-slate-900 dark:text-white leading-tight">{selectedRoleForPermissions} Rolü Yetkileri</h3>
+                                        <p className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400 mt-1">
                                             {selectedRoleForPermissions === 'Sistem Yöneticisi' ? 'Tüm modüllere sınırsız kurumsal erişim' : \`\${roleTemplates[selectedRoleForPermissions]?.length || 0} Adet Tanımlanmış Mikro Yetki\`}
                                         </p>
                                     </div>
                                 </div>
-                                <button className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-black tracking-widest uppercase rounded-xl text-[11px] shadow-sm transition-colors flex items-center justify-center gap-2">
+                                <button className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-black tracking-widest uppercase rounded-xl text-[11px] shadow-sm transition-colors flex items-center justify-center gap-2 shrink-0">
                                     <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
                                     DEĞİŞİKLİKLERİ KAYDET
                                 </button>
@@ -118,12 +117,12 @@ try {
                                                         const isChecked = selectedRoleForPermissions === 'Sistem Yöneticisi' ? true : roleTemplates[selectedRoleForPermissions]?.includes(perm.id);
                                                         return (
                                                             <label key={perm.id} className={\`flex items-start gap-3 p-3.5 rounded-xl border \${isChecked ? 'bg-blue-50/50 border-blue-200 dark:bg-blue-500/5 dark:border-blue-500/20 shadow-sm' : 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/5 hover:border-slate-300 transition-colors'} cursor-pointer group\`}>
-                                                                <div className="pt-0.5">
+                                                                <div className="pt-0.5 shrink-0">
                                                                     <input type="checkbox" checked={isChecked || false} readOnly className={\`w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer transition-all \${isChecked ? 'ring-2 ring-blue-500/20' : ''}\`} />
                                                                 </div>
-                                                                <div className="flex-1">
+                                                                <div className="flex-1 min-w-0">
                                                                     <span className={\`text-[13px] font-bold block mb-1 transition-colors \${isChecked ? 'text-blue-900 dark:text-blue-100' : 'text-slate-700 group-hover:text-slate-900 dark:text-slate-300 dark:group-hover:text-white'}\`}>{perm.label}</span>
-                                                                    <span className="text-[10px] text-slate-400 font-medium font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded opacity-60 group-hover:opacity-100 transition-opacity">{perm.id}</span>
+                                                                    <span className="text-[10px] text-slate-400 font-medium font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded opacity-60 group-hover:opacity-100 transition-opacity whitespace-nowrap overflow-hidden text-ellipsis">{perm.id}</span>
                                                                 </div>
                                                             </label>
                                                         );
