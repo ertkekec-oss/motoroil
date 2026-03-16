@@ -473,18 +473,20 @@ const MyTasksView = ({ user }: any) => {
         setIsUpdating(true);
         try {
             if (feedback.trim()) {
-                await fetch(`/api/staff/tasks/${selectedTask.id}/feedback`, {
+                const res1 = await fetch(`/api/staff/tasks/${selectedTask.id}/feedback`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content: feedback, isFromStaff: true })
                 });
+                if (!res1.ok) throw new Error("Yorum gönderilemedi.");
             }
             if (statusOverride) {
-                await fetch(`/api/staff/tasks/${selectedTask.id}`, {
+                const res2 = await fetch(`/api/staff/tasks/${selectedTask.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: statusOverride })
                 });
+                if (!res2.ok) throw new Error("Durum güncellenemedi.");
             }
             toast.success("Bilgiler iletildi!");
             setFeedback('');
