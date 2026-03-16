@@ -20,7 +20,7 @@ export interface SuspendedSale {
 }
 
 interface SalesContextType {
-    processSale: (saleData: any) => Promise<boolean>;
+    processSale: (saleData: any) => Promise<{success: boolean, error?: string}>;
     suspendedSales: SuspendedSale[];
     refreshSuspended: () => Promise<void>;
     suspendSale: (label: string, items: any[], customer: any | null, total: number) => Promise<void>;
@@ -72,7 +72,7 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
         }
     }, [isAuthenticated]);
 
-    const processSale = async (saleData: any) => {
+    const processSale = async (saleData: any): Promise<{success: boolean, error?: string}> => {
         recordSale();
         const saleBranch = saleData.branch || activeBranchName || 'Merkez';
 
@@ -90,9 +90,6 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
                     }
                     return s;
                 });
-
-                // If branch wasn't found in stocks, consider adding it if it's Merkez or similar
-                // But for optimistic, we usually expect it to exist if they are selling from it.
 
                 return {
                     ...p,
@@ -122,13 +119,13 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
             if (data.success) {
                 // Background update - Don't block the UI
                 Promise.all([refreshKasalar(), refreshCustomers(), refreshTransactions(), refreshProducts()]);
-                return true;
+                return { success: true };
             }
-            return false;
-        } catch (error) {
+            return { success: false, error: data.error || 'Bilinmeyen API hatası' };
+        } catch (error: any) {
             console.error('Sale process failed', error);
-            addNotification({ type: 'danger', icon: '⚠️', text: 'Satış kaydedilemedi (Offline Mod).' });
-            return false;
+            addNotification({ type: 'danger', icon: '⚠️', text: 'Bağlantı hatası: Sunucuya ulaşılamadı. (Offline Mod)' });
+            return { success: false, error: error.message || 'Network error' };
         }
     };
 

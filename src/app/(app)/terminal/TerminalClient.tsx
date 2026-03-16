@@ -147,7 +147,10 @@ export default function TerminalClient() {
     // Offline Sync
     useEffect(() => {
         if (isOnline) {
-            syncQueue(async (payload) => !!await processSale(payload));
+            syncQueue(async (payload) => {
+                const res = await processSale(payload);
+                return res.success;
+            });
         }
     }, [isOnline, processSale]);
 
@@ -280,8 +283,8 @@ export default function TerminalClient() {
     };
 
     const executeSale = async () => {
-        if (paymentMode !== 'account' && !selectedKasa && kasalar?.length > 0) {
-            return showWarning("Hata", "Lütfen kasa/banka seçiniz.");
+        if (paymentMode !== 'account' && !selectedKasa) {
+            return showWarning("Hata", "Lütfen kasa/banka hesabı seçiniz. Sistemde kasa yoksa Finans modülünden Nakit/Banka hesabı oluşturun.");
         }
 
         const payload = {
@@ -309,17 +312,17 @@ export default function TerminalClient() {
             }
 
             const currentCustomerId = customer?.id;
-            const success = await processSale(payload);
-            if (success) {
+            const res = await processSale(payload);
+            if (res.success) {
                 showSuccess("Satış Başarıyla Tamamlandı", "");
                 resetTerminalState();
                 if (currentCustomerId) {
                     router.push(`/customers/${currentCustomerId}`);
                 }
             } else {
-                showError("İşlem Reddedildi", "Satış kaydedilemedi.");
+                showError("İşlem Reddedildi", res.error || "Satış kaydedilemedi.");
             }
-        } catch (e: any) { showError("Hata", e.message); }
+        } catch (e: any) { showError("Hata", e.message || "Bilinmeyen hata"); }
         finally { setIsProcessing(false); searchInputRef.current?.focus(); }
     };
 

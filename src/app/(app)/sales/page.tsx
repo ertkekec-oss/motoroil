@@ -574,8 +574,7 @@ export default function SalesPage() {
     const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
     const [isCollecting, setIsCollecting] = useState(false);
 
-    const { processSale } = useSales();
-    // const { suppliers } = useFinancials(); // Removed duplicate/conflict
+
 
 
     const [selectedOrder, setSelectedOrder] = useState<any>(null);

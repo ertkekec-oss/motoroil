@@ -254,7 +254,7 @@ function POSContent() {
   const handleFinalize = async () => {
     if (cart.length === 0 || processingRef.current || isProcessing) return;
     if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
-    if (paymentMode !== 'account' && !selectedKasa) return showWarning("Hata", "Lütfen kasa/banka seçiniz.");
+    if (paymentMode !== 'account' && !selectedKasa) return showWarning("Hata", "Lütfen kasa/banka seçiniz. Hesabınızda kasa yoksa Finans modülünden oluşturun.");
     if (paymentMode === 'account' && selectedCustomer === 'Perakende Müşteri') return showWarning("Hata", "Perakende müşterisine veresiye satılamaz.");
 
     const canContinue = await checkUpsell('INVOICE_PAGE');
@@ -263,7 +263,7 @@ function POSContent() {
     processingRef.current = true;
     setIsProcessing(true);
     try {
-      const success = await processSale({
+      const res = await processSale({
         items: cart.map(i => ({ productId: i.id, qty: i.qty })),
         total: finalTotal,
         customerName: selectedCustomer,
@@ -277,7 +277,7 @@ function POSContent() {
         referenceCode: referenceCode,
         installments: installmentCount > 1 ? installmentCount : undefined
       });
-      if (success) {
+      if (res.success) {
         showSuccess("Başarılı", "Satış tamamlandı");
         setCart([]); setPaymentMode(null); setPointsToUse(0); setValidCoupon(null); setDiscountValue(0); setReferenceCode('');
 
@@ -289,9 +289,9 @@ function POSContent() {
           setSelectedCustomer('Perakende Müşteri');
         }
       } else {
-        showError("Hata", "Satış kaydedilemedi.");
+        showError("İşlem Reddedildi", res.error || "Satış kaydedilemedi.");
       }
-    } catch (e: any) { showError("Hata", e.message); }
+    } catch (e: any) { showError("Hata", e.message || "Bilinmeyen API hatası"); }
     finally {
       setIsProcessing(false);
       processingRef.current = false;
