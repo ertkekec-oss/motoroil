@@ -120,7 +120,7 @@ export default function SuppliersPage() {
     if (activeTab === "debt" && sup.balance >= 0) return false;
     if (activeTab === "credit" && sup.balance <= 0) return false;
     if (activeTab === "passive" && sup.isActive !== false) return false;
-    if (branchFilter !== "all" && (sup.branch || "Merkez") !== branchFilter)
+    if (branchFilter !== "all" && (sup.branch || "Merkez").toLowerCase() !== branchFilter.toLowerCase())
       return false;
     return true;
   });

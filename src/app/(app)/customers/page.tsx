@@ -67,7 +67,7 @@ export default function CustomersPage() {
             if (cust.customerClass !== activeTab && cust.category !== activeTab) return false;
         }
 
-        if (branchFilter !== 'all' && (cust.branch || 'Merkez') !== branchFilter) return false;
+        if (branchFilter !== 'all' && (cust.branch || 'Merkez').toLowerCase() !== branchFilter.toLowerCase()) return false;
 
         return true;
     });

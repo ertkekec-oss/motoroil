@@ -473,6 +473,9 @@ export default function Sidebar() {
                             onChange={handleBranchChange}
                             className="w-full px-3 py-2.5 rounded-[14px] font-semibold text-[13px] outline-none cursor-pointer transition-colors pdy-sb-select"
                         >
+                            {(!hasPermission('branch_isolation') || isSystemAdmin) && (
+                                <option value="all">🌐 TÜM ŞUBELER</option>
+                            )}
                             {branches.length > 0 ? (
                                 branches?.map(b => (
                                     <option key={b.id} value={b.name}>

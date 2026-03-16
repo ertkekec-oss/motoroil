@@ -44,8 +44,8 @@ export async function GET(request: Request) {
         // Apply Branch Isolation (Personel İzolasyon)
         if (isStaff && user.branch && user.branch !== 'all') {
             const branchCond = user.branch === 'Merkez' 
-                ? { OR: [{ branch: 'Merkez' }, { branch: null }, { branch: '' }] }
-                : { branch: user.branch };
+                ? { OR: [{ branch: { equals: 'Merkez', mode: 'insensitive' } }, { branch: null }, { branch: '' }] }
+                : { branch: { equals: user.branch, mode: 'insensitive' } };
                 
             if (where.AND) {
                 where.AND.push(branchCond);
