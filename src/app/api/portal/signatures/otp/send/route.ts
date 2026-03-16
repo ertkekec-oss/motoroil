@@ -6,7 +6,7 @@ import { createHash } from 'crypto';
 
 export async function POST(req: Request) {
     try {
-        const { token } = await req.json();
+        const { token, phone: reqPhone } = await req.json();
 
         if (!token) {
             return NextResponse.json({ error: 'Token is required' }, { status: 400 });
@@ -37,12 +37,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Bu zarf için OTP istenmiyor' }, { status: 400 });
         }
 
-        const config = await prisma.otpProviderConfig.findUnique({
+        let config = await prisma.otpProviderConfig.findUnique({
             where: { tenantId_providerName: { tenantId: envelope.tenantId, providerName: 'NETGSM' } }
         });
 
-        // Phone Resolution Logic
-        const resolvedPhone = session.recipient.phone || session.recipient.signer?.phone;
+        if (!config || !config.isEnabled) {
+            config = await prisma.otpProviderConfig.findUnique({
+                where: { tenantId_providerName: { tenantId: 'PLATFORM_ADMIN', providerName: 'NETGSM' } }
+            });
+        }
+
+        // Phone Resolution Logic (priority to user submitted phone)
+        const resolvedPhone = reqPhone || session.recipient.phone || session.recipient.signer?.phone;
 
         if (!resolvedPhone) {
             return NextResponse.json({ error: 'No phone number available for OTP verification.' }, { status: 400 });

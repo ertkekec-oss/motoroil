@@ -1,0 +1,71 @@
+{
+  "events": [
+    {
+      "id": "cmmsj521y0004nbp0zyrxtr6c",
+      "tenantId": "cmmqvlxis0005ips96a93jf0h",
+      "envelopeId": "cmmsj4gep0000g0wi8nuq6jsp",
+      "action": "OTP_SENT",
+      "actorId": "cmmsj4gep0001g0wing7le05i",
+      "ip": null,
+      "userAgent": null,
+      "metaJson": {
+        "phone": "5330213403",
+        "code_simulated": "123456"
+      },
+      "createdAt": "2026-03-16T01:53:43.078Z"
+    },
+    {
+      "id": "cmmsj28i1000d24v9wmppgag1",
+      "tenantId": "cmmqvlxis0005ips96a93jf0h",
+      "envelopeId": "cmmsj1kg1000024v9q6zqaj9u",
+      "action": "OTP_SENT",
+      "actorId": "cmmsj1kg1000124v9ettc5qev",
+      "ip": null,
+      "userAgent": null,
+      "metaJson": {
+        "phone": "05330213403",
+        "code_simulated": "123456"
+      },
+      "createdAt": "2026-03-16T01:51:31.466Z"
+    }
+  ],
+  "configs": [
+    {
+      "id": "cmmqxc0km0000100oar9k5bev",
+      "tenantId": "PLATFORM_ADMIN",
+      "providerName": "NETGSM",
+      "isEnabled": true,
+      "apiUsername": "8503095238",
+      "apiPasswordEncrypted": "N5.67eC1",
+      "sender": "MotoroilLtd",
+      "otpTemplate": "Doğrulama kodunuz: {{code}}",
+      "codeLength": 6,
+      "ttlSeconds": 180,
+      "cooldownSeconds": 60,
+      "maxDailyAttempts": 5,
+      "testPhone": "05330213403",
+      "createdAt": "2026-03-14T22:55:29.930Z",
+      "updatedAt": "2026-03-14T23:02:23.159Z"
+    }
+  ],
+  "envelopes": [
+    {
+      "id": "cmmsj4gep0000g0wi8nuq6jsp",
+      "tenantId": "cmmqvlxis0005ips96a93jf0h",
+      "companyId": "cmmqvlxis0005ips96a93jf0h",
+      "title": "deneme",
+      "documentKey": "tenants/cmmqvlxis0005ips96a93jf0h/signatures/drafts/e3a1c62c-ec28-49ef-92fe-257ed28c706d-AKBANK_Entegrasyon_Formu12.pdf",
+      "documentFileName": "AKBANK_Entegrasyon_Formu12.pdf",
+      "status": "PENDING",
+      "provider": null,
+      "createdByUserId": "cmmqvlxqo0007ips9e8ftdkiw",
+      "createdAt": "2026-03-16T01:53:14.933Z",
+      "updatedAt": "2026-03-16T01:53:14.933Z",
+      "completedAt": null,
+      "signedDocumentKey": null,
+      "otpRequired": true,
+      "sequentialSigning": true,
+      "documentCategory": "CONTRACT"
+    }
+  ]
+}
