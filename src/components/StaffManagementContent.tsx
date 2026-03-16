@@ -201,87 +201,78 @@ export default function StaffManagementContent() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const allPermissions = [
-        // --- SATIŞ & POS ---
-        { id: 'pos_access', label: 'Hızlı Satış (POS) Erişimi', category: 'Satış' },
-        { id: 'sales_archive', label: 'Geçmiş Satışları Görme', category: 'Satış' },
-        { id: 'discount_auth', label: 'İskonto Yapma Yetkisi', category: 'Satış' },
-        { id: 'price_override', label: '💸 Fiyat Değiştirme / Manuel Fiyat', category: 'Satış' },
-        { id: 'return_create', label: '↩️ İade Alma', category: 'Satış' },
-        { id: 'credit_sales', label: 'Veresiye (Açık Hesap) Satış', category: 'Satış' },
-        { id: 'field_sales_access', label: '📍 Saha Satış Modülü Erişimi (Mobil)', category: 'Satış' },
-        { id: 'field_sales_admin', label: '🗺️ Saha Satış Yönetimi (Rota Planlama)', category: 'Satış' },
+        // --- SATIŞ & OPERASYON ---
+        { id: 'pos_access', label: 'Hızlı Satış (POS) Erişimi', category: 'Satış & Operasyon' },
+        { id: 'sales_archive', label: 'Geçmiş Satışları Görüntüleme', category: 'Satış & Operasyon' },
+        { id: 'discount_auth', label: 'İskonto ve Fiyat Düşürme Yetkisi', category: 'Satış & Operasyon' },
+        { id: 'price_override', label: '💸 Anlık Fiyat Değiştirme / İnsiyatif', category: 'Satış & Operasyon' },
+        { id: 'return_create', label: '↩️ Ürün İade Alma ve İşleme', category: 'Satış & Operasyon' },
+        { id: 'credit_sales', label: 'Açık Hesap (Veresiye) Satış Yetkisi', category: 'Satış & Operasyon' },
+        { id: 'offer_create', label: 'Müşteriye Teklif Hazırlama', category: 'Satış & Operasyon' },
+        { id: 'offer_approve', label: '✅ Teklif Onaylama ve Siparişe Çevirme', category: 'Satış & Operasyon' },
+        { id: 'ecommerce_view', label: 'E-Ticaret Paneli Görüntüleme', category: 'Satış & Operasyon' },
+        { id: 'ecommerce_manage', label: 'E-Ticaret Sipariş Yönetimi', category: 'Satış & Operasyon' },
+        { id: 'field_sales_access', label: '📍 Saha Satış Modülü Erişimi (Mobil)', category: 'Satış & Operasyon' },
+        { id: 'field_sales_admin', label: '🗺️ Saha Satış Yönetimi (Rota Planlama)', category: 'Satış & Operasyon' },
 
-        // --- SERVİS & İŞ EMRİ ---
-        { id: 'service_view', label: 'Servis / İş Emirlerini Görme', category: 'Servis' },
-        { id: 'service_create', label: 'Yeni İş Emri Oluşturma', category: 'Servis' },
-        { id: 'service_complete', label: 'İş Emri Tamamlama / Kapatma', category: 'Servis' },
-        { id: 'appointment_manage', label: 'Randevu Takvimi Yönetimi', category: 'Servis' },
+        // --- STOK & ÜRETİM ---
+        { id: 'inventory_view', label: 'Depo ve Stok Görüntüleme', category: 'Stok & Üretim' },
+        { id: 'inventory_edit', label: 'Ürün Kartı Ekleme ve Düzenleme', category: 'Stok & Üretim' },
+        { id: 'inventory_transfer', label: 'Depolar Arası Transfer', category: 'Stok & Üretim' },
+        { id: 'stock_correction', label: 'Stok Sayım ve Miktar Düzeltme', category: 'Stok & Üretim' },
+        { id: 'approve_products', label: '🔴 Ürün Kartı Kesin Onayı', category: 'Stok & Üretim' },
+        { id: 'approve_transfers', label: '🔴 Sistem İçi Transfer Onaylama', category: 'Stok & Üretim' },
 
-        // --- TEKLİF YÖNETİMİ ---
-        { id: 'offer_create', label: 'Teklif Hazırlama', category: 'Teklif' },
-        { id: 'offer_approve', label: '✅ Teklif Onaylama / Satışa Çevirme', category: 'Teklif' },
+        // --- FİNANS & MUHASEBE ---
+        { id: 'finance_view', label: 'Finansal Gösterge Paneli ve Özetler', category: 'Finans & Muhasebe' },
+        { id: 'finance_transactions', label: 'Kasa ve Banka Hareketleri', category: 'Finans & Muhasebe' },
+        { id: 'accounting_manage', label: 'Kasa/Banka Hesap Yönetimi', category: 'Finans & Muhasebe' },
+        { id: 'expense_create', label: 'Gider ve Masraf Fişi Girişi', category: 'Finans & Muhasebe' },
+        { id: 'finance_reports', label: 'Bilanço ve Kar/Zarar Göstergeleri', category: 'Finans & Muhasebe' },
+        { id: 'tax_manage', label: 'KDV, Vergi ve Beyannameler', category: 'Finans & Muhasebe' },
+        { id: 'mizan_export', label: 'Mizan ve Mali Dışa Aktarımlar', category: 'Finans & Muhasebe' },
+        { id: 'e_invoice', label: 'Resmi e-Fatura ve e-Arşiv Kesimi', category: 'Finans & Muhasebe' },
+        { id: 'create_bank', label: '🔴 Kasa/Banka Açma ve Kapatma', category: 'Finans & Muhasebe' },
 
-        // --- DEPO & STOK ---
-        { id: 'inventory_view', label: 'Stok Görüntüleme', category: 'Depo' },
-        { id: 'inventory_edit', label: 'Ürün Ekleme / Düzenleme', category: 'Depo' },
-        { id: 'inventory_transfer', label: 'Depolar Arası Transfer İsteği', category: 'Depo' },
-        { id: 'stock_correction', label: 'Stok Sayım / Düzeltme', category: 'Depo' },
+        // --- MÜŞTERİ & TEDARİKÇİ (CRM) ---
+        { id: 'customer_view', label: 'Müşteri (Cari) Listesi', category: 'Müşteri & Tedarikçi' },
+        { id: 'customer_edit', label: 'Müşteri Ekleme ve Düzenleme', category: 'Müşteri & Tedarikçi' },
+        { id: 'customer_delete', label: '⚠️ Müşteri Silme Yetkisi', category: 'Müşteri & Tedarikçi' },
+        { id: 'supplier_view', label: 'Tedarikçi Listesi', category: 'Müşteri & Tedarikçi' },
+        { id: 'supplier_edit', label: 'Tedarikçi Ekleme ve Düzenleme', category: 'Müşteri & Tedarikçi' },
 
-        // --- MUHASEBE & FİNANS ---
-        { id: 'finance_view', label: 'Finansal Özetleri Görme', category: 'Finans' },
-        { id: 'finance_transactions', label: 'Kasa/Banka Hareketleri', category: 'Finans' },
-        { id: 'accounting_manage', label: 'Kasa/Banka Hesap Yönetimi', category: 'Finans' },
-        { id: 'expense_create', label: 'Gider / Masraf Girişi', category: 'Finans' },
-        { id: 'finance_reports', label: 'Bilanço ve Kar/Zarar', category: 'Finans' },
+        // --- İNSAN KAYNAKLARI (HR) ---
+        { id: 'hr_view', label: 'Personel Listesini Görüntüleme', category: 'İnsan Kaynakları' },
+        { id: 'hr_manage', label: 'Personel Dosyası Düzenleme', category: 'İnsan Kaynakları' },
+        { id: 'staff_manage', label: 'Personel Operasyon Yönetimi', category: 'İnsan Kaynakları' },
+        { id: 'shift_manage', label: 'Vardiya ve İzinleri Yönetme', category: 'İnsan Kaynakları' },
+        { id: 'payroll_manage', label: 'Maaş, Prim ve Bordro Onayı', category: 'İnsan Kaynakları' },
+        { id: 'create_staff', label: '🔴 Yeni Personel Girişi / Çıkışı', category: 'İnsan Kaynakları' },
 
-        // --- MÜŞTERİ & TEDARİKÇİ ---
-        { id: 'customer_view', label: 'Müşteri Listesi', category: 'Cari' },
-        { id: 'customer_edit', label: 'Müşteri Ekleme / Düzenleme', category: 'Cari' },
-        { id: 'customer_delete', label: '⚠️ Müşteri Silme', category: 'Cari' },
-        { id: 'supplier_view', label: 'Tedarikçi Listesi', category: 'Cari' },
-        { id: 'supplier_edit', label: 'Tedarikçi Yönetimi', category: 'Cari' },
+        // --- SERVİS & TEKNİK ---
+        { id: 'service_view', label: 'Servis / İş Emirlerini Görme', category: 'Servis & Teknik' },
+        { id: 'service_create', label: 'Yeni İş Emri Oluşturma', category: 'Servis & Teknik' },
+        { id: 'service_complete', label: 'İş Emri Tamamlama / Kapatma', category: 'Servis & Teknik' },
 
-        // --- E-TİCARET ---
-        { id: 'ecommerce_view', label: 'E-Ticaret Paneli', category: 'Online' },
-        { id: 'ecommerce_manage', label: 'Sipariş ve Entegrasyon Yönetimi', category: 'Online' },
-
-        // --- YÖNETİM & GÜVENLİK ---
-        { id: 'staff_manage', label: 'Personel Yönetimi', category: 'Yönetim' },
-        { id: 'settings_manage', label: 'Sistem Ayarları', category: 'Yönetim' },
-        { id: 'admin_view', label: '⚙️ Platform Yönetim Paneli', category: 'Yönetim' },
-        { id: 'security_access', label: 'Güvenlik Masası / Loglar', category: 'Yönetim' },
-
-        // --- KRİTİK İŞLEMLER ---
-        { id: 'delete_records', label: '🔴 Kayıt Silme (Genel)', category: 'Kritik' },
-        { id: 'create_staff', label: '🔴 Personel Ekleme', category: 'Kritik' },
-        { id: 'create_bank', label: '🔴 Kasa/Banka Silme/Açma', category: 'Kritik' },
-        { id: 'approve_products', label: '🔴 Ürün Kartı Onayı', category: 'Kritik' },
-        { id: 'approve_transfers', label: '🔴 Transfer Onaylama', category: 'Kritik' },
-
-        // --- İNSAN KAYNAKLARI & BORDRO ---
-        { id: 'hr_view', label: 'Personel Listesi Görme', category: 'İnsan Kayn.' },
-        { id: 'hr_manage', label: 'Personel Ekle/Çıkar', category: 'İnsan Kayn.' },
-        { id: 'payroll_manage', label: 'Maaş ve Bordro Onayı', category: 'İnsan Kayn.' },
-        { id: 'shift_manage', label: 'Vardiya ve İzinleri Yönet', category: 'İnsan Kayn.' },
-
-        // --- RESMİ MUHASEBE & MALİ MÜŞAVİR ---
-        { id: 'tax_manage', label: 'KDV, Vergi ve Beyannameler', category: 'Resmi Muh.' },
-        { id: 'mizan_export', label: 'Mizan ve Dışa Aktarımlar', category: 'Resmi Muh.' },
-        { id: 'e_invoice', label: 'Resmi e-Fatura ve e-Arşiv Kesimi', category: 'Resmi Muh.' },
+        // --- YÖNETİM & PLATFORM ---
+        { id: 'settings_manage', label: 'Sistem Ayarları', category: 'Yönetim & Platform' },
+        { id: 'admin_view', label: '⚙️ Platform Yönetim Paneli', category: 'Yönetim & Platform' },
+        { id: 'security_access', label: 'Güvenlik Masası / Loglar', category: 'Yönetim & Platform' },
+        { id: 'delete_records', label: '🔴 Kayıt Silme (Genel)', category: 'Yönetim & Platform' },
 
         // --- ÖZEL KISITLAMALAR ---
-        { id: 'branch_isolation', label: '🚫 Şube İzolasyonu (Sadece Kendi Şubesi)', category: 'Kısıtlama' }
+        { id: 'branch_isolation', label: '🚫 Şube İzolasyonu (Sadece Kendi Şubesi)', category: 'Kısıtlamalar' }
     ];
 
     const roleTemplates: Record<string, string[]> = {
-        'Yönetici': allPermissions?.map(p => p.id),
-        'Şube Müdürü': ['pos_access', 'sales_archive', 'discount_auth', 'inventory_view', 'customer_view', 'customer_edit', 'service_view', 'service_create', 'branch_isolation'],
-        'Saha Satış': ['field_sales_access', 'field_sales_admin', 'customer_view', 'customer_edit', 'inventory_view', 'pos_access', 'sales_archive'],
-        'E-Ticaret Uzmanı': ['ecommerce_view', 'ecommerce_manage', 'inventory_view', 'inventory_edit', 'sales_archive'],
-        'Servis Personeli': ['service_view', 'service_create', 'service_complete', 'inventory_view'],
-        'İnsan Kaynakları': ['hr_view', 'hr_manage', 'payroll_manage', 'shift_manage', 'staff_manage'],
-        'Mali Müşavir': ['tax_manage', 'mizan_export', 'e_invoice', 'finance_view', 'finance_transactions', 'finance_reports'],
-        'Personel': ['pos_access', 'branch_isolation']
+        'Sistem Yöneticisi': allPermissions.map(p => p.id),
+        'Şube Yöneticisi': ['pos_access', 'sales_archive', 'discount_auth', 'inventory_view', 'customer_view', 'customer_edit', 'service_view', 'service_create', 'branch_isolation', 'hr_view', 'finance_view', 'expense_create'],
+        'Saha Satış': ['field_sales_access', 'field_sales_admin', 'customer_view', 'customer_edit', 'inventory_view', 'pos_access', 'sales_archive', 'branch_isolation'],
+        'E-Ticaret Uzmanı': ['ecommerce_view', 'ecommerce_manage', 'inventory_view', 'inventory_edit', 'sales_archive', 'branch_isolation'],
+        'Servis Personeli': ['service_view', 'service_create', 'service_complete', 'inventory_view', 'branch_isolation'],
+        'İnsan Kaynakları': ['hr_view', 'hr_manage', 'payroll_manage', 'shift_manage', 'staff_manage', 'create_staff', 'branch_isolation'],
+        'Mali Müşavir': ['tax_manage', 'mizan_export', 'e_invoice', 'finance_view', 'finance_transactions', 'finance_reports', 'accounting_manage'],
+        'Kasiyer / Standart Personel': ['pos_access', 'branch_isolation']
     };
 
     const filteredStaff = useMemo(() => {
@@ -927,8 +918,9 @@ export default function StaffManagementContent() {
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
                                             className={activeTab === tab.id
-                                                ? "px-3 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-600 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-[6px] transition-all"
-                                                : "px-3 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
+                                                ? "px-3 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
+                                                : "px-3 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
+                                            }
                                         >
                                             {tab.label}
                                         </button>
@@ -1120,7 +1112,7 @@ export default function StaffManagementContent() {
                                     <button key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left ${idx === 0 ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'}`}>
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg ${idx === 0 ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}>
-                                                {roleName === 'Yönetici' ? '👑' : roleName === 'Saha Satış' ? '📍' : roleName === 'Şube Müdürü' ? '🏢' : '👤'}
+                                                {roleName === 'Sistem Yöneticisi' ? '👑' : roleName === 'Saha Satış' ? '📍' : roleName === 'Şube Yöneticisi' ? '🏢' : '👤'}
                                             </div>
                                             <div>
                                                 <div className={`text-[13px] font-bold ${idx === 0 ? 'text-blue-700' : 'text-slate-900'}`}>{roleName}</div>
@@ -1138,7 +1130,7 @@ export default function StaffManagementContent() {
                         <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex-1 flex flex-col h-full overflow-hidden">
                             <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-[#1e293b]">
                                 <div>
-                                    <h3 className="text-lg font-black text-slate-900 dark:text-white">Yönetici Rolü Yetkileri</h3>
+                                    <h3 className="text-lg font-black text-slate-900 dark:text-white">Sistem Yöneticisi Rolü Yetkileri</h3>
                                     <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Tüm modüllere sınırsız erişim (Tam Yetki)</p>
                                 </div>
                                 <button className="h-10 px-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[12px] text-[13px] hover:bg-slate-50 shadow-sm transition-colors">Düzenle</button>
@@ -2042,14 +2034,14 @@ export default function StaffManagementContent() {
                                                 <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest pl-1">Departman & Yönetim Rolü *</label>
                                                 <select className="w-full h-12 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] px-4 text-[14px] font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all" value={newStaff.role} onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}>
                                                     <option value="">Organizasyon Şeması Rolü Seçiniz</option>
-                                                    <option value="Yönetici">👑 Yönetici (Üst Yönetim)</option>
-                                                    <option value="Şube Müdürü">🏢 Şube Müdürü / Yöneticisi</option>
-                                                    <option value="Muhasebe">💰 Finans & Muhasebe Uzmanı</option>
-                                                    <option value="İnsan Kaynakları">👥 İnsan Kaynakları Uzmanı</option>
-                                                    <option value="Servis Personeli">🔧 Servis & Teknik Personel</option>
-                                                    <option value="Satış Temsilcisi">🤝 Satış Temsilcisi (Ofis)</option>
+                                                    <option value="Sistem Yöneticisi">👑 Sistem Yöneticisi (Üst Yönetim)</option>
+                                                    <option value="Şube Yöneticisi">🏢 Şube Yöneticisi</option>
+                                                    <option value="E-Ticaret Uzmanı">🌐 E-Ticaret Uzmanı</option>
                                                     <option value="Saha Satış">🚚 Saha Satış Uzmanı</option>
-                                                    <option value="Personel">👤 Genel Personel</option>
+                                                    <option value="Mali Müşavir">💼 Mali Müşavir</option>
+                                                    <option value="İnsan Kaynakları">👥 İnsan Kaynakları Yetkilisi</option>
+                                                    <option value="Servis Personeli">🔧 Servis Personeli</option>
+                                                    <option value="Kasiyer / Standart Personel">👤 Kasiyer / Standart Personel</option>
                                                 </select>
                                             </div>
 
