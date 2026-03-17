@@ -133,22 +133,54 @@ export async function POST(req: Request) {
 
             const totalBonus = bonusSgkExempt + bonusTaxable;
 
-            // 2. Kıstelyevm ve PDKS (Çalışılan Gün) Kontrolü
+            // 2. Kıstelyevm (Çalışılan Gün) Kontrolü
             let workedDays = 30;
-            if (staff.entryDate && new Date(staff.entryDate) > periodStart) {
-                const msDiff = periodEnd.getTime() - new Date(staff.entryDate).getTime();
-                workedDays = Math.ceil(msDiff / (1000 * 3600 * 24));
-                if (workedDays > 30) workedDays = 30; // Max 30 SGK günü
-            }
-            if (staff.leaveDate && new Date(staff.leaveDate) < periodEnd) {
-                let startDateToUse = periodStart;
-                if (staff.entryDate && new Date(staff.entryDate) > periodStart) startDateToUse = new Date(staff.entryDate);
-                const msDiff = new Date(staff.leaveDate).getTime() - startDateToUse.getTime();
+            
+            const staffEntry = staff.entryDate ? new Date(staff.entryDate) : null;
+            const staffLeave = staff.leaveDate ? new Date(staff.leaveDate) : null;
+            
+            if (staffEntry && staffEntry > periodStart && staffEntry <= periodEnd) {
+                const msDiff = periodEnd.getTime() - staffEntry.getTime();
                 workedDays = Math.ceil(msDiff / (1000 * 3600 * 24)) + 1;
-                if (workedDays > 30) workedDays = 30;
+            }
+            
+            if (staffLeave && staffLeave < periodEnd && staffLeave >= periodStart) {
+                const startDateToUse = (staffEntry && staffEntry > periodStart) ? staffEntry : periodStart;
+                const msDiff = staffLeave.getTime() - startDateToUse.getTime();
+                workedDays = Math.ceil(msDiff / (1000 * 3600 * 24)) + 1;
+            }
+            if (workedDays > 30) workedDays = 30;
+
+            // PDKS Devamsızlık ve Ücretsiz İzin Kesintileri
+            const leaveRequests = await prisma.leaveRequest.findMany({
+                where: {
+                    staffId: staff.id,
+                    status: 'Onaylandı',
+                    type: 'Ücretsiz İzin',
+                    startDate: { lte: periodEnd },
+                    endDate: { gte: periodStart }
+                }
+            });
+
+            let unpaidLeaveDays = 0;
+            for (const lr of leaveRequests) {
+                const overlapStart = lr.startDate > periodStart ? lr.startDate : periodStart;
+                const overlapEnd = lr.endDate < periodEnd ? lr.endDate : periodEnd;
+                const overlapMs = overlapEnd.getTime() - overlapStart.getTime();
+                let overlapDays = Math.ceil(overlapMs / (1000 * 3600 * 24)) + 1;
+                if (overlapDays > 0) unpaidLeaveDays += overlapDays;
             }
 
-            // TODO: PDKS devamsızlık düşülebilir (gelecekte).
+            const absences = await prisma.attendance.count({
+                where: {
+                    staffId: staff.id,
+                    date: { gte: periodStart, lte: periodEnd },
+                    status: 'ABSENT' 
+                }
+            });
+
+            workedDays -= (unpaidLeaveDays + absences);
+            if (workedDays < 0) workedDays = 0;
             
             // 3. Maaş Hesaplama Motoru (GROSS vs NET)
             const baseSalary = Number(staff.salary || 0);
