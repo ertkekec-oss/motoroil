@@ -33,16 +33,19 @@ export async function POST(request: Request) {
             if (staffRecord) finalStaffId = staffRecord.id;
         }
 
-        // Get the default company for this tenant
-        const company = await prisma.company.findFirst({
-            where: { tenantId: (user as any).tenantId || 'PLATFORM_ADMIN' }
-        });
+        // Get the default company for this tenant or use session companyId
+        let companyId = (user as any).companyId;
+        
+        if (!companyId) {
+            const company = await prisma.company.findFirst({
+                where: { tenantId: (user as any).tenantId || 'PLATFORM_ADMIN' }
+            });
 
-        if (!company && (user as any).tenantId !== 'PLATFORM_ADMIN') {
-            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 404 });
+            if (!company && (user as any).tenantId !== 'PLATFORM_ADMIN') {
+                return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 404 });
+            }
+            companyId = company?.id;
         }
-
-        const companyId = company?.id;
 
         console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode, companyId, finalStaffId });
 
@@ -86,7 +89,7 @@ export async function POST(request: Request) {
                 where: {
                     isActive: true,
                     type: 'Banka',
-                    companyId: company.id // Strict Tenant Isolation
+                    companyId: companyId // Strict Tenant Isolation
                 }
             });
             targetKasaId = bankKasa?.id;
