@@ -827,12 +827,9 @@ export class NilveraInvoiceService {
     async cancelEArchiveInvoice(uuid: string, notes: string = "İptal/İade") {
         try {
             console.log(`[NilveraService] Canceling EArchive Invoice: UUID=${uuid}`);
-            const res = await axios.post(
-                `${this.config.baseUrl}/EArchive/Invoice/Cancel`,
-                [{
-                    UUID: uuid,
-                    Notes: notes
-                }],
+            const res = await axios.put(
+                `${this.config.baseUrl}/earchive/Invoices/${uuid}/Cancel`,
+                null,
                 {
                     headers: this.getHeaders(),
                     validateStatus: () => true

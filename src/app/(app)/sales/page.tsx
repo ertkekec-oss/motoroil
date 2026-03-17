@@ -72,30 +72,120 @@ export default function SalesPage() {
 
     const handleDeleteInvoice = async (id: string, isFormal?: boolean) => {
         const warningMessage = isFormal 
-            ? 'DİKKAT: Bu resmi bir faturadır! İptal ederseniz GİB portaldan veya e-Logo üzerinden de faturayı reddetmeli/iptal etmelisiniz. Sistemden sildiğinizde bakiye ve stoklar GERİ ALINACAKTIR. Emin misiniz?'
-            : 'Bu faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.';
+            ? 'DİKKAT: Bu resmi bir faturadır! İptal ederseniz GİB portalı veya e-Arşiv üzerinden faturayı iptal edeceğiz. GİB reddi yapılamıyorsa sadece sistem etkilerini geri alma seçeneği sunulacaktır.\n\nFatura iadesi seçeneğinizi belirleyin:'
+            : 'Bu (proforma/taslak) faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.';
 
-        showConfirm(isFormal ? 'Resmi Fatura İptali' : 'Fatura İptal Edilecek', warningMessage, async () => {
-            try {
-                const res = await apiFetch(`/api/sales/invoices/${id}`, { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) {
-                    showSuccess('İptal Başarılı', data.message || 'Fatura ve finansal etkileri iptal edildi.');
-                    fetchInvoices();
-                    if (activeTab === 'store') {
-                        // Refresh store tab if we are there
-                        apiFetch('/api/sales/history?source=POS').then(r => r.json()).then(d => {
-                            if (d.success) setStoreOrders(d.orders);
-                        });
-                    }
+        if (!isFormal) {
+            showConfirm('Fatura İptal Edilecek', warningMessage, async () => {
+                await processCancelRequest(id, 'cancel');
+            });
+            return;
+        }
+
+        // Custom Modal approach for Formal Cancellations -> to select Refund Option
+        const handleCancelCustom = () => {
+             const overlay = document.createElement('div');
+             overlay.style.position = 'fixed';
+             overlay.style.top = '0'; overlay.style.left = '0'; overlay.style.width = '100vw'; overlay.style.height = '100vh';
+             overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
+             overlay.style.zIndex = '999999';
+             overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center';
+
+             const box = document.createElement('div');
+             box.style.background = theme === 'light' ? '#fff' : '#1e293b';
+             box.style.color = theme === 'light' ? '#000' : '#fff';
+             box.style.padding = '24px';
+             box.style.borderRadius = '16px';
+             box.style.width = '450px';
+             box.style.maxWidth = '90%';
+             box.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+
+             box.innerHTML = `
+                 <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 12px; color: ${theme === 'light' ? '#dc2626' : '#f87171'}">Resmi Fatura İptal Seçenekleri</h3>
+                 <p style="font-size: 14px; margin-bottom: 24px; opacity: 0.8">${warningMessage}</p>
+                 
+                 <div style="display: flex; flex-direction: column; gap: 12px;">
+                     <button id="btn-balance" style="padding: 12px; border-radius: 8px; border: 1px solid #3b82f6; background: rgba(59, 130, 246, 0.1); color: #3b82f6; text-align: left; cursor: pointer; font-weight: 500;">
+                         <strong>💰 İadeyi Bakiye Olarak Yükle (Cari Alacak)</strong><br/>
+                         <span style="font-size: 12px; opacity: 0.8">Fatura iptal edilir, nakit çıkışı olmaz. Müşteri carisine alacak yazılır.</span>
+                     </button>
+                     <button id="btn-refund" style="padding: 12px; border-radius: 8px; border: 1px solid #dc2626; background: rgba(220, 38, 38, 0.1); color: #dc2626; text-align: left; cursor: pointer; font-weight: 500;">
+                         <strong>💳 Tamamen Para İadesi Yap (Kasa Çıkışı)</strong><br/>
+                         <span style="font-size: 12px; opacity: 0.8">Fatura iptal edilir ve müşteriye para nakden/bankadan iade edilir.</span>
+                     </button>
+                     <button id="btn-abort" style="padding: 12px; border-radius: 8px; border: 1px solid #64748b; background: transparent; color: #64748b; text-align: center; cursor: pointer; font-weight: 500; margin-top: 8px;">
+                         Vazgeç
+                     </button>
+                 </div>
+             `;
+
+             overlay.appendChild(box);
+             document.body.appendChild(overlay);
+
+             const cleanup = () => { document.body.removeChild(overlay); };
+
+             document.getElementById('btn-balance')!.onclick = () => {
+                 cleanup();
+                 processCancelRequest(id, 'balanceToCustomer');
+             };
+             document.getElementById('btn-refund')!.onclick = () => {
+                 cleanup();
+                 processCancelRequest(id, 'cashRefund');
+             };
+             document.getElementById('btn-abort')!.onclick = cleanup;
+        };
+
+        handleCancelCustom();
+    };
+
+    const processCancelRequest = async (id: string, refundOption: 'cancel' | 'balanceToCustomer' | 'cashRefund') => {
+        try {
+            const res = await apiFetch(`/api/sales/invoices/${id}`, { 
+                method: 'DELETE',
+                body: JSON.stringify({ refundOption })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                showSuccess('İptal Başarılı', data.message || 'Fatura ve finansal etkileri iptal edildi.');
+                fetchInvoices();
+                if (activeTab === 'store') {
+                    apiFetch('/api/sales/history?source=POS').then(r => r.json()).then(d => {
+                        if (d.success) setStoreOrders(d.orders);
+                    });
+                }
+            } else {
+                // If the error asks to force local cancel because Nilvera failed
+                if (data.askForLocalCancel) {
+                    showConfirm('Nilvera İptali Başarısız', `${data.error}\n\nSadece Periodya sistemindeki karşılığını (Stok ve Kasa hareketini) iptal edip bağları koparmak ister misiniz? Mükerrer işlem oluşmadığından emin olun.`, async () => {
+                        await processCancelRequestByForce(id, refundOption);
+                    });
                 } else {
                     showError('Hata', data.error || 'İptal edilemedi.');
                 }
-            } catch (e) {
-                showError('Hata', 'Bağlantı hatası.');
             }
-        });
+        } catch (e) {
+            showError('Hata', 'Bağlantı hatası.');
+        }
     };
+
+    const processCancelRequestByForce = async (id: string, refundOption: string) => {
+        try {
+            const res = await apiFetch(`/api/sales/invoices/${id}`, { 
+                method: 'DELETE',
+                body: JSON.stringify({ refundOption, forceLocalCancel: true })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess('Başarılı', data.message || 'Yerel sistem iptali/iadesi tamamlandı.');
+                fetchInvoices();
+            } else {
+                showError('Hata', data.error || 'İptal edilemedi.');
+            }
+        } catch(e) {
+            showError('Hata', 'Bağlantı hatası.');
+        }
+    }
 
     const handleDeleteStoreSale = async (id: string) => {
         showConfirm('Satış Silinecek', 'Bu mağaza satışını (POS) tamamen silmek ve stok/kasa/cari hareketlerini GERİ ALMAK istediğinize emin misiniz?', async () => {

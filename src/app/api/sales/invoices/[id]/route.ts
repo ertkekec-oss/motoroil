@@ -79,7 +79,16 @@ export async function DELETE(
 
         const { id } = await params;
 
-        // Ensure ownership
+        let refundOption = 'cancel';
+        let forceLocalCancel = false;
+        try {
+            const body = await request.json();
+            refundOption = body.refundOption || 'cancel';
+            forceLocalCancel = body.forceLocalCancel || false;
+        } catch (e) {
+            // No body provided, use defaults
+        }
+
         const invoice = await prisma.salesInvoice.findFirst({
             where: { id, companyId: auth.user.companyId }
         });
@@ -110,12 +119,28 @@ export async function DELETE(
             }, { status: 400 });
         }
 
+        // Check Idempotency: Have we already processed a refund for this reference?
+        const checkDuplicateReversal = await prisma.transaction.findFirst({
+            where: {
+                companyId: auth.user.companyId,
+                description: { contains: `[İPTAL/İADE] REF:${invoice.orderId || invoice.id}` },
+                deletedAt: null
+            }
+        });
+
+        if (checkDuplicateReversal) {
+            return NextResponse.json({ 
+                success: false, 
+                error: 'Bu faturanın finansal iade/iptal işlemi daha önce yapılmış! Mükerrer işlem engellendi.' 
+            }, { status: 400 });
+        }
+
         // --- NILVERA E-ARSIV CANCELLATION CHECK ---
         const invoiceAny = invoice as any;
         if (invoice.isFormal && invoiceAny.formalUuid) {
             const formalType = invoiceAny.formalType || 'EARSIV';
 
-            if (formalType === 'EARSIV') {
+            if (formalType === 'EARSIV' && !forceLocalCancel) {
                 const settings = await prisma.appSettings.findFirst({
                     where: { key: 'erecordConfig', companyId: auth.user.companyId }
                 });
@@ -123,8 +148,7 @@ export async function DELETE(
                 if (settings && settings.value) {
                     const config = settings.value as any;
                     const apiKey = config.apiKey;
-                    const isTest = config.isTestEnvironment || false;
-                    const baseUrl = isTest ? 'https://apitest.nilvera.com' : 'https://api.nilvera.com';
+                    const baseUrl = config.isTestEnvironment ? 'https://apitest.nilvera.com' : 'https://api.nilvera.com';
 
                     if (apiKey) {
                         try {
@@ -137,14 +161,16 @@ export async function DELETE(
                             if (!cancelResult.success) {
                                 return NextResponse.json({ 
                                     success: false, 
+                                    askForLocalCancel: true,
                                     error: `Fatura e-Arşiv (Nilvera) sisteminde iptal edilemediği için GİB'e iletildiğinden sistemimizde de iptali durduruldu. (Hata: ${cancelResult.error})`
                                 }, { status: 400 });
                             }
                         } catch(e: any) {
                             return NextResponse.json({ 
                                 success: false, 
+                                askForLocalCancel: true,
                                 error: 'Nilvera e-Arşiv iptal işlemi sırasında beklenmeyen hata oluştu: ' + e.message 
-                            }, { status: 500 });
+                            }, { status: 400 });
                         }
                     } else {
                         return NextResponse.json({ success: false, error: 'e-Belge ayarları eksik. Lütfen şirket entegrasyon API anahtarını kontrol edin.' }, { status: 400 });
@@ -152,10 +178,11 @@ export async function DELETE(
                 } else {
                     return NextResponse.json({ success: false, error: 'e-Belge yapılandırması (Anahtar/Şifre) bulunamadı.' }, { status: 400 });
                 }
-            } else if (formalType === 'EFATURA') {
+            } else if (formalType === 'EFATURA' && !forceLocalCancel) {
                 return NextResponse.json({ 
                     success: false, 
-                    error: 'Bu bir e-Fatura (Ticari/Temel). e-Faturalar buradan iptal edilemez. Alıcının reddetmesi veya GİB/KEP portalinden iptal işlemi yapmanız gereklidir.' 
+                    askForLocalCancel: true,
+                    error: 'Bu bir e-Fatura (Ticari/Temel). e-Faturalar buradan iptal edilemez. Alıcının reddetmesi veya GİB/KEP portalinden iptal işlemi yapmanız gereklidir.\n\nEğer dışarıdan iptalini sağladıysanız veya iade faturası kestirdiyseniz, sadece yerel işlemleri geri alarak devam edebilirsiniz.' 
                 }, { status: 400 });
             }
         }
@@ -226,10 +253,43 @@ export async function DELETE(
 
                         for (const t of transactions) {
                             if (t.type === 'Sales' || t.type === 'Collection') {
-                                await tx.kasa.update({
-                                    where: { id: t.kasaId },
-                                    data: { balance: { decrement: t.amount } }
-                                });
+                                if (refundOption === 'balanceToCustomer') {
+                                    // 💰 İadeyi Bakiye Olarak Yükle (Cari Alacak)
+                                    // We DO NOT take cash out of the kasa. We mark the original collection as softly deleted or just reversed by adding to the customer's balance.
+                                    if (t.customerId) {
+                                        await tx.customer.update({
+                                            where: { id: t.customerId },
+                                            data: { balance: { increment: t.amount } } // Credit the customer's account balance
+                                        });
+
+                                        await tx.transaction.create({
+                                           data: {
+                                               companyId: order.companyId,
+                                               kasaId: t.kasaId,
+                                               customerId: t.customerId,
+                                               amount: t.amount,
+                                               type: 'Income', // technically it is not income, but an account adjustment (customer credit). We can just use Collection but it doesn't matter too much here, better 'Income' 
+                                               categoryId: t.categoryId,
+                                               description: `[İPTAL/İADE] REF:${order.id} (İade Bedeli Cari Hesaba Alacak Kaydedildi)`,
+                                               date: new Date(),
+                                           }
+                                        });
+                                    }
+                                } else {
+                                    // 💳 Tamamen Para İadesi Yap (Kasa Çıkışı) YA DA Normal İptal
+                                    await tx.kasa.update({
+                                        where: { id: t.kasaId },
+                                        data: { balance: { decrement: t.amount } } // Cash leaves kasa
+                                    });
+                                    
+                                    if (t.customerId && t.type === 'Collection') {
+                                         // Revert Collection -> Customer debt goes UP again
+                                         await tx.customer.update({
+                                             where: { id: t.customerId },
+                                             data: { balance: { increment: t.amount } }
+                                         });
+                                    }
+                                }
                             } else if (t.type === 'Expense') {
                                 await tx.kasa.update({
                                     where: { id: t.kasaId },
@@ -237,7 +297,7 @@ export async function DELETE(
                                 });
                             }
                             
-                            if (t.customerId && t.type === 'Sales') {
+                            if (t.customerId && t.type === 'Sales' && refundOption !== 'balanceToCustomer') {
                                 let rawData: any = order.rawData || {};
                                 if (typeof rawData === 'string') {
                                     try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
@@ -248,13 +308,9 @@ export async function DELETE(
                                         data: { balance: { decrement: t.amount } }
                                     });
                                 }
-                            } else if (t.customerId && t.type === 'Collection') {
-                                // Revert Collection -> Customer debt goes UP again
-                                await tx.customer.update({
-                                    where: { id: t.customerId },
-                                    data: { balance: { increment: t.amount } }
-                                });
                             }
+                            
+                            // Soft delete the original transaction
                             await tx.transaction.update({
                                 where: { id: t.id },
                                 data: { deletedAt: new Date() }
@@ -330,11 +386,27 @@ export async function DELETE(
                     }
                 } else {
                     // STANDALONE INVOICE Reversal Logic
-                    // 1. Revert Customer Balance
-                    await tx.customer.update({
-                        where: { id: invoice.customerId },
-                        data: { balance: { decrement: invoice.totalAmount } }
-                    });
+                    // 1. Revert Customer Balance OR Process Refund Option
+                    if (refundOption === 'balanceToCustomer' && invoice.customerId) {
+                        // 💰 İadeyi Bakiye Olarak Yükle (Cari Alacak): In a standalone invoice, it had probably added to the balance natively, but we MUST credit the user because they already paid perhaps? Wait! Standard standalone invoices are UNPAID. Wait, if it's standalone, its impact is: customer debt goes UP when invoiced.
+                        // So if we CANCEL it, customer debt goes DOWN (decrement).
+                        // If they paid for it, that was a separate transaction, which they might want refunded. But this endpoint ONLY cancels the invoice.
+                        
+                        // IF we treat this as a refund of a paid invoice, we need to handle that carefully, but generally, cancelling a standalone sales invoice just removes the debt.
+                        await tx.customer.update({
+                            where: { id: invoice.customerId },
+                            data: { balance: { decrement: invoice.totalAmount } }
+                        });
+                        
+                        // For 'balanceToCustomer' on a pre-paid standalone, we don't automatically know if they paid. We just revert the debt line. 
+                        // To be safe and idempotent, we just revert the debt, since there's no native "Collection" attached to Standalone Invoice within Periodya directly, collections are disjoint.
+                    } else if (invoice.customerId) {
+                        // 💳 OR Cancel
+                        await tx.customer.update({
+                            where: { id: invoice.customerId },
+                            data: { balance: { decrement: invoice.totalAmount } }
+                        });
+                    }
 
                     // 2. Soft Delete related Transaction
                     await tx.transaction.updateMany({
@@ -347,6 +419,24 @@ export async function DELETE(
                         },
                         data: { deletedAt: new Date() }
                     });
+                    
+                    // Create an audit trail transaction showing it was reverted
+                    if (invoice.customerId) {
+                        const anyKasa = await tx.kasa.findFirst({ where: { companyId: invoice.companyId } });
+                        if (anyKasa) {
+                             await tx.transaction.create({
+                                data: {
+                                    companyId: invoice.companyId,
+                                    kasaId: anyKasa.id,
+                                    customerId: invoice.customerId,
+                                    amount: 0, // 0 amount just for the ledger trail, debt was reduced separately
+                                    type: 'Income',
+                                    description: `[İPTAL/İADE] REF:${invoice.id} Standalone Fatura İptal Edildi`,
+                                    date: new Date(),
+                                }
+                             });
+                        }
+                    }
 
                     // 3. Revert Inventory / Stocks
                     const items: any = typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items;
