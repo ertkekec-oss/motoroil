@@ -2137,20 +2137,38 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             // VADELENDİRME SADECE VERESİYE SATIŞLARDA GÖZÜKMELİ
                                             if (!isVeresiye) return null;
 
+                                            const invoiceIdsForOrder = (customer?.invoices || [])
+                                                .filter((inv: any) => inv.orderId === selectedOrder?.id)
+                                                .map((inv: any) => inv.id);
+
+                                            const isAlreadyVadelendi = selectedOrder && (
+                                                vadelenenIds.includes(selectedOrder.id) || 
+                                                invoiceIdsForOrder.some((id: string) => vadelenenIds.includes(id)) ||
+                                                customer?.paymentPlans?.some((p: any) => 
+                                                    (
+                                                        p.description === selectedOrder.id || 
+                                                        (lastInvoice && p.description === lastInvoice.id) || 
+                                                        (lastInvoice && p.description === lastInvoice.orderId) ||
+                                                        invoiceIdsForOrder.includes(p.description)
+                                                    ) && 
+                                                    p.status !== 'İptal' && p.status !== 'Cancelled'
+                                                )
+                                            );
+
                                             return (
                                                 <div className="flex flex-col gap-2 pt-3 mt-3 border-t border-slate-200 dark:border-slate-800">
-                                                    <label className={`flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors ${selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? 'bg-slate-100 dark:bg-slate-900/10 opacity-60 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500/50'}`}>
+                                                    <label className={`flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors ${isAlreadyVadelendi ? 'bg-slate-100 dark:bg-slate-900/10 opacity-60 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500/50'}`}>
                                                         <input
                                                             type="checkbox"
-                                                            disabled={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled'))}
-                                                            checked={selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) ? false : isInstallmentInvoice}
+                                                            disabled={isAlreadyVadelendi}
+                                                            checked={isAlreadyVadelendi ? false : isInstallmentInvoice}
                                                             onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
                                                             className="w-4 h-4 rounded text-emerald-500 accent-emerald-500 disabled:opacity-50"
                                                         />
                                                         <div className="flex flex-col">
                                                             <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
                                                                 Vade & Ödeme Planı (Sadece Veresiye)
-                                                                {selectedOrder && (vadelenenIds.includes(selectedOrder.id) || customer?.paymentPlans?.some((p: any) => p.description === selectedOrder.id && p.status !== 'İptal' && p.status !== 'Cancelled')) && (
+                                                                {isAlreadyVadelendi && (
                                                                     <span className="ml-2 text-[10px] bg-amber-500/20 text-amber-500 px-1 py-0.5 rounded uppercase">Zaten Vadelendi</span>
                                                                 )}
                                                             </span>
