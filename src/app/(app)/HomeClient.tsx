@@ -206,7 +206,7 @@ function POSContent() {
     let list = customers || [];
     
     // Şube bazlı filtreleme
-    if (activeBranchName && activeBranchName !== 'Tümü' && activeBranchName !== 'Global') {
+    if (activeBranchName && activeBranchName !== 'Tümü' && activeBranchName !== 'Global' && activeBranchName !== 'TÜM ŞUBELER') {
         list = list.filter(c => !c.branch || c.branch === 'Global' || c.branch === 'Ortak' || c.branch === activeBranchName);
     }
 

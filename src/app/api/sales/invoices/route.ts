@@ -209,7 +209,7 @@ export async function GET(request: Request) {
         if (!companyId) return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 400 });
 
         const where: any = { deletedAt: null, companyId };
-        if (branch && branch !== 'Tümü' && branch !== 'all') {
+        if (branch && branch !== 'Tümü' && branch !== 'all' && branch !== 'TÜM ŞUBELER') {
             where.branch = branch;
         }
 

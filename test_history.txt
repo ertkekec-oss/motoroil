@@ -1,0 +1,6 @@
+﻿No PLATFORM_ADMIN company found
+Using company: cmmqvjp510001hrwa3zxwgqp5
+POS orders for target company: 0
+Total POS orders in DB: 29
+Sales transactions: 0
+Kasas: []

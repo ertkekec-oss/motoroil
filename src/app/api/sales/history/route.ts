@@ -48,7 +48,7 @@ export async function GET(request: Request) {
 
         // Branch filter
         const activeBranch = request.headers.get('x-active-branch') || searchParams.get('branch');
-        if (activeBranch && activeBranch !== 'Tümü' && activeBranch !== 'Global') {
+        if (activeBranch && activeBranch !== 'Tümü' && activeBranch !== 'Global' && activeBranch !== 'TÜM ŞUBELER') {
             whereClause.branch = decodeURIComponent(activeBranch);
         }
 

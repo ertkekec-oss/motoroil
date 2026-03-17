@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
                             gte: target.startDate,
                             lte: target.endDate
                         },
-                        status: { notIn: ['CANCELLED', 'Returned'] }
+                        status: { notIn: ['CANCELLED', 'Returned', 'İptal Edildi', 'İade'] }
                     },
                     _sum: { totalAmount: true }
                 });

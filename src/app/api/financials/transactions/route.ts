@@ -29,7 +29,7 @@ export async function GET(request: Request) {
         }
 
         const activeBranch = request.headers.get('x-active-branch') || searchParams.get('branch');
-        const branchFilter = (activeBranch && activeBranch !== 'Tümü' && activeBranch !== 'Global') ? { branch: decodeURIComponent(activeBranch) } : {};
+        const branchFilter = (activeBranch && activeBranch !== 'Tümü' && activeBranch !== 'Global' && activeBranch !== 'TÜM ŞUBELER') ? { branch: decodeURIComponent(activeBranch) } : {};
 
         const transactions = await prisma.transaction.findMany({
             where: {

@@ -46,7 +46,7 @@ export async function GET(request: Request) {
         // Priority 2: Use user's permanent branch (Staff assignment)
         const effectiveBranch = user.activeBranch || user.branch;
 
-        if (effectiveBranch && effectiveBranch !== 'all' && effectiveBranch !== 'Tümü' && effectiveBranch !== 'Global') {
+        if (effectiveBranch && effectiveBranch !== 'all' && effectiveBranch !== 'Tümü' && effectiveBranch !== 'Global' && effectiveBranch !== 'TÜM ŞUBELER') {
             const branchCond = effectiveBranch === 'Merkez' 
                 ? { OR: [{ branch: { equals: 'Merkez', mode: 'insensitive' } }, { branch: null }, { branch: '' }, { branch: 'Global' }, { branch: 'Ortak' }] }
                 : { OR: [{ branch: { equals: effectiveBranch, mode: 'insensitive' } }, { branch: 'Global' }, { branch: 'Ortak' }] };
