@@ -801,7 +801,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         {overdueInstallments.length > 0 ? `${overdueInstallments.length} adet gecikmiş taksit ödemesi bulunmaktadır (Toplam: ${overdueAmount.toLocaleString('tr-TR')} ₺). ` : ''}
                         {todayInstallments.length > 0 ? `BUGÜN VADE GÜNÜ olan ${todayInstallments.length} adet ödeme var (Toplam: ${todayAmount.toLocaleString('tr-TR')} ₺).` : ''}
                     </span>
-                    <button style={{ marginLeft: '12px', padding: '6px 12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '11px', fontWeight: '800' }}>Detayları İncele</button>
+                    <Link href={`/payment?amount=${overdueAmount + todayAmount}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`} style={{ marginLeft: '12px', padding: '6px 12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '11px', fontWeight: '800', textDecoration: 'none' }}>Tahsil Et</Link>
                 </div>
             )}
 
