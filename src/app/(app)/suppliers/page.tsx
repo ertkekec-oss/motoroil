@@ -203,7 +203,7 @@ export default function SuppliersPage() {
     if (isProcessing) return;
     setIsProcessing(true);
     try {
-      const res = await fetch(`/api/suppliers/${editSupplier.id}`, {
+      const res = await fetch(`/api/suppliers`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editSupplier),
