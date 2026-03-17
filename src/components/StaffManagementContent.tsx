@@ -10,6 +10,9 @@ import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 
+import PayrollModule from './PayrollModule';
+import AdvancesModule from './AdvancesModule';
+
 
 export default function StaffManagementContent() {
     const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
@@ -913,7 +916,7 @@ export default function StaffManagementContent() {
                             { group: 'PERSONEL', items: [{ id: 'list', label: 'Personel Listesi' }, { id: 'roles', label: 'Roller & Yetkiler' }] },
                             { group: 'OPERASYON', items: [{ id: 'tasks', label: 'Görevler' }, { id: 'performance', label: 'Hedefler' }] },
                             { group: 'ZAMAN', items: [{ id: 'shifts', label: 'Vardiya' }, { id: 'leaves', label: 'İzinler' }, { id: 'attendance', label: 'PDKS' }, { id: 'puantaj', label: 'Puantaj' }] },
-                            { group: 'FİNANS', items: [{ id: 'payroll', label: 'Bordro' }] },
+                            { group: 'FİNANS', items: [{ id: 'payroll', label: 'Bordro' }, { id: 'advances', label: 'Avans & Kesintiler' }] },
                             { group: 'DOSYALAR', items: [{ id: 'files', label: 'Personel Dosyaları' }] },
                         ].map((grp, i) => (
                             <div key={grp.group} className="flex items-center gap-3">
@@ -1457,98 +1460,14 @@ export default function StaffManagementContent() {
                 );
             })()}
 
-            {/* --- PAYROLL TAB --- */}
             {/* --- PAYROLL TAB (BORDRO) --- */}
             {activeTab === 'payroll' && (
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50 dark:bg-[#1e293b]">
-                        <div>
-                            <h3 className="text-[16px] font-black text-slate-900 dark:text-white flex items-center gap-2"><span>💰</span> Maaş & Hakediş Listesi</h3>
-                            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">DÖNEM: {new Date().toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}</div>
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={handleGeneratePayrolls}
-                                disabled={isProcessing}
-                                className="h-9 px-4 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 text-[12px] font-bold hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50 flex items-center gap-2"
-                            >
-                                {isProcessing ? 'İŞLENİYOR...' : 'BORDROLARI OLUŞTUR ⚙️'}
-                            </button>
-                            <button onClick={handlePayAll} className="h-9 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-[12px] font-bold transition-all shadow-sm flex items-center gap-2">TÜMÜNÜ ÖDE</button>
-                        </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                                <tr>
-                                    <th className="p-4 pl-6 font-bold">Personel</th>
-                                    <th className="p-4 font-bold text-right">Maaş</th>
-                                    <th className="p-4 font-bold text-right">Prim</th>
-                                    <th className="p-4 font-bold text-right">Avans / Kesinti</th>
-                                    <th className="p-4 font-bold text-right">Net Ödenecek</th>
-                                    <th className="p-4 pr-6 font-bold text-center">Durum</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {staff?.map((person) => {
-                                    const payroll = payrolls.find(p => p.staffId === person.id);
-                                    return (
-                                        <tr key={person.id} className="hover:bg-slate-50 dark:bg-[#1e293b]/70 transition-colors h-[64px]">
-                                            <td className="p-4 pl-6 align-middle font-bold text-slate-900 dark:text-white text-[13px]">{person.name}</td>
-                                            <td className="p-4 align-middle text-right text-slate-600 dark:text-slate-400 font-medium text-[13px]">
-                                                {payroll ? `₺ ${Number(payroll.salary).toLocaleString()}` : '-'}
-                                            </td>
-                                            <td className="p-4 align-middle text-right text-emerald-600 font-bold text-[13px]">
-                                                {payroll && Number(payroll.bonus) > 0 ? `+ ₺ ${Number(payroll.bonus).toLocaleString()}` : '-'}
-                                            </td>
-                                            <td className="p-4 align-middle text-right text-rose-500 font-bold text-[13px]">
-                                                {payroll && Number(payroll.deductions) > 0 ? `- ₺ ${Number(payroll.deductions).toLocaleString()}` : '-'}
-                                            </td>
-                                            <td className="p-4 align-middle text-right font-black text-lg text-slate-900 dark:text-white">
-                                                {payroll ? `₺ ${Number(payroll.netPay).toLocaleString()}` : '-'}
-                                            </td>
-                                            <td className="p-4 pr-6 align-middle text-center">
-                                                {payroll ? (
-                                                    payroll.status === 'Bekliyor' ? (
-                                                        <div className="flex flex-col gap-1.5 items-center justify-center">
-                                                            <span className="text-[10px] text-slate-400 font-bold uppercase">BEKLİYOR</span>
-                                                            <button
-                                                                onClick={() => handleMarkAsPaid(payroll)}
-                                                                className="h-7 px-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 font-bold hover:bg-emerald-100 transition-colors shadow-sm text-[10px]"
-                                                            >
-                                                                ÖDE 💸
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border inline-flex items-center gap-1.5 ${payroll.status === 'Ödendi' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>
-                                                            <div className={`w-1 h-1 rounded-full ${payroll.status === 'Ödendi' ? 'bg-emerald-500' : 'bg-slate-400'}`}></div>
-                                                            {payroll.status} {payroll.paidAt && `(${new Date(payroll.paidAt).toLocaleDateString()})`}
-                                                        </span>
-                                                    )
-                                                ) : (
-                                                    <button
-                                                        onClick={() => handleOpenPayrollModal(person)}
-                                                        className="h-7 px-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 font-bold hover:bg-blue-100 transition-colors shadow-sm text-[10px]">
-                                                        HESAPLA
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                            <tfoot className="bg-slate-50 dark:bg-[#1e293b] border-t border-slate-200 dark:border-white/5">
-                                <tr>
-                                    <td colSpan={4} className="p-4 text-right text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest align-middle">TOPLAM ÖDENECEK</td>
-                                    <td className="p-4 text-right text-[22px] font-black text-emerald-600 align-middle">
-                                        ₺ {payrolls.reduce((sum, p) => sum + Number(p.netPay || 0), 0).toLocaleString()}
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
+                <PayrollModule />
+            )}
+
+            {/* --- ADVANCES TAB (AVANS VE KESİNTİLER) --- */}
+            {activeTab === 'advances' && (
+                <AdvancesModule staffList={staff} />
             )}
 
             {/* --- ATTENDANCE TAB (PDKS) --- */}

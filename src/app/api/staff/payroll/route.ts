@@ -201,6 +201,20 @@ export async function POST(req: Request) {
                 pResult = calculateNetToGross(totalTargetNet, payrollParams, workedDays, 0);
             }
 
+            // 4. Avans ve Kesintileri Düş
+            const advances = await prisma.advanceDeduction.findMany({
+                where: {
+                    staffId: staff.id,
+                    period: period,
+                    status: 'APPROVED'
+                }
+            });
+
+            let totalAdvanceDeductions = 0;
+            for (const adv of advances) {
+                totalAdvanceDeductions += Number(adv.amount);
+            }
+
             const data = {
                 staffId: staff.id,
                 period,
@@ -211,8 +225,8 @@ export async function POST(req: Request) {
                 stampTax: pResult.stampTax,
                 workedDays: workedDays,
                 bonus: totalBonus,
-                deductions: 0, // Manuel girilecekler için
-                netPay: pResult.net,
+                deductions: totalAdvanceDeductions, // Otomatik olarak sistemdeki avans/kesintiler uygulanır
+                netPay: Math.max(0, pResult.net - totalAdvanceDeductions), // Net eksi avanslar
                 status: exists ? exists.status : 'Bekliyor'
             };
 
