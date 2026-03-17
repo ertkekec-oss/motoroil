@@ -10,9 +10,11 @@ export async function GET(req: Request) {
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
 
+    const allowedRoles = ['admin', 'müdür', 'company_manager', 'tenant_admin'];
+    const userRole = auth.user.role?.toLowerCase();
+
     if (!isPlatformAdmin &&
-        auth.user.role?.toLowerCase() !== 'admin' &&
-        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !allowedRoles.includes(userRole) &&
         !auth.user.permissions?.includes('staff_manage')) {
         return NextResponse.json({ success: false, error: "Bu işlem için yetkiniz bulunmamaktadır." }, { status: 403 });
     }
@@ -36,10 +38,12 @@ export async function POST(req: Request) {
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
 
+    const allowedRoles = ['admin', 'müdür', 'company_manager', 'tenant_admin'];
+    const userRole = auth.user.role?.toLowerCase();
+
     // Yetki kontrolü
     if (!isPlatformAdmin &&
-        auth.user.role?.toLowerCase() !== 'admin' &&
-        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !allowedRoles.includes(userRole) &&
         !auth.user.permissions?.includes('staff_manage')) {
         return NextResponse.json({ success: false, error: "Tablet ekleme yetkiniz bulunmamaktadır." }, { status: 403 });
     }
@@ -77,9 +81,11 @@ export async function PATCH(req: Request) {
 
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
 
+    const allowedRoles = ['admin', 'müdür', 'company_manager', 'tenant_admin'];
+    const userRole = auth.user.role?.toLowerCase();
+
     if (!isPlatformAdmin &&
-        auth.user.role?.toLowerCase() !== 'admin' &&
-        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !allowedRoles.includes(userRole) &&
         !auth.user.permissions?.includes('staff_manage')) {
         return NextResponse.json({ success: false, error: "Tablet düzenleme yetkiniz bulunmamaktadır." }, { status: 403 });
     }
@@ -120,9 +126,11 @@ export async function DELETE(req: Request) {
 
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
 
+    const allowedRoles = ['admin', 'müdür', 'company_manager', 'tenant_admin'];
+    const userRole = auth.user.role?.toLowerCase();
+
     if (!isPlatformAdmin &&
-        auth.user.role?.toLowerCase() !== 'admin' &&
-        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !allowedRoles.includes(userRole) &&
         !auth.user.permissions?.includes('staff_manage')) {
         return NextResponse.json({ success: false, error: "Tablet silme yetkiniz bulunmamaktadır." }, { status: 403 });
     }
