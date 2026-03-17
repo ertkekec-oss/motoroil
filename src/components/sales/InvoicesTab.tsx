@@ -16,7 +16,7 @@ interface InvoicesTabProps {
     purchaseInvoices: any[];
     wayslips: any[];
     handleApproveInvoice: (id: string) => Promise<void>;
-    handleDeleteInvoice: (id: string, isFormal?: boolean) => Promise<void>;
+    handleDeleteInvoice: (id: string, isFormal: boolean, formalType?: string) => Promise<void>;
     handleSendToELogo: (id: string, type: any) => Promise<void>;
     handleViewPDF: (id: string) => Promise<void>;
     handleAcceptPurchaseInvoice: (id: string, documentType?: 'INVOICE' | 'DESPATCH') => Promise<void>;
@@ -231,7 +231,7 @@ export function InvoicesTab({
                                                                         </button>
 
                                                                         <button
-                                                                            onClick={() => handleDeleteInvoice(inv.id, inv.isFormal)}
+                                                                            onClick={() => handleDeleteInvoice(inv.id, inv.isFormal, inv.formalType)}
                                                                             className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-slate-800 border-red-900/50 text-red-400 hover:bg-red-900/20'}`}
                                                                         >
                                                                             İptal Et
@@ -548,9 +548,9 @@ export function InvoicesTab({
                                                                                     Kabul Et / Envantere İşle
                                                                                 </button>
                                                                             )}
-                                                                            {!irs.isFormal && irs.type === 'Giden' && (
-                                                                                <button onClick={() => handleDeleteInvoice(irs.id, irs.isFormal)} className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/30'}`}>
-                                                                                    🗑️ Sil
+                                                                            {irs.status !== 'İptal Edildi' && (
+                                                                                <button onClick={() => handleDeleteInvoice(irs.id, irs.isFormal, irs.formalType)} className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/30'}`}>
+                                                                                    {irs.isFormal ? 'Geri Al' : 'İptal Et'}
                                                                                 </button>
                                                                             )}
                                                                         </div>

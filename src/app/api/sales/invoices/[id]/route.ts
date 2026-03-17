@@ -275,12 +275,13 @@ export async function DELETE(
                         for (const t of transactions) {
                             if (t.type === 'Sales' || t.type === 'Collection') {
                                 if (refundOption === 'balanceToCustomer') {
-                                    // 💰 İadeyi Bakiye Olarak Yükle (Cari Alacak)
-                                    // We DO NOT take cash out of the kasa. We mark the original collection as softly deleted or just reversed by adding to the customer's balance.
+                                    // 💰 İadeyi Bakiye Olarak Yükle (Cari Alacak / Borçtan Mahsup)
+                                    // Periodya'da balance > 0 = Müşteri bize borçlu demektir. (Debt)
+                                    // Bakiye/Kredi tanımlamak veya borcunu sıfırlamak için balance'ı küçültmeliyiz (decrement).
                                     if (t.customerId) {
                                         await tx.customer.update({
                                             where: { id: t.customerId },
-                                            data: { balance: { increment: t.amount } } // Credit the customer's account balance
+                                            data: { balance: { decrement: t.amount } }
                                         });
 
                                         await tx.transaction.create({
@@ -289,7 +290,7 @@ export async function DELETE(
                                                kasaId: t.kasaId,
                                                customerId: t.customerId,
                                                amount: t.amount,
-                                               type: 'Income', // technically it is not income, but an account adjustment (customer credit). We can just use Collection but it doesn't matter too much here, better 'Income' 
+                                               type: 'Income',
                                                categoryId: t.categoryId,
                                                description: `[İPTAL/İADE] REF:${order.id} (İade Bedeli Cari Hesaba Alacak Kaydedildi)`,
                                                date: new Date(),
@@ -297,41 +298,38 @@ export async function DELETE(
                                         });
                                     }
                                 } else {
-                                    // 💳 Tamamen Para İadesi Yap (Kasa Çıkışı) YA DA Normal İptal
-                                    await tx.kasa.update({
-                                        where: { id: t.kasaId },
-                                        data: { balance: { decrement: t.amount } } // Cash leaves kasa
-                                    });
-                                    
-                                    if (t.customerId && t.type === 'Collection') {
-                                         // Revert Collection -> Customer debt goes UP again
-                                         await tx.customer.update({
-                                             where: { id: t.customerId },
-                                             data: { balance: { increment: t.amount } }
-                                         });
+                                    // 💳 Tamamen Para İadesi Yap (Kasa Çıkışı) YA DA Normal İptal (Taslak)
+                                    let rawData: any = order.rawData || {};
+                                    if (typeof rawData === 'string') {
+                                        try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
+                                    }
+
+                                    if (rawData.paymentMode === 'account') {
+                                        // Cari hesaba satılmıştı, kasadan para GİRMEMİŞTİ. İade edilecek nakit yok.
+                                        // Sadece müşterinin borcunu sıfırlayacağız (veya faturanın borcunu sileceğiz).
+                                        if (t.customerId && t.type === 'Sales') {
+                                            await tx.customer.update({
+                                                where: { id: t.customerId },
+                                                data: { balance: { decrement: t.amount } }
+                                            });
+                                        }
+                                    } else {
+                                        // Nakit/Kart/Havale ile girmişti -> Kasadan parayı GİRMİŞTİ. Kasadan geri ÇIKARACAĞIZ.
+                                        await tx.kasa.update({
+                                            where: { id: t.kasaId },
+                                            data: { balance: { decrement: t.amount } }
+                                        });
                                     }
                                 }
                             } else if (t.type === 'Expense') {
+                                // Komisyon vb. giderleri kasaya geri iade et
                                 await tx.kasa.update({
                                     where: { id: t.kasaId },
                                     data: { balance: { increment: t.amount } }
                                 });
                             }
                             
-                            if (t.customerId && t.type === 'Sales' && refundOption !== 'balanceToCustomer') {
-                                let rawData: any = order.rawData || {};
-                                if (typeof rawData === 'string') {
-                                    try { rawData = JSON.parse(rawData); } catch (e) { rawData = {}; }
-                                }
-                                if (rawData.paymentMode === 'account') {
-                                    await tx.customer.update({
-                                        where: { id: t.customerId },
-                                        data: { balance: { decrement: t.amount } }
-                                    });
-                                }
-                            }
-                            
-                            // Soft delete the original transaction
+                            // Orijinal işlemi soft delete yap
                             await tx.transaction.update({
                                 where: { id: t.id },
                                 data: { deletedAt: new Date() }

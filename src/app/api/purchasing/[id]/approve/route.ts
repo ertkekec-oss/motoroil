@@ -11,7 +11,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         const { id } = await context.params;
         const body = await request.json().catch(() => ({}));
-        let { skipStockUpdate = false, skipFinanceUpdate = false, pricingConfig = {} } = body;
+        let { skipStockUpdate = false, skipFinanceUpdate = false, pricingConfig = {}, originalSalesInvoiceNo } = body;
         const companyId = session.user?.companyId || (session as any).companyId;
         let relatedDespatches: string[] = [];
 
@@ -347,12 +347,47 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                         companyId,
                         type: 'Purchase',
                         amount: invoice!.totalAmount,
-                        description: `Alış Faturası Onayı: ${invoice!.invoiceNo} - ${invoice!.supplier.name}`,
+                        description: `Alış/İade Faturası Onayı: ${invoice!.invoiceNo} - ${invoice!.supplier.name}`,
                         supplierId: invoice!.supplierId,
                         kasaId: null, // Required to be generic payable transaction
                         branch: String(branch)
                     }
                 });
+
+                // C.1 Handle Return Invoice Points Deduction (Eğer orijinal satış faturası numarası verildiyse)
+                if (originalSalesInvoiceNo) {
+                    const originalSale = await tx.salesInvoice.findFirst({
+                        where: { invoiceNo: originalSalesInvoiceNo, companyId },
+                        include: { customer: true }
+                    });
+
+                    if (originalSale && originalSale.orderId && originalSale.customerId) {
+                        const relatedOrder = await tx.order.findUnique({
+                            where: { id: originalSale.orderId }
+                        });
+
+                        if (relatedOrder) {
+                            let rawData: any = relatedOrder.rawData || {};
+                            if (typeof rawData === 'string') {
+                                try { rawData = JSON.parse(rawData); } catch (e) {}
+                            }
+                            
+                            // Check if points were earned in the original order
+                            const earnedPoints = Number(rawData.dynamicEarnedPoints || 0);
+                            const usedPoints = Number(rawData.pointsUsed || 0);
+                            const netPointsToRevert = earnedPoints - usedPoints;
+
+                            if (netPointsToRevert > 0) {
+                                // Deduct points
+                                await tx.customer.update({
+                                    where: { id: originalSale.customerId },
+                                    data: { points: { decrement: netPointsToRevert } }
+                                });
+                                console.log(`[PurchaseApprove] Reverted ${netPointsToRevert} points from Customer(${originalSale.customerId}) due to Return Invoice ${invoice!.invoiceNo}`);
+                            }
+                        }
+                    }
+                }
             }
 
             // E. Auto-close related despatches so they don't remain open 

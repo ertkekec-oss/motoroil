@@ -70,19 +70,23 @@ export default function SalesPage() {
 
     const [incomingPricingData, setIncomingPricingData] = useState<any>({ isOpen: false, invoiceId: '', documentType: 'INVOICE', newItems: [], skipStock: false, skipFinance: false });
 
-    const handleDeleteInvoice = async (id: string, isFormal?: boolean) => {
-        const warningMessage = isFormal 
-            ? 'DİKKAT: Bu resmi bir faturadır! İptal ederseniz GİB portalı veya e-Arşiv üzerinden faturayı iptal edeceğiz. GİB reddi yapılamıyorsa sadece sistem etkilerini geri alma seçeneği sunulacaktır.\n\nFatura iadesi seçeneğinizi belirleyin:'
-            : 'Bu (proforma/taslak) faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.';
-
+    const handleDeleteInvoice = async (id: string, isFormal: boolean, formalType?: string) => {
         if (!isFormal) {
-            showConfirm('Fatura İptal Edilecek', warningMessage, async () => {
+            showConfirm('Fatura İptal Edilecek', 'Bu (proforma/taslak) faturayı iptal etmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALACAKTIR.', async () => {
                 await processCancelRequest(id, 'cancel');
             });
             return;
         }
 
-        // Custom Modal approach for Formal Cancellations -> to select Refund Option
+        if (formalType === 'EFATURA') {
+             showWarning(
+                 'İptal Edilemez', 
+                 'Bu bir e-Fatura (Ticari/Temel) olduğu için Periodya üzerinden tek taraflı iptal edilemez. Alıcının KEP üzerinden reddetmesi veya size "İade Faturası" kesmesi gerekmektedir.'
+             );
+             return;
+        }
+
+        // Custom Modal approach for e-Arşiv Cancellations
         const handleCancelCustom = () => {
              const overlay = document.createElement('div');
              overlay.style.position = 'fixed';
@@ -101,17 +105,17 @@ export default function SalesPage() {
              box.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
 
              box.innerHTML = `
-                 <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 12px; color: ${theme === 'light' ? '#dc2626' : '#f87171'}">Resmi Fatura İptal Seçenekleri</h3>
-                 <p style="font-size: 14px; margin-bottom: 24px; opacity: 0.8">${warningMessage}</p>
+                 <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 12px; color: ${theme === 'light' ? '#dc2626' : '#f87171'}">e-Arşiv Fatura İptal Seçenekleri</h3>
+                 <p style="font-size: 14px; margin-bottom: 24px; opacity: 0.8">Faturayı GİB portalı ve Nilvera üzerinden iptal edeceğiz. Müşterinizle mutabık kalınan iade yöntemini seçiniz:</p>
                  
                  <div style="display: flex; flex-direction: column; gap: 12px;">
                      <button id="btn-balance" style="padding: 12px; border-radius: 8px; border: 1px solid #3b82f6; background: rgba(59, 130, 246, 0.1); color: #3b82f6; text-align: left; cursor: pointer; font-weight: 500;">
-                         <strong>💰 İadeyi Bakiye Olarak Yükle (Cari Alacak)</strong><br/>
-                         <span style="font-size: 12px; opacity: 0.8">Fatura iptal edilir, nakit çıkışı olmaz. Müşteri carisine alacak yazılır.</span>
+                         <strong>💰 Bakiye Tanıma (Cari Alacak/Parapuan)</strong><br/>
+                         <span style="font-size: 12px; opacity: 0.8">Fatura iptal edilir, kasadan nakit çıkışı olmaz. Müşteri carisine ödenen tutar alacak olarak yansıtılır veya borçtan mahsup edilir. Stoklar depoya geri döner.</span>
                      </button>
                      <button id="btn-refund" style="padding: 12px; border-radius: 8px; border: 1px solid #dc2626; background: rgba(220, 38, 38, 0.1); color: #dc2626; text-align: left; cursor: pointer; font-weight: 500;">
                          <strong>💳 Tamamen Para İadesi Yap (Kasa Çıkışı)</strong><br/>
-                         <span style="font-size: 12px; opacity: 0.8">Fatura iptal edilir ve müşteriye para nakden/bankadan iade edilir.</span>
+                         <span style="font-size: 12px; opacity: 0.8">Fatura iptal edilir ve müşteriye para nakden/bankadan iade edilir. Kasa ve stoklarınız eski haline döner.</span>
                      </button>
                      <button id="btn-abort" style="padding: 12px; border-radius: 8px; border: 1px solid #64748b; background: transparent; color: #64748b; text-align: center; cursor: pointer; font-weight: 500; margin-top: 8px;">
                          Vazgeç
@@ -515,20 +519,75 @@ export default function SalesPage() {
                     newItems = preflightData.items.filter((item: any) => item.isNew);
                 }
 
-                if (newItems.length > 0) {
-                    setIncomingPricingData({
-                        isOpen: true,
-                        invoiceId: id,
-                        documentType,
-                        newItems,
-                        skipStock,
-                        skipFinance
-                    });
-                    setIsProcessingAction(null);
-                    return; // Stop here, wait for modal
-                }
+                const proceedToConfirm = async (origInvNo?: string) => {
+                    if (newItems.length > 0) {
+                        setIncomingPricingData({
+                            isOpen: true,
+                            invoiceId: id,
+                            documentType,
+                            newItems,
+                            skipStock,
+                            skipFinance,
+                            originalSalesInvoiceNo: origInvNo
+                        });
+                        setIsProcessingAction(null);
+                        return; // Wait for modal
+                    }
+                    await confirmPurchaseInvoiceWithPricing(id, skipStock, skipFinance, {}, origInvNo);
+                };
 
-                await confirmPurchaseInvoiceWithPricing(id, skipStock, skipFinance, {});
+                if (preflightData.isReturnInvoice) {
+                     // Custom modal to ask for the linked Sales Invoice Number
+                     const overlay = document.createElement('div');
+                     overlay.style.position = 'fixed';
+                     overlay.style.top = '0'; overlay.style.left = '0'; overlay.style.width = '100vw'; overlay.style.height = '100vh';
+                     overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
+                     overlay.style.zIndex = '999999';
+                     overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center';
+
+                     const box = document.createElement('div');
+                     box.style.background = theme === 'light' ? '#fff' : '#1e293b';
+                     box.style.color = theme === 'light' ? '#000' : '#fff';
+                     box.style.padding = '24px';
+                     box.style.borderRadius = '16px';
+                     box.style.width = '450px';
+                     box.style.maxWidth = '90%';
+                     box.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+
+                     box.innerHTML = `
+                         <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 12px; color: ${theme === 'light' ? '#ea580c' : '#fb923c'}">Dikkat: İade Faturası Tespit Edildi</h3>
+                         <p style="font-size: 14px; margin-bottom: 16px; opacity: 0.8">
+                             Bu belge bir iade faturası (IADE) profiline sahip. <br/>
+                             Eğer müşteriye daha önce bu işlem için parapuan tanımlandıysa, geri alınabilmesi için lütfen <b>Orijinal Satış Faturası No (Örn: INV-001)</b> giriniz.
+                         </p>
+                         <input type="text" id="orig-inv-input" placeholder="Orijinal Fatura No (Opsiyonel)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; color: #000;"/>
+                         
+                         <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                             <button id="btn-cancel-return" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #64748b; background: transparent; color: #64748b; cursor: pointer;">
+                                 İptal
+                             </button>
+                             <button id="btn-submit-return" style="padding: 8px 16px; border-radius: 8px; border: none; background: #3b82f6; color: #fff; cursor: pointer; font-weight: 500;">
+                                 Kabul Et ve İşle
+                             </button>
+                         </div>
+                     `;
+
+                     overlay.appendChild(box);
+                     document.body.appendChild(overlay);
+
+                     document.getElementById('btn-cancel-return')!.onclick = () => {
+                         document.body.removeChild(overlay);
+                         setIsProcessingAction(null);
+                     };
+
+                     document.getElementById('btn-submit-return')!.onclick = async () => {
+                         const val = (document.getElementById('orig-inv-input') as HTMLInputElement).value.trim();
+                         document.body.removeChild(overlay);
+                         await proceedToConfirm(val || undefined);
+                     };
+                } else {
+                    await proceedToConfirm();
+                }
             } catch (e) { 
                 showError('Hata', 'Ön kontrol sırasında bağlantı hatası oluştu.'); 
                 setIsProcessingAction(null);
@@ -536,13 +595,13 @@ export default function SalesPage() {
         });
     };
 
-    const confirmPurchaseInvoiceWithPricing = async (id: string, skipStock: boolean, skipFinance: boolean, pricingConfig: Record<string, number>) => {
+    const confirmPurchaseInvoiceWithPricing = async (id: string, skipStock: boolean, skipFinance: boolean, pricingConfig: Record<string, number>, originalSalesInvoiceNo?: string) => {
         setIsProcessingAction(id);
         try {
             const res = await apiFetch(`/api/purchasing/${id}/approve`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ skipStockUpdate: skipStock, skipFinanceUpdate: skipFinance, pricingConfig })
+                body: JSON.stringify({ skipStockUpdate: skipStock, skipFinanceUpdate: skipFinance, pricingConfig, originalSalesInvoiceNo })
             });
             const data = await res.json();
             if (data.success) {
@@ -1167,7 +1226,8 @@ export default function SalesPage() {
                         incomingPricingData.invoiceId, 
                         incomingPricingData.skipStock, 
                         incomingPricingData.skipFinance, 
-                        pricingConfig
+                        pricingConfig,
+                        incomingPricingData.originalSalesInvoiceNo
                     );
                 }}
             />

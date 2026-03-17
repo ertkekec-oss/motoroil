@@ -100,8 +100,14 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
                 productId: product?.id || null
             });
         }
+        let isReturnInvoice = false;
         
-        return NextResponse.json({ success: true, items });
+        // Detect if this is an IADE profile invoice (e-Fatura or e-Arşiv)
+        if (data.InvoiceProfile === 'IADE' || data.Model?.InvoiceProfile === 'IADE') {
+            isReturnInvoice = true;
+        }
+
+        return NextResponse.json({ success: true, items, isReturnInvoice });
     } catch (e: any) {
         return NextResponse.json({ success: false, error: e.message }, { status: 500 });
     }
