@@ -55,7 +55,7 @@ export async function POST(request: Request) {
             // 2. Create the Main Branch
             const mainBranch = await tx.branch.create({
                 data: {
-                    name: branch.branchName || 'Merkez Şube',
+                    name: branch.branchName || 'Merkez',
                     type: 'Şube',
                     city: company.city || '',
                     district: company.district || '',

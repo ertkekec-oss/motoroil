@@ -30,7 +30,7 @@ export default function OnboardingPage() {
     });
 
     const [branchData, setBranchData] = useState({
-        branchName: 'Merkez Şube',
+        branchName: 'Merkez',
         warehouseName: 'Ana Depo'
     });
 
@@ -203,7 +203,7 @@ export default function OnboardingPage() {
                                 </h2>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm">İlk kayıtlarınızın otomatik olarak yapılacağı ana nokta.</p>
                                 <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-lg text-sm border border-amber-100 dark:border-amber-900/50 flex gap-3">
-                                    <span className="text-xl">⚠️</span> <strong>Dikkate Alın:</strong> İşiniz tek bir konumda olsa bile "Merkez Şube" ve "Ana Depo" olarak varsayılan bir yapıyı sistem otomatik olarak kullanır. Sonradan istediğiniz kadar şube ekleyebilirsiniz.
+                                    <span className="text-xl">⚠️</span> <strong>Dikkate Alın:</strong> İşiniz tek bir konumda olsa bile "Merkez" ve "Ana Depo" olarak varsayılan bir yapıyı sistem otomatik olarak kullanır. Sonradan istediğiniz kadar şube ekleyebilirsiniz.
                                 </div>
                             </div>
 
