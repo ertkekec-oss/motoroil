@@ -55,6 +55,20 @@ export default function SuppliersPage() {
     }
   }, [activeBranchName]);
 
+  // Handle ?edit= parameter
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId && suppliers.length > 0) {
+      const supplierToEdit = suppliers.find(s => s.id === editId);
+      if (supplierToEdit && !isEditModalOpen) {
+        setEditSupplier({ ...supplierToEdit });
+        setIsEditModalOpen(true);
+        // Silently clear the edit parameter from URL to prevent reopening on reload
+        window.history.replaceState({}, '', '/suppliers');
+      }
+    }
+  }, [searchParams, suppliers]);
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -120,7 +134,7 @@ export default function SuppliersPage() {
     if (activeTab === "debt" && sup.balance >= 0) return false;
     if (activeTab === "credit" && sup.balance <= 0) return false;
     if (activeTab === "passive" && sup.isActive !== false) return false;
-    if (branchFilter !== "all" && (sup.branch || "Merkez").toLowerCase() !== branchFilter.toLowerCase())
+    if (branchFilter !== "all" && (sup.branch || "Merkez").trim().toLocaleLowerCase('tr-TR') !== branchFilter.trim().toLocaleLowerCase('tr-TR'))
       return false;
     return true;
   });
@@ -131,11 +145,11 @@ export default function SuppliersPage() {
     currentPage * ITEMS_PER_PAGE,
   );
 
-  // Stats
-  const totalDebt = suppliers
+  // Stats (Using filtered suppliers so it responds to branch dropdown)
+  const totalDebt = filteredSuppliers
     .filter((s) => s.balance < 0)
     .reduce((acc, s) => acc + Math.abs(s.balance), 0);
-  const totalCredit = suppliers
+  const totalCredit = filteredSuppliers
     .filter((s) => s.balance > 0)
     .reduce((acc, s) => acc + s.balance, 0);
 
@@ -301,7 +315,7 @@ export default function SuppliersPage() {
             </span>
           </div>
           <div className={`text-[28px] font-semibold tracking-tight ${textValueClass}`}>
-            {suppliers.length}
+            {filteredSuppliers.length}
           </div>
           <div className={`text-[12px] mt-1 font-medium ${textLabelClass}`}>Aktif Tedarikçi</div>
         </div>
@@ -786,7 +800,7 @@ export default function SuppliersPage() {
                 </div>
                 <div>
                   <label className={`block text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${textLabelClass}`}>Şube</label>
-                  <select value={editSupplier.branch} onChange={e => setEditSupplier({ ...editSupplier, branch: e.target.value })} className={inputClass} disabled>
+                  <select value={editSupplier.branch || ''} onChange={e => setEditSupplier({ ...editSupplier, branch: e.target.value })} className={inputClass}>
                     {branches.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                   </select>
                 </div>

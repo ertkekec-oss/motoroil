@@ -67,7 +67,7 @@ export default function CustomersPage() {
             if (cust.customerClass !== activeTab && cust.category !== activeTab) return false;
         }
 
-        if (branchFilter !== 'all' && (cust.branch || 'Merkez').toLowerCase() !== branchFilter.toLowerCase()) return false;
+        if (branchFilter !== 'all' && (cust.branch || 'Merkez').trim().toLocaleLowerCase('tr-TR') !== branchFilter.trim().toLocaleLowerCase('tr-TR')) return false;
 
         return true;
     });
@@ -241,11 +241,11 @@ export default function CustomersPage() {
         );
     };
 
-    const totalReceivable = customers.reduce((sum, c) => {
+    const totalReceivable = filteredCustomers.reduce((sum, c) => {
         const netBalance = Number(c.balance);
         return sum + (netBalance > 0 ? netBalance : 0);
     }, 0);
-    const totalPayable = customers.filter(c => Number(c.balance) < 0).reduce((sum, c) => sum + Math.abs(Number(c.balance)), 0);
+    const totalPayable = filteredCustomers.filter(c => Number(c.balance) < 0).reduce((sum, c) => sum + Math.abs(Number(c.balance)), 0);
 
     const cardClass = isLight
         ? "bg-white border border-slate-200 shadow-sm"
@@ -349,7 +349,7 @@ export default function CustomersPage() {
                         <span className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>Toplam Müşteri</span>
                     </div>
                     <div className={`text-[28px] font-semibold tracking-tight ${textValueClass}`}>
-                        {customers.length}
+                        {filteredCustomers.length}
                     </div>
                     <div className={`text-[12px] mt-1 font-medium ${textLabelClass}`}>Aktif Müşteri</div>
                 </div>
