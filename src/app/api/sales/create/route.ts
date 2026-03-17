@@ -339,13 +339,7 @@ export async function POST(request: Request) {
                 }
             }
 
-            // I. Create Journal
-            try {
-                await createJournalFromSale(order, enrichedItems, targetKasaId, tx);
-            } catch (accErr) {
-                console.error('[Accounting Sync Error]:', accErr);
-            }
-
+            // Accounting moved outside transaction to prevent silent rollback bugs
             return order;
         });
 
@@ -434,6 +428,15 @@ export async function POST(request: Request) {
             } catch (commErr) {
                 console.error('[Commission] Error calculating or recording commission (Safe Mode):', commErr);
             }
+        }
+
+        // --- ACCOUNTING FALLBACK ---
+        // Placing this outside of the critical transaction blocks guarantees
+        // that accounting engine failures will NOT silently rollback the physical sale.
+        try {
+            await createJournalFromSale(result, enrichedItems, targetKasaId);
+        } catch (accErr: any) {
+            console.error('[Accounting Sync Error After Sale]:', accErr?.message || accErr);
         }
 
         // AUDIT LOG (Don't await to save response time, catch errors silently)
