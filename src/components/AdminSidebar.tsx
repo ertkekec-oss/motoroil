@@ -206,6 +206,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                     <NavGroup title="AYARLAR" icon={Settings} groupKey="settings_main">
                         <NavItem href="/admin/documents" icon={FileText} label="Platform Dökümanları" />
                         <NavItem href="/admin/settings/mail" icon={Mail} label="Mail Ayarları (Global)" />
+                        <NavItem href="/admin/settings/payroll" icon={Settings} label="Bordro Parametreleri" />
                     </NavGroup>
                 </div>
             )}
