@@ -765,9 +765,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const balanceColor = balance > 0 ? '#ef4444' : '#10b981'; // Borçlu: Red, Alacaklı: Green
 
     const filteredHistory = historyList.filter(item => {
+        if (item.type === 'Vadelendirme') return false;
         if (activeTab === 'all') return true;
-        if (activeTab === 'sales') return item.type === 'Fatura' || item.type === 'Satış' || item.type === 'İrsaliye' || item.type === 'Vadelendirme';
-        if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider' || item.type === 'Vadelendirme';
+        if (activeTab === 'sales') return item.type === 'Fatura' || item.type === 'Satış' || item.type === 'İrsaliye';
+        if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider';
         return true;
     });
 
@@ -1908,8 +1909,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     <tr style={{ background: '#080a0f', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.03))' }}>
                                                         <td colSpan={6} style={{ padding: '24px 32px' }}>
                                                             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
-                                                                {/* Sol Taraf: Kalemler (Order Summary) */}
-                                                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                {/* Sol Taraf: Kalemler (Order Summary) ve Ödeme Planı */}
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                                    <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
                                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', paddingBottom: '16px' }}>
                                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                                             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
@@ -1948,6 +1950,31 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     </div>
                                                                 </div>
 
+                                                                {(() => {
+                                                                    const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
+                                                                    if (!attachedPlan) return null;
+                                                                    return (
+                                                                        <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                                                                <h4 style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#f59e0b', letterSpacing: '1px' }}>ÖDEME PLANI DETAYI</h4>
+                                                                                <span style={{ fontSize: '11px', fontWeight: '800', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', padding: '4px 8px', borderRadius: '8px' }}>{attachedPlan.installments?.length || attachedPlan.installmentCount} Taksit</span>
+                                                                            </div>
+                                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                                {attachedPlan.installments?.map((inst: any) => (
+                                                                                    <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', opacity: inst.status === 'Cancelled' ? 0.5 : 1 }}>
+                                                                                        <span style={{ color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '600', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>
+                                                                                            {inst.installmentNo}. Taksit ({new Date(inst.dueDate).toLocaleDateString('tr-TR')})
+                                                                                            {inst.status === 'Cancelled' && <span style={{ color: '#ef4444', marginLeft: '6px' }}>(İptal Edildi)</span>}
+                                                                                        </span>
+                                                                                        <span style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '800', fontFamily: 'monospace', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })()}
+                                                                </div>
+
                                                                 {/* Sağ Taraf: Payment Breakdown & Timeline */}
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
@@ -1972,29 +1999,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         </div>
                                                                     </div>
 
-                                                                    {(() => {
-                                                                        const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
-                                                                        if (!attachedPlan) return null;
-                                                                        return (
-                                                                            <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                                                                                    <h4 style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#f59e0b', letterSpacing: '1px' }}>ÖDEME PLANI DETAYI</h4>
-                                                                                    <span style={{ fontSize: '11px', fontWeight: '800', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', padding: '4px 8px', borderRadius: '8px' }}>{attachedPlan.installments?.length || attachedPlan.installmentCount} Taksit</span>
-                                                                                </div>
-                                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                                                    {attachedPlan.installments?.map((inst: any) => (
-                                                                                        <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', opacity: inst.status === 'Cancelled' ? 0.5 : 1 }}>
-                                                                                            <span style={{ color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '600', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>
-                                                                                                {inst.installmentNo}. Taksit ({new Date(inst.dueDate).toLocaleDateString('tr-TR')})
-                                                                                                {inst.status === 'Cancelled' && <span style={{ color: '#ef4444', marginLeft: '6px' }}>(İptal Edildi)</span>}
-                                                                                            </span>
-                                                                                            <span style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '800', fontFamily: 'monospace', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </div>
-                                                                            </div>
-                                                                        );
-                                                                    })()}
+
 
                                                                     <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
                                                                         <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>ZAMAN ÇİZELGESİ</h4>
@@ -2022,6 +2027,24 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                     </div>
                                                                                 </div>
                                                                             )}
+
+                                                                            {(() => {
+                                                                                const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
+                                                                                if (attachedPlan && attachedPlan.status !== 'İptal' && attachedPlan.status !== 'Cancelled') {
+                                                                                    return (
+                                                                                        <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1, marginTop: '16px' }}>
+                                                                                            <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#8b5cf6', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
+                                                                                            <div>
+                                                                                                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Vadelendirme Yapıldı</div>
+                                                                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>
+                                                                                                    Ödeme planı oluşturuldu ({attachedPlan.installments?.length || attachedPlan.installmentCount} Taksit)
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    );
+                                                                                }
+                                                                                return null;
+                                                                            })()}
                                                                         </div>
                                                                     </div>
 
