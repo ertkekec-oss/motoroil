@@ -9,9 +9,10 @@ import VatSimulationContent from '@/components/VatSimulationContent';
 import BaBsReconciliationContent from '@/components/BaBsReconciliationContent';
 import FinancialHealthContent from '@/components/FinancialHealthContent';
 import FinancialAuditContent from '@/components/FinancialAuditContent';
+import AdvisorExportModule from '@/components/AdvisorExportModule';
 
 export default function AdvisorPage() {
-    const [activeTab, setActiveTab] = useState<'plan' | 'mizan' | 'income' | 'vat' | 'babs' | 'health' | 'audit' | 'checks'>('checks');
+    const [activeTab, setActiveTab] = useState<'plan' | 'mizan' | 'income' | 'vat' | 'babs' | 'health' | 'audit' | 'checks' | 'export'>('checks');
 
     return (
         <div className="p-6 md:p-10 animate-in fade-in duration-500 font-sans min-h-screen bg-[#F6F8FB] dark:bg-[#0F172A] text-slate-900 dark:text-white">
@@ -51,6 +52,7 @@ export default function AdvisorPage() {
                         { id: 'vat', label: 'KDV Simülasyonu' },
                         { id: 'babs', label: 'BA/BS' },
                         { id: 'audit', label: 'Denetim' },
+                        { id: 'export', label: 'Veri Aktarımı (Luca/Zirve)' },
                     ].map((tab) => {
                         const isActive = activeTab === tab.id;
                         return (
@@ -120,6 +122,12 @@ export default function AdvisorPage() {
                 {activeTab === 'audit' && (
                     <div className="animate-in zoom-in-95 fade-in duration-300">
                         <FinancialAuditContent />
+                    </div>
+                )}
+                
+                {activeTab === 'export' && (
+                    <div className="animate-in zoom-in-95 fade-in duration-300">
+                        <AdvisorExportModule />
                     </div>
                 )}
             </div>
