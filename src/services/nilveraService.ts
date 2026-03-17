@@ -841,8 +841,13 @@ export class NilveraInvoiceService {
                 return { success: false, status: res.status, error: JSON.stringify(res.data) };
             }
 
-            console.log("[NilveraService] EArchive Cancel Success:", res.data);
-            return { success: true, data: res.data };
+            // Nilvera can return 200 OK with an array of errors if cancellation fails (e.g. "Raporlandı")
+            if (Array.isArray(res.data) && res.data.length > 0) {
+                console.warn("[NilveraService] EArchive Cancel Error (200 OK):", res.data);
+                return { success: false, status: res.status, error: res.data.join(" | ") };
+            }
+
+            return { success: true };
         } catch (error: any) {
             console.error("[NilveraService] EArchive Cancel Exception:", error.message);
             return { success: false, error: error.message };
