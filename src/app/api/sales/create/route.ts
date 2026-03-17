@@ -18,12 +18,16 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode, branch, staffId: bodyStaffId } = body;
 
-        // Resolve staffId (either from body or from current session if user is staff)
         let finalStaffId = bodyStaffId;
-        if (!finalStaffId && (user as any).id) {
-            // Check if current user is stored in Staff table
-            const staffRecord = await prisma.staff.findUnique({
-                where: { id: (user as any).id },
+        if (!finalStaffId && user) {
+            // Find staff by matching username or email with the user session
+            const staffRecord = await prisma.staff.findFirst({
+                where: {
+                    OR: [
+                        { username: (user as any).username },
+                        { email: (user as any).email || 'missing-email' }
+                    ]
+                },
                 select: { id: true }
             });
             if (staffRecord) finalStaffId = staffRecord.id;
@@ -306,14 +310,6 @@ export async function POST(request: Request) {
                 }
             });
 
-            // E. Update Kasa Balance
-            // Satış yapıldığında (nakit veya kredi kartı fark etmeksizin POS üzerinden fiilen geçiyorsa) kasanın bakiyesi artmalıdır.
-            if (targetKasaId && effectivePaymentMode !== 'account') {
-                await tx.kasa.update({
-                    where: { id: targetKasaId },
-                    data: { balance: { increment: finalTotal } }
-                });
-            }
             // E. Update Customer Balance
             if (customerId) {
                 const updateData: any = {};

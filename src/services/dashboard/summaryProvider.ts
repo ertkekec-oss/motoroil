@@ -80,7 +80,18 @@ export class PrismaSummaryProvider implements IDashboardSummaryProvider {
                 status: { in: ["PAID", "SHIPPED", "DELIVERED", "COMPLETED"] }
             }
         });
-        const gmvTotal = Number(orders._sum.totalAmount || 0);
+        const networkGmvTotal = Number(orders._sum.totalAmount || 0);
+
+        const posOrders = await prisma.order.aggregate({
+            _sum: { totalAmount: true },
+            where: {
+                ...baseCompanyGuard,
+                status: { in: ["Tamamlandı", "Faturalandırıldı"] },
+                marketplace: "POS"
+            }
+        });
+        const posGmv = Number(posOrders._sum.totalAmount || 0);
+        const gmvTotal = networkGmvTotal + posGmv;
 
         // 2. Active RFQ Count
         const activeRfqs = await prisma.rfq.count({
@@ -113,17 +124,38 @@ export class PrismaSummaryProvider implements IDashboardSummaryProvider {
                 updatedAt: { gte: startOfMonth }
             }
         });
-        const collectedThisMonth = Number(collected._sum.totalAmount || 0);
+        const networkCollected = Number(collected._sum.totalAmount || 0);
+
+        const posCollectedQuery = await prisma.order.aggregate({
+            _sum: { totalAmount: true },
+            where: {
+                ...baseCompanyGuard,
+                status: { in: ["Tamamlandı", "Faturalandırıldı"] },
+                marketplace: "POS",
+                orderDate: { gte: startOfMonth }
+            }
+        });
+        const posCollected = Number(posCollectedQuery._sum.totalAmount || 0);
+        const collectedThisMonth = networkCollected + posCollected;
 
         // 5. Daily Tx Count
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
-        const dailyTxCount = await prisma.networkOrder.count({
+        const dailyTxCountNetwork = await prisma.networkOrder.count({
             where: {
                 ...companyIdGuard,
                 createdAt: { gte: startOfDay }
             }
         });
+
+        const dailyTxCountPos = await prisma.order.count({
+            where: {
+                ...baseCompanyGuard,
+                marketplace: "POS",
+                orderDate: { gte: startOfDay }
+            }
+        });
+        const dailyTxCount = dailyTxCountNetwork + dailyTxCountPos;
 
         // 6. Setup State
         let hasCompanyProfile = false;
