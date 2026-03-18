@@ -10,7 +10,7 @@ export async function GET(req: Request) {
         const user = session.user || session;
         const tenantId = session.tenantId || user.tenantId;
 
-        if (!user.permissions?.includes('b2b_manage') && user.role !== 'TENANT_OWNER' && user.role !== 'SUPER_ADMIN') {
+        if (!user.permissions?.includes('b2b_manage') && !['TENANT_OWNER', 'SUPER_ADMIN', 'ADMIN', 'PLATFORM_ADMIN'].includes(user.role)) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
@@ -76,7 +76,7 @@ export async function PATCH(req: Request) {
         const user = session.user || session;
         const tenantId = session.tenantId || user.tenantId;
 
-        if (!user.permissions?.includes('b2b_manage') && user.role !== 'TENANT_OWNER' && user.role !== 'SUPER_ADMIN') {
+        if (!user.permissions?.includes('b2b_manage') && !['TENANT_OWNER', 'SUPER_ADMIN', 'ADMIN', 'PLATFORM_ADMIN'].includes(user.role)) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 

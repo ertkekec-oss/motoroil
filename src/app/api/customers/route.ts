@@ -23,7 +23,17 @@ export async function GET(request: Request) {
         const url = new URL(request.url);
         const searchQuery = url.searchParams.get('search');
 
+        // Resolve company
+        const company = await prisma.company.findFirst({
+            where: { tenantId: user.tenantId }
+        });
+        
         const where: any = { deletedAt: null };
+        if (company) {
+            where.companyId = company.id;
+        } else if (user.tenantId !== 'PLATFORM_ADMIN') {
+            return NextResponse.json({ success: false, customers: [] });
+        }
 
         // Apply Search Filtering
         if (searchQuery) {
