@@ -253,11 +253,21 @@ export async function POST(request: Request) {
                     const qty = Number(item.qty || item.quantity || 1);
                     const prodId = String(item.productId);
 
-                    await tx.stock.upsert({
+                    const existingStock = await tx.stock.findUnique({
                         where: { productId_branch: { productId: prodId, branch: targetBranch } },
-                        update: { quantity: { decrement: qty } },
-                        create: { productId: prodId, branch: targetBranch, quantity: -qty }
+                        select: { id: true }
                     });
+
+                    if (existingStock) {
+                        await tx.stock.update({
+                            where: { id: existingStock.id },
+                            data: { quantity: { decrement: qty } }
+                        });
+                    } else {
+                        await tx.stock.create({
+                            data: { productId: prodId, branch: targetBranch, quantity: -qty }
+                        });
+                    }
 
                     await (tx as any).stockMovement.create({
                         data: {
@@ -346,6 +356,9 @@ export async function POST(request: Request) {
 
             // Accounting moved outside transaction to prevent silent rollback bugs
             return order;
+        }, {
+            maxWait: 10000, // default is 2000
+            timeout: 20000  // default is 5000
         });
 
         // G. Bank Commission (Post-Transaction)
