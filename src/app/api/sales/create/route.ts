@@ -118,12 +118,13 @@ export async function POST(request: Request) {
         const finalTotal = parseFloat(total);
         let finalEnrichedItems: any[] = [];
 
-        const result = await prisma.$transaction(async (tx) => {
+        // --- Execute completely outside an Interactive Transaction to prevent Neon PgBouncer Locks ---
+        const result = await (async () => {
             // A. Enrich Items with product details for history/receipts
             const enrichedItems = [];
             if (Array.isArray(items) && items.length > 0) {
                 const productIds = (items as any[]).map(i => String(i.productId));
-                const products = await tx.product.findMany({
+                const products = await prisma.product.findMany({
                     where: { id: { in: productIds } },
                     select: { id: true, name: true, price: true, salesVat: true }
                 });
@@ -144,12 +145,12 @@ export async function POST(request: Request) {
             // --- CAMPAIGN ENGINE EVALUATION ---
             let customerCategoryStr: string | null = null;
             if (customerId) {
-                const customerRec = await tx.customer.findFirst({ where: { id: customerId, companyId } });
+                const customerRec = await prisma.customer.findFirst({ where: { id: customerId, companyId } });
                 if (!customerRec) throw new Error("Müşteri bulunamadı veya erişim yetkiniz yok.");
                 customerCategoryStr = customerRec?.customerClass || null;
             }
 
-            const activeCampaigns = companyId ? await tx.campaign.findMany({
+            const activeCampaigns = companyId ? await prisma.campaign.findMany({
                 where: {
                     companyId: companyId,
                     isActive: true,
@@ -195,7 +196,7 @@ export async function POST(request: Request) {
                                 const totalFreeQty = times * rewardQty;
 
                                 if (conds.rewardProductId) {
-                                  const rp = await tx.product.findUnique({ where: { id: conds.rewardProductId }, select: { id: true, name: true, price: true, salesVat: true } });
+                                  const rp = await prisma.product.findUnique({ where: { id: conds.rewardProductId }, select: { id: true, name: true, price: true, salesVat: true } });
                                   if (rp) {
                                       enrichedItems.push({
                                           productId: rp.id,
@@ -224,7 +225,7 @@ export async function POST(request: Request) {
             }
             // --- END CAMPAIGN ENGINE ---
 
-            const order = await (tx as any).order.create({
+            const order = await prisma.order.create({
                 data: {
                     marketplace: 'POS',
                     marketplaceId: 'LOCAL',
@@ -254,23 +255,23 @@ export async function POST(request: Request) {
                     const qty = Number(item.qty || item.quantity || 1);
                     const prodId = String(item.productId);
 
-                    const existingStock = await tx.stock.findUnique({
+                    const existingStock = await prisma.stock.findUnique({
                         where: { productId_branch: { productId: prodId, branch: targetBranch } },
                         select: { id: true }
                     });
 
                     if (existingStock) {
-                        await tx.stock.update({
+                        await prisma.stock.update({
                             where: { id: existingStock.id },
                             data: { quantity: { decrement: qty } }
                         });
                     } else {
-                        await tx.stock.create({
+                        await prisma.stock.create({
                             data: { productId: prodId, branch: targetBranch, quantity: -qty }
                         });
                     }
 
-                    await (tx as any).stockMovement.create({
+                    await prisma.stockMovement.create({
                         data: {
                             productId: prodId,
                             branch: targetBranch,
@@ -284,7 +285,7 @@ export async function POST(request: Request) {
 
                     if (targetBranch === 'Merkez') {
                         try {
-                            await tx.product.update({
+                            await prisma.product.update({
                                 where: { id: prodId },
                                 data: { stock: { decrement: qty } }
                             });
@@ -297,7 +298,7 @@ export async function POST(request: Request) {
 
             // C. Update Kasa
             if (effectivePaymentMode !== 'account') {
-                await tx.kasa.update({
+                await prisma.kasa.update({
                     where: { id: targetKasaId },
                     data: { balance: { increment: finalTotal } }
                 });
@@ -317,7 +318,7 @@ export async function POST(request: Request) {
 
             transactionDesc += ` | REF:${order.id}`;
 
-            await (tx as any).transaction.create({
+            await prisma.transaction.create({
                 data: {
                     companyId: companyId,
                     type: 'Sales',
@@ -340,15 +341,15 @@ export async function POST(request: Request) {
                     updateData.points = { increment: netPoints };
                 }
                 if (Object.keys(updateData).length > 0) {
-                    await tx.customer.update({ where: { id: customerId }, data: updateData });
+                    await prisma.customer.update({ where: { id: customerId }, data: updateData });
                 }
             }
 
             // F. Coupon
             if (couponCode) {
-                const coupon = await tx.coupon.findFirst({ where: { code: couponCode, companyId } }) as any;
+                const coupon = await prisma.coupon.findFirst({ where: { code: couponCode, companyId } }) as any;
                 if (coupon) {
-                    await tx.coupon.update({
+                    await prisma.coupon.update({
                         where: { code: couponCode },
                         data: { usedCount: (coupon.usedCount || 0) + 1, usedAt: new Date(), isUsed: true }
                     });
@@ -357,10 +358,7 @@ export async function POST(request: Request) {
 
             // Accounting moved outside transaction to prevent silent rollback bugs
             return order;
-        }, {
-            maxWait: 15000, 
-            timeout: 45000  
-        });
+        })();
 
         // G. Bank Commission (Post-Transaction)
         // Moved outside main transaction to avoid aborting the sale if commission logic fails
