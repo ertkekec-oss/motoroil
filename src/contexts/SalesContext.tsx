@@ -33,8 +33,7 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
     const { setProducts, refreshProducts } = useInventory();
     const { addTransaction, refreshKasalar, refreshTransactions } = useFinancials();
     const { refreshCustomers } = useCRM();
-    const { addNotification } = useModal() as any;
-    const { recordSale } = useApp();
+    const { recordSale, addNotification } = useApp();
 
     const [suspendedSales, setSuspendedSales] = useState<SuspendedSale[]>([]);
 
