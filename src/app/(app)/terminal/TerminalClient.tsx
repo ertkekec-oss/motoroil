@@ -409,7 +409,7 @@ export default function TerminalClient() {
                 <div className="flex gap-4">
                     <div className="px-4 border-l border-slate-100 dark:border-white/5">
                         <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Açık Hesap</span>
-                        <span className="text-sm font-bold">{customer?.balance || 0} TL</span>
+                        <span className="text-sm font-bold">{Number(customer?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL</span>
                     </div>
                 </div>
 
@@ -516,7 +516,7 @@ export default function TerminalClient() {
                             {filteredCustomers.map(c => (
                                 <button key={c.id} onClick={() => { setSelectedCustomer(c.name); setIsCustomerModalOpen(false); }} className="w-full text-left p-3 bg-slate-50 dark:bg-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex justify-between">
                                     <span className="font-bold truncate">{c.name}</span>
-                                    <span className="text-xs text-slate-500">{c.balance || 0} TL</span>
+                                    <span className="text-xs text-slate-500">{Number(c.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL</span>
                                 </button>
                             ))}
                         </div>
@@ -639,9 +639,9 @@ export default function TerminalClient() {
                         <h3 className="text-xl font-black mb-4 flex items-center gap-2 tracking-tight"><CreditCard className="text-indigo-500" /> Ödemeyi Tamamla</h3>
 
                         <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-5 rounded-2xl mb-6 shadow-sm">
-                            <div className="flex justify-between text-sm font-bold text-slate-500 mb-2"><span>Sepet Ara Toplam</span><span>₺{subtotal.toLocaleString()}</span></div>
+                            <div className="flex justify-between text-sm font-bold text-slate-500 mb-2"><span>Sepet Ara Toplam</span><span>₺{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                             {(appliedDiscount > 0 || pointsToUse > 0) && (
-                                <div className="flex justify-between text-sm font-bold text-emerald-500 mb-2"><span>Manuel İndirim / Puan</span><span>-₺{(appliedDiscount + (pointsToUse || 0)).toLocaleString()}</span></div>
+                                <div className="flex justify-between text-sm font-bold text-emerald-500 mb-2"><span>Manuel İndirim / Puan</span><span>-₺{(appliedDiscount + (pointsToUse || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                             )}
 
                             {/* Campaign Engine Rewards inside Checkout Summary */}
@@ -654,7 +654,7 @@ export default function TerminalClient() {
                                         {computedCampaignDiscount > 0 && (
                                             <div className="flex justify-between font-medium text-emerald-600 dark:text-emerald-400">
                                                 <span>Kampanya İndirimi</span>
-                                                <span>-₺{computedCampaignDiscount.toLocaleString()}</span>
+                                                <span>-₺{computedCampaignDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         )}
                                         {computedEarnedPoints > 0 && (
@@ -674,7 +674,7 @@ export default function TerminalClient() {
                             )}
 
                             <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-3"></div>
-                            <div className="flex justify-between text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight"><span>Genel Toplam</span><span>₺{finalTotal.toLocaleString()}</span></div>
+                            <div className="flex justify-between text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight"><span>Genel Toplam</span><span>₺{finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                         </div>
 
                         {paymentMode !== 'account' && (
@@ -693,7 +693,7 @@ export default function TerminalClient() {
                                             className={`p-4 rounded-xl border flex flex-col justify-center transition-all shadow-sm ${selectedKasa === k.id ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 ring-2 ring-indigo-500/50' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'}`}
                                         >
                                             <span className={`text-sm font-bold truncate block w-full text-left ${selectedKasa === k.id ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}>{k.name}</span>
-                                            <span className={`text-[10px] mt-1 text-left uppercase font-bold tracking-widest ${selectedKasa === k.id ? 'text-indigo-500 dark:text-indigo-500/70' : 'text-slate-400 dark:text-slate-500'}`}>{k.currency || 'TRY'} • Bakiye: {k.balance || 0}</span>
+                                            <span className={`text-[10px] mt-1 text-left uppercase font-bold tracking-widest ${selectedKasa === k.id ? 'text-indigo-500 dark:text-indigo-500/70' : 'text-slate-400 dark:text-slate-500'}`}>{k.currency || 'TRY'} • Bakiye: {Number(k.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </button>
                                     ))}
                                     {(!(kasalar || []).filter((k: any) => {

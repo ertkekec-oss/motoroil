@@ -34,7 +34,7 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
                             </td>
                             <td className="py-4 px-4 text-center">
                                 <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                                    ₺{Number(getPrice(item)).toLocaleString()}
+                                    ₺{Number(getPrice(item)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                             </td>
                             <td className="py-4 px-4">
@@ -58,7 +58,7 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
                             </td>
                             <td className="py-4 px-4 text-right">
                                 <span className="font-black text-rose-600 dark:text-rose-400 text-lg tracking-tight">
-                                    ₺{(Number(getPrice(item)) * item.qty).toLocaleString()}
+                                    ₺{(Number(getPrice(item)) * item.qty).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                             </td>
                             <td className="py-4 px-4 text-center">

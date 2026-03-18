@@ -243,22 +243,23 @@ export async function POST(request: Request) {
 
             finalEnrichedItems = enrichedItems.length > 0 ? enrichedItems : items;
 
-            // B. Update Product Stocks (Parallelized)
+            // B. Update Product Stocks (Sequential to prevent Prisma tx deadlocks)
             const resolvedItems = enrichedItems.length > 0 ? enrichedItems : items;
             if (Array.isArray(resolvedItems) && resolvedItems.length > 0) {
                 const targetBranch = branch || 'Merkez';
-                const stockOps = resolvedItems.filter(i => i.productId).map(async (item) => {
+                for (const item of resolvedItems) {
+                    if (!item.productId) continue;
+                    
                     const qty = Number(item.qty || item.quantity || 1);
                     const prodId = String(item.productId);
-                    const ops = [];
 
-                    ops.push(tx.stock.upsert({
+                    await tx.stock.upsert({
                         where: { productId_branch: { productId: prodId, branch: targetBranch } },
                         update: { quantity: { decrement: qty } },
                         create: { productId: prodId, branch: targetBranch, quantity: -qty }
-                    }));
+                    });
 
-                    ops.push(tx.stockMovement.create({
+                    await (tx as any).stockMovement.create({
                         data: {
                             productId: prodId,
                             branch: targetBranch,
@@ -268,18 +269,19 @@ export async function POST(request: Request) {
                             referenceId: order.id,
                             price: Number(item.price || 0)
                         }
-                    }));
+                    });
 
                     if (targetBranch === 'Merkez') {
-                        ops.push(tx.product.update({
-                            where: { id: prodId },
-                            data: { stock: { decrement: qty } }
-                        }).catch(e => console.error("Legacy stock sync error:", e)));
+                        try {
+                            await tx.product.update({
+                                where: { id: prodId },
+                                data: { stock: { decrement: qty } }
+                            });
+                        } catch (e) {
+                            console.error("Legacy stock sync error:", e);
+                        }
                     }
-
-                    return Promise.all(ops);
-                });
-                await Promise.all(stockOps);
+                }
             }
 
             // C. Update Kasa

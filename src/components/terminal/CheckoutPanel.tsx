@@ -43,12 +43,12 @@ export default function CheckoutPanel({
                 <div className="space-y-3 bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
                     <div className="flex justify-between text-xs font-medium text-slate-500">
                         <span>Ara Toplam</span>
-                        <span>₺{subtotal.toLocaleString()}</span>
+                        <span>₺{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     {totalDiscount > 0 && (
                         <div className="flex justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
                             <span>İndirim</span>
-                            <span>-₺{totalDiscount.toLocaleString()}</span>
+                            <span>-₺{totalDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                     )}
                     <div className="flex justify-between text-[11px] font-medium text-slate-400">
@@ -57,7 +57,7 @@ export default function CheckoutPanel({
                     </div>
                     <div className="flex justify-between items-end pt-3 border-t border-slate-100 dark:border-white/10 mt-2">
                         <span className="font-bold text-sm text-slate-800 dark:text-slate-200">GENEL TOPLAM</span>
-                        <span className="text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight">₺{finalTotal.toLocaleString()}</span>
+                        <span className="text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight">₺{finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                 </div>
 
@@ -78,7 +78,7 @@ export default function CheckoutPanel({
                             {computedCampaignDiscount > 0 && (
                                 <div className="flex justify-between items-center font-bold text-emerald-700 dark:text-emerald-400 bg-white/60 dark:bg-slate-900/60 p-2 rounded-lg border border-white/20 dark:border-white/5 backdrop-blur-sm">
                                     <span className="flex items-center gap-1.5">🎁 Ödeme İndirimi</span>
-                                    <span className="text-sm">-₺{computedCampaignDiscount.toLocaleString()}</span>
+                                    <span className="text-sm">-₺{computedCampaignDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             )}
                             {computedEarnedPoints > 0 && (
