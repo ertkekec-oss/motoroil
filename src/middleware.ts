@@ -56,11 +56,13 @@ export async function middleware(request: NextRequest) {
 
         try {
             const { payload } = await jwtVerify(sessionToken, getJWTAscii());
-            const allowedAdminRoles = ['SUPER_ADMIN', 'PLATFORM_ADMIN', 'SUPPORT_AGENT'];
+            const allowedAdminRoles = ['SUPER_ADMIN', 'PLATFORM_ADMIN', 'SUPPORT_AGENT', 'ADMIN', 'OWNER', 'TENANT_ADMIN', 'MANAGER', 'MÜDÜR'];
             // @ts-ignore Let's safely check payload role
-            const userRole = payload?.role as string;
+            const userRole = (payload?.role as string)?.toUpperCase();
 
-            if (!allowedAdminRoles.includes(userRole)) {
+            // Broad check: allows any admin/manager through middleware. 
+            // Core permissions are rigorously handled at the route/page level.
+            if (!userRole || (!allowedAdminRoles.includes(userRole) && !userRole.includes('ADMIN'))) {
                 if (pathname.startsWith('/api')) {
                     return NextResponse.json({ error: 'Bu alana erişim yetkiniz yok.' }, { status: 403 });
                 }
