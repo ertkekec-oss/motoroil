@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle, ChevronRight, Printer } from 'lucide-react';
+import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle, ChevronRight, Printer, Target, TrendingUp, DollarSign } from 'lucide-react';
 import { IconActivity, IconTrendingUp, IconClock, IconCheck, IconAlert, IconZap, IconShield, IconRefresh, IconTrash } from '@/components/icons/PremiumIcons';
 import { useApp } from '@/contexts/AppContext';
 import dynamic from 'next/dynamic';
@@ -42,82 +42,115 @@ const ProgressBar = ({ label, value, max, color = "#3b82f6" }: any) => {
     );
 };
 
+// ─── PROFILE SIDEBAR (COMMON LEFT COLUMN) ──────────────────────────
+const ProfileSidebar = ({ user, title = "ÖZET", dataCount = 0, dataLabel = "Kayıt" }: any) => {
+    return (
+        <div className="lg:col-span-1 flex flex-col gap-4 h-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-[16px] p-6 text-center">
+            <div className="flex flex-col items-center space-y-4 pt-4">
+                <div className="w-24 h-24 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-4xl font-black shadow-inner">
+                    {user?.name?.substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">{user?.name}</h3>
+                    <p className="text-xs font-bold uppercase text-slate-500 mt-1 tracking-widest">{user?.role || 'Personel'}</p>
+                </div>
+                <div className="w-full h-px bg-slate-100 dark:bg-white/5 my-4"></div>
+                <div className="w-full text-left space-y-5 px-2">
+                    <div>
+                        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Durum Göstergesi</div>
+                        <div className="text-[13px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 mt-1">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Aktif Çalışan
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">{title}</div>
+                        <div className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 mt-1">{dataCount} {dataLabel}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // ─── DASHBOARD VIEW ──────────────────────────────────────────────────
 const DashboardView = ({
     handleQrCheckin, handleGpsCheckin, isScannerOpen, setIsScannerOpen, onQrScan, pdksStatus, handleCheckout,
-    targets = [], statsData, turnover, shifts = [], payrolls = [], tasks = []
+    targets = [], statsData, turnover, shifts = [], payrolls = [], tasks = [], user
 }: any) => {
     const activeTasksCount = tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length;
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Top Summaries */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#3b82f6">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Günlük Cirom</h4>
-                        <IconActivity className="w-5 h-5 text-blue-500" />
-                    </div>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">₺{(turnover || 0).toLocaleString()}</p>
-                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Bugünkü satış totali</p>
-                </EnterpriseCard>
-
-                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#8b5cf6">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Hedef Gerçekleşme</h4>
-                        <IconTrendingUp className="w-5 h-5 text-purple-500" />
-                    </div>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.achievement || '%0'}</p>
-                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Bu ayki hedef durumu</p>
-                </EnterpriseCard>
-
-                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#f59e0b">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Bekleyen Görev</h4>
-                        <IconClock className="w-5 h-5 text-amber-500" />
-                    </div>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{activeTasksCount}</p>
-                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Size atanmış aktif görev</p>
-                </EnterpriseCard>
-
-                <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#10b981">
-                    <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kazanılan Prim</h4>
-                        <IconZap className="w-5 h-5 text-emerald-500" />
-                    </div>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.bonus || '₺0'}</p>
-                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Dönem biriken tutar</p>
-                </EnterpriseCard>
-            </div>
-
-            {/* PDKS & Vardiya */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <EnterpriseCard>
-                    <EnterpriseSectionHeader title="PDKS Geçiş İşlemleri" icon="⚡" />
-                    <div className="p-6 space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            {!pdksStatus?.isWorking ? (
-                                <>
-                                    <button onClick={handleQrCheckin} className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group">
-                                        <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">📱</span></div>
-                                        <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
-                                    </button>
-                                    <button onClick={handleGpsCheckin} className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group">
-                                        <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">📍</span></div>
-                                        <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
-                                    </button>
-                                </>
-                            ) : (
-                                <button onClick={handleCheckout} className="col-span-2 flex flex-col items-center gap-3 p-6 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group">
-                                    <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">🏁</span></div>
-                                    <span className="text-[12px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest text-center">MESAİYİ BİTİR (ÇIKIŞ YAP)</span>
-                                </button>
-                            )}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 h-[calc(100vh-280px)] min-h-[600px]">
+            <ProfileSidebar user={user} title="Aktif Görev" dataCount={activeTasksCount} dataLabel="Adet" />
+            
+            <div className="lg:col-span-3 flex flex-col space-y-6 h-full overflow-y-auto custom-scrollbar pr-2">
+                {/* Top Summaries */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 shrink-0">
+                    <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#3b82f6">
+                        <div className="flex justify-between items-start mb-4">
+                            <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Günlük Cirom</h4>
+                            <IconActivity className="w-5 h-5 text-blue-500" />
                         </div>
-                        <div className="flex items-center justify-center pt-2">
-                            <span className="text-[10px] uppercase font-bold text-slate-400">📲 Konum ve cihaz parmak izi güvenli şekilde doğrulanır.</span>
+                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">₺{(turnover || 0).toLocaleString()}</p>
+                        <p className="text-[11px] font-semibold text-slate-400 mt-2">Bugünkü satış totali</p>
+                    </EnterpriseCard>
+
+                    <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#8b5cf6">
+                        <div className="flex justify-between items-start mb-4">
+                            <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Hedef Gerçekleşme</h4>
+                            <IconTrendingUp className="w-5 h-5 text-purple-500" />
                         </div>
-                    </div>
+                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.achievement || '%0'}</p>
+                        <p className="text-[11px] font-semibold text-slate-400 mt-2">Bu ayki hedef durumu</p>
+                    </EnterpriseCard>
+
+                    <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#f59e0b">
+                        <div className="flex justify-between items-start mb-4">
+                            <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Bekleyen Görev</h4>
+                            <IconClock className="w-5 h-5 text-amber-500" />
+                        </div>
+                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{activeTasksCount}</p>
+                        <p className="text-[11px] font-semibold text-slate-400 mt-2">Size atanmış aktif görev</p>
+                    </EnterpriseCard>
+
+                    <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#10b981">
+                        <div className="flex justify-between items-start mb-4">
+                            <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kazanılan Prim</h4>
+                            <IconZap className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.bonus || '₺0'}</p>
+                        <p className="text-[11px] font-semibold text-slate-400 mt-2">Dönem biriken tutar</p>
+                    </EnterpriseCard>
+                </div>
+
+                {/* PDKS & Vardiya */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-[300px]">
+                    <EnterpriseCard className="h-full flex flex-col">
+                        <EnterpriseSectionHeader title="PDKS Geçiş İşlemleri" icon="⚡" />
+                        <div className="p-6 space-y-6 flex-1 flex flex-col justify-center">
+                            <div className="grid grid-cols-2 gap-4">
+                                {!pdksStatus?.isWorking ? (
+                                    <>
+                                        <button onClick={handleQrCheckin} className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group">
+                                            <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">📱</span></div>
+                                            <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
+                                        </button>
+                                        <button onClick={handleGpsCheckin} className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group">
+                                            <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">📍</span></div>
+                                            <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button onClick={handleCheckout} className="col-span-2 flex flex-col items-center justify-center gap-3 p-8 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group h-full">
+                                        <div className="w-16 h-16 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform"><span className="text-3xl">🏁</span></div>
+                                        <span className="text-[13px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest text-center mt-2">MESAİYİ BİTİR (ÇIKIŞ YAP)</span>
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex items-center justify-center pt-2">
+                                <span className="text-[10px] uppercase font-bold text-slate-400">📲 Konum ve cihaz parmak izi güvenli şekilde doğrulanır.</span>
+                            </div>
+                        </div>
                 </EnterpriseCard>
 
                 <EnterpriseCard>
@@ -144,53 +177,143 @@ const DashboardView = ({
                     </div>
                 </EnterpriseCard>
             </div>
-
+            </div>
             <BarcodeScanner isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={onQrScan} />
         </div>
     );
 };
 
 // ─── TARGETS VIEW ────────────────────────────────────────────────────
-const TargetsView = ({ targets, statsData }: any) => {
+const TargetsView = ({ targets, statsData, user }: any) => {
+    const totalTarget = targets?.reduce((sum: any, t: any) => sum + Number(t.targetValue), 0) || 0;
+    const totalActual = targets?.reduce((sum: any, t: any) => sum + Number(t.currentValue), 0) || 0;
+    const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+    const totalEstBonus = targets?.reduce((sum: any, t: any) => sum + Number(t.estimatedBonus || 0), 0) || 0;
+    const activeTargetsCount = targets?.filter((t: any) => t.status !== 'İptal' && t.currentValue < t.targetValue).length || 0;
+    const completedTargetsCount = targets?.filter((t: any) => t.currentValue >= t.targetValue).length || 0;
+
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <EnterpriseCard>
-                <EnterpriseSectionHeader title="Kazanç ve Hedeflerim" icon="🎯" />
-                <div className="p-8">
-                    {(!targets || targets.length === 0) && (!statsData?.assignments || statsData?.assignments?.length === 0) ? (
-                        <div className="text-center text-sm font-semibold text-slate-400 py-12 border border-dashed border-slate-300 dark:border-slate-700/50 rounded-lg">
-                            Size atanmış aktif bir hedef bulunmamaktadır. Yöneticiniz ile görüşün.
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px]">
+            {/* COLUMN 1: Profile Summary */}
+            <ProfileSidebar user={user} title="Aktif Dönem Hedefleri" dataCount={targets?.length || 0} dataLabel="Adet Hedef" />
+
+            {/* COLUMNS 2-4: The Content */}
+            <div className="lg:col-span-3 flex flex-col h-full bg-white dark:bg-[#0f172a] shadow-sm rounded-[16px] border border-slate-200 dark:border-white/5 p-6 space-y-6">
+                <div className="flex items-center justify-between bg-slate-50 dark:bg-[#1e293b]/60 p-5 rounded-[12px] border border-slate-100 dark:border-white/5 shrink-0">
+                    <div>
+                        <h2 className="text-[18px] font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <Target className="w-5 h-5 text-emerald-500" />
+                            Kişisel Hedef ve Performansım
+                        </h2>
+                        <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1">Bu dönemki hedeflerinizi ve komisyon hakedişlerinizi anlık takip edebilirsiniz.</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] p-5 shadow-sm">
+                        <h4 className="text-[11px] font-bold tracking-widest text-slate-500 uppercase mb-3 flex items-center gap-1.5"><TrendingUp className="w-3 h-3" /> İlerleme Başarısı</h4>
+                        <div className="text-3xl font-black text-slate-900 dark:text-white">%{overallProgress}</div>
+                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-3 overflow-hidden">
+                            <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] p-5 shadow-sm">
+                        <h4 className="text-[11px] font-bold tracking-widest text-slate-500 uppercase mb-3 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> Ulaşılan Hedefler</h4>
+                        <div className="text-3xl font-black text-slate-900 dark:text-white">{completedTargetsCount}</div>
+                    </div>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] p-5 shadow-sm">
+                        <h4 className="text-[11px] font-bold tracking-widest text-slate-500 uppercase mb-3 flex items-center gap-1.5">🔥 Aktif Hedefler</h4>
+                        <div className="text-3xl font-black text-slate-900 dark:text-white">{activeTargetsCount}</div>
+                    </div>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] p-5 shadow-sm bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-900/10 dark:to-[#0f172a]">
+                        <h4 className="text-[11px] font-bold tracking-widest text-emerald-600 dark:text-emerald-400 uppercase mb-3 flex items-center gap-1.5"><DollarSign className="w-3 h-3" /> Prim (Tahmini)</h4>
+                        <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400">₺{totalEstBonus.toLocaleString()}</div>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl">
+                    <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b] shrink-0">
+                        <h3 className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Detaylı Hedef Tablosu</h3>
+                    </div>
+                    {targets?.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/30 dark:bg-transparent">
+                            <Target className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3 opacity-50" />
+                            <h3 className="text-[14px] font-bold text-slate-600 dark:text-slate-300 mb-1">Hedef Ataması Bulunmuyor</h3>
+                            <p className="text-[12px] text-slate-500">Bu dönem için henüz sizin adınıza planlanmış bir performans hedefi yok.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {targets?.map((t: any) => (
-                                <div key={t.id} className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-800/20">
-                                    <ProgressBar 
-                                        label={t.type === 'TURNOVER' ? `💰 Ciro Hedefi (₺${Number(t.targetValue).toLocaleString()})` : `📍 Aksiyon Hedefi (${t.targetValue} Adet)`} 
-                                        value={t.currentValue} 
-                                        max={t.targetValue || 1} 
-                                        color={t.type === 'TURNOVER' ? "#3b82f6" : "#10b981"} 
-                                    />
-                                    <p className="text-[10px] text-slate-400 font-medium mt-3 text-center">{t.name || 'Dönemsel Operasyonel Hedef'}</p>
-                                </div>
-                            ))}
-                            {statsData?.assignments?.map((ass: any) => (
-                                <div key={ass.id} className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-purple-50 dark:bg-purple-900/10">
-                                    <ProgressBar 
-                                        label={`🎯 Satış / Performans Matrisi (${ass.period?.name})`} 
-                                        value={ass.performances?.[0]?.actual || 0} 
-                                        max={ass.target || 1} 
-                                        color="#8b5cf6" 
-                                    />
-                                    <p className="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-3 text-center uppercase tracking-widest">
-                                        Tamamlanma: %{(((ass.performances?.[0]?.actual || 0) / (ass.target || 1)) * 100).toFixed(1)}
-                                    </p>
-                                </div>
-                            ))}
+                        <div className="flex-1 overflow-y-auto custom-scroll outline-none">
+                            <table className="w-full text-left border-collapse min-w-[700px]">
+                                <thead className="bg-slate-50 dark:bg-[#1e293b] sticky top-0 z-10 border-b border-slate-200 dark:border-white/5 shadow-sm">
+                                    <tr>
+                                        <th className="p-3 pl-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest backdrop-blur bg-slate-50/90 dark:bg-[#1e293b]/90">Hedef Türü</th>
+                                        <th className="p-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest backdrop-blur bg-slate-50/90 dark:bg-[#1e293b]/90">Durum</th>
+                                        <th className="p-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right backdrop-blur bg-slate-50/90 dark:bg-[#1e293b]/90">KOTA</th>
+                                        <th className="p-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right backdrop-blur bg-slate-50/90 dark:bg-[#1e293b]/90">Cari Gerçekleşen</th>
+                                        <th className="p-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest pr-4 w-48 backdrop-blur bg-slate-50/90 dark:bg-[#1e293b]/90">Performans</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50 bg-white dark:bg-[#0f172a]">
+                                    {targets.map((t: any) => {
+                                        const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
+                                        const isCompleted = progress >= 100;
+
+                                        return (
+                                            <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+                                                <td className="p-3 pl-4 align-middle">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${t.type === 'TURNOVER' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400'}`}>
+                                                            {t.type === 'TURNOVER' ? <DollarSign className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200 truncate">
+                                                                {t.type === 'TURNOVER' ? 'Ciro Hedefi' : 'Aksiyon Hedefi'} ({t.period})
+                                                            </div>
+                                                            <div className="text-[10px] uppercase font-bold text-slate-400 truncate mt-0.5 tracking-widest">
+                                                                {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="p-3 align-middle whitespace-nowrap">
+                                                    {isCompleted ? (
+                                                        <span className="inline-flex items-center justify-center px-2 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] uppercase tracking-widest rounded border border-emerald-200 dark:border-emerald-500/30">
+                                                            BAŞARILI
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center justify-center px-2 py-1 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 font-bold text-[10px] uppercase tracking-widest rounded border border-blue-200 dark:border-blue-500/30">
+                                                            DEVAM EDİYOR
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="p-3 align-middle text-[13px] font-bold text-slate-600 dark:text-slate-300 text-right whitespace-nowrap">
+                                                    {t.type === 'TURNOVER' ? `₺${Number(t.targetValue).toLocaleString()}` : `${t.targetValue}`}
+                                                </td>
+                                                <td className="p-3 align-middle text-[13px] font-black text-emerald-600 dark:text-emerald-400 text-right whitespace-nowrap">
+                                                    {t.type === 'TURNOVER' ? `₺${Number(t.currentValue).toLocaleString()}` : `${t.currentValue}`}
+                                                </td>
+                                                <td className="p-3 align-middle pr-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                            <div className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${Math.min(progress, 100)}%` }} />
+                                                        </div>
+                                                        <span className={`text-[11px] font-black w-9 text-right shrink-0 ${isCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>%{progress}</span>
+                                                    </div>
+                                                    {t.estimatedBonus > 0 && (
+                                                        <div className="mt-1 flex justify-end">
+                                                            <span className="text-[9px] uppercase font-bold text-emerald-600 dark:text-emerald-400 tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded">Hakediş: ₺{Number(t.estimatedBonus).toLocaleString()}</span>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
                         </div>
                     )}
                 </div>
-            </EnterpriseCard>
+            </div>
         </div>
     );
 };
@@ -237,7 +360,9 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
     const paginatedTasks = filteredTasks.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage);
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 min-h-[500px]">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+            <ProfileSidebar user={user} title="Atanmış Aktif Görevler" dataCount={tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length} dataLabel="Görev" />
+
             <div className="lg:col-span-1">
                 <EnterpriseCard className="h-full flex flex-col">
                     <EnterpriseSectionHeader title="Atanan Görevlerim" icon="📋" />
@@ -365,9 +490,11 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
             <style>{printStyles}</style>
             
+            <ProfileSidebar user={user} title="Onay Bekleyen Talep" dataCount={leaves.filter((l: any) => l.status === 'Bekliyor').length} dataLabel="Adet" />
+
             {/* INVISIBLE PRINT CONTAINER */}
             <div id="printable-area" className="hidden">
                 {printableLeave && (
@@ -477,9 +604,12 @@ const PayrollView = ({ payrolls, user }: any) => {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
             <style>{printStyles}</style>
 
+            <ProfileSidebar user={user} title="Toplam Bordro Kaydı" dataCount={payrolls.length} dataLabel="Ay" />
+
+            {/* INVISIBLE PRINT CONTAINER */}
             <div id="printable-area" className="hidden">
                 {printablePayroll && (
                     <div className="p-10 font-sans text-black border-2 border-slate-800 m-8 rounded-xl shadow-none">
@@ -514,84 +644,90 @@ const PayrollView = ({ payrolls, user }: any) => {
                 )}
             </div>
 
-            <EnterpriseCard className="no-print">
-                <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
-                <div className="p-6 overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-[#f8fafc] dark:bg-[#0f111a]">
-                            <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-slate-800">
-                                <th className="px-4 py-3">Dönem</th>
-                                <th className="px-4 py-3">Net Hakediş (TRL)</th>
-                                <th className="px-4 py-3">Brüt + Prim / Kesinti</th>
-                                <th className="px-4 py-3">Durum & İşlem Z.</th>
-                                <th className="px-4 py-3 text-right">Eylem</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-sm text-slate-400">Aktif bordro kaydı bulunmamaktadır.</td></tr> :
-                                payrolls.map((pr: any) => (
-                                    <tr key={pr.id} className="border-b transition hover:bg-slate-50 dark:hover:bg-slate-800/10">
-                                        <td className="px-4 py-4 text-[14px] font-black">{pr.period}</td>
-                                        <td className="px-4 py-4 text-[16px] font-black text-emerald-600">₺{Number(pr.netPay).toLocaleString()}</td>
-                                        <td className="px-4 py-4 text-[11px] font-semibold text-slate-500 space-y-1">
-                                            <div>Brüt: ₺{Number(pr.basePay).toLocaleString()}</div>
-                                            <div className="text-blue-500">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                             <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded ${pr.status === 'Ödendi' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{pr.status || 'Bekliyor'}</span>
-                                        </td>
-                                        <td className="px-4 py-4 text-right">
-                                            <button onClick={() => handlePrint(pr)} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-2">
-                                                <Printer className="w-3 h-3"/> Pusula Yazdır
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </EnterpriseCard>
+            <div className="lg:col-span-3 flex flex-col h-full">
+                <EnterpriseCard className="no-print h-full flex flex-col">
+                    <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
+                    <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#f8fafc] dark:bg-[#0f111a] sticky top-0 z-10">
+                                <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-slate-800">
+                                    <th className="px-4 py-3">Dönem</th>
+                                    <th className="px-4 py-3">Net Hakediş (TRL)</th>
+                                    <th className="px-4 py-3">Brüt + Prim / Kesinti</th>
+                                    <th className="px-4 py-3">Durum & İşlem Z.</th>
+                                    <th className="px-4 py-3 text-right">Eylem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-sm text-slate-400">Aktif bordro kaydı bulunmamaktadır.</td></tr> :
+                                    payrolls.map((pr: any) => (
+                                        <tr key={pr.id} className="border-b transition hover:bg-slate-50 dark:hover:bg-slate-800/10">
+                                            <td className="px-4 py-4 text-[14px] font-black">{pr.period}</td>
+                                            <td className="px-4 py-4 text-[16px] font-black text-emerald-600">₺{Number(pr.netPay).toLocaleString()}</td>
+                                            <td className="px-4 py-4 text-[11px] font-semibold text-slate-500 space-y-1">
+                                                <div>Brüt: ₺{Number(pr.basePay).toLocaleString()}</div>
+                                                <div className="text-blue-500">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                 <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded ${pr.status === 'Ödendi' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{pr.status || 'Bekliyor'}</span>
+                                            </td>
+                                            <td className="px-4 py-4 text-right">
+                                                <button onClick={() => handlePrint(pr)} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-2">
+                                                    <Printer className="w-3 h-3"/> Pusula Yazdır
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </EnterpriseCard>
+            </div>
         </div>
     );
 };
 
 // ─── SHIFTS VIEW ─────────────────────────────────────────────────────
-const ShiftsView = ({ shifts }: any) => {
+const ShiftsView = ({ shifts, user }: any) => {
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <EnterpriseCard>
-                <EnterpriseSectionHeader title="Haftalık Vardiya Planım" icon="📅" />
-                <div className="p-6">
-                    {shifts.length === 0 ? (
-                        <div className="py-12 text-center text-sm font-semibold text-slate-400 border border-dashed rounded-xl">
-                            İlgili hafta için planlanmış vardiya yok.
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {shifts.map((s: any) => {
-                                const isPermit = s.type === 'İzinli';
-                                return (
-                                    <div key={s.id} className={`p-5 rounded-2xl border flex flex-col justify-between h-32 relative overflow-hidden ${isPermit ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200 dark:bg-slate-800/30 dark:border-slate-700/50'}`}>
-                                        <div className="flex justify-between items-start z-10">
-                                            <div>
-                                                <div className={`text-[12px] font-bold uppercase tracking-widest ${isPermit ? 'text-amber-700' : 'text-slate-500'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
-                                                <div className={`text-[16px] font-black ${isPermit ? 'text-amber-900' : 'text-slate-900 dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: '2-digit' })}</div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+            <ProfileSidebar user={user} title="Haftalık Planlanmış" dataCount={shifts.length} dataLabel="Vardiya" />
+            
+            <div className="lg:col-span-3 flex flex-col h-full">
+                <EnterpriseCard className="h-full flex flex-col">
+                    <EnterpriseSectionHeader title="Haftalık Vardiya Planım" icon="📅" />
+                    <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
+                        {shifts.length === 0 ? (
+                            <div className="py-12 text-center text-[13px] font-bold text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
+                                İlgili dönem içi planlanmış vardiya yok.
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+                                {shifts.map((s: any) => {
+                                    const isPermit = s.type === 'İzinli';
+                                    return (
+                                        <div key={s.id} className={`p-5 rounded-2xl border flex flex-col justify-between h-32 relative overflow-hidden ${isPermit ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200 dark:bg-slate-800/30 dark:border-slate-700/50'}`}>
+                                            <div className="flex justify-between items-start z-10">
+                                                <div>
+                                                    <div className={`text-[12px] font-bold uppercase tracking-widest ${isPermit ? 'text-amber-700' : 'text-slate-500'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
+                                                    <div className={`text-[16px] font-black ${isPermit ? 'text-amber-900' : 'text-slate-900 dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: '2-digit' })}</div>
+                                                </div>
+                                                {isPermit ? <span className="text-xl">🌴</span> : <span className="text-xl">🏢</span>}
                                             </div>
-                                            {isPermit ? <span className="text-xl">🌴</span> : <span className="text-xl">🏢</span>}
+                                            <div className="z-10 bg-white/50 dark:bg-black/20 p-2 rounded-lg text-center backdrop-blur-sm">
+                                                <span className={`text-[14px] font-black tracking-tight ${isPermit ? 'text-amber-700' : 'text-blue-600 dark:text-blue-400'}`}>
+                                                    {isPermit ? "TAM GÜN İZİNLİ" : `${new Date(s.start).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} - ${new Date(s.end).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="z-10 bg-white/50 dark:bg-black/20 p-2 rounded-lg text-center backdrop-blur-sm">
-                                            <span className={`text-[14px] font-black tracking-tight ${isPermit ? 'text-amber-700' : 'text-blue-600 dark:text-blue-400'}`}>
-                                                {isPermit ? "TAM GÜN İZİNLİ" : `${new Date(s.start).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} - ${new Date(s.end).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`}
-                                            </span>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    )}
-                </div>
-            </EnterpriseCard>
+                                    )
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </EnterpriseCard>
+            </div>
         </div>
     );
 };
@@ -599,37 +735,41 @@ const ShiftsView = ({ shifts }: any) => {
 // ─── PROFILE VIEW ────────────────────────────────────────────────────
 const ProfileSettingsView = ({ user }: any) => {
     return (
-        <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
-            <EnterpriseCard>
-                <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
-                <div className="p-8">
-                    <div className="flex items-center gap-6 mb-8 border-b pb-8 border-slate-200 dark:border-slate-800">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white relative shadow-lg">
-                            {user?.name?.[0]?.toUpperCase() || 'P'}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+            <ProfileSidebar user={user} title="Hesap Durumu" dataCount={"ONAYLI"} dataLabel="Kullanıcı" />
+            
+            <div className="lg:col-span-3 flex flex-col h-full">
+                <EnterpriseCard className="h-full flex flex-col">
+                    <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
+                    <div className="p-8 flex-1 overflow-y-auto custom-scrollbar">
+                        <div className="flex items-center gap-6 mb-8 border-b pb-8 border-slate-200 dark:border-slate-800">
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white relative shadow-lg">
+                                {user?.name?.[0]?.toUpperCase() || 'P'}
+                            </div>
+                            <div>
+                                <h4 className="text-2xl font-black">{user?.name}</h4>
+                                <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 text-[11px] font-bold uppercase rounded-md">{user?.role || 'Personel'}</span>
+                                <div className="mt-1 text-xs font-bold uppercase text-slate-400">ŞİRKET ID NO: #{user?.id?.slice(0,6).toUpperCase()}</div>
+                            </div>
                         </div>
-                        <div>
-                            <h4 className="text-2xl font-black">{user?.name}</h4>
-                            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 text-[11px] font-bold uppercase rounded-md">{user?.role || 'Personel'}</span>
-                            <div className="mt-1 text-xs font-bold uppercase text-slate-400">ŞİRKET ID NO: #{user?.id?.slice(0,6).toUpperCase()}</div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <EnterpriseInput label="Tam Ad Soyad" defaultValue={user?.name} disabled />
+                            <EnterpriseInput label="E-Posta Adresi" type="email" defaultValue={user?.email} disabled />
+                            <EnterpriseInput label="Telefon Numarası" type="tel" placeholder="Ulaşım bilgisi sisteme kapalı" disabled />
+                        </div>
+                        <div className="pt-8 border-t border-slate-200 dark:border-slate-800">
+                            <h4 className="text-[12px] font-bold text-slate-600 uppercase flex items-center gap-2 mb-6"><span>🔒</span> Parola Güncelle</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <EnterpriseInput label="Mevcut Şifre" type="password" />
+                                <EnterpriseInput label="Yeni Şifre" type="password" />
+                            </div>
+                            <div className="mt-8 flex justify-end">
+                                <EnterpriseButton variant="primary" className="px-10">BİLGİLERİ GÜNCELLE</EnterpriseButton>
+                            </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <EnterpriseInput label="Tam Ad Soyad" defaultValue={user?.name} disabled />
-                        <EnterpriseInput label="E-Posta Adresi" type="email" defaultValue={user?.email} disabled />
-                        <EnterpriseInput label="Telefon Numarası" type="tel" placeholder="Ulaşım bilgisi sisteme kapalı" disabled />
-                    </div>
-                    <div className="pt-8 border-t border-slate-200 dark:border-slate-800">
-                        <h4 className="text-[12px] font-bold text-slate-600 uppercase flex items-center gap-2 mb-6"><span>🔒</span> Parola Güncelle</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <EnterpriseInput label="Mevcut Şifre" type="password" />
-                            <EnterpriseInput label="Yeni Şifre" type="password" />
-                        </div>
-                        <div className="mt-8 flex justify-end">
-                            <EnterpriseButton variant="primary" className="px-10">BİLGİLERİ GÜNCELLE</EnterpriseButton>
-                        </div>
-                    </div>
-                </div>
-            </EnterpriseCard>
+                </EnterpriseCard>
+            </div>
         </div>
     );
 };
@@ -757,16 +897,6 @@ export default function PersonelPanel() {
         </div>
     );
 
-    const TABS = [
-        { key: 'dashboard', label: 'Özet', icon: <IconActivity className="w-4 h-4"/> },
-        { key: 'targets', label: 'Hedefler', icon: <IconTrendingUp className="w-4 h-4"/> },
-        { key: 'tasks', label: 'Görevler', icon: <Briefcase className="w-4 h-4"/> },
-        { key: 'leave', label: 'İzinler', icon: <Calendar className="w-4 h-4"/> },
-        { key: 'payroll', label: 'Bordro', icon: <FileText className="w-4 h-4"/> },
-        { key: 'shifts', label: 'Vardiya', icon: <IconClock className="w-4 h-4"/> },
-        { key: 'profile', label: 'Profil', icon: <UserCircle className="w-4 h-4"/> },
-    ] as const;
-
     return (
         <div style={{ background: 'var(--bg-main)' }} className="min-h-screen text-slate-900 dark:text-white pb-24 no-print relative">
             <div style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border-color)' }} className="px-8 py-6 sticky top-0 z-40 shadow-sm">
@@ -775,26 +905,48 @@ export default function PersonelPanel() {
                         <h1 className="text-[22px] font-black tracking-tight flex items-center gap-3">
                             <span className="text-3xl drop-shadow-sm">👨‍💼</span> PERSONEL PORTALI
                         </h1>
-                        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">İnsan Kaynakları & Operasyon Yönetim Paneli</p>
+                        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Gelişmiş İnsan Kaynakları & Operasyon Yönetim Paneli</p>
                     </div>
                 </div>
             </div>
 
             <div className="max-w-[1700px] mx-auto p-8 space-y-8 duration-700">
-                <div className="flex bg-slate-100/80 dark:bg-slate-800/40 p-1.5 rounded-xl border w-fit overflow-x-auto">
-                    {TABS.map(tab => (
-                        <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`${activeTab === tab.key ? "bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"} flex items-center gap-2 px-6 py-3 text-[12px] font-bold uppercase tracking-widest rounded-lg transition-all whitespace-nowrap`}>
-                            {tab.icon} {tab.label}
-                        </button>
-                    ))}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2">
+                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                        {[
+                            { group: 'GENEL', items: [{ id: 'dashboard', label: 'Özet / PDKS' }] },
+                            { group: 'OPERASYON', items: [{ id: 'tasks', label: 'Görevler' }, { id: 'targets', label: 'Hedefler' }] },
+                            { group: 'ZAMAN', items: [{ id: 'shifts', label: 'Vardiya' }, { id: 'leave', label: 'İzinler' }] },
+                            { group: 'FİNANS', items: [{ id: 'payroll', label: 'Bordro' }] },
+                            { group: 'HESAP', items: [{ id: 'profile', label: 'Profil' }] },
+                        ].map((grp, i) => (
+                            <div key={grp.group} className="flex items-center gap-3">
+                                {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
+                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                    {grp.items.map(tab => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => setActiveTab(tab.id as any)}
+                                            className={activeTab === tab.id
+                                                ? "px-4 py-2 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
+                                                : "px-4 py-2 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
+                                            }
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {activeTab === 'dashboard' && <DashboardView handleQrCheckin={handleQrCheckin} handleGpsCheckin={handleGpsCheckin} isScannerOpen={isScannerOpen} setIsScannerOpen={setIsScannerOpen} onQrScan={onQrScan} pdksStatus={pdksStatus} handleCheckout={handleCheckout} targets={targets} statsData={statsData} turnover={turnover} shifts={shifts} payrolls={payrolls} tasks={tasks} />}
-                {activeTab === 'targets' && <TargetsView targets={targets} statsData={statsData} />}
+                {activeTab === 'dashboard' && <DashboardView handleQrCheckin={handleQrCheckin} handleGpsCheckin={handleGpsCheckin} isScannerOpen={isScannerOpen} setIsScannerOpen={setIsScannerOpen} onQrScan={onQrScan} pdksStatus={pdksStatus} handleCheckout={handleCheckout} targets={targets} statsData={statsData} turnover={turnover} shifts={shifts} payrolls={payrolls} tasks={tasks} user={currentUser} />}
+                {activeTab === 'targets' && <TargetsView targets={targets} statsData={statsData} user={currentUser} />}
                 {activeTab === 'tasks' && <TasksView user={currentUser} tasks={tasks} fetchTasks={fetchCoreData} loading={loading} />}
                 {activeTab === 'leave' && <LeavesView user={currentUser} leaves={leaves} fetchLeaves={fetchCoreData} loading={loading} />}
                 {activeTab === 'payroll' && <PayrollView payrolls={payrolls} user={currentUser} />}
-                {activeTab === 'shifts' && <ShiftsView shifts={shifts} />}
+                {activeTab === 'shifts' && <ShiftsView shifts={shifts} user={currentUser} />}
                 {activeTab === 'profile' && <ProfileSettingsView user={currentUser} />}
             </div>
             {/* Branding Footer */}

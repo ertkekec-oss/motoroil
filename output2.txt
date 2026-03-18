@@ -1,0 +1,7 @@
+﻿src/app/(app)/staff/me/page.tsx(205,30): error TS2552: Cannot find name 'Target'. Did you mean 'targets'?
+src/app/(app)/staff/me/page.tsx(214,136): error TS2304: Cannot find name 'TrendingUp'.
+src/app/(app)/staff/me/page.tsx(229,160): error TS2304: Cannot find name 'DollarSign'.
+src/app/(app)/staff/me/page.tsx(240,30): error TS2552: Cannot find name 'Target'. Did you mean 'targets'?
+src/app/(app)/staff/me/page.tsx(266,87): error TS2304: Cannot find name 'DollarSign'.
+src/app/(app)/staff/me/page.tsx(266,124): error TS2304: Cannot find name 'TrendingUp'.
+src/app/api/sales/create/route.ts(437,49): error TS2304: Cannot find name 'enrichedItems'.

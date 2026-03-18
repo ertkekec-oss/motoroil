@@ -1,26 +1,44 @@
+const { PrismaClient } = require('@prisma/client');
 const axios = require('axios');
-const prisma = require('./src/lib/prisma').prisma;
+const fs = require('fs');
 
-async function main() {
-    const settings = await prisma.appSettings.findFirst({
-        where: { key: 'erecordConfig' }
-    });
-    const config = settings.value;
-    const apiKey = config.apiKey;
-    const isTest = config.isTestEnvironment || false;
-    const baseUrl = isTest ? 'https://apitest.nilvera.com' : 'https://api.nilvera.com';
+const db = new PrismaClient();
 
+async function run() {
     try {
-        const res = await axios.post(`${baseUrl}/earchive/Invoice/Cancel`, [], {
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            }
+        const s = await db.appSettings.findFirst({ where: { key: 'eFaturaSettings' } });
+        if (!s) return console.log('No settings');
+        const config = typeof s.value === 'string' ? JSON.parse(s.value) : s.value;
+        const apiKey = config.apiKey || config.nilvera?.apiKey;
+        const isProd = config.environment === 'production' || config.nilvera?.environment === 'production';
+        const baseUrl = isProd ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+
+        console.log('API Key length ok?', !!apiKey);
+        console.log('Base URL:', baseUrl);
+
+        const res = await axios.get(`${baseUrl}/earchive/Invoices`, {
+            headers: { Authorization: `Bearer ${apiKey}` },
+            params: { limit: 10 }
         });
-        console.log("Success:", res.data);
+
+        console.log('Recent eArchive Invoices:');
+        res.data.Content?.slice(0, 10).forEach(i => {
+            console.log(`- ${i.InvoiceSerieOrNumber} | UUID: ${i.UUID} | Status: ${i.InvoiceStatus}`);
+        });
+        
+        console.log('-----------------');
+        
+        try {
+            const resListCanceled = await axios.get(`${baseUrl}/earchive/Invoices?Condition=CANCELED`, {
+                headers: { Authorization: `Bearer ${apiKey}` },
+            });
+            console.log('Canceled List Count:', resListCanceled.data.TotalCount || 0);
+        } catch(ee) {}
+
     } catch(e) {
-        console.log("Error status:", e.response?.status);
-        console.log("Error data:", e.response?.data);
+        console.error(e.response ? JSON.stringify(e.response.data) : e.message);
+    } finally {
+        await db.$disconnect();
     }
 }
-main();
+run();

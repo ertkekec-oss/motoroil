@@ -9,23 +9,32 @@ export async function GET(req: NextRequest) {
     if (!auth.authorized) return auth.response;
 
     try {
-        const userId = auth.user.id;
+        const user = auth.user;
+        const userId = user.id;
 
-        // Fetch staff details (shift info)
-        const staff = await (prisma as any).staff.findUnique({
-            where: { id: userId },
+        const staffRecord = await (prisma as any).staff.findFirst({
+            where: {
+                OR: [
+                    { userId: userId },
+                    { username: user.username || user.email },
+                    { email: user.email }
+                ].filter(Boolean),
+                deletedAt: null
+            },
             select: {
+                id: true,
                 shiftTemplate: true,
                 dailyWorkingHours: true,
                 weeklyOffDays: true,
             }
         });
 
-        // Fetch the active attendance (checkIn without checkOut)
+        const targetStaffId = staffRecord ? staffRecord.id : userId;
+
         const activeAtt = await (prisma as any).attendance.findFirst({
             where: {
-                staffId: userId,
-                checkOut: null
+                staffId: targetStaffId,
+                checkOut: null,
             },
             orderBy: { checkIn: 'desc' },
             select: {
@@ -37,7 +46,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            staff,
+            staff: staffRecord,
             activeSession: activeAtt,
             isWorking: !!activeAtt
         });

@@ -79,7 +79,8 @@ export async function POST(req: NextRequest) {
                 where: {
                     staffId,
                     date: { gte: today },
-                    checkOut: null
+                    checkOut: null,
+                    status: { not: 'ON_LEAVE' }
                 }
             });
 

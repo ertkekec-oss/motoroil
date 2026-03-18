@@ -59,9 +59,22 @@ export async function POST(req: NextRequest) {
         }
 
         try {
+            const staffRecord = await prisma.staff.findFirst({
+                where: {
+                    OR: [
+                        { userId: userId },
+                        { username: user.username || user.email },
+                        { email: user.email }
+                    ].filter(Boolean) as any,
+                    deletedAt: null
+                }
+            });
+
+            const targetStaffId = staffRecord ? staffRecord.id : userId;
+
             const activeAtt = await prisma.attendance.findFirst({
                 where: {
-                    staffId: userId,
+                    staffId: targetStaffId,
                     checkOut: null
                 },
                 orderBy: { checkIn: 'desc' }

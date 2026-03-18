@@ -115,6 +115,7 @@ export async function POST(request: Request) {
         const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         const orderNumber = `POS-${dateStr}-${randomSuffix}`;
         const finalTotal = parseFloat(total);
+        let finalEnrichedItems: any[] = [];
 
         const result = await prisma.$transaction(async (tx) => {
             // A. Enrich Items with product details for history/receipts
@@ -239,6 +240,8 @@ export async function POST(request: Request) {
                     rawData: { targetKasaId, description, paymentMode, referenceCode, dynamicEarnedPoints, pointsUsed, couponCode }
                 }
             });
+
+            finalEnrichedItems = enrichedItems.length > 0 ? enrichedItems : items;
 
             // B. Update Product Stocks (Parallelized)
             const resolvedItems = enrichedItems.length > 0 ? enrichedItems : items;
@@ -434,7 +437,7 @@ export async function POST(request: Request) {
         // Placing this outside of the critical transaction blocks guarantees
         // that accounting engine failures will NOT silently rollback the physical sale.
         try {
-            await createJournalFromSale(result, enrichedItems, targetKasaId);
+            await createJournalFromSale(result, finalEnrichedItems, targetKasaId);
         } catch (accErr: any) {
             console.error('[Accounting Sync Error After Sale]:', accErr?.message || accErr);
         }

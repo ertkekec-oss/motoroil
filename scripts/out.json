@@ -1,0 +1,68 @@
+{
+  "records": [
+    {
+      "id": "cmmsiqut3000d457ltvqtbzx7",
+      "staffId": "cmmsh2lym0003tfafv1tkkzpn",
+      "date": "2026-03-22T00:00:00.000Z",
+      "checkIn": "2026-03-22T09:00:00.000Z",
+      "checkOut": "2026-03-17T23:02:42.501Z",
+      "locationIn": null,
+      "locationOut": "38.710541853178746, 35.55747679770179",
+      "deviceInfo": null,
+      "status": "ON_LEAVE",
+      "workingHours": 0,
+      "isPuantajOk": true,
+      "notes": "Onaylı İzin: Yıllık İzin",
+      "createdAt": "2026-03-16T01:42:40.504Z",
+      "updatedAt": "2026-03-17T23:02:43.144Z"
+    },
+    {
+      "id": "cmmsiquqi000b457l57h48o99",
+      "staffId": "cmmsh2lym0003tfafv1tkkzpn",
+      "date": "2026-03-21T00:00:00.000Z",
+      "checkIn": "2026-03-21T09:00:00.000Z",
+      "checkOut": "2026-03-17T23:03:05.903Z",
+      "locationIn": null,
+      "locationOut": "38.71041636757721, 35.557514901809036",
+      "deviceInfo": null,
+      "status": "ON_LEAVE",
+      "workingHours": 0,
+      "isPuantajOk": true,
+      "notes": "Onaylı İzin: Yıllık İzin",
+      "createdAt": "2026-03-16T01:42:40.410Z",
+      "updatedAt": "2026-03-17T23:03:06.556Z"
+    },
+    {
+      "id": "cmmsiqunw0009457l8arm3x6g",
+      "staffId": "cmmsh2lym0003tfafv1tkkzpn",
+      "date": "2026-03-20T00:00:00.000Z",
+      "checkIn": "2026-03-20T09:00:00.000Z",
+      "checkOut": "2026-03-17T23:03:35.887Z",
+      "locationIn": null,
+      "locationOut": "38.710471565754965, 35.55756757047646",
+      "deviceInfo": null,
+      "status": "ON_LEAVE",
+      "workingHours": 0,
+      "isPuantajOk": true,
+      "notes": "Onaylı İzin: Yıllık İzin",
+      "createdAt": "2026-03-16T01:42:40.316Z",
+      "updatedAt": "2026-03-17T23:03:36.383Z"
+    }
+  ],
+  "activeAtt": {
+    "id": "cmmsiqula0007457lpda32f1r",
+    "staffId": "cmmsh2lym0003tfafv1tkkzpn",
+    "date": "2026-03-19T00:00:00.000Z",
+    "checkIn": "2026-03-19T09:00:00.000Z",
+    "checkOut": null,
+    "locationIn": null,
+    "locationOut": null,
+    "deviceInfo": null,
+    "status": "ON_LEAVE",
+    "workingHours": 0,
+    "isPuantajOk": true,
+    "notes": "Onaylı İzin: Yıllık İzin",
+    "createdAt": "2026-03-16T01:42:40.222Z",
+    "updatedAt": "2026-03-16T01:42:40.222Z"
+  }
+}
