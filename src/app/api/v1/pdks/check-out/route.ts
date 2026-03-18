@@ -63,8 +63,9 @@ export async function POST(req: NextRequest) {
                 where: {
                     OR: [
                         { userId: userId },
-                        { username: user.username || user.email },
-                        { email: user.email }
+                        user.username ? { username: user.username } : null,
+                        user.email ? { username: user.email } : null,
+                        user.email ? { email: user.email } : null
                     ].filter(Boolean) as any,
                     deletedAt: null
                 }

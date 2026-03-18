@@ -25,7 +25,9 @@ export class SalesPerformanceEngine {
         const perf = await prisma.performance.create({
             data: {
                 assignmentId,
-                actual
+                actual,
+                achievement,
+                isCumulative: false
             }
         });
 
@@ -239,7 +241,7 @@ export class SalesPerformanceEngine {
         const assQ2 = await prisma.targetAssignment.create({ data: { planId: plan.id, periodId: q2.id, staffId, target: dec(1000000), bonusPotential: dec(40000) } });
 
         // Simulate Performance
-        await prisma.performance.create({ data: { assignmentId: assQ1.id, actual: dec(1150000) } });
+        await prisma.performance.create({ data: { assignmentId: assQ1.id, actual: dec(1150000), achievement: dec(1.15), isCumulative: false } });
         await prisma.bonusResult.create({ data: { assignmentId: assQ1.id, baseBonus: dec(40000), accelerator: dec(1.2), finalBonus: dec(48000), isRecovered: false } });
 
         await this.evaluateGamification(companyId, staffId, q1.id, 1.15, 1150000);

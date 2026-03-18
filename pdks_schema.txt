@@ -1,0 +1,25 @@
+model PdksEvent {
+  id              String     @id @default(cuid())
+  tenantId        String
+  userId          String
+  siteId          String?
+  type            PdksType
+  mode            PdksMode
+  status          PdksStatus @default(APPROVED)
+  deviceFp        String
+  requestPublicIp String?
+  displayPublicIp String?
+  lat             Float?
+  lng             Float?
+  accuracy        Float?
+  clientTime      DateTime
+  serverTime      DateTime   @default(now())
+  riskScore       Int        @default(0)
+  riskFlags       Json?
+  offlineId       String?    @unique
+  notes           String?
+
+  @@index([tenantId, userId])
+  @@index([tenantId, serverTime])
+  @@index([siteId])
+}

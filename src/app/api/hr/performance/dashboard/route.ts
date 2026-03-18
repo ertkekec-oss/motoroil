@@ -1,24 +1,37 @@
 import { NextResponse } from 'next/server';
 import { SalesPerformanceEngine } from '@/services/hr/performance/engine';
 import { authorize, getStaffIdFromSession } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 
 export async function GET(request: Request) {
     try {
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
 
-        const user = (auth as any).user;
-        const tenantId = user.impersonateTenantId || user.tenantId;
-        const companyId = user.companyId || user.impersonateCompanyId;
-
+        const user = auth.user;
         const staffId = await getStaffIdFromSession(user);
         
-        let data = await SalesPerformanceEngine.getDashboardData(staffId || user.id);
+        // Ensure tenantId and companyId are robustly fetched from Staff record
+        let staffRecord = null;
+        if (staffId) {
+            staffRecord = await prisma.staff.findUnique({ where: { id: staffId }, select: { tenantId: true, companyId: true, id: true } });
+        } else if (user.id) {
+            staffRecord = await prisma.staff.findUnique({ where: { userId: user.id }, select: { tenantId: true, companyId: true, id: true } });
+        }
+        
+        const tenantId = staffRecord?.tenantId || user.impersonateTenantId || user.tenantId;
+        const companyId = staffRecord?.companyId || user.companyId || user.impersonateCompanyId;
+        const targetTargetId = staffRecord?.id || staffId || user.id;
+
+        if (!tenantId || !companyId || !targetTargetId) {
+            return NextResponse.json({ error: "Context (tenant, company, or target id) missing" }, { status: 400 });
+        }
+
+        let data = await SalesPerformanceEngine.getDashboardData(targetTargetId);
 
         if (data.assignments.length === 0) {
-            const targetId = staffId || user.id;
-            await SalesPerformanceEngine.bootstrapMatrixForStaff(tenantId, companyId, targetId);
-            data = await SalesPerformanceEngine.getDashboardData(targetId);
+            await SalesPerformanceEngine.bootstrapMatrixForStaff(tenantId, companyId, targetTargetId);
+            data = await SalesPerformanceEngine.getDashboardData(targetTargetId);
         }
 
         const formatCurr = (val: any) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(val));

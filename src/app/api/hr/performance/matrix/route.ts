@@ -65,7 +65,6 @@ export async function POST(req: Request) {
                 year: Number(year),
                 totalTarget: Number(totalTarget),
                 bonusPool: Number(bonusPool),
-                mode: 'STANDARD',
                 status: 'PUBLISHED'
             }
         });
@@ -90,8 +89,8 @@ export async function POST(req: Request) {
                     name: q.name,
                     startDate: q.startDate,
                     endDate: q.endDate,
-                    targetAmount: quarterTargets,
-                    weight: quarterWeight
+                    target: quarterTargets,
+                    bonus: (Number(bonusPool) / 4)
                 }
             });
 
