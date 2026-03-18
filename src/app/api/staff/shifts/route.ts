@@ -21,18 +21,12 @@ export async function GET(request: Request) {
         }
 
         if (mine === 'true') {
+            const { getSession, getStaffIdFromSession } = await import('@/lib/auth');
             const sessionResult: any = await getSession();
             const session = sessionResult?.user || sessionResult;
             if (session) {
-                const staffUser = await (prisma as any).staff.findFirst({
-                    where: {
-                        OR: [
-                            { email: session.email },
-                            { username: session.username || session.email }
-                        ]
-                    }, select: { id: true }
-                });
-                if (staffUser) where.staffId = staffUser.id;
+                const resolvedId = await getStaffIdFromSession(session);
+                if (resolvedId) where.staffId = resolvedId;
             }
         } else if (staffId) {
             where.staffId = staffId;

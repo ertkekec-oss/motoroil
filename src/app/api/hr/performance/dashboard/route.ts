@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SalesPerformanceEngine } from '@/services/hr/performance/engine';
-import { authorize } from '@/lib/auth';
+import { authorize, getStaffIdFromSession } from '@/lib/auth';
 
 export async function GET(request: Request) {
     try {
@@ -11,20 +11,9 @@ export async function GET(request: Request) {
         const tenantId = user.impersonateTenantId || user.tenantId;
         const companyId = user.companyId || user.impersonateCompanyId;
 
-        const prismaClient = (await import('@/lib/prisma')).prisma;
-        const staffRecord = await (prismaClient as any).staff.findFirst({
-            where: {
-                OR: [
-                    { email: user.email },
-                    { username: user.username || user.email || 'NO_USER' }
-                ]
-            },
-            select: { id: true }
-        });
+        const staffId = await getStaffIdFromSession(user);
         
-        const staffId = staffRecord?.id || user.id;
-
-        let data = await SalesPerformanceEngine.getDashboardData(staffId);
+        let data = await SalesPerformanceEngine.getDashboardData(staffId || user.id);
 
         // Bootstrap for missing matrix configurations
         if (data.assignments.length === 0) {

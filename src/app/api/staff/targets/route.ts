@@ -29,16 +29,10 @@ export async function GET(req: NextRequest) {
         const where: any = { companyId: company.id };
 
         if (mine === 'true') {
-            const staffUser = await (prisma as any).staff.findFirst({
-                where: {
-                    OR: [
-                        { email: session.user?.email },
-                        { username: session.user?.username || session.user?.email }
-                    ]
-                }
-            });
-            if (staffUser) {
-                where.staffId = staffUser.id;
+            const { getStaffIdFromSession } = await import('@/lib/auth');
+            const resolvedId = await getStaffIdFromSession(session);
+            if (resolvedId) {
+                where.staffId = resolvedId;
             } else {
                 return NextResponse.json({ targets: [] });
             }

@@ -10,15 +10,8 @@ export async function GET(req: Request) {
         const companyId = auth.user.companyId;
         const userId = auth.user.id;
 
-        const staffUser = await (prisma as any).staff.findFirst({
-            where: {
-                OR: [
-                    { email: auth.user.email },
-                    { username: auth.user.username || auth.user.email }
-                ]
-            }
-        });
-        const staffId = staffUser ? staffUser.id : null;
+        const { getStaffIdFromSession } = await import('@/lib/auth');
+        const staffId = await getStaffIdFromSession(auth.user);
 
         // Today's start and end logic
         const startOfDay = new Date();

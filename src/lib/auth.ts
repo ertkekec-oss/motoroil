@@ -239,3 +239,33 @@ export async function requirePlatformFinanceAdmin() {
     }
     return session;
 }
+
+/**
+ * Ensures we map the active JWT user cleanly to resolving their Staff.id
+ */
+export async function getStaffIdFromSession(session: any): Promise<string | null> {
+    if (!session || !session.id || session.id === 'SYSTEM') return null;
+    const prisma = (await import('@/lib/prisma')).default;
+
+    let searchEmail = session.email;
+    let searchUsername = session.username;
+
+    if (!searchEmail) {
+        const user = await prisma.user.findUnique({ where: { id: session.id }, select: { email: true } });
+        if (user && user.email) searchEmail = user.email;
+    }
+
+    if (!searchEmail && !searchUsername) return null;
+
+    const staff = await prisma.staff.findFirst({
+        where: {
+            OR: [
+                searchEmail ? { email: searchEmail } : {},
+                searchUsername ? { username: searchUsername } : {}
+            ].filter(c => Object.keys(c).length > 0) as any
+        },
+        select: { id: true }
+    });
+
+    return staff?.id || null;
+}
