@@ -15,9 +15,10 @@ export async function GET(req: NextRequest) {
         const staffRecord = await (prisma as any).staff.findFirst({
             where: {
                 OR: [
-                    { userId: userId },
-                    { username: user.username || user.email },
-                    { email: user.email }
+                    userId ? { userId: userId } : null,
+                    user.username ? { username: user.username } : null,
+                    user.email ? { username: user.email } : null,
+                    user.email ? { email: user.email } : null
                 ].filter(Boolean),
                 deletedAt: null
             },

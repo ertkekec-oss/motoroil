@@ -1,8 +1,0 @@
-﻿scripts/test_market_signal_endpoints.ts(64,5): error TS2322: Type 'NextResponse<{ message: string; }> | NextResponse<{ error: string; }>' is not assignable to type 'NextResponse<{ data: any; meta: { nextCursor: any; }; }>'.
-  Type 'NextResponse<{ message: string; }>' is not assignable to type 'NextResponse<{ data: any; meta: { nextCursor: any; }; }>'.
-    Type '{ message: string; }' is missing the following properties from type '{ data: any; meta: { nextCursor: any; }; }': data, meta
-src/components/network/market/CategoryHeatMiniBoard.tsx(2,58): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
-src/components/network/market/MarketSignalsWidget.tsx(2,58): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
-src/components/network/market/MarketSignalsWidget.tsx(4,23): error TS2307: Cannot find module '@/components/ui/badge' or its corresponding type declarations.
-src/components/network/market/TenantInsightsWidget.tsx(2,58): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
-src/components/network/market/TenantInsightsWidget.tsx(4,23): error TS2307: Cannot find module '@/components/ui/badge' or its corresponding type declarations.

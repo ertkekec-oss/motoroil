@@ -25,9 +25,7 @@ export class SalesPerformanceEngine {
         const perf = await prisma.performance.create({
             data: {
                 assignmentId,
-                actual,
-                achievement,
-                isCumulative: false
+                actual
             }
         });
 
@@ -228,26 +226,25 @@ export class SalesPerformanceEngine {
                 year: 2026,
                 totalTarget: dec(4000000),
                 bonusPool: dec(160000),
-                mode: 'STANDARD',
-                status: 'PUBLISHED'
+                status: 'ACTIVE'
             }
         });
 
         // Create Periods
-        const q1 = await prisma.targetPeriod.create({ data: { tenantId, companyId, planId: plan.id, name: 'Q1', startDate: new Date('2026-01-01'), endDate: new Date('2026-03-31'), targetAmount: dec(1000000), weight: 0.25 } });
-        const q2 = await prisma.targetPeriod.create({ data: { tenantId, companyId, planId: plan.id, name: 'Q2', startDate: new Date('2026-04-01'), endDate: new Date('2026-06-30'), targetAmount: dec(1000000), weight: 0.25 } });
+        const q1 = await prisma.targetPeriod.create({ data: { planId: plan.id, name: 'Q1', startDate: new Date('2026-01-01'), endDate: new Date('2026-03-31'), target: dec(1000000), bonus: dec(40000) } });
+        const q2 = await prisma.targetPeriod.create({ data: { planId: plan.id, name: 'Q2', startDate: new Date('2026-04-01'), endDate: new Date('2026-06-30'), target: dec(1000000), bonus: dec(40000) } });
 
         // Assign to Staff
-        const assQ1 = await prisma.targetAssignment.create({ data: { tenantId, companyId, planId: plan.id, periodId: q1.id, staffId, target: dec(1000000), bonusPotential: dec(40000) } });
-        const assQ2 = await prisma.targetAssignment.create({ data: { tenantId, companyId, planId: plan.id, periodId: q2.id, staffId, target: dec(1000000), bonusPotential: dec(40000) } });
+        const assQ1 = await prisma.targetAssignment.create({ data: { planId: plan.id, periodId: q1.id, staffId, target: dec(1000000), bonusPotential: dec(40000) } });
+        const assQ2 = await prisma.targetAssignment.create({ data: { planId: plan.id, periodId: q2.id, staffId, target: dec(1000000), bonusPotential: dec(40000) } });
 
         // Simulate Performance
-        await prisma.performance.create({ data: { assignmentId: assQ1.id, actual: dec(1150000), achievement: dec(1.15), isCumulative: false } });
+        await prisma.performance.create({ data: { assignmentId: assQ1.id, actual: dec(1150000) } });
         await prisma.bonusResult.create({ data: { assignmentId: assQ1.id, baseBonus: dec(40000), accelerator: dec(1.2), finalBonus: dec(48000), isRecovered: false } });
 
         await this.evaluateGamification(companyId, staffId, q1.id, 1.15, 1150000);
 
-        await prisma.leaderboardScore.create({ data: { tenantId, companyId, staffId, scoreValue: 7800, rankGlobal: 2, rankBranch: 1, periodType: 'Q1' } });
+        await prisma.leaderboardScore.create({ data: { companyId, periodId: q1.id, staffId, scoreValue: 7800, rank: 2, scoreType: 'Q1_PERFORMANCE' } });
         await this.generateAITargetSuggestion(plan.id, 1000000);
     }
 }
