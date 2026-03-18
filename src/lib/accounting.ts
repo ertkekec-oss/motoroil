@@ -46,9 +46,18 @@ export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez
     const companyId = kasa.companyId;
 
     const existing = await prismaClient.account.findFirst({
-        where: { kasaId, branch, companyId } as any
+        where: { kasaId } as any
     });
-    if (existing) return existing;
+    if (existing) {
+        // Otomatik branch/companyId düzeltmesi (eğer eski kayıtlarda null kalmışsa)
+        if (existing.companyId !== companyId || existing.branch !== branch) {
+            await prismaClient.account.update({
+                where: { id: existing.id },
+                data: { companyId, branch }
+            });
+        }
+        return existing;
+    }
 
     // TDHP'ye göre Ana Grubu belirle
     let parentRoot = ACCOUNTS.KASA;
@@ -148,7 +157,13 @@ export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez
                 });
             } catch (createError: any) {
                 if (createError.code === 'P2002') {
-                    nextSeq++; // Race condition, try next
+                    // EĞER KASA ID ICIN P2002 YEDİYSEK (büyük ihtimal şube/companyId null kalmıştır ve select yakalayamamıştır)
+                    // Veya code (100.01.001) duplicate yemişsek. Biz her ihtimale karşı Kasa objesini direkt soralım!
+                    const ghostAccount = await prismaClient.account.findFirst({ where: { kasaId } });
+                    if (ghostAccount) {
+                        return ghostAccount; // Infinite loop'u kırıyoruz!
+                    }
+                    nextSeq++; // Race condition on Code, try next branch
                 } else {
                     throw createError;
                 }
