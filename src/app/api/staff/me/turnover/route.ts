@@ -10,6 +10,16 @@ export async function GET(req: Request) {
         const companyId = auth.user.companyId;
         const userId = auth.user.id;
 
+        const staffUser = await (prisma as any).staff.findFirst({
+            where: {
+                OR: [
+                    { email: auth.user.email },
+                    { username: auth.user.username || auth.user.email }
+                ]
+            }
+        });
+        const staffId = staffUser ? staffUser.id : null;
+
         // Today's start and end logic
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
@@ -21,13 +31,16 @@ export async function GET(req: Request) {
         const orders = await (prisma as any).order.findMany({
             where: {
                 companyId,
-                createdBy: userId,
-                createdAt: {
+                OR: [
+                    { createdBy: userId },
+                    staffId ? { staffId: staffId } : {}
+                ],
+                orderDate: {
                     gte: startOfDay,
                     lte: endOfDay
                 },
                 status: {
-                    notIn: ['İptal', 'İade']
+                    in: ['Tamamlandı', 'COMPLETED', 'Ödendi', 'Açık Hesap']
                 }
             }
         });

@@ -42,30 +42,31 @@ const ProgressBar = ({ label, value, max, color = "#3b82f6" }: any) => {
     );
 };
 
-// ─── PROFILE SIDEBAR (COMMON LEFT COLUMN) ──────────────────────────
-const ProfileSidebar = ({ user, title = "ÖZET", dataCount = 0, dataLabel = "Kayıt" }: any) => {
+// ─── PROFILE HEADER (COMMON TOP ROW) ──────────────────────────
+const ProfileHeader = ({ user, title = "ÖZET", dataCount = 0, dataLabel = "Kayıt" }: any) => {
     return (
-        <div className="lg:col-span-1 flex flex-col gap-4 h-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-[16px] p-6 text-center">
-            <div className="flex flex-col items-center space-y-4 pt-4">
-                <div className="w-24 h-24 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-4xl font-black shadow-inner">
+        <div className="w-full flex justify-between items-center h-auto bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-[16px] p-6 mb-6">
+            <div className="flex items-center gap-6">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-3xl font-black shadow-inner shrink-0">
                     {user?.name?.substring(0, 2).toUpperCase()}
                 </div>
                 <div>
                     <h3 className="text-xl font-black text-slate-900 dark:text-white">{user?.name}</h3>
                     <p className="text-xs font-bold uppercase text-slate-500 mt-1 tracking-widest">{user?.role || 'Personel'}</p>
                 </div>
-                <div className="w-full h-px bg-slate-100 dark:bg-white/5 my-4"></div>
-                <div className="w-full text-left space-y-5 px-2">
-                    <div>
-                        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Durum Göstergesi</div>
-                        <div className="text-[13px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 mt-1">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Aktif Çalışan
-                        </div>
+            </div>
+            
+            <div className="flex items-center gap-8">
+                <div className="text-right hidden sm:block">
+                    <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Durum Göstergesi</div>
+                    <div className="text-[13px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-end gap-2 mt-1">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Aktif Çalışan
                     </div>
-                    <div>
-                        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">{title}</div>
-                        <div className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 mt-1">{dataCount} {dataLabel}</div>
-                    </div>
+                </div>
+                <div className="h-10 w-px bg-slate-100 dark:bg-white/5 hidden sm:block"></div>
+                <div className="text-right">
+                    <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">{title}</div>
+                    <div className="text-[16px] font-black text-emerald-600 dark:text-emerald-400 mt-1">{dataCount} <span className="text-sm font-bold text-slate-400">{dataLabel}</span></div>
                 </div>
             </div>
         </div>
@@ -80,10 +81,10 @@ const DashboardView = ({
     const activeTasksCount = tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length;
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 h-[calc(100vh-280px)] min-h-[600px]">
-            <ProfileSidebar user={user} title="Aktif Görev" dataCount={activeTasksCount} dataLabel="Adet" />
+        <div className="flex flex-col animate-in fade-in duration-500 h-[calc(100vh-280px)] min-h-[600px]">
+            <ProfileHeader user={user} title="Aktif Görev" dataCount={activeTasksCount} dataLabel="Adet" />
             
-            <div className="lg:col-span-3 flex flex-col space-y-6 h-full overflow-y-auto custom-scrollbar pr-2">
+            <div className="flex flex-col space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
                 {/* Top Summaries */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 shrink-0">
                     <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#3b82f6">
@@ -193,12 +194,12 @@ const TargetsView = ({ targets, statsData, user }: any) => {
     const completedTargetsCount = targets?.filter((t: any) => t.currentValue >= t.targetValue).length || 0;
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px]">
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
             {/* COLUMN 1: Profile Summary */}
-            <ProfileSidebar user={user} title="Aktif Dönem Hedefleri" dataCount={targets?.length || 0} dataLabel="Adet Hedef" />
+            <ProfileHeader user={user} title="Aktif Dönem Hedefleri" dataCount={targets?.length || 0} dataLabel="Adet Hedef" />
 
             {/* COLUMNS 2-4: The Content */}
-            <div className="lg:col-span-3 flex flex-col h-full bg-white dark:bg-[#0f172a] shadow-sm rounded-[16px] border border-slate-200 dark:border-white/5 p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto flex flex-col bg-white dark:bg-[#0f172a] shadow-sm rounded-[16px] border border-slate-200 dark:border-white/5 p-6 space-y-6">
                 <div className="flex items-center justify-between bg-slate-50 dark:bg-[#1e293b]/60 p-5 rounded-[12px] border border-slate-100 dark:border-white/5 shrink-0">
                     <div>
                         <h2 className="text-[18px] font-black text-slate-900 dark:text-white flex items-center gap-2">
@@ -360,10 +361,11 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
     const paginatedTasks = filteredTasks.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage);
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
-            <ProfileSidebar user={user} title="Atanmış Aktif Görevler" dataCount={tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length} dataLabel="Görev" />
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+            <ProfileHeader user={user} title="Atanmış Aktif Görevler" dataCount={tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length} dataLabel="Görev" />
 
-            <div className="lg:col-span-1">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+                <div className="lg:col-span-1 border border-transparent">
                 <EnterpriseCard className="h-full flex flex-col">
                     <EnterpriseSectionHeader title="Atanan Görevlerim" icon="📋" />
                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/10">
@@ -449,6 +451,7 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
                         </div>
                     )}
                 </EnterpriseCard>
+                </div>
             </div>
         </div>
     );
@@ -490,12 +493,13 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
             <style>{printStyles}</style>
             
-            <ProfileSidebar user={user} title="Onay Bekleyen Talep" dataCount={leaves.filter((l: any) => l.status === 'Bekliyor').length} dataLabel="Adet" />
-
-            {/* INVISIBLE PRINT CONTAINER */}
+            <ProfileHeader user={user} title="Onay Bekleyen Talep" dataCount={leaves.filter((l: any) => l.status === 'Bekliyor').length} dataLabel="Adet" />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+                {/* INVISIBLE PRINT CONTAINER */}
             <div id="printable-area" className="hidden">
                 {printableLeave && (
                     <div className="p-10 font-[serif] text-black">
@@ -589,6 +593,7 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
                         </table>
                     </div>
                 </EnterpriseCard>
+                </div>
             </div>
         </div>
     );
@@ -604,10 +609,10 @@ const PayrollView = ({ payrolls, user }: any) => {
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
             <style>{printStyles}</style>
 
-            <ProfileSidebar user={user} title="Toplam Bordro Kaydı" dataCount={payrolls.length} dataLabel="Ay" />
+            <ProfileHeader user={user} title="Toplam Bordro Kaydı" dataCount={payrolls.length} dataLabel="Ay" />
 
             {/* INVISIBLE PRINT CONTAINER */}
             <div id="printable-area" className="hidden">
@@ -644,7 +649,7 @@ const PayrollView = ({ payrolls, user }: any) => {
                 )}
             </div>
 
-            <div className="lg:col-span-3 flex flex-col h-full">
+            <div className="flex-1 flex flex-col overflow-hidden">
                 <EnterpriseCard className="no-print h-full flex flex-col">
                     <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
                     <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
@@ -691,10 +696,10 @@ const PayrollView = ({ payrolls, user }: any) => {
 // ─── SHIFTS VIEW ─────────────────────────────────────────────────────
 const ShiftsView = ({ shifts, user }: any) => {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
-            <ProfileSidebar user={user} title="Haftalık Planlanmış" dataCount={shifts.length} dataLabel="Vardiya" />
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+            <ProfileHeader user={user} title="Haftalık Planlanmış" dataCount={shifts.length} dataLabel="Vardiya" />
             
-            <div className="lg:col-span-3 flex flex-col h-full">
+            <div className="flex-1 flex flex-col overflow-hidden">
                 <EnterpriseCard className="h-full flex flex-col">
                     <EnterpriseSectionHeader title="Haftalık Vardiya Planım" icon="📅" />
                     <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
@@ -735,10 +740,10 @@ const ShiftsView = ({ shifts, user }: any) => {
 // ─── PROFILE VIEW ────────────────────────────────────────────────────
 const ProfileSettingsView = ({ user }: any) => {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
-            <ProfileSidebar user={user} title="Hesap Durumu" dataCount={"ONAYLI"} dataLabel="Kullanıcı" />
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+            <ProfileHeader user={user} title="Hesap Durumu" dataCount={"ONAYLI"} dataLabel="Kullanıcı" />
             
-            <div className="lg:col-span-3 flex flex-col h-full">
+            <div className="flex-1 flex flex-col overflow-hidden">
                 <EnterpriseCard className="h-full flex flex-col">
                     <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
                     <div className="p-8 flex-1 overflow-y-auto custom-scrollbar">
