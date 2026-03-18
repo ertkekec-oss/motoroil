@@ -5,6 +5,7 @@ import { logActivity } from '@/lib/audit';
 import { createJournalFromSale, createJournalFromTransaction } from '@/lib/accounting';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Allow sufficient time for accounting and campaigns
 
 export async function POST(request: Request) {
     const auth = await authorize();
@@ -357,8 +358,8 @@ export async function POST(request: Request) {
             // Accounting moved outside transaction to prevent silent rollback bugs
             return order;
         }, {
-            maxWait: 10000, // default is 2000
-            timeout: 20000  // default is 5000
+            maxWait: 15000, 
+            timeout: 45000  
         });
 
         // G. Bank Commission (Post-Transaction)
