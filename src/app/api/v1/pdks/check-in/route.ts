@@ -151,7 +151,6 @@ export async function POST(req: NextRequest) {
             const staffRecord = await prisma.staff.findFirst({
                 where: {
                     OR: [
-                        { userId: userId },
                         user.username ? { username: user.username } : null,
                         user.email ? { username: user.email } : null,
                         user.email ? { email: user.email } : null

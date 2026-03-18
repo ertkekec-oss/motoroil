@@ -12,11 +12,19 @@ export async function GET(request: Request) {
         const staffId = await getStaffIdFromSession(user);
         
         // Ensure tenantId and companyId are robustly fetched from Staff record
-        let staffRecord = null;
+        let staffRecord: any = null;
         if (staffId) {
             staffRecord = await prisma.staff.findUnique({ where: { id: staffId }, select: { tenantId: true, companyId: true, id: true } });
-        } else if (user.id) {
-            staffRecord = await prisma.staff.findUnique({ where: { userId: user.id }, select: { tenantId: true, companyId: true, id: true } });
+        } else if (user.email || user.username) {
+            staffRecord = await prisma.staff.findFirst({ 
+                where: { 
+                    OR: [
+                        user.username ? { username: user.username } : null,
+                        user.email ? { email: user.email } : null
+                    ].filter(Boolean) as any
+                }, 
+                select: { tenantId: true, companyId: true, id: true } 
+            });
         }
         
         const tenantId = staffRecord?.tenantId || user.impersonateTenantId || user.tenantId;

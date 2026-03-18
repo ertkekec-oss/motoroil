@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
         const staffRecord = await (prisma as any).staff.findFirst({
             where: {
                 OR: [
-                    userId ? { userId: userId } : null,
                     user.username ? { username: user.username } : null,
                     user.email ? { username: user.email } : null,
                     user.email ? { email: user.email } : null
