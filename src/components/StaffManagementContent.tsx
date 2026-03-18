@@ -12,10 +12,11 @@ import { useFinancials } from '@/contexts/FinancialContext';
 
 import PayrollModule from './PayrollModule';
 import AdvancesModule from './AdvancesModule';
-
+import PdksSecurityModule from './PdksSecurityModule';
 
 export default function StaffManagementContent() {
     const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
+    const [pdksSubTab, setPdksSubTab] = useState('puantaj');
     const [selectedRoleForPermissions, setSelectedRoleForPermissions] = useState('Sistem Yöneticisi');
 
     const { staff, currentUser, hasPermission, addNotification, refreshStaff, branches } = useApp();
@@ -1470,12 +1471,39 @@ export default function StaffManagementContent() {
                 <AdvancesModule staffList={staff} />
             )}
 
-            {/* --- ATTENDANCE TAB (PDKS) --- */}
-            {/* --- ATTENDANCE TAB (PDKS) --- */}
             {activeTab === 'attendance' && (
                 <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-6 border-l-4 border-l-emerald-500 flex flex-col justify-between">
+                    <div className="flex gap-6 border-b border-slate-200 dark:border-slate-800 mb-6 pb-0">
+                        <button 
+                            className={`pb-3 text-[13px] font-bold border-b-2 transition-colors ${pdksSubTab === 'puantaj' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`} 
+                            onClick={() => setPdksSubTab('puantaj')}
+                        >
+                            Puantaj ve Mesai
+                        </button>
+                        <button 
+                            className={`pb-3 text-[13px] font-bold border-b-2 transition-colors ${pdksSubTab === 'onay' ? 'border-amber-500 text-amber-600' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`} 
+                            onClick={() => setPdksSubTab('onay')}
+                        >
+                            Onay Havuzu
+                        </button>
+                        <button 
+                            className={`pb-3 text-[13px] font-bold border-b-2 transition-colors ${pdksSubTab === 'tabletler' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`} 
+                            onClick={() => setPdksSubTab('tabletler')}
+                        >
+                            Tablet Yönetimi
+                        </button>
+                        <button 
+                            className={`pb-3 text-[13px] font-bold border-b-2 transition-colors ${pdksSubTab === 'loglar' ? 'border-purple-500 text-purple-600' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`} 
+                            onClick={() => setPdksSubTab('loglar')}
+                        >
+                            Tüm Hareketler
+                        </button>
+                    </div>
+
+                    {pdksSubTab === 'puantaj' && (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[16px] shadow-sm p-6 border-l-4 border-l-emerald-500 flex flex-col justify-between">
                             <h4 className="text-[11px] font-bold tracking-widest text-emerald-700 flex items-center gap-1.5 uppercase"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> ŞU AN ÇALIŞAN</h4>
                             <div className="text-[32px] font-black text-slate-900 dark:text-white mt-3">{attendance.filter(a => !a.checkOut).length} <span className="text-[14px] font-medium text-slate-500 dark:text-slate-400 ml-1">Kişi</span></div>
                         </div>
@@ -1611,6 +1639,12 @@ export default function StaffManagementContent() {
                             </table>
                         </div>
                     </div>
+                 </>
+                 )}
+
+                 {pdksSubTab !== 'puantaj' && (
+                     <PdksSecurityModule activeSubTab={pdksSubTab} setActiveSubTab={setPdksSubTab} />
+                 )}
                 </div>
             )}
 

@@ -285,7 +285,6 @@ export default function Sidebar() {
                             { name: 'Canlı Takip', href: '/field-sales/admin/live' },
                         ]
                     },
-                    { name: 'PDKS', href: '/staff/pdks', icon: Clock },
                     {
                         name: 'İnsan Kaynakları',
                         icon: Users,

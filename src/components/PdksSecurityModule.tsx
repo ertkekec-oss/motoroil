@@ -22,14 +22,13 @@ import {
     Wifi
 } from "lucide-react";
 
-export default function AdminPdksPage() {
+export default function PdksSecurityModule({ activeSubTab, setActiveSubTab }: { activeSubTab: string, setActiveSubTab: (v: string) => void }) {
     const { theme } = useTheme();
     const isLight = theme === 'light';
     const { showConfirm } = useModal();
 
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [activeTab, setActiveTab] = useState<"onay" | "tabletler" | "loglar">("onay");
     const [displays, setDisplays] = useState<any[]>([]);
     const [events, setEvents] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -142,8 +141,6 @@ export default function AdminPdksPage() {
         );
     };
 
-    // Styling constants
-    const bgPage = isLight ? 'min-h-screen bg-[#F6F8FB]' : 'min-h-screen bg-[#0f172a]';
     const textMain = isLight ? 'text-slate-900' : 'text-slate-100';
     const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
     const bgCard = isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-slate-800';
@@ -151,7 +148,7 @@ export default function AdminPdksPage() {
     const borderColor = isLight ? 'border-slate-200' : 'border-slate-800';
 
     if (loading) return (
-        <div className={`${bgPage} flex flex-col items-center justify-center p-20 animate-in fade-in duration-700`}>
+        <div className={`flex flex-col items-center justify-center p-20 animate-in fade-in duration-700`}>
             <div className={`w-12 h-12 rounded-full border-4 border-t-blue-600 animate-spin mb-4 ${isLight ? 'border-slate-200' : 'border-slate-800'}`}></div>
             <div className={`text-[12px] font-bold uppercase tracking-widest ${textMuted}`}>Güvenlik Paneli Yükleniyor...</div>
         </div>
@@ -160,8 +157,8 @@ export default function AdminPdksPage() {
     const pendingEvents = events.filter(e => e.status === "PENDING");
 
     return (
-        <div data-pos-theme={theme} className={`${bgPage} font-sans transition-colors duration-300 p-6 md:p-10 animate-in fade-in duration-700`}>
-            <div className="max-w-[1400px] mx-auto space-y-8">
+        <div data-pos-theme={theme} className={`font-sans transition-colors duration-300 animate-in fade-in duration-700`}>
+            <div className="space-y-6">
 
                 {/* Executive Header Strip */}
                 <header className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b ${borderColor}`}>
@@ -170,10 +167,10 @@ export default function AdminPdksPage() {
                             <ShieldCheck size={24} strokeWidth={2.5} />
                         </div>
                         <div>
-                            <h1 className={`text-[28px] font-bold tracking-tight mb-1 ${textMain}`}>
-                                Workforce Security Control
+                            <h1 className={`text-[20px] font-bold tracking-tight mb-1 ${textMain}`}>
+                                Workforce Security Control (Güvenlik)
                             </h1>
-                            <p className={`text-[13px] font-medium flex items-center gap-2 ${textMuted}`}>
+                            <p className={`text-[12px] font-medium flex items-center gap-2 ${textMuted}`}>
                                 <TabletSmartphone size={14} /> Donanımsız Personel Takip Sistemi Yönetimi
                             </p>
                         </div>
@@ -188,7 +185,7 @@ export default function AdminPdksPage() {
                         >
                             <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
                         </button>
-                        {activeTab === "tabletler" && (
+                        {activeSubTab === "tabletler" && (
                             <button
                                 onClick={handleOpenCreate}
                                 className={`h-10 px-4 rounded-[12px] text-[13px] font-semibold transition-all shadow-sm flex items-center gap-2 ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
@@ -199,38 +196,9 @@ export default function AdminPdksPage() {
                     </div>
                 </header>
 
-                {/* Premium Segmented Control */}
-                <div className={`flex items-center p-1.5 rounded-full w-fit max-w-full overflow-x-auto custom-scrollbar ${bgSurface}`}>
-                    {[
-                        { id: "onay", label: "Onay Havuzu", icon: AlertTriangle, count: pendingEvents.length },
-                        { id: "tabletler", label: "Tablet Yönetimi", icon: TabletSmartphone },
-                        { id: "loglar", label: "Tüm Hareketler", icon: History }
-                    ].map((tab) => {
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
-                                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] transition-all whitespace-nowrap ${isActive
-                                    ? (isLight ? 'bg-blue-100 text-blue-700 font-semibold shadow-sm' : 'bg-blue-500/20 text-blue-400 font-semibold')
-                                    : (isLight ? 'text-slate-500 font-medium hover:bg-slate-200/50' : 'text-slate-400 font-medium hover:bg-slate-800')
-                                    }`}
-                            >
-                                <tab.icon size={16} />
-                                {tab.label}
-                                {tab.id === "onay" && tab.count! > 0 && (
-                                    <span className={`ml-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${isActive ? (isLight ? 'bg-blue-200 text-blue-800' : 'bg-blue-500/30 text-blue-200') : (isLight ? 'bg-slate-200 text-slate-600' : 'bg-white/10 text-slate-300')}`}>
-                                        {tab.count}
-                                    </span>
-                                )}
-                            </button>
-                        );
-                    })}
-                </div>
-
                 {/* Content Container */}
                 <div className="space-y-6">
-                    {activeTab === "onay" && (
+                    {activeSubTab === "onay" && (
                         <div className={`rounded-[20px] border p-8 md:p-10 shadow-sm ${bgCard}`}>
                             {pendingEvents.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 opacity-60">
@@ -291,7 +259,7 @@ export default function AdminPdksPage() {
                         </div>
                     )}
 
-                    {activeTab === "tabletler" && (
+                    {activeSubTab === "tabletler" && (
                         <div className="space-y-8">
                             {/* Tablet Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -414,7 +382,7 @@ export default function AdminPdksPage() {
                         </div>
                     )}
 
-                    {activeTab === "loglar" && (
+                    {activeSubTab === "loglar" && (
                         <div className={`rounded-[20px] border shadow-sm overflow-hidden ${bgCard}`}>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse min-w-[800px]">
@@ -580,15 +548,6 @@ export default function AdminPdksPage() {
                     </div>
                 </div>
             )}
-
-            <style jsx global>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
-                [data-pos-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
-                [data-pos-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
-            `}</style>
         </div>
     );
 }
