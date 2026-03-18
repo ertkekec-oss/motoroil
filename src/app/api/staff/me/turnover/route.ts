@@ -25,8 +25,7 @@ export async function GET(req: Request) {
             where: {
                 companyId,
                 OR: [
-                    { createdBy: userId },
-                    staffId ? { staffId: staffId } : {}
+                    { staffId: staffId || userId }
                 ],
                 orderDate: {
                     gte: startOfDay,

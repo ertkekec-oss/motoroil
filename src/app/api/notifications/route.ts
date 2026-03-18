@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     let ctx;
     try {
         ctx = await getRequestContext(req);
+        const data = await req.json();
         const userRecord = await (prisma as any).staff.findUnique({ where: { id: ctx.userId }, select: { companyId: true } });
         const notification = await (prisma as any).notification.create({
             data: {
