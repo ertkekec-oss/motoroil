@@ -829,7 +829,7 @@ export class NilveraInvoiceService {
             console.log(`[NilveraService] Canceling EArchive Invoice: UUID=${uuid}`);
             const res = await axios.put(
                 `${this.config.baseUrl}/earchive/Invoices/${uuid}/Cancel`,
-                null,
+                { Notes: [notes] },
                 {
                     headers: this.getHeaders(),
                     validateStatus: () => true
@@ -841,9 +841,15 @@ export class NilveraInvoiceService {
                 return { success: false, status: res.status, error: JSON.stringify(res.data) };
             }
 
-            // Nilvera can return 200 OK with an array of errors if cancellation fails (e.g. "Raporlandı")
+            // Nilvera can return 200 OK with an object containing an `Errors` array if cancellation fails
+            if (res.data?.Errors && Array.isArray(res.data.Errors) && res.data.Errors.length > 0) {
+                console.warn("[NilveraService] EArchive Cancel Error (200 OK with Errors array):", res.data.Errors);
+                const errStrs = res.data.Errors.map((e: any) => e.Message || e.Detail || JSON.stringify(e));
+                return { success: false, status: res.status, error: errStrs.join(" | ") };
+            }
+
             if (Array.isArray(res.data) && res.data.length > 0) {
-                console.warn("[NilveraService] EArchive Cancel Error (200 OK):", res.data);
+                console.warn("[NilveraService] EArchive Cancel Error (200 OK Array):", res.data);
                 return { success: false, status: res.status, error: res.data.join(" | ") };
             }
 
