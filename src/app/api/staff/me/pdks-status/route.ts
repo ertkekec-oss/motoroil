@@ -54,6 +54,6 @@ export async function GET(req: NextRequest) {
 
     } catch (error: any) {
         console.error("[PDKS Status Fetch Error]:", error);
-        return NextResponse.json({ success: false, error: "Durum alınırken hata oluştu." }, { status: 500 });
+        return NextResponse.json({ success: false, error: error.message || "Durum alınırken hata", stack: error.stack }, { status: 500 });
     }
 }
