@@ -8,9 +8,21 @@ export async function GET(request: Request) {
         if (!auth.authorized) return auth.response;
 
         const user = (auth as any).user;
-        const staffId = user.id;
         const tenantId = user.impersonateTenantId || user.tenantId;
         const companyId = user.companyId || user.impersonateCompanyId;
+
+        const prismaClient = (await import('@/lib/prisma')).prisma;
+        const staffRecord = await (prismaClient as any).staff.findFirst({
+            where: {
+                OR: [
+                    { email: user.email },
+                    { username: user.username || user.email || 'NO_USER' }
+                ]
+            },
+            select: { id: true }
+        });
+        
+        const staffId = staffRecord?.id || user.id;
 
         let data = await SalesPerformanceEngine.getDashboardData(staffId);
 

@@ -8,10 +8,29 @@ export async function GET(req: Request) {
     const period = searchParams.get('period'); // e.g. "2024-02"
     const branch = searchParams.get('branch');
     const staffId = searchParams.get('staffId');
+    const mine = searchParams.get('mine');
 
     const where: any = {};
     if (period) where.period = period;
-    if (staffId) where.staffId = staffId;
+    
+    if (mine === 'true') {
+        const { getSession } = await import('@/lib/auth');
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+        if (session) {
+            const staffUser = await (prisma as any).staff.findFirst({
+                where: {
+                    OR: [
+                        { email: session.email },
+                        { username: session.username || session.email }
+                    ]
+                }, select: { id: true }
+            });
+            if (staffUser) where.staffId = staffUser.id;
+        }
+    } else if (staffId) {
+        where.staffId = staffId;
+    }
 
     // Filter by staff branch if needed, but payroll links to staff. 
     // If branch param exists, we filter staff.

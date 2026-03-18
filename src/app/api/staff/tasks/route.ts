@@ -19,12 +19,31 @@ export async function GET(req: Request) {
 
         const url = new URL(req.url);
         const staffId = url.searchParams.get('staffId');
+        const mine = url.searchParams.get('mine');
+
+        const where: any = { tenantId };
+
+        if (mine === 'true') {
+            const { getSession } = await import('@/lib/auth');
+            const sessionResult: any = await getSession();
+            const session = sessionResult?.user || sessionResult;
+            if (session) {
+                const staffUser = await (prisma as any).staff.findFirst({
+                    where: {
+                        OR: [
+                            { email: session.email },
+                            { username: session.username || session.email }
+                        ]
+                    }, select: { id: true }
+                });
+                if (staffUser) where.staffId = staffUser.id;
+            }
+        } else if (staffId) {
+            where.staffId = staffId;
+        }
 
         const tasks = await prisma.staffTask.findMany({
-            where: { 
-                tenantId,
-                ...(staffId ? { staffId } : {})
-             },
+            where,
             include: {
                 staff: {
                     select: { name: true, role: true }

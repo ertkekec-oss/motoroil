@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
+import { getSession } from '@/lib/auth';
 
 export async function GET(request: Request) {
     try {
@@ -8,6 +9,7 @@ export async function GET(request: Request) {
         const start = searchParams.get('start');
         const end = searchParams.get('end');
         const staffId = searchParams.get('staffId');
+        const mine = searchParams.get('mine');
 
         const where: any = {};
 
@@ -18,7 +20,21 @@ export async function GET(request: Request) {
             };
         }
 
-        if (staffId) {
+        if (mine === 'true') {
+            const sessionResult: any = await getSession();
+            const session = sessionResult?.user || sessionResult;
+            if (session) {
+                const staffUser = await (prisma as any).staff.findFirst({
+                    where: {
+                        OR: [
+                            { email: session.email },
+                            { username: session.username || session.email }
+                        ]
+                    }, select: { id: true }
+                });
+                if (staffUser) where.staffId = staffUser.id;
+            }
+        } else if (staffId) {
             where.staffId = staffId;
         }
 

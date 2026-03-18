@@ -7,9 +7,29 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const staffId = searchParams.get('staffId');
         const status = searchParams.get('status');
+        const mine = searchParams.get('mine');
 
         const where: any = {};
-        if (staffId) where.staffId = staffId;
+        
+        if (mine === 'true') {
+            const { getSession } = await import('@/lib/auth');
+            const sessionResult: any = await getSession();
+            const session = sessionResult?.user || sessionResult;
+            if (session) {
+                const staffUser = await (prisma as any).staff.findFirst({
+                    where: {
+                        OR: [
+                            { email: session.email },
+                            { username: session.username || session.email }
+                        ]
+                    }, select: { id: true }
+                });
+                if (staffUser) where.staffId = staffUser.id;
+            }
+        } else if (staffId) {
+            where.staffId = staffId;
+        }
+        
         if (status) where.status = status;
 
         const leaves = await prisma.leaveRequest.findMany({

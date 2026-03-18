@@ -806,11 +806,11 @@ export default function PersonelPanel() {
 
             const [hrRes, targetsRes, shiftsRes, payrollRes, tasksRes, leavesRes, tnrRes] = await Promise.all([
                 fetch('/api/hr/performance/dashboard').then(r => r.json()),
-                fetch(`/api/staff/targets?staffId=${userId}`).then(r => r.json()),
-                fetch(`/api/staff/shifts?staffId=${userId}&start=${startOfWeek.toISOString()}&end=${endOfWeek.toISOString()}`).then(r => r.json()),
-                fetch(`/api/staff/payroll?staffId=${userId}`).then(r => r.json()),
-                fetch(`/api/staff/tasks?staffId=${userId}`).then(r => r.json()),
-                fetch(`/api/staff/leaves?staffId=${userId}`).then(r => r.json()),
+                fetch(`/api/staff/targets?mine=true`).then(r => r.json()),
+                fetch(`/api/staff/shifts?mine=true&start=${startOfWeek.toISOString()}&end=${endOfWeek.toISOString()}`).then(r => r.json()),
+                fetch(`/api/staff/payroll?mine=true`).then(r => r.json()),
+                fetch(`/api/staff/tasks?mine=true`).then(r => r.json()),
+                fetch(`/api/staff/leaves?mine=true`).then(r => r.json()),
                 fetch(`/api/staff/me/turnover`).then(r => r.json())
             ]);
 
@@ -818,7 +818,7 @@ export default function PersonelPanel() {
             if (Array.isArray(targetsRes)) setTargets(targetsRes);
             else if (targetsRes?.targets && Array.isArray(targetsRes.targets)) setTargets(targetsRes.targets);
             if (Array.isArray(shiftsRes)) setShifts(shiftsRes);
-            if (payrollRes?.payrolls) setPayrolls(payrollRes.payrolls.filter((p: any) => p.staffId === userId));
+            if (payrollRes?.payrolls) setPayrolls(payrollRes.payrolls);
             if (Array.isArray(tasksRes)) setTasks(tasksRes);
             if (Array.isArray(leavesRes)) setLeaves(leavesRes);
             if (tnrRes.success) setTurnover(tnrRes.turnover);
