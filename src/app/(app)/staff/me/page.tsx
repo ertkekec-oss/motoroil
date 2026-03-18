@@ -80,6 +80,15 @@ const DashboardView = ({
 }: any) => {
     const activeTasksCount = tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length;
 
+    // Hedefler sekmesindeki aynı dinamik hedefleri Özet tablosuna yansıtma:
+    const totalTarget = targets?.reduce((sum: any, t: any) => sum + Number(t.targetValue), 0) || 0;
+    const totalActual = targets?.reduce((sum: any, t: any) => sum + Number(t.currentValue), 0) || 0;
+    const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+    const totalEstBonus = targets?.reduce((sum: any, t: any) => sum + Number(t.estimatedBonus || 0), 0) || 0;
+
+    const displayAchievement = targets?.length > 0 ? `%${overallProgress}` : (statsData?.stats?.achievement || '%0.0');
+    const displayBonus = targets?.length > 0 ? `₺${totalEstBonus.toLocaleString('tr-TR')}` : (statsData?.stats?.bonus || '₺0,00');
+
     return (
         <div className="flex flex-col animate-in fade-in duration-500 h-[calc(100vh-280px)] min-h-[600px]">
             <ProfileHeader user={user} title="Aktif Görev" dataCount={activeTasksCount} dataLabel="Adet" />
@@ -101,7 +110,7 @@ const DashboardView = ({
                             <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Hedef Gerçekleşme</h4>
                             <IconTrendingUp className="w-5 h-5 text-purple-500" />
                         </div>
-                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.achievement || '%0'}</p>
+                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{displayAchievement}</p>
                         <p className="text-[11px] font-semibold text-slate-400 mt-2">Bu ayki hedef durumu</p>
                     </EnterpriseCard>
 
@@ -119,7 +128,7 @@ const DashboardView = ({
                             <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kazanılan Prim</h4>
                             <IconZap className="w-5 h-5 text-emerald-500" />
                         </div>
-                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.bonus || '₺0'}</p>
+                        <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{displayBonus}</p>
                         <p className="text-[11px] font-semibold text-slate-400 mt-2">Dönem biriken tutar</p>
                     </EnterpriseCard>
                 </div>
