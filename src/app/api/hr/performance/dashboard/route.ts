@@ -15,10 +15,10 @@ export async function GET(request: Request) {
         
         let data = await SalesPerformanceEngine.getDashboardData(staffId || user.id);
 
-        // Bootstrap for missing matrix configurations
         if (data.assignments.length === 0) {
-            await SalesPerformanceEngine.bootstrapMatrixForStaff(tenantId, companyId, staffId);
-            data = await SalesPerformanceEngine.getDashboardData(staffId);
+            const targetId = staffId || user.id;
+            await SalesPerformanceEngine.bootstrapMatrixForStaff(tenantId, companyId, targetId);
+            data = await SalesPerformanceEngine.getDashboardData(targetId);
         }
 
         const formatCurr = (val: any) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(val));
