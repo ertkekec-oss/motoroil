@@ -285,11 +285,32 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 const endpoint = type === 'Satış' ? `/api/orders/${id}` : `/api/financials/transactions?id=${id}`;
                 const res = await fetch(endpoint, { method: 'DELETE' });
                 const data = await res.json();
+                
                 if (data.success) {
                     showSuccess("Başarılı", "İşlem iade alındı/iptal edildi.");
                     setCompletedIds(prev => [...prev, id]);
                     // Don't refresh immediately to show locked state
                     // router.refresh();
+                } else if (data.askForLocalCancel) {
+                    // Formal invoice cancellation failed or it's e-Fatura, offer forced local deletion
+                    showConfirm("Sadece Yerel (Muhasebe) İptali", `${data.error}\n\ne-Belge iptali yapılamadı. İsterseniz faturanın sadece sistemimizdeki (Periodya'daki) stok/bakiye etkilerini geri alabilirsiniz. Bu işlemi yapmak istediğinize emin misiniz?`, async () => {
+                        try {
+                            const forceRes = await fetch(endpoint, { 
+                                method: 'DELETE', 
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ forceLocalCancel: true }) 
+                            });
+                            const forceData = await forceRes.json();
+                            if (forceData.success) {
+                                showSuccess("Başarılı", "Sistem içi yerel iade/iptal tamamlandı.");
+                                setCompletedIds(prev => [...prev, id]);
+                            } else {
+                                showError("Hata", forceData.error || "İşlem yapılamadı.");
+                            }
+                        } catch (e) {
+                            showError("Hata", "Bağlantı hatası.");
+                        }
+                    });
                 } else {
                     showError("Hata", data.error || "İşlem yapılamadı.");
                 }

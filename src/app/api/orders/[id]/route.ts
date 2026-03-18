@@ -54,6 +54,93 @@ export async function DELETE(
             }, { status: 400 });
         }
 
+        // Check for forceLocalCancel
+        let forceLocalCancel = false;
+        try {
+            const body = await request.json();
+            forceLocalCancel = body.forceLocalCancel || false;
+        } catch (e) {
+            // empty body
+        }
+
+        const invoice = await prisma.salesInvoice.findFirst({
+            where: { orderId: order.id, companyId: order.companyId }
+        });
+
+        // --- NILVERA E-ARSIV CANCELLATION CHECK ---
+        if (invoice && invoice.isFormal && (invoice as any).formalUuid) {
+            const invoiceAny = invoice as any;
+            const formalType = invoiceAny.formalType || 'EARSIV';
+
+            if (formalType === 'EARSIV' && !forceLocalCancel) {
+                let nilveraApiKey = '';
+                let nilveraBaseUrl = 'https://apitest.nilvera.com';
+
+                const intSettings = await (prisma as any).integratorSettings.findFirst({
+                    where: { companyId: order.companyId, isActive: true }
+                });
+
+                if (intSettings?.credentials) {
+                    try {
+                        const { decrypt } = await import('@/lib/encryption');
+                        const creds = JSON.parse(decrypt(intSettings.credentials));
+                        nilveraApiKey = (creds.apiKey || creds.ApiKey || '').trim();
+                        nilveraBaseUrl = (intSettings.environment === 'PRODUCTION')
+                            ? 'https://api.nilvera.com'
+                            : 'https://apitest.nilvera.com';
+                    } catch (e) {
+                        console.warn('[Formal Cancel] Failed to decrypt integratorSettings');
+                    }
+                }
+
+                if (!nilveraApiKey) {
+                    const settings = await prisma.appSettings.findUnique({
+                        where: { companyId_key: { companyId: order.companyId, key: 'eFaturaSettings' } }
+                    });
+                    if (settings && settings.value) {
+                        const config = settings.value as any;
+                        nilveraApiKey = (config.apiKey || config.nilvera?.apiKey || '').trim();
+                        nilveraBaseUrl = (config.environment?.toLowerCase() === 'production' || config.nilvera?.environment?.toLowerCase() === 'production') 
+                            ? 'https://api.nilvera.com' 
+                            : 'https://apitest.nilvera.com';
+                    }
+                }
+
+                if (nilveraApiKey) {
+                    try {
+                        const { NilveraInvoiceService } = await import('@/services/nilveraService');
+                        const nilvera = new NilveraInvoiceService({ apiKey: nilveraApiKey, baseUrl: nilveraBaseUrl });
+                            
+                        // Send cancellation to Nilvera
+                        const cancelResult = await nilvera.cancelEArchiveInvoice(invoiceAny.formalUuid);
+
+                        if (!cancelResult.success) {
+                            return NextResponse.json({ 
+                                success: false, 
+                                askForLocalCancel: true,
+                                error: `Bağlı Fatura e-Arşiv (Nilvera) sisteminde iptal edilemedi! Lütfen Nilvera portali üzerinden iptali gerçekleştirin. (Hata: ${cancelResult.error})`
+                            }, { status: 400 });
+                        }
+                    } catch(e: any) {
+                        return NextResponse.json({ 
+                            success: false, 
+                            askForLocalCancel: true,
+                            error: 'Nilvera e-Arşiv iptal işlemi sırasında beklenmeyen hata oluştu: ' + e.message 
+                        }, { status: 400 });
+                    }
+                } else {
+                    return NextResponse.json({ success: false, error: 'e-Belge yapılandırması (Anahtar/Şifre) bulunamadı.' }, { status: 400 });
+                }
+            } else if (formalType === 'EFATURA' && !forceLocalCancel) {
+                return NextResponse.json({ 
+                    success: false, 
+                    askForLocalCancel: true,
+                    error: 'Bu siparişe bağlı bir e-Fatura (Ticari/Temel) var. e-Faturalar doğrudan buradan iptal edilemez. Alıcının reddetmesi veya GİB/Kep üzerinden iptal/iade faturası kesilmesi gereklidir.' 
+                }, { status: 400 });
+            }
+        }
+        // --- END NILVERA CANCELLATION CHECK ---
+
         // Reversal logic for POS
         await prisma.$transaction(async (tx) => {
             // 1. Revert Stocks
