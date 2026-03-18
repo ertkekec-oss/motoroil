@@ -15,7 +15,14 @@ export async function POST(request: Request) {
     const writeCheck = verifyWriteAccess(user);
     if (!writeCheck.authorized) return writeCheck.response;
 
-    try {
+    let debugStep = 'INIT';
+    
+    // We race the main logic against an 8s timeout to catch Hobby plan invocation limits safely!
+    const timeoutRace = new Promise<any>((_, reject) => {
+        setTimeout(() => reject(new Error('TRACER_TIMEOUT: Sistem bu adımda tıkandı -> ' + debugStep)), 8000);
+    });
+
+    const executionPromise = (async () => {
         const body = await request.json();
         const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode, branch, staffId: bodyStaffId } = body;
 
@@ -51,6 +58,7 @@ export async function POST(request: Request) {
         console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode, companyId, finalStaffId });
 
         // 1. Kasa ID Güvenli Seçim
+        debugStep = 'KASA_SECIMI';
         let targetKasaId = (kasaId === 'CashKasa' || !kasaId) ? undefined : kasaId;
         
         if (targetKasaId && companyId) {
@@ -141,6 +149,7 @@ export async function POST(request: Request) {
                     });
                 }
             }
+            debugStep = 'CAMPAIGNS';
 
             // --- CAMPAIGN ENGINE EVALUATION ---
             let customerCategoryStr: string | null = null;
@@ -224,6 +233,7 @@ export async function POST(request: Request) {
                 } catch(e) { console.error("Campaign process error", e) }
             }
             // --- END CAMPAIGN ENGINE ---
+            debugStep = 'ORDER_CREATE';
 
             const order = await prisma.order.create({
                 data: {
@@ -245,6 +255,7 @@ export async function POST(request: Request) {
 
             finalEnrichedItems = enrichedItems.length > 0 ? enrichedItems : items;
 
+            debugStep = 'STOCK_UPDATE';
             // B. Update Product Stocks (Sequential to prevent Prisma tx deadlocks)
             const resolvedItems = enrichedItems.length > 0 ? enrichedItems : items;
             if (Array.isArray(resolvedItems) && resolvedItems.length > 0) {
@@ -296,187 +307,118 @@ export async function POST(request: Request) {
                 }
             }
 
+            debugStep = 'KASA_UPDATE';
             // C. Update Kasa
             if (effectivePaymentMode !== 'account') {
                 await prisma.kasa.update({
-                    where: { id: targetKasaId },
-                    data: { balance: { increment: finalTotal } }
-                });
+                            const rawCount = body.installments || body.installmentCount;
+                            instCount = parseInt(String(rawCount || '1'), 10);
+                            if (isNaN(instCount)) instCount = 1;
+                        } catch (e) { instCount = 1; }
+
+                        const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
+
+                        console.log(`[Commission] Finding config for: labelRaw="${instLabelRaw}", fallback="${instLabelFallback}", instCount=${instCount}`);
+
+                        const lookups = [
+                            instLabelRaw.toLowerCase().trim(),
+                            instLabelFallback.toLowerCase().trim(),
+                            (instCount === 1 ? 'tek çekim' : ''),
+                            (instCount === 1 ? 'nakit' : ''),
+                            (instCount === 1 ? 'peşin' : '')
+                        ].filter(Boolean);
+
+                        let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
+                            if (!c || typeof c !== 'object') return false;
+                            const configLabel = String(c.installment || '').toLowerCase().trim();
+                            const configNum = parseInt(configLabel.replace(/\D/g, ''), 10);
+
+                            if (lookups.includes(configLabel)) return true;
+                            if (instCount > 1 && !isNaN(configNum) && configNum === instCount) return true;
+                            if (instCount === 1) {
+                                return ['tek', 'tek çekim', 'peşin', 'nakit', '1', '1 taksit'].includes(configLabel);
+                            }
+                            return false;
+                        });
+
+                        if (commissionConfig) {
+                            const rate = Number(commissionConfig.rate || 0);
+                            if (rate > 0) {
+                                const commissionAmount = (finalTotal * rate) / 100;
+                                console.log(`[Commission] Found config: ${commissionConfig.installment}, Rate: %${rate}, Amount: ${commissionAmount}`);
+
+                                const commTrx = await prisma.transaction.create({
+                                    data: {
+                                        companyId: companyId,
+                                        type: 'Expense',
+                                        amount: commissionAmount,
+                                        description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) | REF:${result.id}`,
+                                        kasaId: targetKasaId,
+                                        date: new Date(),
+                                        branch: branch || 'Merkez'
+                                    }
+                                });
+
+                                await createJournalFromTransaction(commTrx, prisma);
+
+                                await prisma.kasa.update({
+                                    where: { id: targetKasaId },
+                                    data: { balance: { decrement: commissionAmount } }
+                                });
+                                console.log(`[Commission] Successfully recorded commission expense: ${commTrx.id}`);
+                            } else {
+                                console.log(`[Commission] Config found but rate is 0 or invalid.`);
+                            }
+                        } else {
+                            console.warn(`[Commission] No matching commission config found in settings.`);
+                        }
+                    }
+                } catch (commErr) {
+                    console.error('[Commission] Error calculating or recording commission (Safe Mode):', commErr);
+                }
             }
 
-            // D. Create Transaction
-            let transactionDesc = description;
-            const modeLabel = effectivePaymentMode === 'credit_card' ? 'Kredi Kartı' :
-                effectivePaymentMode === 'account' ? 'Cari Hesap' :
-                    effectivePaymentMode === 'transfer' ? 'Havale/EFT' : 'Nakit';
-
-            if (!description || description.includes('POS Satışı') || description.startsWith('POS:')) {
-                transactionDesc = `POS Satışı (${modeLabel}) - ${customerName || 'Perakende'}`;
-            } else if (!description.includes(modeLabel)) {
-                transactionDesc = `${description} (${modeLabel})`;
+            // --- ACCOUNTING FALLBACK ---
+            // Placing this outside of the critical transaction blocks guarantees
+            // that accounting engine failures will NOT silently rollback the physical sale.
+            try {
+                await createJournalFromSale(result, finalEnrichedItems, targetKasaId);
+            } catch (accErr: any) {
+                console.error('[Accounting Sync Error After Sale]:', accErr?.message || accErr);
             }
 
-            transactionDesc += ` | REF:${order.id}`;
+            // AUDIT LOG (Don't await to save response time, catch errors silently)
+            logActivity({
+                tenantId: (user as any).tenantId || 'PLATFORM_ADMIN',
+                userId: (user as any).id,
+                userName: (user as any).username,
+                action: 'CREATE_SALE',
+                entity: 'Order',
+                entityId: result.id,
+                after: result,
+                details: `${result.orderNumber} nolu satış gerçekleştirildi.`,
+                userAgent: request.headers.get('user-agent') || undefined,
+                ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
+            }).catch(err => console.error("Sync Audit Error:", err));
 
-            await prisma.transaction.create({
-                data: {
-                    companyId: companyId,
-                    type: 'Sales',
-                    amount: finalTotal,
-                    description: transactionDesc,
-                    kasaId: targetKasaId,
-                    customerId: customerId || null,
-                    branch: branch || 'Merkez'
-                }
-            });
-
-            // E. Update Customer Balance
-            if (customerId) {
-                const updateData: any = {};
-                if (effectivePaymentMode === 'account') {
-                    updateData.balance = { increment: finalTotal };
-                }
-                const netPoints = dynamicEarnedPoints - (pointsUsed ? Number(pointsUsed) : 0);
-                if (netPoints !== 0) {
-                    updateData.points = { increment: netPoints };
-                }
-                if (Object.keys(updateData).length > 0) {
-                    await prisma.customer.update({ where: { id: customerId }, data: updateData });
-                }
-            }
-
-            // F. Coupon
-            if (couponCode) {
-                const coupon = await prisma.coupon.findFirst({ where: { code: couponCode, companyId } }) as any;
-                if (coupon) {
-                    await prisma.coupon.update({
-                        where: { code: couponCode },
-                        data: { usedCount: (coupon.usedCount || 0) + 1, usedAt: new Date(), isUsed: true }
-                    });
-                }
-            }
-
-            // Accounting moved outside transaction to prevent silent rollback bugs
-            return order;
+            return {
+                success: true,
+                orderId: result.id,
+                orderNumber: result.orderNumber,
+                message: 'Satış başarıyla kaydedildi.'
+            };
         })();
 
-        // G. Bank Commission (Post-Transaction)
-        // Moved outside main transaction to avoid aborting the sale if commission logic fails
-        if (effectivePaymentMode === 'credit_card') {
-            // Awaiting commission logic to prevent serverless timeout race conditions
-            try {
-                console.log(`[Commission] Starting calculation for total: ${finalTotal}, Mode: ${effectivePaymentMode}`);
-                const settingsRes = await prisma.appSettings.findUnique({
-                    where: {
-                        companyId_key: {
-                            companyId: companyId,
-                            key: 'salesExpenses'
-                        }
-                    }
-                });
-                const salesExpenses = settingsRes?.value as any;
-
-                if (Array.isArray(salesExpenses?.posCommissions)) {
-                    const instLabelRaw = String(body.installmentLabel || '');
-                    let instCount = 1;
-                    try {
-                        const rawCount = body.installments || body.installmentCount;
-                        instCount = parseInt(String(rawCount || '1'), 10);
-                        if (isNaN(instCount)) instCount = 1;
-                    } catch (e) { instCount = 1; }
-
-                    const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
-
-                    console.log(`[Commission] Finding config for: labelRaw="${instLabelRaw}", fallback="${instLabelFallback}", instCount=${instCount}`);
-
-                    const lookups = [
-                        instLabelRaw.toLowerCase().trim(),
-                        instLabelFallback.toLowerCase().trim(),
-                        (instCount === 1 ? 'tek çekim' : ''),
-                        (instCount === 1 ? 'nakit' : ''),
-                        (instCount === 1 ? 'peşin' : '')
-                    ].filter(Boolean);
-
-                    let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
-                        if (!c || typeof c !== 'object') return false;
-                        const configLabel = String(c.installment || '').toLowerCase().trim();
-                        const configNum = parseInt(configLabel.replace(/\D/g, ''), 10);
-
-                        if (lookups.includes(configLabel)) return true;
-                        if (instCount > 1 && !isNaN(configNum) && configNum === instCount) return true;
-                        if (instCount === 1) {
-                            return ['tek', 'tek çekim', 'peşin', 'nakit', '1', '1 taksit'].includes(configLabel);
-                        }
-                        return false;
-                    });
-
-                    if (commissionConfig) {
-                        const rate = Number(commissionConfig.rate || 0);
-                        if (rate > 0) {
-                            const commissionAmount = (finalTotal * rate) / 100;
-                            console.log(`[Commission] Found config: ${commissionConfig.installment}, Rate: %${rate}, Amount: ${commissionAmount}`);
-
-                            const commTrx = await prisma.transaction.create({
-                                data: {
-                                    companyId: companyId,
-                                    type: 'Expense',
-                                    amount: commissionAmount,
-                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) | REF:${result.id}`,
-                                    kasaId: targetKasaId,
-                                    date: new Date(),
-                                    branch: branch || 'Merkez'
-                                }
-                            });
-
-                            await createJournalFromTransaction(commTrx, prisma);
-
-                            await prisma.kasa.update({
-                                where: { id: targetKasaId },
-                                data: { balance: { decrement: commissionAmount } }
-                            });
-                            console.log(`[Commission] Successfully recorded commission expense: ${commTrx.id}`);
-                        } else {
-                            console.log(`[Commission] Config found but rate is 0 or invalid.`);
-                        }
-                    } else {
-                        console.warn(`[Commission] No matching commission config found in settings.`);
-                    }
-                }
-            } catch (commErr) {
-                console.error('[Commission] Error calculating or recording commission (Safe Mode):', commErr);
-            }
-        }
-
-        // --- ACCOUNTING FALLBACK ---
-        // Placing this outside of the critical transaction blocks guarantees
-        // that accounting engine failures will NOT silently rollback the physical sale.
         try {
-            await createJournalFromSale(result, finalEnrichedItems, targetKasaId);
-        } catch (accErr: any) {
-            console.error('[Accounting Sync Error After Sale]:', accErr?.message || accErr);
+            const finalResponse = await Promise.race([executionPromise, timeoutRace]);
+            return NextResponse.json(finalResponse);
+        } catch (error: any) {
+            console.error('Sale POST Error:', error);
+            return NextResponse.json(
+                { success: false, error: error.message || 'Satış kaydedilemedi.' },
+                { status: 500 }
+            );
         }
-
-        // AUDIT LOG (Don't await to save response time, catch errors silently)
-        logActivity({
-            tenantId: (user as any).tenantId || 'PLATFORM_ADMIN',
-            userId: (user as any).id,
-            userName: (user as any).username,
-            action: 'CREATE_SALE',
-            entity: 'Order',
-            entityId: result.id,
-            after: result,
-            details: `${result.orderNumber} nolu satış gerçekleştirildi.`,
-            userAgent: request.headers.get('user-agent') || undefined,
-            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
-        }).catch(err => console.error("Sync Audit Error:", err));
-
-        return NextResponse.json({
-            success: true,
-            orderId: result.id,
-            orderNumber: result.orderNumber,
-            message: 'Satış başarıyla kaydedildi.'
-        });
-
     } catch (error: any) {
         console.error('Sale Create Error Full:', error);
         return NextResponse.json(
@@ -485,3 +427,4 @@ export async function POST(request: Request) {
         );
     }
 }
+```
