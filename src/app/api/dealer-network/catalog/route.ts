@@ -38,7 +38,7 @@ export async function GET(req: Request) {
                 code: true,
                 price: true,
                 stock: true,
-                DealerCatalogItem: {
+                dealerCatalogItems: {
                     where: { supplierTenantId: tenantId }
                 }
             },
@@ -47,7 +47,7 @@ export async function GET(req: Request) {
 
         // Map to UI friendly shape
         const items = rawProducts.map((p: any) => {
-            const catalogItem = p.DealerCatalogItem?.[0];
+            const catalogItem = p.dealerCatalogItems?.[0];
             return {
                 id: p.id,
                 name: p.name,
