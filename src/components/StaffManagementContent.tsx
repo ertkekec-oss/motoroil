@@ -897,7 +897,7 @@ export default function StaffManagementContent() {
                         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
                             <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-[14px]">✨</div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aktif Personel</div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Müsait (Boşta)</div>
                                 <div className="text-[16px] font-black leading-none text-emerald-600 dark:text-emerald-400 mt-0.5">{staff.filter(s => s.status === 'Müsait' || s.status === 'Aktif' || s.status === 'Boşta' || !s.status).length}</div>
                             </div>
                         </div>
@@ -905,8 +905,8 @@ export default function StaffManagementContent() {
                         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
                             <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">⚡</div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Devam Eden İş</div>
-                                <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{staff.filter(s => s.currentJob).length}</div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Meşgul (Görevli)</div>
+                                <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{staff.filter(s => s.status === 'Meşgul' || s.currentJob).length}</div>
                             </div>
                         </div>
 

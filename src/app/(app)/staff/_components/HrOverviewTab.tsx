@@ -36,7 +36,7 @@ export default function HrOverviewTab({ staff, targets, documentsCount, setShowA
                     <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 rounded-l-[12px]"></div>
                     <div className="flex items-center justify-between mb-3 pl-2">
                         <div className="text-slate-600 dark:text-slate-300 text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                            AKTİF / MÜSAİT
+                            MÜSAİT (BOŞTA)
                         </div>
                         <div className="w-6 h-6 rounded border border-emerald-100 bg-emerald-50 dark:bg-emerald-500/10 dark:border-emerald-500/20 flex items-center justify-center text-[12px] text-emerald-500">✨</div>
                     </div>
@@ -48,7 +48,7 @@ export default function HrOverviewTab({ staff, targets, documentsCount, setShowA
                     <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 rounded-l-[12px]"></div>
                     <div className="flex items-center justify-between mb-3 pl-2">
                         <div className="text-slate-600 dark:text-slate-300 text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                            DEVAM EDEN İŞ
+                            MEŞGUL (GÖREVLİ)
                         </div>
                         <div className="w-6 h-6 rounded border border-amber-100 bg-amber-50 dark:bg-amber-500/10 dark:border-amber-500/20 flex items-center justify-center text-[12px] text-amber-500">⚡</div>
                     </div>
