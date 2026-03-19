@@ -31,12 +31,26 @@ export async function GET(req: Request) {
             }
         });
 
+        // Fetch associated customers by matching tax numbers
+        const taxNumbers = memberships.map(m => m.dealerCompany?.taxNumber).filter(Boolean) as string[];
+        
+        const matchingCustomers = await prisma.customer.findMany({
+            where: {
+                company: { tenantId: tenantId },
+                taxNumber: { in: taxNumbers }
+            },
+            select: { id: true, taxNumber: true }
+        });
+
+        const customerMap = new Map(matchingCustomers.map(c => [c.taxNumber, c.id]));
+
         const formattedDealers = memberships.map((m: any) => ({
             id: m.id,
             dealerName: m.dealerCompany?.companyName || m.dealerUser?.email || 'İsimsiz Bayi',
             taxNumber: m.dealerCompany?.taxNumber || '-',
             status: m.status,
-            creditLimit: Number(m.creditLimit)
+            creditLimit: Number(m.creditLimit),
+            customerId: m.dealerCompany?.taxNumber ? customerMap.get(m.dealerCompany.taxNumber) : null
         }));
 
         return NextResponse.json({ success: true, data: formattedDealers });
