@@ -1,0 +1,42 @@
+[
+  {
+    "id": "cmmshw01b0001cdqo44nerp7f",
+    "staffId": "cmmsh2lym0003tfafv1tkkzpn",
+    "period": "2026-03",
+    "salary": "50000",
+    "bonus": "0",
+    "deductions": "0",
+    "netPay": "38447.64",
+    "grossSalary": "50000",
+    "sgkDeduction": "7000",
+    "incomeTax": "3824.68",
+    "stampTax": "227.68",
+    "workedDays": 30,
+    "isLocked": true,
+    "status": "Ödendi",
+    "paidAt": "2026-03-17T01:18:40.480Z",
+    "note": null,
+    "createdAt": "2026-03-16T01:18:40.944Z",
+    "updatedAt": "2026-03-17T01:18:40.481Z"
+  },
+  {
+    "id": "cmmuzu1k1000119n1kj9i4y7x",
+    "staffId": "cmmsh2lym0003tfafv1tkkzpn",
+    "period": "2026-04",
+    "salary": "50000",
+    "bonus": "0",
+    "deductions": "0",
+    "netPay": "49999.99",
+    "grossSalary": "66159.18",
+    "sgkDeduction": "9262.28",
+    "incomeTax": "5884.98",
+    "stampTax": "350.33",
+    "workedDays": 30,
+    "isLocked": false,
+    "status": "Bekliyor",
+    "paidAt": null,
+    "note": null,
+    "createdAt": "2026-03-17T19:16:35.042Z",
+    "updatedAt": "2026-03-17T19:16:35.042Z"
+  }
+]

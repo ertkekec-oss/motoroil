@@ -276,16 +276,19 @@ export async function PUT(req: Request) {
         const existing = await prisma.payroll.findUnique({ where: { id } });
         if (!existing) return NextResponse.json({ success: false, error: 'Bulunamadı' }, { status: 404 });
 
-        if (existing.isLocked) {
-           return NextResponse.json({ success: false, error: 'Bu bordro ödendi(kilitli) olduğu için düzenlenemez. Düzeltmeler yeni aya yansıtılmalıdır.' }, { status: 400 });
+        if (existing.isLocked && status !== 'Bekliyor') {
+           return NextResponse.json({ success: false, error: 'Bu bordro ödendi(kilitli) olduğu için düzenlenemez. İptal ederek kilidi açabilirsiniz.' }, { status: 400 });
         }
 
-        let isLocked = false;
+        let isLocked = existing.isLocked;
         let paidAt = existing.paidAt;
 
         if (status === 'İşlendi' || status === 'Ödendi') {
             isLocked = true; // Resmi kapanış kilidi
             if (!paidAt) paidAt = new Date();
+        } else if (status === 'Bekliyor') {
+            isLocked = false;
+            paidAt = null;
         }
 
         // Netpay recalculation dynamically if deductions manually overridden

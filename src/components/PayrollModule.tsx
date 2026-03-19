@@ -86,6 +86,27 @@ export default function PayrollModule() {
         }
     };
 
+    const handleUnlock = async (id: string) => {
+        showConfirm('Kilidi Aç', 'Bordronun ödeme kilidini açarsanız, Dönemi Hesapla tuşu ile baştan yeniden hesaplatabilirsiniz. Onaylıyor musunuz?', async () => {
+            try {
+                const res = await fetch('/api/staff/payroll', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, status: 'Bekliyor' })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess('Başarılı', 'Bordro kilidi açıldı ve durumu Bekliyor yapıldı.');
+                    fetchPayrolls();
+                } else {
+                    showError('Hata', data.error || 'İşlem başarısız.');
+                }
+            } catch (e) {
+                showError('Hata', 'Sistemsel bir sorun oluştu.');
+            }
+        });
+    };
+
     const totalSalary = payrolls.reduce((acc, curr) => acc + Number(curr.netPay), 0);
     const totalGross = payrolls.reduce((acc, curr) => acc + Number(curr.grossSalary || 0), 0);
     const totalSgk = payrolls.reduce((acc, curr) => acc + Number(curr.sgkDeduction || 0), 0);
@@ -184,13 +205,21 @@ export default function PayrollModule() {
                                     </td>
                                     <td className="h-14 px-4 align-middle text-right pr-6">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {p.status !== 'Ödendi' && (
+                                            {p.status !== 'Ödendi' ? (
                                                 <button 
                                                     onClick={() => handleMarkAsPaid(p.id)}
                                                     className="h-8 px-3 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-[11px] font-bold flex items-center gap-1 transition-colors"
                                                 >
                                                     <CheckCircle className="w-3.5 h-3.5" />
                                                     ÖDENDİ YAP
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => handleUnlock(p.id)}
+                                                    className="h-8 px-3 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 text-[11px] font-bold flex items-center gap-1 transition-colors"
+                                                    title="Ödeme Kilidini Açıp Yeniden Hesaplanabilir Yap"
+                                                >
+                                                    KİLİDİ AÇ
                                                 </button>
                                             )}
                                         </div>
