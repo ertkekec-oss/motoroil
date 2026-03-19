@@ -18,7 +18,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
         const id = params.id;
 
-        const membership = await prisma.dealerMembership.findUnique({
+        const membership = await prisma.dealerMembership.findFirst({
             where: { id: id, tenantId: tenantId }
         });
 
@@ -26,12 +26,36 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
             return NextResponse.json({ error: 'Bayi kaydı bulunamadı.' }, { status: 404 });
         }
 
-        // Hard-delete membership. The dealerUser and dealerCompany persist, but access to this tenant is revoked.
-        await prisma.dealerMembership.delete({
-            where: { id: id }
+        const membershipId = id;
+
+        // Siparişleri kontrol et. Varsa silme, sadece askıya al (SUSPENDED)
+        const ordersCount = await prisma.order.count({
+            where: { dealerMembershipId: membershipId }
         });
 
-        return NextResponse.json({ success: true, message: 'Bayi başarıyla silindi.' });
+        if (ordersCount > 0) {
+            await prisma.dealerMembership.update({
+                where: { id: membershipId },
+                data: { status: 'SUSPENDED' }
+            });
+            return NextResponse.json({ success: true, message: 'Bayiye ait geçmiş siparişler olduğu için tamamen silinmek yerine erişimi sonlandırıldı (ASKIYA ALINDI).' });
+        }
+
+        // Hard-delete
+        // Önce sepetleri ve denemeleri şartsız sil (constraint hatası vermemesi için)
+        await prisma.dealerCart.deleteMany({
+            where: { dealerMembershipId: membershipId }
+        });
+        await prisma.dealerCheckoutAttempt.deleteMany({
+            where: { dealerMembershipId: membershipId }
+        });
+
+        // Ve en son üyeliği sil
+        await prisma.dealerMembership.delete({
+            where: { id: membershipId }
+        });
+
+        return NextResponse.json({ success: true, message: 'Bayi ve tüm B2B ön belleği kalıcı olarak silindi.' });
     } catch (error: any) {
         console.error('[Dealer DELETE] Error:', error);
         return NextResponse.json({ error: 'Silme işlemi sırasında bir hata oluştu.' }, { status: 500 });
