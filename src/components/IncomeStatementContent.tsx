@@ -98,6 +98,7 @@ export default function IncomeStatementContent() {
                 </div>
             </div>
 
+            {loading ? (
                 <div className="text-center p-20 text-[13px] font-semibold text-slate-400 animate-pulse flex flex-col items-center gap-3">
                     <LineChart className="w-8 h-8 opacity-50" />
                     <span>Gelir tablosu hesaplanıyor...</span>
