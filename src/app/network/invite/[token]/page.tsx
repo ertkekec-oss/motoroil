@@ -171,12 +171,6 @@ export default function InviteRedeemPage() {
                                     value={legalName}
                                     onChange={setLegalName}
                                 />
-                                <Field
-                                    label="Yetkili Kişi"
-                                    placeholder="Ad Soyad"
-                                    value={contactPerson}
-                                    onChange={setContactPerson}
-                                />
                                 <div className="grid grid-cols-2 gap-4">
                                     <Field
                                         label="Vergi No"
