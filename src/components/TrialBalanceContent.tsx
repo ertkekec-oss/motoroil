@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
+import { Scale, RefreshCw, Printer, Search, AlertCircle, CheckCircle2 } from 'lucide-react';
 import LedgerDetailModal from './LedgerDetailModal';
 
 interface MizanRow {
@@ -78,60 +79,74 @@ export default function TrialBalanceContent() {
     const formatMoney = (val: number) => val.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     return (
-        <div className="animate-in fade-in duration-500">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm mb-6">
+        <div className="animate-in fade-in duration-500 space-y-6">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h2 className="text-[24px] font-bold text-slate-900 dark:text-white  bg-gradient-to-r from-green-400 to-emerald-600">
-                            ⚖️ Genel Geçici Mizan
-                        </h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-                            Hesapların dönem sonu borç/alacak toplamları ve bakiyeleri.
-                        </p>
-                    </div>
                     <div className="flex items-center gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-slate-900 dark:text-white hover:text-slate-900 dark:text-white transition-colors">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <Scale className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                                Genel Geçici Mizan
+                            </h2>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">
+                                Hesapların dönem sonu borç/alacak toplamları ve bakiyeleri.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <label className="flex items-center gap-2 cursor-pointer select-none text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors bg-slate-50 dark:bg-slate-800/50 px-3 h-11 rounded-xl border border-slate-200 dark:border-white/5">
                             <input
                                 type="checkbox"
                                 checked={hideZero}
                                 onChange={e => setHideZero(e.target.checked)}
-                                className="checkbox checkbox-xs checkbox-primary"
+                                className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600"
                             />
                             <span>Hareketsizleri Gizle</span>
                         </label>
-                        <button onClick={fetchReport} className="btn btn-ghost btn-sm">🔄 Yenile</button>
-                        <button className="btn btn-outline btn-sm">🖨️ Yazdır</button>
+                        <button 
+                            onClick={fetchReport} 
+                            className="px-4 h-11 rounded-xl font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-all bg-white dark:bg-[#1e293b] shadow-sm text-[13px]"
+                        >
+                            <RefreshCw className="w-4 h-4" /> 
+                            <span className="hidden sm:inline">Yenile</span>
+                        </button>
+                        <button className="px-4 h-11 rounded-xl font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-all bg-white dark:bg-[#1e293b] shadow-sm text-[13px]">
+                            <Printer className="w-4 h-4" /> 
+                            <span className="hidden sm:inline">Yazdır</span>
+                        </button>
                     </div>
                 </div>
 
-                <div className="mt-6 relative">
+                <div className="mt-6 relative group">
+                    <Search className="w-5 h-5 absolute left-4 top-[14px] text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
                     <input
                         type="text"
-                        placeholder="Hesap Ara..."
+                        placeholder="Mizan hesaplarında hızlı ara..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-black/20 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 py-4 text-[13px] h-[52px] pl-12 focus:outline-none focus:border-green-500 transition-colors"
+                        className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-[13px] font-semibold h-[48px] pl-11 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-900 dark:text-white"
                     />
-                    <span className="absolute left-4 top-3.5 text-slate-500 dark:text-slate-400">🔍</span>
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm overflow-hidden p-0">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse text-sm">
-                        <thead className="bg-[#F6F8FB] dark:bg-[#0F172A] border-b border-slate-200 dark:border-slate-800 font-bold sticky top-0 z-10">
+                        <thead className="bg-[#F6F8FB] dark:bg-[#0F172A] border-b border-slate-200 dark:border-white/10 font-bold sticky top-0 z-10">
                             <tr>
-                                <th className="p-4 w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">KOD</th>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">HESAP ADI</th>
-                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">TOPLAM BORÇ</th>
-                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">TOPLAM ALACAK</th>
-                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">BORÇ BAKİYESİ</th>
-                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">ALACAK BAKİYESİ</th>
+                                <th className="p-4 w-32 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">KOD</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">HESAP ADI</th>
+                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">TOPLAM BORÇ</th>
+                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">TOPLAM ALACAK</th>
+                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">BORÇ BAKİYESİ</th>
+                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">ALACAK BAKİYESİ</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Mizan hesaplanıyor...</td></tr>
+                                <tr><td colSpan={6} className="p-8 text-center text-[13px] font-semibold text-slate-400 animate-pulse">Mizan hesaplanıyor, lütfen bekleyin...</td></tr>
                             ) : filteredData.length === 0 ? (
                                 <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Kayıt bulunamadı.</td></tr>
                             ) : (
@@ -139,10 +154,10 @@ export default function TrialBalanceContent() {
                                     <tr
                                         key={row.id}
                                         onClick={() => openLedger(row)}
-                                        className="h-[52px] border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer"
+                                        className="h-[52px] border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
                                         title="Ekstre için tıklayın"
                                     >
-                                        <td className="px-4 py-2 font-mono text-[13px] text-slate-900 dark:text-white">
+                                        <td className="px-4 py-2 font-mono text-[13px] font-semibold text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300">
                                             {row.code}
                                         </td>
                                         <td className="px-4 py-2 font-semibold text-[13px] text-slate-900 dark:text-white">
@@ -150,19 +165,19 @@ export default function TrialBalanceContent() {
                                         </td>
 
                                         {/* Tutarlar */}
-                                        <td className="px-4 py-2 text-[13px] text-right font-mono text-slate-900 dark:text-white">
-                                            {row.totalDebt > 0 ? formatMoney(row.totalDebt) : '-'}
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-medium text-slate-600 dark:text-slate-400">
+                                            {row.totalDebt > 0 ? formatMoney(row.totalDebt) : <span className="text-slate-300 dark:text-slate-600">-</span>}
                                         </td>
-                                        <td className="px-4 py-2 text-[13px] text-right font-mono text-slate-900 dark:text-white">
-                                            {row.totalCredit > 0 ? formatMoney(row.totalCredit) : '-'}
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-medium text-slate-600 dark:text-slate-400">
+                                            {row.totalCredit > 0 ? formatMoney(row.totalCredit) : <span className="text-slate-300 dark:text-slate-600">-</span>}
                                         </td>
 
                                         {/* Bakiyeler */}
-                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-bold text-slate-900 dark:text-white">
-                                            {row.balanceDirection === 'Borç' ? formatMoney(row.balance) : '-'}
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50/30 dark:bg-indigo-500/5 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 transition-colors">
+                                            {row.balanceDirection === 'Borç' ? formatMoney(row.balance) : <span className="text-slate-300 dark:text-slate-600">-</span>}
                                         </td>
-                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-bold text-slate-900 dark:text-white">
-                                            {row.balanceDirection === 'Alacak' ? formatMoney(row.balance) : '-'}
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-black text-rose-600 dark:text-rose-400 bg-rose-50/30 dark:bg-rose-500/5 group-hover:bg-rose-50 dark:group-hover:bg-rose-500/10 transition-colors">
+                                            {row.balanceDirection === 'Alacak' ? formatMoney(row.balance) : <span className="text-slate-300 dark:text-slate-600">-</span>}
                                         </td>
                                     </tr>
                                 ))
@@ -170,13 +185,13 @@ export default function TrialBalanceContent() {
                         </tbody>
                         {/* DİP TOPLAM */}
                         {!loading && filteredData.length > 0 && (
-                            <tfoot className="bg-[#F6F8FB] dark:bg-[#0F172A] border-t-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-bold sticky bottom-0">
-                                <tr>
-                                    <td colSpan={2} className="p-4 text-right uppercase tracking-wider text-[12px] text-slate-500 dark:text-slate-400">Genel Toplam</td>
-                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.debt)}</td>
-                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.credit)}</td>
-                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.balanceDebt)}</td>
-                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.balanceCredit)}</td>
+                            <tfoot className="bg-slate-50 dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold sticky bottom-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                                <tr className="h-14">
+                                    <td colSpan={2} className="p-4 text-right uppercase tracking-[0.2em] text-[10px] font-black text-slate-500 dark:text-slate-400">GENEL TOPLAM</td>
+                                    <td className="p-4 text-right font-mono text-[14px] text-slate-700 dark:text-slate-300">{formatMoney(totals.debt)}</td>
+                                    <td className="p-4 text-right font-mono text-[14px] text-slate-700 dark:text-slate-300">{formatMoney(totals.credit)}</td>
+                                    <td className="p-4 text-right font-mono text-[14px] font-black text-indigo-600 dark:text-indigo-400">{formatMoney(totals.balanceDebt)}</td>
+                                    <td className="p-4 text-right font-mono text-[14px] font-black text-rose-600 dark:text-rose-400">{formatMoney(totals.balanceCredit)}</td>
                                 </tr>
                             </tfoot>
                         )}
@@ -186,17 +201,18 @@ export default function TrialBalanceContent() {
 
             {/* Mizan Denge Kontrolü */}
             {!loading && Math.abs(totals.debt - totals.credit) > 0.05 && (
-                <div className="mt-4 p-4 bg-rose-50 dark:bg-rose-500/10 border border-red-500/50 rounded-[12px] flex items-center gap-4 text-red-200 animate-pulse">
-                    <div className="text-3xl">⚠️</div>
+                <div className="mt-4 p-4 border rounded-2xl flex items-start gap-4 bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 animate-in slide-in-from-bottom-2 fade-in">
+                    <AlertCircle className="w-6 h-6 shrink-0 mt-0.5" />
                     <div>
-                        <h4 className="font-bold text-lg">Mizan Dengesi Bozuk!</h4>
-                        <p className="text-sm">Borç ve Alacak toplamları eşit değil. Fark: {formatMoney(Math.abs(totals.debt - totals.credit))} ₺. Lütfen Yevmiye Fişlerini kontrol edin.</p>
+                        <h4 className="font-bold text-[15px] tracking-tight">Mizan Dengesi Bozuk!</h4>
+                        <p className="text-[13px] font-medium leading-relaxed opacity-90 mt-1">Borç ve Alacak toplamları eşit değil. Fark: <span className="font-mono font-bold">{formatMoney(Math.abs(totals.debt - totals.credit))} ₺</span>. Lütfen kaydedilmiş son Yevmiye Fişlerindeki dengeyi kontrol edin.</p>
                     </div>
                 </div>
             )}
-            {!loading && Math.abs(totals.debt - totals.credit) <= 0.05 && (
-                <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-[12px] flex justify-center text-emerald-600 dark:text-emerald-400 text-sm font-bold">
-                    ✅ Mizan Dengeli (Borç = Alacak)
+            {!loading && Math.abs(totals.debt - totals.credit) <= 0.05 && filteredData.length > 0 && (
+                <div className="mt-4 p-4 border rounded-2xl flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-500/10 text-emerald-600 dark:text-emerald-400 animate-in slide-in-from-bottom-2 fade-in">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="text-[13px] font-bold">Mizan Dengeli (Borç = Alacak)</span>
                 </div>
             )}
 

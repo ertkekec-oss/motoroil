@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useModal } from '@/contexts/ModalContext';
+import { BookOpen, RefreshCw, Plus, Search, FileText, CornerDownRight, AlertCircle } from 'lucide-react';
 import LedgerDetailModal from './LedgerDetailModal';
 
 interface Account {
@@ -136,68 +137,75 @@ export default function AccountPlanContent() {
     };
 
     return (
-        <div className="animate-in fade-in duration-500">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm mb-6">
+        <div className="animate-in fade-in duration-500 space-y-6">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h2 className="text-[24px] font-bold text-slate-900 dark:text-white">
-                            📑 Tek Düzen Hesap Planı
-                        </h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-                            Resmi muhasebe kayıtları için hesap ağacı yönetimi.
-                        </p>
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                            <BookOpen className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                                Tek Düzen Hesap Planı
+                            </h2>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">
+                                Resmi muhasebe kayıtları için alt gruplu hesap ağacı yönetimi.
+                            </p>
+                        </div>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                         <button
                             onClick={handleSync}
                             disabled={syncing}
-                            className={`btn btn-outline btn-warning btn-sm ${syncing ? 'loading' : ''}`}
+                            className={`px-4 h-11 rounded-xl font-bold text-[13px] text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 flex items-center gap-2 transition-all shadow-sm ${syncing ? 'opacity-50 pointer-events-none' : ''}`}
                             title="Kasalar ve Komisyonları Kontrol Et"
                         >
-                            {syncing ? 'Eşitleniyor...' : '⚠️ Hesapları Eşitle'}
+                            <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                            <span className="hidden sm:inline">{syncing ? 'Eşitleniyor...' : 'Hesapları Eşitle'}</span>
                         </button>
                         <button
                             onClick={fetchAccounts}
-                            className="btn btn-ghost btn-sm"
+                            className="w-11 h-11 rounded-xl font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center transition-all bg-white dark:bg-[#1e293b] shadow-sm"
+                            title="Yenile"
                         >
-                            🔄 Yenile
+                            <RefreshCw className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => {
                                 setNewAccount({ code: '', name: '', parentCode: '', type: 'Borç' });
                                 setShowAddModal(true);
                             }}
-                            className="btn btn-primary"
+                            className="px-4 h-11 rounded-xl font-bold text-[13px] text-white shadow-md bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 flex items-center gap-2 transition-all"
                         >
-                            + Ana Hesap Ekle
+                            <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Ana Hesap Ekle</span>
                         </button>
                     </div>
                 </div>
 
-                <div className="mt-6 relative">
+                <div className="mt-6 relative group">
+                    <Search className="w-5 h-5 absolute left-4 top-[14px] text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                     <input
                         type="text"
-                        placeholder="Hesap Kodu veya Adı ile ara..."
+                        placeholder="Hesap kodu veya adı ile ağaçta hızlı ara..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-black/20 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 py-4 text-[13px] h-[52px] pl-12 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-[13px] font-semibold h-[48px] pl-11 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-900 dark:text-white"
                     />
-                    <span className="absolute left-4 top-3.5 text-slate-500 dark:text-slate-400">🔍</span>
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm overflow-hidden p-0">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-[#F6F8FB] dark:bg-[#0F172A] border-b border-slate-200 dark:border-slate-800 font-bold sticky top-0 z-10">
+                        <thead className="bg-[#F6F8FB] dark:bg-[#0F172A] border-b border-slate-200 dark:border-white/10 font-bold sticky top-0 z-10">
                             <tr>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">HESAP KODU</th>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">HESAP ADI</th>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">SINIF</th>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">YÖN</th>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-right">BORÇ BAKİYESİ</th>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-right">ALACAK BAKİYESİ</th>
-                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">İŞLEM</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400 text-left">HESAP KODU</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400 text-left">HESAP ADI</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400 text-left">SINIF</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400 text-left">YÖN</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400 text-right">BORÇ BAKİYESİ</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400 text-right">ALACAK BAKİYESİ</th>
+                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400 text-center w-[100px]">İŞLEM</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -219,36 +227,36 @@ export default function AccountPlanContent() {
                                     const isMain = depth === 0;
 
                                     return (
-                                        <tr key={acc.id} className={`h-[52px] border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors ${isMain ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}>
-                                            <td className="px-4 py-2 font-semibold text-[13px] font-mono font-bold text-blue-600 dark:text-blue-400">
+                                        <tr key={acc.id} className={`h-[52px] border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group ${isMain ? 'bg-slate-50/30 dark:bg-slate-800/20' : ''}`}>
+                                            <td className={`px-4 py-2 font-semibold text-[13px] font-mono ${isMain ? 'font-black text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}>
                                                 <div className="flex items-center gap-2">
-                                                    <span style={{ marginLeft: `${depth * 20}px` }} className="relative flex items-center">
-                                                        {isMain ? '' : <span className='absolute -left-3 top-[-10px] w-2 h-4 border-l border-b border-slate-300 dark:border-slate-700 rounded-bl'></span>}
+                                                    <span style={{ marginLeft: `${Math.min(depth * 16, 64)}px` }} className="flex items-center gap-1.5">
+                                                        {!isMain && <CornerDownRight className="w-3.5 h-3.5 text-slate-400" />}
                                                         {acc.code}
                                                     </span>
                                                     {acc.warnings && acc.warnings.length > 0 && (
-                                                        <div className="group relative">
-                                                            <span className="text-yellow-500 cursor-warning animate-pulse">⚠️</span>
-                                                            <div className="absolute left-6 top-0 w-64 p-2 bg-black/90 border border-yellow-500/30 rounded text-xs text-yellow-200 invisible group-hover:visible z-50">
+                                                        <div className="group/warning relative">
+                                                            <AlertCircle className="w-3.5 h-3.5 text-amber-500 cursor-warning animate-pulse" />
+                                                            <div className="absolute left-6 top-0 w-64 p-3 bg-slate-900 border border-amber-500/30 rounded-xl text-[11px] font-semibold text-amber-100 invisible group-hover/warning:visible z-50 shadow-xl pointer-events-none">
                                                                 {acc.warnings.join(', ')}
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className={`p-4 ${isMain ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-900 dark:text-white'}`}>
+                                            <td className={`p-4 text-[13px] ${isMain ? 'font-black text-slate-900 dark:text-white' : 'font-semibold text-slate-600 dark:text-slate-400'}`}>
                                                 {acc.name}
                                             </td>
                                             <td className="px-4 py-2 font-semibold text-[13px]">
                                                 {acc.accountClass ? (
                                                     <span className={`
-                                                        text-xs px-2 py-1 rounded-md font-bold
-                                                        ${acc.accountClass === 'AKTIF' || acc.accountClass === 'GIDER' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-600 dark:text-blue-400 text-orange-400'}
+                                                        text-[10px] px-2 py-0.5 rounded font-black tracking-widest uppercase
+                                                        ${acc.accountClass === 'AKTIF' || acc.accountClass === 'GIDER' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'}
                                                     `}>
                                                         {acc.accountClass}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-gray-600 text-xs">-</span>
+                                                    <span className="text-slate-400 dark:text-slate-600 text-xs">-</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-2 font-semibold text-[13px] hidden md:table-cell">
@@ -284,20 +292,20 @@ export default function AccountPlanContent() {
                                             </td>
 
                                             <td className="px-4 py-2 font-semibold text-[13px] text-center">
-                                                <div className="flex justify-center gap-2">
+                                                <div className="flex justify-center items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onClick={() => openLedger(acc)}
-                                                        className="btn btn-ghost btn-xs text-yellow-400 hover:bg-yellow-500/10"
-                                                        title="Hesap Hareketleri (Ekstre)"
+                                                        className="w-8 h-8 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10 flex items-center justify-center transition-all bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 shadow-sm"
+                                                        title="Hesap Hareketleri (Muavin Defter)"
                                                     >
-                                                        📜
+                                                        <FileText className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => prepareSubAccount(acc)}
-                                                        className="btn btn-ghost btn-xs text-blue-600 dark:text-blue-400 hover:bg-blue-500/10"
+                                                        className="w-8 h-8 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:text-slate-400 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/10 flex items-center justify-center transition-all bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 shadow-sm"
                                                         title="Alt Hesap Ekle"
                                                     >
-                                                        + Alt
+                                                        <Plus className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
