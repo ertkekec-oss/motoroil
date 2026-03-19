@@ -1648,8 +1648,9 @@ export default function StaffManagementContent() {
                                                                                         <td className="py-3 px-4 font-black text-slate-900 dark:text-white">
                                                                                             {log.workingHours ? `${log.workingHours} Sa` : '-'}
                                                                                         </td>
-                                                                                        <td className="py-3 px-4 text-slate-500">
-                                                                                            {log.deviceInfo || log.locationIn || 'Ofis / Geçiş Noktası'}
+                                                                                        <td className="py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-normal">
+                                                                                            {log.locationIn || 'Ofis / Geçiş Noktası'}
+                                                                                            {log.locationOut ? ` -> ${log.locationOut}` : ''}
                                                                                         </td>
                                                                                     </tr>
                                                                                 ))}
