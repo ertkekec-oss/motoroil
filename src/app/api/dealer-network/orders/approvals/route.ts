@@ -34,7 +34,7 @@ export async function GET(req: Request) {
                 customerName: true,
                 dealerMembership: {
                     select: {
-                        dealerUser: { select: { name: true, email: true } },
+                        dealerUser: { select: { phone: true, email: true } },
                         dealerCompany: { select: { companyName: true } }
                     }
                 }
