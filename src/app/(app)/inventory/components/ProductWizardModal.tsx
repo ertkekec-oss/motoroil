@@ -566,7 +566,7 @@ function StepPricingTax({ data, onChange }: any) {
     );
 }
 
-function StepOtherInfo({ data, onChange, categories }: any) {
+function StepOtherInfo({ data, onChange, categories, globalCategories }: any) {
     return (
         <div className="animate-in fade-in duration-300 space-y-8">
             <div className="mb-2 border-b border-slate-200 dark:border-white/5 pb-2">
@@ -576,12 +576,30 @@ function StepOtherInfo({ data, onChange, categories }: any) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Kategori</label>
-                    <select value={data.category || ''} onChange={e => onChange({ ...data, category: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:bg-[#0f172a] shadow-sm">
-                        <option value="" disabled>Kategori Seçin</option>
-                        {(categories.length > 0 ? categories : ["Motosiklet", "Otomobil", "Aksesuar", "Yedek Parça", "Genel"]).map((c: string) => (
-                            <option key={c} value={c}>{c}</option>
-                        ))}
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Global Kategori</label>
+                    <select 
+                        value={data.globalCategoryId || data.category || ''} 
+                        onChange={e => {
+                            const val = e.target.value;
+                            const selectedCat = globalCategories?.find((c: any) => c.id === val);
+                            if (selectedCat) {
+                                onChange({ ...data, globalCategoryId: val, category: selectedCat.path.split(' > ').pop() });
+                            } else {
+                                onChange({ ...data, category: val });
+                            }
+                        }} 
+                        className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:bg-[#0f172a] shadow-sm"
+                    >
+                        <option value="" disabled>Ağaçtan Kategori Seç...</option>
+                        {globalCategories && globalCategories.length > 0 ? (
+                            globalCategories.map((c: any) => (
+                                <option key={c.id} value={c.id}>{c.path}</option>
+                            ))
+                        ) : (
+                            (categories && categories.length > 0 ? categories : ["Motosiklet", "Otomobil", "Aksesuar", "Yedek Parça", "Genel"]).map((c: string) => (
+                                <option key={c} value={c}>{c}</option>
+                            ))
+                        )}
                     </select>
                 </div>
                 <div className="space-y-2">
