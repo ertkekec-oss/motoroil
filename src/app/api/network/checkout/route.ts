@@ -83,7 +83,7 @@ export async function POST(req: Request) {
                     status: true,
                     financialMode: true,
                     dealerCompany: { select: { companyName: true } },
-                    dealerUser: { select: { name: true, email: true } },
+                    dealerUser: { select: { email: true, phone: true } },
                 },
             })
             if (!membership || membership.status !== "ACTIVE") throw new HttpErr(403, "INVALID_MEMBERSHIP")
@@ -213,7 +213,7 @@ export async function POST(req: Request) {
 
             // 5) Order create (core model fields)
             const orderNumber = makeOrderNumber()
-            const customerName = membership.dealerCompany?.companyName || membership.dealerUser?.name || "B2B Bayi"
+            const customerName = membership.dealerCompany?.companyName || membership.dealerUser?.email || "B2B Bayi"
             const customerEmail = membership.dealerUser?.email || ""
 
             // Satici tenant altindaki uygun companyId'yi bul. Bir tenant in altindaki satici firmayi al.
