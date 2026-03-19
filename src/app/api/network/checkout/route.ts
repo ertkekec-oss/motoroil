@@ -52,7 +52,8 @@ export async function POST(req: Request) {
                 const existing = await tx.order.findUnique({
                     where: { id: attempt.orderId },
                     select: { id: true, orderNumber: true },
-                })
+                    adminBypass: true,
+                } as any)
                 return { orderId: existing?.id ?? attempt.orderId, orderNumber: existing?.orderNumber ?? null, reused: true }
             }
 
@@ -117,7 +118,8 @@ export async function POST(req: Request) {
                     stock: true, // Int
                     reservedStock: true, // YENI
                 },
-            })
+                adminBypass: true,
+            } as any)
 
             const byId = new Map<string, any>(products.map((p) => [p.id, p]))
 
@@ -161,7 +163,8 @@ export async function POST(req: Request) {
                 await tx.product.update({
                     where: { id: ci.productId },
                     data: { reservedStock: { increment: ci.quantity } },
-                })
+                    adminBypass: true,
+                } as any)
             }
 
             // --- CREDIT EXPOSURE CHECK ---
@@ -246,7 +249,8 @@ export async function POST(req: Request) {
                     paymentRequired,
                 },
                 select: { id: true, orderNumber: true },
-            })
+                adminBypass: true,
+            } as any)
 
             // 6) cart close
             await tx.dealerCart.update({

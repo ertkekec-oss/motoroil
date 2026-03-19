@@ -11,7 +11,7 @@ export async function PATCH(req: Request, { params }: { params: any }) {
         const user = session.user || session;
         const tenantId = session.tenantId || user.tenantId;
 
-        if (!user.permissions?.includes('b2b_manage') && user.role !== 'TENANT_OWNER') {
+        if (!user.permissions?.includes('b2b_manage') && !['TENANT_OWNER', 'SUPER_ADMIN', 'ADMIN', 'PLATFORM_ADMIN'].includes(user.role)) {
             return NextResponse.json({ error: 'Bu islem icin b2b_manage yetkisi gereklidir' }, { status: 403 });
         }
 

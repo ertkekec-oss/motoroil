@@ -17,8 +17,9 @@ export async function POST(req: Request) {
                 id: orderId,
                 dealerMembershipId: ctx.activeMembershipId,
                 companyId: ctx.supplierTenantId
-            }
-        })
+            },
+            adminBypass: true
+        } as any)
 
         if (!order) {
             return NextResponse.json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 })

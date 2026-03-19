@@ -23,7 +23,8 @@ export async function GET(req: Request) {
                 totalAmount: true,
                 currency: true,
             },
-        })
+            adminBypass: true,
+        } as any)
 
         const hasMore = orders.length > TAKE
         const page = hasMore ? orders.slice(0, TAKE) : orders

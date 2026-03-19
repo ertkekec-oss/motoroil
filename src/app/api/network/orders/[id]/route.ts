@@ -26,7 +26,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 items: true,
                 currency: true
             },
-        })
+            adminBypass: true
+        } as any)
 
         if (!order) {
             return NextResponse.json({ ok: false, error: "ORDER_NOT_FOUND" }, { status: 404 })

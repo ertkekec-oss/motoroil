@@ -30,10 +30,11 @@ export async function computeExposureBase(ctx: {
             dealerMembershipId: ctx.activeMembershipId,
             companyId: ctx.supplierTenantId,
             salesChannel: "DEALER_B2B",
-            status: { in: CREDIT_EXPOSURE_STATUSES }
+        status: { in: CREDIT_EXPOSURE_STATUSES }
         },
-        _sum: { dealerPrice: true, totalAmount: true }
-    })
+        _sum: { dealerPrice: true, totalAmount: true },
+        adminBypass: true
+    } as any)
 
     // Use dealerPrice if available, fallback to totalAmount
     const exposureBase = Number(exposureAggr._sum.dealerPrice || exposureAggr._sum.totalAmount || 0)
