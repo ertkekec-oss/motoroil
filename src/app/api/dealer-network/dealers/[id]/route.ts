@@ -44,10 +44,10 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
         // Hard-delete
         // Önce sepetleri ve denemeleri şartsız sil (constraint hatası vermemesi için)
         await prisma.dealerCart.deleteMany({
-            where: { dealerMembershipId: membershipId }
+            where: { membershipId: membershipId }
         });
         await prisma.dealerCheckoutAttempt.deleteMany({
-            where: { dealerMembershipId: membershipId }
+            where: { membershipId: membershipId }
         });
 
         // Ve en son üyeliği sil
