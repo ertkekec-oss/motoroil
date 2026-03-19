@@ -729,6 +729,31 @@ export default function StaffManagementContent() {
         }
     };
 
+    const handleResetDeviceStatus = async (staffId: string, staffName: string) => {
+        showConfirm('Cihaz Kilidini Aç', `${staffName} personeli için mevcut PDKS cihaz eşleşmesi silinecek. Personel, yeni telefonuyla uygulama üzerinden tekrar ilk giriş kaydını yapabilir ve o cihaza mühürlenir. Onaylıyor musunuz?`, async () => {
+            setIsProcessing(true);
+            try {
+                const res = await fetch('/api/admin/pdks/devices/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ staffId })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess("Cihaz Kilidi Kaldırıldı", `${staffName} artık yeni cihazından sorunsuz PDKS girişi sağlayabilir.`);
+                } else {
+                    showSuccess("Hata", data.error || "İşlem yapılırken bir hata oluştu.");
+                }
+            } catch (e) {
+                console.error('Reset device failed', e);
+                showSuccess("Hata", "Ağ hatası oluştu.");
+            } finally {
+                setIsProcessing(false);
+            }
+        });
+    };
+
     const handleProcessAttendance = async (staffId: string, type: 'CHECK_IN' | 'CHECK_OUT') => {
         setIsProcessing(true);
         try {
@@ -1583,9 +1608,17 @@ export default function StaffManagementContent() {
                                                     <tr>
                                                         <td colSpan={5} className="p-0 border-none bg-slate-50/50 dark:bg-[#0f172a]">
                                                             <div className="py-6 px-16 border-t border-slate-100 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
-                                                                <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                                                    <span>🕒</span> {person.name} - Son Hareket Geçmişi
-                                                                </h4>
+                                                                <div className="flex items-center justify-between mb-4">
+                                                                    <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                                                        <span>🕒</span> {person.name} - Son Hareket Geçmişi
+                                                                    </h4>
+                                                                    <button 
+                                                                        onClick={() => handleResetDeviceStatus(person.id, person.name)}
+                                                                        className="h-7 px-3 bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-colors flex items-center gap-1.5 shadow-sm"
+                                                                    >
+                                                                        <span>🔓</span> CİHAZ KİLİDİNİ KALDIR
+                                                                    </button>
+                                                                </div>
                                                                 {personLogs.length > 0 ? (
                                                                     <div className="bg-white dark:bg-[#1e293b]/30 border border-slate-200 dark:border-white/5 rounded-xl overflow-hidden shadow-sm">
                                                                         <table className="w-full text-left text-[12px]">

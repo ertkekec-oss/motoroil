@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
         // 1. Policy Fetch (Placeholder - DB'den de alınabilir)
         const policy = {
-            allowSingleDevice: false, // Temporarily disabled until UI toggle is added
+            allowSingleDevice: true,
             minGpsAccuracyMeters: 100,
             officeIpMatch: true,
         };
