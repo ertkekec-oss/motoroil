@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 
 export async function PATCH(req: Request, { params }: { params: any }) {
     try {
@@ -18,12 +19,21 @@ export async function PATCH(req: Request, { params }: { params: any }) {
         const body = await req.json();
 
         const resolvedParams = await Promise.resolve(params);
-        const orderId = resolvedParams.id;
+        const membershipId = resolvedParams.id;
 
-        // Tenant checks on whether the dealer with {params.id} belongs to {tenantId} would happen here
-        console.log(`[Credit] Modifying limit for ${orderId} at tenant ${tenantId} by ${user.id}`);
+        await prisma.dealerMembership.update({
+            where: {
+                id: membershipId,
+                tenantId: tenantId
+            },
+            data: {
+                creditLimit: Number(body.creditLimit) || 0
+            }
+        });
 
-        return NextResponse.json({ success: true, message: `Kredi limiti güncellendi: ${orderId}`, limit: body.creditLimit });
+        console.log(`[Credit] Modifying limit for ${membershipId} at tenant ${tenantId} by ${user.id}`);
+
+        return NextResponse.json({ success: true, message: `Kredi limiti güncellendi`, limit: body.creditLimit });
     } catch (error: any) {
         if (error.message === 'UNAUTHORIZED') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useModal } from '@/contexts/ModalContext';
-import { Download, FileSpreadsheet, Briefcase, Building2, Ticket, PackageOpen, DownloadCloud, Import } from 'lucide-react';
+import { Download, FileSpreadsheet, Briefcase, Building2, Ticket, PackageOpen, DownloadCloud, Import, Loader2 } from 'lucide-react';
 
 export default function AdvisorExportModule() {
     const { showSuccess, showWarning, showError } = useModal();

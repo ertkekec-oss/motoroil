@@ -1613,7 +1613,7 @@ export default function StaffManagementContent() {
                                                                         <span>🕒</span> {person.name} - Son Hareket Geçmişi
                                                                     </h4>
                                                                     <button 
-                                                                        onClick={() => handleResetDeviceStatus(person.id, person.name)}
+                                                                        onClick={() => handleResetDeviceStatus(String(person.id), person.name)}
                                                                         className="h-7 px-3 bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-colors flex items-center gap-1.5 shadow-sm"
                                                                     >
                                                                         <span>🔓</span> CİHAZ KİLİDİNİ KALDIR
