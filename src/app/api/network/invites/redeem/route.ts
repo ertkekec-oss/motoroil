@@ -5,7 +5,7 @@ import { hashPassword } from "@/lib/auth"
 
 export async function POST(req: Request) {
     const body = await req.json().catch(() => null)
-    if (!body?.token || !body?.phoneE164 || !body?.company?.legalName) {
+    if (!body?.token || !body?.phoneE164 || !body?.company?.legalName || !body?.company?.taxNo) {
         return NextResponse.json({ ok: false, error: "INVALID_INPUT" }, { status: 400 })
     }
 
@@ -13,7 +13,13 @@ export async function POST(req: Request) {
     const phoneE164 = String(body.phoneE164)
     const email = body.email ? String(body.email).toLowerCase() : null
     const legalName = String(body.company.legalName).trim()
-    const taxNumber = body.company.taxNo ? String(body.company.taxNo).trim() : null
+    const taxNumber = String(body.company.taxNo).trim()
+    const taxOffice = body.company.taxOffice ? String(body.company.taxOffice).trim() : null
+    const contactPerson = body.company.contactPerson ? String(body.company.contactPerson).trim() : null
+    const iban = body.company.iban ? String(body.company.iban).trim() : null
+    const city = body.company.city ? String(body.company.city).trim() : null
+    const district = body.company.district ? String(body.company.district).trim() : null
+    const address = body.company.address ? String(body.company.address).trim() : null
     const password = body.password ? String(body.password) : null
 
     try {
@@ -88,6 +94,10 @@ export async function POST(req: Request) {
                         data: {
                             companyName: legalName,
                             taxNumber,
+                            taxOffice,
+                            address,
+                            city,
+                            district
                         },
                         select: { id: true },
                     })
@@ -164,6 +174,49 @@ export async function POST(req: Request) {
                         dealerCompanyId,
                     },
                 })
+            }
+
+            // --- 6. CREATE AUTO-Cari (Customer Card in headquarters) ---
+            const supplierCompany = await tx.company.findFirst({
+                where: { tenantId: supplierTenantId },
+                orderBy: { createdAt: "asc" },
+                select: { id: true }
+            })
+
+            if (supplierCompany) {
+                // Check if customer already exists for this vergi No or phone
+                const existingCustomer = await tx.customer.findFirst({
+                    where: { 
+                        companyId: supplierCompany.id,
+                        OR: [
+                            { taxNumber: taxNumber },
+                            { phone: phoneE164 }
+                        ]
+                    },
+                    select: { id: true }
+                })
+
+                if (!existingCustomer) {
+                    await tx.customer.create({
+                        data: {
+                            companyId: supplierCompany.id,
+                            name: legalName,
+                            email,
+                            phone: phoneE164,
+                            taxNumber,
+                            taxOffice,
+                            contactPerson,
+                            iban,
+                            address,
+                            city,
+                            district,
+                            branch: "Merkez",
+                            supplierClass: "B2B_DEALER",
+                            customerClass: "B2B_BAYI",
+                            isPortalActive: true,
+                        }
+                    })
+                }
             }
 
             return { dealerUserId, dealerCompanyId, membershipId: membership.id }

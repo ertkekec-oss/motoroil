@@ -26,6 +26,12 @@ export default function InviteRedeemPage() {
     const [email, setEmail] = useState("")
     const [legalName, setLegalName] = useState("")
     const [taxNo, setTaxNo] = useState("")
+    const [taxOffice, setTaxOffice] = useState("")
+    const [contactPerson, setContactPerson] = useState("")
+    const [iban, setIban] = useState("")
+    const [city, setCity] = useState("")
+    const [district, setDistrict] = useState("")
+    const [address, setAddress] = useState("")
     const [password, setPassword] = useState("")
     const [passwordConfirm, setPasswordConfirm] = useState("")
     const [state, setState] = useState<RedeemState>({ status: "idle" })
@@ -36,9 +42,10 @@ export default function InviteRedeemPage() {
             normalizePhone(phone).length >= 10 &&
             email.includes("@") &&
             legalName.trim().length >= 2 &&
+            taxNo.trim().length >= 10 &&
             (!password || password === passwordConfirm)
         )
-    }, [token, phone, email, legalName, password, passwordConfirm])
+    }, [token, phone, email, legalName, taxNo, password, passwordConfirm])
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -56,7 +63,13 @@ export default function InviteRedeemPage() {
                 email,
                 company: {
                     legalName,
-                    taxNo: taxNo.trim() || undefined,
+                    taxNo: taxNo.trim(),
+                    taxOffice: taxOffice.trim() || undefined,
+                    contactPerson: contactPerson.trim() || undefined,
+                    iban: iban.trim() || undefined,
+                    city: city.trim() || undefined,
+                    district: district.trim() || undefined,
+                    address: address.trim() || undefined,
                 },
                 password: password ? password : undefined
             }),
@@ -159,10 +172,50 @@ export default function InviteRedeemPage() {
                                     onChange={setLegalName}
                                 />
                                 <Field
-                                    label="Vergi No"
-                                    placeholder="Opsiyonel"
-                                    value={taxNo}
-                                    onChange={setTaxNo}
+                                    label="Yetkili Kişi"
+                                    placeholder="Ad Soyad"
+                                    value={contactPerson}
+                                    onChange={setContactPerson}
+                                />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Field
+                                        label="Vergi No"
+                                        placeholder="Zorunlu"
+                                        value={taxNo}
+                                        onChange={setTaxNo}
+                                    />
+                                    <Field
+                                        label="Vergi Dairesi"
+                                        placeholder="Opsiyonel"
+                                        value={taxOffice}
+                                        onChange={setTaxOffice}
+                                    />
+                                </div>
+                                <Field
+                                    label="IBAN"
+                                    placeholder="TR..."
+                                    value={iban}
+                                    onChange={setIban}
+                                />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Field
+                                        label="İl"
+                                        placeholder="Örn. İstanbul"
+                                        value={city}
+                                        onChange={setCity}
+                                    />
+                                    <Field
+                                        label="İlçe"
+                                        placeholder="Örn. Kadıköy"
+                                        value={district}
+                                        onChange={setDistrict}
+                                    />
+                                </div>
+                                <Field
+                                    label="Açık Adres"
+                                    placeholder="Mahalle, Sokak..."
+                                    value={address}
+                                    onChange={setAddress}
                                 />
                                 <div className="border-t pt-4 mt-4">
                                     <h3 className="text-sm font-medium mb-3">Hesap Şifresi (Sisteme giriş için)</h3>
