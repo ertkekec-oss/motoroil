@@ -38,6 +38,40 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             });
         }
 
+        // --- UPDATE STAFF STATUS LOGIC ---
+        // If task was completed or cancelled, check if they have any other active tasks
+        if (data.status === 'Tamamlandı' || data.status === 'İptal') {
+            const pendingTasks = await prisma.staffTask.findMany({
+                where: {
+                    staffId: task.staffId,
+                    status: { notIn: ['Tamamlandı', 'İptal'] }
+                },
+                orderBy: { createdAt: 'desc' },
+                take: 1
+            });
+
+            if (pendingTasks.length > 0) {
+                // Assign them to the next pending task
+                await prisma.staff.update({
+                    where: { id: task.staffId },
+                    data: { currentJob: pendingTasks[0].title, status: 'Meşgul' }
+                });
+            } else {
+                // Free the staff
+                await prisma.staff.update({
+                    where: { id: task.staffId },
+                    data: { currentJob: null, status: 'Müsait' }
+                });
+            }
+        } else if (data.status === 'Devam Ediyor' || data.status === 'Bekliyor') {
+            // Ensure they are marked as busy since the task is active
+            await prisma.staff.update({
+                where: { id: task.staffId },
+                data: { currentJob: task.title, status: 'Meşgul' }
+            });
+        }
+        // ---------------------------------
+
         return NextResponse.json(task);
     } catch (error) {
         console.error('Error updating task:', error);
