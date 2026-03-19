@@ -25,16 +25,21 @@ export async function computeExposureBase(ctx: {
 
     const creditLimit = Number(membership.creditLimit || 0)
 
+    const company = await prisma.company.findFirst({
+        where: { tenantId: ctx.supplierTenantId },
+        select: { id: true },
+        orderBy: { createdAt: "asc" }
+    })
+
     const exposureAggr = await prisma.order.aggregate({
         where: {
             dealerMembershipId: ctx.activeMembershipId,
-            companyId: ctx.supplierTenantId,
+            companyId: company?.id ?? "",
             salesChannel: "DEALER_B2B",
-        status: { in: CREDIT_EXPOSURE_STATUSES }
+            status: { in: CREDIT_EXPOSURE_STATUSES }
         },
-        _sum: { dealerPrice: true, totalAmount: true },
-        adminBypass: true
-    } as any)
+        _sum: { dealerPrice: true, totalAmount: true }
+    })
 
     // Use dealerPrice if available, fallback to totalAmount
     const exposureBase = Number(exposureAggr._sum.dealerPrice || exposureAggr._sum.totalAmount || 0)

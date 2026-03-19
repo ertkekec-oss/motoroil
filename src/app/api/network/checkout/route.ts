@@ -51,9 +51,8 @@ export async function POST(req: Request) {
             if (attempt.orderId) {
                 const existing = await tx.order.findUnique({
                     where: { id: attempt.orderId },
-                    select: { id: true, orderNumber: true },
-                    adminBypass: true,
-                } as any)
+                    select: { id: true, orderNumber: true }
+                })
                 return { orderId: existing?.id ?? attempt.orderId, orderNumber: existing?.orderNumber ?? null, reused: true }
             }
 
@@ -117,9 +116,8 @@ export async function POST(req: Request) {
                     price: true, // Decimal(10,2)
                     stock: true, // Int
                     reservedStock: true, // YENI
-                },
-                adminBypass: true,
-            } as any)
+                }
+            })
 
             const byId = new Map<string, any>(products.map((p) => [p.id, p]))
 
@@ -162,9 +160,8 @@ export async function POST(req: Request) {
             for (const ci of cart.items) {
                 await tx.product.update({
                     where: { id: ci.productId },
-                    data: { reservedStock: { increment: ci.quantity } },
-                    adminBypass: true,
-                } as any)
+                    data: { reservedStock: { increment: ci.quantity } }
+                })
             }
 
             // --- CREDIT EXPOSURE CHECK ---
@@ -248,9 +245,8 @@ export async function POST(req: Request) {
                     creditExceededAmount,
                     paymentRequired,
                 },
-                select: { id: true, orderNumber: true },
-                adminBypass: true,
-            } as any)
+                select: { id: true, orderNumber: true }
+            })
 
             // 6) cart close
             await tx.dealerCart.update({
@@ -283,6 +279,6 @@ export async function POST(req: Request) {
         if (e instanceof HttpErr) {
             return NextResponse.json({ ok: false, error: e.code, meta: e.meta ?? null }, { status: e.http })
         }
-        return NextResponse.json({ ok: false, error: "CHECKOUT_FAILED" }, { status: 500 })
+        return NextResponse.json({ ok: false, error: "CHECKOUT_FAILED", details: e?.message, stack: e?.stack }, { status: 500 })
     }
 }
