@@ -195,11 +195,19 @@ export async function POST(req: Request) {
                     },
                     select: { id: true }
                 })
-
                 if (!existingCustomer) {
+                    // Kategori bul ("Genel" kategorisi)
+                    let targetCategoryId = null;
+                    const generalCat = await tx.customerCategory.findFirst({
+                        where: { name: 'Genel', companyId: supplierCompany.id },
+                        select: { id: true }
+                    });
+                    if (generalCat) targetCategoryId = generalCat.id;
+
                     await tx.customer.create({
                         data: {
                             companyId: supplierCompany.id,
+                            ...(targetCategoryId ? { categoryId: targetCategoryId } : {}),
                             name: legalName,
                             email,
                             phone: phoneE164,
@@ -213,7 +221,6 @@ export async function POST(req: Request) {
                             branch: "Merkez",
                             supplierClass: "B2B_DEALER",
                             customerClass: "B2B_BAYI",
-                            isPortalActive: true,
                         }
                     })
                 }
@@ -227,6 +234,7 @@ export async function POST(req: Request) {
         if (e instanceof RedeemError) {
             return NextResponse.json({ ok: false, error: e.code }, { status: e.http })
         }
+        console.error("[REDEEM_FAILED] Internal Error:", e);
         return NextResponse.json({ ok: false, error: "REDEEM_FAILED" }, { status: 500 })
     }
 }
