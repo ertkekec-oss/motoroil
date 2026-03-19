@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             return NextResponse.json({ ok: false, error: "ORDER_ID_REQUIRED" }, { status: 400 })
         }
 
-        const order = await prisma.order.findUnique({
+        const order = await prisma.order.findFirst({
             where: {
                 id,
                 dealerMembershipId: ctx.activeMembershipId,
@@ -25,8 +25,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 totalAmount: true,
                 items: true,
                 currency: true
-            },
-            adminBypass: true
+            }
         } as any)
 
         if (!order) {
@@ -35,9 +34,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
         return NextResponse.json({ ok: true, order })
     } catch (error: any) {
+        console.error("B2B Order Fetch Error:", error);
         if (error.message === "UNAUTHORIZED" || error.message === "NO_ACTIVE_MEMBERSHIP" || error.message === "INVALID_MEMBERSHIP_CONTEXT") {
             return NextResponse.json({ ok: false, error: error.message }, { status: 403 })
         }
-        return NextResponse.json({ ok: false, error: "FETCH_ORDER_FAILED" }, { status: 500 })
+        return NextResponse.json({ ok: false, error: "FETCH_ORDER_FAILED", detail: error.message, stack: error.stack }, { status: 500 })
     }
 }

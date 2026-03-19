@@ -38,15 +38,13 @@ export async function GET() {
         const agg = await prisma.order.aggregate({
             where: {
                 dealerMembershipId: ctx.activeMembershipId,
-                companyId: ctx.supplierTenantId,
                 salesChannel: "DEALER_B2B",
                 status: { in: [...CREDIT_EXPOSURE_STATUSES] },
             },
             _sum: {
                 dealerPrice: true as any,
                 totalAmount: true as any,
-            },
-            adminBypass: true,
+            }
         } as any)
 
         const sumDealer = toNumber((agg as any)._sum?.dealerPrice)

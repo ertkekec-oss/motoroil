@@ -16,9 +16,7 @@ export async function POST(req: Request) {
             where: {
                 id: orderId,
                 dealerMembershipId: ctx.activeMembershipId,
-                companyId: ctx.supplierTenantId
-            },
-            adminBypass: true
+            }
         } as any)
 
         if (!order) {

@@ -22,8 +22,7 @@ export async function GET(req: Request) {
                 orderDate: true,
                 totalAmount: true,
                 currency: true,
-            },
-            adminBypass: true,
+            }
         } as any)
 
         const hasMore = orders.length > TAKE
