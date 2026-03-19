@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prismaRaw } from "@/lib/prisma"
 import { requireDealerContext } from "@/lib/network/context"
 
 export async function POST(req: Request) {
@@ -15,14 +15,13 @@ export async function POST(req: Request) {
         }
 
         // Product'ın bu tedarikçiye ait olduğunu kontrol et ve stok doğrula
-        const product: any = await prisma.product.findFirst({
+        const product: any = await prismaRaw.product.findFirst({
             where: {
                 id: productId,
                 company: { tenantId: ctx.supplierTenantId }, // supplier kısıtlaması
                 deletedAt: null,
             },
             select: { id: true, stock: true, reservedStock: true }, // "stockQty" şemada "stock"
-            adminBypass: true,
         } as any)
 
         if (!product) {
@@ -30,7 +29,7 @@ export async function POST(req: Request) {
         }
 
         // Get or Create Active Cart
-        let cart = await prisma.dealerCart.findFirst({
+        let cart = await prismaRaw.dealerCart.findFirst({
             where: {
                 membershipId: ctx.activeMembershipId,
                 status: "ACTIVE",
@@ -38,7 +37,7 @@ export async function POST(req: Request) {
         })
 
         if (!cart) {
-            cart = await prisma.dealerCart.create({
+            cart = await prismaRaw.dealerCart.create({
                 data: {
                     membershipId: ctx.activeMembershipId,
                     supplierTenantId: ctx.supplierTenantId,
@@ -47,7 +46,7 @@ export async function POST(req: Request) {
         }
 
         // Mevcut cart item'ı bulalım (Eğer varsa ürün adedini güncelleyip üstüne ekleyeceğiz)
-        const existingItem = await prisma.dealerCartItem.findUnique({
+        const existingItem = await prismaRaw.dealerCartItem.findUnique({
             where: {
                 cartId_productId: {
                     cartId: cart.id,
@@ -71,12 +70,12 @@ export async function POST(req: Request) {
         }
 
         if (existingItem) {
-            await prisma.dealerCartItem.update({
+            await prismaRaw.dealerCartItem.update({
                 where: { id: existingItem.id },
                 data: { quantity: finalQuantity },
             })
         } else {
-            await prisma.dealerCartItem.create({
+            await prismaRaw.dealerCartItem.create({
                 data: {
                     cartId: cart.id,
                     productId: productId,

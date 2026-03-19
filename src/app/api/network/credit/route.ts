@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prismaRaw as prisma } from "@/lib/prisma"
 import { requireDealerContext } from "@/lib/network/context"
 
 function toNumber(v: any) {
@@ -46,7 +46,8 @@ export async function GET() {
                 dealerPrice: true as any,
                 totalAmount: true as any,
             },
-        })
+            adminBypass: true,
+        } as any)
 
         const sumDealer = toNumber((agg as any)._sum?.dealerPrice)
         const sumTotal = toNumber((agg as any)._sum?.totalAmount)

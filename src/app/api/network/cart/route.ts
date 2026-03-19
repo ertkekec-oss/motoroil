@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prismaRaw } from "@/lib/prisma"
 import { requireDealerContext } from "@/lib/network/context"
 
 function toNumber(v: any) {
@@ -10,7 +10,7 @@ export async function GET() {
     try {
         const ctx = await requireDealerContext()
 
-        const cart = await prisma.dealerCart.findFirst({
+        const cart = await prismaRaw.dealerCart.findFirst({
             where: {
                 membershipId: ctx.activeMembershipId,
                 status: "ACTIVE",
@@ -42,7 +42,7 @@ export async function GET() {
         }
 
         // İskonto hesaplaması 
-        const membership = await prisma.dealerMembership.findUnique({
+        const membership = await prismaRaw.dealerMembership.findUnique({
             where: { id: ctx.activeMembershipId },
             select: { priceRule: { select: { discount: true, isActive: true } } },
         })

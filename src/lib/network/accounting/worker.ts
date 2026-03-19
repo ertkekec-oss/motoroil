@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma"
+import { prismaRaw as prisma } from "@/lib/prisma"
 
 const MAX_ATTEMPTS = 5
 

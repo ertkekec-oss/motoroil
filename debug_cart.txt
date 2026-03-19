@@ -1,0 +1,7 @@
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+Checking products:
+
+FAILLLLL: Error: SECURITY_ERROR: Access to model 'Product' denied without active session.
+    at Array.$allOperations (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\lib\prisma.ts:288:27)
+    at async l (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async main (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\debug_cart.ts:6:19)

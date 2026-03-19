@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prismaRaw as prisma } from "@/lib/prisma"
 import { requireDealerSession } from "@/lib/network/session"
 import { readActiveMembershipId } from "@/lib/network/cookies"
 

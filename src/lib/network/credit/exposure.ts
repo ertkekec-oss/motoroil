@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma"
+import { prismaRaw as prisma } from "@/lib/prisma"
 
 export const CREDIT_EXPOSURE_STATUSES = [
     "PENDING_APPROVAL",

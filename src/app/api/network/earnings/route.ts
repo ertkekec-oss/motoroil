@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authorize } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { prismaRaw as prisma } from "@/lib/prisma";
 import { startOfDay, addDays, subDays } from "date-fns";
 
 export async function GET(req: NextRequest) {

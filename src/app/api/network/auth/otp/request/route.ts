@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prismaRaw as prisma } from "@/lib/prisma"
 import { randomNumericCode, sha256Base64 } from "@/lib/network/crypto"
 import { consumeRateLimit, RateLimitError, cleanupRateLimitEvents } from "@/lib/network/rateLimit"
 import { getClientIp } from "@/lib/network/ip"

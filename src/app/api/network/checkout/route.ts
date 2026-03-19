@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { randomBytes } from "crypto"
-import prisma from "@/lib/prisma"
+import { prismaRaw as prisma } from "@/lib/prisma"
 import { requireDealerContext } from "@/lib/network/context"
 import { enqueueAccountingEvent } from "@/lib/network/accounting/outbox"
 import { computeExposureBase } from "@/lib/network/credit/exposure"

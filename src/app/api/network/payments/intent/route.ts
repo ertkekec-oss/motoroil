@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prismaRaw as prisma } from "@/lib/prisma";
 import { requireDealerContext } from "@/lib/network/context";
 import { getPaymentProviderAdapter } from "@/lib/network/payments/getProvider";
 import { PaymentScope } from "@/lib/network/payments/types";

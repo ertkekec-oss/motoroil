@@ -102,6 +102,13 @@ const prismaClientSingleton = () => {
                         return query(args);
                     }
 
+                    // 0. Manual Internal Bypass
+                    if ((args as any)?.adminBypass) {
+                        const newArgs = { ...(args as any) };
+                        delete newArgs.adminBypass;
+                        return query(newArgs);
+                    }
+
                     const session: any = await getSession();
                     const user = session?.user || session;
 
@@ -111,14 +118,8 @@ const prismaClientSingleton = () => {
                         const impersonateId = user.impersonateTenantId;
                         const isPlatformAdmin = tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
 
-                        // 1. Platform Admin veya Internal Bypass Kontrolü
-                        if (isPlatformAdmin && (!impersonateId || (args as any)?.adminBypass)) {
-                            const newArgs = { ...(args as any) };
-                            if (newArgs.adminBypass) delete newArgs.adminBypass;
-                            return query(newArgs);
-                        }
-
-                        if ((args as any)?.adminBypass) {
+                        // 1. Platform Admin Kontrolü
+                        if (isPlatformAdmin && !impersonateId) {
                             return query(args);
                         }
 
@@ -295,10 +296,15 @@ const prismaClientSingleton = () => {
 // Use a global variable to store the singleton to avoid circularity and hot-reload issues
 const globalForPrisma = globalThis as unknown as {
     prisma: any;
+    prismaRaw: any;
 };
 
+export const prismaRaw = globalForPrisma.prismaRaw ?? new PrismaClient();
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = prisma;
+    globalForPrisma.prismaRaw = prismaRaw;
+}
 
 export default prisma;

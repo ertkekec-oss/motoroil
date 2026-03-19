@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prismaRaw as prisma } from "@/lib/prisma"
 import { sha256Base64 } from "@/lib/network/crypto"
 import { hashPassword } from "@/lib/auth"
 

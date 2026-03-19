@@ -1,0 +1,3 @@
+﻿src/components/AdvisorExportModule.tsx(204,36): error TS2304: Cannot find name 'Loader2'.
+src/components/StaffManagementContent.tsx(1616,112): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
