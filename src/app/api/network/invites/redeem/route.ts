@@ -185,17 +185,30 @@ export async function POST(req: Request) {
 
             if (supplierCompany) {
                 // Check if customer already exists for this vergi No or phone
-                const existingCustomer = await tx.customer.findFirst({
+                const orConditions: any[] = [];
+                if (taxNumber) orConditions.push({ taxNumber });
+                if (email) orConditions.push({ email });
+
+                const existingCustomer = orConditions.length > 0 ? await tx.customer.findFirst({
                     where: { 
                         companyId: supplierCompany.id,
-                        OR: [
-                            { taxNumber: taxNumber },
-                            { phone: phoneE164 }
-                        ]
+                        OR: orConditions
                     },
-                    select: { id: true }
-                })
-                if (!existingCustomer) {
+                    select: { id: true, deletedAt: true }
+                }) : null;
+
+                if (existingCustomer) {
+                    if (existingCustomer.deletedAt) {
+                        await tx.customer.update({
+                            where: { id: existingCustomer.id },
+                            data: {
+                                deletedAt: null,
+                                supplierClass: "B2B_DEALER",
+                                customerClass: "B2B_BAYI",
+                            }
+                        });
+                    }
+                } else {
                     // Kategori bul ("Genel" kategorisi)
                     let targetCategoryId = null;
                     const generalCat = await tx.customerCategory.findFirst({
