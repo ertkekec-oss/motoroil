@@ -44,8 +44,8 @@ export default function AdvisorPage() {
             </header>
 
             {/* Navigation Zone v2: Enterprise Tabs */}
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl p-1.5 mb-8 shadow-sm border border-slate-200 dark:border-white/5 w-full overflow-x-auto custom-scroll">
-                <div className="flex items-center gap-1 min-w-max">
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl p-2 mb-8 shadow-sm border border-slate-200 dark:border-white/5 w-full">
+                <div className="flex flex-wrap items-center justify-start gap-1.5">
                     {[
                         { id: 'checks', label: 'Çek & Senet', icon: <Ticket className="w-4 h-4" /> },
                         { id: 'health', label: 'Finans', icon: <Activity className="w-4 h-4" /> },

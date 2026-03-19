@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { ShieldCheck, AlertTriangle, Info, XOctagon, Loader2, ArrowRight, Shield, Activity } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Info, XOctagon, Loader2, ArrowRight, Shield, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function FinancialAuditContent() {
     const [issues, setIssues] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ISSUES_PER_PAGE = 10;
 
     useEffect(() => {
         const fetchAudit = async () => {
@@ -73,30 +75,70 @@ export default function FinancialAuditContent() {
                     <p className="text-slate-600 dark:text-slate-300 mt-2 font-medium max-w-lg mx-auto">Tüm finansal kayıtlarınız yasal mevzuata, vergi kanunlarına ve genel kabul görmüş muhasebe standartlarına tamamen uygun görünüyor.</p>
                 </div>
             ) : (
-                <div className="space-y-4">
-                    {issues?.map((issue, idx) => (
-                        <div key={idx} className={`p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-4 ${getColor(issue.type)} border border-slate-200 dark:border-white/5 shadow-sm transition-all hover:shadow-md group`}>
-                            <div className="mt-1 md:mt-0 shrink-0">{getIcon(issue.type)}</div>
-                            <div className="flex-1">
-                                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
-                                    <h4 className="font-black text-slate-900 dark:text-white text-[15px]">{issue.title}</h4>
-                                    <span className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-black/30 px-3 py-1 rounded-full border border-slate-200 dark:border-white/10 uppercase tracking-widest shrink-0">
-                                        {new Date(issue.date).toLocaleDateString()} &middot; Fiş: {issue.fisNo}
-                                    </span>
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {issues.slice((currentPage - 1) * ISSUES_PER_PAGE, currentPage * ISSUES_PER_PAGE).map((issue, idx) => (
+                            <div key={idx} className={`p-6 rounded-[20px] flex flex-col justify-between ${getColor(issue.type)} border border-slate-200 dark:border-white/5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 group min-h-[220px] relative overflow-hidden bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl`}>
+                                <div>
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex gap-3">
+                                            <div className="shrink-0 mt-0.5">{getIcon(issue.type)}</div>
+                                            <div>
+                                                <h4 className="font-black text-slate-900 dark:text-white text-[16px] leading-tight line-clamp-2">{issue.title}</h4>
+                                                <div className="text-[11px] font-bold uppercase tracking-wider mt-2 flex flex-wrap gap-2 text-slate-500 dark:text-slate-400">
+                                                    <span>{new Date(issue.date).toLocaleDateString()}</span>
+                                                    <span>&bull;</span>
+                                                    <span>FİŞ: {issue.fisNo}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-slate-600 dark:text-slate-300 text-[13px] font-medium leading-relaxed line-clamp-3 mb-6">
+                                        {issue.description}
+                                    </p>
                                 </div>
-                                <p className="text-slate-600 dark:text-slate-300 text-[13px] font-medium mt-1 leading-relaxed max-w-4xl">{issue.description}</p>
-                                <div className="mt-3 flex gap-2 items-center text-[11px] font-bold uppercase tracking-wider">
-                                    <span className="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-white/5">{issue.category}</span>
-                                    {issue.account !== '-' && (
-                                        <span className="text-indigo-600 dark:text-indigo-400 font-mono bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-500/20">{issue.account}</span>
-                                    )}
+                                <div className="mt-auto flex flex-col xl:flex-row justify-between xl:items-center gap-4 pt-4 border-t border-slate-200/50 dark:border-white/5">
+                                    <div className="flex gap-2 items-center text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-[#0f172a] px-2.5 py-1 rounded shadow-sm border border-slate-200 dark:border-white/5">{issue.category}</span>
+                                        {issue.account !== '-' && (
+                                            <span className="text-indigo-600 dark:text-indigo-400 font-mono bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 rounded shadow-sm border border-indigo-100 dark:border-indigo-500/20">{issue.account}</span>
+                                        )}
+                                    </div>
+                                    <button className="px-5 h-10 w-full xl:w-auto rounded-xl font-bold text-[12px] text-slate-700 dark:text-slate-200 bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 flex justify-center items-center gap-2 transition-all shadow-sm">
+                                        İncele <ArrowRight className="w-4 h-4" />
+                                    </button>
                                 </div>
                             </div>
-                            <button className="px-4 h-11 w-full md:w-auto rounded-xl font-bold text-[13px] text-slate-600 dark:text-slate-300 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center gap-2 transition-all group-hover:border-slate-300 dark:group-hover:border-white/20">
-                                İncele <ArrowRight className="w-4 h-4" />
-                            </button>
+                        ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {issues.length > ISSUES_PER_PAGE && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-[#1e293b] p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+                            <span className="text-[13px] font-bold text-slate-500 dark:text-slate-400">
+                                Toplam <span className="text-slate-900 dark:text-white">{issues.length}</span> bulgudan <span className="text-slate-900 dark:text-white">{(currentPage - 1) * ISSUES_PER_PAGE + 1}-{Math.min(currentPage * ISSUES_PER_PAGE, issues.length)}</span> arası gösteriliyor
+                            </span>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+                                <div className="flex items-center justify-center px-4 font-black font-mono text-[14px] text-slate-900 dark:text-white">
+                                    {currentPage} / {Math.ceil(issues.length / ISSUES_PER_PAGE)}
+                                </div>
+                                <button 
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(issues.length / ISSUES_PER_PAGE)))}
+                                    disabled={currentPage === Math.ceil(issues.length / ISSUES_PER_PAGE)}
+                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                                >
+                                    <ChevronRight className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
-                    ))}
+                    )}
                 </div>
             )}
         </div>
