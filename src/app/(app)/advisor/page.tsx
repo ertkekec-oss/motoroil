@@ -20,10 +20,10 @@ export default function AdvisorPage() {
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 px-2">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-[6px]">FINANCE MODULE</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-[6px]">PERİODYA FİNANS</span>
                     </div>
                     <h1 className="text-[32px] font-bold text-slate-900 dark:text-white tracking-tight leading-none mb-2">
-                        Financial Command Center
+                        Finansal Yönetim Merkezi
                     </h1>
                     <p className="text-[14px] text-slate-500 dark:text-slate-400 font-medium">
                         Resmi muhasebe kayıtları, hesap planı ve finansal yönetişim paneli.
