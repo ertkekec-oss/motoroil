@@ -31,7 +31,15 @@ export async function GET(req: Request) {
             where.companyId = company.id;
         }
 
-        if (type && type !== 'all') where.type = type;
+        if (type && type !== 'all') {
+            if (type === 'In') {
+                where.type = { in: ['In', 'Alınan Çek', 'Alınan'] };
+            } else if (type === 'Out') {
+                where.type = { in: ['Out', 'Verilen Çek', 'Verilen'] };
+            } else {
+                where.type = type;
+            }
+        }
         if (status && status !== 'all') where.status = status;
 
         if (start && end) {
