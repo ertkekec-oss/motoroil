@@ -25,6 +25,12 @@ export default function CheckModule() {
     const [filterType, setFilterType] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
 
+    // Collection Modal State
+    const [collectionModalOpen, setCollectionModalOpen] = useState(false);
+    const [selectedCheckForCollection, setSelectedCheckForCollection] = useState<any>(null);
+    const [collectionTargetKasaId, setCollectionTargetKasaId] = useState('');
+    const [collectionActionType, setCollectionActionType] = useState<string>('');
+
     // New Data Form
     const [formData, setFormData] = useState({
         type: 'In', // In (Alınan), Out (Verilen)
@@ -85,33 +91,30 @@ export default function CheckModule() {
 
     const handleStatusChange = async (id: string, newStatus: string) => {
         if (newStatus === 'Tahsil Edildi' || newStatus === 'Ödendi') {
+            const check = checks.find(c => c.id === id);
+            if (!check) return;
             const banks = kasalar.filter((k: any) => k.type.toLowerCase().includes('bank') || k.type === 'Banka');
-
             if (banks.length === 0) {
                 showError('Hata', 'İşlem için tanımlı bir banka kasası bulunamadı.');
                 return;
             }
-
-            const kasaOptions = banks?.map(b => `${b.name}`).join(', ');
-            showPrompt(
-                'Kasa Seçimi',
-                `Tahsilat/Ödeme yapılacak kasayı yazınız:\n(${kasaOptions})`,
-                (selectedKasaName) => {
-                    if (!selectedKasaName) return;
-
-                    const selectedKasa = banks.find(b => b.name.toLowerCase() === selectedKasaName.toLowerCase());
-                    if (!selectedKasa) {
-                        showError('Hata', 'Geçersiz kasa seçimi.');
-                        return;
-                    }
-
-                    updateStatus(id, newStatus, String(selectedKasa.id));
-                },
-                banks[0].name
-            );
+            setSelectedCheckForCollection(check);
+            setCollectionActionType(newStatus);
+            setCollectionTargetKasaId(banks.length > 0 ? String(banks[0].id) : '');
+            setCollectionModalOpen(true);
         } else {
             updateStatus(id, newStatus);
         }
+    };
+
+    const handleExecuteCollection = () => {
+        if (!selectedCheckForCollection || !collectionTargetKasaId) {
+            showError("Hata", "Lütfen bir kasa veya banka seçin.");
+            return;
+        }
+        updateStatus(selectedCheckForCollection.id, collectionActionType, collectionTargetKasaId);
+        setCollectionModalOpen(false);
+        setSelectedCheckForCollection(null);
     };
 
     const updateStatus = async (id: string, status: string, kasaId?: string) => {
@@ -537,6 +540,92 @@ export default function CheckModule() {
                     )}
                 </div>
             </div>
+
+            {/* COLLECTION MODAL */}
+            {collectionModalOpen && selectedCheckForCollection && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 shadow-2xl rounded-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className={`p-6 border-b ${collectionActionType === 'Tahsil Edildi' ? 'border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/5' : 'border-blue-100 dark:border-blue-500/20 bg-blue-50/50 dark:bg-blue-500/5'}`}>
+                            <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shadow-sm ${collectionActionType === 'Tahsil Edildi' ? 'bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400' : 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400'}`}>
+                                    <Wallet className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                                        {collectionActionType === 'Tahsil Edildi' ? 'Çek Tahsilatı' : 'Çek / Senet Ödemesi'}
+                                    </h3>
+                                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                                        Fiziki portföyden banka hesabına geçiş
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Information Block */}
+                            <div className="bg-slate-50 dark:bg-[#1e293b] rounded-xl p-4 border border-slate-100 dark:border-white/5 flex justify-between items-center">
+                                <div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                                        {collectionActionType === 'Tahsil Edildi' ? 'Gönderen (Müşteri)' : 'Alıcı (Tedarikçi)'}
+                                    </div>
+                                    <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                                        {selectedCheckForCollection.customer?.name || selectedCheckForCollection.supplier?.name || '-'}
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                                        Tutar
+                                    </div>
+                                    <div className={`text-lg font-black ${collectionActionType === 'Tahsil Edildi' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>
+                                        ₺{Number(selectedCheckForCollection.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bank Selection */}
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-black tracking-widest text-slate-500 dark:text-slate-400 uppercase flex items-center gap-1.5 ml-1">
+                                    <Wallet className="w-3.5 h-3.5" /> Hedef Kasa / Banka 
+                                </label>
+                                <select 
+                                    className="w-full h-12 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl px-4 text-[13px] font-bold outline-none focus:border-blue-500 transition-all appearance-none"
+                                    value={collectionTargetKasaId}
+                                    onChange={(e) => setCollectionTargetKasaId(e.target.value)}
+                                >
+                                    <option value="">Seçiniz...</option>
+                                    {kasalar.filter((k: any) => k.type.toLowerCase().includes('bank') || k.type === 'Banka').map((kasa: any) => (
+                                        <option key={kasa.id} value={kasa.id}>{kasa.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Warning Note */}
+                            <div className="bg-amber-50 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20 rounded-xl p-3 text-amber-800 dark:text-amber-400 flex items-start gap-3">
+                                <div className="text-lg">ℹ️</div>
+                                <p className="text-[11px] font-semibold leading-relaxed pt-0.5">
+                                    Bu işlem, seçili çekin tutarını doğrudan {collectionTargetKasaId ? kasalar.find((k:any)=>String(k.id)===collectionTargetKasaId)?.name : 'hedef bankaya'} aktaracak ve çeki sistemde kapatacaktır. Bu işlem bir finansal muhasebe fişi (102 Bankalar / 101 Alınan Çekler vb.) oluşturur.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="p-5 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0f172a] flex justify-end gap-3 rounded-b-2xl">
+                            <button 
+                                onClick={() => setCollectionModalOpen(false)} 
+                                className="px-6 h-11 rounded-xl text-slate-600 dark:text-slate-400 font-bold text-sm bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                            >
+                                İptal
+                            </button>
+                            <button 
+                                onClick={handleExecuteCollection} 
+                                className={`px-6 h-11 rounded-xl font-bold text-sm text-white shadow-md active:scale-95 transition-all flex items-center gap-2 ${collectionActionType === 'Tahsil Edildi' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'}`}
+                            >
+                                <CheckCircle2 className="w-4 h-4" /> 
+                                İşlemi Tamamla
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
