@@ -44,25 +44,25 @@ export default function AdvisorPage() {
             </header>
 
             {/* Navigation Zone v2: Enterprise Tabs */}
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl p-2 mb-8 shadow-sm border border-slate-200 dark:border-white/5 w-full">
-                <div className="flex flex-wrap items-center justify-start gap-1.5">
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl p-1.5 mb-8 shadow-sm border border-slate-200 dark:border-white/5 w-full overflow-hidden">
+                <div className="flex items-center justify-between gap-0.5 md:gap-1 w-full">
                     {[
-                        { id: 'checks', label: 'Çek & Senet', icon: <Ticket className="w-4 h-4" /> },
-                        { id: 'health', label: 'Finans', icon: <Activity className="w-4 h-4" /> },
-                        { id: 'plan', label: 'Hesap Planı', icon: <ListTree className="w-4 h-4" /> },
-                        { id: 'mizan', label: 'Mizan', icon: <Scale className="w-4 h-4" /> },
-                        { id: 'income', label: 'Gelir Tablosu', icon: <BarChart3 className="w-4 h-4" /> },
-                        { id: 'vat', label: 'KDV Simülasyonu', icon: <Calculator className="w-4 h-4" /> },
-                        { id: 'babs', label: 'BA/BS', icon: <Handshake className="w-4 h-4" /> },
-                        { id: 'audit', label: 'Denetim', icon: <ShieldCheck className="w-4 h-4" /> },
-                        { id: 'export', label: 'Veri Aktarımı', icon: <Import className="w-4 h-4" /> },
+                        { id: 'checks', label: 'Çek & Senet', icon: <Ticket className="w-4 h-4 shrink-0" /> },
+                        { id: 'health', label: 'Finans', icon: <Activity className="w-4 h-4 shrink-0" /> },
+                        { id: 'plan', label: 'Hesap Planı', icon: <ListTree className="w-4 h-4 shrink-0" /> },
+                        { id: 'mizan', label: 'Mizan', icon: <Scale className="w-4 h-4 shrink-0" /> },
+                        { id: 'income', label: 'Gelir Tablosu', icon: <BarChart3 className="w-4 h-4 shrink-0" /> },
+                        { id: 'vat', label: 'KDV Simülasyonu', icon: <Calculator className="w-4 h-4 shrink-0" /> },
+                        { id: 'babs', label: 'BA/BS', icon: <Handshake className="w-4 h-4 shrink-0" /> },
+                        { id: 'audit', label: 'Denetim', icon: <ShieldCheck className="w-4 h-4 shrink-0" /> },
+                        { id: 'export', label: 'Veri Aktarımı', icon: <Import className="w-4 h-4 shrink-0" /> },
                     ].map((tab) => {
                         const isActive = activeTab === tab.id;
                         return (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`flex items-center gap-2 h-11 px-5 rounded-xl text-[13px] font-bold transition-all relative whitespace-nowrap ${
+                                className={`flex flex-1 items-center justify-center gap-1.5 md:gap-2 h-10 lg:h-11 px-1 lg:px-4 rounded-xl text-[11px] lg:text-[13px] font-bold transition-all whitespace-nowrap ${
                                     isActive
                                         ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-500/20'
                                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent'
