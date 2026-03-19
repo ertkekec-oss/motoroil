@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { Ticket, Activity, ListTree, Scale, BarChart3, Calculator, Handshake, ShieldCheck, Import, FileText, DownloadCloud } from 'lucide-react';
 import CheckModule from '@/components/CheckModule';
 import AccountPlanContent from '@/components/AccountPlanContent';
 import TrialBalanceContent from '@/components/TrialBalanceContent';
@@ -17,58 +18,58 @@ export default function AdvisorPage() {
     return (
         <div className="p-6 md:p-10 animate-in fade-in duration-500 font-sans min-h-screen bg-[#F6F8FB] dark:bg-[#0F172A] text-slate-900 dark:text-white">
             {/* Header Redesign: Strategic Zone */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 px-2">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-[6px]">PERİODYA FİNANS</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 rounded-[6px] border border-indigo-100 dark:border-indigo-500/20">PERİODYA FİNANS</span>
                     </div>
-                    <h1 className="text-[32px] font-bold text-slate-900 dark:text-white tracking-tight leading-none mb-2">
-                        Finansal Yönetim Merkezi
+                    <h1 className="text-[32px] font-black text-slate-900 dark:text-white tracking-tight leading-none mb-2">
+                        Mali Müşavir & Finans Merkezi
                     </h1>
                     <p className="text-[14px] text-slate-500 dark:text-slate-400 font-medium">
-                        Resmi muhasebe kayıtları, hesap planı ve finansal yönetişim paneli.
+                        Resmi muhasebe kayıtları, hesap planı, vergi simülasyonları ve finansal yönetişim paneli.
                     </p>
                 </div>
                 {/* Contextual Action Bar */}
                 <div className="flex items-center gap-3">
-                    <button className="h-[44px] px-6 rounded-[12px] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-[13px] font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                    <button className="h-[44px] px-6 rounded-xl border-2 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 text-[13px] font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2">
+                         <FileText className="w-4 h-4 text-slate-400" />
                         Geçmiş Dönem
                     </button>
-                    <button className="h-[44px] px-6 rounded-[12px] bg-blue-600 text-white text-[13px] font-semibold hover:bg-blue-700 transition-all">
-                        Yeni Rapor Oluştur
+                    <button className="h-[44px] px-6 rounded-xl bg-indigo-600 text-white text-[13px] font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 flex items-center gap-2">
+                        <DownloadCloud className="w-4 h-4" />
+                        Aylık Rapor İndir
                     </button>
                 </div>
             </header>
 
-            {/* Navigation Zone v2 */}
-            <div className="flex border-b border-slate-200 dark:border-slate-800 mb-8 w-full overflow-x-auto custom-scroll select-none">
-                <div className="flex h-[48px] items-end gap-8 px-2 w-full min-w-max">
+            {/* Navigation Zone v2: Enterprise Tabs */}
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl p-1.5 mb-8 shadow-sm border border-slate-200 dark:border-white/5 w-full overflow-x-auto custom-scroll">
+                <div className="flex items-center gap-1 min-w-max">
                     {[
-                        { id: 'checks', label: 'Çek & Senet' },
-                        { id: 'health', label: 'Finans' },
-                        { id: 'plan', label: 'Hesap Planı' },
-                        { id: 'mizan', label: 'Genel Mizan' },
-                        { id: 'income', label: 'Gelir Tablosu' },
-                        { id: 'vat', label: 'KDV Simülasyonu' },
-                        { id: 'babs', label: 'BA/BS' },
-                        { id: 'audit', label: 'Denetim' },
-                        { id: 'export', label: 'Veri Aktarımı (Luca/Zirve)' },
+                        { id: 'checks', label: 'Çek & Senet', icon: <Ticket className="w-4 h-4" /> },
+                        { id: 'health', label: 'Finans', icon: <Activity className="w-4 h-4" /> },
+                        { id: 'plan', label: 'Hesap Planı', icon: <ListTree className="w-4 h-4" /> },
+                        { id: 'mizan', label: 'Mizan', icon: <Scale className="w-4 h-4" /> },
+                        { id: 'income', label: 'Gelir Tablosu', icon: <BarChart3 className="w-4 h-4" /> },
+                        { id: 'vat', label: 'KDV Simülasyonu', icon: <Calculator className="w-4 h-4" /> },
+                        { id: 'babs', label: 'BA/BS', icon: <Handshake className="w-4 h-4" /> },
+                        { id: 'audit', label: 'Denetim', icon: <ShieldCheck className="w-4 h-4" /> },
+                        { id: 'export', label: 'Veri Aktarımı', icon: <Import className="w-4 h-4" /> },
                     ].map((tab) => {
                         const isActive = activeTab === tab.id;
                         return (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`pb-3 text-[14px] font-semibold transition-all relative whitespace-nowrap ${
+                                className={`flex items-center gap-2 h-11 px-5 rounded-xl text-[13px] font-bold transition-all relative whitespace-nowrap ${
                                     isActive
-                                        ? 'text-blue-600 dark:text-blue-400'
-                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                                        ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-500/20'
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent'
                                 }`}
                             >
+                                {tab.icon}
                                 {tab.label}
-                                {isActive && (
-                                    <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>
-                                )}
                             </button>
                         );
                     })}
