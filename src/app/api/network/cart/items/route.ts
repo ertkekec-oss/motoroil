@@ -15,14 +15,15 @@ export async function POST(req: Request) {
         }
 
         // Product'ın bu tedarikçiye ait olduğunu kontrol et ve stok doğrula
-        const product = await prisma.product.findFirst({
+        const product: any = await prisma.product.findFirst({
             where: {
                 id: productId,
                 company: { tenantId: ctx.supplierTenantId }, // supplier kısıtlaması
                 deletedAt: null,
             },
             select: { id: true, stock: true, reservedStock: true }, // "stockQty" şemada "stock"
-        })
+            adminBypass: true,
+        } as any)
 
         if (!product) {
             return NextResponse.json({ ok: false, error: "PRODUCT_NOT_FOUND_OR_UNAUTHORIZED" }, { status: 404 })
@@ -86,9 +87,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ ok: true })
     } catch (error: any) {
+        console.error("Cart POST Error:", error)
         if (error.message === "UNAUTHORIZED" || error.message === "NO_ACTIVE_MEMBERSHIP" || error.message === "INVALID_MEMBERSHIP_CONTEXT") {
             return NextResponse.json({ ok: false, error: error.message }, { status: 403 })
         }
-        return NextResponse.json({ ok: false, error: "CART_ERROR" }, { status: 500 })
+        return NextResponse.json({ ok: false, error: "CART_ERROR", details: error.message }, { status: 500 })
     }
 }
