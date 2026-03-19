@@ -8,12 +8,17 @@ export async function POST(req: Request) {
 
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
+    const role = auth.user.role?.toLowerCase() || '';
+    const hasAccess = isPlatformAdmin ||
+                      role.includes('admin') ||
+                      role.includes('owner') ||
+                      role.includes('müdür') ||
+                      role.includes('manager') ||
+                      auth.user.permissions?.includes('staff_manage');
 
-    if (!isPlatformAdmin &&
-        auth.user.role?.toLowerCase() !== 'admin' &&
-        auth.user.role?.toLowerCase() !== 'müdür' &&
-        !auth.user.permissions?.includes('staff_manage')) {
-        return NextResponse.json({ success: false, error: "PDKS onaylama yetkiniz bulunmamaktadır." }, { status: 403 });
+    // Yetki kontrolü (Onay mekanizması)
+    if (!hasAccess) {
+        return NextResponse.json({ success: false, error: "PDKS işlem onayı için yetkiniz bulunmamaktadır." }, { status: 403 });
     }
 
     try {

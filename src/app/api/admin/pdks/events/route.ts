@@ -9,11 +9,16 @@ export async function GET(req: Request) {
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
 
+    const role = auth.user.role?.toLowerCase() || '';
+    const hasAccess = isPlatformAdmin || 
+                      role.includes('admin') || 
+                      role.includes('owner') || 
+                      role.includes('müdür') || 
+                      role.includes('manager') ||
+                      auth.user.permissions?.includes('staff_manage');
+
     // Yetki kontrolü (Admin, Müdür veya staff_manage yetkisi olanlar görebilir)
-    if (!isPlatformAdmin &&
-        auth.user.role?.toLowerCase() !== 'admin' &&
-        auth.user.role?.toLowerCase() !== 'müdür' &&
-        !auth.user.permissions?.includes('staff_manage')) {
+    if (!hasAccess) {
         return NextResponse.json({ success: false, error: "PDKS kayıtlarını görme yetkiniz bulunmamaktadır." }, { status: 403 });
     }
 
