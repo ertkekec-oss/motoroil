@@ -37,7 +37,7 @@ export default function NetworkCatalogPage() {
     const addToCart = async (p: any, qty: number) => {
         setAddingToCart(p.id)
         try {
-            const res = await fetch("/api/network/cart", {
+            const res = await fetch("/api/network/cart/items", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
