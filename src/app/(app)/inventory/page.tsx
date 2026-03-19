@@ -602,7 +602,8 @@ function InventoryContent() {
         "unit",
         "currency",
         "purchaseCurrency",
-        "otvCode"
+        "otvCode",
+        "globalCategoryId"
       ];
       const updateData: any = {};
       validFields.forEach((field) => {
@@ -760,6 +761,7 @@ function InventoryContent() {
       showDescriptionOnInvoice: false,
       shelfLocation: "",
       tags: "",
+      globalCategoryId: undefined,
       branch: activeBranchName || "Merkez",
       imageUrl: undefined,
       imageKey: undefined,

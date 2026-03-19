@@ -35,6 +35,14 @@ export default function ProductWizardModal({
     generateCombinations = () => { },
 }: any) {
     const [currentStep, setCurrentStep] = useState(1);
+    const [globalCategories, setGlobalCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetch("/api/catalog/global-categories")
+            .then(res => res.json())
+            .then(d => { if (d.success) setGlobalCategories(d.categories); })
+            .catch(e => console.error("Global categories fetch error:", e));
+    }, []);
     const totalSteps = 5;
     
     const router = useRouter();
@@ -210,7 +218,7 @@ export default function ProductWizardModal({
                         <StepPricingTax mode={mode} data={data} onChange={onChange} />
                     )}
                     {currentStep === 3 && (
-                        <StepOtherInfo mode={mode} data={data} onChange={onChange} categories={categories} />
+                        <StepOtherInfo mode={mode} data={data} onChange={onChange} categories={categories} globalCategories={globalCategories} />
                     )}
                     {currentStep === 4 && (
                         <StepVariantsPriceLists

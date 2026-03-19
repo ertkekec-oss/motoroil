@@ -119,7 +119,7 @@ export async function POST(request: Request) {
             salesOiv, salesOtv, otvType, otvCode, isParent, variantsData, unit,
             currency, purchaseCurrency, imageUrl, imageKey,
             description, countryCode, invoiceTitle, showDescriptionOnInvoice, shelfLocation, tags, gtin,
-            purchaseDiscount, purchaseOtv
+            purchaseDiscount, purchaseOtv, globalCategoryId
         } = body;
 
         const targetBranch = branch || 'Merkez';
@@ -136,6 +136,7 @@ export async function POST(request: Request) {
                     barcode: barcode || '',
                     brand: brand || '',
                     category: category || 'Genel',
+                    globalCategoryId: globalCategoryId || null,
                     type: type || 'Ürün',
                     stock: isParent ? 0 : initialQty,
                     price: parseFloat(price) || 0,

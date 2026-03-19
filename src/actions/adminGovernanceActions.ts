@@ -24,7 +24,7 @@ export async function createCategoryAction(data: { name: string; parentId?: stri
             slug: data.slug,
         }
     });
-    revalidatePath("/admin/catalog/categories");
+    revalidatePath("/admin/settings/categories");
     return { success: true, category };
 }
 
@@ -34,7 +34,7 @@ export async function updateCategoryAction(id: string, data: { name?: string; ac
         where: { id },
         data
     });
-    revalidatePath("/admin/catalog/categories");
+    revalidatePath("/admin/settings/categories");
     return { success: true };
 }
 
@@ -50,7 +50,7 @@ export async function addCategoryAttributeAction(categoryId: string, data: { nam
             } : undefined
         }
     });
-    revalidatePath("/admin/catalog/categories");
+    revalidatePath("/admin/settings/categories");
     return { success: true };
 }
 

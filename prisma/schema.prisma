@@ -385,6 +385,7 @@ model Product {
   shelfLocation                     String?
   tags                              String?
   gtin                              String?
+  globalCategoryId                  String?
   b2bSuggestions                    B2BSuggestion[]
   bomsAsProduct                     Bom[]                    @relation("ProductBom")
   bomItemsAsMaterial                BomItem[]                @relation("ProductBomItem")
@@ -398,6 +399,7 @@ model Product {
   networkListings                   NetworkListing[]
   offerLines                        OfferLine[]
   company                           Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  globalCategory                    GlobalCategory?          @relation("ProductGlobalCategory", fields: [globalCategoryId], references: [id])
   parent                            Product?                 @relation("ProductVariants", fields: [parentId], references: [id])
   variants                          Product[]                @relation("ProductVariants")
   productPrices                     ProductPrice[]
@@ -417,6 +419,7 @@ model Product {
   @@index([reservedStock])
   @@index([companyId, deletedAt, category])
   @@index([companyId, isParent, deletedAt])
+  @@index([globalCategoryId])
 }
 
 model VariantAttribute {
@@ -2756,6 +2759,7 @@ model GlobalCategory {
   parent           GlobalCategory?              @relation("CategoryToCategory", fields: [parentId], references: [id])
   children         GlobalCategory[]             @relation("CategoryToCategory")
   products         GlobalProduct[]
+  tenantProducts   Product[]                    @relation("ProductGlobalCategory")
 
   @@index([parentId])
 }
