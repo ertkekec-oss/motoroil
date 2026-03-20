@@ -13,7 +13,7 @@ export async function GET() {
                 status: true,
                 tenantId: true,
                 creditLimit: true,
-                tenant: { select: { id: true, name: true } },
+                tenant: { select: { id: true, name: true, ownerEmail: true, phone: true, companies: { take: 1, select: { vkn: true, address: true, city: true, district: true, taxOffice: true } } } },
                 dealerCompany: { select: { id: true, companyName: true } },
             },
         })
@@ -43,6 +43,13 @@ export async function GET() {
                 creditLimit,
                 balance,
                 currency: "TRY",
+                supplierEmail: membership.tenant?.ownerEmail ?? null,
+                supplierPhone: membership.tenant?.phone ?? null,
+                supplierAddress: membership.tenant?.companies?.[0]?.address ?? null,
+                supplierCity: membership.tenant?.companies?.[0]?.city ?? null,
+                supplierDistrict: membership.tenant?.companies?.[0]?.district ?? null,
+                supplierVkn: membership.tenant?.companies?.[0]?.vkn ?? null,
+                supplierTaxOffice: membership.tenant?.companies?.[0]?.taxOffice ?? null,
             },
         })
     } catch (error: any) {
