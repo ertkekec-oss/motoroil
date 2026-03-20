@@ -23,6 +23,8 @@ export default function DealersPage() {
     const [selectedDealer, setSelectedDealer] = useState<any>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [newCreditLimit, setNewCreditLimit] = useState("");
+    const [newCategoryId, setNewCategoryId] = useState("");
+    const [appCategories, setAppCategories] = useState<any[]>([]);
 
     const fetchDealers = () => {
         fetch("/api/dealer-network/dealers")
@@ -42,6 +44,14 @@ export default function DealersPage() {
                 if (data.customers) setCustomers(data.customers);
                 else if (data.data) setCustomers(data.data);
                 else if (Array.isArray(data)) setCustomers(data);
+            })
+            .catch(err => console.error(err));
+
+        fetch("/api/customers/categories") // Fetch customer categories
+            .then(res => res.json())
+            .then(data => {
+                if (data.data) setAppCategories(data.data);
+                else if (Array.isArray(data)) setAppCategories(data);
             })
             .catch(err => console.error(err));
     }, []);
@@ -102,17 +112,18 @@ export default function DealersPage() {
             const res = await fetch(`/api/dealer-network/dealers/${selectedDealer.id}/credit-limit`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ creditLimit: parseFloat(newCreditLimit) })
+                body: JSON.stringify({ creditLimit: parseFloat(newCreditLimit), categoryId: newCategoryId })
             });
             const data = await res.json();
             if (!res.ok) {
-                throw new Error(data.error || "Limit güncellenemedi.");
+                throw new Error(data.error || "Limit/Kategori güncellenemedi.");
             }
             setIsDrawerOpen(false);
             setSelectedDealer(null);
             setNewCreditLimit("");
-            toast.success("Kredi limiti güncellendi.");
-            setDealers(prev => prev.map(d => d.id === selectedDealer.id ? { ...d, creditLimit: newCreditLimit } : d));
+            setNewCategoryId("");
+            toast.success("Bayi finansal ayarları güncellendi.");
+            setDealers(prev => prev.map(d => d.id === selectedDealer.id ? { ...d, creditLimit: newCreditLimit, categoryId: newCategoryId } : d));
         } catch (error: any) {
             toast.error(error.message || "Limit güncellenemedi.");
         }
@@ -121,6 +132,7 @@ export default function DealersPage() {
     const openCreditDrawer = (dealer: any) => {
         setSelectedDealer(dealer);
         setNewCreditLimit(dealer.creditLimit?.toString() || "");
+        setNewCategoryId(dealer.categoryId || "");
         setIsDrawerOpen(true);
     };
 
@@ -355,7 +367,7 @@ export default function DealersPage() {
                         <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 <CreditCard className="w-5 h-5 text-indigo-500" />
-                                Finansal Limitler
+                                Finansal ve Kategori Ayarları
                             </h2>
                             <button onClick={() => setIsDrawerOpen(false)} className="text-slate-400 hover:text-slate-600 dark:text-slate-400 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <X className="w-5 h-5" />
@@ -381,11 +393,28 @@ export default function DealersPage() {
                                 <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl p-4">
                                     <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Bu limit bayi tarafından yapılabilecek maksimum açık hesap alışveriş hacmini belirler. Siparişleri sırasında bu limit referans alınacaktır.</p>
                                 </div>
+
+                                <div className="mt-6 space-y-3 border-t border-slate-200 dark:border-slate-800 pt-6">
+                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Bayi Özel Fiyat Kategorisi (Cari Sınıfı)</label>
+                                    <select
+                                        value={newCategoryId}
+                                        onChange={e => setNewCategoryId(e.target.value)}
+                                        className="block w-full rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 sm:text-base font-medium bg-white dark:bg-[#0f172a] transition-all"
+                                    >
+                                        <option value="">-- Standart Satış Fiyatı (Kategori Yok) --</option>
+                                        {appCategories.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl p-4">
+                                        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Seçilen sınıfa atanmış bir fiyat listesi varsa, bu bayi B2B sipariş ekranında Ana Fiyat yerine o listeye ait fiyatları görür.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-end gap-3 flex-shrink-0">
                             <button onClick={() => setIsDrawerOpen(false)} className="px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">İptal</button>
-                            <button onClick={handleUpdateCreditLine} className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-600/20">Limiti Güncelle</button>
+                            <button onClick={handleUpdateCreditLine} className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-600/20">Ayarları Güncelle</button>
                         </div>
                     </div>
                 </div>

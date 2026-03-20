@@ -14,8 +14,14 @@ export async function GET(req: Request) {
 
         const membership = await prisma.dealerMembership.findUnique({
             where: { id: membershipId },
-            select: { tenantId: true, dealerCompanyId: true }
+            select: { tenantId: true, dealerCompanyId: true, categoryId: true }
         })
+
+        let priceListId = null;
+        if (membership && membership.categoryId) {
+            const custCat = await prisma.customerCategory.findUnique({ where: { id: membership.categoryId } });
+            if (custCat) priceListId = custCat.priceListId;
+        }
 
         if (!membership) {
             return NextResponse.json({ ok: false, error: "MEMBERSHIP_NOT_FOUND" }, { status: 404 })
@@ -53,6 +59,8 @@ export async function GET(req: Request) {
                         stock: true,
                         imageUrl: true,
                         category: true,
+                        description: true,
+                        ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                         variants: {
                             select: {
                                 id: true,
@@ -73,9 +81,19 @@ export async function GET(req: Request) {
             nextCursor = nextItem?.id;
         }
 
-        const products = catalogItems.map(item => {
+        const products = catalogItems.map((item: any) => {
             const prod = item.product;
-            const priceResolved = Number(item.price ?? prod.price ?? 0);
+            
+            // 1. Check mapped PriceList from Cari Kategorisi
+            let listPrice = null;
+            if (priceListId && prod.productPrices && prod.productPrices.length > 0) {
+                listPrice = Number(prod.productPrices[0].price);
+            }
+
+            // 2. Resolve Price: Override ListPrice / DealerCatalogItemPrice / Default ProductPrice
+            const priceResolved = listPrice !== null 
+                ? listPrice 
+                : Number(item.price ?? prod.price ?? 0);
 
             const variantValues = Array.isArray(prod.variants) ? prod.variants : []
             const variantStock = variantValues.reduce((acc: number, v: any) => acc + (v.stock || 0), 0);
@@ -87,6 +105,7 @@ export async function GET(req: Request) {
                 sku: prod.code,
                 image: prod.imageUrl || null,
                 category: prod.category || "Diğer",
+                description: prod.description || null,
                 stock: totalStock,
                 priceResolved,
                 minOrderQty: item.minOrderQty,

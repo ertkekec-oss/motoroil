@@ -85,6 +85,7 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
                 syncData = {
                     customerName: customer.name,
                     customerEmail: customer.email,
+                    customerId: customer.id,
                     rawData: rawData as any
                 };
             }

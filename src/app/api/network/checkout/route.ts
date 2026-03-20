@@ -82,7 +82,8 @@ export async function POST(req: Request) {
                     id: true,
                     status: true,
                     financialMode: true,
-                    dealerCompany: { select: { companyName: true } },
+                    categoryId: true,
+                    dealerCompany: { select: { companyName: true, taxNumber: true } },
                     dealerUser: { select: { email: true, phone: true } },
                 },
             })
@@ -98,6 +99,12 @@ export async function POST(req: Request) {
                 select: { discount: true },
             })
             const discountPct = rule?.discount ? toNumber(rule.discount) : 0
+
+            let priceListId = null;
+            if (membership.categoryId) {
+                const custCat = await tx.customerCategory.findUnique({ where: { id: membership.categoryId } });
+                if (custCat) priceListId = custCat.priceListId;
+            }
 
             // 2) Products scope
             const productIds = cart.items.map((i) => i.productId)
@@ -116,6 +123,7 @@ export async function POST(req: Request) {
                     price: true, // Decimal(10,2)
                     stock: true, // Int
                     reservedStock: true, // YENI
+                    ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                 }
             })
 
@@ -136,7 +144,13 @@ export async function POST(req: Request) {
                     throw new HttpErr(409, "INSUFFICIENT_STOCK", { productId: p.id, available, requested: ci.quantity })
                 }
 
-                const listPrice = toNumber(p.price)
+                let listPrice = toNumber(p.price);
+                if (p.productPrices && p.productPrices.length > 0) {
+                    listPrice = toNumber(p.productPrices[0].price);
+                }
+
+                // First apply base exact price if category is matched
+                // Then apply percentage discount logic
                 const effectivePrice = discountPct > 0 ? Math.max(0, listPrice * (1 - discountPct / 100)) : listPrice
                 const lineTotal = effectivePrice * ci.quantity
                 grandTotal += lineTotal

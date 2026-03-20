@@ -4002,6 +4002,7 @@ model DealerMembership {
   creditLimit      Decimal                 @default(0.0) @db.Decimal(12, 2)
   financialMode    DealerFinancialMode     @default(ISOLATED)
   priceRuleId      String?
+  categoryId       String?
   createdAt        DateTime                @default(now())
   updatedAt        DateTime                @updatedAt
   carts            DealerCart[]

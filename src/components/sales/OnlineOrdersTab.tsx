@@ -141,7 +141,7 @@ export function OnlineOrdersTab({
                 dateMatch = orderDate >= new Date(customStartDate) && orderDate <= end;
             }
         }
-        let marketplaceMatch = marketplaceFilter === 'ALL' ? order.marketplace !== 'B2B_NETWORK' : order.marketplace === marketplaceFilter;
+        let marketplaceMatch = marketplaceFilter === 'ALL' ? !['B2B_NETWORK', 'B2B'].includes(order.marketplace) : order.marketplace === marketplaceFilter;
         return marketplaceMatch && statusMatch && dateMatch;
     });
 

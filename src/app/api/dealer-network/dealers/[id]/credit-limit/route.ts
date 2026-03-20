@@ -21,14 +21,20 @@ export async function PATCH(req: Request, { params }: { params: any }) {
         const resolvedParams = await Promise.resolve(params);
         const membershipId = resolvedParams.id;
 
+        const updateData: any = {};
+        if (body.creditLimit !== undefined) {
+            updateData.creditLimit = Number(body.creditLimit) || 0;
+        }
+        if (body.categoryId !== undefined) {
+            updateData.categoryId = body.categoryId === "" ? null : body.categoryId;
+        }
+
         await prisma.dealerMembership.update({
             where: {
                 id: membershipId,
                 tenantId: tenantId
             },
-            data: {
-                creditLimit: Number(body.creditLimit) || 0
-            }
+            data: updateData
         });
 
         console.log(`[Credit] Modifying limit for ${membershipId} at tenant ${tenantId} by ${user.id}`);

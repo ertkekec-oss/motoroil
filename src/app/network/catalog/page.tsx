@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useModal } from "@/contexts/ModalContext"
 import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check } from "lucide-react"
+import NetworkProductDetailModal from "./components/NetworkProductDetailModal"
 
 export default function NetworkCatalogPage() {
     const { showError, showSuccess } = useModal()
@@ -12,6 +13,7 @@ export default function NetworkCatalogPage() {
     const [loading, setLoading] = useState(true)
     const [products, setProducts] = useState<any[]>([])
     const [addingToCart, setAddingToCart] = useState<string | null>(null)
+    const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
 
     // Load categories once
     useEffect(() => {
@@ -209,29 +211,38 @@ export default function NetworkCatalogPage() {
                                                 </div>
                                             </div>
 
-                                            <button
-                                                disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)}
-                                                onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))}
-                                                className={`h-10 px-4 rounded-xl text-[13px] font-semibold flex items-center justify-center min-w-[80px] gap-2 transition-all active:scale-95 border
-                                                    ${addingToCart === p.id 
-                                                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' 
-                                                    : p.stock < (p.minOrderQty || 1)
-                                                        ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                                                        : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 shadow-sm'
-                                                    }`}
-                                            >
-                                                {addingToCart === p.id ? (
-                                                    <>
-                                                        <Check className="w-4 h-4" strokeWidth={2.5} />
-                                                        Eklendi
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Plus className="w-4 h-4" strokeWidth={2.5} />
-                                                        Ekle
-                                                    </>
-                                                )}
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => setSelectedProduct(p)}
+                                                    className="h-10 px-3 rounded-xl text-[13px] font-semibold flex items-center justify-center bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm"
+                                                    title="İncele"
+                                                >
+                                                    <Info className="w-4 h-4" strokeWidth={2} />
+                                                </button>
+                                                <button
+                                                    disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)}
+                                                    onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))}
+                                                    className={`h-10 px-4 rounded-xl text-[13px] font-semibold flex items-center justify-center min-w-[80px] gap-2 transition-all active:scale-95 border
+                                                        ${addingToCart === p.id 
+                                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' 
+                                                        : p.stock < (p.minOrderQty || 1)
+                                                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                                                            : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 shadow-sm'
+                                                        }`}
+                                                >
+                                                    {addingToCart === p.id ? (
+                                                        <>
+                                                            <Check className="w-4 h-4" strokeWidth={2.5} />
+                                                            Eklendi
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Plus className="w-4 h-4" strokeWidth={2.5} />
+                                                            Ekle
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -248,6 +259,14 @@ export default function NetworkCatalogPage() {
                 </div>
 
             </div>
+            
+            <NetworkProductDetailModal 
+                isOpen={!!selectedProduct} 
+                onClose={() => setSelectedProduct(null)} 
+                product={selectedProduct} 
+                addingToCart={addingToCart}
+                onAddToCart={addToCart}
+            />
         </div>
     )
 }

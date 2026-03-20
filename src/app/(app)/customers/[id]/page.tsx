@@ -86,7 +86,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 deletedAt: null,
                 OR: [
                     ...(customer.email ? [{ customerEmail: customer.email }] : []),
-                    { customerName: customer.name }
+                    { customerName: customer.name },
+                    { customerId: customer.id }
                 ]
             },
             orderBy: { orderDate: 'desc' },

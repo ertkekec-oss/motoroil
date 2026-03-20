@@ -43,7 +43,7 @@ export default function ProductWizardModal({
             .then(d => { if (d.success) setGlobalCategories(d.categories); })
             .catch(e => console.error("Global categories fetch error:", e));
     }, []);
-    const totalSteps = 5;
+    const totalSteps = 6;
     
     const router = useRouter();
     const { showSuccess, showError, showWarning, showPrompt } = useModal();
@@ -189,6 +189,7 @@ export default function ProductWizardModal({
                             { step: 3, label: "Diğer Bilgiler" },
                             { step: 4, label: "Varyant & Fiyatlar" },
                             { step: 5, label: "Bağlı Ürünler" },
+                            { step: 6, label: "B2B Katalog Detayı" },
                         ].map((s, idx) => (
                             <React.Fragment key={s.step}>
                                 <div className="flex flex-col items-center gap-1 relative z-10">
@@ -199,7 +200,7 @@ export default function ProductWizardModal({
                                         {s.label}
                                     </span>
                                 </div>
-                                {idx < 4 && (
+                                {idx < 5 && (
                                     <div className="flex-1 h-1 mx-2 rounded-full bg-slate-200 dark:bg-white/10 relative overflow-hidden">
                                         <div className={`absolute left-0 top-0 bottom-0 bg-slate-900 dark:bg-white transition-all duration-300 ${currentStep > s.step ? 'w-full !bg-emerald-600' : currentStep === s.step ? 'w-1/2' : 'w-0'}`} />
                                     </div>
@@ -920,6 +921,34 @@ function StepConnectedProducts({ mode, data, onChange, setCurrentStep }: any) {
                         <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">{mode === "create" ? "Her şey hazır mı?" : "Değişiklikleri kaydedin"}</h4>
                         <p className="text-sm text-slate-500">{mode === "create" ? "Ürünü kaydettikten sonra dilediğiniz zaman düzenleyebilirsiniz." : "Düzenlediğiniz bu ürünün tüm verileri anında güncellenecektir."}</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+function StepB2BDetails({ mode, data, onChange }: any) {
+    return (
+        <div className="animate-in fade-in duration-300 space-y-8">
+            <div className="mb-2 border-b border-slate-200 dark:border-white/5 pb-2">
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white">6. Aşama: B2B ve Katalog Detayları</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">B2B Ağı ve Periodya Hub üzerinde incelendiğinde müşterilerinize gösterilecek gelişmiş açıklamayı buraya girebilirsiniz.</p>
+            </div>
+            
+            <div className="space-y-4">
+                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Açıklaması (Gelişmiş)</label>
+                <textarea
+                    rows={12}
+                    value={data.description || ''}
+                    onChange={e => onChange({ ...data, description: e.target.value })}
+                    className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-white dark:bg-[#0f172a] shadow-sm resize-y text-[15px] font-medium leading-relaxed"
+                    placeholder="Ürün hakkında pazarlama amaçlı, detaylı bir metin yazabilirsiniz. Örneğin: Ürün materyalleri, garantisi, kullanım alanları vb."
+                ></textarea>
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl flex gap-3 items-start">
+                    <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                        Bu alana girilen detaylı ürün yazısı, doğrudan B2B Özel Kataloğu ve Periodya Satış Hubı üzerindeki İncele ekranlarında müşterilerinize sunulacaktır. Boş bırakmanız halinde detay sayfası gösterilmeyecektir.
+                    </p>
                 </div>
             </div>
         </div>

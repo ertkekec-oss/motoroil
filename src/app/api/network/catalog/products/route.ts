@@ -16,14 +16,19 @@ export async function GET(req: Request) {
         const q = (url.searchParams.get("q") || "").trim()
         const cursor = url.searchParams.get("cursor")
 
-        // 1) Membership bazlı aktif price rule çek (V1: global rule ya da membership'e bağlanmış kural)
         const membership = await prisma.dealerMembership.findUnique({
             where: { id: ctx.activeMembershipId },
-            select: { priceRule: { select: { discount: true, isActive: true } } },
+            select: { categoryId: true, priceRule: { select: { discount: true, isActive: true } } },
         });
 
         const rule = membership?.priceRule?.isActive ? membership.priceRule : null;
         const discountPct = rule ? toNumber(rule.discount) : 0; // % olarak (örn: 15.00)
+
+        let priceListId = null;
+        if (membership?.categoryId) {
+            const custCat = await prisma.customerCategory.findUnique({ where: { id: membership.categoryId } });
+            if (custCat) priceListId = custCat.priceListId;
+        }
 
         // 2) Product scope (mutlak tenant filtresi - company üzerinden tenant kontrolü)
         const where: any = {
@@ -60,6 +65,7 @@ export async function GET(req: Request) {
                 stock: true, // stockQty yerine stock
                 reservedStock: true, // reserve validation icin
                 barcode: true,
+                ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
             },
         })
 
@@ -67,8 +73,11 @@ export async function GET(req: Request) {
         const page = hasMore ? products.slice(0, TAKE) : products
         const nextCursor = hasMore ? page[page.length - 1]?.id ?? null : null
 
-        const items = page.map((p) => {
-            const listPrice = toNumber(p.price)
+        const items = page.map((p: any) => {
+            let listPrice = toNumber(p.price);
+            if (p.productPrices && p.productPrices.length > 0) {
+                listPrice = toNumber(p.productPrices[0].price);
+            }
             const effectivePrice =
                 discountPct > 0 ? Math.max(0, listPrice * (1 - discountPct / 100)) : listPrice
 

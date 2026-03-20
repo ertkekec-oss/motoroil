@@ -50,6 +50,7 @@ export async function GET(req: Request) {
             taxNumber: m.dealerCompany?.taxNumber || '-',
             status: m.status,
             creditLimit: Number(m.creditLimit),
+            categoryId: m.categoryId,
             customerId: m.dealerCompany?.taxNumber ? customerMap.get(m.dealerCompany.taxNumber) : null
         }));
 

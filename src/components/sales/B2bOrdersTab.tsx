@@ -11,7 +11,7 @@ export function B2bOrdersTab({ onlineOrders, fetchOnlineOrders }: { onlineOrders
     const router = useRouter();
     const isLight = theme === 'light';
 
-    const b2bOrders = onlineOrders.filter((o: any) => o.marketplace === 'B2B_NETWORK');
+    const b2bOrders = onlineOrders.filter((o: any) => ['B2B_NETWORK', 'B2B'].includes(o.marketplace));
 
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [currentPage, setCurrentPage] = useState(1);
