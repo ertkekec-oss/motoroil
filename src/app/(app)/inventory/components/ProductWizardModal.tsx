@@ -943,8 +943,8 @@ function StepB2BDetails({ mode, data, onChange }: any) {
                 <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Açıklaması (Gelişmiş)</label>
                 <textarea
                     rows={12}
-                    value={data.description || ''}
-                    onChange={e => onChange({ ...data, description: e.target.value })}
+                    value={data.b2bDescription || ''}
+                    onChange={e => onChange({ ...data, b2bDescription: e.target.value })}
                     className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-white dark:bg-[#0f172a] shadow-sm resize-y text-[15px] font-medium leading-relaxed"
                     placeholder="Ürün hakkında pazarlama amaçlı, detaylı bir metin yazabilirsiniz. Örneğin: Ürün materyalleri, garantisi, kullanım alanları vb."
                 ></textarea>

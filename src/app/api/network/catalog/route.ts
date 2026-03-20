@@ -33,6 +33,15 @@ export async function GET(req: Request) {
         let cursor = url.searchParams.get("cursor") || undefined
         const cat = url.searchParams.get("category") || ""
 
+        const totalCount = await prisma.dealerCatalogItem.count({ where: {
+                supplierTenantId: membership.tenantId,
+                visibility: "VISIBLE",
+                ...(q ? {
+                    product: {
+                        ...(cat ? { category: cat } : {}),
+                        OR: [
+                            { name: { contains: q, mode: 'insensitive' } }, });
+        const totalPages = Math.ceil(totalCount / take);
         const catalogItems = await prisma.dealerCatalogItem.findMany({
             where: {
                 supplierTenantId: membership.tenantId,
@@ -114,11 +123,7 @@ export async function GET(req: Request) {
             }
         });
 
-        return NextResponse.json({
-            ok: true,
-            products,
-            nextCursor
-        })
+        return NextResponse.json({ ok: true, products, pagination: { page, limit: take, totalCount, totalPages } })
 
     } catch (e: any) {
         if (e.message === "UNAUTHORIZED") {

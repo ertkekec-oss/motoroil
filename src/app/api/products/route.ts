@@ -119,7 +119,7 @@ export async function POST(request: Request) {
             salesOiv, salesOtv, otvType, otvCode, isParent, variantsData, unit,
             currency, purchaseCurrency, imageUrl, imageKey,
             description, countryCode, invoiceTitle, showDescriptionOnInvoice, shelfLocation, tags, gtin,
-            purchaseDiscount, purchaseOtv, globalCategoryId
+            purchaseDiscount, purchaseOtv, globalCategoryId, b2bDescription
         } = body;
 
         const targetBranch = branch || 'Merkez';
@@ -160,6 +160,7 @@ export async function POST(request: Request) {
                     imageUrl: imageUrl || undefined,
                     imageKey: imageKey || undefined,
                     description: description || undefined,
+                    b2bDescription: b2bDescription || undefined,
                     countryCode: countryCode || undefined,
                     invoiceTitle: invoiceTitle || undefined,
                     showDescriptionOnInvoice: showDescriptionOnInvoice || false,

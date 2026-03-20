@@ -9182,4 +9182,4 @@ model AdvanceDeduction {
 
   @@index([staffId])
   @@index([period])
-}
+}

@@ -45,7 +45,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                         stock: true,
                         imageUrl: true,
                         category: true,
-                        description: true,
+                        b2bDescription: true,
                         ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                         variants: {
                             select: {
@@ -87,7 +87,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 sku: prod.code,
                 image: prod.imageUrl || null,
                 category: prod.category || "Diğer",
-                description: prod.description || null,
+                description: prod.b2bDescription || null,
                 stock: totalStock,
                 priceResolved,
                 minOrderQty: catalogItem.minOrderQty,
