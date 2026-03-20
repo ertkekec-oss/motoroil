@@ -16,7 +16,7 @@ export default async function SellerProductEditPage({ params }: { params: Promis
     }
 
     const companyId = user.companyId || session?.companyId || session?.settings?.companyId;
-    if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin") {
+    if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER") {
         redirect("/403");
     }
 

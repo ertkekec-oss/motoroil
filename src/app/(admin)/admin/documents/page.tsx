@@ -9,7 +9,7 @@ export const metadata = {
 
 export default async function PlatformDocumentsPage() {
     const session = await getSession();
-    if (!session || session.user.role !== "SUPER_ADMIN") {
+    if (!session || session.user.role !== "SUPER_ADMIN" && user.role !== "OWNER") {
         redirect("/login");
     }
 

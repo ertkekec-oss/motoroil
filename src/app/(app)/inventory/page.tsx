@@ -1696,6 +1696,7 @@ function InventoryContent() {
         }}
         isProcessing={isProcessing}
         categories={dbCategories}
+        globalCategories={globalCategories}
         allProducts={products || []}
         priceLists={priceLists}
         productPrices={productPrices}

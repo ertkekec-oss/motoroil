@@ -9,7 +9,7 @@ export async function PATCH(req: NextRequest, context: any) {
     try {
         const session: any = await getSession();
         const user = session?.user || session;
-        if (!user || (!user.permissions?.includes('network_sell') && user.role !== 'SUPER_ADMIN')) {
+        if (!user || (!user.permissions?.includes('network_sell') && user.role !== "SUPER_ADMIN" && user.role !== "OWNER")) {
             return ApiError('Unauthorized: network_sell permission required', 403);
         }
 

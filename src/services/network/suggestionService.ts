@@ -30,8 +30,9 @@ export async function applySuggestion(suggestionId: string, companyId: string, a
         const erpProduct = await prisma.product.findUnique({ where: { id: productId } });
         if (!erpProduct) throw new Error("Product not found");
 
-        const gp = await getOrCreateGlobalProduct(erpProduct);
-        console.log(`[SuggestionService] Applying LIST for ${productId}. GlobalProduct ID: ${gp?.id}`);
+        const gpResult = await matchOrCreateGlobalProduct(erpProduct, true);
+        const gp = gpResult.globalProduct;
+        console.log(`[SuggestionService] Applying LIST for ${productId}. GlobalProduct ID: ${gp?.id} matching method: ${gpResult.method}`);
 
         await prisma.networkListing.upsert({
             where: { sellerCompanyId_erpProductId: { sellerCompanyId: companyId, erpProductId: productId } },
@@ -79,26 +80,10 @@ export async function applySuggestion(suggestionId: string, companyId: string, a
     return { success: true, status: finalStatus };
 }
 
+import { matchOrCreateGlobalProduct } from "./hubDeduplicationService";
+
 export async function getOrCreateGlobalProduct(erpProduct: any) {
-    let globalProduct;
-    if (erpProduct.barcode) {
-        globalProduct = await prisma.globalProduct.findFirst({
-            where: { barcode: erpProduct.barcode }
-        });
-    }
-    if (!globalProduct) {
-        globalProduct = await prisma.globalProduct.findFirst({
-            where: { name: erpProduct.name }
-        });
-    }
-    if (!globalProduct) {
-        globalProduct = await prisma.globalProduct.create({
-            data: {
-                name: erpProduct.name,
-                barcode: erpProduct.barcode || null,
-                description: erpProduct.description || null,
-            }
-        });
-    }
-    return globalProduct;
+    // Deprecated. Forwarding to new Deduplicator.
+    const result = await matchOrCreateGlobalProduct(erpProduct);
+    return result.globalProduct;
 }

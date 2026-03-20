@@ -14,7 +14,7 @@ export default async function TestDesktopPage() {
 
     // Checking multi-tenant isolation compliance, though mock data is shown.
     const companyId = user.companyId || session?.companyId || session?.settings?.companyId;
-    if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin") {
+    if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER") {
         redirect("/403");
     }
 

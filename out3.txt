@@ -4,11 +4,10 @@
 -----------------------------------------
 ➡️  Satıcının Girdiği İsim: "philips airfryer xxl beyaz 7 litre"
 
-AI RAWMATCH: null
-⚡ Hub PIM & AI Processing Time: 1.177s
+⚡ Hub PIM & AI Processing Time: 679.282ms
 
 ✅ AI İŞLEMİ ve EŞLEŞTİRME BAŞARILI
-⚙️  Eşleştirme Modeli  : AI_NEW_CARD
+⚙️  Eşleştirme Modeli  : FUZZY_TEXT
 🎯 Güven Skoru (Conf): %100
 🏷️  Temizlenmiş AI İsmi: philips airfryer xxl beyaz 7 litre
 📦 Master Kart ID    : cmmz5uzfy0001afiydi6fmrjq

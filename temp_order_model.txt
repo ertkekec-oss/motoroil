@@ -1,0 +1,47 @@
+
+model Order {
+  id                    String            @id @default(cuid())
+  marketplaceId         String
+  orderNumber           String
+  marketplace           String
+  customerName          String
+  customerEmail         String?
+  totalAmount           Decimal           @db.Decimal(10, 2)
+  currency              String            @default("TRY")
+  status                String
+  orderDate             DateTime
+  items                 Json
+  shippingAddress       Json?
+  invoiceAddress        Json?
+  cargoTrackingNo       String?
+  cargoProvider         String?
+  rawData               Json?
+  deletedAt             DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  branch                String?           @default("Merkez")
+  companyId             String
+  shipmentPackageId     String?
+  detailsFetchedAt      DateTime?
+  staffId               String?
+  dealerMembershipId    String?
+  salesChannel          SalesChannel      @default(POS)
+  dealerPrice           Decimal?          @db.Decimal(12, 2)
+  reservationReleasedAt DateTime?
+  accountingPostedAt    DateTime?
+  isLimitExceeded       Boolean?          @default(false)
+  creditExceededAmount  Decimal?          @db.Decimal(12, 2)
+  paymentRequired       Boolean?          @default(false)
+  company               Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  dealerMembership      DealerMembership? @relation("OrderDealerMembership", fields: [dealerMembershipId], references: [id])
+  staff                 Staff?            @relation("StaffStoreOrders", fields: [staffId], references: [id])
+
+  @@unique([companyId, orderNumber])
+  @@index([marketplace, orderNumber])
+  @@index([customerName])
+  @@index([orderDate])
+  @@index([status])
+  @@index([companyId])
+  @@index([companyId, orderDate, status])
+  @@index([companyId, deletedAt, createdAt])
+}

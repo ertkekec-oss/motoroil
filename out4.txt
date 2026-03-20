@@ -1,0 +1,8 @@
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+➡️  İsim: "Sony P23 Oyuncu Kulaklığı o53ykg"
+⚡ Hub PIM & AI Processing Time: 1.290s
+
+✅ BAŞARILI
+⚙️  Model: AI_NEW_CARD
+🏷️  Temiz İsim: Sony P23 Oyuncu Kulaklığı o53ykg
+📁 AI Kategori Bulamadı

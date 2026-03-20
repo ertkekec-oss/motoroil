@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getSession();
-        if (!session || session.user.role !== 'SUPER_ADMIN') {
+        if (!session || session.user.role !== "SUPER_ADMIN" && user.role !== "OWNER") {
             return new NextResponse('Unauthorized', { status: 401 });
         }
 

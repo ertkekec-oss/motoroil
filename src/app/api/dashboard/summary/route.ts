@@ -30,7 +30,7 @@ export async function GET(req: Request) {
 
         const companyId = user.companyId || session?.companyId || session?.settings?.companyId;
 
-        if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin") {
+        if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER") {
             return NextResponse.json({ error: "No company context" }, { status: 403 });
         }
 

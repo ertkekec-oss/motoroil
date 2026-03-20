@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, context: any) {
         const session: any = await getSession();
         const user = session?.user || session;
 
-        if (!user || (!user.permissions?.includes('network_buy') && user.role !== 'SUPER_ADMIN')) {
+        if (!user || (!user.permissions?.includes('network_buy') && user.role !== "SUPER_ADMIN" && user.role !== "OWNER")) {
             return ApiError('Unauthorized: network_buy permission required', 403);
         }
 

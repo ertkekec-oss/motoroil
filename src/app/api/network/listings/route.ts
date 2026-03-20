@@ -3,12 +3,13 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { networkListingCreateSchema } from '@/lib/validation/network';
 import { ApiError, ApiSuccess } from '@/services/network/helpers';
+import { matchOrCreateGlobalProduct } from '@/services/network/hubDeduplicationService';
 
 export async function POST(req: NextRequest) {
     try {
         const session: any = await getSession();
         const user = session?.user || session;
-        if (!user || (!user.permissions?.includes('network_sell') && user.role !== 'SUPER_ADMIN')) {
+        if (!user || (!user.permissions?.includes('network_sell') && user.role !== "SUPER_ADMIN" && user.role !== "OWNER")) {
             return ApiError('Unauthorized: network_sell permission required', 403);
         }
 
@@ -33,12 +34,15 @@ export async function POST(req: NextRequest) {
             return ApiError('Product not found in your inventory', 404);
         }
 
-        // UPSERT - Unique(sellerCompanyId, productId) based on MVP Protection rule
+        // Run Hub Deduplication Engine
+        const { globalProduct, method, confidence } = await matchOrCreateGlobalProduct(product);
+
+        // UPSERT - Unique(sellerCompanyId, erpProductId) 
         const listing = await prisma.networkListing.upsert({
             where: {
-                sellerCompanyId_productId: {
+                sellerCompanyId_erpProductId: {
                     sellerCompanyId: currentCompanyId,
-                    productId: data.productId
+                    erpProductId: data.productId
                 }
             },
             update: {
@@ -50,14 +54,13 @@ export async function POST(req: NextRequest) {
             },
             create: {
                 sellerCompanyId: currentCompanyId,
-                productId: data.productId,
+                erpProductId: data.productId,
                 price: data.price,
                 availableQty: data.availableQty,
                 minQty: data.minQty,
                 leadTimeDays: data.leadTimeDays,
                 status: 'ACTIVE',
-                // globalProductId might be updated via workers or separate mapping phase
-                globalProductId: null
+                globalProductId: globalProduct.id
             }
         });
 

@@ -39,7 +39,7 @@ export default async function LedgersAuditPage({
     const session: any = await getSession();
     const user = session?.user || session;
 
-    if (!user || (user.role !== "SUPER_ADMIN" && user.role !== "admin")) {
+    if (!user || (user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER")) {
         redirect("/403");
     }
 

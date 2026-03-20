@@ -44,7 +44,7 @@ export default async function BuyerOrderDetailPage({
 
     // Buyer yetki kontrolü
     const perms: string[] = user.permissions || [];
-    if (!perms.includes("network_buy") && user.role !== "SUPER_ADMIN" && user.role !== "admin") {
+    if (!perms.includes("network_buy") && user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER") {
         redirect("/403");
     }
 
