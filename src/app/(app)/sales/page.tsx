@@ -1087,6 +1087,13 @@ export default function SalesPage() {
                     />
                 )}
 
+                {activeTab === 'b2b' && (
+                    <B2bOrdersTab
+                        onlineOrders={onlineOrders}
+                        fetchOnlineOrders={fetchOnlineOrders}
+                    />
+                )}
+
                 {(activeTab === 'invoices' || activeTab === 'wayslips') && (
                     <InvoicesTab
                         invoiceSubTab={invoiceSubTab}

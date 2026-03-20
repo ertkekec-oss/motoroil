@@ -143,7 +143,11 @@ export function B2bOrdersTab({ onlineOrders, fetchOnlineOrders }: { onlineOrders
                                             </>
                                         )}
                                         {order.status === 'APPROVED' && (
-                                            <button onClick={() => router.push(`/customers`)} className="px-3 py-1.5 border rounded-lg text-[12px] font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-50 border-slate-200 transition-colors ml-auto mr-0">
+                                            <button onClick={() => {
+                                                let rData: any = {};
+                                                try { rData = typeof order.rawData === 'string' ? JSON.parse(order.rawData) : (order.rawData || {}); } catch (e) {}
+                                                router.push(rData.customerId ? `/customers/${rData.customerId}` : `/customers`);
+                                            }} className="px-3 py-1.5 border rounded-lg text-[12px] font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-50 border-slate-200 transition-colors ml-auto mr-0">
                                                 Cari Detayına Git
                                             </button>
                                         )}

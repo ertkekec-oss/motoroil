@@ -396,9 +396,9 @@ export function OnlineOrdersTab({
                     {/* Groups container internally separating, but visually unified */}
                     <div className="flex gap-2">
                         <OutlineChip active={marketplaceFilter === 'ALL'} onClick={() => setMarketplaceFilter('ALL')}>Tüm Platformlar</OutlineChip>
-                        {['B2B_NETWORK', 'Trendyol', 'Hepsiburada', 'N11', 'Pazarama']?.map(mp => (
+                        {['Trendyol', 'Hepsiburada', 'N11', 'Pazarama']?.map(mp => (
                             <OutlineChip key={mp} active={marketplaceFilter === mp} onClick={() => setMarketplaceFilter(mp)}>
-                                {mp === 'B2B_NETWORK' ? 'B2B Satışları' : mp}
+                                {mp}
                             </OutlineChip>
                         ))}
                     </div>

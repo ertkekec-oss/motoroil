@@ -52,9 +52,46 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
                 }
             }
 
+            let syncData: any = {};
+            if (status === 'APPROVED' && order.marketplace === 'B2B_NETWORK') {
+                let customer = await tx.customer.findFirst({
+                    where: {
+                        companyId: order.companyId,
+                        OR: [
+                            ...(order.customerEmail ? [{ email: order.customerEmail }] : []),
+                            { name: order.customerName }
+                        ]
+                    }
+                });
+
+                if (!customer) {
+                    customer = await tx.customer.create({
+                        data: {
+                            companyId: order.companyId,
+                            name: order.customerName || 'B2B Müşterisi',
+                            email: order.customerEmail || '',
+                            phone: '',
+                            balance: 0
+                        }
+                    });
+                }
+
+                let rawData = {};
+                try {
+                    rawData = typeof order.rawData === 'string' ? JSON.parse(order.rawData) : (order.rawData || {});
+                } catch (e) {}
+                (rawData as any).customerId = customer.id;
+
+                syncData = {
+                    customerName: customer.name,
+                    customerEmail: customer.email,
+                    rawData: rawData as any
+                };
+            }
+
             const updatedOrder = await tx.order.update({
                 where: { id },
-                data: { status }
+                data: { status, ...syncData }
             });
 
             return updatedOrder;
