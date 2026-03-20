@@ -1,19 +1,19 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useModal } from "@/contexts/ModalContext"
 import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check } from "lucide-react"
-import NetworkProductDetailModal from "./components/NetworkProductDetailModal"
 
 export default function NetworkCatalogPage() {
     const { showError, showSuccess } = useModal()
+    const router = useRouter()
     const [q, setQ] = useState("")
     const [activeCat, setActiveCat] = useState<string>("")
     const [categories, setCategories] = useState<string[]>([])
     const [loading, setLoading] = useState(true)
     const [products, setProducts] = useState<any[]>([])
     const [addingToCart, setAddingToCart] = useState<string | null>(null)
-    const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
 
     // Load categories once
     useEffect(() => {
@@ -213,7 +213,7 @@ export default function NetworkCatalogPage() {
 
                                             <div className="flex items-center gap-2">
                                                 <button
-                                                    onClick={() => setSelectedProduct(p)}
+                                                    onClick={() => router.push('/network/catalog/' + p.id)}
                                                     className="h-10 px-3 rounded-xl text-[13px] font-semibold flex items-center justify-center bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm"
                                                     title="İncele"
                                                 >
@@ -260,13 +260,7 @@ export default function NetworkCatalogPage() {
 
             </div>
             
-            <NetworkProductDetailModal 
-                isOpen={!!selectedProduct} 
-                onClose={() => setSelectedProduct(null)} 
-                product={selectedProduct} 
-                addingToCart={addingToCart}
-                onAddToCart={addToCart}
-            />
+            
         </div>
     )
 }
