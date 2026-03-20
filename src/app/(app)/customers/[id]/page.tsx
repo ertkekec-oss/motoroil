@@ -232,7 +232,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 }
             } catch { safeItems = []; }
 
-            const mplace = o.marketplace === 'trendyol' ? 'Trendyol' : o.marketplace === 'n11' ? 'N11' : o.marketplace === 'hepsiburada' ? 'Hepsiburada' : o.marketplace === 'pazarama' ? 'Pazarama' : (o.marketplace === 'POS' ? 'POS' : o.marketplace);
+            const mplace = o.marketplace === 'B2B_NETWORK' ? 'B2B Ağı' : o.marketplace === 'trendyol' ? 'Trendyol' : o.marketplace === 'n11' ? 'N11' : o.marketplace === 'hepsiburada' ? 'Hepsiburada' : o.marketplace === 'pazarama' ? 'Pazarama' : (o.marketplace === 'POS' ? 'POS' : o.marketplace);
             let currentDesc = `${mplace} Siparişi - #${o.orderNumber || '-'} (${o.status || '-'})`;
             
             let paymentStr = "";

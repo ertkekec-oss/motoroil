@@ -122,10 +122,10 @@ export function OnlineOrdersTab({
     const filteredOnlineOrders = onlineOrders.filter(order => {
         let statusMatch = true;
         if (statusFilter !== 'ALL') {
-            if (statusFilter === 'NEW') statusMatch = ['Yeni', 'Created', 'Picking', 'WaitingForApproval', 'Preparing', 'ReadyToShip', 'Unpaid'].includes(order.status);
+            if (statusFilter === 'NEW') statusMatch = ['Yeni', 'Created', 'Picking', 'WaitingForApproval', 'Preparing', 'ReadyToShip', 'Unpaid', 'PENDING_APPROVAL', 'APPROVED', 'PAID_PENDING_APPROVAL', 'PAID'].includes(order.status);
             else if (statusFilter === 'SHIPPED') statusMatch = ['Kargolandı', 'Shipped', 'Hazırlanıyor', 'Invoiced'].includes(order.status);
             else if (statusFilter === 'COMPLETED') statusMatch = ['Tamamlandı', 'Delivered', 'Faturalandırıldı', 'Returned'].includes(order.status);
-            else if (statusFilter === 'CANCELLED') statusMatch = ['Cancelled', 'CANCELLED', 'İptal Edildi', 'İptal'].includes(order.status);
+            else if (statusFilter === 'CANCELLED') statusMatch = ['Cancelled', 'CANCELLED', 'İptal Edildi', 'İptal', 'REJECTED'].includes(order.status);
         }
         let dateMatch = true;
         if (dateFilter !== 'ALL') {
@@ -184,7 +184,7 @@ export function OnlineOrdersTab({
                         Bekleyen Sipariş
                     </div>
                     <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-blue-600' : 'text-blue-500'}`}>
-                        {onlineOrders.filter(o => ['Yeni', 'Hazırlanıyor', 'WaitingForApproval', 'Picking'].includes(o.status)).length}
+                        {onlineOrders.filter(o => ['Yeni', 'Hazırlanıyor', 'WaitingForApproval', 'Picking', 'PENDING_APPROVAL', 'APPROVED'].includes(o.status)).length}
                         <span className={`text-[14px] font-medium ml-2 ${textLabelClass}`}>adet</span>
                     </div>
                     <div className={`text-[12px] mt-1 ${textLabelClass}`}>Hazırlanması gereken</div>
@@ -396,9 +396,9 @@ export function OnlineOrdersTab({
                     {/* Groups container internally separating, but visually unified */}
                     <div className="flex gap-2">
                         <OutlineChip active={marketplaceFilter === 'ALL'} onClick={() => setMarketplaceFilter('ALL')}>Tüm Platformlar</OutlineChip>
-                        {['Trendyol', 'Hepsiburada', 'N11', 'Pazarama']?.map(mp => (
+                        {['B2B_NETWORK', 'Trendyol', 'Hepsiburada', 'N11', 'Pazarama']?.map(mp => (
                             <OutlineChip key={mp} active={marketplaceFilter === mp} onClick={() => setMarketplaceFilter(mp)}>
-                                {mp}
+                                {mp === 'B2B_NETWORK' ? 'B2B Satışları' : mp}
                             </OutlineChip>
                         ))}
                     </div>
@@ -408,9 +408,9 @@ export function OnlineOrdersTab({
                     <div className="flex gap-2">
                         {[
                             { val: 'ALL', label: 'Tüm Durumlar' },
-                            { val: 'NEW', label: 'Yeni' },
-                            { val: 'SHIPPED', label: 'Kargolandı' },
-                            { val: 'COMPLETED', label: 'Tamamlandı' },
+                            { val: 'NEW', label: 'Onaylanan & Yeni' },
+                            { val: 'SHIPPED', label: 'Hazırlanıyor & Kargo' },
+                            { val: 'COMPLETED', label: 'Faturalandı / Tamamlandı' },
                         ]?.map(({ val, label }) => (
                             <OutlineChip key={val} active={statusFilter === val} onClick={() => setStatusFilter(val)}>{label}</OutlineChip>
                         ))}
@@ -487,7 +487,7 @@ export function OnlineOrdersTab({
                                                 </td>
                                                 <td className="px-4 align-middle">
                                                     <span className={`text-[12px] font-medium px-2 py-1 border rounded-[6px] ${isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
-                                                        {o.marketplace}
+                                                        {o.marketplace === 'B2B_NETWORK' ? 'B2B Ağı' : o.marketplace}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 align-middle py-1.5">
