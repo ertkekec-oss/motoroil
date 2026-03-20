@@ -18,7 +18,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             // ✅ İZOLASYON: Sadece o şirkete ait faturayı çek
             const invoice = await tx.salesInvoice.findFirst({
                 where: { id, companyId: ctx.companyId },
-                include: { customer: true }
+                include: { customer: true, order: true }
             });
 
             if (!invoice) {
@@ -37,13 +37,18 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     const qty = Number(item.qty || 1);
 
                     // ✅ OVERSELL GUARD: Sadece yeterli stok varsa decrement yap (updateMany + count check)
+                    const stockUpdateData: any = { quantity: { decrement: qty } };
+                    if (invoice.order?.marketplace === 'B2B_NETWORK') {
+                        stockUpdateData.reservedStock = { decrement: qty };
+                    }
+
                     const stockUpdate = await tx.stock.updateMany({
                         where: {
                             productId: item.productId,
                             branch: targetBranch,
                             quantity: { gte: qty }
                         },
-                        data: { quantity: { decrement: qty } }
+                        data: stockUpdateData
                     });
 
                     if (stockUpdate.count === 0) {
@@ -65,9 +70,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
                     // Legacy sync (Merkez şubesi için denormalize alan)
                     if (targetBranch === 'Merkez') {
+                        const legacyUpdateData: any = { stock: { decrement: qty } };
+                        if (invoice.order?.marketplace === 'B2B_NETWORK') {
+                            legacyUpdateData.reservedStock = { decrement: qty };
+                        }
+                        
                         const productUpdate = await tx.product.updateMany({
                             where: { id: item.productId, companyId: ctx.companyId },
-                            data: { stock: { decrement: qty } }
+                            data: legacyUpdateData
                         });
                         if (productUpdate.count === 0) {
                             throw new Error(`Ürün stok kaydı (legacy) güncellenemedi veya yetkisiz erişim: ${item.productId}`);

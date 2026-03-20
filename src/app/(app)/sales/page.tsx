@@ -14,6 +14,7 @@ import { Sun, Moon } from 'lucide-react';
 
 // New Sub-Components
 import { OnlineOrdersTab } from '@/components/sales/OnlineOrdersTab';
+import { B2bOrdersTab } from '@/components/sales/B2bOrdersTab';
 import { StoreOrdersTab } from '@/components/sales/StoreOrdersTab';
 import { InvoicesTab } from '@/components/sales/InvoicesTab';
 import { InvoiceMappingModal } from '@/components/sales/InvoiceMappingModal';
@@ -1045,6 +1046,7 @@ export default function SalesPage() {
                 {[
                     { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
                     { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
+                    { key: 'b2b', label: 'B2B Satışları', onClick: () => setActiveTab('b2b') },
                     { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
                     { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
                 ].map(({ key, label, onClick }) => {

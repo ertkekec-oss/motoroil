@@ -141,7 +141,7 @@ export function OnlineOrdersTab({
                 dateMatch = orderDate >= new Date(customStartDate) && orderDate <= end;
             }
         }
-        let marketplaceMatch = marketplaceFilter === 'ALL' ? true : order.marketplace === marketplaceFilter;
+        let marketplaceMatch = marketplaceFilter === 'ALL' ? order.marketplace !== 'B2B_NETWORK' : order.marketplace === marketplaceFilter;
         return marketplaceMatch && statusMatch && dateMatch;
     });
 
@@ -184,7 +184,7 @@ export function OnlineOrdersTab({
                         Bekleyen Sipariş
                     </div>
                     <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-blue-600' : 'text-blue-500'}`}>
-                        {onlineOrders.filter(o => ['Yeni', 'Hazırlanıyor', 'WaitingForApproval', 'Picking', 'PENDING_APPROVAL', 'APPROVED'].includes(o.status)).length}
+                        {onlineOrders.filter(o => o.marketplace !== 'B2B_NETWORK' && ['Yeni', 'Hazırlanıyor', 'WaitingForApproval', 'Picking'].includes(o.status)).length}
                         <span className={`text-[14px] font-medium ml-2 ${textLabelClass}`}>adet</span>
                     </div>
                     <div className={`text-[12px] mt-1 ${textLabelClass}`}>Hazırlanması gereken</div>

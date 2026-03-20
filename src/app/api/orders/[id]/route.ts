@@ -150,32 +150,50 @@ export async function DELETE(
                     if (item.productId) {
                         const qty = Number(item.qty || item.quantity || 1);
                         try {
-                            // Sync Stock Record (increment because we are returning items to shelf)
-                            await tx.stock.upsert({
-                                where: { productId_branch: { productId: String(item.productId), branch: targetBranch } },
-                                update: { quantity: { increment: qty } },
-                                create: { productId: String(item.productId), branch: targetBranch, quantity: qty }
-                            });
+                            const isB2b = order.marketplace === 'B2B_NETWORK';
+                            const isFormalInvoice = invoice && (invoice.isFormal || invoice.status === 'Onaylandı');
 
-                            // Create Stock Movement
-                            await (tx as any).stockMovement.create({
-                                data: {
-                                    productId: String(item.productId),
-                                    branch: targetBranch,
-                                    companyId: order.companyId,
-                                    quantity: qty,
-                                    type: 'RETURN',
-                                    referenceId: order.id,
-                                    price: Number(item.price || 0)
-                                }
-                            });
-
-                            // Revert Legacy field if Merkez
-                            if (targetBranch === 'Merkez') {
-                                await tx.product.update({
-                                    where: { id: String(item.productId) },
-                                    data: { stock: { increment: qty } }
+                            if (isB2b && !isFormalInvoice) {
+                                // Un-invoiced B2B order: it only reserved stock, didn't deduct quantity.
+                                await tx.stock.updateMany({
+                                    where: { productId: String(item.productId), branch: targetBranch },
+                                    data: { reservedStock: { decrement: qty } }
                                 });
+
+                                if (targetBranch === 'Merkez') {
+                                    await tx.product.updateMany({
+                                        where: { id: String(item.productId) },
+                                        data: { reservedStock: { decrement: qty } }
+                                    });
+                                }
+                            } else {
+                                // Sync Stock Record (increment because we are returning items to shelf)
+                                await tx.stock.upsert({
+                                    where: { productId_branch: { productId: String(item.productId), branch: targetBranch } },
+                                    update: { quantity: { increment: qty } },
+                                    create: { productId: String(item.productId), branch: targetBranch, quantity: qty }
+                                });
+
+                                // Create Stock Movement
+                                await (tx as any).stockMovement.create({
+                                    data: {
+                                        productId: String(item.productId),
+                                        branch: targetBranch,
+                                        companyId: order.companyId,
+                                        quantity: qty,
+                                        type: 'RETURN',
+                                        referenceId: order.id,
+                                        price: Number(item.price || 0)
+                                    }
+                                });
+
+                                // Revert Legacy field if Merkez
+                                if (targetBranch === 'Merkez') {
+                                    await tx.product.update({
+                                        where: { id: String(item.productId) },
+                                        data: { stock: { increment: qty } }
+                                    });
+                                }
                             }
                         } catch (e) {
                             console.error("Stock reversal error:", e);
