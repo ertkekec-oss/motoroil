@@ -939,19 +939,45 @@ function StepB2BDetails({ mode, data, onChange }: any) {
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">B2B Ağı ve Periodya Hub üzerinde incelendiğinde müşterilerinize gösterilecek gelişmiş açıklamayı buraya girebilirsiniz.</p>
             </div>
             
-            <div className="space-y-4">
-                <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Açıklaması (Gelişmiş)</label>
-                <textarea
-                    rows={12}
-                    value={data.b2bDescription || ''}
-                    onChange={e => onChange({ ...data, b2bDescription: e.target.value })}
-                    className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-white dark:bg-[#0f172a] shadow-sm resize-y text-[15px] font-medium leading-relaxed"
-                    placeholder="Ürün hakkında pazarlama amaçlı, detaylı bir metin yazabilirsiniz. Örneğin: Ürün materyalleri, garantisi, kullanım alanları vb."
-                ></textarea>
-                <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl flex gap-3 items-start">
-                    <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-                        Bu alana girilen detaylı ürün yazısı, doğrudan B2B Özel Kataloğu ve Periodya Satış Hubı üzerindeki İncele ekranlarında müşterilerinize sunulacaktır. Boş bırakmanız halinde detay sayfası gösterilmeyecektir.
-                    </p>
+            <div className="flex flex-col lg:flex-row gap-8">
+                {/* Left Side: Image */}
+                <div className="w-full lg:w-1/3 shrink-0 flex flex-col gap-3">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold opacity-0 select-none hidden lg:block">Görsel Alanı</label>
+                    <div className="aspect-square bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-white/5 flex items-center justify-center p-6 overflow-hidden relative shadow-inner">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-100/30 dark:to-slate-900/40 pointer-events-none" />
+                        {data.imageUrl ? (
+                            <img src={data.imageUrl} alt={data.name || "Ürün Görseli"} className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply dark:mix-blend-normal z-10" />
+                        ) : (
+                            <div className="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500 z-10">
+                                <Package className="w-12 h-12 opacity-80" strokeWidth={1.5} />
+                                <span className="text-sm font-medium">Görsel Yok</span>
+                            </div>
+                        )}
+                    </div>
+                    {data.name && (
+                        <div className="text-center">
+                            <h4 className="font-semibold text-slate-900 dark:text-white line-clamp-1">{data.name}</h4>
+                            <p className="text-xs text-slate-500 mt-1 uppercase tracking-wide">{data.code || "SKU Yükleniyor"}</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Right Side: Form & Description */}
+                <div className="w-full lg:w-2/3 space-y-4 flex flex-col">
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Ürün Açıklaması (Gelişmiş)</label>
+                    <textarea
+                        rows={12}
+                        value={data.b2bDescription || ''}
+                        onChange={e => onChange({ ...data, b2bDescription: e.target.value })}
+                        className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-white dark:bg-[#0f172a] shadow-sm resize-y text-[15px] font-medium leading-relaxed"
+                        placeholder="Ürün hakkında pazarlama amaçlı, detaylı bir metin yazabilirsiniz. Örneğin: Ürün materyalleri, garantisi, kullanım alanları vb."
+                    ></textarea>
+                    
+                    <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl flex gap-3 items-start mt-auto">
+                        <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                            Bu alana girilen detaylı ürün yazısı, doğrudan B2B Özel Kataloğu ve Periodya Satış Hubı üzerindeki İncele ekranlarında müşterilerinize sunulacaktır. Boş bırakmanız halinde detay sayfası gösterilmeyecektir.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
