@@ -25,6 +25,7 @@ export async function GET(req: Request) {
         const q = url.searchParams.get("q") || ""
         const take = parseInt(url.searchParams.get("take") || "20", 10)
         let cursor = url.searchParams.get("cursor") || undefined
+        const cat = url.searchParams.get("category") || ""
 
         const catalogItems = await prisma.dealerCatalogItem.findMany({
             where: {
@@ -32,12 +33,13 @@ export async function GET(req: Request) {
                 visibility: "VISIBLE",
                 ...(q ? {
                     product: {
+                        ...(cat ? { category: cat } : {}),
                         OR: [
                             { name: { contains: q, mode: 'insensitive' } },
                             { code: { contains: q, mode: 'insensitive' } }
                         ]
                     }
-                } : {})
+                } : (cat ? { product: { category: cat } } : {}))
             },
             take: take + 1,
             ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -49,6 +51,8 @@ export async function GET(req: Request) {
                         code: true,
                         price: true,
                         stock: true,
+                        imageUrl: true,
+                        category: true,
                         variants: {
                             select: {
                                 id: true,
@@ -81,7 +85,8 @@ export async function GET(req: Request) {
                 id: prod.id,
                 name: prod.name,
                 sku: prod.code,
-                image: null,
+                image: prod.imageUrl || null,
+                category: prod.category || "Diğer",
                 stock: totalStock,
                 priceResolved,
                 minOrderQty: item.minOrderQty,

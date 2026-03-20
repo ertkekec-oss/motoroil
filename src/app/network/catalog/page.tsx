@@ -7,20 +7,32 @@ import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check }
 export default function NetworkCatalogPage() {
     const { showError, showSuccess } = useModal()
     const [q, setQ] = useState("")
+    const [activeCat, setActiveCat] = useState<string>("")
+    const [categories, setCategories] = useState<string[]>([])
     const [loading, setLoading] = useState(true)
     const [products, setProducts] = useState<any[]>([])
     const [addingToCart, setAddingToCart] = useState<string | null>(null)
+
+    // Load categories once
+    useEffect(() => {
+        fetch("/api/network/catalog/categories")
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok) setCategories(data.categories || [])
+            })
+            .catch(() => {})
+    }, [])
 
     // Helper: Debounce search
     useEffect(() => {
         const timer = setTimeout(() => fetchCatalog(), 400)
         return () => clearTimeout(timer)
-    }, [q])
+    }, [q, activeCat])
 
     const fetchCatalog = async () => {
         setLoading(true)
         try {
-            const res = await fetch(`/api/network/catalog?q=${encodeURIComponent(q)}`)
+            const res = await fetch(`/api/network/catalog?q=${encodeURIComponent(q)}&category=${encodeURIComponent(activeCat)}`)
             const data = await res.json()
             if (res.ok && data.ok) {
                 setProducts(data.products || [])
@@ -96,6 +108,35 @@ export default function NetworkCatalogPage() {
                     </div>
                 </div>
 
+                {/* 1.5. CATEGORY FILTERS (Scrollable) */}
+                {categories.length > 0 && (
+                    <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 custom-scroll scroll-smooth -mt-2" style={{ scrollbarWidth: "none" }}>
+                        <button
+                            onClick={() => setActiveCat("")}
+                            className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border shrink-0
+                                ${activeCat === "" 
+                                    ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
+                                    : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:bg-blue-50"
+                                }`}
+                        >
+                            Tümü
+                        </button>
+                        {categories.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setActiveCat(cat)}
+                                className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border shrink-0
+                                    ${activeCat === cat 
+                                        ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
+                                        : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:bg-blue-50"
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 {/* 2. PRODUCT GRID */}
                 <div className="pt-4 border-t border-slate-200/60">
                     {loading ? (
@@ -123,10 +164,20 @@ export default function NetworkCatalogPage() {
 
                                     {/* Image Area */}
                                     <div className="h-48 bg-slate-50/50 border-b border-slate-100 flex items-center justify-center p-6 relative">
-                                        {/* Mockup product icon */}
-                                        <div className="w-20 h-20 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-300 group-hover:scale-105 group-hover:text-blue-500/50 transition-all duration-300">
-                                            <PackageOpen className="w-10 h-10" strokeWidth={1} />
-                                        </div>
+                                        {p.image ? (
+                                            <div className="w-full h-full relative group-hover:scale-105 transition-transform duration-300">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img 
+                                                    src={p.image} 
+                                                    alt={p.name} 
+                                                    className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="w-20 h-20 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-300 group-hover:scale-105 group-hover:text-blue-500/50 transition-all duration-300">
+                                                <PackageOpen className="w-10 h-10" strokeWidth={1} />
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Content Area */}
