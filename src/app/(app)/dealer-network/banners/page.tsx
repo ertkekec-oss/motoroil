@@ -79,13 +79,10 @@ export default function BannerManagementPage() {
     };
 
     const handleDelete = (id: string) => {
-        showConfirm({
-            title: "Banner'ı Sil",
-            message: "Bu banner'ı kalıcı olarak silmek istediğinize emin misiniz?",
-            confirmText: "Evet, Sil",
-            cancelText: "Vazgeç",
-            type: "danger",
-            onConfirm: async () => {
+        showConfirm(
+            "Banner'ı Sil",
+            "Bu banner'ı kalıcı olarak silmek istediğinize emin misiniz?",
+            async () => {
                 try {
                     const res = await fetch(`/api/dealer-network/banners/${id}`, { method: 'DELETE' });
                     if (!res.ok) throw new Error("Silinemedi");
@@ -95,7 +92,7 @@ export default function BannerManagementPage() {
                     showError("Hata", e.message);
                 }
             }
-        });
+        );
     };
 
     const updateBannerField = async (id: string, field: string, value: any) => {
