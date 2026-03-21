@@ -603,7 +603,8 @@ function InventoryContent() {
         "currency",
         "purchaseCurrency",
         "otvCode",
-        "globalCategoryId"
+        "globalCategoryId",
+        "b2bDescription"
       ];
       const updateData: any = {};
       validFields.forEach((field) => {
