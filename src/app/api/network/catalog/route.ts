@@ -30,17 +30,25 @@ export async function GET(req: Request) {
         const url = new URL(req.url)
         const q = url.searchParams.get("q") || ""
         const take = parseInt(url.searchParams.get("take") || "20", 10)
+        const page = parseInt(url.searchParams.get("page") || "1", 10)
         let cursor = url.searchParams.get("cursor") || undefined
         const cat = url.searchParams.get("category") || ""
 
-        const totalCount = await prisma.dealerCatalogItem.count({ where: {
+        const totalCount = await prisma.dealerCatalogItem.count({
+            where: {
                 supplierTenantId: membership.tenantId,
                 visibility: "VISIBLE",
                 ...(q ? {
                     product: {
                         ...(cat ? { category: cat } : {}),
                         OR: [
-                            { name: { contains: q, mode: 'insensitive' } }, });
+                            { name: { contains: q, mode: 'insensitive' } },
+                            { code: { contains: q, mode: 'insensitive' } }
+                        ]
+                    }
+                } : (cat ? { product: { category: cat } } : {}))
+            }
+        });
         const totalPages = Math.ceil(totalCount / take);
         const catalogItems = await prisma.dealerCatalogItem.findMany({
             where: {
@@ -56,8 +64,8 @@ export async function GET(req: Request) {
                     }
                 } : (cat ? { product: { category: cat } } : {}))
             },
-            take: take + 1,
-            ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+            take: take,
+            ...(cursor ? { cursor: { id: cursor }, skip: 1 } : { skip: Math.max(0, (page - 1) * take) }),
             include: {
                 product: {
                     select: {
