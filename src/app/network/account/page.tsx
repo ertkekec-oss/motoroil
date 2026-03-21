@@ -170,8 +170,22 @@ function ProfileTab({ me, handleLogout, getPath }: { me: any, handleLogout: () =
 
 function FinancesTab({ me }: { me: any }) {
     const [subTab, setSubTab] = useState("invoices")
+    const [finances, setFinances] = useState<any>(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        ;(async () => {
+            const res = await fetch("/api/network/finances")
+            const data = await res.json().catch(() => null)
+            if (data?.ok) {
+                setFinances(data)
+            }
+            setLoading(false)
+        })()
+    }, [])
+
     const fmt = (val: number | undefined) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: me?.currency || "TRY" }).format(val || 0)
-    const curCred = Math.max(0, (me?.creditLimit || 0) - (me?.balance > 0 ? me?.balance : 0))
+    const curCred = Math.max(0, (me?.creditLimit || 0) - Math.max(0, me?.balance || 0) - (me?.exposureBase || 0))
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -225,22 +239,84 @@ function FinancesTab({ me }: { me: any }) {
                 </div>
                 
                 <div className="flex-1 p-6 relative">
-                    {subTab === 'invoices' && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 animate-in fade-in duration-300">
-                             <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
-                                <Layers className="w-8 h-8" strokeWidth={1.5} />
-                            </div>
-                            <h3 className="text-[15px] font-semibold text-slate-900 mb-1">Faturalar Yakında Geliyor...</h3>
-                            <div className="text-slate-500 text-[14px] max-w-sm leading-relaxed">Bağlı olduğunuz tedarikçi tarafından kesilmiş güncel fatura ve satış kalemlerinizin detayları çok yakında bu alanda listelenecek.</div>
+                    {loading && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 animate-pulse">
+                            <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+                            <h3 className="text-[14px] font-medium text-slate-500">Finansal Veriler Yükleniyor...</h3>
                         </div>
                     )}
-                    {subTab === 'transactions' && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 animate-in fade-in duration-300">
-                             <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
-                                <ArrowRightLeft className="w-8 h-8" strokeWidth={1.5} />
-                            </div>
-                            <h3 className="text-[15px] font-semibold text-slate-900 mb-1">Hesap Hareketleri Yakında</h3>
-                            <div className="text-slate-500 text-[14px] max-w-sm leading-relaxed">Tüm tahsilat, havale ve kredi kartı ödemelerinizin finansal dökümü yakında bu menüde detaylandırılacaktır.</div>
+
+                    {!loading && subTab === 'invoices' && (
+                        <div className="animate-in fade-in duration-300">
+                            {(!finances?.invoices || finances.invoices.length === 0) && (!finances?.orders || finances.orders.length === 0) ? (
+                                <div className="flex flex-col items-center justify-center text-center p-12">
+                                     <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                                        <Layers className="w-8 h-8" strokeWidth={1.5} />
+                                    </div>
+                                    <h3 className="text-[15px] font-semibold text-slate-900 mb-1">Faturalar Yakında Geliyor...</h3>
+                                    <div className="text-slate-500 text-[14px] max-w-sm leading-relaxed">Bağlı olduğunuz tedarikçi tarafından kesilmiş güncel fatura ve satış kalemlerinizin detayları çok yakında bu alanda listelenecek.</div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <h4 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2">Satışlar ve Faturalar ({finances?.invoices?.length + finances?.orders?.length})</h4>
+                                    <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                                        {[...(finances?.invoices || []), ...(finances?.orders || [])].sort((a,b)=> new Date(b.date).getTime() - new Date(a.date).getTime()).map((item: any) => (
+                                            <div key={item.id} className="p-4 hover:bg-slate-50 flex items-center justify-between gap-4 transition-colors">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-[14px] font-semibold text-slate-900">{item.no || "No'suz İşlem"}</span>
+                                                    <span className="text-xs text-slate-500">{new Date(item.date).toLocaleDateString('tr-TR')} • {item.isFormal !== undefined ? (item.isFormal ? 'Resmi Fatura' : 'Taslak Fatura') : 'B2B Siparişi'}</span>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <span className={`text-[15px] font-bold ${item.isFormal !== undefined ? 'text-indigo-600' : 'text-emerald-600'}`}>{fmt(item.amount)}</span>
+                                                    <span className="text-[11px] font-medium px-2 py-0.5 roundedbg-slate-100 text-slate-500 bg-slate-100 rounded-md">
+                                                        {item.status || "Tamamlandı"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {!loading && subTab === 'transactions' && (
+                        <div className="animate-in fade-in duration-300">
+                             {!finances?.transactions || finances.transactions.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center text-center p-12">
+                                     <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                                        <ArrowRightLeft className="w-8 h-8" strokeWidth={1.5} />
+                                    </div>
+                                    <h3 className="text-[15px] font-semibold text-slate-900 mb-1">Hesap Hareketleri Yakında</h3>
+                                    <div className="text-slate-500 text-[14px] max-w-sm leading-relaxed">Tüm tahsilat, havale ve kredi kartı ödemelerinizin finansal dökümü yakında bu menüde detaylandırılacaktır.</div>
+                                </div>
+                             ) : (
+                                <div className="space-y-4">
+                                     <h4 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2">Mali İşlem Geçmişi ({finances.transactions.length})</h4>
+                                     <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                                        {finances.transactions.map((tx: any) => {
+                                            const isCollection = ["income", "Collection", "Senet", "Check"].includes(tx.type);
+                                            const isPayment = tx.type === "Payment";
+                                            return (
+                                                <div key={tx.id} className="p-4 hover:bg-slate-50 flex items-center justify-between gap-4 transition-colors">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="text-[14px] font-semibold text-slate-900">{tx.desc || tx.type}</span>
+                                                        <span className="text-xs text-slate-500">{new Date(tx.date).toLocaleDateString('tr-TR')} • REF: {tx.id.slice(-6).toUpperCase()}</span>
+                                                    </div>
+                                                    <div className="flex flex-col items-end gap-1">
+                                                        <span className={`text-[15px] font-bold ${isCollection ? 'text-emerald-600' : isPayment ? 'text-blue-600' : 'text-rose-600'}`}>
+                                                            {isCollection ? '+' : ''}{fmt(Math.abs(tx.amount))}
+                                                        </span>
+                                                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${isCollection ? 'bg-emerald-50 text-emerald-600' : isPayment ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}`}>
+                                                            {isCollection ? 'Tahsilat' : isPayment ? 'S. Ödemesi' : 'Borç Dekontu'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                     </div>
+                                </div>
+                             )}
                         </div>
                     )}
                 </div>

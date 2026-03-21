@@ -27,7 +27,42 @@ export async function GET() {
                 ? Number(membership.creditLimit)
                 : membership.creditLimit
 
-        const balance = 0; // T1.2'de Bakiye MVP için şimdilik 0 sabitlendi
+        let balance = 0;
+        let customerId = null;
+        
+        // 1) Match by Email
+        let crmCustomer = null;
+        if (membership.dealerUser?.email) {
+            crmCustomer = await prisma.customer.findFirst({
+                where: { 
+                    email: membership.dealerUser.email, 
+                    company: { tenantId: membership.tenantId },
+                    deletedAt: null 
+                },
+                select: { id: true, balance: true }
+            })
+        }
+        
+        // 2) Match by Tax Number (Fallback)
+        if (!crmCustomer && membership.dealerCompany?.taxNumber) {
+            crmCustomer = await prisma.customer.findFirst({
+                where: { 
+                    taxNumber: membership.dealerCompany.taxNumber, 
+                    company: { tenantId: membership.tenantId },
+                    deletedAt: null 
+                },
+                select: { id: true, balance: true }
+            })
+        }
+        
+        if (crmCustomer) {
+            balance = typeof crmCustomer.balance === "object" ? Number(crmCustomer.balance) : Number(crmCustomer.balance || 0);
+            customerId = crmCustomer.id;
+        }
+
+        // Get un-invoiced / pending order exposure for exact credit usage
+        const { computeExposureBase } = await import("@/lib/network/credit/exposure");
+        const { exposureBase } = await computeExposureBase(ctx).catch(() => ({ exposureBase: 0 }));
 
         return NextResponse.json({
             ok: true,
@@ -40,8 +75,10 @@ export async function GET() {
                 supplierTenantId: membership.tenantId,
                 supplierName: membership.tenant?.name ?? "Tedarikçi",
 
+                customerId,
                 creditLimit,
                 balance,
+                exposureBase,
                 currency: "TRY",
                 supplierEmail: membership.tenant?.ownerEmail ?? null,
                 supplierPhone: membership.tenant?.phone ?? null,
