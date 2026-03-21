@@ -1,0 +1,22 @@
+model DealerMembership {
+  id               String                  @id @default(uuid())
+  dealerUserId     String
+  dealerCompanyId  String?
+  tenantId         String
+  status           DealerMembershipStatus  @default(ACTIVE)
+  creditLimit      Decimal                 @default(0.0) @db.Decimal(12, 2)
+  financialMode    DealerFinancialMode     @default(ISOLATED)
+  priceRuleId      String?
+  categoryId       String?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  carts            DealerCart[]
+  checkoutAttempts DealerCheckoutAttempt[]
+  dealerCompany    DealerCompany?          @relation(fields: [dealerCompanyId], references: [id])
+  dealerUser       DealerUser              @relation(fields: [dealerUserId], references: [id])
+  priceRule        DealerPriceRule?        @relation(fields: [priceRuleId], references: [id])
+  tenant           Tenant                  @relation(fields: [tenantId], references: [id])
+  orders           Order[]                 @relation("OrderDealerMembership")
+
+  @@unique([dealerUserId, tenantId])
+  @@index([tenantId])

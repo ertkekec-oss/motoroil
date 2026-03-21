@@ -181,9 +181,34 @@ export async function POST(req: Request) {
             // --- CREDIT EXPOSURE CHECK ---
             const settings = await tx.dealerNetworkSettings.findUnique({
                 where: { tenantId: ctx.supplierTenantId },
-                select: { creditPolicy: true, approvalRequiresPaymentIfFlagged: true }
+                select: { creditPolicy: true, approvalRequiresPaymentIfFlagged: true, shippingCost: true, freeShippingThreshold: true }
             })
             const creditPolicy = settings?.creditPolicy || "HARD_LIMIT"
+
+            const shippingCost = settings?.shippingCost ? Number(settings.shippingCost) : 0
+            const freeShippingThreshold = settings?.freeShippingThreshold ? Number(settings.freeShippingThreshold) : 0
+            
+            let shippingFee = 0;
+            if (shippingCost > 0 && grandTotal > 0 && (freeShippingThreshold === 0 || grandTotal < freeShippingThreshold)) {
+                shippingFee = shippingCost;
+            }
+
+            if (shippingFee > 0) {
+                grandTotal += shippingFee;
+                snapshotItems.push({
+                    id: "shipping-" + Date.now(),
+                    productId: "shipping_fee",
+                    name: "Kargo Ücreti",
+                    code: "KARGO-01",
+                    barcode: "KARGO-01",
+                    quantity: 1,
+                    unit: "ADET",
+                    unitPrice: shippingFee,
+                    listPrice: shippingFee,
+                    discountPct: 0,
+                    lineTotal: shippingFee,
+                })
+            }
 
             const { creditLimit, exposureBase } = await computeExposureBase(ctx)
             const projectedExposure = exposureBase + grandTotal

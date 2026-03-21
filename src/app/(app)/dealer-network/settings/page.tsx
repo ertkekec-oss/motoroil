@@ -7,7 +7,7 @@ import {
     EnterpriseButton,
     EnterpriseSwitch
 } from "@/components/ui/enterprise";
-import { Save, AlertCircle, Settings2, CreditCard, Box, Info } from "lucide-react";
+import { Save, AlertCircle, Settings2, CreditCard, Box, Info, Truck } from "lucide-react";
 
 export default function DealerNetworkSettingsPage() {
     const [loading, setLoading] = useState(true);
@@ -27,7 +27,9 @@ export default function DealerNetworkSettingsPage() {
                     hardLimitBlock: data.hardLimitBlock ?? true,
                     forceCardOnLimit: data.forceCardOnLimit ?? false,
                     approvalRequiresPaymentIfFlagged: data.approvalRequiresPaymentIfFlagged ?? true,
-                    showLimitOnCartUI: data.showLimitOnCartUI ?? true
+                    showLimitOnCartUI: data.showLimitOnCartUI ?? true,
+                    shippingCost: data.shippingCost || '',
+                    freeShippingThreshold: data.freeShippingThreshold || ''
                 });
             } catch (err: any) {
                 setError(err.message || "İşlem başarısız oldu");
@@ -199,6 +201,46 @@ export default function DealerNetworkSettingsPage() {
                                     checked={settings?.showLimitOnCartUI}
                                     onChange={(val) => handleChange('showLimitOnCartUI', val)}
                                 />
+                            </div>
+                        </div>
+                    </EnterpriseCard>
+
+                    {/* 3. KARGO YONETIMI */}
+                    <EnterpriseCard>
+                        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-4 mb-5">
+                            <Truck className="w-5 h-5 text-indigo-500" />
+                            <h2 className="text-base font-bold text-slate-900 dark:text-white">Kargo Yönetimi</h2>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-1.5">Sabit Kargo Ücreti (₺)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={settings?.shippingCost || ''}
+                                    onChange={(e) => handleChange('shippingCost', e.target.value)}
+                                    placeholder="Örn: 99.90"
+                                    className="w-full max-w-sm px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0f172a] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                                />
+                                <p className="text-[13px] text-slate-500 mt-2">Sepete yansıtılacak varsayılan kargo gönderim bedeli.</p>
+                            </div>
+
+                            <hr className="border-slate-100 dark:border-slate-800" />
+
+                            <div>
+                                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-1.5">Ücretsiz Kargo Sepet Tutarı (₺)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={settings?.freeShippingThreshold || ''}
+                                    onChange={(e) => handleChange('freeShippingThreshold', e.target.value)}
+                                    placeholder="Örn: 1500"
+                                    className="w-full max-w-sm px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0f172a] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                                />
+                                <p className="text-[13px] text-slate-500 mt-2">Bu tutarın üzerindeki alışverişlerde sistem kargoyu ücretsiz hale getirir.</p>
                             </div>
                         </div>
                     </EnterpriseCard>

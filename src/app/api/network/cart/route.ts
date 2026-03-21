@@ -37,7 +37,7 @@ export async function GET() {
         if (!cart) {
             return NextResponse.json({
                 ok: true,
-                cart: { items: [], summary: { subTotal: 0, totalDiscount: 0, grandTotal: 0, discountPct: 0 } },
+                cart: { items: [], summary: { subTotal: 0, totalDiscount: 0, grandTotal: 0, discountPct: 0, shippingFee: 0, shippingCost: 0, freeShippingThreshold: 0 } },
             })
         }
 
@@ -80,6 +80,27 @@ export async function GET() {
             }
         })
 
+        const settings = await prismaRaw.dealerNetworkSettings.findUnique({
+            where: { tenantId: ctx.supplierTenantId }
+        });
+
+        const shippingCost = settings?.shippingCost ? toNumber(settings.shippingCost) : 0;
+        const freeShippingThreshold = settings?.freeShippingThreshold ? toNumber(settings.freeShippingThreshold) : 0;
+        
+        // Shipping fee calculation
+        let shippingFee = 0;
+        if (shippingCost > 0) {
+            if (freeShippingThreshold > 0 && grandTotal < freeShippingThreshold) {
+                shippingFee = shippingCost;
+            } else if (freeShippingThreshold === 0) {
+                // if there is no threshold but a fixed shipping cost, always apply
+                shippingFee = shippingCost;
+            }
+        }
+        
+        // add shipping fee to grand total
+        grandTotal += shippingFee;
+
         return NextResponse.json({
             ok: true,
             cart: {
@@ -90,6 +111,9 @@ export async function GET() {
                     totalDiscount,
                     grandTotal,
                     discountPct,
+                    shippingFee,
+                    shippingCost,
+                    freeShippingThreshold
                 },
             },
         })

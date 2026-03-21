@@ -4217,6 +4217,8 @@ model DealerNetworkSettings {
   forceCardOnLimit                 Boolean            @default(false)
   approvalRequiresPaymentIfFlagged Boolean            @default(true)
   showLimitOnCartUI                Boolean            @default(true)
+  shippingCost                     Decimal?           @db.Decimal(12, 2)
+  freeShippingThreshold            Decimal?           @db.Decimal(12, 2)
   createdAt                        DateTime           @default(now())
   updatedAt                        DateTime           @updatedAt
 }

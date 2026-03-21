@@ -117,6 +117,7 @@ export default function NetworkCatalogPage() {
 
             const data = await res.json().catch(() => ({}))
             if (res.ok && (data.ok || !data.error)) {
+                window.dispatchEvent(new Event('cart_update'));
                 showSuccess("Sepet", `${qty} adet ${p.name} sepete eklendi.`)
             } else {
                 showError("Sepet", data.error || "Ürün sepete eklenemedi.")
@@ -128,6 +129,11 @@ export default function NetworkCatalogPage() {
             setAddingToCart(null)
         }
     }
+
+    const imageProducts = products.filter((p: any) => !!p.image).slice(0, 8);
+    const noImageProducts = products.filter((p: any) => !p.image);
+    const leftList = noImageProducts.slice(0, Math.ceil(noImageProducts.length / 2));
+    const rightList = noImageProducts.slice(Math.ceil(noImageProducts.length / 2));
 
     return (
         <div className="font-sans min-h-[calc(100vh-64px)] bg-slate-50">
@@ -305,8 +311,9 @@ export default function NetworkCatalogPage() {
                                                                 </div>
                                                             </div>
                                                             <div className="p-5 flex flex-col flex-1">
-                                                                <div className="flex items-center justify-between mb-2">
+                                                                <div className="flex flex-wrap items-center gap-2 mb-2">
                                                                     <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase bg-slate-100 px-2 py-0.5 rounded-md">{p.sku || "N/A"}</span>
+                                                                    <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase bg-slate-100 px-2 py-0.5 rounded-md">{p.category || "Diğer"}</span>
                                                                     {(p.minOrderQty > 1) && (
                                                                       <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">MOQ: {p.minOrderQty}</span>
                                                                     )}
@@ -348,9 +355,10 @@ export default function NetworkCatalogPage() {
                                                             <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
                                                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
                                                                 <div className="flex-1 min-w-0 pl-1">
-                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                    <div className="flex flex-wrap items-center gap-2 mb-1">
                                                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
-                                                                        <div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded truncate max-w-[100px]">{p.category || "Diğer"}</span>
+                                                                        <div className={`ml-auto w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                                                                     </div>
                                                                     <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
                                                                 </div>
@@ -379,9 +387,10 @@ export default function NetworkCatalogPage() {
                                                             <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
                                                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
                                                                 <div className="flex-1 min-w-0 pl-1">
-                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                    <div className="flex flex-wrap items-center gap-2 mb-1">
                                                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
-                                                                        <div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded truncate max-w-[100px]">{p.category || "Diğer"}</span>
+                                                                        <div className={`ml-auto w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                                                                     </div>
                                                                     <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
                                                                 </div>
@@ -432,14 +441,6 @@ export default function NetworkCatalogPage() {
                         </>
                     )}
                 </div>
-
-                {/* Footer Text */}
-                <div className="mt-14 text-center pb-8 border-t border-slate-200/50 pt-8">
-                    <p className="text-sm font-medium text-slate-500">
-                        Periodya B2B — Kurumsal ticaret altyapısı ile işinizi büyütün.
-                    </p>
-                </div>
-
             </div>
             
             

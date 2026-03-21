@@ -1,0 +1,57 @@
+model Customer {
+  id                  String                       @id @default(cuid())
+  name                String
+  email               String?
+  phone               String?
+  address             String?
+  taxNumber           String?
+  taxOffice           String?
+  contactPerson       String?
+  iban                String?
+  balance             Decimal                      @default(0) @db.Decimal(12, 2)
+  points              Decimal                      @default(0) @db.Decimal(10, 2)
+  branch              String?                      @default("Merkez")
+  categoryId          String?
+  supplierClass       String?
+  customerClass       String?
+  deletedAt           DateTime?
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  referralCode        String?                      @unique
+  city                String?
+  companyId           String
+  district            String?
+  isPortalActive      Boolean                      @default(false)
+  lastPortalLogin     DateTime?
+  portalPassword      String?
+  assignedStaffId     String?
+  lat                 Float?
+  lng                 Float?
+  locationPinnedAt    DateTime?
+  accountReconStatus  AccountReconciliationStatus?
+  checks              Check[]
+  coupons             Coupon[]
+  assignedStaff       Staff?                       @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
+  category            CustomerCategory?            @relation(fields: [categoryId], references: [id])
+  company             Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documents           CustomerDocument[]
+  locationRequests    CustomerLocationRequest[]
+  offers              Offer[]
+  predictiveVisits    PredictiveVisit[]
+  reconciliations     Reconciliation[]
+  routeStops          RouteStop[]
+  routeTemplateStops  RouteTemplateStop[]
+  invoices            SalesInvoice[]
+  salesOrders         SalesOrder[]
+  visits              SalesVisit[]
+  salesXOpportunities SalesXOpportunity[]
+  services            ServiceRecord[]
+  transactions        Transaction[]
+  warranties          Warranty[]
+
+  @@unique([email, companyId])
+  @@index([name])
+  @@index([phone])
+  @@index([email])
+  @@index([taxNumber])
+  @@index([companyId])

@@ -72,6 +72,8 @@ export async function PATCH(req: Request) {
         let forceCardOnLimit = typeof body.forceCardOnLimit === 'boolean' ? body.forceCardOnLimit : undefined;
         const approvalRequiresPaymentIfFlagged = typeof body.approvalRequiresPaymentIfFlagged === 'boolean' ? body.approvalRequiresPaymentIfFlagged : undefined;
         const showLimitOnCartUI = typeof body.showLimitOnCartUI === 'boolean' ? body.showLimitOnCartUI : undefined;
+        const shippingCost = body.shippingCost !== undefined ? (body.shippingCost === null ? null : Number(body.shippingCost)) : undefined;
+        const freeShippingThreshold = body.freeShippingThreshold !== undefined ? (body.freeShippingThreshold === null ? null : Number(body.freeShippingThreshold)) : undefined;
 
         // policy specific business rules
         if (creditPolicy === 'FORCE_CARD_ON_LIMIT') {
@@ -86,6 +88,8 @@ export async function PATCH(req: Request) {
         if (forceCardOnLimit !== undefined) updateData.forceCardOnLimit = forceCardOnLimit;
         if (approvalRequiresPaymentIfFlagged !== undefined) updateData.approvalRequiresPaymentIfFlagged = approvalRequiresPaymentIfFlagged;
         if (showLimitOnCartUI !== undefined) updateData.showLimitOnCartUI = showLimitOnCartUI;
+        if (shippingCost !== undefined) updateData.shippingCost = shippingCost;
+        if (freeShippingThreshold !== undefined) updateData.freeShippingThreshold = freeShippingThreshold;
 
         const updated = await prisma.dealerNetworkSettings.upsert({
             where: { tenantId },

@@ -12,9 +12,25 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
 
     // Setup mounted state to avoid hydration mismatch on dynamic links
     const [mounted, setMounted] = useState(false)
+    const [cartSummary, setCartSummary] = useState<any>(null)
+
+    const loadSummary = async () => {
+        try {
+            const res = await fetch("/api/network/cart", { cache: "no-store" })
+            const data = await res.json()
+            if (data.ok) setCartSummary(data.cart?.summary)
+        } catch (e) {}
+    }
+
     useEffect(() => {
         setMounted(true)
-    }, [])
+        if (!isPublic) {
+            loadSummary()
+            const handleUpdate = () => loadSummary()
+            window.addEventListener("cart_update", handleUpdate)
+            return () => window.removeEventListener("cart_update", handleUpdate)
+        }
+    }, [isPublic])
 
     // Public sayfalar için minimal topbar veya gizli
     const isPublic = pathname === "/network/login" || pathname === "/login" || pathname === "/" || pathname.startsWith("/network/invite") || pathname.startsWith("/invite");
@@ -77,6 +93,16 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
 
                     {/* Right: Actions */}
                     <div className="flex items-center space-x-5">
+                        
+                        {/* Dynamic Free Shipping Notification */}
+                        {cartSummary && cartSummary.freeShippingThreshold > 0 && cartSummary.grandTotal < cartSummary.freeShippingThreshold && (
+                            <div className="hidden lg:flex items-center mx-2 animate-in fade-in slide-in-from-right-4 duration-500">
+                                <div className="bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-sm shadow-amber-500/5">
+                                    {Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(cartSummary.freeShippingThreshold - cartSummary.grandTotal + cartSummary.shippingFee)} ekleyin, kargo BEDAVA!
+                                </div>
+                            </div>
+                        )}
+
                         <Link 
                             href={getPath("/network/cart")} 
                             className="relative flex items-center text-slate-500 hover:text-blue-600 transition-colors group"
@@ -107,6 +133,13 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
             <main>
                 {children}
             </main>
+
+            {/* Global Periodya B2B Footer Text */}
+            <div className="w-full flex justify-center py-6 mt-12 mb-8 pointer-events-none">
+                <div className="px-5 py-2.5 bg-slate-100/80 border border-slate-200 text-slate-500 text-xs font-semibold tracking-tight shadow-sm rounded-full backdrop-blur-sm">
+                    Periodya B2B — Kurumsal ticaret altyapısı ile işinizi büyütün.
+                </div>
+            </div>
         </div>
     )
 }

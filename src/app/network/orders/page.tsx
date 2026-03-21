@@ -245,14 +245,6 @@ export default function NetworkOrdersListPage() {
                         </div>
                     )}
                 </div>
-
-                {/* Footer Text */}
-                <div className="mt-10 text-center pb-8 border-t border-slate-200/50 pt-8">
-                    <p className="text-sm font-medium text-slate-500">
-                        Periodya B2B — Kurumsal ticaret altyapısı ile işinizi büyütün.
-                    </p>
-                </div>
-
             </div>
 
             {/* INTENT DRAWER / MODAL */}
