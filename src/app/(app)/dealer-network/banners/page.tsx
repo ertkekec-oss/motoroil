@@ -162,6 +162,16 @@ export default function BannerManagementPage() {
                 </div>
             }
         >
+            <div className="mb-6 p-4 rounded-xl border border-blue-100 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-800 flex flex-col sm:flex-row gap-3 text-sm text-blue-800 dark:text-blue-200">
+                <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <div className="flex flex-col gap-1.5">
+                    <span className="font-semibold text-blue-900 dark:text-blue-100">Önerilen Görsel Ölçüleri ve Formatları</span>
+                    <span className="leading-relaxed">
+                        Katalog sayfasında en iyi görünüm için <strong>1200x400 piksel</strong>, <strong>1920x640 piksel</strong> (veya 3:1 oranında yatay) görseller kullanmanız önerilir. Yükleyeceğiniz görsellerin boyutu en fazla <strong>4.5 MB</strong> olmalıdır. Geçerli formatlar: <strong>JPG, PNG, WEBP</strong>.
+                    </span>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {banners.map((banner) => (
                     <EnterpriseCard key={banner.id} className="overflow-hidden p-0 relative group">
