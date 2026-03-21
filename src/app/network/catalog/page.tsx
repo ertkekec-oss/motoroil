@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useModal } from "@/contexts/ModalContext"
-import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check } from "lucide-react"
+import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check, Eye, EyeOff, ArrowRight } from "lucide-react"
 
 export default function NetworkCatalogPage() {
     const { showError, showSuccess } = useModal()
@@ -18,6 +18,17 @@ export default function NetworkCatalogPage() {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [addingToCart, setAddingToCart] = useState<string | null>(null)
+    const [hideB2bPrice, setHideB2bPrice] = useState(false)
+
+    useEffect(() => {
+        setHideB2bPrice(localStorage.getItem('hideB2bPrice') === 'true')
+    }, [])
+    
+    const toggleHideB2bPrice = () => {
+        const newVal = !hideB2bPrice;
+        setHideB2bPrice(newVal);
+        localStorage.setItem('hideB2bPrice', String(newVal));
+    }
 
     // Load categories once
     useEffect(() => {
@@ -159,21 +170,30 @@ export default function NetworkCatalogPage() {
                         )}
                     </div>
 
-                    <div className="w-full md:w-[350px] shrink-0 relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" strokeWidth={1.5} />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Stok kodu (SKU) veya ürün adı girin..."
-                            className="w-full bg-white border border-slate-300 rounded-xl pl-11 pr-10 py-2.5 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-sm"
-                            value={q}
-                            onChange={(e) => setQ(e.target.value)}
-                        />
-                        <div className="absolute inset-y-0 right-1.5 flex items-center">
-                            <button className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
-                                <Filter className="h-4 w-4" strokeWidth={2} />
-                            </button>
+                    <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
+                        <button
+                            onClick={toggleHideB2bPrice}
+                            className="h-11 px-3.5 rounded-xl border border-slate-300 bg-white text-slate-500 hover:bg-slate-50 transition-colors flex items-center justify-center shadow-sm"
+                            title={hideB2bPrice ? "B2B Fiyatını Göster" : "B2B Fiyatını Gizle"}
+                        >
+                            {hideB2bPrice ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                        <div className="w-full md:w-[350px] relative group">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" strokeWidth={1.5} />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Stok kodu (SKU) veya ürün adı girin..."
+                                className="w-full bg-white border border-slate-300 rounded-xl pl-11 pr-10 py-2.5 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-sm"
+                                value={q}
+                                onChange={(e) => setQ(e.target.value)}
+                            />
+                            <div className="absolute inset-y-0 right-1.5 flex items-center">
+                                <button className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+                                    <Filter className="h-4 w-4" strokeWidth={2} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,12 +242,21 @@ export default function NetworkCatalogPage() {
                                                                 <h3 className="text-[15px] font-semibold text-slate-900 leading-snug line-clamp-2 mb-4 group-hover:text-blue-600 transition-colors">{p.name}</h3>
                                                                 <div className="mt-auto flex items-end justify-between pt-4 border-t border-slate-100/50">
                                                                     <div>
-                                                                        <div className="text-[12px] font-medium text-slate-500 mb-0.5">Size Özel</div>
-                                                                        <div className="text-lg font-bold text-slate-900 tracking-tight">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</div>
+                                                                        {hideB2bPrice ? (
+                                                                            <>
+                                                                                <div className="text-[12px] font-medium text-slate-500 mb-0.5">Satış Fiyatı</div>
+                                                                                <div className="text-lg font-bold text-slate-900 tracking-tight">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</div>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <div className="text-[11px] font-medium text-slate-400 mb-0.5" title="Liste Fiyatı">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</div>
+                                                                                <div className="text-lg font-bold text-slate-900 tracking-tight">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</div>
+                                                                            </>
+                                                                        )}
                                                                         <div className="text-[12px] text-slate-500 mt-1 flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} /> Stok: {p.stock > 0 ? <span className="font-medium text-slate-700">{p.stock} adet</span> : "Tükendi"}</div>
                                                                     </div>
                                                                     <div className="flex items-center gap-2">
-                                                                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="h-10 px-3 rounded-xl text-[13px] font-semibold flex items-center justify-center bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm" title="İncele"><Info className="w-4 h-4" strokeWidth={2} /></button>
+                                                                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="h-10 px-3 rounded-xl text-[13px] font-semibold flex items-center justify-center bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm" title="Detaya Git"><Search className="w-4 h-4" strokeWidth={2} /></button>
                                                                         <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`h-10 px-4 rounded-xl text-[13px] font-semibold flex items-center justify-center min-w-[80px] gap-2 transition-all active:scale-95 border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 shadow-sm'}`}>
                                                                             {addingToCart === p.id ? <><Check className="w-4 h-4" strokeWidth={2.5} /> Eklendi</> : <><Plus className="w-4 h-4" strokeWidth={2.5} /> Ekle</>}
                                                                         </button>
@@ -254,10 +283,17 @@ export default function NetworkCatalogPage() {
                                                                     <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
                                                                 </div>
                                                                 <div className="flex flex-col items-end pr-2 text-right shrink-0">
-                                                                    <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
+                                                                    {hideB2bPrice ? (
+                                                                        <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                                    ) : (
+                                                                        <>
+                                                                            <span className="text-[11px] font-medium text-slate-400">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                                            <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
+                                                                        </>
+                                                                    )}
                                                                 </div>
                                                                 <div className="flex items-center gap-1.5 shrink-0 border-l border-slate-100 pl-4">
-                                                                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200"><Info className="w-[18px] h-[18px]" strokeWidth={2} /></button>
+                                                                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200" title="Detaya Git"><Search className="w-[18px] h-[18px]" strokeWidth={2} /></button>
                                                                     <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-colors border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'}`}>
                                                                         {addingToCart === p.id ? <Check className="w-[18px] h-[18px]" strokeWidth={2.5} /> : <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />}
                                                                     </button>
@@ -278,10 +314,17 @@ export default function NetworkCatalogPage() {
                                                                     <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
                                                                 </div>
                                                                 <div className="flex flex-col items-end pr-2 text-right shrink-0">
-                                                                    <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
+                                                                    {hideB2bPrice ? (
+                                                                        <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                                    ) : (
+                                                                        <>
+                                                                            <span className="text-[11px] font-medium text-slate-400">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                                            <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
+                                                                        </>
+                                                                    )}
                                                                 </div>
                                                                 <div className="flex items-center gap-1.5 shrink-0 border-l border-slate-100 pl-4">
-                                                                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200"><Info className="w-[18px] h-[18px]" strokeWidth={2} /></button>
+                                                                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200" title="Detaya Git"><Search className="w-[18px] h-[18px]" strokeWidth={2} /></button>
                                                                     <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-colors border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'}`}>
                                                                         {addingToCart === p.id ? <Check className="w-[18px] h-[18px]" strokeWidth={2.5} /> : <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />}
                                                                     </button>

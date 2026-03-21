@@ -89,6 +89,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 category: prod.category || "Diğer",
                 description: prod.b2bDescription || null,
                 stock: totalStock,
+                basePrice: Number(prod.price ?? 0),
                 priceResolved,
                 minOrderQty: catalogItem.minOrderQty,
                 maxOrderQty: catalogItem.maxOrderQty,

@@ -124,6 +124,7 @@ export async function GET(req: Request) {
                 category: prod.category || "Diğer",
                 description: prod.description || null,
                 stock: totalStock,
+                basePrice: Number(prod.price ?? 0),
                 priceResolved,
                 minOrderQty: item.minOrderQty,
                 maxOrderQty: item.maxOrderQty,

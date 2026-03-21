@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useModal } from "@/contexts/ModalContext"
-import { PackageOpen, ShoppingBag, Heart, Share2, HelpCircle, MessageCircle, ChevronLeft, Loader2, Star } from "lucide-react"
+import { PackageOpen, ChevronLeft, Loader2 } from "lucide-react"
 
 export default function CatalogProductDetailPage() {
     const params = useParams()
@@ -14,6 +14,11 @@ export default function CatalogProductDetailPage() {
     const [loading, setLoading] = useState(true)
     const [quantity, setQuantity] = useState(1)
     const [addingToCart, setAddingToCart] = useState(false)
+    const [hideB2bPrice, setHideB2bPrice] = useState(false)
+
+    useEffect(() => {
+        setHideB2bPrice(localStorage.getItem('hideB2bPrice') === 'true')
+    }, [])
 
     useEffect(() => {
         async function fetchProduct() {
@@ -118,30 +123,35 @@ export default function CatalogProductDetailPage() {
                 <div className="w-[60%] flex flex-col pt-2">
                     
                     {/* Title */}
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-4">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-8">
                         {product.name}
                     </h1>
 
-                    {/* Ratings Mock */}
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="flex gap-1 text-slate-300">
-                            {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-current" />)}
-                        </div>
-                        <span className="text-sm font-bold text-slate-400 tracking-wide uppercase">(0) View All Reviews</span>
-                    </div>
-
                     {/* Price */}
-                    <div className="flex items-center gap-4 mb-8">
-                        <span className="text-4xl font-black text-[#1a1a1a] tracking-tight">
-                            {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(product.priceResolved).replace('$', '₺')}
-                        </span>
-                        {/* Mock old price & discount badge for Pawzy style */}
-                        <span className="text-2xl font-bold text-slate-300 line-through">
-                            {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(product.priceResolved * 1.1).replace('$', '₺')}
-                        </span>
-                        <span className="px-2.5 py-1 bg-red-600 text-white text-[13px] font-black rounded-md tracking-wider">
-                            -10%
-                        </span>
+                    <div className="flex items-end gap-6 mb-8">
+                        {hideB2bPrice ? (
+                            <div className="flex flex-col">
+                                <span className="text-[13px] font-bold text-slate-400 tracking-wider uppercase mb-1">Satış Fiyatı</span>
+                                <span className="text-4xl font-black text-[#1a1a1a] tracking-tight">
+                                    {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(product.basePrice || product.priceResolved)}
+                                </span>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="flex flex-col">
+                                    <span className="text-[13px] font-bold text-slate-400 tracking-wider uppercase mb-1">Liste Fiyatı</span>
+                                    <span className="text-2xl font-bold text-slate-400">
+                                        {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(product.basePrice || product.priceResolved)}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[13px] font-bold text-slate-500 tracking-wider uppercase mb-1 flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Size Özel</span>
+                                    <span className="text-4xl font-black text-[#1a1a1a] tracking-tight">
+                                        {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(product.priceResolved)}
+                                    </span>
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Description Paragraph */}
@@ -151,24 +161,21 @@ export default function CatalogProductDetailPage() {
 
                     {/* Meta Grid */}
                     <div className="grid grid-cols-[120px_1fr] gap-y-4 text-[13px] mb-10 border-t border-slate-100 pt-8">
-                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">AVAILABLE:</div>
+                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">STOK DURUMU:</div>
                         <div className={`font-bold uppercase tracking-wider ${stock > 0 ? "text-emerald-500" : "text-red-500"}`}>
-                            {stock > 0 ? `IN STOCK (${stock})` : "OUT OF STOCK"}
+                            {stock > 0 ? `Stok: ${stock} adet` : "Stokta Yok"}
                         </div>
-
-                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">TAGS:</div>
-                        <div className="font-medium text-slate-500">{product.category}, B2B</div>
 
                         <div className="font-extrabold text-[#1a1a1a] tracking-wide">SKU:</div>
                         <div className="font-medium text-slate-500 uppercase">{product.sku || "N/A"}</div>
                         
-                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">CATEGORY:</div>
+                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">KATEGORİ:</div>
                         <div className="font-medium text-slate-500">{product.category}</div>
                     </div>
 
                     {/* Add to Cart Area */}
                     <div className="mb-4">
-                        <div className="font-extrabold text-[#1a1a1a] text-[13px] tracking-wide mb-4">QUANTITY:</div>
+                        <div className="font-extrabold text-[#1a1a1a] text-[13px] tracking-wide mb-4">MİKTAR:</div>
                         
                         <div className="flex items-center gap-4 h-14">
                             {/* Quantity Selector */}
@@ -200,12 +207,7 @@ export default function CatalogProductDetailPage() {
                                     : "bg-slate-100 hover:bg-slate-200 text-[#1a1a1a] active:scale-[0.98]"
                                 }`}
                             >
-                                {addingToCart ? "Yükleniyor..." : "Add To Bag"}
-                            </button>
-
-                            {/* Favorite Button */}
-                            <button className="w-14 h-14 shrink-0 rounded-[14px] bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-[#1a1a1a] transition-all">
-                                <Heart className="w-6 h-6" strokeWidth={1.5} />
+                                {addingToCart ? "Yükleniyor..." : "SEPETE EKLE"}
                             </button>
                         </div>
                     </div>
@@ -219,24 +221,8 @@ export default function CatalogProductDetailPage() {
                             : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white"
                         }`}
                     >
-                        Buy Now (Hemen Al)
+                        HEMEN AL
                     </button>
-
-                    {/* Links row */}
-                    <div className="flex items-center gap-8 mt-10 pt-8 border-t border-slate-100 text-[13px] font-black text-[#1a1a1a] tracking-wider uppercase">
-                        <button className="flex items-center gap-2.5 hover:text-blue-600 transition-colors">
-                            <Share2 className="w-[18px] h-[18px]" strokeWidth={2.5} />
-                            Share
-                        </button>
-                        <button className="flex items-center gap-2.5 hover:text-blue-600 transition-colors">
-                            <HelpCircle className="w-[18px] h-[18px]" strokeWidth={2.5} />
-                            Ask a Question
-                        </button>
-                        <button className="flex items-center gap-2.5 hover:text-blue-600 transition-colors">
-                            <MessageCircle className="w-[18px] h-[18px]" strokeWidth={2.5} />
-                            FAQ
-                        </button>
-                    </div>
 
                 </div>
             </div>
