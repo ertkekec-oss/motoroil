@@ -43,6 +43,12 @@ export default function BannerManagementPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        if (file.size > 4.5 * 1024 * 1024) {
+            showError("Boyut Çok Büyük", "Vercel sunucu sınırları gereği görsellerin boyutu maksimum 4.5 MB olmalıdır. Lütfen daha düşük boyutlu veya sıkıştırılmış bir JPG/PNG/WEBP yükleyin.");
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+        }
+
         setUploading(true);
         try {
             const formData = new FormData();
@@ -53,8 +59,21 @@ export default function BannerManagementPage() {
                 body: formData
             });
 
-            const uploadData = await uploadRes.json();
-            if (!uploadRes.ok) throw new Error(uploadData.error || "Yükleme başarısız");
+            let uploadData;
+            if (!uploadRes.ok) {
+                const rawText = await uploadRes.text().catch(() => "Sunucu yanıt vermedi");
+                if (uploadRes.status === 413 || rawText.includes("Request Entity Too Large")) {
+                    throw new Error("Görsel boyutu sunucu limitini aşıyor (4.5 MB sınırı). Lütfen görselinizi sıkıştırarak tekrar deneyin.");
+                }
+                try {
+                    const errJson = JSON.parse(rawText);
+                    throw new Error(errJson.error || "Yükleme başarısız");
+                } catch {
+                    throw new Error("Beklenmeyen Hata: " + rawText.substring(0, 100));
+                }
+            } else {
+                uploadData = await uploadRes.json();
+            }
 
             // Create banner record
             const createRes = await fetch("/api/dealer-network/banners", {
