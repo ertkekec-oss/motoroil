@@ -4221,6 +4221,19 @@ model DealerNetworkSettings {
   updatedAt                        DateTime           @updatedAt
 }
 
+model NetworkBanner {
+  id        String   @id @default(cuid())
+  tenantId  String
+  imageUrl  String
+  linkUrl   String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
 model DealerCatalogItem {
   id               String                  @id @default(cuid())
   supplierTenantId String

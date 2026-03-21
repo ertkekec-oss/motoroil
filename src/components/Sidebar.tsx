@@ -55,7 +55,7 @@ export default function Sidebar() {
             'dealer-network-parent': [
                 '/dealer-network/dealers', '/dealer-network/catalog',
                 '/dealer-network/orders/approvals', '/dealer-network/refunds',
-                '/dealer-network/settings'
+                '/dealer-network/settings', '/dealer-network/banners'
             ],
             'customers-parent': ['/customers', '/suppliers'],
             'signatures-parent': ['/signatures', '/signatures/envelopes', '/signatures/new', '/signatures/templates', '/signatures/inbox', '/signatures/completed'],
@@ -138,6 +138,7 @@ export default function Sidebar() {
             '/dealer-network/orders/approvals': { perm: 'b2b_manage' },
             '/dealer-network/refunds': { perm: 'b2b_manage' },
             '/dealer-network/settings': { perm: 'b2b_manage' },
+            '/dealer-network/banners': { perm: 'b2b_manage' },
             '/admin/b2b/dealer-orders': { platformOnly: true },
             '/admin/b2b/refunds': { platformOnly: true },
             '/admin/b2b/policies': { platformOnly: true },
@@ -207,6 +208,7 @@ export default function Sidebar() {
                             { name: 'B2B Katalog', href: '/dealer-network/catalog' },
                             { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals' },
                             { name: 'İadeler', href: '/dealer-network/refunds' },
+                            { name: 'Banner Yönetimi', href: '/dealer-network/banners' },
                             { name: 'Ayarlar', href: '/dealer-network/settings' },
                         ]
                     },

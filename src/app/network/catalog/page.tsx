@@ -11,6 +11,7 @@ export default function NetworkCatalogPage() {
     const [q, setQ] = useState("")
     const [activeCat, setActiveCat] = useState<string>("")
     const [categories, setCategories] = useState<string[]>([])
+    const [banners, setBanners] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [products, setProducts] = useState<any[]>([])
     const [page, setPage] = useState(1)
@@ -23,6 +24,13 @@ export default function NetworkCatalogPage() {
             .then(res => res.json())
             .then(data => {
                 if (data.ok) setCategories(data.categories || [])
+            })
+            .catch(() => {})
+
+        fetch("/api/network/catalog/banners")
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok) setBanners(data.banners || [])
             })
             .catch(() => {})
     }, [])
@@ -90,15 +98,16 @@ export default function NetworkCatalogPage() {
                 
                 {/* 1. HEADER & SEARCH BAR */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <div className="inline-flex items-center px-2.5 py-1 mb-3 rounded-md bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-600 uppercase tracking-wide">
-                            Katalog Altyapısı
+                    {banners.length > 0 ? (
+                        <div className="w-full relative overflow-hidden rounded-2xl md:mr-8 max-h-[140px] md:max-h-[160px] flex items-center bg-transparent group cursor-pointer shadow-sm">
+                            <img src={banners[0].imageUrl} alt="Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { if(banners[0].linkUrl) window.open(banners[0].linkUrl, '_blank') }} />
+                            {banners.length > 1 && (
+                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.length} Etkinlik</div>
+                            )}
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Ürün Kataloğu</h1>
-                        <p className="mt-2 text-[15px] text-slate-500 max-w-xl leading-relaxed">
-                            Ağa özel tanımlanmış ürünleri, tahsis edilen limitinizi kullanarak size özel fiyatlarla sipariş edebilirsiniz.
-                        </p>
-                    </div>
+                    ) : (
+                        <div className="w-full md:mr-8"></div>
+                    )}
 
                     <div className="w-full md:w-[400px] shrink-0 relative group">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
