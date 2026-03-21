@@ -1,35 +1,27 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { requireDealerSession } from "@/lib/network/session";
+import { readActiveMembershipId } from "@/lib/network/cookies";
+import { prismaRaw as prisma } from '@/lib/prisma';
 
 export async function GET(req: Request) {
     try {
-        const session = await getSession();
+        const session = await requireDealerSession().catch(() => null);
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        // Get the supplier's tenantId. DealerMembership has supplierTenantId.
-        const dealerMembershipId = session.user?.dealerMembershipId || (session as any).dealerMembershipId;
-        
-        let targetTenantId = '';
+        const membershipId = await readActiveMembershipId();
+        if (!membershipId) return NextResponse.json({ error: 'No membership selected' }, { status: 400 });
 
-        if (dealerMembershipId) {
-            const membership = await prisma.dealerMembership.findUnique({
-                where: { id: dealerMembershipId }
-            });
-            if (membership) {
-                targetTenantId = membership.supplierTenantId;
-            }
-        } 
-        
-        if (!targetTenantId) {
-            const user = session.user || session;
-            targetTenantId = session.tenantId || user.tenantId;
-        }
+        const membership = await prisma.dealerMembership.findUnique({
+            where: { id: membershipId },
+            select: { supplierTenantId: true }
+        });
 
-        if (!targetTenantId) return NextResponse.json({ error: 'No tenant context' }, { status: 400 });
+        if (!membership) return NextResponse.json({ error: 'Membership not found' }, { status: 404 });
 
         const banners = await prisma.networkBanner.findMany({
-            where: { tenantId: targetTenantId, isActive: true },
+            where: { tenantId: membership.supplierTenantId, isActive: true },
             orderBy: { order: 'asc' }
         });
 
