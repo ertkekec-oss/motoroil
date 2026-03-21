@@ -639,7 +639,7 @@ function StepOtherInfo({ data, onChange, categories, globalCategories }: any) {
                     <div className="space-y-2">
                         <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Açıklama</label>
                         <p className="text-[11px] text-slate-500 mb-2">Bu ürün hakkında not. E-ticaret entegrasyonlarınızda da gösterilir.</p>
-                        <textarea rows={3} value={data.description || ''} onChange={e => onChange({ description: e.target.value })} className="w-full rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none p-4 resize-none shadow-sm" placeholder="Ürün detayları..." />
+                        <textarea rows={3} value={data.description || ''} onChange={e => onChange({ ...data, description: e.target.value })} className="w-full rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none p-4 resize-none shadow-sm" placeholder="Ürün detayları..." />
                     </div>
                     <label className="flex items-center gap-3 cursor-pointer p-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl hover:border-slate-300 transition-colors">
                         <input type="checkbox" checked={data.showDescriptionOnInvoice ?? false} onChange={e => onChange({ ...data, showDescriptionOnInvoice: e.target.checked })} className="w-5 h-5 text-slate-900 dark:text-white rounded border-slate-300 focus:ring-slate-900" />
