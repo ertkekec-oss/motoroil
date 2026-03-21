@@ -97,9 +97,9 @@ export default function NetworkCatalogPage() {
             <div className="mx-auto w-full max-w-7xl px-6 py-10 space-y-8">
                 
                 {/* 1. BANNERS ROW */}
-                <div className="flex flex-col md:flex-row justify-between gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Alan 1 (Main Banner) */}
-                    <div className="w-full md:w-[calc(76%-12px)] relative overflow-hidden rounded-2xl flex items-center bg-slate-100 group cursor-pointer shadow-sm transition-all" style={{ aspectRatio: '1200/420' }}>
+                    <div className={`w-full relative overflow-hidden rounded-2xl flex items-center bg-slate-100 group cursor-pointer shadow-sm transition-all ${banners.some(b => b.placement === 'side') ? 'md:col-span-3' : 'md:col-span-4'}`} style={{ aspectRatio: '1200/420' }}>
                         {banners.filter(b => b.placement === 'main' || !b.placement).length > 0 ? (
                             <>
                                 <img src={banners.filter(b => b.placement === 'main' || !b.placement)[0].imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'main' || !b.placement)[0].linkUrl; if(link) window.open(link, '_blank') }} />
@@ -116,7 +116,7 @@ export default function NetworkCatalogPage() {
 
                     {/* Alan 2 (Side Banner) */}
                     {banners.filter(b => b.placement === 'side').length > 0 && (
-                        <div className="hidden md:flex md:w-[calc(24%-12px)] relative overflow-hidden rounded-2xl items-center bg-slate-100 group cursor-pointer shadow-sm transition-all shrink-0" style={{ aspectRatio: '380/420' }}>
+                        <div className="hidden md:flex md:col-span-1 w-full relative overflow-hidden rounded-2xl items-center bg-slate-100 group cursor-pointer shadow-sm transition-all" style={{ aspectRatio: '380/420' }}>
                             <img src={banners.filter(b => b.placement === 'side')[0].imageUrl} alt="Side Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'side')[0].linkUrl; if(link) window.open(link, '_blank') }} />
                         </div>
                     )}
@@ -174,34 +174,7 @@ export default function NetworkCatalogPage() {
                     </div>
                 </div>
 
-                {/* 1.5. CATEGORY FILTERS (Scrollable) */}
-                {categories.length > 0 && (
-                    <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 custom-scroll scroll-smooth -mt-2" style={{ scrollbarWidth: "none" }}>
-                        <button
-                            onClick={() => setActiveCat("")}
-                            className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border shrink-0
-                                ${activeCat === "" 
-                                    ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
-                                    : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:bg-blue-50"
-                                }`}
-                        >
-                            Tümü
-                        </button>
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setActiveCat(cat)}
-                                className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border shrink-0
-                                    ${activeCat === cat 
-                                        ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
-                                        : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:bg-blue-50"
-                                    }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
-                )}
+
 
                 {/* 2. PRODUCT GRID */}
                 <div className="pt-4 border-t border-slate-200/60">
