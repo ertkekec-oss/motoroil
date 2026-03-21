@@ -12,6 +12,7 @@ export default function NetworkCatalogPage() {
     const [activeCat, setActiveCat] = useState<string>("")
     const [categories, setCategories] = useState<string[]>([])
     const [banners, setBanners] = useState<any[]>([])
+    const [bannersLoading, setBannersLoading] = useState(true)
     const [loading, setLoading] = useState(true)
     const [products, setProducts] = useState<any[]>([])
     const [page, setPage] = useState(1)
@@ -27,12 +28,13 @@ export default function NetworkCatalogPage() {
             })
             .catch(() => {})
 
-        fetch("/api/network/catalog/banners")
+        fetch(`/api/network/catalog/banners?t=${Date.now()}`)
             .then(res => res.json())
             .then(data => {
                 if (data.ok) setBanners(data.banners || [])
             })
             .catch(() => {})
+            .finally(() => setBannersLoading(false))
     }, [])
 
     // Helper: Debounce search
@@ -97,30 +99,32 @@ export default function NetworkCatalogPage() {
             <div className="mx-auto w-full max-w-7xl px-6 py-10 space-y-8">
                 
                 {/* 1. BANNERS ROW */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    {/* Alan 1 (Main Banner) */}
-                    <div className={`w-full relative overflow-hidden rounded-2xl flex items-center bg-slate-100 group cursor-pointer shadow-sm transition-all ${banners.some(b => b.placement === 'side') ? 'md:col-span-3' : 'md:col-span-4'}`} style={{ aspectRatio: '1200/420' }}>
-                        {banners.filter(b => b.placement === 'main' || !b.placement).length > 0 ? (
-                            <>
-                                <img src={banners.filter(b => b.placement === 'main' || !b.placement)[0].imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'main' || !b.placement)[0].linkUrl; if(link) window.open(link, '_blank') }} />
-                                {banners.filter(b => b.placement === 'main' || !b.placement).length > 1 && (
-                                    <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.filter(b => b.placement === 'main' || !b.placement).length}</div>
-                                )}
-                            </>
-                        ) : (
-                            <div className="absolute inset-0 w-full h-full bg-slate-200 dark:bg-slate-800 animate-pulse flex items-center justify-center">
-                                <span className="text-slate-400 font-medium text-sm hidden md:inline-block">Alan 1 Banner Yükleniyor...</span>
+                {bannersLoading ? (
+                    <div className="w-full rounded-2xl bg-slate-200 dark:bg-slate-800 animate-pulse flex items-center justify-center shadow-sm" style={{ aspectRatio: '1200/420' }}>
+                        <span className="text-slate-400 font-medium text-sm hidden md:inline-block">Katalog Yükleniyor...</span>
+                    </div>
+                ) : banners.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        {/* Alan 1 (Main Banner) */}
+                        <div className={`w-full relative overflow-hidden rounded-2xl flex items-center bg-slate-100 group cursor-pointer shadow-sm transition-all ${banners.some(b => b.placement === 'side') ? 'md:col-span-3' : 'md:col-span-4'}`} style={{ aspectRatio: '1200/420' }}>
+                            {banners.filter(b => b.placement === 'main' || !b.placement).length > 0 && (
+                                <>
+                                    <img src={banners.filter(b => b.placement === 'main' || !b.placement)[0].imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'main' || !b.placement)[0].linkUrl; if(link) window.open(link, '_blank') }} />
+                                    {banners.filter(b => b.placement === 'main' || !b.placement).length > 1 && (
+                                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.filter(b => b.placement === 'main' || !b.placement).length}</div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+
+                        {/* Alan 2 (Side Banner) */}
+                        {banners.filter(b => b.placement === 'side').length > 0 && (
+                            <div className="hidden md:flex md:col-span-1 w-full relative overflow-hidden rounded-2xl items-center bg-slate-100 group cursor-pointer shadow-sm transition-all" style={{ aspectRatio: '380/420' }}>
+                                <img src={banners.filter(b => b.placement === 'side')[0].imageUrl} alt="Side Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'side')[0].linkUrl; if(link) window.open(link, '_blank') }} />
                             </div>
                         )}
                     </div>
-
-                    {/* Alan 2 (Side Banner) */}
-                    {banners.filter(b => b.placement === 'side').length > 0 && (
-                        <div className="hidden md:flex md:col-span-1 w-full relative overflow-hidden rounded-2xl items-center bg-slate-100 group cursor-pointer shadow-sm transition-all" style={{ aspectRatio: '380/420' }}>
-                            <img src={banners.filter(b => b.placement === 'side')[0].imageUrl} alt="Side Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'side')[0].linkUrl; if(link) window.open(link, '_blank') }} />
-                        </div>
-                    )}
-                </div>
+                ) : null}
 
                 {/* 2. SEARCH BAR & FILTERS ROW */}
                 <div className="flex flex-col-reverse md:flex-row md:items-center justify-between gap-4">
