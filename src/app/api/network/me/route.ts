@@ -14,7 +14,8 @@ export async function GET() {
                 tenantId: true,
                 creditLimit: true,
                 tenant: { select: { id: true, name: true, ownerEmail: true, phone: true, companies: { take: 1, select: { vkn: true, address: true, city: true, district: true, taxOffice: true } } } },
-                dealerCompany: { select: { id: true, companyName: true } },
+                dealerUser: { select: { email: true } },
+                dealerCompany: { select: { id: true, companyName: true, taxNumber: true } },
             },
         })
 

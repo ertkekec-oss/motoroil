@@ -260,19 +260,10 @@ function FinancesTab({ me }: { me: any }) {
                                 <div className="space-y-4">
                                     <h4 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2">Satışlar ve Faturalar ({finances?.invoices?.length + finances?.orders?.length})</h4>
                                     <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
-                                        {[...(finances?.invoices || []), ...(finances?.orders || [])].sort((a,b)=> new Date(b.date).getTime() - new Date(a.date).getTime()).map((item: any) => (
-                                            <div key={item.id} className="p-4 hover:bg-slate-50 flex items-center justify-between gap-4 transition-colors">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-[14px] font-semibold text-slate-900">{item.no || "No'suz İşlem"}</span>
-                                                    <span className="text-xs text-slate-500">{new Date(item.date).toLocaleDateString('tr-TR')} • {item.isFormal !== undefined ? (item.isFormal ? 'Resmi Fatura' : 'Taslak Fatura') : 'B2B Siparişi'}</span>
-                                                </div>
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <span className={`text-[15px] font-bold ${item.isFormal !== undefined ? 'text-indigo-600' : 'text-emerald-600'}`}>{fmt(item.amount)}</span>
-                                                    <span className="text-[11px] font-medium px-2 py-0.5 roundedbg-slate-100 text-slate-500 bg-slate-100 rounded-md">
-                                                        {item.status || "Tamamlandı"}
-                                                    </span>
-                                                </div>
-                                            </div>
+                                        {[...(finances?.invoices || []), ...(finances?.orders || [])]
+                                            .sort((a,b)=> new Date(b.date).getTime() - new Date(a.date).getTime())
+                                            .map((item: any) => (
+                                            <InvoiceRow key={item.id} item={item} fmt={fmt} />
                                         ))}
                                     </div>
                                 </div>
@@ -321,6 +312,75 @@ function FinancesTab({ me }: { me: any }) {
                     )}
                 </div>
             </div>
+        </div>
+    )
+}
+
+function InvoiceRow({ item, fmt }: { item: any, fmt: any }) {
+    const [expanded, setExpanded] = useState(false)
+    const canPrint = item.isFormal || (item.status && item.isFormal !== undefined); // SalesInvoice
+
+    return (
+        <div className="flex flex-col">
+            <div 
+                onClick={() => setExpanded(!expanded)}
+                className="p-4 hover:bg-slate-50 flex items-center justify-between gap-4 transition-colors cursor-pointer group"
+            >
+                <div className="flex flex-col gap-1">
+                    <span className="text-[14px] font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
+                        {expanded ? '▼' : '▶'} {item.no || "No'suz İşlem"}
+                    </span>
+                    <span className="text-xs text-slate-500 ml-5">{new Date(item.date).toLocaleDateString('tr-TR')} • {item.isFormal !== undefined ? (item.isFormal ? 'Resmi E-Fatura' : 'Taslak Fatura') : 'B2B Siparişi'}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end gap-1">
+                        <span className={`text-[15px] font-bold ${item.isFormal !== undefined ? 'text-indigo-600' : 'text-emerald-600'}`}>{fmt(item.amount)}</span>
+                        <span className="text-[11px] font-medium px-2 py-0.5 text-slate-500 bg-slate-100 rounded-md">
+                            {item.status || "Tamamlandı"}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            {expanded && (
+                <div className="p-4 bg-slate-100/50 border-t border-slate-100 border-b border-b-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                        <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider">İşlem Kalemleri</h5>
+                        {canPrint && (
+                            <a 
+                                href={`/api/sales/invoices?action=get-pdf&invoiceId=${item.id}`} 
+                                target="_blank" 
+                                className="text-xs font-semibold bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg hover:border-slate-300 hover:text-blue-600 hover:shadow-sm transition-all flex items-center gap-1.5"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <span>📄</span> PDF İncele / Yazdır
+                            </a>
+                        )}
+                    </div>
+                    <div className="space-y-2">
+                        {item.items && item.items.length > 0 ? (
+                            item.items.map((sub: any, idx: number) => (
+                                <div key={idx} className="bg-white border border-slate-200/60 p-3 rounded-lg flex justify-between items-center shadow-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded bg-slate-50 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                                            {idx + 1}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[13px] font-medium text-slate-800">{sub.name || sub.productName || "Ürün Girişi"}</span>
+                                            <span className="text-[11px] text-slate-500">{sub.qty || sub.quantity} Adet x {fmt(sub.price)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-[13px] font-bold text-slate-700">
+                                        {fmt((sub.qty || sub.quantity) * (sub.price || 0))}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-sm text-slate-500 py-2">Kalem detayı bulunmuyor.</div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
