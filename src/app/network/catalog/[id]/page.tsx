@@ -95,15 +95,15 @@ export default function CatalogProductDetailPage() {
                 </button>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-6 py-12 flex flex-col md:flex-row gap-8 lg:gap-16">
+            <div className="max-w-[1400px] mx-auto px-6 py-8 flex items-start gap-12">
                 
-                {/* Left side: Huge Image */}
-                <div className="w-full md:w-1/2 flex items-center justify-center rounded-[32px] bg-slate-50 border border-slate-100 p-8 min-h-[350px] md:min-h-[500px] relative">
+                {/* Left side: Image */}
+                <div className="w-[40%] shrink-0 flex items-center justify-center rounded-3xl bg-slate-50 border border-slate-100 p-8 min-h-[450px] relative">
                     {product.image ? (
                         <img 
                             src={product.image} 
                             alt={product.name} 
-                            className="w-full h-full object-contain max-h-[400px] md:max-h-[600px] filter drop-shadow-xl select-none"
+                            className="w-full h-full object-contain max-h-[500px] filter drop-shadow-xl select-none"
                             draggable={false}
                         />
                     ) : (
@@ -115,7 +115,7 @@ export default function CatalogProductDetailPage() {
                 </div>
 
                 {/* Right side: Product Content */}
-                <div className="w-full md:w-1/2 flex flex-col pt-4">
+                <div className="w-[60%] flex flex-col pt-2">
                     
                     {/* Title */}
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-4">
