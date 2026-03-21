@@ -83,8 +83,7 @@ export async function GET() {
                     date: true,
                     type: true,
                     description: true,
-                    amount: true,
-                    orderId: true
+                    amount: true
                 }
             });
         } else {
@@ -100,14 +99,8 @@ export async function GET() {
                     }
                 });
 
-                transactions = await prisma.transaction.findMany({
-                    where: { orderId: { in: orderIds }, deletedAt: null },
-                    orderBy: { date: 'desc' },
-                    take: 50,
-                    select: {
-                        id: true, date: true, type: true, description: true, amount: true, orderId: true
-                    }
-                });
+                // Cannot fetch transactions by orderId natively since it's not a field
+                transactions = [];
             }
         }
 
@@ -136,8 +129,7 @@ export async function GET() {
                 date: t.date,
                 type: t.type,
                 desc: t.description,
-                amount: Number(t.amount || 0),
-                orderId: t.orderId
+                amount: Number(t.amount || 0)
             }))
         });
 
