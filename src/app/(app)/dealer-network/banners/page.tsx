@@ -102,17 +102,25 @@ export default function BannerManagementPage() {
         const target = banners.find(b => b.id === id);
         if (!target) return;
 
-        const updated = { ...target, [field]: value };
+        // Optimistic UI update
+        const originalValue = target[field];
+        setBanners(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
         
         try {
-            await fetch(`/api/dealer-network/banners/${id}`, {
+            const res = await fetch(`/api/dealer-network/banners/${id}`, {
                 method: 'PATCH',
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updated)
+                body: JSON.stringify({ ...target, [field]: value })
             });
-            setBanners(prev => prev.map(b => b.id === id ? updated : b));
+            
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
         } catch (e: any) {
-            showError("Hata", "Banner güncellenemedi.");
+            // Revert state
+            setBanners(prev => prev.map(b => b.id === id ? { ...b, [field]: originalValue } : b));
+            showError("Hata", e.message || "Banner güncellenemedi.");
         }
     };
 
@@ -159,7 +167,7 @@ export default function BannerManagementPage() {
                                 </span>
                                 <EnterpriseSwitch 
                                     checked={banner.isActive} 
-                                    onChange={(val) => updateBannerField(banner.id, 'isActive', val)} 
+                                    onChange={(e) => updateBannerField(banner.id, 'isActive', e.target.checked)} 
                                 />
                             </div>
                             <div>
