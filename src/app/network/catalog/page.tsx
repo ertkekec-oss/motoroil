@@ -19,10 +19,30 @@ export default function NetworkCatalogPage() {
     const [totalPages, setTotalPages] = useState(1)
     const [addingToCart, setAddingToCart] = useState<string | null>(null)
     const [hideB2bPrice, setHideB2bPrice] = useState(false)
+    const [mainBannerIndex, setMainBannerIndex] = useState(0)
+    const [sideBannerIndex, setSideBannerIndex] = useState(0)
 
     useEffect(() => {
         setHideB2bPrice(localStorage.getItem('hideB2bPrice') === 'true')
     }, [])
+
+    useEffect(() => {
+        if (!banners || banners.length === 0) return;
+        
+        const mainBanners = banners.filter(b => b.placement !== 'side');
+        const sideBanners = banners.filter(b => b.placement === 'side');
+        
+        const timer = setInterval(() => {
+            if (mainBanners.length > 1) {
+                setMainBannerIndex(prev => (prev + 1) % mainBanners.length);
+            }
+            if (sideBanners.length > 1) {
+                setSideBannerIndex(prev => (prev + 1) % sideBanners.length);
+            }
+        }, 5000);
+        
+        return () => clearInterval(timer);
+    }, [banners]);
     
     const toggleHideB2bPrice = () => {
         const newVal = !hideB2bPrice;
@@ -116,22 +136,70 @@ export default function NetworkCatalogPage() {
                     </div>
                 ) : banners.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        {/* Alan 1 (Main Banner) */}
-                        <div className={`w-full relative overflow-hidden rounded-2xl flex items-center bg-slate-100 group cursor-pointer shadow-sm transition-all ${banners.some(b => b.placement === 'side') ? 'md:col-span-3' : 'md:col-span-4'}`} style={{ aspectRatio: '1200/420' }}>
-                            {banners.filter(b => b.placement !== 'side').length > 0 && (
-                                <>
-                                    <img src={banners.filter(b => b.placement !== 'side')[0].imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement !== 'side')[0].linkUrl; if(link) window.open(link, '_blank') }} />
-                                    {banners.filter(b => b.placement !== 'side').length > 1 && (
-                                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.filter(b => b.placement !== 'side').length}</div>
-                                    )}
-                                </>
-                            )}
-                        </div>
+                        {/* Alan 1 (Main Banner Carousel) */}
+                        {banners.filter(b => b.placement !== 'side').length > 0 && (
+                            <div className={`w-full relative overflow-hidden rounded-2xl flex bg-slate-100 group shadow-sm transition-all ${banners.some(b => b.placement === 'side') ? 'md:col-span-3' : 'md:col-span-4'}`} style={{ aspectRatio: '1200/420' }}>
+                                {(() => {
+                                    const mainBanners = banners.filter(b => b.placement !== 'side');
+                                    const current = mainBanners[mainBannerIndex % mainBanners.length];
+                                    
+                                    return (
+                                        <>
+                                            <div key={current.id} className="w-full h-full animate-in fade-in duration-700 absolute inset-0 cursor-pointer" onClick={() => { if(current.linkUrl) window.open(current.linkUrl, '_blank') }}>
+                                                <img src={current.imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                                            </div>
+                                            
+                                            {mainBanners.length > 1 && (
+                                                <>
+                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-full z-10">
+                                                        {mainBanners.map((_, idx) => (
+                                                            <button 
+                                                                key={idx} 
+                                                                onClick={(e) => { e.stopPropagation(); setMainBannerIndex(idx); }}
+                                                                className={`w-2 h-2 rounded-full transition-all ${idx === (mainBannerIndex % mainBanners.length) ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide z-10">
+                                                        {(mainBannerIndex % mainBanners.length) + 1} / {mainBanners.length}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                            </div>
+                        )}
 
-                        {/* Alan 2 (Side Banner) */}
+                        {/* Alan 2 (Side Banner Carousel) */}
                         {banners.filter(b => b.placement === 'side').length > 0 && (
-                            <div className="hidden md:flex md:col-span-1 w-full relative overflow-hidden rounded-2xl items-center bg-slate-100 group cursor-pointer shadow-sm transition-all" style={{ aspectRatio: '380/420' }}>
-                                <img src={banners.filter(b => b.placement === 'side')[0].imageUrl} alt="Side Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'side')[0].linkUrl; if(link) window.open(link, '_blank') }} />
+                            <div className={`hidden md:flex w-full relative overflow-hidden rounded-2xl bg-slate-100 group shadow-sm transition-all ${banners.filter(b => b.placement !== 'side').length === 0 ? 'md:col-span-4' : 'md:col-span-1'}`} style={{ aspectRatio: banners.filter(b => b.placement !== 'side').length === 0 ? '1200/420' : '380/420' }}>
+                                {(() => {
+                                    const sideBanners = banners.filter(b => b.placement === 'side');
+                                    const current = sideBanners[sideBannerIndex % sideBanners.length];
+                                    
+                                    return (
+                                        <>
+                                            <div key={current.id} className="w-full h-full animate-in fade-in duration-700 absolute inset-0 cursor-pointer" onClick={() => { if(current.linkUrl) window.open(current.linkUrl, '_blank') }}>
+                                                <img src={current.imageUrl} alt="Side Banner" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                                            </div>
+                                            
+                                            {sideBanners.length > 1 && (
+                                                <>
+                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full z-10">
+                                                        {sideBanners.map((_, idx) => (
+                                                            <button 
+                                                                key={idx} 
+                                                                onClick={(e) => { e.stopPropagation(); setSideBannerIndex(idx); }}
+                                                                className={`w-1.5 h-1.5 rounded-full transition-all ${idx === (sideBannerIndex % sideBanners.length) ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
                         )}
                     </div>
