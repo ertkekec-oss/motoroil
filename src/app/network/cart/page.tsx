@@ -26,7 +26,7 @@ type CartData = {
 export default function CartPage() {
     const getPath = useNetworkPath()
     const [cart, setCart] = useState<CartData | null>(null)
-    const [credit, setCredit] = useState<{ creditLimit: number; exposureBase: number; availableCredit: number } | null>(null)
+    const [credit, setCredit] = useState<{ creditLimit: number; exposureBase: number; availableCredit: number; creditPolicy?: string } | null>(null)
     const [paymentMode, setPaymentMode] = useState<"ON_ACCOUNT" | "CARD">("ON_ACCOUNT")
     const [loading, setLoading] = useState(true)
     const [err, setErr] = useState<string | null>(null)
@@ -62,13 +62,18 @@ export default function CartPage() {
 
     const grandTotal = cart?.summary?.grandTotal || 0
     const availableCredit = credit?.availableCredit || 0
-    const limitExceeded = (credit?.creditLimit || 0) > 0 && grandTotal > availableCredit
+    // Fix: 0 limit means 0 credit, not unlimited!
+    const limitExceeded = credit !== null && grandTotal > availableCredit
+    const creditPolicy = credit?.creditPolicy || "HARD_LIMIT"
+    
+    // Yalnızca Hard Limit veya Force Card on Limit politikalarında açık hesap engellenir
+    const isAccountBlocked = limitExceeded && (creditPolicy === "HARD_LIMIT" || creditPolicy === "FORCE_CARD_ON_LIMIT")
 
     useEffect(() => {
-        if (limitExceeded && paymentMode === "ON_ACCOUNT") {
+        if (isAccountBlocked && paymentMode === "ON_ACCOUNT") {
             setPaymentMode("CARD")
         }
-    }, [limitExceeded, paymentMode])
+    }, [isAccountBlocked, paymentMode])
 
     const hasItems = (cart?.items?.length || 0) > 0
 
@@ -271,12 +276,14 @@ export default function CartPage() {
                                         </div>
                                     </label>
 
-                                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${limitExceeded ? "opacity-50 cursor-not-allowed" : ""} ${paymentMode === "ON_ACCOUNT" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}>
-                                        <input type="radio" className="mt-1" checked={paymentMode === "ON_ACCOUNT"} onChange={() => !limitExceeded && setPaymentMode("ON_ACCOUNT")} disabled={limitExceeded} />
+                                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${isAccountBlocked ? "opacity-50 cursor-not-allowed" : ""} ${paymentMode === "ON_ACCOUNT" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}>
+                                        <input type="radio" className="mt-1" checked={paymentMode === "ON_ACCOUNT"} onChange={() => !isAccountBlocked && setPaymentMode("ON_ACCOUNT")} disabled={isAccountBlocked} />
                                         <div>
                                             <div className="font-medium text-sm">Açık Hesap / Veresiye</div>
-                                            {limitExceeded ? (
+                                            {isAccountBlocked ? (
                                                 <div className="text-xs text-destructive mt-0.5 font-medium">Kredi limitiniz yetersiz ({fmt(availableCredit)} kullanılabilir)</div>
+                                            ) : limitExceeded && creditPolicy === "SOFT_LIMIT" ? (
+                                                <div className="text-xs text-orange-600 mt-0.5 font-medium">Limit aşımı (Onaya Düşecek)</div>
                                             ) : (
                                                 <div className="text-xs text-muted-foreground mt-0.5">Mevcut limitinizden düşülür</div>
                                             )}

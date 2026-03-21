@@ -53,6 +53,11 @@ export async function GET() {
 
         const availableCredit = Math.max(0, creditLimit - exposureBase)
 
+        const settings = await prisma.dealerNetworkSettings.findUnique({
+            where: { tenantId: ctx.supplierTenantId },
+            select: { creditPolicy: true }
+        })
+
         return NextResponse.json({
             ok: true,
             membershipId: membership.id,
@@ -60,6 +65,7 @@ export async function GET() {
             exposureBase,
             availableCredit,
             currency: "TRY",
+            creditPolicy: settings?.creditPolicy || "HARD_LIMIT"
         })
     } catch (e: any) {
         if (

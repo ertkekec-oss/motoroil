@@ -187,7 +187,9 @@ export async function POST(req: Request) {
 
             const { creditLimit, exposureBase } = await computeExposureBase(ctx)
             const projectedExposure = exposureBase + grandTotal
-            const limitExceeded = creditLimit > 0 && projectedExposure > creditLimit
+            
+            // Fix: 0 limit means 0 credit, not unlimited!
+            const limitExceeded = projectedExposure > creditLimit
 
             let isLimitExceeded = false
             let creditExceededAmount: number | undefined = undefined
