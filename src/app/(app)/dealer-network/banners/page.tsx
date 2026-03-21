@@ -180,6 +180,19 @@ export default function BannerManagementPage() {
                                     onChange={(e) => setBanners(prev => prev.map(b => b.id === banner.id ? { ...b, linkUrl: e.target.value } : b))}
                                 />
                             </div>
+                            <div className="pt-2">
+                                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                    Banner Alanı
+                                </label>
+                                <select
+                                    value={banner.placement || 'main'}
+                                    onChange={(e) => updateBannerField(banner.id, 'placement', e.target.value)}
+                                    className="w-full px-3 py-2 text-sm font-medium border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-[#0f172a] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                >
+                                    <option value="main">Alan 1 (Sol Geniş Carousel)</option>
+                                    <option value="side">Alan 2 (Sağ Dar Banner)</option>
+                                </select>
+                            </div>
                         </div>
                     </EnterpriseCard>
                 ))}

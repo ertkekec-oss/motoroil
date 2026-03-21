@@ -96,31 +96,76 @@ export default function NetworkCatalogPage() {
         <div className="font-sans min-h-[calc(100vh-64px)] bg-slate-50">
             <div className="mx-auto w-full max-w-7xl px-6 py-10 space-y-8">
                 
-                {/* 1. HEADER & SEARCH BAR */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    {banners.length > 0 ? (
-                        <div className="w-full relative overflow-hidden rounded-2xl md:mr-8 max-h-[140px] md:max-h-[160px] flex items-center bg-transparent group cursor-pointer shadow-sm">
-                            <img src={banners[0].imageUrl} alt="Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { if(banners[0].linkUrl) window.open(banners[0].linkUrl, '_blank') }} />
-                            {banners.length > 1 && (
-                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.length} Etkinlik</div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="w-full md:mr-8"></div>
-                    )}
+                {/* 1. BANNERS ROW */}
+                <div className="flex flex-col md:flex-row justify-between gap-6">
+                    {/* Alan 1 (Main Banner) */}
+                    <div className="w-full md:flex-1 relative overflow-hidden rounded-2xl max-h-[140px] md:max-h-[180px] flex items-center bg-transparent group cursor-pointer shadow-sm">
+                        {banners.filter(b => b.placement === 'main' || !b.placement).length > 0 ? (
+                            <>
+                                <img src={banners.filter(b => b.placement === 'main' || !b.placement)[0].imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'main' || !b.placement)[0].linkUrl; if(link) window.open(link, '_blank') }} />
+                                {banners.filter(b => b.placement === 'main' || !b.placement).length > 1 && (
+                                    <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.filter(b => b.placement === 'main' || !b.placement).length}</div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="w-full h-[140px] md:h-[180px] bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse flex items-center justify-center">
+                                <span className="text-slate-400 font-medium text-sm hidden md:inline-block">Katalog Yükleniyor...</span>
+                            </div>
+                        )}
+                    </div>
 
-                    <div className="w-full md:w-[400px] shrink-0 relative group">
+                    {/* Alan 2 (Side Banner) */}
+                    {banners.filter(b => b.placement === 'side').length > 0 && (
+                        <div className="w-full md:w-[320px] shrink-0 relative overflow-hidden rounded-2xl max-h-[140px] md:max-h-[180px] flex items-center bg-transparent group cursor-pointer shadow-sm hidden md:flex">
+                            <img src={banners.filter(b => b.placement === 'side')[0].imageUrl} alt="Side Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'side')[0].linkUrl; if(link) window.open(link, '_blank') }} />
+                        </div>
+                    )}
+                </div>
+
+                {/* 2. SEARCH BAR & FILTERS ROW */}
+                <div className="flex flex-col-reverse md:flex-row md:items-center justify-between gap-4">
+                    {/* CATEGORY FILTERS */}
+                    <div className="flex-1 w-full overflow-hidden">
+                        {categories.length > 0 && (
+                            <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 custom-scroll scroll-smooth" style={{ scrollbarWidth: "none" }}>
+                                <button
+                                    onClick={() => setActiveCat("")}
+                                    className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border shrink-0
+                                        ${activeCat === "" 
+                                            ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
+                                            : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:bg-blue-50"
+                                        }`}
+                                >
+                                    Tümü
+                                </button>
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setActiveCat(cat)}
+                                        className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border shrink-0
+                                            ${activeCat === cat 
+                                                ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
+                                                : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:bg-blue-50"
+                                            }`}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="w-full md:w-[350px] shrink-0 relative group">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                             <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" strokeWidth={1.5} />
                         </div>
                         <input
                             type="text"
                             placeholder="Stok kodu (SKU) veya ürün adı girin..."
-                            className="w-full bg-white border border-slate-300 rounded-xl pl-11 pr-4 py-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-sm"
+                            className="w-full bg-white border border-slate-300 rounded-xl pl-11 pr-10 py-2.5 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-sm"
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
                         />
-                        {/* Optional Filter Button inside input */}
                         <div className="absolute inset-y-0 right-1.5 flex items-center">
                             <button className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
                                 <Filter className="h-4 w-4" strokeWidth={2} />

@@ -4226,6 +4226,7 @@ model NetworkBanner {
   tenantId  String
   imageUrl  String
   linkUrl   String?
+  placement String   @default("main") // "main" or "side"
   isActive  Boolean  @default(true)
   order     Int      @default(0)
   createdAt DateTime @default(now())

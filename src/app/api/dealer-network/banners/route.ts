@@ -52,6 +52,7 @@ export async function POST(req: Request) {
                 tenantId,
                 imageUrl: body.imageUrl,
                 linkUrl: body.linkUrl || null,
+                placement: body.placement || "main",
                 isActive: typeof body.isActive === 'boolean' ? body.isActive : true,
                 order: typeof body.order === 'number' ? body.order : nextOrder
             }

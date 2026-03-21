@@ -24,6 +24,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
             data: {
                 imageUrl: body.imageUrl,
                 linkUrl: body.linkUrl,
+                placement: body.placement,
                 isActive: body.isActive,
                 order: body.order
             }
