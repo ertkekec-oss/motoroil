@@ -30,14 +30,13 @@ export default function NetworkCatalogPage() {
     // Helper: Debounce search
     useEffect(() => {
         const timer = setTimeout(() => fetchCatalog(), 400)
-    
-    const imageProducts = products.filter(p => !!p.image).slice(0, 8);
-    const noImageProducts = products.filter(p => !p.image);
+        return () => clearTimeout(timer)
+    }, [q, activeCat, page])
+
+    const imageProducts = products.filter((p: any) => !!p.image).slice(0, 8);
+    const noImageProducts = products.filter((p: any) => !p.image);
     const leftList = noImageProducts.slice(0, Math.ceil(noImageProducts.length / 2));
     const rightList = noImageProducts.slice(Math.ceil(noImageProducts.length / 2));
-
-    return () => clearTimeout(timer)
-    }, [q, activeCat, page])
 
     useEffect(() => { setPage(1) }, [q, activeCat])
 
