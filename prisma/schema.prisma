@@ -349,6 +349,7 @@ model Product {
   reservedStock                     Int                      @default(0)
   category                          String?
   description                       String?
+  b2bDescription                    String?
   imageUrl                          String?                  @db.VarChar(2048)
   imageKey                          String?                  @db.VarChar(1024)
   documentUrl                       String?                  @db.VarChar(2048)
