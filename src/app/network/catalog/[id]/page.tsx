@@ -95,27 +95,27 @@ export default function CatalogProductDetailPage() {
                 </button>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-6 py-12 flex flex-col lg:flex-row gap-16 lg:gap-24">
+            <div className="max-w-[1400px] mx-auto px-6 py-12 flex flex-col md:flex-row gap-8 lg:gap-16">
                 
                 {/* Left side: Huge Image */}
-                <div className="w-full lg:w-1/2 flex items-center justify-center rounded-[32px] bg-slate-50 border border-slate-100 p-12 min-h-[600px] relative">
+                <div className="w-full md:w-1/2 flex items-center justify-center rounded-[32px] bg-slate-50 border border-slate-100 p-8 min-h-[350px] md:min-h-[500px] relative">
                     {product.image ? (
                         <img 
                             src={product.image} 
                             alt={product.name} 
-                            className="w-full h-full object-contain max-h-[700px] filter drop-shadow-xl select-none"
+                            className="w-full h-full object-contain max-h-[400px] md:max-h-[600px] filter drop-shadow-xl select-none"
                             draggable={false}
                         />
                     ) : (
-                        <div className="text-slate-300 flex flex-col items-center gap-6">
-                            <PackageOpen className="w-32 h-32" strokeWidth={1} />
-                            <span className="text-lg font-medium tracking-wide">Ürün Görseli Yok</span>
+                        <div className="text-slate-300 flex flex-col items-center gap-4">
+                            <PackageOpen className="w-24 h-24" strokeWidth={1} />
+                            <span className="text-base font-medium tracking-wide">Ürün Görseli Yok</span>
                         </div>
                     )}
                 </div>
 
                 {/* Right side: Product Content */}
-                <div className="w-full lg:w-1/2 flex flex-col pt-4">
+                <div className="w-full md:w-1/2 flex flex-col pt-4">
                     
                     {/* Title */}
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-4">
