@@ -15,13 +15,13 @@ export async function GET(req: Request) {
 
         const membership = await prisma.dealerMembership.findUnique({
             where: { id: membershipId },
-            select: { supplierTenantId: true }
+            select: { tenantId: true }
         });
 
         if (!membership) return NextResponse.json({ error: 'Membership not found' }, { status: 404 });
 
         const banners = await prisma.networkBanner.findMany({
-            where: { tenantId: membership.supplierTenantId, isActive: true },
+            where: { tenantId: membership.tenantId, isActive: true },
             orderBy: { order: 'asc' }
         });
 
