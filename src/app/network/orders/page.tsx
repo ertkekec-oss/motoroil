@@ -39,10 +39,13 @@ type Row = {
 export default function NetworkOrdersListPage() {
     const getPath = useNetworkPath()
     const [items, setItems] = useState<Row[]>([])
-    const [cursor, setCursor] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
-    const [loadingMore, setLoadingMore] = useState(false)
     const [err, setErr] = useState<string | null>(null)
+
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+    const [statusFilter, setStatusFilter] = useState("all")
+    const [totalCount, setTotalCount] = useState(0)
 
     const [intentDetail, setIntentDetail] = useState<any | null>(null)
     const [intentLoading, setIntentLoading] = useState(false)
@@ -62,49 +65,41 @@ export default function NetworkOrdersListPage() {
         setIntentLoading(false)
     }
 
-    async function loadFirst() {
+    async function loadData() {
         setLoading(true); setErr(null)
-        const res = await fetch("/api/network/orders", { cache: "no-store" })
+        const res = await fetch(`/api/network/orders?page=${page}&status=${statusFilter}`, { cache: "no-store" })
         const data = await res.json().catch(() => null)
         if (!res.ok || !data?.ok) { setErr("Siparişler alınamadı."); setLoading(false); return }
         setItems(data.items || [])
-        setCursor(data.nextCursor || null)
+        setTotalPages(data.totalPages || 1)
+        setTotalCount(data.totalCount || 0)
         setLoading(false)
     }
 
-    async function loadMore() {
-        if (!cursor) return
-        setLoadingMore(true); setErr(null)
-        const res = await fetch(`/api/network/orders?cursor=${encodeURIComponent(cursor)}`, { cache: "no-store" })
-        const data = await res.json().catch(() => null)
-        if (!res.ok || !data?.ok) { setErr("Devamı alınamadı."); setLoadingMore(false); return }
-        setItems((p) => [...p, ...(data.items || [])])
-        setCursor(data.nextCursor || null)
-        setLoadingMore(false)
-    }
-
-    useEffect(() => { loadFirst() }, [])
+    useEffect(() => { loadData() }, [page, statusFilter])
 
     return (
         <div className="font-sans min-h-[calc(100vh-64px)] bg-slate-50">
             <div className="mx-auto w-full max-w-5xl px-6 py-10 space-y-8">
                 
                 {/* 1. HEADER */}
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-200/60">
                     <div>
-                        <div className="inline-flex items-center px-2.5 py-1 mb-3 rounded-md bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-600 uppercase tracking-wide">
-                            Trade Geçmişi
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Siparişlerim</h1>
-                        <p className="mt-2 text-[15px] text-slate-500 max-w-xl leading-relaxed">
-                            B2B ağındaki aktif ve geçmiş tüm siparişlerinizi buradan takip edebilirsiniz.
+                        <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                            Siparişlerim
+                            <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-100 text-[11px] font-bold text-blue-600 uppercase tracking-wide">
+                                Trade Geçmişi
+                            </span>
+                        </h1>
+                        <p className="mt-1.5 text-[14px] text-slate-500 leading-relaxed font-medium">
+                            B2B ağındaki aktif ve geçmiş tüm siparişlerinizi ve ödemelerinizi buradan takip edebilirsiniz.
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
                         <Link 
                             href={getPath("/network/dashboard")} 
-                            className="h-10 px-4 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                            className="h-9 px-4 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-[0_1px_2px_rgb(0,0,0,0.05)]"
                         >
                             Dashboard'a Dön
                         </Link>
@@ -124,12 +119,31 @@ export default function NetworkOrdersListPage() {
                     </div>
                 )}
 
-                {/* 2. ORDERS LIST */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="p-5 border-b border-slate-200/60 flex items-center justify-between bg-slate-50/50">
-                        <h2 className="text-[14px] font-semibold text-slate-800">Sipariş Listesi</h2>
-                        <div className="text-[13px] text-slate-500 font-medium bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-sm">
-                            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `${items.length} Kayıt`}
+                {/* 2. FILTERS */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scroll">
+                    {[
+                        { id: 'all', label: 'Tüm Siparişler' },
+                        { id: 'PENDING', label: 'Bekleyenler' },
+                        { id: 'AWAITING_PAYMENT', label: 'Ödeme Bekleyen' },
+                        { id: 'COMPLETED', label: 'Onaylandı / Tamamlandı' },
+                        { id: 'CANCELLED', label: 'İptal Edildi' }
+                    ].map(f => (
+                        <button 
+                            key={f.id} 
+                            onClick={() => { setPage(1); setStatusFilter(f.id); }}
+                            className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all whitespace-nowrap ${statusFilter === f.id ? 'bg-slate-800 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                        >
+                            {f.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* 3. ORDERS LIST */}
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-slate-200/60 flex items-center justify-between bg-slate-50/50">
+                        <h2 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Sipariş Listesi</h2>
+                        <div className="text-[13px] text-slate-500 font-bold bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-sm">
+                            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `${totalCount} Kayıt`}
                         </div>
                     </div>
 
@@ -143,19 +157,21 @@ export default function NetworkOrdersListPage() {
                             <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
                                 <ClipboardList className="w-8 h-8" strokeWidth={1.5} />
                             </div>
-                            <h3 className="text-lg font-semibold text-slate-900 mb-2">Sipariş Bulunamadı</h3>
+                            <h3 className="text-[15px] font-bold text-slate-900 mb-1">Kayıt Bulunamadı</h3>
                             <p className="text-[14px] text-slate-500 max-w-sm">
-                                Henüz bu ağda herhangi bir sipariş oluşturmamışsınız. Katalog üzerinden ürün ekleyerek başlayabilirsiniz.
+                                Seçili filtreye uygun veya mevcut ağda herhangi bir sipariş bulunmuyor.
                             </p>
-                            <Link 
-                                href={getPath("/network/catalog")}
-                                className="mt-6 inline-flex h-10 items-center justify-center rounded-xl bg-blue-600 px-6 text-[13px] font-semibold text-white transition hover:bg-blue-700 shadow-sm"
-                            >
-                                Kataloğa Git
-                            </Link>
+                            {statusFilter === 'all' && (
+                                <Link 
+                                    href={getPath("/network/catalog")}
+                                    className="mt-6 inline-flex h-9 items-center justify-center rounded-lg bg-blue-600 px-6 text-[13px] font-bold text-white transition hover:bg-blue-700 shadow-sm"
+                                >
+                                    Kataloğa Git
+                                </Link>
+                            )}
                         </div>
                     ) : (
-                        <div className="divide-y divide-slate-100">
+                        <div className="flex flex-col min-w-[700px] overflow-x-auto divide-y divide-slate-100">
                             {items.map((o) => {
                                 const statusConf = getStatusConfig(o.status)
                                 const isOrderPaid = isPaid(o.status)
@@ -164,45 +180,40 @@ export default function NetworkOrdersListPage() {
                                     <Link 
                                         key={o.id} 
                                         href={getPath(`/network/orders/${o.id}`)} 
-                                        className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 hover:bg-slate-50 transition-colors"
+                                        className="group grid grid-cols-12 items-center gap-4 p-4 hover:bg-slate-50 transition-colors cursor-pointer"
                                     >
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <div className="font-semibold text-[15px] text-slate-900 group-hover:text-blue-600 transition-colors">
-                                                    {o.orderNumber}
-                                                </div>
-                                                <div className={`px-2 py-0.5 rounded-full text-[11px] font-semibold border flex items-center gap-1.5 ${statusConf.color}`}>
-                                                    {statusConf.icon}
-                                                    {statusConf.label}
-                                                </div>
+                                        <div className="col-span-3 lg:col-span-3 flex flex-col gap-1.5">
+                                            <div className="font-bold text-[14px] text-slate-900 group-hover:text-blue-600 transition-colors">
+                                                {o.orderNumber}
                                             </div>
-                                            
-                                            <div className="flex flex-wrap items-center gap-3 text-[13px] text-slate-500">
-                                                <div className="flex items-center gap-1.5">
-                                                    Tarih: <span className="font-medium text-slate-700">{new Date(o.orderDate).toLocaleString("tr-TR")}</span>
-                                                </div>
-                                                
-                                                {isOrderPaid && (
-                                                    <>
-                                                        <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                                                        <button
-                                                            onClick={(e) => showIntentInfo(e, o.id)}
-                                                            className="text-emerald-600 hover:text-emerald-700 font-medium hover:underline flex items-center gap-1"
-                                                        >
-                                                            Tahsilat Detayı
-                                                        </button>
-                                                    </>
-                                                )}
+                                            <div className="text-[12px] font-medium text-slate-500">
+                                                {new Date(o.orderDate).toLocaleString("tr-TR")}
                                             </div>
                                         </div>
-                                        
-                                        <div className="flex items-center justify-between sm:justify-end gap-6 sm:w-64">
-                                            <div className="text-left sm:text-right">
-                                                <div className="text-[12px] text-slate-500 mb-0.5">Toplam Tutar</div>
-                                                <div className="text-[16px] font-bold text-slate-900">{fmt(o.totalAmount)}</div>
+
+                                        <div className="col-span-4 lg:col-span-4 flex flex-col items-start gap-1">
+                                            <div className={`px-2 py-0.5 rounded text-[11px] font-bold border flex items-center gap-1.5 ${statusConf.color}`}>
+                                                {statusConf.icon}
+                                                {statusConf.label}
                                             </div>
-                                            <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-600 text-slate-400 transition-all shadow-sm">
-                                                <ChevronRight className="w-4 h-4" />
+                                            {isOrderPaid && (
+                                                <button
+                                                    onClick={(e) => showIntentInfo(e, o.id)}
+                                                    className="text-emerald-600 text-[11px] bg-emerald-50/50 px-2 py-0.5 rounded border border-emerald-100 hover:bg-emerald-100 font-bold transition-colors flex items-center gap-1 mt-1"
+                                                >
+                                                    Tahsilat Detayı İncele
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <div className="col-span-4 lg:col-span-4 text-right flex flex-col gap-0.5">
+                                            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Toplam Tutar</div>
+                                            <div className="text-[16px] font-black text-slate-800 tracking-tight">{fmt(o.totalAmount)}</div>
+                                        </div>
+
+                                        <div className="col-span-1 flex justify-end">
+                                            <div className="text-slate-300 group-hover:text-blue-600 transition-colors">
+                                                <ChevronRight className="w-5 h-5" />
                                             </div>
                                         </div>
                                     </Link>
@@ -211,23 +222,28 @@ export default function NetworkOrdersListPage() {
                         </div>
                     )}
 
-                    <div className="p-5 border-t border-slate-100 flex justify-center bg-slate-50/30">
-                        {cursor ? (
-                            <button
-                                onClick={loadMore}
-                                disabled={loadingMore}
-                                className="h-10 px-6 rounded-xl border border-slate-200 bg-white text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
-                            >
-                                {loadingMore && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
-                                {loadingMore ? "Yükleniyor..." : "Daha Fazla Göster"}
-                            </button>
-                        ) : (
-                            <div className="text-[13px] font-medium text-slate-400 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-slate-200"></span>
-                                Tüm siparişler listelendi
+                    {/* PAGINATION ROW */}
+                    {totalPages > 1 && (
+                        <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                            <span className="text-[13px] font-medium text-slate-500">Sayfa {page} / {totalPages}</span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setPage(Math.max(1, page - 1))}
+                                    disabled={page === 1}
+                                    className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+                                >
+                                    Önceki
+                                </button>
+                                <button
+                                    onClick={() => setPage(Math.min(totalPages, page + 1))}
+                                    disabled={page === totalPages}
+                                    className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+                                >
+                                    Sonraki
+                                </button>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer Text */}
