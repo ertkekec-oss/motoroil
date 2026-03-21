@@ -107,11 +107,11 @@ export default function NetworkCatalogPage() {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         {/* Alan 1 (Main Banner) */}
                         <div className={`w-full relative overflow-hidden rounded-2xl flex items-center bg-slate-100 group cursor-pointer shadow-sm transition-all ${banners.some(b => b.placement === 'side') ? 'md:col-span-3' : 'md:col-span-4'}`} style={{ aspectRatio: '1200/420' }}>
-                            {banners.filter(b => b.placement === 'main' || !b.placement).length > 0 && (
+                            {banners.filter(b => b.placement !== 'side').length > 0 && (
                                 <>
-                                    <img src={banners.filter(b => b.placement === 'main' || !b.placement)[0].imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement === 'main' || !b.placement)[0].linkUrl; if(link) window.open(link, '_blank') }} />
-                                    {banners.filter(b => b.placement === 'main' || !b.placement).length > 1 && (
-                                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.filter(b => b.placement === 'main' || !b.placement).length}</div>
+                                    <img src={banners.filter(b => b.placement !== 'side')[0].imageUrl} alt="Main Banner" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onClick={() => { const link = banners.filter(b => b.placement !== 'side')[0].linkUrl; if(link) window.open(link, '_blank') }} />
+                                    {banners.filter(b => b.placement !== 'side').length > 1 && (
+                                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold">1 / {banners.filter(b => b.placement !== 'side').length}</div>
                                     )}
                                 </>
                             )}
