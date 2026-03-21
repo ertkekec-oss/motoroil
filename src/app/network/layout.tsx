@@ -28,9 +28,9 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
 
     const navs = [
         { path: getPath("/network/dashboard"), label: "Dashboard" },
-        { path: getPath("/network/catalog"), label: "Catalog" },
-        { path: getPath("/network/orders"), label: "Orders" },
-        { path: getPath("/network/account"), label: "Account" },
+        { path: getPath("/network/catalog"), label: "Katalog" },
+        { path: getPath("/network/orders"), label: "Siparişlerim" },
+        { path: getPath("/network/account"), label: "Hesabım" },
     ]
 
     return (

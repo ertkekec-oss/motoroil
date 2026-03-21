@@ -4,13 +4,14 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useNetworkPath } from "@/hooks/useNetworkPath"
-import { Building2, CreditCard, LogOut, ArrowRightLeft, UserCircle2, Loader2, Landmark, Wallet } from "lucide-react"
+import { Building2, LogOut, ArrowRightLeft, UserCircle2, Loader2, Landmark, Wallet, Layers, Banknote, ShieldCheck } from "lucide-react"
 
 export default function NetworkAccountPage() {
     const getPath = useNetworkPath()
     const router = useRouter()
     const [me, setMe] = useState<any>(null)
     const [loading, setLoading] = useState(true)
+    const [activeTab, setActiveTab] = useState("profile")
 
     useEffect(() => {
         ; (async () => {
@@ -41,129 +42,208 @@ export default function NetworkAccountPage() {
 
     return (
         <div className="font-sans min-h-[calc(100vh-64px)] bg-slate-50">
-            <div className="mx-auto w-full max-w-4xl px-6 py-10 space-y-8">
+            <div className="mx-auto w-full max-w-6xl px-6 py-10 space-y-8">
                 
                 {/* HEADER */}
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
                     <div>
                         <div className="inline-flex items-center px-2.5 py-1 mb-3 rounded-md bg-transparent border border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                            Profil & Ayarlar
+                            Yönetim Merkezi
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Hesabım</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Hesap ve Finans</h1>
                         <p className="mt-2 text-[15px] text-slate-500 max-w-xl leading-relaxed">
-                            Ağ içindeki bağlandığınız tedarikçilere ait hesap bilgilerinizi yönetin.
+                            Ağ içindeki bağlandığınız tedarikçilere ait profilinizi yönetin, limit ve bakiye durumlarınızı inceleyin.
                         </p>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     
-                    {/* LEFT COLUMN: IDENTIFICATION OR OVERVIEW */}
-                    <div className="md:col-span-1 flex flex-col gap-6">
-                        
-                        {/* Profile Info Card */}
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center text-center">
-                            <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4 border border-blue-100">
-                                <UserCircle2 className="w-10 h-10" strokeWidth={1.5} />
-                            </div>
-                            <h2 className="text-lg font-bold text-slate-900 leading-tight">
-                                {me?.dealerCompanyName || "Cari İsim Yok"}
-                            </h2>
-                            <p className="text-[13px] font-medium text-slate-500 mt-1">Bayi Hesabı</p>
-                            
-                            <div className="w-full border-t border-slate-100 mt-6 pt-6 flex flex-col gap-3">
-                                <Link
-                                    href={getPath("/network/select-supplier")}
-                                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-[0.98]"
-                                >
-                                    <ArrowRightLeft className="w-4 h-4 text-slate-400" />
-                                    Tedarikçi Değiştir
-                                </Link>
+                    {/* LEFT COLUMN: TABS */}
+                    <div className="md:col-span-1 flex flex-col gap-2">
+                        <button 
+                            onClick={() => setActiveTab('profile')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[14px] font-semibold transition-all ${
+                                activeTab === 'profile' 
+                                    ? 'bg-white shadow-sm border border-slate-200 text-blue-600' 
+                                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 border border-transparent cursor-pointer'
+                            }`}
+                        >
+                            <UserCircle2 className={`w-5 h-5 ${activeTab==='profile'?'text-blue-500':'text-slate-400'}`} />
+                            Profilim
+                        </button>
 
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-rose-50 hover:bg-rose-100 px-4 py-2.5 text-[13px] font-semibold text-rose-700 transition-all active:scale-[0.98]"
-                                >
-                                    <LogOut className="w-4 h-4" />
-                                    Güvenli Çıkış Yap
-                                </button>
-                            </div>
-                        </div>
+                        <button 
+                            onClick={() => setActiveTab('finances')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[14px] font-semibold transition-all ${
+                                activeTab === 'finances' 
+                                    ? 'bg-white shadow-sm border border-slate-200 text-blue-600' 
+                                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 border border-transparent cursor-pointer'
+                            }`}
+                        >
+                            <Wallet className={`w-5 h-5 ${activeTab==='finances'?'text-blue-500':'text-slate-400'}`} />
+                            Hesabım (Finans)
+                        </button>
                     </div>
 
-                    {/* RIGHT COLUMN: ACTIVE SUPPLIER DETAILS */}
-                    <div className="md:col-span-2 space-y-6">
-                        
-                        {/* Session Context */}
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                            <div className="p-6 border-b border-slate-100/60 bg-slate-50/50 flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 shrink-0">
-                                    <Building2 className="w-5 h-5 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-[15px] font-semibold text-slate-900">Aktif Tedarikçi Bağlantısı</h3>
-                                    <p className="text-[13px] text-slate-500 mt-0.5">Şu an işlem yaptığınız tedarikçi ve size tanımlanan koşullar.</p>
-                                </div>
-                            </div>
-                            <div className="p-6">
-                                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-                                    <div className="flex flex-col gap-1.5">
-                                        <dt className="text-[12px] font-medium text-slate-500">Tedarikçi Firma</dt>
-                                        <dd className="text-[15px] font-semibold text-slate-900 border-b border-slate-100 pb-2">
-                                            {me?.supplierName || "Bilinmiyor"}
-                                        </dd>
-                                    </div>
-                                    <div className="flex flex-col gap-1.5">
-                                        <dt className="text-[12px] font-medium text-slate-500">Bayi Adınız (Bağlantı)</dt>
-                                        <dd className="text-[15px] font-medium text-slate-800 border-b border-slate-100 pb-2 truncate" title={me?.dealerCompanyName}>
-                                            {me?.dealerCompanyName || "-"}
-                                        </dd>
-                                    </div>
-                                </dl>
-                            </div>
-                        </div>
-
-                        {/* Financials Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            
-                            <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] p-6 relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50/50 to-transparent rounded-bl-full pointer-events-none" />
-                                <div className="flex items-center gap-4 mb-4">
-                                     <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
-                                        <Wallet className="w-5 h-5" strokeWidth={1.5} />
-                                    </div>
-                                    <div className="text-[13px] font-medium text-slate-500">Kredi Limitiniz</div>
-                                </div>
-                                <div className="text-2xl font-bold text-slate-900 tracking-tight">
-                                    {new Intl.NumberFormat("tr-TR", { style: "currency", currency: me?.currency || "TRY" }).format(me?.creditLimit || 0)}
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] p-6 relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-50/50 to-transparent rounded-bl-full pointer-events-none" />
-                                <div className="flex items-center gap-4 mb-4">
-                                     <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
-                                        <Landmark className="w-5 h-5" strokeWidth={1.5} />
-                                    </div>
-                                    <div className="text-[13px] font-medium text-slate-500">Güncel Bakiyeniz</div>
-                                </div>
-                                <div className="text-2xl font-bold text-slate-900 tracking-tight">
-                                    {new Intl.NumberFormat("tr-TR", { style: "currency", currency: me?.currency || "TRY" }).format(me?.balance || 0)}
-                                </div>
-                            </div>
-
-                        </div>
+                    {/* RIGHT COLUMN: CONTENT */}
+                    <div className="md:col-span-3">
+                        {activeTab === 'profile' && <ProfileTab me={me} handleLogout={handleLogout} getPath={getPath} />}
+                        {activeTab === 'finances' && <FinancesTab me={me} />}
                     </div>
 
                 </div>
 
-                {/* Footer Text */}
-                <div className="mt-14 text-center pb-8 border-t border-slate-200/50 pt-8">
-                    <p className="text-sm font-medium text-slate-500">
-                        Periodya B2B — Kurumsal ticaret altyapısı ile işinizi büyütün.
-                    </p>
+            </div>
+        </div>
+    )
+}
+
+function ProfileTab({ me, handleLogout, getPath }: { me: any, handleLogout: () => void, getPath: (s:string) => string }) {
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
+             {/* Profile Info Card */}
+             <div className="flex flex-col gap-6">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] p-6 flex flex-col items-center text-center">
+                    <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4 border border-blue-100">
+                        <UserCircle2 className="w-10 h-10" strokeWidth={1.5} />
+                    </div>
+                    <h2 className="text-lg font-bold text-slate-900 leading-tight">
+                        {me?.dealerCompanyName || "Cari İsim Yok"}
+                    </h2>
+                    <p className="text-[13px] font-medium text-slate-500 mt-1">B2B Bayi Hesabı</p>
+                    
+                    <div className="w-full border-t border-slate-100 mt-6 pt-6 flex flex-col gap-3">
+                        <Link
+                            href={getPath("/network/select-supplier")}
+                            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-[0.98]"
+                        >
+                            <ArrowRightLeft className="w-4 h-4 text-slate-400" />
+                            Tedarikçi Değiştir
+                        </Link>
+
+                        <button
+                            onClick={handleLogout}
+                            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-rose-50 hover:bg-rose-100 px-4 py-2.5 text-[13px] font-semibold text-rose-700 transition-all active:scale-[0.98]"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Güvenli Çıkış Yap
+                        </button>
+                    </div>
+                </div>
+             </div>
+
+             {/* Supplier Info Context */}
+             <div className="space-y-6">
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] overflow-hidden">
+                        <div className="p-6 border-b border-slate-100/60 bg-slate-50/50 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 shrink-0">
+                                <Building2 className="w-5 h-5 text-indigo-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-[15px] font-semibold text-slate-900">Aktif Tedarikçi Bağlantısı</h3>
+                                <p className="text-[13px] text-slate-500 mt-0.5">Şu an işlem yaptığınız tedarikçi ve koşullar.</p>
+                            </div>
+                        </div>
+                        <div className="p-6">
+                            <dl className="grid grid-cols-1 gap-y-6">
+                                <div className="flex flex-col gap-1.5">
+                                    <dt className="text-[12px] font-medium text-slate-500">Tedarikçi Firma</dt>
+                                    <dd className="text-[15px] font-semibold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                                        <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                                        {me?.supplierName || "Bilinmiyor"}
+                                    </dd>
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <dt className="text-[12px] font-medium text-slate-500">Bayi Adınız (Cari Unvanı)</dt>
+                                    <dd className="text-[15px] font-medium text-slate-800 border-b border-slate-100 pb-2 truncate" title={me?.dealerCompanyName}>
+                                        {me?.dealerCompanyName || "-"}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+             </div>
+        </div>
+    )
+}
+
+function FinancesTab({ me }: { me: any }) {
+    const [subTab, setSubTab] = useState("invoices")
+    const fmt = (val: number | undefined) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: me?.currency || "TRY" }).format(val || 0)
+    const curCred = Math.max(0, (me?.creditLimit || 0) - (me?.balance > 0 ? me?.balance : 0))
+
+    return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {/* Top Fixed Boxes */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Credit Limits Box */}
+                <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50/50 to-transparent rounded-bl-full pointer-events-none" />
+                    <div className="flex items-center justify-between mb-6 relative z-10">
+                        <div className="text-[14px] font-semibold text-slate-700 flex items-center gap-2">
+                             <Wallet className="w-4 h-4 text-blue-500" /> Kredi Limiti & Kullanım
+                        </div>
+                    </div>
+                    <div className="space-y-3 relative z-10">
+                        <div className="flex justify-between items-end border-b border-slate-100 pb-2">
+                            <span className="text-[13px] font-medium text-slate-500">Güncel Kredi (Kullanılabilir)</span>
+                            <span className="text-xl font-bold text-blue-600 tracking-tight">{fmt(curCred)}</span>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <span className="text-xs font-medium text-slate-400">Toplam Tanımlı Limit</span>
+                            <span className="text-[14px] font-semibold text-slate-700">{fmt(me?.creditLimit)}</span>
+                        </div>
+                    </div>
                 </div>
 
+                {/* Debt/Receivable Box */}
+                <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-rose-50/50 to-transparent rounded-bl-full pointer-events-none" />
+                    <div className="flex sm:flex-row flex-col sm:items-center justify-between mb-6 gap-4 relative z-10">
+                        <div className="text-[14px] font-semibold text-slate-700 flex items-center gap-2">
+                             <Landmark className="w-4 h-4 text-rose-500" /> Cari Hesap Özeti (Borç)
+                        </div>
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm tracking-wide flex items-center justify-center gap-2 active:scale-95 shrink-0">
+                            <Banknote className="w-4 h-4" /> Ödeme Yap
+                        </button>
+                    </div>
+                    <div className="space-y-3 relative z-10 mt-auto">
+                        <div className="flex justify-between items-end">
+                            <span className="text-[13px] font-medium text-slate-500">Güncel Borç (Açık Bakiye)</span>
+                            <span className={`text-2xl font-bold tracking-tight ${me?.balance > 0 ? 'text-rose-600' : 'text-slate-900'}`}>{fmt(Math.max(0, me?.balance))}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Inner Tabs: Satış ve Faturalar | Finansal İşlemler */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] overflow-hidden min-h-[400px] flex flex-col">
+                <div className="flex items-center border-b border-slate-100 px-2 sm:px-4 pt-4 gap-2 sm:gap-6 overflow-x-auto custom-scroll bg-slate-50/30">
+                    <button onClick={() => setSubTab('invoices')} className={`pb-3 px-3 text-[14px] font-semibold border-b-[2.5px] transition-all whitespace-nowrap ${subTab === 'invoices' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}>Satış ve Faturalar</button>
+                    <button onClick={() => setSubTab('transactions')} className={`pb-3 px-3 text-[14px] font-semibold border-b-[2.5px] transition-all whitespace-nowrap ${subTab === 'transactions' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}>Finansal İşlemler</button>
+                </div>
+                
+                <div className="flex-1 p-6 relative">
+                    {subTab === 'invoices' && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 animate-in fade-in duration-300">
+                             <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                                <Layers className="w-8 h-8" strokeWidth={1.5} />
+                            </div>
+                            <h3 className="text-[15px] font-semibold text-slate-900 mb-1">Faturalar Yakında Geliyor...</h3>
+                            <div className="text-slate-500 text-[14px] max-w-sm leading-relaxed">Bağlı olduğunuz tedarikçi tarafından kesilmiş güncel fatura ve satış kalemlerinizin detayları çok yakında bu alanda listelenecek.</div>
+                        </div>
+                    )}
+                    {subTab === 'transactions' && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 animate-in fade-in duration-300">
+                             <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                                <ArrowRightLeft className="w-8 h-8" strokeWidth={1.5} />
+                            </div>
+                            <h3 className="text-[15px] font-semibold text-slate-900 mb-1">Hesap Hareketleri Yakında</h3>
+                            <div className="text-slate-500 text-[14px] max-w-sm leading-relaxed">Tüm tahsilat, havale ve kredi kartı ödemelerinizin finansal dökümü yakında bu menüde detaylandırılacaktır.</div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )
