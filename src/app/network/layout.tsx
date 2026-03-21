@@ -22,6 +22,9 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
         } catch (e) {}
     }
 
+    // Public sayfalar için minimal topbar veya gizli
+    const isPublic = pathname === "/network/login" || pathname === "/login" || pathname === "/" || pathname.startsWith("/network/invite") || pathname.startsWith("/invite");
+
     useEffect(() => {
         setMounted(true)
         if (!isPublic) {
@@ -32,8 +35,6 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
         }
     }, [isPublic])
 
-    // Public sayfalar için minimal topbar veya gizli
-    const isPublic = pathname === "/network/login" || pathname === "/login" || pathname === "/" || pathname.startsWith("/network/invite") || pathname.startsWith("/invite");
     if (isPublic) {
         return <>{children}</>
     }
