@@ -9,6 +9,7 @@ export default function NetworkCatalogPage() {
     const { showError, showSuccess } = useModal()
     const router = useRouter()
     const [q, setQ] = useState("")
+    const [debouncedQ, setDebouncedQ] = useState("")
     const [activeCat, setActiveCat] = useState<string>("")
     const [categories, setCategories] = useState<string[]>([])
     const [banners, setBanners] = useState<any[]>([])
@@ -50,7 +51,7 @@ export default function NetworkCatalogPage() {
         localStorage.setItem('hideB2bPrice', String(newVal));
     }
 
-    // Load categories once
+    // Load categories & banners once
     useEffect(() => {
         fetch("/api/network/catalog/categories")
             .then(res => res.json())
@@ -68,23 +69,25 @@ export default function NetworkCatalogPage() {
             .finally(() => setBannersLoading(false))
     }, [])
 
-    // Helper: Debounce search
+    // Debounce typing specifically
     useEffect(() => {
-        const timer = setTimeout(() => fetchCatalog(), 400)
+        const timer = setTimeout(() => setDebouncedQ(q), 400)
         return () => clearTimeout(timer)
-    }, [q, activeCat, page])
+    }, [q])
 
-    const imageProducts = products.filter((p: any) => !!p.image).slice(0, 8);
-    const noImageProducts = products.filter((p: any) => !p.image);
-    const leftList = noImageProducts.slice(0, Math.ceil(noImageProducts.length / 2));
-    const rightList = noImageProducts.slice(Math.ceil(noImageProducts.length / 2));
+    // Fetch immediately on relevant state changes
+    useEffect(() => {
+        fetchCatalog()
+    }, [debouncedQ, activeCat, page])
 
-    useEffect(() => { setPage(1) }, [q, activeCat])
+    // Reset pagination ONLY when search or category changes, not on page changes!
+    useEffect(() => { setPage(1) }, [debouncedQ, activeCat])
 
     const fetchCatalog = async () => {
         setLoading(true)
         try {
-            const res = await fetch(`/api/network/catalog?q=${encodeURIComponent(q)}&category=${encodeURIComponent(activeCat)}&page=${page}&take=16`)
+            // we use debouncedQ here
+            const res = await fetch(`/api/network/catalog?q=${encodeURIComponent(debouncedQ)}&category=${encodeURIComponent(activeCat)}&page=${page}&take=16`)
             const data = await res.json()
             if (res.ok && data.ok) {
                 setProducts(data.products || [])
@@ -121,7 +124,8 @@ export default function NetworkCatalogPage() {
         } catch (e: any) {
             showError("Hata", "Ağ hatası: " + e.message)
         } finally {
-            setTimeout(() => setAddingToCart(null), 1000) // Keep success state briefly
+            // Remove artificial 1 second delay so the button feels instantly responsive
+            setAddingToCart(null)
         }
     }
 
