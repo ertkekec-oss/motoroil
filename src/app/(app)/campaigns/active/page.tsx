@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { Gift, Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export default function ActiveCampaigns() {
     const { showConfirm, showError, showSuccess } = useModal();
@@ -118,9 +119,9 @@ export default function ActiveCampaigns() {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                                            <Link href={`/campaigns/edit/${c.id}`} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                                                 <Edit className="w-4 h-4" />
-                                            </button>
+                                            </Link>
                                             <button onClick={() => handleDelete(c.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-colors">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
