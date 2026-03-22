@@ -321,18 +321,53 @@ export default function NetworkCatalogPage() {
                                                         return (
                                                             <>
                                                                 {/* First Two Products (Regular) */}
-                                                                {firstRow.slice(0, 2).map(p => (
-                                                                    <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                                                ))}
+                                                                <div className="flex flex-col gap-6 lg:col-span-2">
+                                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                                        {firstRow.slice(0, 2).map(p => (
+                                                                            <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                                        ))}
+                                                                    </div>
+
+                                                                    {/* NEW: Sleek Horizontal Product Card (To fill the gap) */}
+                                                                    {remaining.length > 0 && (
+                                                                        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[24px] p-5 flex items-center gap-6 shadow-xl border border-slate-700 relative overflow-hidden group">
+                                                                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[40px] rounded-full translate-x-1/2 -translate-y-1/2" />
+                                                                            <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center p-2 shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                                                                                <img src={remaining[0].image} alt={remaining[0].name} className="w-full h-full object-contain" />
+                                                                            </div>
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <div className="flex items-center gap-2 mb-1">
+                                                                                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">ÖNERİLEN ÜRÜN</span>
+                                                                                    {remaining[0].campaign && <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">KAMPANYA</span>}
+                                                                                </div>
+                                                                                <h4 className="text-white font-bold text-base truncate mb-2">{remaining[0].name}</h4>
+                                                                                <div className="flex items-center justify-between gap-4">
+                                                                                    <div className="flex items-baseline gap-1.5">
+                                                                                        <span className="text-indigo-400 text-xs font-bold uppercase tracking-wider">FİYAT:</span>
+                                                                                        <span className="text-white font-black text-lg leading-none">{fmt(remaining[0].priceResolved)}</span>
+                                                                                    </div>
+                                                                                    <button 
+                                                                                        onClick={() => addToCart(remaining[0], 1)}
+                                                                                        disabled={addingToCart === remaining[0].id}
+                                                                                        className="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-black transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex items-center gap-2"
+                                                                                    >
+                                                                                        {addingToCart === remaining[0].id ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                                                                                        {addingToCart === remaining[0].id ? 'EKLENDİ' : 'HIZLI EKLE'}
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
 
                                                                 {/* Featured Wide Product (Slots 3 & 4) */}
                                                                 {useFeatured ? (
-                                                                    <div className="md:col-span-2 bg-white rounded-[32px] shadow-xl flex flex-row relative group/feat border border-slate-200 h-[460px] overflow-hidden transition-all duration-500">
+                                                                    <div className="lg:col-span-2 bg-white rounded-[32px] shadow-xl flex flex-col sm:flex-row relative group/feat border border-slate-200 h-[460px] md:h-full lg:h-[460px] overflow-hidden transition-all duration-500">
                                                                         {/* Background Highlight */}
                                                                         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-50/20 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-60 pointer-events-none" />
                                                                         
                                                                         {/* LEFT: Image Area (40%) */}
-                                                                        <div className="w-[40%] bg-white p-6 flex flex-col relative shrink-0 border-r border-slate-50">
+                                                                        <div className="w-full sm:w-[40%] bg-white p-8 flex flex-col relative shrink-0 border-r border-slate-50">
                                                                             <div className="flex-1 flex items-center justify-center relative bg-white min-h-0">
                                                                                 <img key={featuredProduct.id} src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[260px] object-contain filter drop-shadow-sm group-hover/feat:scale-105 transition-all duration-1000 animate-in fade-in zoom-in-95" style={{ mixBlendMode: 'multiply' }} />
                                                                                 
@@ -341,9 +376,9 @@ export default function NetworkCatalogPage() {
                                                                                     {featuredProduct.campaign && (
                                                                                         <div className="bg-emerald-600 text-white rounded-xl px-4 py-2.5 shadow-xl border border-white/20 flex items-center gap-2 animate-in slide-in-from-left-4 duration-500">
                                                                                             <ShoppingCart className="w-4 h-4" />
-                                                                                            <div className="flex flex-col">
+                                                                                            <div className="flex flex-col text-left">
                                                                                                 <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-wider">KAMPANYA</span>
-                                                                                                <span className="text-[12px] font-black uppercase tracking-tight leading-none">
+                                                                                                <span className="text-[12px] font-black uppercase tracking-tight leading-none text-nowrap">
                                                                                                     {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
                                                                                                 </span>
                                                                                             </div>
@@ -352,8 +387,8 @@ export default function NetworkCatalogPage() {
                                                                                     {featuredProduct.pointsRate > 0 && (
                                                                                         <div className="bg-amber-500 text-white rounded-xl px-4 py-2.5 shadow-xl border border-white/20 flex items-center gap-2 animate-in slide-in-from-left-4 duration-700">
                                                                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                                                            <div className="flex flex-col">
-                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-wider">KAZANILACAK PUAN</span>
+                                                                                            <div className="flex flex-col text-left">
+                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-wider">PUAN KAZANCI</span>
                                                                                                 <span className="text-[12px] font-black uppercase tracking-tight leading-none text-nowrap">
                                                                                                     +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PARAPUAN
                                                                                                 </span>
@@ -365,67 +400,65 @@ export default function NetworkCatalogPage() {
                                                                         </div>
 
                                                                         {/* RIGHT: Content & Actions (60%) */}
-                                                                        <div className="flex-1 p-10 flex flex-col bg-white relative">
-                                                                            <div className="flex-1">
-                                                                                <div className="flex items-center gap-2 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                                                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-3 py-1 rounded-full">GÜNÜN FIRSATI</span>
-                                                                                    <div className="w-1.5 h-1.5 bg-slate-100 rounded-full" />
-                                                                                    <span className="text-[11px] font-bold text-slate-400 tracking-widest truncate max-w-[150px]">
-                                                                                        {(featuredProduct.sku || "").substring(0, 25)}
-                                                                                    </span>
-                                                                                </div>
-                                                                                <h3 key={`name-${featuredProduct.id}`} className="text-3xl font-black text-slate-900 leading-[1.1] mb-5 group-hover/feat:text-indigo-600 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-700 delay-75">
-                                                                                    {(featuredProduct.name || "").substring(0, 25)}
-                                                                                </h3>
-                                                                                <div className="w-12 h-1.5 bg-indigo-500 rounded-full mb-8" />
-                                                                                
-                                                                                <div className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100/50 relative overflow-hidden group/desc">
-                                                                                    <p key={`desc-${featuredProduct.id}`} className="text-[15px] text-slate-600 font-medium leading-[1.6] italic line-clamp-4 animate-in fade-in duration-1000">
-                                                                                        {featuredProduct.b2bDescription || featuredProduct.description || "Kampanyalı ürünümüz için özel b2b detayları yakında eklenecektir."}
-                                                                                    </p>
-                                                                                </div>
+                                                                        <div className="flex-1 p-10 flex flex-col bg-white relative justify-center">
+                                                                            <div className="flex items-center gap-2 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                                                                <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-3 py-1 rounded-full">GÜNÜN FIRSATI</span>
+                                                                                <div className="w-1.5 h-1.5 bg-slate-100 rounded-full" />
+                                                                                <span className="text-[11px] font-bold text-slate-400 tracking-widest truncate max-w-[150px]">
+                                                                                    {(featuredProduct.sku || "").substring(0, 25)}
+                                                                                </span>
+                                                                            </div>
+                                                                            <h3 key={`name-${featuredProduct.id}`} className="text-3xl font-black text-slate-900 leading-[1.1] mb-5 group-hover/feat:text-indigo-600 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-700 delay-75">
+                                                                                {(featuredProduct.name || "").substring(0, 25)}
+                                                                            </h3>
+                                                                            <div className="w-12 h-1.5 bg-indigo-500 rounded-full mb-8" />
+                                                                            
+                                                                            <div className="bg-slate-50/50 rounded-2xl p-6 border border-slate-100/50 relative mb-8">
+                                                                                <p key={`desc-${featuredProduct.id}`} className="text-[15px] text-slate-600 font-medium leading-[1.6] italic line-clamp-3 animate-in fade-in duration-1000">
+                                                                                    {featuredProduct.b2bDescription || featuredProduct.description || "Kampanyalı ürünümüz için özel b2b detayları yakında eklenecektir."}
+                                                                                </p>
                                                                             </div>
 
                                                                             {/* Action Bar */}
-                                                                            <div className="mt-8 pt-8 border-t border-slate-100/80">
-                                                                                <div className="flex items-center justify-between gap-6">
-                                                                                    <div className="flex flex-col min-w-0">
-                                                                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1 leading-none">ÖZEL NET FİYAT</span>
-                                                                                        <div className="flex items-baseline gap-2">
-                                                                                            <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none animate-in zoom-in-95 duration-500">
-                                                                                                {fmt(featuredProduct.priceResolved)}
-                                                                                            </span>
-                                                                                        </div>
+                                                                            <div className="flex items-center justify-between gap-6 pt-6 border-t border-slate-100">
+                                                                                <div className="flex flex-col min-w-0">
+                                                                                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1 leading-none">ÖZEL NET FİYAT</span>
+                                                                                    <div className="flex items-baseline gap-2">
+                                                                                        <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none">
+                                                                                            {fmt(featuredProduct.priceResolved)}
+                                                                                        </span>
                                                                                     </div>
+                                                                                </div>
 
-                                                                                    <div className="flex items-center gap-3 shrink-0">
-                                                                                        <button 
-                                                                                            onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
-                                                                                            className="h-14 px-8 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-black text-[14px] transition-all active:scale-95 flex items-center gap-2 shadow-sm"
-                                                                                        >
-                                                                                            İNCELE
-                                                                                        </button>
-                                                                                        <button 
-                                                                                            disabled={addingToCart === featuredProduct.id || featuredProduct.stock <= 0}
-                                                                                            onClick={() => addToCart(featuredProduct, 1)}
-                                                                                            className={`h-14 px-10 rounded-2xl font-black text-[14px] tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/20 min-w-[180px] ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
-                                                                                        >
-                                                                                            {addingToCart === featuredProduct.id ? <><Check className="w-6 h-6" /> EKLENDİ</> : <><Plus className="w-6 h-6" /> SEPETE EKLE</>}
-                                                                                        </button>
-                                                                                    </div>
+                                                                                <div className="flex items-center gap-3 shrink-0">
+                                                                                    <button 
+                                                                                        onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
+                                                                                        className="h-14 px-8 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-black text-[14px] transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+                                                                                    >
+                                                                                        İNCELE
+                                                                                    </button>
+                                                                                    <button 
+                                                                                        disabled={addingToCart === featuredProduct.id || featuredProduct.stock <= 0}
+                                                                                        onClick={() => addToCart(featuredProduct, 1)}
+                                                                                        className={`h-14 px-10 rounded-2xl font-black text-[14px] tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/20 min-w-[180px] ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+                                                                                    >
+                                                                                        {addingToCart === featuredProduct.id ? <><Check className="w-6 h-6" /> EKLENDİ</> : <><Plus className="w-6 h-6" /> SEPETE EKLE</>}
+                                                                                    </button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 ) : (
                                                                     // Fallback if not enough products for featured or not on page 1
-                                                                    firstRow.slice(2, 4).map(p => (
-                                                                        <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                                                    ))
+                                                                    <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                                        {firstRow.slice(2, 4).map(p => (
+                                                                            <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                                        ))}
+                                                                    </div>
                                                                 )}
 
                                                                 {/* Remaining Products */}
-                                                                {remaining.map(p => (
+                                                                {remaining.slice(1).map(p => (
                                                                     <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
                                                                 ))}
                                                             </>
