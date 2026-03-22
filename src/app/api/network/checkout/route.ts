@@ -129,6 +129,16 @@ export async function POST(req: Request) {
 
             const byId = new Map<string, any>(products.map((p) => [p.id, p]))
 
+            // Fetch explicit dealer catalog prices
+            const catItems = await tx.dealerCatalogItem.findMany({
+                where: { supplierTenantId: ctx.supplierTenantId, productId: { in: productIds } },
+                select: { productId: true, price: true }
+            });
+            const catPriceMap = new Map();
+            for (const c of catItems) {
+                if (c.price !== null) catPriceMap.set(c.productId, toNumber(c.price));
+            }
+
             // 3) Snapshot items + stok doğrulama
             let grandTotal = 0
             const snapshotItems: any[] = []
@@ -144,10 +154,19 @@ export async function POST(req: Request) {
                     throw new HttpErr(409, "INSUFFICIENT_STOCK", { productId: p.id, available, requested: ci.quantity })
                 }
 
-                let listPrice = toNumber(p.price);
+                let listPriceMapped = null;
                 if (p.productPrices && p.productPrices.length > 0) {
-                    listPrice = toNumber(p.productPrices[0].price);
+                    listPriceMapped = toNumber(p.productPrices[0].price);
                 }
+
+                const catPriceRaw = catPriceMap.get(p.id);
+                const catPrice = catPriceRaw !== undefined ? catPriceRaw : null;
+                
+                const priceResolved = listPriceMapped !== null 
+                    ? listPriceMapped 
+                    : (catPrice !== null ? catPrice : toNumber(p.price));
+
+                const listPrice = priceResolved;
 
                 // First apply base exact price if category is matched
                 // Then apply percentage discount logic

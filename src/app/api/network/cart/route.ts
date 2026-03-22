@@ -44,18 +44,58 @@ export async function GET() {
         // İskonto hesaplaması 
         const membership = await prismaRaw.dealerMembership.findUnique({
             where: { id: ctx.activeMembershipId },
-            select: { priceRule: { select: { discount: true, isActive: true } } },
+            select: { categoryId: true, priceRule: { select: { discount: true, isActive: true } } },
         })
 
         const rule = membership?.priceRule?.isActive ? membership.priceRule : null
         const discountPct = rule ? toNumber(rule.discount) : 0
+
+        let priceListId = null;
+        if (membership && membership.categoryId) {
+            const custCat = await prismaRaw.customerCategory.findUnique({ where: { id: membership.categoryId } });
+            if (custCat) priceListId = custCat.priceListId;
+        }
+
+        const productIds = cart.items.map(i => i.productId);
+        
+        // Fetch explicit dealer catalog prices
+        const catItems = await prismaRaw.dealerCatalogItem.findMany({
+            where: { supplierTenantId: ctx.supplierTenantId, productId: { in: productIds } },
+            select: { productId: true, price: true }
+        });
+        const catPriceMap = new Map();
+        for (const c of catItems) {
+            if (c.price !== null) catPriceMap.set(c.productId, toNumber(c.price));
+        }
+
+        // Fetch price lists
+        let productPriceMap = new Map();
+        if (priceListId) {
+            const ppList = await prismaRaw.productPrice.findMany({
+                where: { priceListId, productId: { in: productIds } },
+                select: { productId: true, price: true }
+            });
+            for (const pp of ppList) {
+                if (pp.price !== null) productPriceMap.set(pp.productId, toNumber(pp.price));
+            }
+        }
 
         let subTotal = 0
         let totalDiscount = 0
         let grandTotal = 0
 
         const items = cart.items.map((item) => {
-            const listPrice = toNumber(item.product.price)
+            const listPriceRaw = productPriceMap.get(item.productId);
+            const listPriceMapped = listPriceRaw !== undefined ? listPriceRaw : null;
+
+            const catPriceRaw = catPriceMap.get(item.productId);
+            const catPrice = catPriceRaw !== undefined ? catPriceRaw : null;
+            
+            const priceResolved = listPriceMapped !== null 
+                ? listPriceMapped 
+                : (catPrice !== null ? catPrice : toNumber(item.product.price));
+
+            const listPrice = priceResolved;
             const effectivePrice = discountPct > 0 ? Math.max(0, listPrice * (1 - discountPct / 100)) : listPrice
 
             const lineListTotal = listPrice * item.quantity
