@@ -13,7 +13,9 @@ export default function EditCampaign(props: { params: Promise<{ id: string }> })
     const [loading, setLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(true);
     const [targetOptions, setTargetOptions] = useState<any[]>([]);
-    
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedLabel, setSelectedLabel] = useState("");
     const [formData, setFormData] = useState({
         name: "",
         campaignType: "PERCENT_DISCOUNT",
@@ -54,6 +56,10 @@ export default function EditCampaign(props: { params: Promise<{ id: string }> })
                         targetType: current.conditions?.targetType || 'ALL',
                         targetValue: current.conditions?.targetValue || '',
                     });
+                    if (current.conditions?.targetValue) {
+                        setSearchQuery(current.conditions.targetValue);
+                        setSelectedLabel(current.conditions.targetValue);
+                    }
                 } else {
                     showError("Hata", "Kampanya bulunamadı");
                     router.push("/campaigns/active");
@@ -68,13 +74,14 @@ export default function EditCampaign(props: { params: Promise<{ id: string }> })
     }, [params.id]);
 
     useEffect(() => {
-        if (formData.targetType !== "ALL" && formData.targetValue.length > 1) {
+        if (formData.targetType !== "ALL" && searchQuery.length >= 2 && searchQuery !== selectedLabel) {
             const timer = setTimeout(async () => {
                 try {
-                    const res = await fetch(`/api/campaigns/targets?type=${formData.targetType}&q=${encodeURIComponent(formData.targetValue)}`);
+                    const res = await fetch(`/api/campaigns/targets?type=${formData.targetType}&q=${encodeURIComponent(searchQuery)}`);
                     if (res.ok) {
                         const data = await res.json();
                         setTargetOptions(data);
+                        setShowDropdown(true);
                     }
                 } catch (e) {
                     console.error("Option load error", e);
@@ -84,7 +91,7 @@ export default function EditCampaign(props: { params: Promise<{ id: string }> })
         } else {
             setTargetOptions([]);
         }
-    }, [formData.targetValue, formData.targetType]);
+    }, [searchQuery, formData.targetType, selectedLabel]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -197,16 +204,47 @@ export default function EditCampaign(props: { params: Promise<{ id: string }> })
                         </div>
 
                         {formData.targetType !== "ALL" ? (
-                            <div>
+                            <div className="relative">
                                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">
                                     Hedef Adı / Kodu <span className="text-rose-500">*</span>
                                 </label>
-                                <input list="target-options" required value={formData.targetValue} onChange={e => setFormData({ ...formData, targetValue: e.target.value })} type="text" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/50 text-[14px] font-medium" />
-                                <datalist id="target-options">
-                                    {targetOptions.map((opt, i) => (
-                                        <option key={i} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </datalist>
+                                <input 
+                                    required 
+                                    value={searchQuery} 
+                                    onChange={e => {
+                                        setSearchQuery(e.target.value);
+                                        if (e.target.value === "") {
+                                            setFormData({ ...formData, targetValue: "" });
+                                            setSelectedLabel("");
+                                        }
+                                    }} 
+                                    onFocus={() => { if (targetOptions.length > 0) setShowDropdown(true); }}
+                                    onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                                    type="text" 
+                                    className={`w-full border ${!formData.targetValue && searchQuery ? 'border-rose-400 focus:ring-rose-500/50' : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500/50'} rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 text-[14px] font-medium`} 
+                                />
+                                {showDropdown && targetOptions.length > 0 && (
+                                    <ul className="absolute z-20 w-full mt-1 max-h-60 overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl divide-y divide-slate-100 dark:divide-slate-700/50">
+                                        {targetOptions.map((opt, i) => (
+                                            <li 
+                                                key={i} 
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault(); // prevent blur
+                                                    setFormData({ ...formData, targetValue: opt.value });
+                                                    setSearchQuery(opt.label);
+                                                    setSelectedLabel(opt.label);
+                                                    setShowDropdown(false);
+                                                }}
+                                                className="px-4 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 cursor-pointer text-[13px] font-medium transition-colors"
+                                            >
+                                                {opt.label}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                {!formData.targetValue && searchQuery && !showDropdown && (
+                                    <p className="text-[10px] text-rose-500 mt-1 font-semibold flex items-center gap-1">Lütfen listeden geçerli bir seçim yapınız.</p>
+                                )}
                             </div>
                         ) : (
                              <div></div>
