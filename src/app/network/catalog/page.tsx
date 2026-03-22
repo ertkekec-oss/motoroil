@@ -144,6 +144,9 @@ export default function NetworkCatalogPage() {
     const leftList = noImageProducts.slice(0, Math.ceil(noImageProducts.length / 2));
     const rightList = noImageProducts.slice(Math.ceil(noImageProducts.length / 2));
 
+    const fmt = (v: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(v);
+    const minProductsInFirstTwoRows = 4;
+
     return (
         <div className="font-sans min-h-[calc(100vh-64px)] bg-slate-50">
             <div className="mx-auto w-full max-w-7xl px-6 py-10 space-y-8">
@@ -308,273 +311,262 @@ export default function NetworkCatalogPage() {
                         <>
                             <div className="space-y-12">
                                 {/* Grid Array (First 8 items with image or just the first 8) */}
-                                <>
-                                            {imageProducts.length > 0 && (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                                    {(() => {
-                                                        const firstRow = imageProducts.slice(0, 4);
-                                                        const remaining = imageProducts.slice(4);
-                                                        const useFeatured = page === 1 && firstRow.length >= 3;
-                                                        const featuredProduct = firstRow[featuredIndex % firstRow.length];
-                                                        const fmt = (v: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(v);
+                                {imageProducts.length > 0 && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {(() => {
+                                            const firstRow = imageProducts.slice(0, 4);
+                                            const useFeatured = page === 1 && firstRow.length >= 3;
+                                            const featuredProduct = firstRow[featuredIndex % firstRow.length];
 
-                                                        return (
-                                                            <>
-                                                                {/* First Row: 4 Regular Cards */}
-                                                                <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                                                    {products.slice(0, 4).map(p => (
-                                                                        <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                                                    ))}
+                                            return (
+                                                <>
+                                                    {/* First Row: 4 Regular Cards */}
+                                                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                                        {products.slice(0, 4).map(p => (
+                                                            <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Second Row: Best Sellers Banner (Full Width) */}
+                                                    {products.length > 4 && (
+                                                        <div className="col-span-full">
+                                                            <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-[32px] p-8 flex flex-col md:flex-row items-center gap-10 shadow-2xl border border-slate-700/50 relative overflow-hidden group">
+                                                                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 blur-[80px] rounded-full translate-x-1/2 -translate-y-1/2" />
+                                                                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2" />
+                                                                
+                                                                <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-3xl flex items-center justify-center p-4 shrink-0 shadow-2xl group-hover:scale-110 transition-transform duration-700 relative z-10">
+                                                                    <img src={products[4].image} alt={products[4].name} className="w-full h-full object-contain" />
+                                                                    <div className="absolute -top-3 -right-3 bg-amber-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
+                                                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                                                    </div>
                                                                 </div>
-
-                                                                {/* Second Row: Best Sellers Banner (Full Width) */}
-                                                                {products.length > 4 && (
-                                                                    <div className="col-span-full">
-                                                                        <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-[32px] p-8 flex flex-col md:flex-row items-center gap-10 shadow-2xl border border-slate-700/50 relative overflow-hidden group">
-                                                                            <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 blur-[80px] rounded-full translate-x-1/2 -translate-y-1/2" />
-                                                                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2" />
-                                                                            
-                                                                            <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-3xl flex items-center justify-center p-4 shrink-0 shadow-2xl group-hover:scale-110 transition-transform duration-700 relative z-10">
-                                                                                <img src={products[4].image} alt={products[4].name} className="w-full h-full object-contain" />
-                                                                                <div className="absolute -top-3 -right-3 bg-amber-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
-                                                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                                                                </div>
-                                                                            </div>
-                                                                            
-                                                                            <div className="flex-1 min-w-0 relative z-10 text-center md:text-left">
-                                                                                <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
-                                                                                    <span className="text-[12px] font-black text-indigo-400 uppercase tracking-[0.3em] bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20">EN ÇOK SATAN ÜRÜNLER</span>
-                                                                                    <div className="flex -space-x-2">
-                                                                                        {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-800 bg-slate-700 flex items-center justify-center text-[10px] text-slate-400 font-bold">U{i}</div>)}
-                                                                                    </div>
-                                                                                </div>
-                                                                                <h4 className="text-white font-black text-2xl md:text-4xl truncate mb-4 tracking-tight">{products[4].name}</h4>
-                                                                                <p className="text-slate-400 font-medium mb-6 line-clamp-1 italic text-lg opacity-80">"Müşterilerimizin en çok tercih ettiği performans ürünü."</p>
-                                                                                
-                                                                                <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-6 border-t border-white/5">
-                                                                                    <div className="flex flex-col">
-                                                                                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-2">BU AY EN ÇOK SATAN</span>
-                                                                                        <span className="text-white font-black text-4xl leading-none tracking-tighter">{fmt(products[4].priceResolved)}</span>
-                                                                                    </div>
-                                                                                    <div className="flex items-center gap-4">
-                                                                                        <button 
-                                                                                            onClick={() => router.push('/network/catalog/' + products[4].id)}
-                                                                                            className="h-14 px-8 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-black text-[14px] transition-all border border-white/10 active:scale-95"
-                                                                                        >
-                                                                                            DETAYLAR
-                                                                                        </button>
-                                                                                        <button 
-                                                                                            onClick={() => addToCart(products[4], 1)}
-                                                                                            disabled={addingToCart === products[4].id}
-                                                                                            className={`h-14 px-12 rounded-2xl font-black text-[15px] transition-all active:scale-95 shadow-2xl flex items-center gap-3 ${addingToCart === products[4].id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/40'}`}
-                                                                                        >
-                                                                                            {addingToCart === products[4].id ? <Check className="w-6 h-6" /> : <ShoppingCart className="w-6 h-6" />}
-                                                                                            {addingToCart === products[4].id ? 'SEPETE EKLENDİ' : 'HIZLI SATIN AL'}
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
+                                                                
+                                                                <div className="flex-1 min-w-0 relative z-10 text-center md:text-left">
+                                                                    <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
+                                                                        <span className="text-[12px] font-black text-indigo-400 uppercase tracking-[0.3em] bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20">EN ÇOK SATAN ÜRÜNLER</span>
+                                                                        <div className="flex -space-x-2">
+                                                                            {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-800 bg-slate-700 flex items-center justify-center text-[10px] text-slate-400 font-bold">U{i}</div>)}
                                                                         </div>
                                                                     </div>
-                                                                )}
+                                                                    <h4 className="text-white font-black text-2xl md:text-4xl truncate mb-4 tracking-tight">{products[4].name}</h4>
+                                                                    <p className="text-slate-400 font-medium mb-6 line-clamp-1 italic text-lg opacity-80">"Müşterilerimizin en çok tercih ettiği performans ürünü."</p>
+                                                                    
+                                                                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-6 border-t border-white/5">
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-2">BU AY EN ÇOK SATAN</span>
+                                                                            <span className="text-white font-black text-4xl leading-none tracking-tighter">{fmt(products[4].priceResolved)}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-4">
+                                                                            <button 
+                                                                                onClick={() => router.push('/network/catalog/' + products[4].id)}
+                                                                                className="h-14 px-8 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-black text-[14px] transition-all border border-white/10 active:scale-95"
+                                                                            >
+                                                                                DETAYLAR
+                                                                            </button>
+                                                                            <button 
+                                                                                onClick={() => addToCart(products[4], 1)}
+                                                                                disabled={addingToCart === products[4].id}
+                                                                                className={`h-14 px-12 rounded-2xl font-black text-[15px] transition-all active:scale-95 shadow-2xl flex items-center gap-3 ${addingToCart === products[4].id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/40'}`}
+                                                                            >
+                                                                                {addingToCart === products[4].id ? <Check className="w-6 h-6" /> : <ShoppingCart className="w-6 h-6" />}
+                                                                                {addingToCart === products[4].id ? 'SEPETE EKLENDİ' : 'HIZLI SATIN AL'}
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
 
-                                                                {/* Third Row: Featured Item (Left) & More Best Sellers or Next Items (Right) */}
-                                                                <div className="col-span-full grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
-                                                                    {/* Large Featured Card (Horizontal Layout) */}
-                                                                    {useFeatured ? (
-                                                                        <div className="lg:col-span-2 bg-white rounded-[32px] shadow-xl flex flex-col md:flex-row relative group/feat border border-slate-200 h-auto md:h-[480px] overflow-hidden transition-all duration-500">
-                                                                            {/* LEFT: Image Area (40%) */}
-                                                                            <div className="w-full md:w-[40%] bg-slate-50/50 p-8 flex flex-col relative shrink-0 border-r border-slate-100 flex items-center justify-center">
-                                                                                <div className="relative w-full h-full flex items-center justify-center">
-                                                                                    <img key={featuredProduct.id} src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[300px] object-contain filter drop-shadow-md group-hover/feat:scale-105 transition-all duration-1000 animate-in fade-in zoom-in-95" />
-                                                                                    
-                                                                                    {/* Badges on Top Left of Image */}
-                                                                                    <div className="absolute top-0 left-0 flex flex-col gap-2">
-                                                                                        {featuredProduct.campaign && (
-                                                                                            <div className="bg-emerald-600 text-white rounded-xl px-4 py-2 shadow-lg border border-white/20 flex items-center gap-2">
-                                                                                                <ShoppingCart className="w-4 h-4" />
-                                                                                                <div className="flex flex-col text-left">
-                                                                                                    <span className="text-[9px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-widest">KAMPANYA</span>
-                                                                                                    <span className="text-[11px] font-black uppercase tracking-tight leading-none">
-                                                                                                        {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
-                                                                                                    </span>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        )}
-                                                                                        {featuredProduct.pointsRate > 0 && (
-                                                                                            <div className="bg-amber-500 text-white rounded-xl px-4 py-2 shadow-lg border border-white/20 flex items-center gap-2">
-                                                                                                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                                                                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                                                                </div>
-                                                                                                <div className="flex flex-col text-left">
-                                                                                                    <span className="text-[9px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-widest">PUAN KAZANCI</span>
-                                                                                                    <span className="text-[11px] font-black uppercase tracking-tight leading-none">
-                                                                                                        +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PUAN
-                                                                                                    </span>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            {/* RIGHT: Content Area (60%) */}
-                                                                            <div className="flex-1 p-10 flex flex-col bg-white relative justify-center">
-                                                                                <div className="flex items-center gap-3 mb-4">
-                                                                                    <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl uppercase tracking-[0.2em]">ÖZEL VİTRİN</span>
-                                                                                    <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
-                                                                                    <span className="text-[12px] font-bold text-slate-400">
-                                                                                        {featuredProduct.sku}
-                                                                                    </span>
-                                                                                </div>
-                                                                                
-                                                                                <h3 key={`name-${featuredProduct.id}`} className="text-3xl font-black text-slate-900 leading-[1.15] mb-6 group-hover/feat:text-indigo-600 transition-colors">
-                                                                                    {featuredProduct.name}
-                                                                                </h3>
-                                                                                
-                                                                                <p className="text-[16px] text-slate-500 font-medium leading-relaxed mb-10 line-clamp-3">
-                                                                                    {featuredProduct.b2bDescription || featuredProduct.description || "Kampanyalı ürünümüz için özel b2b detayları."}
-                                                                                </p>
-
-                                                                                <div className="flex items-center justify-between gap-10 pt-8 border-t border-slate-100 mt-auto">
-                                                                                    <div className="flex flex-col">
-                                                                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">NET BİRİM FİYAT</span>
-                                                                                        <span className="text-4xl font-black text-slate-900 tracking-tighter">
-                                                                                            {fmt(featuredProduct.priceResolved)}
+                                                    {/* Third Row: Featured Item (Left) & More Best Sellers or Next Items (Right) */}
+                                                    <div className="col-span-full grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
+                                                        {/* Large Featured Card (Horizontal Layout) */}
+                                                        {useFeatured ? (
+                                                            <div className="lg:col-span-2 bg-white rounded-[32px] shadow-xl flex flex-col md:flex-row relative group/feat border border-slate-200 h-auto md:h-[480px] overflow-hidden transition-all duration-500">
+                                                                {/* LEFT: Image Area (40%) */}
+                                                                <div className="w-full md:w-[40%] bg-slate-50/50 p-8 flex flex-col relative shrink-0 border-r border-slate-100 flex items-center justify-center">
+                                                                    <div className="relative w-full h-full flex items-center justify-center">
+                                                                        <img key={featuredProduct.id} src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[300px] object-contain filter drop-shadow-md group-hover/feat:scale-105 transition-all duration-1000 animate-in fade-in zoom-in-95" />
+                                                                        
+                                                                        {/* Badges on Top Left of Image */}
+                                                                        <div className="absolute top-0 left-0 flex flex-col gap-2">
+                                                                            {featuredProduct.campaign && (
+                                                                                <div className="bg-emerald-600 text-white rounded-xl px-4 py-2 shadow-lg border border-white/20 flex items-center gap-2">
+                                                                                    <ShoppingCart className="w-4 h-4" />
+                                                                                    <div className="flex flex-col text-left">
+                                                                                        <span className="text-[9px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-widest">KAMPANYA</span>
+                                                                                        <span className="text-[11px] font-black uppercase tracking-tight leading-none">
+                                                                                            {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
                                                                                         </span>
                                                                                     </div>
-
-                                                                                    <div className="flex items-center gap-4">
-                                                                                        <button 
-                                                                                            onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
-                                                                                            className="h-14 px-8 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-black text-[14px] transition-all"
-                                                                                        >
-                                                                                            İNCELE
-                                                                                        </button>
-                                                                                        <button 
-                                                                                            disabled={addingToCart === featuredProduct.id}
-                                                                                            onClick={() => addToCart(featuredProduct, 1)}
-                                                                                            className={`h-14 px-10 rounded-2xl font-black text-[14px] transition-all active:scale-95 shadow-xl ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30'}`}
-                                                                                        >
-                                                                                            {addingToCart === featuredProduct.id ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
-                                                                                            {addingToCart === featuredProduct.id ? 'EKLENDİ' : 'SEPETE EKLE'}
-                                                                                        </button>
+                                                                                </div>
+                                                                            )}
+                                                                            {featuredProduct.pointsRate > 0 && (
+                                                                                <div className="bg-amber-500 text-white rounded-xl px-4 py-2 shadow-lg border border-white/20 flex items-center gap-2">
+                                                                                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                                                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                                                    </div>
+                                                                                    <div className="flex flex-col text-left">
+                                                                                        <span className="text-[9px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-widest">PUAN KAZANCI</span>
+                                                                                        <span className="text-[11px] font-black uppercase tracking-tight leading-none">
+                                                                                            +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PUAN
+                                                                                        </span>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
+                                                                            )}
                                                                         </div>
-                                                                    ) : (
-                                                                        products.slice(5, 7).map(p => (
-                                                                            <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                                                        ))
-                                                                    )}
-
-                                                                    {/* Side Regular Cards (Spans 2 cols) */}
-                                                                    <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                                                        {products.slice(minProductsInFirstTwoRows, minProductsInFirstTwoRows + 2).map(p => (
-                                                                            <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                                                        ))}
                                                                     </div>
                                                                 </div>
 
-                                                                {/* Remaining Products */}
-                                                                {products.slice(minProductsInFirstTwoRows + 2).map(p => (
-                                                                    <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                                                ))}
-                                                            </>
-
-                                                                {/* Remaining Products */}
-                                                                {remaining.slice(1).map(p => (
-                                                                    <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                                                ))}
-                                                            </>
-                                                        )
-                                                    })()}
-                                                </div>
-                                            )}
-
-                                            {noImageProducts.length > 0 && (
-                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-                                                    {/* Left List */}
-                                                    <div className="flex flex-col gap-3">
-                                                        {leftList.map(p => (
-                                                            <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
-                                                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
-                                                                {p.campaign && (
-                                                                    <div className="absolute top-0 right-0 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 border-b border-l border-emerald-200 px-2 py-0.5 rounded-bl-xl flex items-center shadow-sm uppercase tracking-wide z-10">
-                                                                        {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                                                                {/* RIGHT: Content Area (60%) */}
+                                                                <div className="flex-1 p-10 flex flex-col bg-white relative justify-center">
+                                                                    <div className="flex items-center gap-3 mb-4">
+                                                                        <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl uppercase tracking-[0.2em]">ÖZEL VİTRİN</span>
+                                                                        <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
+                                                                        <span className="text-[12px] font-bold text-slate-400">
+                                                                            {featuredProduct.sku}
+                                                                        </span>
                                                                     </div>
-                                                                )}
-                                                                <div className="flex-1 min-w-0 pl-1">
-                                                                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
-                                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded truncate max-w-[100px]">{p.category || "Diğer"}</span>
-                                                                        <div className={`ml-auto w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                                                    
+                                                                    <h3 key={`name-${featuredProduct.id}`} className="text-3xl font-black text-slate-900 leading-[1.15] mb-6 group-hover/feat:text-indigo-600 transition-colors">
+                                                                        {featuredProduct.name}
+                                                                    </h3>
+                                                                    
+                                                                    <p className="text-[16px] text-slate-500 font-medium leading-relaxed mb-10 line-clamp-3">
+                                                                        {featuredProduct.b2bDescription || featuredProduct.description || "Kampanyalı ürünümüz için özel b2b detayları."}
+                                                                    </p>
+
+                                                                    <div className="flex items-center justify-between gap-10 pt-8 border-t border-slate-100 mt-auto">
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">NET BİRİM FİYAT</span>
+                                                                            <span className="text-4xl font-black text-slate-900 tracking-tighter">
+                                                                                {fmt(featuredProduct.priceResolved)}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div className="flex items-center gap-4">
+                                                                            <button 
+                                                                                onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
+                                                                                className="h-14 px-8 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-black text-[14px] transition-all"
+                                                                            >
+                                                                                İNCELE
+                                                                            </button>
+                                                                            <button 
+                                                                                disabled={addingToCart === featuredProduct.id}
+                                                                                onClick={() => addToCart(featuredProduct, 1)}
+                                                                                className={`h-14 px-10 rounded-2xl font-black text-[14px] transition-all active:scale-95 shadow-xl ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30'}`}
+                                                                            >
+                                                                                {addingToCart === featuredProduct.id ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+                                                                                {addingToCart === featuredProduct.id ? 'EKLENDİ' : 'SEPETE EKLE'}
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
-                                                                    <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
-                                                                </div>
-                                                                <div className="flex flex-col items-end pr-2 text-right shrink-0">
-                                                                    {hideB2bPrice ? (
-                                                                        <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
-                                                                    ) : (
-                                                                        <>
-                                                                            <span className="text-[11px] font-medium text-slate-400">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
-                                                                            <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                                <div className="flex items-center gap-1.5 shrink-0 border-l border-slate-100 pl-4">
-                                                                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200" title="Detaya Git"><Search className="w-[18px] h-[18px]" strokeWidth={2} /></button>
-                                                                    <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-colors border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'}`}>
-                                                                        {addingToCart === p.id ? <Check className="w-[18px] h-[18px]" strokeWidth={2.5} /> : <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />}
-                                                                    </button>
                                                                 </div>
                                                             </div>
-                                                        ))}
+                                                        ) : (
+                                                            products.slice(5, 7).map(p => (
+                                                                <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                            ))
+                                                        )}
+
+                                                        {/* Side Regular Cards (Spans 2 cols) */}
+                                                        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                            {products.slice(minProductsInFirstTwoRows, minProductsInFirstTwoRows + 2).map(p => (
+                                                                <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                    {/* Right List */}
-                                                    <div className="flex flex-col gap-3">
-                                                        {rightList.map(p => (
-                                                            <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
-                                                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
-                                                                {p.campaign && (
-                                                                    <div className="absolute top-0 right-0 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 border-b border-l border-emerald-200 px-2 py-0.5 rounded-bl-xl flex items-center shadow-sm uppercase tracking-wide z-10">
-                                                                        {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
-                                                                    </div>
-                                                                )}
-                                                                <div className="flex-1 min-w-0 pl-1">
-                                                                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
-                                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded truncate max-w-[100px]">{p.category || "Diğer"}</span>
-                                                                        <div className={`ml-auto w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                                                                    </div>
-                                                                    <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
-                                                                </div>
-                                                                <div className="flex flex-col items-end pr-2 text-right shrink-0">
-                                                                    {hideB2bPrice ? (
-                                                                        <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
-                                                                    ) : (
-                                                                        <>
-                                                                            <span className="text-[11px] font-medium text-slate-400">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
-                                                                            <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                                <div className="flex items-center gap-1.5 shrink-0 border-l border-slate-100 pl-4">
-                                                                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200" title="Detaya Git"><Search className="w-[18px] h-[18px]" strokeWidth={2} /></button>
-                                                                    <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-colors border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'}`}>
-                                                                        {addingToCart === p.id ? <Check className="w-[18px] h-[18px]" strokeWidth={2.5} /> : <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />}
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        ))}
+
+                                                    {/* Remaining Products */}
+                                                    {products.slice(minProductsInFirstTwoRows + 4).map(p => (
+                                                        <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                    ))}
+                                                </>
+                                            )
+                                        })()}
+                                    </div>
+                                )}
+
+                                {noImageProducts.length > 0 && (
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                                        {/* Left List */}
+                                        <div className="flex flex-col gap-3">
+                                            {leftList.map(p => (
+                                                <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
+                                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
+                                                    {p.campaign && (
+                                                        <div className="absolute top-0 right-0 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 border-b border-l border-emerald-200 px-2 py-0.5 rounded-bl-xl flex items-center shadow-sm uppercase tracking-wide z-10">
+                                                            {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1 min-w-0 pl-1">
+                                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded truncate max-w-[100px]">{p.category || "Diğer"}</span>
+                                                            <div className={`ml-auto w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                                        </div>
+                                                        <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
+                                                    </div>
+                                                    <div className="flex flex-col items-end pr-2 text-right shrink-0">
+                                                        {hideB2bPrice ? (
+                                                            <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                        ) : (
+                                                            <>
+                                                                <span className="text-[11px] font-medium text-slate-400">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                                <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 shrink-0 border-l border-slate-100 pl-4">
+                                                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200" title="Detaya Git"><Search className="w-[18px] h-[18px]" strokeWidth={2} /></button>
+                                                        <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-colors border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'}`}>
+                                                            {addingToCart === p.id ? <Check className="w-[18px] h-[18px]" strokeWidth={2.5} /> : <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />}
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            )}
-</>
+                                            ))}
+                                        </div>
+                                        {/* Right List */}
+                                        <div className="flex flex-col gap-3">
+                                            {rightList.map(p => (
+                                                <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
+                                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
+                                                    {p.campaign && (
+                                                        <div className="absolute top-0 right-0 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 border-b border-l border-emerald-200 px-2 py-0.5 rounded-bl-xl flex items-center shadow-sm uppercase tracking-wide z-10">
+                                                            {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1 min-w-0 pl-1">
+                                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded truncate max-w-[100px]">{p.category || "Diğer"}</span>
+                                                            <div className={`ml-auto w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                                        </div>
+                                                        <h4 className="font-semibold text-slate-900 text-[14px] truncate">{p.name}</h4>
+                                                    </div>
+                                                    <div className="flex flex-col items-end pr-2 text-right shrink-0">
+                                                        {hideB2bPrice ? (
+                                                            <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                        ) : (
+                                                            <>
+                                                                <span className="text-[11px] font-medium text-slate-400">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</span>
+                                                                <span className="font-black text-slate-900 text-[15px]">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 shrink-0 border-l border-slate-100 pl-4">
+                                                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-[10px] bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors border border-slate-200" title="Detaya Git"><Search className="w-[18px] h-[18px]" strokeWidth={2} /></button>
+                                                        <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-colors border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'}`}>
+                                                            {addingToCart === p.id ? <Check className="w-[18px] h-[18px]" strokeWidth={2.5} /> : <ShoppingCart className="w-[18px] h-[18px]" strokeWidth={2} />}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             
-                            {/* Pagination Buttons */}
                             {/* Pagination Buttons - ONLY on Category Pages or Searches */}
                             {(activeCat !== "" || debouncedQ !== "") && totalPages > 1 && (
                                 <div className="mt-12 flex items-center justify-center gap-2">
