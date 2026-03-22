@@ -79,8 +79,7 @@ export async function GET(req: Request) {
                         brand: true,
                         description: true,
                         b2bDescription: true,
-                        pointsRate: true,
-                        minOrderQty: true,
+                        // pointsRate: true, // pointsRate is on Campaign model, not Product
                         ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                         variants: {
                             select: {
@@ -96,7 +95,15 @@ export async function GET(req: Request) {
             }
         });
 
-        const campaigns = await prisma.campaign.findMany({ where: { tenantId: membership.tenantId, isActive: true, deletedAt: null, campaignType: "BUY_X_GET_Y" } });
+        const campaigns = await prisma.campaign.findMany({ 
+            where: { 
+                tenantId: membership.tenantId, 
+                isActive: true, 
+                deletedAt: null, 
+                campaignType: { in: ["BUY_X_GET_Y", "POINTS"] }
+            } 
+        });
+
         let nextCursor: string | undefined = undefined;
         if (catalogItems.length > take) {
             const nextItem = catalogItems.pop();
@@ -123,6 +130,12 @@ export async function GET(req: Request) {
                 return false;
             });
 
+            // If it's a POINTS campaign, apply the pointsRate
+            let resolvedPointsRate = 0;
+            if (campaign && campaign.campaignType === "POINTS") {
+                resolvedPointsRate = Number(campaign.pointsRate || 0);
+            }
+
             return {
                 id: prod.id,
                 name: prod.name,
@@ -135,9 +148,9 @@ export async function GET(req: Request) {
                 brand: prod.brand,
                 description: prod.description,
                 b2bDescription: prod.b2bDescription,
-                pointsRate: Number(prod.pointsRate || 0),
-                minOrderQty: prod.minOrderQty,
-                campaign: campaign ? {
+                pointsRate: resolvedPointsRate,
+                minOrderQty: item.minOrderQty || 1,
+                campaign: (campaign && campaign.campaignType === "BUY_X_GET_Y") ? {
                     id: campaign.id,
                     name: campaign.name,
                     buyQuantity: campaign.buyQuantity,
