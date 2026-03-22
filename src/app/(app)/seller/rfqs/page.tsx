@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -12,7 +12,7 @@ export default async function SellerRfqsListPage() {
     if (!user) redirect("/login");
     const sellerCompanyId = user.companyId || session?.companyId;
 
-    // Find all RFQs where this seller has an item and the RFQ is SENT or RESPONDED
+    // Find all RFQs where this seller has an item and the RFQ is SENT or RESPONDED or ACCEPTED
     const rfqs = await prisma.rfq.findMany({
         where: {
             status: { in: ["SENT", "RESPONDED", "ACCEPTED"] },
@@ -31,11 +31,11 @@ export default async function SellerRfqsListPage() {
         orderBy: { updatedAt: "desc" }
     });
 
-    const rfqsEnhanced = await Promise.all(rfqs.map(async r => {
-        const buyer = await prisma.company.findUnique({ where: { id: r.buyerCompanyId } });
+    const rfqsEnhanced = await Promise.all(rfqs.map(async (r: any) => {
+        const buyer = await prismaRaw.company.findUnique({ where: { id: r.buyerCompanyId } });
         return {
             ...r,
-            buyerName: buyer?.name || "Unknown Buyer"
+            buyerName: buyer?.name || "Bilinmeyen Alıcı Firma"
         }
     }));
 

@@ -49,7 +49,7 @@ export default function Sidebar() {
             'b2b-global-parent': [
                 '/support/tickets', '/hub/seller/orders', '/hub/buyer/orders',
                 '/seller/products', '/catalog', '/hub/finance', '/hub/trust-score',
-                '/seller/boost', '/seller/boost/analytics', '/rfq', '/contracts', '/hub/buyer',
+                '/seller/boost', '/seller/boost/analytics', '/rfq', '/seller/rfqs', '/contracts', '/hub/buyer',
                 '/hub-dashboard'
             ],
             'dealer-network-parent': [
@@ -160,6 +160,7 @@ export default function Sidebar() {
             '/reconciliation/disputes': { perm: 'finance_view' },
             '/hub/buyer/orders': { perm: 'supplier_view' },
             '/hub/seller/orders': { perm: 'sales_archive' },
+            '/seller/rfqs': { perm: 'sales_archive' },
         };
 
         const rawGroups = [
@@ -175,8 +176,11 @@ export default function Sidebar() {
                         subItems: [
                             { name: 'Hub Paneli', href: '/hub-dashboard' },
                             { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
-                            { name: 'SİPARİŞLER', href: '' },
-                            ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/hub/seller/orders' }] : []),
+                            { name: 'SİPARİŞ & TEKLİF', href: '' },
+                            ...(isSeller ? [
+                                { name: 'Gelen Müzakereler (RFQ)', href: '/seller/rfqs' },
+                                { name: 'Alınan Siparişler', href: '/hub/seller/orders' }
+                            ] : []),
                             ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/hub/buyer/orders' }] : []),
 
                             { name: 'KATALOG', href: '' },

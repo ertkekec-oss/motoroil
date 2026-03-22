@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import CounterClient from "./CounterClient";
@@ -31,7 +31,7 @@ export default async function SellerRfqDetailPage({ params }: { params: Promise<
         return <div className="p-10 text-center">RFQ not found or access denied.</div>;
     }
 
-    const buyerCompany = await prisma.company.findUnique({
+    const buyerCompany = await prismaRaw.company.findUnique({
         where: { id: rfq.buyerCompanyId }
     });
 
