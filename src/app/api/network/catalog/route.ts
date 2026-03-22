@@ -115,13 +115,25 @@ export async function GET(req: Request) {
                 : Number(item.price ?? prod.price ?? 0);
 
             let appliedCampaign = null;
+            let appliedPointsCampaign = null;
             campaigns.forEach(c => {
                 if(!c.conditions) return;
-                const { targetType, targetValue, buyQuantity, rewardQuantity } = c.conditions;
-                if(targetType === "ALL") { appliedCampaign = c; return; }
-                if(targetType === "BRAND" && prod.brand === targetValue) { appliedCampaign = c; return; }
-                if(targetType === "CATEGORY" && prod.category === targetValue) { appliedCampaign = c; return; }
-                if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) { appliedCampaign = c; return; }
+                const { targetType, targetValue } = c.conditions;
+                let match = false;
+                
+                if(targetType === "ALL" || !targetType) match = true;
+                else if(targetType === "BRAND" && prod.brand === targetValue) match = true;
+                else if(targetType === "CATEGORY" && prod.category === targetValue) match = true;
+                else if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) match = true;
+
+                if (match) {
+                    const cType = (c.campaignType || c.type || "").toUpperCase();
+                    if (cType === "LOYALTY_POINTS") {
+                        appliedPointsCampaign = c;
+                    } else {
+                        appliedCampaign = c;
+                    }
+                }
             });
 
             const variantValues = Array.isArray(prod.variants) ? prod.variants : []
@@ -141,7 +153,8 @@ export async function GET(req: Request) {
                 minOrderQty: item.minOrderQty,
                 maxOrderQty: item.maxOrderQty,
                 catalogItemId: item.id,
-                campaign: appliedCampaign ? { name: appliedCampaign.name, buyQuantity: appliedCampaign.conditions.buyQuantity, rewardQuantity: appliedCampaign.conditions.rewardQuantity } : null
+                campaign: appliedCampaign ? { name: appliedCampaign.name, buyQuantity: appliedCampaign.conditions?.buyQuantity, rewardQuantity: appliedCampaign.conditions?.rewardQuantity } : null,
+                pointsCampaign: appliedPointsCampaign ? { name: appliedPointsCampaign.name, type: appliedPointsCampaign.campaignType || appliedPointsCampaign.type, discountRate: appliedPointsCampaign.pointsRate || appliedPointsCampaign.discountRate } : null
             }
         });
 

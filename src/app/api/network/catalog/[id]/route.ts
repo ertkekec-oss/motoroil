@@ -86,13 +86,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             const { targetType, targetValue } = c.conditions;
             let match = false;
             
-            if(targetType === "ALL") match = true;
+            if(targetType === "ALL" || !targetType) match = true;
             else if(targetType === "BRAND" && prod.brand === targetValue) match = true;
             else if(targetType === "CATEGORY" && prod.category === targetValue) match = true;
             else if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) match = true;
 
             if (match) {
-                if (c.campaignType === "LOYALTY_POINTS" || c.type === "LOYALTY_POINTS") {
+                const cType = (c.campaignType || c.type || "").toUpperCase();
+                if (cType === "LOYALTY_POINTS") {
                     appliedPointsCampaign = c;
                 } else {
                     appliedCampaign = c;

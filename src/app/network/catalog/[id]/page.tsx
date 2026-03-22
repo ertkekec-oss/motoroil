@@ -162,7 +162,7 @@ export default function CatalogProductDetailPage() {
                                             <div>
                                                 <span className="block text-[10px] font-extrabold text-purple-600 uppercase tracking-widest leading-none mb-1">Kazanılacak Parapuan</span>
                                                 <span className="block text-sm font-bold text-purple-950 leading-none">
-                                                    +{Math.floor((product.priceResolved * quantity * (product.pointsCampaign.discountRate || 0)) / 100).toLocaleString('tr-TR')} Puan
+                                                    +{Math.floor(product.priceResolved * quantity * (product.pointsCampaign?.discountRate || 0)).toLocaleString('tr-TR')} Puan
                                                 </span>
                                             </div>
                                         </div>
