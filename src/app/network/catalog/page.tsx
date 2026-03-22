@@ -380,36 +380,36 @@ export default function NetworkCatalogPage() {
 
                                                                 {/* Third Row: Featured Item (Left) & More Best Sellers or Next Items (Right) */}
                                                                 <div className="col-span-full grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
-                                                                    {/* Large Featured Card (Spans 2 columns) */}
+                                                                    {/* Large Featured Card (Horizontal Layout) */}
                                                                     {useFeatured ? (
-                                                                        <div className="lg:col-span-2 bg-slate-50/20 rounded-[44px] shadow-sm flex flex-col relative group/feat border border-slate-100/50 overflow-hidden transition-all duration-500 min-h-[640px]">
-                                                                            {/* TOP: Image */}
-                                                                            <div className="flex-1 bg-white p-12 flex flex-col relative">
-                                                                                <div className="flex-1 flex items-center justify-center relative">
-                                                                                    <img key={featuredProduct.id} src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[360px] object-contain filter drop-shadow-md group-hover/feat:scale-105 transition-all duration-1000 animate-in fade-in zoom-in-95" />
+                                                                        <div className="lg:col-span-2 bg-white rounded-[32px] shadow-xl flex flex-col md:flex-row relative group/feat border border-slate-200 h-auto md:h-[480px] overflow-hidden transition-all duration-500">
+                                                                            {/* LEFT: Image Area (40%) */}
+                                                                            <div className="w-full md:w-[40%] bg-slate-50/50 p-8 flex flex-col relative shrink-0 border-r border-slate-100 flex items-center justify-center">
+                                                                                <div className="relative w-full h-full flex items-center justify-center">
+                                                                                    <img key={featuredProduct.id} src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[300px] object-contain filter drop-shadow-md group-hover/feat:scale-105 transition-all duration-1000 animate-in fade-in zoom-in-95" />
                                                                                     
-                                                                                    {/* Badges */}
-                                                                                    <div className="absolute top-0 left-0 flex flex-col gap-3">
+                                                                                    {/* Badges on Top Left of Image */}
+                                                                                    <div className="absolute top-0 left-0 flex flex-col gap-2">
                                                                                         {featuredProduct.campaign && (
-                                                                                            <div className="bg-emerald-600 text-white rounded-2xl px-5 py-3 shadow-2xl border border-white/20 flex items-center gap-3">
-                                                                                                <ShoppingCart className="w-5 h-5" />
+                                                                                            <div className="bg-emerald-600 text-white rounded-xl px-4 py-2 shadow-lg border border-white/20 flex items-center gap-2">
+                                                                                                <ShoppingCart className="w-4 h-4" />
                                                                                                 <div className="flex flex-col text-left">
-                                                                                                    <span className="text-[10px] font-bold opacity-80 leading-none mb-1 uppercase tracking-widest">KAMPANYA</span>
-                                                                                                    <span className="text-[14px] font-black uppercase tracking-tight leading-none">
+                                                                                                    <span className="text-[9px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-widest">KAMPANYA</span>
+                                                                                                    <span className="text-[11px] font-black uppercase tracking-tight leading-none">
                                                                                                         {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
                                                                                                     </span>
                                                                                                 </div>
                                                                                             </div>
                                                                                         )}
                                                                                         {featuredProduct.pointsRate > 0 && (
-                                                                                            <div className="bg-amber-500 text-white rounded-2xl px-5 py-3 shadow-2xl border border-white/20 flex items-center gap-3">
-                                                                                                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                                                                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                                                            <div className="bg-amber-500 text-white rounded-xl px-4 py-2 shadow-lg border border-white/20 flex items-center gap-2">
+                                                                                                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                                                                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                                                                 </div>
                                                                                                 <div className="flex flex-col text-left">
-                                                                                                    <span className="text-[10px] font-bold opacity-80 leading-none mb-1 uppercase tracking-widest">PUAN KAZANCI</span>
-                                                                                                    <span className="text-[14px] font-black uppercase tracking-tight leading-none">
-                                                                                                        +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PARAPUAN
+                                                                                                    <span className="text-[9px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-widest">PUAN KAZANCI</span>
+                                                                                                    <span className="text-[11px] font-black uppercase tracking-tight leading-none">
+                                                                                                        +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PUAN
                                                                                                     </span>
                                                                                                 </div>
                                                                                             </div>
@@ -418,8 +418,8 @@ export default function NetworkCatalogPage() {
                                                                                 </div>
                                                                             </div>
 
-                                                                            {/* BOTTOM: Floating Content Area */}
-                                                                            <div className="m-6 p-10 bg-white rounded-[36px] shadow-2xl shadow-slate-200/50 flex flex-col border border-slate-50 relative -mt-24 z-10">
+                                                                            {/* RIGHT: Content Area (60%) */}
+                                                                            <div className="flex-1 p-10 flex flex-col bg-white relative justify-center">
                                                                                 <div className="flex items-center gap-3 mb-4">
                                                                                     <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl uppercase tracking-[0.2em]">ÖZEL VİTRİN</span>
                                                                                     <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
@@ -432,11 +432,11 @@ export default function NetworkCatalogPage() {
                                                                                     {featuredProduct.name}
                                                                                 </h3>
                                                                                 
-                                                                                <p className="text-[16px] text-slate-500 font-medium leading-relaxed mb-10 line-clamp-2">
+                                                                                <p className="text-[16px] text-slate-500 font-medium leading-relaxed mb-10 line-clamp-3">
                                                                                     {featuredProduct.b2bDescription || featuredProduct.description || "Kampanyalı ürünümüz için özel b2b detayları."}
                                                                                 </p>
 
-                                                                                <div className="flex items-center justify-between gap-10 pt-8 border-t border-slate-100">
+                                                                                <div className="flex items-center justify-between gap-10 pt-8 border-t border-slate-100 mt-auto">
                                                                                     <div className="flex flex-col">
                                                                                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">NET BİRİM FİYAT</span>
                                                                                         <span className="text-4xl font-black text-slate-900 tracking-tighter">
@@ -447,14 +447,14 @@ export default function NetworkCatalogPage() {
                                                                                     <div className="flex items-center gap-4">
                                                                                         <button 
                                                                                             onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
-                                                                                            className="h-16 px-10 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-black text-[14px] transition-all"
+                                                                                            className="h-14 px-8 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-black text-[14px] transition-all"
                                                                                         >
                                                                                             İNCELE
                                                                                         </button>
                                                                                         <button 
                                                                                             disabled={addingToCart === featuredProduct.id}
                                                                                             onClick={() => addToCart(featuredProduct, 1)}
-                                                                                            className={`h-16 px-12 rounded-2xl font-black text-[14px] transition-all active:scale-95 shadow-xl ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30'}`}
+                                                                                            className={`h-14 px-10 rounded-2xl font-black text-[14px] transition-all active:scale-95 shadow-xl ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30'}`}
                                                                                         >
                                                                                             {addingToCart === featuredProduct.id ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
                                                                                             {addingToCart === featuredProduct.id ? 'EKLENDİ' : 'SEPETE EKLE'}
