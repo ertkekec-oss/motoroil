@@ -75,20 +75,41 @@ export async function initiateShipment(params: InitShipmentParams) {
 
         let shp;
         try {
-            // a. Create internal shipment record
-            shp = await tx.shipment.create({
-                data: {
-                    networkOrderId,
-                    mode,
-                    status: 'LABEL_CREATED',
-                    carrierCode,
-                    trackingNumber: shipmentResult.trackingNumber,
-                    labelUrl: shipmentResult.labelUrl,
-                    items: normalizedItems,
-                    sequence: nextSequence,
-                    initKey
-                }
+            const pendingShp = await tx.shipment.findFirst({
+                where: { networkOrderId, status: 'PENDING', carrierCode: 'SYSTEM' }
             });
+
+            if (pendingShp) {
+                // Bağlı olan SellerEarning'in kopmaması için Escrow sırasında açılan dummy shipment'ı güncelliyoruz.
+                shp = await tx.shipment.update({
+                    where: { id: pendingShp.id },
+                    data: {
+                        mode,
+                        status: 'LABEL_CREATED',
+                        carrierCode,
+                        trackingNumber: shipmentResult.trackingNumber,
+                        labelUrl: shipmentResult.labelUrl,
+                        items: normalizedItems,
+                        sequence: nextSequence,
+                        initKey
+                    }
+                });
+            } else {
+                // a. Create internal shipment record
+                shp = await tx.shipment.create({
+                    data: {
+                        networkOrderId,
+                        mode,
+                        status: 'LABEL_CREATED',
+                        carrierCode,
+                        trackingNumber: shipmentResult.trackingNumber,
+                        labelUrl: shipmentResult.labelUrl,
+                        items: normalizedItems,
+                        sequence: nextSequence,
+                        initKey
+                    }
+                });
+            }
         } catch (e: any) {
             if (e.code === 'P2002') {
                 const existingShp = await tx.shipment.findUnique({

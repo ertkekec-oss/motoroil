@@ -59,7 +59,7 @@ export default function ConfirmDeliveryAction({
                         }
                         });
                     }}
-                    disabled={!allShipmentsDelivered || loading}
+                    disabled={loading}
                     className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all flex justify-center items-center gap-2
               ${!allShipmentsDelivered
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'

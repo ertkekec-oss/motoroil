@@ -96,7 +96,7 @@ export async function processCheckoutAction() {
                 totalAmount,
                 commissionAmount,
                 currency: "TRY",
-                status: "PROCESSING",
+                status: "PAID",
                 items: orderItems,
                 itemsHash,
                 payments: {
