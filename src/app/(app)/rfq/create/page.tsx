@@ -18,7 +18,8 @@ export default async function CreateNetworkRfqPage() {
         where: { status: "ACTIVE" },
         include: { globalProduct: true },
         distinct: ['globalProductId'], // Fetch unique global products
-    });
+        adminBypass: true // Bypass Prisma Tenant Middleware so buyers can see ALL network products
+    } as any);
 
     const products = activeProductsRaw
         .map(p => ({

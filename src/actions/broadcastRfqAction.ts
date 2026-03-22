@@ -26,6 +26,8 @@ export async function broadcastRfqAction(globalProductId: string, quantity: numb
     }
 
     // 1. Intelligence Routing: Find all ACTIVE sellers of this global product
+    // We MUST use adminBypass: true because Prisma Middleware inherently isolates reads to the user's own companyId,
+    // which prevents the Buyer from discovering Network Suppliers.
     const capableListings = await prisma.networkListing.findMany({
         where: {
             globalProductId: globalProductId,
@@ -35,8 +37,9 @@ export async function broadcastRfqAction(globalProductId: string, quantity: numb
         },
         select: {
             sellerCompanyId: true,
-        }
-    });
+        },
+        adminBypass: true
+    } as any);
 
     if (capableListings.length === 0) {
         return { success: false, message: "Ağda bu ürünü sağlayan aktif bir tedarikçi bulunamadı." };

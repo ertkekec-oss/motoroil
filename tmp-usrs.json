@@ -1,0 +1,26 @@
+[
+  {
+    "email": "admin@periodya.com",
+    "tenantId": "demo-tenant"
+  },
+  {
+    "email": "ertugrul.kekec@periodya.com",
+    "tenantId": "PLATFORM_ADMIN"
+  },
+  {
+    "email": "ertugrul.kekec@motoroil.com.tr",
+    "tenantId": "cmn26425v0000ssw6km61fcxb"
+  },
+  {
+    "email": "oilshoptr@gmail.com",
+    "tenantId": "cmmqvlwxx0001ips90uoifrhx"
+  },
+  {
+    "email": "cgr@kekec.com",
+    "tenantId": "cmmt2dfm5000ailryuuyhmpie"
+  },
+  {
+    "email": "cgrkekecccc@xn--gail-5qa092a.com",
+    "tenantId": "cmmt2c0x00000ilry2gpl8ykp"
+  }
+]
