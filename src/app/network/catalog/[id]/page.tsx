@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useModal } from "@/contexts/ModalContext"
-import { PackageOpen, ChevronLeft, Loader2, Coins, ShoppingCart, Plus, Minus, Search, Eye, EyeOff } from "lucide-react"
+import { PackageOpen, ChevronLeft, Loader2, Coins, ShoppingCart, Plus, Minus } from "lucide-react"
 
 export default function CatalogProductDetailPage() {
     const params = useParams()
@@ -75,10 +75,7 @@ export default function CatalogProductDetailPage() {
     if (loading) {
         return (
             <div className="min-h-[calc(100vh-64px)] bg-white flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4 text-slate-400">
-                    <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-                    <span className="text-sm font-bold tracking-widest uppercase">Yükleniyor...</span>
-                </div>
+                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
             </div>
         )
     }
@@ -86,91 +83,73 @@ export default function CatalogProductDetailPage() {
     if (!product) return null
 
     const stock = product.stock || 0
-    const outOfStock = stock === 0
     const earnPoints = product.pointsRate > 0 ? Math.floor(product.priceResolved * quantity * product.pointsRate) : 0;
     const fmt = (v: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(v);
 
     return (
-        <div className="min-h-screen bg-white text-slate-900 font-sans pb-24">
-            
-            {/* Top Navigation Bar / Breadcrumb */}
-            <div className="max-w-[1400px] mx-auto px-6 py-6 border-b border-slate-100 flex items-center justify-between">
-                <button 
-                    onClick={() => router.push('/network/catalog')}
-                    className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
-                >
-                    <ChevronLeft className="w-4 h-4" />
-                    Kataloğa Dön
+        <div className="min-h-screen bg-white font-sans pb-24">
+            {/* Top Bar */}
+            <div className="max-w-[1400px] mx-auto px-6 py-6 border-b border-slate-50">
+                <button onClick={() => router.push('/network/catalog')} className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors">
+                    <ChevronLeft size={16} /> Kataloğa Dön
                 </button>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-6 py-8 flex flex-col lg:flex-row items-start gap-12">
+            <div className="max-w-[1400px] mx-auto px-6 py-12 flex flex-col lg:flex-row items-stretch gap-16">
                 
-                {/* Left side: Image */}
-                <div className="w-full lg:w-[40%] shrink-0 flex items-center justify-center rounded-3xl bg-slate-50 border border-slate-100 p-8 min-h-[450px] relative">
+                {/* SOL BÖLÜM: ÜRÜN GÖRSELİ */}
+                <div className="w-full lg:w-[45%] shrink-0 flex items-center justify-center rounded-[32px] bg-slate-50 border border-slate-100 p-12 min-h-[500px] relative overflow-hidden">
                     {product.image ? (
-                        <img 
-                            src={product.image} 
-                            alt={product.name} 
-                            className="w-full h-full object-contain max-h-[500px] filter drop-shadow-xl select-none"
-                            draggable={false}
-                        />
+                        <img src={product.image} alt={product.name} className="w-full h-full object-contain filter drop-shadow-2xl select-none" draggable={false} />
                     ) : (
-                        <div className="text-slate-300 flex flex-col items-center gap-4">
+                        <div className="text-slate-200 flex flex-col items-center gap-4">
                             <PackageOpen className="w-24 h-24" strokeWidth={1} />
-                            <span className="text-base font-medium tracking-wide">Ürün Görseli Yok</span>
+                            <span className="text-sm font-bold tracking-widest">GÖRSEL YOK</span>
                         </div>
                     )}
                 </div>
 
-                {/* Right side: Product Content */}
-                <div className="w-full lg:w-[60%] flex flex-col pt-2">
-                    
-                    {/* Title */}
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-8">
+                {/* SAĞ BÖLÜM: İÇERİKLER VE BUTONLAR */}
+                <div className="flex-1 flex flex-col pt-2 min-w-0">
+                    <h1 className="text-[44px] font-black text-slate-900 leading-[1.1] tracking-tight mb-8">
                         {product.name}
                     </h1>
 
-                    {/* Price & Labels */}
-                    <div className="flex flex-wrap items-end gap-6 mb-8">
+                    <div className="flex flex-wrap items-end gap-10 mb-10">
                         {hideB2bPrice ? (
                             <div className="flex flex-col">
-                                <span className="text-[13px] font-bold text-slate-400 tracking-wider uppercase mb-1">Satış Fiyatı</span>
-                                <span className="text-4xl font-black text-[#1a1a1a] tracking-tight">
-                                    {fmt(product.basePrice || product.priceResolved)}
-                                </span>
+                                <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-1.5">SATICININ FİYATI</span>
+                                <span className="text-5xl font-black text-slate-900 tracking-tighter">{fmt(product.basePrice || product.priceResolved)}</span>
                             </div>
                         ) : (
                             <>
                                 <div className="flex flex-col">
-                                    <span className="text-[13px] font-bold text-slate-400 tracking-wider uppercase mb-1">Liste Fiyatı</span>
-                                    <span className="text-2xl font-bold text-slate-400 line-through">
-                                        {fmt(product.basePrice || product.priceResolved)}
-                                    </span>
+                                    <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-1.5">LİSTE FİYATI</span>
+                                    <span className="text-2xl font-bold text-slate-300 line-through tracking-tight">{fmt(product.basePrice || product.priceResolved)}</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[13px] font-bold text-slate-500 tracking-wider uppercase mb-1 flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Size Özel</span>
-                                    <span className="text-4xl font-black text-[#1a1a1a] tracking-tight">
-                                        {fmt(product.priceResolved)}
+                                    <span className="text-[12px] font-black text-blue-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" /> SİZE ÖZEL
                                     </span>
+                                    <span className="text-5xl font-black text-slate-900 tracking-tighter">{fmt(product.priceResolved)}</span>
                                 </div>
-                                
-                                {/* PARAPUAN & KAMPANYA BOXES SIDE-BY-SIDE */}
-                                <div className="flex items-center gap-3 pb-1">
+
+                                {/* PARAPUAN & KAMPANYA KUTUSU */}
+                                <div className="flex flex-col gap-3 min-w-[200px]">
                                     {earnPoints > 0 && (
-                                        <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-4 py-3 rounded-xl border border-amber-100 flex items-center gap-2 shadow-sm whitespace-nowrap">
-                                            <Coins size={16} strokeWidth={3} />
+                                        <div className="bg-amber-50 text-amber-600 text-[11px] font-black px-5 py-3 rounded-2xl border border-amber-100 flex items-center gap-3 shadow-sm min-w-[180px]">
+                                            <Coins size={20} strokeWidth={3} />
                                             <div className="flex flex-col">
-                                                <span className="opacity-70 text-[8px] uppercase leading-none mb-1">PARAPUAN</span>
+                                                <span className="text-[9px] uppercase tracking-[0.1em] opacity-80 leading-none mb-1">PARAPUAN</span>
                                                 <span className="leading-none">+{earnPoints.toLocaleString('tr-TR')} PUAN</span>
                                             </div>
                                         </div>
                                     )}
                                     {product.campaign && (
-                                        <div className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-4 py-3 rounded-xl border border-emerald-100 flex items-center gap-2 shadow-sm whitespace-nowrap">
-                                            <ShoppingCart size={16} strokeWidth={3} />
+                                        <div className="bg-emerald-50 text-emerald-600 text-[11px] font-black px-5 py-3 rounded-2xl border border-emerald-100 flex items-center gap-3 shadow-sm min-w-[180px]">
+                                            <ShoppingCart size={20} strokeWidth={3} />
                                             <div className="flex flex-col">
-                                                <span className="opacity-70 text-[8px] uppercase leading-none mb-1">KAMPANYA</span>
+                                                <span className="text-[9px] uppercase tracking-[0.1em] opacity-80 leading-none mb-1">KAMPANYA</span>
                                                 <span className="leading-none">{product.campaign.name || "AKTİF"}</span>
                                             </div>
                                         </div>
@@ -180,85 +159,39 @@ export default function CatalogProductDetailPage() {
                         )}
                     </div>
 
-                    {/* Description Paragraph */}
-                    <div className="mb-10">
-                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Açıklama</span>
-                        <p className="text-slate-500 text-[15px] leading-relaxed whitespace-pre-wrap font-medium">
-                            {product.description || "Bu ürün için detaylı açıklama bulunmuyor. Özellikleri ve ticari avantajları hakkında satıcı bayiniz ile iletişime geçebilirsiniz."}
-                        </p>
-                    </div>
+                    <p className="text-slate-500 text-[16px] leading-relaxed mb-12 max-w-2xl font-medium">
+                        {product.description || "Bu ürün için detaylı açıklama bulunmuyor."}
+                    </p>
 
-                    {/* Meta Grid */}
-                    <div className="grid grid-cols-[120px_1fr] gap-y-4 text-[13px] mb-10 border-t border-slate-100 pt-8">
-                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">STOK DURUMU:</div>
-                        <div className={`font-bold uppercase tracking-wider ${stock > 0 ? "text-emerald-500" : "text-red-500"}`}>
-                            {stock > 0 ? `Stok: ${stock} adet` : "Stokta Yok"}
-                        </div>
-
-                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">SKU / KOD:</div>
-                        <div className="font-medium text-slate-500 uppercase">{product.sku || "—"}</div>
-                        
-                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">KATEGORİ:</div>
-                        <div className="font-medium text-slate-500">{product.category || "Diğer"}</div>
-                    </div>
-
-                    {/* Add to Cart Area */}
-                    <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-4 h-14">
-                            {/* Quantity Selector */}
-                            <div className="flex items-center justify-between px-2 w-[140px] h-full rounded-[14px] border border-slate-200 bg-white shadow-sm grow-0">
-                                <button 
-                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="w-10 h-10 flex flex-col items-center justify-center text-slate-400 hover:text-[#1a1a1a] hover:bg-slate-50 rounded-lg text-lg transition-colors font-medium"
-                                >
-                                    -
-                                </button>
-                                <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    value={localQtyStr !== null ? localQtyStr : quantity.toString()}
-                                    onChange={(e) => setLocalQtyStr(e.target.value)}
-                                    onBlur={(e) => {
-                                        let n = parseInt(e.target.value, 10);
-                                        if (isNaN(n) || n < 1) n = 1;
-                                        setQuantity(n);
-                                        setLocalQtyStr(null);
-                                    }}
-                                    className="text-[17px] font-black text-[#1a1a1a] w-12 text-center bg-transparent border-none outline-none focus:ring-0 p-0 mx-auto"
-                                />
-                                <button 
-                                    onClick={() => setQuantity(quantity + 1)}
-                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-[#1a1a1a] hover:bg-slate-50 rounded-lg text-lg transition-colors font-medium"
-                                >
-                                    +
-                                </button>
+                    <div className="grid grid-cols-2 gap-10 max-w-md pb-12 border-b border-slate-100 mb-12">
+                        <div className="space-y-1.5">
+                            <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest">STOK DURUMU</span>
+                            <div className={`text-[15px] font-black uppercase flex items-center gap-2 ${stock > 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                                <div className={`w-2 h-2 rounded-full ${stock > 0 ? "bg-emerald-500" : "bg-rose-500"}`} /> {stock > 0 ? `STOK: ${stock} ADET` : "TÜKENDİ"}
                             </div>
-
-                            {/* Add to Cart Button */}
-                            <button
-                                disabled={outOfStock || addingToCart}
-                                onClick={handleAddToCart}
-                                className={`flex-1 h-full rounded-[14px] text-[15px] font-extrabold uppercase tracking-wide transition-all flex items-center justify-center gap-2 ${
-                                    outOfStock 
-                                    ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
-                                    : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-500/10"
-                                }`}
-                            >
-                                {addingToCart ? <Loader2 className="animate-spin w-5 h-5" /> : "SEPETE EKLE"}
-                            </button>
                         </div>
+                        <div className="space-y-1.5">
+                             <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest">SKU / KOD</span>
+                             <div className="text-[15px] font-black text-slate-900 uppercase truncate">{product.sku}</div>
+                        </div>
+                        <div className="space-y-1.5">
+                             <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest">KATEGORİ</span>
+                             <div className="text-[15px] font-black text-slate-900 uppercase">{product.category || "Diğer"}</div>
+                        </div>
+                    </div>
 
-                        {/* Buy It Now Button */}
-                        <button
-                            disabled={outOfStock || addingToCart}
-                            className={`w-full h-14 rounded-[14px] border-2 text-[15px] font-black uppercase tracking-wide transition-all ${
-                                outOfStock 
-                                ? "border-slate-200 text-slate-300"
-                                : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white shadow-sm"
-                            }`}
-                        >
-                            HEMEN AL
-                        </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-5 mt-auto">
+                        <div className="flex items-center justify-between w-full sm:w-[160px] h-16 bg-white border border-slate-200 rounded-2xl p-2 shadow-sm shrink-0">
+                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all"><Minus size={20} /></button>
+                            <input type="text" value={quantity} readOnly className="w-10 text-center font-black text-lg bg-transparent border-none focus:ring-0 p-0" />
+                            <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all"><Plus size={20} /></button>
+                        </div>
+                        <div className="flex-1 w-full flex items-center gap-4">
+                            <button disabled={stock === 0 || addingToCart} onClick={handleAddToCart} className="flex-1 h-16 bg-blue-600 text-white rounded-2xl font-black text-[15px] hover:bg-blue-700 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-3 uppercase tracking-wider">
+                                {addingToCart ? <Loader2 size={24} className="animate-spin" /> : <>SEPETE EKLE</>}
+                            </button>
+                            <button disabled={stock === 0} className="w-[180px] h-16 border-2 border-slate-900 text-slate-900 rounded-2xl font-black text-[15px] hover:bg-slate-900 hover:text-white transition-all uppercase tracking-wider">HEMEN AL</button>
+                        </div>
                     </div>
 
                 </div>
