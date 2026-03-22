@@ -2,12 +2,44 @@
 
 import { useState, useEffect } from "react";
 import FinanceStatusBanner from "@/components/FinanceStatusBanner";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function PayoutsPage() {
+    const { showPrompt, showSuccess, showError } = useModal();
     const [destinations, setDestinations] = useState<any[]>([]);
     const [requests, setRequests] = useState<any[]>([]);
     const [balances, setBalances] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [payoutLoading, setPayoutLoading] = useState(false);
+
+    const handlePayout = () => {
+        showPrompt("Para Çekme (Payout)", "Lütfen çekmek istediğiniz tutarı (₺) girin:", async (val) => {
+            const amount = parseFloat(val);
+            if (isNaN(amount) || amount <= 0) {
+                showError("Hata", "Geçerli bir tutar girmelisiniz.");
+                return;
+            }
+
+            setPayoutLoading(true);
+            try {
+                // Ensure the import exists via another replace or just rely on global if not strictly needed
+                // Actually I need to import it properly. I will add the import at the top later.
+                const res = await (await import("@/actions/requestPayoutAction")).requestPayoutAction(amount);
+                if (res.success) {
+                    showSuccess("Talep Alındı", `Çekim talebiniz (${amount} ₺) başarıyla oluşturuldu ve bakiye rezerve edildi.`);
+                    // Local refresh bypasses full page reload
+                    const summaryData = await fetch("/api/network/payouts/summary").then(r => r.json());
+                    if (summaryData.balances) setBalances(summaryData.balances);
+                    const requestsData = await fetch("/api/network/payouts/requests").then(r => r.json());
+                    if (requestsData.items) setRequests(requestsData.items);
+                }
+            } catch (err: any) {
+                showError("İşlem Başarısız", err.message);
+            } finally {
+                setPayoutLoading(false);
+            }
+        });
+    };
 
     useEffect(() => {
         Promise.all([
@@ -47,7 +79,12 @@ export default function PayoutsPage() {
                 <div className="bg-white dark:bg-[#0f172a] p-5 rounded-xl border border-blue-200 shadow-sm shadow-blue-50">
                     <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Çekilebilir Bakiye (Available)</p>
                     <p className="text-3xl font-bold text-blue-700">{formatMoney(balances?.availableBalance || 0)}</p>
-                    <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Para Çek Talebi Oluştur</button>
+                    <button 
+                        onClick={handlePayout}
+                        disabled={payoutLoading}
+                        className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50">
+                        {payoutLoading ? "İşleniyor..." : "Para Çek Talebi Oluştur"}
+                    </button>
                 </div>
                 <div className="bg-white dark:bg-[#0f172a] p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm opacity-80">
                     <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Bekleyen Kazanç (Pending)</p>
