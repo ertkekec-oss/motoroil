@@ -83,7 +83,8 @@ export default function CatalogProductDetailPage() {
     if (!product) return null
 
     const stock = product.stock || 0
-    const earnPoints = product.pointsRate > 0 ? Math.floor(product.priceResolved * quantity * product.pointsRate) : 0;
+    const pointsRate = product.pointsRate || product.pointsCampaign?.discountRate || 0;
+    const earnPoints = pointsRate > 0 ? Math.floor((product.priceResolved || 0) * quantity * pointsRate) : 0;
     const fmt = (v: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(v);
 
     return (
@@ -146,22 +147,22 @@ export default function CatalogProductDetailPage() {
 
                         {/* PARAPUAN VE KAMPANYA ALANI (EŞİT BÜYÜKLÜKTE, ALT YANA) */}
                         {(earnPoints > 0 || product.campaign) && (
-                            <div className="flex gap-4">
+                            <div className="flex flex-wrap gap-4">
                                 {earnPoints > 0 && (
-                                    <div className="flex-1 bg-amber-50 text-amber-600 font-black px-6 py-5 rounded-2xl border border-amber-200 shadow-sm flex items-center gap-4">
-                                        <div className="bg-amber-100 p-2.5 rounded-xl text-amber-500"><Coins size={28} strokeWidth={2.5} /></div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[11px] uppercase tracking-[0.1em] opacity-80 leading-none mb-1.5">PARAPUAN</span>
-                                            <span className="text-[17px] leading-none">+{earnPoints.toLocaleString('tr-TR')} PUAN</span>
+                                    <div className="w-full sm:w-[220px] bg-amber-50 text-amber-600 font-black px-5 py-4 rounded-xl border border-amber-200 shadow-sm flex items-center gap-4 shrink-0">
+                                        <div className="bg-amber-100 p-2 rounded-lg text-amber-500"><Coins size={24} strokeWidth={2.5} /></div>
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-[10px] uppercase tracking-[0.1em] opacity-80 leading-none mb-1.5">PARAPUAN</span>
+                                            <span className="text-[15px] leading-none truncate">+{earnPoints.toLocaleString('tr-TR')} PUAN</span>
                                         </div>
                                     </div>
                                 )}
                                 {product.campaign && (
-                                    <div className="flex-1 bg-emerald-50 text-emerald-600 font-black px-6 py-5 rounded-2xl border border-emerald-200 shadow-sm flex items-center gap-4">
-                                        <div className="bg-emerald-100 p-2.5 rounded-xl text-emerald-500"><ShoppingCart size={28} strokeWidth={2.5} /></div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[11px] uppercase tracking-[0.1em] opacity-80 leading-none mb-1.5">KAMPANYA</span>
-                                            <span className="text-[17px] leading-none">{product.campaign.name || "AKTİF"}</span>
+                                    <div className="w-full sm:w-[220px] bg-emerald-50 text-emerald-600 font-black px-5 py-4 rounded-xl border border-emerald-200 shadow-sm flex items-center gap-4 shrink-0">
+                                        <div className="bg-emerald-100 p-2 rounded-lg text-emerald-500"><ShoppingCart size={24} strokeWidth={2.5} /></div>
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-[10px] uppercase tracking-[0.1em] opacity-80 leading-none mb-1.5">KAMPANYA</span>
+                                            <span className="text-[15px] leading-none truncate" title={product.campaign.name || "AKTİF"}>{product.campaign.name || "AKTİF"}</span>
                                         </div>
                                     </div>
                                 )}
