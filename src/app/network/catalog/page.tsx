@@ -328,18 +328,18 @@ export default function NetworkCatalogPage() {
                                                                         {/* Background Highlight */}
                                                                         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-50/30 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-60 pointer-events-none" />
                                                                         
-                                                                        {/* LEFT: Image & Info Boxes (Explicitly 40%) */}
-                                                                        <div className="w-[40%] bg-white p-6 flex flex-col relative shrink-0 border-r border-slate-100">
+                                                                        {/* LEFT: Image Area */}
+                                                                        <div className="w-[40%] bg-white p-6 flex flex-col relative shrink-0 border-r border-slate-100 h-full">
                                                                             <div className="flex-1 flex items-center justify-center relative bg-white">
                                                                                 <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[240px] object-contain filter drop-shadow-sm group-hover/feat:scale-105 transition-transform duration-700" style={{ mixBlendMode: 'multiply' }} />
                                                                                 
                                                                                 {/* BADGES Overlay Layer */}
                                                                                 <div className="absolute top-0 left-0 flex flex-col gap-2 z-20">
                                                                                     {featuredProduct.campaign && (
-                                                                                        <div className="bg-emerald-600 text-white rounded-xl px-3 py-2.5 shadow-xl border border-white/20 flex items-center gap-2 group-hover/feat:-translate-y-1 transition-transform">
+                                                                                        <div className="bg-emerald-600 text-white rounded-xl px-3 py-2.5 shadow-xl border border-white/20 flex items-center gap-2">
                                                                                             <ShoppingCart className="w-4 h-4" />
                                                                                             <div className="flex flex-col">
-                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5">KAMPANYA</span>
+                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase">KAMPANYA</span>
                                                                                                 <span className="text-[12px] font-black uppercase tracking-tight leading-none">
                                                                                                     {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
                                                                                                 </span>
@@ -347,12 +347,12 @@ export default function NetworkCatalogPage() {
                                                                                         </div>
                                                                                     )}
                                                                                     {featuredProduct.pointsRate > 0 && (
-                                                                                        <div className="bg-amber-500 text-white rounded-xl px-3 py-2.5 shadow-xl border border-white/20 flex items-center gap-2 group-hover/feat:-translate-y-1 transition-transform delay-75">
+                                                                                        <div className="bg-amber-500 text-white rounded-xl px-3 py-2.5 shadow-xl border border-white/20 flex items-center gap-2">
                                                                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                                                             <div className="flex flex-col">
-                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5">KAZANÇ</span>
-                                                                                                <span className="text-[12px] font-black uppercase tracking-tight leading-none text-nowrap">
-                                                                                                    +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PUAN
+                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase text-nowrap">KAZANILACAK PUAN</span>
+                                                                                                <span className="text-[12px] font-black uppercase tracking-tight leading-none">
+                                                                                                    +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PARAPUAN
                                                                                                 </span>
                                                                                             </div>
                                                                                         </div>
@@ -361,8 +361,8 @@ export default function NetworkCatalogPage() {
                                                                             </div>
                                                                         </div>
 
-                                                                        {/* RIGHT: Content & Actions (60%) */}
-                                                                        <div className="w-[60%] p-8 flex flex-col bg-white relative">
+                                                                        {/* RIGHT: Content & Actions */}
+                                                                        <div className="flex-1 p-8 flex flex-col bg-white relative h-full">
                                                                             <div className="flex-1">
                                                                                 <div className="flex items-center gap-2 mb-4">
                                                                                     <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-3 py-1 rounded-full">GÜNÜN FIRSATI</span>
@@ -420,6 +420,39 @@ export default function NetworkCatalogPage() {
                                                                     firstRow.slice(2, 4).map(p => (
                                                                         <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
                                                                     ))
+                                                                )}
+
+                                                                {/* FEATURED CATEGORIES STRIP (To fill the gap) */}
+                                                                {useFeatured && (
+                                                                    <div className="col-span-full py-4 mt-2">
+                                                                        <div className="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide">
+                                                                            <div className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-indigo-600/20 shrink-0">
+                                                                                <Filter className="w-4 h-4" />
+                                                                                <span className="text-sm font-black whitespace-nowrap">ÖNERİLEN KATEGORİLER:</span>
+                                                                            </div>
+                                                                            {[
+                                                                                { label: 'Yağ ve Sıvılar', icon: '🛢️' },
+                                                                                { label: 'Fren Sistemleri', icon: '⚙️' },
+                                                                                { label: 'Aydınlatma Grubu', icon: '💡' },
+                                                                                { label: 'Motor Parçaları', icon: '🔧' },
+                                                                                { label: 'Filtreler', icon: '💨' },
+                                                                                { label: 'Dış Aksesuar', icon: '🚗' },
+                                                                                { label: 'Elektrik Sistemi', icon: '🔋' }
+                                                                            ].map((cat, i) => (
+                                                                                <button 
+                                                                                    key={i}
+                                                                                    onClick={() => setCategoryFilter(cat.label)}
+                                                                                    className="flex items-center gap-2 bg-white hover:bg-indigo-50 border border-slate-100 hover:border-indigo-200 px-5 py-3 rounded-2xl text-slate-600 hover:text-indigo-600 font-bold text-sm transition-all shadow-sm shrink-0 active:scale-95"
+                                                                                >
+                                                                                    <span className="text-lg">{cat.icon}</span>
+                                                                                    {cat.label}
+                                                                                </button>
+                                                                            ))}
+                                                                            <button className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 px-5 py-3 rounded-2xl text-slate-400 font-bold text-sm transition-all shrink-0">
+                                                                                Tümünü Gör <ArrowRight className="w-4 h-4" />
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
                                                                 )}
 
                                                                 {/* Remaining Products */}
