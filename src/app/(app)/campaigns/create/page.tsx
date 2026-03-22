@@ -23,6 +23,8 @@ export default function CreateCampaign() {
         description: "",
         buyQuantity: 1,
         rewardQuantity: 1,
+        targetType: 'ALL',
+        targetValue: '',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -47,7 +49,9 @@ export default function CreateCampaign() {
             if (formData.campaignType === "BUY_X_GET_Y") {
                 payload.conditions = {
                     buyQuantity: Number(formData.buyQuantity),
-                    rewardQuantity: Number(formData.rewardQuantity)
+                    rewardQuantity: Number(formData.rewardQuantity),
+                    targetType: formData.targetType,
+                    targetValue: formData.targetValue
                 };
             }
 
@@ -111,16 +115,50 @@ export default function CreateCampaign() {
                 </div>
 
                 {formData.campaignType === "BUY_X_GET_Y" && (
-                    <>
+                    <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800 flex-wrap">
+                        <div className="md:col-span-2 mb-1">
+                            <h4 className="text-[14px] font-bold text-indigo-900 dark:text-indigo-300 flex items-center gap-2">
+                                Kurgu Hedefleme Seçenekleri
+                            </h4>
+                            <p className="text-[13px] text-indigo-600 dark:text-indigo-400 mt-1">Bu promosyon hangi ürün, marka veya kategori satın alındığında aktif olacak belirleyin.</p>
+                        </div>
+                        
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Alış Adedi (Buy X)</label>
-                            <input required value={formData.buyQuantity} onChange={e => setFormData({ ...formData, buyQuantity: Number(e.target.value) })} type="number" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="2" />
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Hedef Tipi</label>
+                            <select value={formData.targetType} onChange={e => setFormData({ ...formData, targetType: e.target.value })} className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/50 text-[14px] font-semibold text-slate-700 dark:text-slate-300">
+                                <option value="ALL">Tüm Sepet Geneli (Herhangi Ürünler)</option>
+                                <option value="BRAND">Belirli Marka (Brand)</option>
+                                <option value="CATEGORY">Belirli Kategori (Category)</option>
+                                <option value="PRODUCT">Sabit Spesifik Ürün (Product)</option>
+                            </select>
+                        </div>
+
+                        {formData.targetType !== "ALL" ? (
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">
+                                    Hedef Adı / Kodu <span className="text-rose-500">*</span>
+                                </label>
+                                <input required value={formData.targetValue} onChange={e => setFormData({ ...formData, targetValue: e.target.value })} type="text" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/50 text-[14px] font-medium" placeholder={`Örn: ${formData.targetType === 'PRODUCT' ? 'Motul 5W30 4L' : formData.targetType === 'CATEGORY' ? 'Motor Yağı' : 'Castrol'}`} />
+                            </div>
+                        ) : (
+                             <div></div>
+                        )}
+
+                        <div>
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Alış Şartı Adedi (Satın Aldığında)</label>
+                            <div className="relative">
+                                <input required value={formData.buyQuantity} onChange={e => setFormData({ ...formData, buyQuantity: Number(e.target.value) })} type="number" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/50 text-[15px] font-bold pl-12" placeholder="2" />
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">Al: </span>
+                            </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Bedelsiz Adet (Get Y)</label>
-                            <input required value={formData.rewardQuantity} onChange={e => setFormData({ ...formData, rewardQuantity: Number(e.target.value) })} type="number" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="1" />
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Promosyon Adedi (Bedelsiz Verilecek)</label>
+                            <div className="relative">
+                                <input required value={formData.rewardQuantity} onChange={e => setFormData({ ...formData, rewardQuantity: Number(e.target.value) })} type="number" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/50 text-[15px] font-bold pl-16 text-emerald-600" placeholder="1" />
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 font-semibold">Bedava: </span>
+                            </div>
                         </div>
-                    </>
+                    </div>
                 )}
 
                 <div className="col-span-1 md:col-span-2 border-t pt-6 mt-2 border-slate-100 dark:border-slate-800">
