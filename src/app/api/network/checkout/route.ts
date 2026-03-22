@@ -33,6 +33,7 @@ export async function POST(req: Request) {
         }
 
         const paymentMode = body.paymentMode === "ON_ACCOUNT" ? "ON_ACCOUNT" : "CARD"
+        const usePoints = body.usePoints === true;
 
         const result = await prisma.$transaction(async (tx) => {
             // 0) Idempotency (membership scoped)
@@ -88,6 +89,24 @@ export async function POST(req: Request) {
                 },
             })
             if (!membership || membership.status !== "ACTIVE") throw new HttpErr(403, "INVALID_MEMBERSHIP")
+
+            let availablePoints = 0;
+            let crmCustomer = null;
+            if (membership?.dealerUser?.email) {
+                crmCustomer = await tx.customer.findFirst({
+                    where: { email: membership.dealerUser.email, company: { tenantId: ctx.supplierTenantId }, deletedAt: null },
+                    select: { id: true, points: true }
+                });
+            }
+            if (!crmCustomer && membership?.dealerCompany?.taxNumber) {
+                crmCustomer = await tx.customer.findFirst({
+                    where: { taxNumber: membership.dealerCompany.taxNumber, company: { tenantId: ctx.supplierTenantId }, deletedAt: null },
+                    select: { id: true, points: true }
+                });
+            }
+            if (crmCustomer) {
+                availablePoints = Number(crmCustomer.points || 0);
+            }
 
             const rule = await tx.dealerPriceRule.findFirst({
                 where: {
@@ -149,6 +168,7 @@ export async function POST(req: Request) {
 
             // 3) Snapshot items + stok doğrulama
             let grandTotal = 0
+            let earnablePoints = 0
             const snapshotItems: any[] = []
 
             for (const ci of cart.items) {
@@ -239,6 +259,28 @@ export async function POST(req: Request) {
             }
 
             const { creditLimit, exposureBase } = await computeExposureBase(ctx)
+            
+            let pointsUsedAmount = 0;
+            if (usePoints && availablePoints > 0) {
+                pointsUsedAmount = Math.min(grandTotal, availablePoints);
+                if (pointsUsedAmount > 0) {
+                    grandTotal -= pointsUsedAmount;
+                    snapshotItems.push({
+                        id: "pts-" + Date.now(),
+                        productId: "parapuan_usage",
+                        name: "Parapuan Kullanımı",
+                        code: "P-IND-01",
+                        barcode: "P-IND",
+                        quantity: 1,
+                        unit: "ADET",
+                        unitPrice: -pointsUsedAmount,
+                        listPrice: -pointsUsedAmount,
+                        discountPct: 0,
+                        lineTotal: -pointsUsedAmount,
+                    })
+                }
+            }
+            
             const projectedExposure = exposureBase + grandTotal
             
             // Fix: 0 limit means 0 credit, not unlimited!

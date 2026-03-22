@@ -61,7 +61,7 @@ export default function CreateCampaign() {
                 channels: formData.channels,
                 priority: Number(formData.priority),
                 stackingRule: formData.stackingRule,
-                discountRate: formData.campaignType === "LOYALTY_POINTS" ? null : Number(formData.discountRate),
+                discountRate: Number(formData.discountRate),
                 pointsRate: formData.campaignType === "LOYALTY_POINTS" ? Number(formData.discountRate) / 100 : null,
                 minOrderAmount: formData.minOrderAmount ? Number(formData.minOrderAmount) : null,
                 validFrom: formData.validFrom ? new Date(formData.validFrom) : null,
