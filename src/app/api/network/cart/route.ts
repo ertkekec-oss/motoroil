@@ -143,6 +143,7 @@ export async function GET() {
                 id: item.id, // Cart item ID
                 productId: item.productId,
                 name: item.product.name,
+                imageUrl: item.product.imageUrl || null,
                 code: item.product.code,
                 stockQty: availableStock,
                 unit: item.product.unit,

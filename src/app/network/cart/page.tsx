@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useNetworkPath } from "@/hooks/useNetworkPath"
+import { Trash2, PackageOpen, ShoppingCart, Loader2 } from "lucide-react"
 
 type CartItem = {
     id: string
@@ -15,6 +16,7 @@ type CartItem = {
     listPrice: number
     effectivePrice: number
     lineTotal: number
+    imageUrl: string | null
 }
 
 type CartData = {
@@ -33,8 +35,8 @@ export default function CartPage() {
     const [busyItemId, setBusyItemId] = useState<string | null>(null)
     const [checkingOut, setCheckingOut] = useState(false)
 
-    async function load() {
-        setLoading(true)
+    async function load(isBgLoad = false) {
+        if (!isBgLoad) setLoading(true)
         setErr(null)
         const [cartRes, creditRes] = await Promise.all([
             fetch("/api/network/cart", { cache: "no-store" }),
@@ -46,18 +48,18 @@ export default function CartPage() {
 
         if (!cartRes.ok || !data?.ok) {
             setErr("Sepet yüklenemedi.")
-            setLoading(false)
+            if (!isBgLoad) setLoading(false)
             return
         }
         setCart(data.cart)
         if (creditData?.ok) {
             setCredit(creditData)
         }
-        setLoading(false)
+        if (!isBgLoad) setLoading(false)
     }
 
     useEffect(() => {
-        load()
+        load(false)
     }, [])
 
     const grandTotal = cart?.summary?.grandTotal || 0
@@ -100,7 +102,7 @@ export default function CartPage() {
             }
             return
         }
-        await load()
+        await load(true)
     }
 
     async function removeItem(cartItemId: string) {
@@ -119,7 +121,7 @@ export default function CartPage() {
             setErr("Ürün sepetten çıkarılamadı.")
             return
         }
-        await load()
+        await load(true)
     }
 
     async function handleCheckout() {
@@ -188,44 +190,60 @@ export default function CartPage() {
                 )}
 
                 <div className="grid gap-4 lg:grid-cols-3">
-                    <div className="lg:col-span-2 rounded-2xl border bg-card shadow-sm">
-                        <div className="p-4 border-b text-sm text-muted-foreground">
-                            {loading ? "Yükleniyor…" : `${cart?.items?.length || 0} kalem ürün bulunuyor`}
+                    <div className="lg:col-span-2 rounded-[24px] border border-slate-200 bg-white shadow-[0_2px_20px_rgb(0,0,0,0.02)] overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                            <span className="font-semibold text-slate-900 text-[15px]">Ürünler</span>
+                            <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{loading ? "Yükleniyor…" : `${cart?.items?.length || 0} kalem`}</span>
                         </div>
 
-                        <div className="divide-y">
-                            {loading ? (
-                                <div className="p-6 text-sm text-muted-foreground">Sepet yükleniyor…</div>
+                        <div className="divide-y divide-slate-100">
+                            {loading && !cart ? (
+                                <div className="p-16 flex flex-col items-center justify-center gap-4 text-slate-400">
+                                    <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                                    <span className="text-sm font-medium">Sepet yükleniyor...</span>
+                                </div>
                             ) : !hasItems ? (
-                                <div className="p-6 text-sm text-muted-foreground">
-                                    Sepetin boş. Katalogdan ürün ekleyebilirsin.
+                                <div className="p-16 flex flex-col items-center justify-center text-center">
+                                    <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                                        <ShoppingCart className="w-8 h-8" strokeWidth={1.5} />
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Sepetiniz Boş</h3>
+                                    <p className="text-[14px] text-slate-500 max-w-sm">Katalogdan hemen ürün ekleyerek avantajlı b2b fiyatlarıyla alışverişe başlayabilirsiniz.</p>
                                 </div>
                             ) : (
                                 cart!.items.map((it) => (
-                                    <div key={it.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                    <div key={it.id} className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:bg-slate-50/50 transition-colors group">
+                                        <div className="w-20 h-20 rounded-2xl border border-slate-200 bg-white p-2 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                                            {it.imageUrl ? (
+                                                <img src={it.imageUrl} alt={it.name} className="w-full h-full object-contain mix-blend-multiply filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300" />
+                                            ) : (
+                                                <PackageOpen className="text-slate-300 w-8 h-8" strokeWidth={1.5} />
+                                            )}
+                                        </div>
                                         <div className="min-w-0 flex-1">
-                                            <div className="font-medium truncate">{it.name}</div>
-                                            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-                                                {it.code && <span>SKU: <span className="font-medium">{it.code}</span></span>}
-                                                <span>Stok: <span className="font-medium">{it.stockQty}</span> {it.unit ?? "Adet"}</span>
+                                            <div className="font-bold text-slate-900 text-[15px] truncate mb-1.5 group-hover:text-blue-600 transition-colors">{it.name}</div>
+                                            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 flex-wrap mb-2">
+                                                {it.code && <span className="uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md text-slate-500">{it.code}</span>}
+                                                <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${it.stockQty > 0 ? 'bg-emerald-500' : 'bg-red-500'}`} /> Stok: {it.stockQty} {it.unit ?? "Adet"}</span>
                                             </div>
-                                            <div className="mt-2 text-sm">
+                                            <div className="flex items-center gap-3">
                                                 {it.effectivePrice !== it.listPrice && (
-                                                    <span className="text-xs text-muted-foreground line-through mr-2">
+                                                    <span className="text-xs font-semibold text-slate-400 line-through">
                                                         {fmt(it.listPrice)}
                                                     </span>
                                                 )}
-                                                <span className="font-semibold text-primary">{fmt(it.effectivePrice)}</span>
-                                                <span className="text-xs text-muted-foreground"> / {it.unit ?? "adet"}</span>
+                                                <span className="font-black text-[17px] text-slate-900 tracking-tight">{fmt(it.effectivePrice)}</span>
+                                                <span className="text-[11px] font-bold text-slate-400/80 uppercase tracking-widest bg-slate-100/50 px-1.5 py-0.5 rounded"> / {it.unit ?? "ADET"}</span>
                                             </div>
                                             {(it as any).campaignMessage && (
-                                                <div className="mt-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded inline-block border border-emerald-100">
-                                                    🎉 {(it as any).campaignMessage}
+                                                <div className="mt-3 text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/60 inline-flex items-center gap-2 shadow-sm uppercase tracking-wide">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                    {(it as any).campaignMessage}
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0 justify-between">
+                                        <div className="flex items-center gap-6 w-full sm:w-auto mt-4 sm:mt-0 justify-between sm:justify-end shrink-0">
                                             <QtyControl
                                                 value={it.quantity}
                                                 disabled={busyItemId === it.productId || busyItemId === it.id}
@@ -233,18 +251,18 @@ export default function CartPage() {
                                                 max={it.stockQty}
                                             />
 
-                                            <div className="text-right w-24">
-                                                <div className="text-xs text-muted-foreground">Tutar</div>
-                                                <div className="font-semibold">{fmt(it.lineTotal)}</div>
+                                            <div className="text-right w-28 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+                                                <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5">Tutar</div>
+                                                <div className="font-black text-[#1a1a1a]">{fmt(it.lineTotal)}</div>
                                             </div>
 
                                             <button
                                                 onClick={() => removeItem(it.id)}
                                                 disabled={busyItemId === it.id}
-                                                className="h-10 px-3 rounded-xl border bg-card text-sm font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50 transition-colors"
+                                                className="w-10 h-10 rounded-xl border border-rose-200 bg-rose-50 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 disabled:opacity-50 transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-rose-500"
                                                 title="Sepetten çıkar"
                                             >
-                                                {busyItemId === it.id ? "…" : "Sil"}
+                                                {busyItemId === it.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" strokeWidth={2.5} />}
                                             </button>
                                         </div>
                                     </div>
@@ -253,16 +271,16 @@ export default function CartPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border bg-card shadow-sm h-fit sticky top-6">
-                        <div className="p-6 border-b">
-                            <div className="font-semibold">Özet</div>
-                            <div className="mt-1 text-sm text-muted-foreground">Sipariş öncesi canlı hesap</div>
+                    <div className="rounded-[24px] border border-slate-200 bg-white shadow-[0_2px_20px_rgb(0,0,0,0.02)] h-fit sticky top-6 overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+                            <div className="font-semibold text-slate-900 text-[15px]">Özet Bilgisi</div>
+                            <div className="mt-1 text-[13px] text-slate-500 font-medium">Sipariş öncesi canlı hesap</div>
                         </div>
 
-                        <div className="p-6 space-y-3">
+                        <div className="p-6 space-y-4">
                             <Row label="Ara Toplam" value={fmt(cart?.summary?.grandTotal ?? 0)} />
-                            <Row label="Kargo" value="Alıcı Ödemeli (—)" />
-                            <div className="pt-3 border-t" />
+                            <Row label="Kargo Tutarı" value="Alıcı Ödemeli (—)" />
+                            <div className="pt-4 border-t border-slate-100" />
                             <Row
                                 label="Genel Toplam"
                                 value={fmt(cart?.summary?.grandTotal ?? 0)}
@@ -270,27 +288,27 @@ export default function CartPage() {
                             />
 
                             {credit && (
-                                <div className="pt-4 border-t space-y-3 mt-4">
-                                    <div className="font-semibold text-sm mb-2">Ödeme Yöntemi</div>
+                                <div className="pt-5 border-t border-slate-100 space-y-4 mt-5">
+                                    <div className="font-semibold text-sm text-slate-900 mb-2">Ödeme Yöntemi</div>
 
-                                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${paymentMode === "CARD" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}>
-                                        <input type="radio" className="mt-1" checked={paymentMode === "CARD"} onChange={() => setPaymentMode("CARD")} />
+                                    <label className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMode === "CARD" ? "border-blue-500 bg-blue-50/30" : "border-slate-100 hover:border-blue-200 hover:bg-slate-50"}`}>
+                                        <input type="radio" className="mt-1.5 accent-blue-600 w-4 h-4 cursor-pointer" checked={paymentMode === "CARD"} onChange={() => setPaymentMode("CARD")} />
                                         <div>
-                                            <div className="font-medium text-sm">Kredi Kartı / Banka Kartı</div>
-                                            <div className="text-xs text-muted-foreground mt-0.5">Güvenli online ödeme</div>
+                                            <div className="font-semibold text-[14px] text-slate-900">Kredi Kartı / Banka Kartı</div>
+                                            <div className="text-[12px] text-slate-500 mt-1 font-medium">Güvenli online ödeme sistemi</div>
                                         </div>
                                     </label>
 
-                                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${isAccountBlocked ? "opacity-50 cursor-not-allowed" : ""} ${paymentMode === "ON_ACCOUNT" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}>
-                                        <input type="radio" className="mt-1" checked={paymentMode === "ON_ACCOUNT"} onChange={() => !isAccountBlocked && setPaymentMode("ON_ACCOUNT")} disabled={isAccountBlocked} />
+                                    <label className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${isAccountBlocked ? "opacity-40 cursor-not-allowed bg-slate-50 border-slate-100" : paymentMode === "ON_ACCOUNT" ? "border-blue-500 bg-blue-50/30" : "border-slate-100 hover:border-blue-200 hover:bg-slate-50"}`}>
+                                        <input type="radio" className="mt-1.5 accent-blue-600 w-4 h-4 cursor-pointer" checked={paymentMode === "ON_ACCOUNT"} onChange={() => !isAccountBlocked && setPaymentMode("ON_ACCOUNT")} disabled={isAccountBlocked} />
                                         <div>
-                                            <div className="font-medium text-sm">Açık Hesap / Veresiye</div>
+                                            <div className="font-semibold text-[14px] text-slate-900">Açık Hesap / Veresiye</div>
                                             {isAccountBlocked ? (
-                                                <div className="text-xs text-destructive mt-0.5 font-medium">Kredi limitiniz yetersiz ({fmt(availableCredit)} kullanılabilir)</div>
+                                                <div className="text-[12px] text-rose-500 mt-1 font-bold">Kredi limitiniz yetersiz ({fmt(availableCredit)} limit)</div>
                                             ) : limitExceeded && creditPolicy === "SOFT_LIMIT" ? (
-                                                <div className="text-xs text-orange-600 mt-0.5 font-medium">Limit aşımı (Onaya Düşecek)</div>
+                                                <div className="text-[12px] text-amber-600 mt-1 font-bold">Limit aşımı (Yönetici Onayına Düşecek)</div>
                                             ) : (
-                                                <div className="text-xs text-muted-foreground mt-0.5">Mevcut limitinizden düşülür</div>
+                                                <div className="text-[12px] text-slate-500 mt-1 font-medium">Mevcut cari limitinizden otomatik düşülür</div>
                                             )}
                                         </div>
                                     </label>
@@ -300,9 +318,9 @@ export default function CartPage() {
                             <button
                                 disabled={!hasItems || checkingOut}
                                 onClick={handleCheckout}
-                                className="mt-6 w-full h-11 rounded-xl bg-primary text-primary-foreground font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+                                className="mt-8 w-full h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 font-bold text-white shadow-[0_4px_20px_rgb(59,130,246,0.3)] hover:shadow-[0_4px_25px_rgb(59,130,246,0.4)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2"
                             >
-                                {checkingOut ? "Mühürleniyor…" : "Siparişi Doğrula & Oluştur"}
+                                {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Mühürleniyor…</> : "Siparişi Doğrula & Oluştur"}
                             </button>
 
                             <div className="text-xs text-muted-foreground text-center pt-2">
