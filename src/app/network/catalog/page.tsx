@@ -22,6 +22,12 @@ export default function NetworkCatalogPage() {
     const [hideB2bPrice, setHideB2bPrice] = useState(false)
     const [mainBannerIndex, setMainBannerIndex] = useState(0)
     const [sideBannerIndex, setSideBannerIndex] = useState(0)
+    const [featuredIndex, setFeaturedIndex] = useState(0)
+
+    useEffect(() => {
+        // Randomize featured product on each mount/load
+        setFeaturedIndex(Math.floor(Math.random() * 1000))
+    }, [])
 
     useEffect(() => {
         setHideB2bPrice(localStorage.getItem('hideB2bPrice') === 'true')
@@ -302,53 +308,114 @@ export default function NetworkCatalogPage() {
                                 <>
                                             {imageProducts.length > 0 && (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                                    {imageProducts.map(p => (
-                                                        <div key={p.id} className="group bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden flex flex-col relative">
-                                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-transparent group-hover:from-blue-500/20 group-hover:via-blue-500/20 transition-colors duration-500" />
-                                                            <div className="h-48 bg-slate-50/50 border-b border-slate-100 flex items-center justify-center p-6 relative">
-                                                                {p.campaign && (
-                                                                    <div className="absolute top-3 right-3 text-[11px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-md flex items-center shadow-sm uppercase tracking-wider z-10 backdrop-blur-sm">
-                                                                        {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                                                    {(() => {
+                                                        const firstRow = imageProducts.slice(0, 4);
+                                                        const remaining = imageProducts.slice(4);
+                                                        const useFeatured = page === 1 && firstRow.length >= 3;
+                                                        const featuredProduct = firstRow[featuredIndex % firstRow.length];
+                                                        const fmt = (v: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(v);
+
+                                                        return (
+                                                            <>
+                                                                {/* First Two Products (Regular) */}
+                                                                {firstRow.slice(0, 2).map(p => (
+                                                                    <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                                ))}
+
+                                                                {/* Featured Wide Product (Slots 3 & 4) */}
+                                                                {useFeatured ? (
+                                                                    <div className="md:col-span-2 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col md:flex-row relative group/feat border border-slate-800">
+                                                                        {/* Background Decorative Element */}
+                                                                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
+                                                                        
+                                                                        {/* Image Part */}
+                                                                        <div className="w-full md:w-[45%] bg-white/5 p-8 flex items-center justify-center relative overflow-hidden shrink-0">
+                                                                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+                                                                            <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover/feat:scale-110 transition-transform duration-700 mix-blend-lighten" />
+                                                                            {featuredProduct.campaign && (
+                                                                                <div className="absolute top-4 left-4 bg-emerald-500 text-white text-[10px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-widest">
+                                                                                    ÖZEL FIRSAT
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+
+                                                                        {/* Content Part */}
+                                                                        <div className="flex-1 p-6 md:p-8 flex flex-col">
+                                                                            <div className="flex items-center gap-2 mb-3">
+                                                                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">{featuredProduct.category || "Vitrindeki Ürün"}</span>
+                                                                                <div className="w-1 h-1 bg-slate-600 rounded-full" />
+                                                                                <span className="text-[10px] font-bold text-slate-400">{featuredProduct.sku}</span>
+                                                                            </div>
+                                                                            
+                                                                            <h3 className="text-xl md:text-2xl font-black text-white leading-tight mb-4 group-hover/feat:text-blue-400 transition-colors">
+                                                                                {featuredProduct.name}
+                                                                            </h3>
+
+                                                                            {featuredProduct.description && (
+                                                                                <p className="text-sm text-slate-400 line-clamp-2 mb-6 font-medium leading-relaxed">
+                                                                                    {featuredProduct.description}
+                                                                                </p>
+                                                                            )}
+
+                                                                            <div className="mt-auto flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                                                                                <div className="flex flex-col gap-1">
+                                                                                    <div className="flex items-center gap-3">
+                                                                                        <span className="text-2xl font-black text-white tracking-tighter">
+                                                                                            {fmt(featuredProduct.priceResolved)}
+                                                                                        </span>
+                                                                                        {!hideB2bPrice && featuredProduct.basePrice && featuredProduct.basePrice > featuredProduct.priceResolved && (
+                                                                                            <span className="text-sm font-medium text-slate-500 line-through opacity-60">
+                                                                                                {fmt(featuredProduct.basePrice)}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    
+                                                                                    {featuredProduct.pointsRate > 0 && (
+                                                                                        <div className="flex items-center gap-2 text-purple-400">
+                                                                                            <div className="p-1 rounded bg-purple-500/10">
+                                                                                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                                </svg>
+                                                                                            </div>
+                                                                                            <span className="text-[11px] font-black uppercase tracking-widest">
+                                                                                                +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} Parapuan Kazanın
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <button 
+                                                                                        onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
+                                                                                        className="h-12 px-6 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-sm transition-all active:scale-95 flex items-center gap-2"
+                                                                                    >
+                                                                                        İncele
+                                                                                    </button>
+                                                                                    <button 
+                                                                                        disabled={addingToCart === featuredProduct.id || featuredProduct.stock <= 0}
+                                                                                        onClick={() => addToCart(featuredProduct, 1)}
+                                                                                        className={`h-12 px-6 rounded-xl font-bold text-sm transition-all active:scale-95 flex items-center gap-2 shadow-lg ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'}`}
+                                                                                    >
+                                                                                        {addingToCart === featuredProduct.id ? <><Check className="w-4 h-4" /> Eklendi</> : <><ShoppingCart className="w-4 h-4" /> Sepete Ekle</>}
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
+                                                                ) : (
+                                                                    // Fallback if not enough products for featured or not on page 1
+                                                                    firstRow.slice(2, 4).map(p => (
+                                                                        <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                                    ))
                                                                 )}
-                                                                <div className="w-full h-full relative group-hover:scale-105 transition-transform duration-300">
-                                                                    <img src={p.image} alt={p.name} className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply" />
-                                                                </div>
-                                                            </div>
-                                                            <div className="p-5 flex flex-col flex-1">
-                                                                <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                                    <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase bg-slate-100 px-2 py-0.5 rounded-md">{p.sku || "N/A"}</span>
-                                                                    <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase bg-slate-100 px-2 py-0.5 rounded-md">{p.category || "Diğer"}</span>
-                                                                    {(p.minOrderQty > 1) && (
-                                                                      <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">MOQ: {p.minOrderQty}</span>
-                                                                    )}
-                                                                </div>
-                                                                <h3 className="text-[15px] font-semibold text-slate-900 leading-snug line-clamp-2 mb-4 group-hover:text-blue-600 transition-colors">{p.name}</h3>
-                                                                <div className="mt-auto flex items-end justify-between pt-4 border-t border-slate-100/50">
-                                                                    <div>
-                                                                        {hideB2bPrice ? (
-                                                                            <>
-                                                                                <div className="text-[12px] font-medium text-slate-500 mb-0.5">Satış Fiyatı</div>
-                                                                                <div className="text-lg font-bold text-slate-900 tracking-tight">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</div>
-                                                                            </>
-                                                                        ) : (
-                                                                            <>
-                                                                                <div className="text-[11px] font-medium text-slate-400 mb-0.5" title="Liste Fiyatı">L. Fiyatı: {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.basePrice || p.priceResolved)}</div>
-                                                                                <div className="text-lg font-bold text-slate-900 tracking-tight">{new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(p.priceResolved)}</div>
-                                                                            </>
-                                                                        )}
-                                                                        <div className="text-[12px] text-slate-500 mt-1 flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} /> Stok: {p.stock > 0 ? <span className="font-medium text-slate-700">{p.stock} adet</span> : "Tükendi"}</div>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="h-10 px-3 rounded-xl text-[13px] font-semibold flex items-center justify-center bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm" title="Detaya Git"><Search className="w-4 h-4" strokeWidth={2} /></button>
-                                                                        <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`h-10 px-4 rounded-xl text-[13px] font-semibold flex items-center justify-center min-w-[80px] gap-2 transition-all active:scale-95 border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 shadow-sm'}`}>
-                                                                            {addingToCart === p.id ? <><Check className="w-4 h-4" strokeWidth={2.5} /> Eklendi</> : <><Plus className="w-4 h-4" strokeWidth={2.5} /> Ekle</>}
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
+
+                                                                {/* Remaining Products */}
+                                                                {remaining.map(p => (
+                                                                    <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                                ))}
+                                                            </>
+                                                        )
+                                                    })()}
                                                 </div>
                                             )}
 
@@ -459,6 +526,56 @@ export default function NetworkCatalogPage() {
             </div>
             
             
+        </div>
+    )
+}
+
+function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
+    return (
+        <div className="group bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden flex flex-col relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-transparent group-hover:from-blue-500/20 group-hover:via-blue-500/20 transition-colors duration-500" />
+            <div className="h-48 bg-slate-50/50 border-b border-slate-100 flex items-center justify-center p-6 relative">
+                {p.campaign && (
+                    <div className="absolute top-3 right-3 text-[11px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-md flex items-center shadow-sm uppercase tracking-wider z-10 backdrop-blur-sm">
+                        {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                    </div>
+                )}
+                <div className="w-full h-full relative group-hover:scale-105 transition-transform duration-300">
+                    <img src={p.image} alt={p.name} className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply" />
+                </div>
+            </div>
+            <div className="p-5 flex flex-col flex-1">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase bg-slate-100 px-2 py-0.5 rounded-md">{p.sku || "N/A"}</span>
+                    <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase bg-slate-100 px-2 py-0.5 rounded-md">{p.category || "Diğer"}</span>
+                    {(p.minOrderQty > 1) && (
+                        <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">MOQ: {p.minOrderQty}</span>
+                    )}
+                </div>
+                <h3 className="text-[15px] font-semibold text-slate-900 leading-snug line-clamp-2 mb-4 group-hover:text-blue-600 transition-colors">{p.name}</h3>
+                <div className="mt-auto flex items-end justify-between pt-4 border-t border-slate-100/50">
+                    <div>
+                        {hideB2bPrice ? (
+                            <>
+                                <div className="text-[12px] font-medium text-slate-500 mb-0.5">Satış Fiyatı</div>
+                                <div className="text-lg font-bold text-slate-900 tracking-tight">{fmt(p.basePrice || p.priceResolved)}</div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="text-[11px] font-medium text-slate-400 mb-0.5" title="Liste Fiyatı">L. Fiyatı: {fmt(p.basePrice || p.priceResolved)}</div>
+                                <div className="text-lg font-bold text-slate-900 tracking-tight">{fmt(p.priceResolved)}</div>
+                            </>
+                        )}
+                        <div className="text-[12px] text-slate-500 mt-1 flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} /> Stok: {p.stock > 0 ? <span className="font-medium text-slate-700">{p.stock} adet</span> : "Tükendi"}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="h-10 px-3 rounded-xl text-[13px] font-semibold flex items-center justify-center bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm" title="Detaya Git"><Search className="w-4 h-4" strokeWidth={2} /></button>
+                        <button disabled={addingToCart === p.id || p.stock < (p.minOrderQty || 1)} onClick={() => addToCart(p, Math.max(1, p.minOrderQty || 1))} className={`h-10 px-4 rounded-xl text-[13px] font-semibold flex items-center justify-center min-w-[80px] gap-2 transition-all active:scale-95 border ${addingToCart === p.id ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : p.stock < (p.minOrderQty || 1) ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 shadow-sm'}`}>
+                            {addingToCart === p.id ? <><Check className="w-4 h-4" strokeWidth={2.5} /> Eklendi</> : <><Plus className="w-4 h-4" strokeWidth={2.5} /> Ekle</>}
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
