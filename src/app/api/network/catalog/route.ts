@@ -78,6 +78,9 @@ export async function GET(req: Request) {
                         category: true,
                         brand: true,
                         description: true,
+                        b2bDescription: true,
+                        pointsRate: true,
+                        minOrderQty: true,
                         ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                         variants: {
                             select: {
@@ -104,66 +107,59 @@ export async function GET(req: Request) {
             const prod = item.product;
             
             // 1. Check mapped PriceList from Cari Kategorisi
-            let listPrice = null;
+            let resolvedPrice = Number(prod.price);
             if (priceListId && prod.productPrices && prod.productPrices.length > 0) {
-                listPrice = Number(prod.productPrices[0].price);
+                resolvedPrice = Number(prod.productPrices[0].price);
             }
 
-            // 2. Resolve Price: Override ListPrice / DealerCatalogItemPrice / Default ProductPrice
-            const priceResolved = listPrice !== null 
-                ? listPrice 
-                : Number(item.price ?? prod.price ?? 0);
+            // 2. Check stock (total or variant)
+            const resolvedStock = prod.stock;
 
-            let appliedCampaign = null;
-            let appliedPointsCampaign = null;
-            campaigns.forEach(c => {
-                if(!c.conditions) return;
-                const { targetType, targetValue } = c.conditions;
-                let match = false;
-                
-                if(targetType === "ALL" || !targetType) match = true;
-                else if(targetType === "BRAND" && prod.brand === targetValue) match = true;
-                else if(targetType === "CATEGORY" && prod.category === targetValue) match = true;
-                else if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) match = true;
-
-                if (match) {
-                    const cType = (c.campaignType || c.type || "").toUpperCase();
-                    if (cType === "LOYALTY_POINTS") {
-                        appliedPointsCampaign = c;
-                    } else {
-                        appliedCampaign = c;
-                    }
-                }
+            // 3. Find if any campaign matches this product
+            const campaign = campaigns.find(c => {
+                if (c.targetType === "ALL") return true;
+                if (c.targetType === "CATEGORY" && prod.category === c.targetValue) return true;
+                if (c.targetType === "PRODUCT" && prod.id === c.targetValue) return true;
+                return false;
             });
-
-            const variantValues = Array.isArray(prod.variants) ? prod.variants : []
-            const variantStock = variantValues.reduce((acc: number, v: any) => acc + (v.stock || 0), 0);
-            const totalStock = prod.stock + variantStock; // Main stock + variant stock
 
             return {
                 id: prod.id,
                 name: prod.name,
                 sku: prod.code,
-                image: prod.imageUrl || null,
-                category: prod.category || "Diğer",
-                description: prod.description || null,
-                stock: totalStock,
-                basePrice: Number(prod.price ?? 0),
-                priceResolved,
-                minOrderQty: item.minOrderQty,
-                maxOrderQty: item.maxOrderQty,
-                catalogItemId: item.id,
-                campaign: appliedCampaign ? { name: appliedCampaign.name, buyQuantity: appliedCampaign.conditions?.buyQuantity, rewardQuantity: appliedCampaign.conditions?.rewardQuantity } : null,
-                pointsCampaign: appliedPointsCampaign ? { name: appliedPointsCampaign.name, type: appliedPointsCampaign.campaignType || appliedPointsCampaign.type, discountRate: appliedPointsCampaign.pointsRate || appliedPointsCampaign.discountRate } : null
+                image: prod.imageUrl,
+                category: prod.category,
+                priceResolved: resolvedPrice,
+                basePrice: Number(prod.price),
+                stock: resolvedStock,
+                brand: prod.brand,
+                description: prod.description,
+                b2bDescription: prod.b2bDescription,
+                pointsRate: Number(prod.pointsRate || 0),
+                minOrderQty: prod.minOrderQty,
+                campaign: campaign ? {
+                    id: campaign.id,
+                    name: campaign.name,
+                    buyQuantity: campaign.buyQuantity,
+                    rewardQuantity: campaign.rewardQuantity
+                } : null,
+                catalogItemId: item.id
             }
         });
 
-        return NextResponse.json({ ok: true, products, pagination: { page, limit: take, totalCount, totalPages } })
+        return NextResponse.json({
+            ok: true,
+            products,
+            pagination: {
+                totalCount,
+                totalPages,
+                currentPage: page
+            },
+            nextCursor
+        })
 
     } catch (e: any) {
-        if (e.message === "UNAUTHORIZED") {
-            return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 })
-        }
+        console.error("[CATALOG_API_ERROR]", e)
         return NextResponse.json({ ok: false, error: e.message }, { status: 500 })
     }
 }

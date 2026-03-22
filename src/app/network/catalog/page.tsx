@@ -324,63 +324,74 @@ export default function NetworkCatalogPage() {
 
                                                                 {/* Featured Wide Product (Slots 3 & 4) */}
                                                                 {useFeatured ? (
-                                                                    <div className="md:col-span-2 bg-slate-50 rounded-2xl overflow-hidden shadow-md flex flex-col md:flex-row relative group/feat border border-slate-200 h-[435px]">
-                                                                        {/* Background Decorative Element - Subtle white highlight instead of indigo */}
-                                                                        <div className="absolute top-0 right-0 w-64 h-64 bg-white blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-50" />
+                                                                    <div className="md:col-span-2 bg-slate-50 rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row relative group/feat border border-slate-200 h-[460px]">
+                                                                        {/* Background Highlight */}
+                                                                        <div className="absolute top-0 right-0 w-80 h-80 bg-white blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-60" />
                                                                         
-                                                                        {/* Image Part - Matching the Slate-50 background */}
-                                                                        <div className="w-full md:w-[42%] bg-slate-50/50 p-8 flex items-center justify-center relative overflow-hidden shrink-0 border-r border-slate-200/60">
-                                                                            <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full object-contain filter drop-shadow-md group-hover/feat:scale-110 transition-transform duration-700 mix-blend-multiply" />
-                                                                            {featuredProduct.campaign && (
-                                                                                <div className="absolute top-4 left-4 bg-emerald-600 text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg shadow-lg uppercase tracking-[0.1em] z-10 flex items-center gap-1.5 border border-emerald-500/20">
-                                                                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                                                                                    {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-
-                                                                        {/* Content Part */}
-                                                                        <div className="flex-1 p-6 md:p-8 flex flex-col relative bg-white/40 backdrop-blur-sm">
-                                                                            <div className="flex items-center gap-2 mb-3">
-                                                                                <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-2 py-0.5 rounded">Vitrindeki Ürün</span>
-                                                                                <div className="w-1 h-1 bg-slate-200 rounded-full" />
-                                                                                <span className="text-[10px] font-bold text-slate-400">{featuredProduct.sku}</span>
+                                                                        {/* LEFT: Image & Status Badges */}
+                                                                        <div className="w-full md:w-[45%] bg-slate-100/50 p-6 flex flex-col relative overflow-hidden shrink-0 border-r border-slate-200/60">
+                                                                            <div className="flex-1 flex items-center justify-center relative">
+                                                                                <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[280px] object-contain filter drop-shadow-xl group-hover/feat:scale-110 transition-transform duration-700 mix-blend-multiply" />
                                                                             </div>
                                                                             
-                                                                            <h3 className="text-xl md:text-2xl font-bold text-slate-900 leading-tight mb-4 group-hover/feat:text-indigo-600 transition-colors line-clamp-2">
-                                                                                {featuredProduct.name}
-                                                                            </h3>
-
-                                                                            {featuredProduct.description ? (
-                                                                                <p className="text-sm text-slate-500 line-clamp-3 mb-6 font-medium leading-relaxed">
-                                                                                    {featuredProduct.description}
-                                                                                </p>
-                                                                            ) : (
-                                                                                <p className="text-sm text-slate-400 italic mb-6">Bu ürün için özel açıklama bulunmamaktadır.</p>
-                                                                            )}
-
-                                                                            <div className="mt-auto flex flex-col gap-5">
-                                                                                {featuredProduct.pointsRate > 0 && (
-                                                                                    <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-center gap-3">
-                                                                                        <div className="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center shrink-0 shadow-sm text-white">
-                                                                                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                                            </svg>
+                                                                            {/* Badges Overlay on Image Area or Bottom of Image Area */}
+                                                                            <div className="flex flex-col gap-2 mt-4">
+                                                                                {featuredProduct.campaign && (
+                                                                                    <div className="bg-emerald-600 text-white rounded-xl p-3 shadow-lg border border-emerald-500/20 flex items-center gap-3">
+                                                                                        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                                                                                            <ShoppingCart className="w-4 h-4" />
                                                                                         </div>
                                                                                         <div>
-                                                                                            <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Kazanılacak Parapuan</div>
-                                                                                            <div className="text-lg font-black text-emerald-700 leading-none">
-                                                                                                +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} <span className="text-xs font-bold">PUAN</span>
+                                                                                            <div className="text-[10px] font-bold opacity-80 uppercase tracking-wider">Aktif Kampanya</div>
+                                                                                            <div className="text-[13px] font-black leading-none uppercase">
+                                                                                                {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 )}
+                                                                                {featuredProduct.pointsRate > 0 && (
+                                                                                    <div className="bg-amber-500 text-white rounded-xl p-3 shadow-lg border border-amber-400/20 flex items-center gap-3">
+                                                                                        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                                                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <div className="text-[10px] font-bold opacity-80 uppercase tracking-wider">Kazanç</div>
+                                                                                            <div className="text-[13px] font-black leading-none uppercase">
+                                                                                                +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PARAPUAN
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
 
-                                                                                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                                                                        {/* RIGHT: Content & Actions */}
+                                                                        <div className="flex-1 p-8 flex flex-col bg-white relative">
+                                                                            <div className="mb-6">
+                                                                                <div className="flex items-center gap-2 mb-3">
+                                                                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-2.5 py-1 rounded-md">Vitrindeki Ürün</span>
+                                                                                    <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
+                                                                                    <span className="text-[10px] font-bold text-slate-400 tracking-widest">{featuredProduct.sku}</span>
+                                                                                </div>
+                                                                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 leading-[1.15] mb-4 group-hover/feat:text-indigo-600 transition-colors">
+                                                                                    {featuredProduct.name}
+                                                                                </h3>
+                                                                                <div className="w-12 h-1 bg-indigo-100 rounded-full mb-6" />
+                                                                                
+                                                                                <div className="max-h-[100px] overflow-hidden relative">
+                                                                                    <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                                                                                        {featuredProduct.b2bDescription || featuredProduct.description || "Bu ürün detaylı açıklaması yakında eklenecektir."}
+                                                                                    </p>
+                                                                                    <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent" />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div className="mt-auto pt-6 border-t border-slate-100">
+                                                                                <div className="flex items-center justify-between gap-4">
                                                                                     <div className="flex flex-col">
-                                                                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Birim Fiyat</span>
+                                                                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1 pointer-events-none">NET BİRİM FİYAT</span>
                                                                                         <div className="flex items-baseline gap-2">
-                                                                                            <span className="text-2xl font-black text-slate-900 tracking-tighter">
+                                                                                            <span className="text-3xl font-black text-slate-900 tracking-tighter">
                                                                                                 {fmt(featuredProduct.priceResolved)}
                                                                                             </span>
                                                                                             {!hideB2bPrice && featuredProduct.basePrice && featuredProduct.basePrice > featuredProduct.priceResolved && (
@@ -391,20 +402,19 @@ export default function NetworkCatalogPage() {
                                                                                         </div>
                                                                                     </div>
 
-                                                                                    <div className="flex items-center gap-2">
+                                                                                    <div className="flex items-center gap-3">
                                                                                         <button 
                                                                                             onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
-                                                                                            className="h-11 px-5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 font-bold text-sm transition-all active:scale-95 flex items-center gap-2"
+                                                                                            className="h-12 px-6 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 font-black text-[13px] transition-all active:scale-95 flex items-center gap-2"
                                                                                         >
-                                                                                            Detay
+                                                                                            İNCELE
                                                                                         </button>
                                                                                         <button 
                                                                                             disabled={addingToCart === featuredProduct.id || featuredProduct.stock <= 0}
                                                                                             onClick={() => addToCart(featuredProduct, 1)}
-                                                                                            className={`h-11 px-5 rounded-xl font-bold text-sm transition-all active:scale-95 flex items-center gap-2 shadow-sm ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+                                                                                            className={`h-12 px-8 rounded-2xl font-black text-[13px] tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/10 min-w-[140px] ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
                                                                                         >
-                                                                                            {addingToCart === featuredProduct.id ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                                                                                            Ekle
+                                                                                            {addingToCart === featuredProduct.id ? <><Check className="w-5 h-5" /> EKLENDİ</> : <><Plus className="w-5 h-5" /> SEPETE EKLE</>}
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
