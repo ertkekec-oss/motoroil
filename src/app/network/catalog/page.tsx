@@ -306,6 +306,11 @@ export default function NetworkCatalogPage() {
                                                         <div key={p.id} className="group bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden flex flex-col relative">
                                                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-transparent group-hover:from-blue-500/20 group-hover:via-blue-500/20 transition-colors duration-500" />
                                                             <div className="h-48 bg-slate-50/50 border-b border-slate-100 flex items-center justify-center p-6 relative">
+                                                                {p.campaign && (
+                                                                    <div className="absolute top-3 right-3 text-[11px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-md flex items-center shadow-sm uppercase tracking-wider z-10 backdrop-blur-sm">
+                                                                        {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                                                                    </div>
+                                                                )}
                                                                 <div className="w-full h-full relative group-hover:scale-105 transition-transform duration-300">
                                                                     <img src={p.image} alt={p.name} className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply" />
                                                                 </div>
@@ -316,11 +321,6 @@ export default function NetworkCatalogPage() {
                                                                     <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase bg-slate-100 px-2 py-0.5 rounded-md">{p.category || "Diğer"}</span>
                                                                     {(p.minOrderQty > 1) && (
                                                                       <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">MOQ: {p.minOrderQty}</span>
-                                                                    )}
-                                                                    {p.campaign && (
-                                                                        <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm uppercase tracking-wide">
-                                                                            X Al Y Öde
-                                                                        </span>
                                                                     )}
                                                                 </div>
                                                                 <h3 className="text-[15px] font-semibold text-slate-900 leading-snug line-clamp-2 mb-4 group-hover:text-blue-600 transition-colors">{p.name}</h3>
@@ -359,6 +359,11 @@ export default function NetworkCatalogPage() {
                                                         {leftList.map(p => (
                                                             <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
                                                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
+                                                                {p.campaign && (
+                                                                    <div className="absolute top-0 right-0 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 border-b border-l border-emerald-200 px-2 py-0.5 rounded-bl-xl flex items-center shadow-sm uppercase tracking-wide z-10">
+                                                                        {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                                                                    </div>
+                                                                )}
                                                                 <div className="flex-1 min-w-0 pl-1">
                                                                     <div className="flex flex-wrap items-center gap-2 mb-1">
                                                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
@@ -391,6 +396,11 @@ export default function NetworkCatalogPage() {
                                                         {rightList.map(p => (
                                                             <div key={p.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-300 transition-colors shadow-sm relative overflow-hidden group">
                                                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors" />
+                                                                {p.campaign && (
+                                                                    <div className="absolute top-0 right-0 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 border-b border-l border-emerald-200 px-2 py-0.5 rounded-bl-xl flex items-center shadow-sm uppercase tracking-wide z-10">
+                                                                        {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
+                                                                    </div>
+                                                                )}
                                                                 <div className="flex-1 min-w-0 pl-1">
                                                                     <div className="flex flex-wrap items-center gap-2 mb-1">
                                                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded">{p.sku || "N/A"}</span>
