@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import AddToCartButton from "./AddToCartButton";
@@ -28,12 +28,13 @@ export default async function ProductDetailPage({ params }: { params: { productI
         );
     }
 
-    const listings = await prisma.networkListing.findMany({
+    // Use prismaRaw to entirely bypass the strict tenant isolation RLS for B2B Network discovery.
+    // Otherwise, nested relations like `include: { company: true }` will be silently filtered out for other tenants, causing UI crashes.
+    const listings = await prismaRaw.networkListing.findMany({
         where: { globalProductId: productId, status: "ACTIVE" },
         include: { company: true },
-        orderBy: { price: "asc" },
-        adminBypass: true // Necessary to bypass ERP isolation so buyers can see OTHER companies' products
-    } as any);
+        orderBy: { price: "asc" }
+    });
 
     return (
         <div className="min-h-screen bg-[#F6F7F9] text-slate-900 p-6 font-sans">
@@ -105,7 +106,7 @@ export default async function ProductDetailPage({ params }: { params: { productI
                                                 return (
                                                     <tr key={l.id} className={`hover:bg-slate-50 transition-colors group ${isOOS ? 'opacity-60' : ''}`}>
                                                         <td className="px-4 py-3">
-                                                            <div className="font-semibold text-[#1F3A5F]">{l.company.name}</div>
+                                                            <div className="font-semibold text-[#1F3A5F]">{l.company?.name || "Kayıtsız Tedarikçi"}</div>
                                                             {l.minQty > 1 && <div className="text-[10px] text-slate-400 font-medium">Min order: {l.minQty}</div>}
                                                         </td>
                                                         <td className="px-4 py-3 font-mono font-bold text-right text-slate-900 text-base">

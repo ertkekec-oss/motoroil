@@ -1,22 +1,62 @@
 [
   {
-    "id": "cmmqvjp510001hrwa3zxwgqp5",
-    "tenantId": "demo-tenant"
+    "id": "cmn26v5z10003e2hmfxwjbv7c",
+    "globalProductId": "cmn26v5ol0001e2hmu9x92wb9",
+    "sellerCompanyId": "cmmqvlxis0005ips96a93jf0h",
+    "erpProductId": "cmmqvyac900m7jdzkkxhkxvhq",
+    "price": "10480",
+    "availableQty": 5,
+    "minQty": 1,
+    "leadTimeDays": 0,
+    "status": "ACTIVE",
+    "visibility": "NETWORK",
+    "packSize": 1,
+    "createdAt": "2026-03-22T20:07:47.965Z",
+    "updatedAt": "2026-03-22T20:07:47.965Z",
+    "company": {
+      "id": "cmmqvlxis0005ips96a93jf0h",
+      "tenantId": "cmmqvlwxx0001ips90uoifrhx",
+      "name": "MOTOROİL MADENİ YAĞ MOTOR YEDEK PARÇA VE AKSESUARLARI SANAYİ TİCARET İTHALAT VE İHRACAT LİMİTED ŞİRKETİ",
+      "vkn": "6231776841",
+      "taxOffice": "ERCİYES",
+      "address": "bahçeli evler mah. soylular sok.",
+      "district": "Talas",
+      "city": "Kayseri",
+      "createdAt": "2026-03-14T22:07:13.396Z",
+      "updatedAt": "2026-03-14T22:08:59.954Z",
+      "status": "ACTIVE",
+      "taxNumber": "9999999999",
+      "type": "BUYER"
+    }
   },
   {
-    "id": "cmmqvlxis0005ips96a93jf0h",
-    "tenantId": "cmmqvlwxx0001ips90uoifrhx"
-  },
-  {
-    "id": "cmmt2c1cs0004ilryudgmf3vd",
-    "tenantId": "cmmt2c0x00000ilry2gpl8ykp"
-  },
-  {
-    "id": "cmmt2dfu0000eilryobrus9iy",
-    "tenantId": "cmmt2dfm5000ailryuuyhmpie"
-  },
-  {
-    "id": "cmn2642lm0004ssw6vxfeb3z6",
-    "tenantId": "cmn26425v0000ssw6km61fcxb"
+    "id": "cmn2983jx0001aedgjxhjob5w",
+    "globalProductId": "cmn26v5ol0001e2hmu9x92wb9",
+    "sellerCompanyId": "cmn2642lm0004ssw6vxfeb3z6",
+    "erpProductId": "cmn26bm2x003mam9u3svqa439",
+    "price": "10480",
+    "availableQty": 5,
+    "minQty": 1,
+    "leadTimeDays": 0,
+    "status": "ACTIVE",
+    "visibility": "NETWORK",
+    "packSize": 1,
+    "createdAt": "2026-03-22T21:13:50.589Z",
+    "updatedAt": "2026-03-22T21:13:50.589Z",
+    "company": {
+      "id": "cmn2642lm0004ssw6vxfeb3z6",
+      "tenantId": "cmn26425v0000ssw6km61fcxb",
+      "name": "sanane ltd",
+      "vkn": "26369125236",
+      "taxOffice": null,
+      "address": "bahçeli evler mah. soylular sok.",
+      "district": "Arnavutköy",
+      "city": "İstanbul",
+      "createdAt": "2026-03-22T19:46:43.882Z",
+      "updatedAt": "2026-03-22T19:47:43.218Z",
+      "status": "ACTIVE",
+      "taxNumber": "9999999999",
+      "type": "BUYER"
+    }
   }
 ]
