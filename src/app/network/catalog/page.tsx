@@ -328,93 +328,81 @@ export default function NetworkCatalogPage() {
                                                                         {/* Background Highlight */}
                                                                         <div className="absolute top-0 right-0 w-80 h-80 bg-white blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-60" />
                                                                         
-                                                                        {/* LEFT: Image & Status Badges */}
-                                                                        <div className="w-full md:w-[45%] bg-slate-100/50 p-6 flex flex-col relative overflow-hidden shrink-0 border-r border-slate-200/60">
-                                                                            <div className="flex-1 flex items-center justify-center relative">
-                                                                                <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[280px] object-contain filter drop-shadow-xl group-hover/feat:scale-110 transition-transform duration-700 mix-blend-multiply" />
-                                                                            </div>
-                                                                            
-                                                                            {/* Badges Overlay on Image Area or Bottom of Image Area */}
-                                                                            <div className="flex flex-col gap-2 mt-4">
-                                                                                {featuredProduct.campaign && (
-                                                                                    <div className="bg-emerald-600 text-white rounded-xl p-3 shadow-lg border border-emerald-500/20 flex items-center gap-3">
-                                                                                        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                                                                                            <ShoppingCart className="w-4 h-4" />
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <div className="text-[10px] font-bold opacity-80 uppercase tracking-wider">Aktif Kampanya</div>
-                                                                                            <div className="text-[13px] font-black leading-none uppercase">
+                                                                        {/* LEFT: Image Area */}
+                                                                        <div className="w-full md:w-[45%] bg-slate-100/50 p-6 flex flex-col relative overflow-hidden shrink-0 border-r border-slate-200/60 h-full">
+                                                                            <div className="flex-1 flex items-center justify-center relative min-h-0">
+                                                                                <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[260px] object-contain filter drop-shadow-xl group-hover/feat:scale-105 transition-transform duration-700 mix-blend-multiply" />
+                                                                                
+                                                                                {/* BADGES Overlay Top Left */}
+                                                                                <div className="absolute top-0 left-0 flex flex-col gap-2">
+                                                                                    {featuredProduct.campaign && (
+                                                                                        <div className="bg-emerald-600 text-white rounded-lg px-2.5 py-1.5 shadow-lg border border-emerald-500/20 flex items-center gap-2">
+                                                                                            <ShoppingCart className="w-3.5 h-3.5" />
+                                                                                            <span className="text-[10px] font-black uppercase tracking-tight">
                                                                                                 {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
-                                                                                            </div>
+                                                                                            </span>
                                                                                         </div>
-                                                                                    </div>
-                                                                                )}
-                                                                                {featuredProduct.pointsRate > 0 && (
-                                                                                    <div className="bg-amber-500 text-white rounded-xl p-3 shadow-lg border border-amber-400/20 flex items-center gap-3">
-                                                                                        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                                                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                                                    )}
+                                                                                    {featuredProduct.pointsRate > 0 && (
+                                                                                        <div className="bg-amber-500 text-white rounded-lg px-2.5 py-1.5 shadow-lg border border-amber-400/20 flex items-center gap-2">
+                                                                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                                                            <span className="text-[10px] font-black uppercase tracking-tight">
+                                                                                                +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PUAN
+                                                                                            </span>
                                                                                         </div>
-                                                                                        <div>
-                                                                                            <div className="text-[10px] font-bold opacity-80 uppercase tracking-wider">Kazanç</div>
-                                                                                            <div className="text-[13px] font-black leading-none uppercase">
-                                                                                                +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PARAPUAN
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                )}
+                                                                                    )}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
 
                                                                         {/* RIGHT: Content & Actions */}
-                                                                        <div className="flex-1 p-8 flex flex-col bg-white relative">
-                                                                            <div className="mb-6">
-                                                                                <div className="flex items-center gap-2 mb-3">
-                                                                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-2.5 py-1 rounded-md">Vitrindeki Ürün</span>
-                                                                                    <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
-                                                                                    <span className="text-[10px] font-bold text-slate-400 tracking-widest">{featuredProduct.sku}</span>
+                                                                        <div className="flex-1 p-7 flex flex-col bg-white relative max-h-[460px]">
+                                                                            <div className="flex-1 overflow-hidden">
+                                                                                <div className="flex items-center gap-2 mb-2">
+                                                                                    <span className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-2 py-0.5 rounded">VİTRİN</span>
+                                                                                    <div className="w-1 h-1 bg-slate-200 rounded-full" />
+                                                                                    <span className="text-[9px] font-bold text-slate-400 tracking-wider truncate max-w-[120px]">
+                                                                                        {(featuredProduct.sku || "").substring(0, 25)}
+                                                                                    </span>
                                                                                 </div>
-                                                                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 leading-[1.15] mb-4 group-hover/feat:text-indigo-600 transition-colors">
-                                                                                    {featuredProduct.name}
+                                                                                <h3 className="text-xl md:text-2xl font-black text-slate-900 leading-tight mb-3 group-hover/feat:text-indigo-600 transition-colors">
+                                                                                    {(featuredProduct.name || "").substring(0, 25)}
+                                                                                    {(featuredProduct.name || "").length > 25 ? "..." : ""}
                                                                                 </h3>
-                                                                                <div className="w-12 h-1 bg-indigo-100 rounded-full mb-6" />
+                                                                                <div className="w-8 h-0.5 bg-indigo-100 rounded-full mb-4" />
                                                                                 
-                                                                                <div className="max-h-[100px] overflow-hidden relative">
-                                                                                    <p className="text-sm text-slate-500 font-medium leading-relaxed">
-                                                                                        {featuredProduct.b2bDescription || featuredProduct.description || "Bu ürün detaylı açıklaması yakında eklenecektir."}
+                                                                                <div className="relative">
+                                                                                    <p className="text-[13px] text-slate-500 font-medium leading-relaxed line-clamp-6">
+                                                                                        {featuredProduct.b2bDescription || featuredProduct.description || "Bu ürün açıklaması yakında eklenecektir."}
                                                                                     </p>
-                                                                                    <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent" />
                                                                                 </div>
                                                                             </div>
 
-                                                                            <div className="mt-auto pt-6 border-t border-slate-100">
-                                                                                <div className="flex items-center justify-between gap-4">
-                                                                                    <div className="flex flex-col">
-                                                                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1 pointer-events-none">NET BİRİM FİYAT</span>
-                                                                                        <div className="flex items-baseline gap-2">
-                                                                                            <span className="text-3xl font-black text-slate-900 tracking-tighter">
+                                                                            {/* Action Bar - Fixed Bottom with sufficient padding */}
+                                                                            <div className="mt-4 pt-5 border-t border-slate-100 bg-white">
+                                                                                <div className="flex items-center justify-between gap-3">
+                                                                                    <div className="flex flex-col min-w-0">
+                                                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">BİRİM FİYAT</span>
+                                                                                        <div className="flex items-baseline gap-1.5 overflow-hidden">
+                                                                                            <span className="text-2xl font-black text-slate-900 tracking-tighter truncate">
                                                                                                 {fmt(featuredProduct.priceResolved)}
                                                                                             </span>
-                                                                                            {!hideB2bPrice && featuredProduct.basePrice && featuredProduct.basePrice > featuredProduct.priceResolved && (
-                                                                                                <span className="text-sm font-medium text-slate-400 line-through">
-                                                                                                    {fmt(featuredProduct.basePrice)}
-                                                                                                </span>
-                                                                                            )}
                                                                                         </div>
                                                                                     </div>
 
-                                                                                    <div className="flex items-center gap-3">
+                                                                                    <div className="flex items-center gap-2 shrink-0">
                                                                                         <button 
                                                                                             onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
-                                                                                            className="h-12 px-6 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 font-black text-[13px] transition-all active:scale-95 flex items-center gap-2"
+                                                                                            className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 font-black text-[11px] transition-all active:scale-95 flex items-center gap-1.5"
                                                                                         >
                                                                                             İNCELE
                                                                                         </button>
                                                                                         <button 
                                                                                             disabled={addingToCart === featuredProduct.id || featuredProduct.stock <= 0}
                                                                                             onClick={() => addToCart(featuredProduct, 1)}
-                                                                                            className={`h-12 px-8 rounded-2xl font-black text-[13px] tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/10 min-w-[140px] ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+                                                                                            className={`h-10 px-5 rounded-xl font-black text-[11px] tracking-wide transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/10 ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
                                                                                         >
-                                                                                            {addingToCart === featuredProduct.id ? <><Check className="w-5 h-5" /> EKLENDİ</> : <><Plus className="w-5 h-5" /> SEPETE EKLE</>}
+                                                                                            {addingToCart === featuredProduct.id ? <><Check className="w-4 h-4" /> EKLENDİ</> : <><Plus className="w-4 h-4" /> SEPETE EKLE</>}
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
