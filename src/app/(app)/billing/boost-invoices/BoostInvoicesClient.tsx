@@ -1,13 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import FinanceStatusBanner from "@/components/FinanceStatusBanner";
+import { payInvoiceWithLedgerAction } from "@/actions/payInvoiceWithLedgerAction";
+import { useModal } from "@/contexts/ModalContext";
 
 export function BoostInvoicesClient() {
+    const router = useRouter();
+    const { showSuccess, showError, showConfirm } = useModal();
     const [invoices, setInvoices] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
     const [billingHealth, setBillingHealth] = useState<"CURRENT" | "GRACE" | "OVERDUE">("CURRENT");
     const [graceDaysRemaining, setGraceDaysRemaining] = useState<number>(0);
+    const [availableLedgerBalance, setAvailableLedgerBalance] = useState<number>(0);
 
     useEffect(() => {
         fetch("/api/billing/boost-invoices")
@@ -40,6 +47,32 @@ export function BoostInvoicesClient() {
         }
     };
 
+    const handlePay = (invoiceId: string, amount: number) => {
+        showConfirm("Cüzdan Bakiyesiyle Öde", `Bu fatura tutarı (${formatMoney(amount)}) Cüzdan Bakiyenizden tahsil edilecektir. Onaylıyor musunuz?`, async () => {
+            setActionLoadingId(invoiceId);
+            try {
+                const res = await payInvoiceWithLedgerAction(invoiceId);
+                if (res.success) {
+                    showSuccess("Ödeme Başarılı", "Fatura cüzdan bakiyenizden çekildi.");
+                    router.refresh();
+                    
+                    // Simple refresh
+                    fetch("/api/billing/boost-invoices")
+                        .then(r => r.json())
+                        .then(data => {
+                            const h = data.health || { status: "CURRENT" };
+                            setBillingHealth(h.status);
+                            setInvoices(data.items || []);
+                        });
+                }
+            } catch (err: any) {
+                showError("Yetersiz Bakiye veya Hata", err.message);
+            } finally {
+                setActionLoadingId(null);
+            }
+        });
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">🧾 Boost Faturaları & Tahsilat</h1>
@@ -52,7 +85,9 @@ export function BoostInvoicesClient() {
                         <h3 className="text-amber-800 font-bold text-lg">Ödeme İçin Ek Süreniz (Grace Period) Devam Ediyor</h3>
                         <p className="text-amber-700 text-sm mt-1">Boost üyeliğinizin askıya alınmaması için <strong className="font-extrabold">{graceDaysRemaining} gün</strong> içerisinde ödemenizi tamamlayınız.</p>
                     </div>
-                    <button className="mt-4 md:mt-0 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-sm">
+                    <button 
+                        onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth'})}
+                        className="mt-4 md:mt-0 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-sm">
                         Hemen Öde
                     </button>
                 </div>
@@ -64,7 +99,9 @@ export function BoostInvoicesClient() {
                         <h3 className="text-red-800 font-bold text-lg flex items-center gap-2">⚠️ Aboneliğiniz Askıya Alındı (Overdue)</h3>
                         <p className="text-red-700 text-sm mt-1">Gecikmiş faturalarınızdan dolayı hesap görünürlüğünüz düşürüldü. Aktifleştirmek için lütfen ödeme yapınız.</p>
                     </div>
-                    <button className="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-sm">
+                    <button 
+                        onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth'})}
+                        className="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-sm">
                         Gecikmiş Faturayı Öde
                     </button>
                 </div>
@@ -106,6 +143,15 @@ export function BoostInvoicesClient() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <div className="flex gap-3 justify-end items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {inv.status !== "PAID" && (
+                                                    <button 
+                                                        onClick={() => handlePay(inv.id, inv.amount)}
+                                                        disabled={actionLoadingId === inv.id}
+                                                        className="bg-black text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-slate-800 disabled:opacity-50 flex items-center gap-2"
+                                                    >
+                                                        {actionLoadingId === inv.id ? "..." : "Cüzdandan Öde"}
+                                                    </button>
+                                                )}
                                                 <button className="text-slate-400 hover:text-slate-800 font-medium text-xs">PDF</button>
                                                 <button className="text-blue-600 hover:text-blue-800 font-medium text-xs">Detay</button>
                                             </div>
