@@ -1,0 +1,30 @@
+{
+  "a": {
+    "name": "PaymentProvider",
+    "values": [
+      {
+        "name": "ODEL",
+        "dbName": null
+      },
+      {
+        "name": "IYZICO",
+        "dbName": null
+      }
+    ],
+    "dbName": null
+  },
+  "b": {
+    "name": "PaymentMode",
+    "values": [
+      {
+        "name": "DIRECT",
+        "dbName": null
+      },
+      {
+        "name": "ESCROW",
+        "dbName": null
+      }
+    ],
+    "dbName": null
+  }
+}

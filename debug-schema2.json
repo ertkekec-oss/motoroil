@@ -1,0 +1,724 @@
+{
+  "a": {
+    "name": "SellerEarning",
+    "dbName": null,
+    "fields": [
+      {
+        "name": "id",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": true,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "String",
+        "default": {
+          "name": "cuid",
+          "args": []
+        },
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "sellerCompanyId",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": true,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "shipmentId",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": true,
+        "isId": false,
+        "isReadOnly": true,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "grossAmount",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "Decimal",
+        "default": 0,
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "commissionAmount",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "Decimal",
+        "default": 0,
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "chargebackAmount",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "Decimal",
+        "default": 0,
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "netAmount",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "Decimal",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "currency",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "String",
+        "default": "TRY",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "status",
+        "kind": "enum",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "EarningStatus",
+        "default": "PENDING",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "expectedClearDate",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "clearedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "releasedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "createdAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "DateTime",
+        "default": {
+          "name": "now",
+          "args": []
+        },
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "updatedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": true
+      },
+      {
+        "name": "archivedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "company",
+        "kind": "object",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "Company",
+        "relationName": "CompanyToSellerEarning",
+        "relationFromFields": [
+          "sellerCompanyId"
+        ],
+        "relationToFields": [
+          "id"
+        ],
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "shipment",
+        "kind": "object",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "Shipment",
+        "relationName": "SellerEarningToShipment",
+        "relationFromFields": [
+          "shipmentId"
+        ],
+        "relationToFields": [
+          "id"
+        ],
+        "isGenerated": false,
+        "isUpdatedAt": false
+      }
+    ],
+    "primaryKey": null,
+    "uniqueFields": [
+      [
+        "sellerCompanyId",
+        "shipmentId"
+      ]
+    ],
+    "uniqueIndexes": [
+      {
+        "name": null,
+        "fields": [
+          "sellerCompanyId",
+          "shipmentId"
+        ]
+      }
+    ],
+    "isGenerated": false
+  },
+  "b": {
+    "name": "NetworkPayment",
+    "dbName": null,
+    "fields": [
+      {
+        "name": "id",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": true,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "String",
+        "default": {
+          "name": "cuid",
+          "args": []
+        },
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "networkOrderId",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": true,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "provider",
+        "kind": "enum",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "PaymentProvider",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "mode",
+        "kind": "enum",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "PaymentMode",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "status",
+        "kind": "enum",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "PaymentStatus",
+        "default": "INITIATED",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "amount",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "Decimal",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "currency",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "String",
+        "default": "TRY",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "providerPaymentId",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "providerPaymentKey",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": true,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "attemptKey",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": true,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "checkoutUrl",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "rawInit",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "Json",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "payoutStatus",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "String",
+        "default": "INITIATED",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "releasedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "releaseAttemptKey",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": true,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "createdAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "DateTime",
+        "default": {
+          "name": "now",
+          "args": []
+        },
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "updatedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": true
+      },
+      {
+        "name": "order",
+        "kind": "object",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "NetworkOrder",
+        "relationName": "NetworkOrderToNetworkPayment",
+        "relationFromFields": [
+          "networkOrderId"
+        ],
+        "relationToFields": [
+          "id"
+        ],
+        "relationOnDelete": "Cascade",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      }
+    ],
+    "primaryKey": null,
+    "uniqueFields": [],
+    "uniqueIndexes": [],
+    "isGenerated": false
+  },
+  "c": {
+    "name": "LedgerAccount",
+    "dbName": null,
+    "fields": [
+      {
+        "name": "id",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": true,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "String",
+        "default": {
+          "name": "cuid",
+          "args": []
+        },
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "companyId",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": true,
+        "isId": false,
+        "isReadOnly": true,
+        "hasDefaultValue": false,
+        "type": "String",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "availableBalance",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "Decimal",
+        "default": 0,
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "pendingBalance",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "Decimal",
+        "default": 0,
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "currency",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "String",
+        "default": "TRY",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "lastReconciledAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "createdAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "DateTime",
+        "default": {
+          "name": "now",
+          "args": []
+        },
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "updatedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": true
+      },
+      {
+        "name": "archivedAt",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": false,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "DateTime",
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "reservedBalance",
+        "kind": "scalar",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": true,
+        "type": "Decimal",
+        "default": 0,
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "company",
+        "kind": "object",
+        "isList": false,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "Company",
+        "relationName": "CompanyToLedgerAccount",
+        "relationFromFields": [
+          "companyId"
+        ],
+        "relationToFields": [
+          "id"
+        ],
+        "isGenerated": false,
+        "isUpdatedAt": false
+      },
+      {
+        "name": "entries",
+        "kind": "object",
+        "isList": true,
+        "isRequired": true,
+        "isUnique": false,
+        "isId": false,
+        "isReadOnly": false,
+        "hasDefaultValue": false,
+        "type": "LedgerEntry",
+        "relationName": "LedgerAccountToLedgerEntry",
+        "relationFromFields": [],
+        "relationToFields": [],
+        "isGenerated": false,
+        "isUpdatedAt": false
+      }
+    ],
+    "primaryKey": null,
+    "uniqueFields": [],
+    "uniqueIndexes": [],
+    "isGenerated": false
+  }
+}

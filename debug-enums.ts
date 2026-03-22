@@ -1,0 +1,1 @@
+import { Prisma } from '@prisma/client'; import * as fs from 'fs'; const a = Prisma.dmmf.datamodel.enums.find(m => m.name === 'PaymentStatus'); fs.writeFileSync('debug-enums2.json', JSON.stringify({a}, null, 2), 'utf-8');

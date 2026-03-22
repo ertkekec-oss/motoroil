@@ -5,6 +5,8 @@ import { getSession } from "@/lib/auth";
 import { getCartAction, clearCartAction } from "./cartActions";
 import { revalidatePath } from "next/cache";
 
+import crypto from "crypto";
+
 export async function processCheckoutAction() {
     const session: any = await getSession();
     const user = session?.user || session;
@@ -70,31 +72,81 @@ export async function processCheckoutAction() {
 
             // Decrement Stock
             await prisma.networkListing.update({
-                where: {
-                    id: listing.id
-                },
-                data: {
-                    availableQty: {
-                        decrement: item.qty
-                    }
-                }
+                where: { id: listing.id },
+                data: { availableQty: { decrement: item.qty } }
             });
         }
 
         const shippingAmount = 0; // Or standard standard shipping cost calculation
         const totalAmount = subtotalAmount + shippingAmount;
+        
+        // 5% Platform Commission
+        const commissionAmount = totalAmount * 0.05;
+        const netAmount = totalAmount - commissionAmount;
 
-        // Create the Network Order
-        await prisma.networkOrder.create({
+        const itemsHash = crypto.createHash("sha256").update(JSON.stringify(orderItems)).digest("hex");
+
+        // Create the Network Order with Escrow Architecture
+        const order = await prisma.networkOrder.create({
             data: {
                 buyerCompanyId: buyerCompanyId,
                 sellerCompanyId: sellerId,
                 subtotalAmount,
                 shippingAmount,
                 totalAmount,
+                commissionAmount,
                 currency: "TRY",
-                status: "PENDING_PAYMENT",
+                status: "PROCESSING",
                 items: orderItems,
+                itemsHash,
+                payments: {
+                    create: {
+                        provider: "ODEL",
+                        mode: "ESCROW",
+                        status: "PAID", // Simulated payment success
+                        amount: totalAmount,
+                        currency: "TRY",
+                        payoutStatus: "INITIATED",
+                        providerPaymentKey: `mock_pay_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+                    }
+                },
+                shipments: {
+                    create: {
+                        status: "PENDING",
+                        sequence: 1,
+                        carrierCode: "SYSTEM",
+                    }
+                }
+            },
+            include: { shipments: true }
+        });
+
+        // Create Seller Earning mapping to the shipment
+        await prisma.sellerEarning.create({
+            data: {
+                sellerCompanyId: sellerId,
+                shipmentId: order.shipments[0].id,
+                grossAmount: totalAmount,
+                commissionAmount: commissionAmount,
+                netAmount: netAmount,
+                currency: "TRY",
+                status: "PENDING",
+                expectedClearDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+            }
+        });
+
+        // Update the Ledger Account (Escrow Kasa Entegrasyonu)
+        await prisma.ledgerAccount.upsert({
+            where: { companyId: sellerId },
+            create: {
+                companyId: sellerId,
+                pendingBalance: netAmount,
+                availableBalance: 0,
+                reservedBalance: 0,
+                currency: "TRY"
+            },
+            update: {
+                pendingBalance: { increment: netAmount }
             }
         });
     }

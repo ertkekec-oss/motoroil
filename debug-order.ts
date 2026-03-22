@@ -1,0 +1,1 @@
+import { Prisma } from '@prisma/client'; import * as fs from 'fs'; const a = Prisma.dmmf.datamodel.models.find(m => m.name === 'NetworkOrder'); fs.writeFileSync('debug-order.json', JSON.stringify({a}, null, 2), 'utf-8');

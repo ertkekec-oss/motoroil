@@ -1,0 +1,24 @@
+{
+  "a": {
+    "name": "PaymentStatus",
+    "values": [
+      {
+        "name": "INITIATED",
+        "dbName": null
+      },
+      {
+        "name": "PAID",
+        "dbName": null
+      },
+      {
+        "name": "FAILED",
+        "dbName": null
+      },
+      {
+        "name": "CANCELLED",
+        "dbName": null
+      }
+    ],
+    "dbName": null
+  }
+}
