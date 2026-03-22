@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useModal } from "@/contexts/ModalContext"
-import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check, Eye, EyeOff, ArrowRight } from "lucide-react"
+import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check, Eye, EyeOff, ArrowRight, Coins } from "lucide-react"
 
 export default function NetworkCatalogPage() {
     const { showError, showSuccess } = useModal()
@@ -70,9 +70,7 @@ export default function NetworkCatalogPage() {
         return () => clearTimeout(timer)
     }, [q])
 
-    useEffect(() => {
-        fetchCatalog()
-    }, [debouncedQ, activeCat, page])
+    useEffect(() => { fetchCatalog() }, [debouncedQ, activeCat, page])
 
     useEffect(() => { setPage(1) }, [debouncedQ, activeCat])
 
@@ -226,14 +224,6 @@ export default function NetworkCatalogPage() {
                                     {products.map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
                                 </div>
                             )}
-
-                            {!isHomePage && totalPages > 1 && (
-                                <div className="flex justify-center gap-4 mt-10">
-                                    <button disabled={page === 1} onClick={() => setPage(page-1)} className="px-4 py-2 border border-slate-200 rounded bg-white font-bold text-xs">Geri</button>
-                                    <span className="py-2 text-xs font-bold text-slate-500">Sayfa {page}/{totalPages}</span>
-                                    <button disabled={page === totalPages} onClick={() => setPage(page+1)} className="px-4 py-2 border border-slate-200 rounded bg-white font-bold text-xs">İleri</button>
-                                </div>
-                            )}
                         </div>
                     )}
                 </div>
@@ -245,14 +235,14 @@ export default function NetworkCatalogPage() {
 function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
     const stockStatus = p.stock > 0 ? "bg-emerald-500" : "bg-rose-500";
     const stockText = p.stock > 0 ? `${p.stock} adet` : "Tükendi";
+    const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     
     return (
-        <div className="bg-white rounded-[16px] p-5 flex flex-col h-[480px] border border-slate-200 shadow-sm transition-all group relative">
-            <div className="min-h-[220px] max-h-[220px] bg-white rounded-xl mb-4 flex items-center justify-center relative border border-slate-50 p-6">
+        <div className="bg-white rounded-[16px] p-5 flex flex-col h-[485px] border border-slate-200 shadow-sm transition-all group relative">
+            <div className="min-h-[220px] max-h-[220px] bg-white rounded-xl mb-4 flex items-center justify-center relative border border-slate-50 p-6 overflow-hidden">
                 <img src={p.image} className="max-h-full max-w-full object-contain" />
                 {p.campaign && (
-                    <div className="absolute top-2 right-2 bg-emerald-100/80 backdrop-blur-sm text-emerald-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-emerald-200 shadow-sm uppercase z-10 flex items-center gap-1.5">
-                        <ShoppingCart size={12} strokeWidth={3} />
+                    <div className="absolute top-2 right-2 bg-emerald-100/90 backdrop-blur-sm text-emerald-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-emerald-200 shadow-sm uppercase z-10 flex items-center gap-1">
                         {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
                     </div>
                 )}
@@ -264,9 +254,18 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                     <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded tracking-tight uppercase">{p.category || "DİĞER"}</span>
                 </div>
                 <h3 className="text-[14px] font-bold text-slate-800 line-clamp-2 h-10">{p.name}</h3>
-                <div className="flex items-center gap-1.5 mt-auto">
-                    <div className={`w-2 h-2 rounded-full ${stockStatus}`} />
-                    <span className="text-[11px] font-bold text-slate-500">Stok: {stockText}</span>
+                
+                <div className="flex flex-col gap-2 mt-auto">
+                    {earnPoints > 0 && (
+                        <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-2 py-1 rounded-md border border-amber-100 flex items-center gap-1.5 w-fit">
+                            <Coins size={12} strokeWidth={3} />
+                            +{earnPoints.toLocaleString('tr-TR')} PARAPUAN
+                        </div>
+                    )}
+                    <div className="flex items-center gap-1.5">
+                        <div className={`w-2 h-2 rounded-full ${stockStatus}`} />
+                        <span className="text-[11px] font-bold text-slate-500">Stok: {stockText}</span>
+                    </div>
                 </div>
             </div>
 
@@ -280,17 +279,8 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                     <span className="text-xl font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button 
-                        onClick={() => router.push('/network/catalog/' + p.id)}
-                        className="w-[42px] h-[42px] bg-white text-slate-400 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-50 transition-all"
-                    >
-                        <Search size={18} />
-                    </button>
-                    <button 
-                        disabled={addingToCart === p.id}
-                        onClick={() => addToCart(p, 1)}
-                        className={`h-[42px] px-5 bg-white border border-blue-400 text-blue-600 rounded-xl hover:bg-blue-50 active:scale-95 transition-all text-[12px] font-bold flex items-center gap-2 ${addingToCart === p.id ? 'bg-emerald-50 border-emerald-400 text-emerald-600 shadow-inner' : 'shadow-blue-100 shadow-sm'}`}
-                    >
+                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[42px] h-[42px] bg-white text-slate-400 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"><Search size={18} /></button>
+                    <button disabled={addingToCart === p.id} onClick={() => addToCart(p, 1)} className={`h-[42px] px-5 bg-white border border-blue-400 text-blue-600 rounded-xl hover:bg-blue-50 active:scale-95 transition-all text-[12px] font-bold flex items-center gap-2 ${addingToCart === p.id ? 'bg-emerald-50 border-emerald-400 text-emerald-600' : 'shadow-sm'}`}>
                         {addingToCart === p.id ? <Check size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={3} />}
                         {addingToCart === p.id ? 'EKLENDİ' : 'Ekle'}
                     </button>
@@ -301,37 +291,46 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
 }
 
 function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, fmt }: any) {
+    const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     return (
-        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm flex h-[480px] overflow-hidden group">
-            <div className="w-[45%] bg-white p-10 flex items-center justify-center shrink-0 border-r border-slate-100 relative">
-                <img src={p.image} className="w-full h-full object-contain filter drop-shadow-xl group-hover:scale-110 transition-transform duration-700" />
+        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm flex h-[485px] overflow-hidden group">
+            <div className="w-[40%] bg-white p-8 flex items-center justify-center shrink-0 border-r border-slate-100 relative overflow-hidden">
+                <img src={p.image} className="max-h-[300px] max-w-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute top-6 left-6 flex flex-col gap-2">
                     <span className="bg-indigo-600 text-white text-[10px] font-black px-5 py-2 rounded-full shadow-lg">VİTRİN ÖZEL</span>
                 </div>
                 {p.campaign && (
-                    <div className="absolute top-6 right-6 bg-emerald-500 text-white text-[10px] font-black px-4 py-2 rounded-xl shadow-lg shadow-emerald-200 animate-pulse border border-emerald-400">
+                    <div className="absolute top-6 right-6 bg-emerald-500 text-white text-[10px] font-black px-4 py-2 rounded-xl shadow-lg border border-emerald-400">
                         {p.campaign.buyQuantity + p.campaign.rewardQuantity} AL {p.campaign.buyQuantity} ÖDE
                     </div>
                 )}
             </div>
-            <div className="flex-1 p-10 flex flex-col justify-center">
-                <div className="flex gap-2 mb-3">
+            <div className="flex-1 p-10 flex flex-col min-w-0">
+                <div className="flex flex-wrap gap-2 mb-3">
                     <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded">{p.sku}</span>
                     <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded uppercase tracking-wide">{p.category}</span>
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 mb-5 leading-tight">{p.name}</h3>
-                <p className="text-sm text-slate-500 mb-10 line-clamp-3 leading-relaxed">{p.b2bDescription || p.description || "Periodya özel katalog ürünü."}</p>
-                <div className="mt-auto pt-8 border-t border-slate-100 flex items-center justify-between">
-                    <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">MÜŞTERİ ÖZEL FİYATI</span>
-                        <div className="text-3xl font-black text-indigo-600 tracking-tight">{fmt(p.priceResolved)}</div>
-                    </div>
-                    <div className="flex gap-3">
-                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="h-14 px-6 border border-slate-200 rounded-2xl font-black text-xs text-slate-500 hover:bg-slate-50">DETAY</button>
-                        <button onClick={() => addToCart(p, 1)} className="h-14 px-8 bg-indigo-600 text-white rounded-2xl font-black text-xs hover:bg-indigo-700 shadow-xl shadow-indigo-100 flex items-center gap-2 px-6">
-                            <ShoppingCart size={16} />
-                            SEPETE EKLE
-                        </button>
+                <h3 className="text-2xl font-black text-slate-900 mb-4 leading-tight truncate">{p.name}</h3>
+                <p className="text-sm text-slate-500 mb-8 line-clamp-3 leading-relaxed">{p.b2bDescription || p.description || "Periodya özel katalog ürünü."}</p>
+                
+                <div className="mt-auto space-y-6">
+                    {earnPoints > 0 && (
+                        <div className="bg-amber-50 text-amber-600 text-[11px] font-black px-4 py-2 rounded-xl border border-amber-100 flex items-center gap-2 w-fit shadow-sm">
+                            <Coins size={14} strokeWidth={3} />
+                            BU ÜRÜNDEN {earnPoints.toLocaleString('tr-TR')} PARAPUAN KAZANIN
+                        </div>
+                    )}
+                    <div className="pt-6 border-t border-slate-100 flex items-center justify-between gap-4">
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">MÜŞTERİ ÖZEL FİYATI</span>
+                            <div className="text-3xl font-black text-indigo-600 tracking-tight">{fmt(p.priceResolved)}</div>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                            <button onClick={() => router.push('/network/catalog/' + p.id)} className="h-12 px-6 border border-slate-200 rounded-2xl font-black text-[11px] text-slate-500 hover:bg-slate-50">DETAY</button>
+                            <button onClick={() => addToCart(p, 1)} className="h-12 px-8 bg-indigo-600 text-white rounded-2xl font-black text-[11px] hover:bg-indigo-700 shadow-xl shadow-indigo-100 flex items-center gap-2">
+                                <Plus size={14} strokeWidth={3} /> SEPETE EKLE
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -340,25 +339,20 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, fmt }: any
 }
 
 function BestSellerBox({ p, router, addingToCart, addToCart, fmt }: any) {
+    const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     return (
-        <div className="bg-white rounded-[24px] border border-slate-200 p-5 flex items-center gap-6 shadow-sm hover:shadow-md transition-all group h-[160px] relative">
-            <div className="w-24 h-24 bg-white border border-slate-50 rounded-xl p-3 shrink-0 flex items-center justify-center relative">
-                <img src={p.image} className="w-full h-full object-contain" />
-                {p.campaign && (
-                    <div className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded-lg border border-white">
-                        KAMPANYA
-                    </div>
-                )}
+        <div className="bg-white rounded-[24px] border border-slate-200 p-5 flex items-center gap-6 shadow-sm hover:shadow-md transition-all group h-[160px] relative overflow-hidden">
+            <div className="w-24 h-24 bg-white border border-slate-50 rounded-xl p-2 shrink-0 flex items-center justify-center relative">
+                <img src={p.image} className="max-h-full max-w-full object-contain" />
+                {p.campaign && <div className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full border border-white">KMP</div>}
             </div>
             <div className="flex-1 min-w-0">
-                <span className="text-[9px] font-black text-indigo-500 tracking-[0.2em] uppercase mb-1.5 block">HER AYIN FAVORİSİ</span>
-                <h4 className="text-[15px] font-black text-slate-800 truncate mb-2">{p.name}</h4>
-                <div className="flex items-center gap-4">
-                    <div className="flex flex-col">
-                        <span className="text-xl font-black text-slate-900 leading-none">{fmt(p.priceResolved)}</span>
-                        {p.campaign && <span className="text-[10px] text-emerald-600 font-bold mt-1 uppercase">{p.campaign.buyQuantity + p.campaign.rewardQuantity} Al {p.campaign.buyQuantity} Öde</span>}
-                    </div>
-                    <button onClick={() => addToCart(p, 1)} className="h-10 px-6 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition-all ml-auto shadow-sm">Ekle</button>
+                <span className="text-[9px] font-black text-indigo-500 tracking-[0.2em] uppercase mb-1 block">HER AYIN FAVORİSİ</span>
+                <h4 className="text-[15px] font-black text-slate-800 truncate mb-1">{p.name}</h4>
+                {earnPoints > 0 && <div className="text-[9px] font-extrabold text-amber-600 flex items-center gap-1 mb-1"><Coins size={10} /> +{earnPoints} Puan</div>}
+                <div className="flex items-center gap-2">
+                    <span className="text-xl font-black text-slate-900 leading-none">{fmt(p.priceResolved)}</span>
+                    <button onClick={() => addToCart(p, 1)} className="h-9 px-5 bg-blue-600 text-white rounded-xl font-bold text-[11px] hover:bg-blue-700 transition-all ml-auto shadow-sm">Ekle</button>
                 </div>
             </div>
         </div>
@@ -366,10 +360,11 @@ function BestSellerBox({ p, router, addingToCart, addToCart, fmt }: any) {
 }
 
 function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
+    const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     return (
         <div className="bg-white rounded-2xl p-4 flex items-center justify-between border border-slate-100 shadow-sm transition-all group">
             <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-50 text-slate-400 font-bold text-[10px] relative">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-50 relative overflow-hidden">
                     <img src={p.image} className="max-h-8 max-w-8 object-contain" />
                     {!p.image && "NO IMG"}
                 </div>
@@ -378,17 +373,17 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{p.sku}</span>
                         <div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'}`} />
                         <span className="text-[9px] font-bold text-slate-400">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
-                        {p.campaign && <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 rounded border border-emerald-100">KAMPANYA</span>}
+                        {earnPoints > 0 && <span className="text-[9px] font-black text-amber-600 bg-amber-50 px-1.5 rounded border border-amber-100 flex items-center gap-1"><Coins size={10} /> +{earnPoints}</span>}
                     </div>
                     <h5 className="text-[13px] font-bold text-slate-800 truncate">{p.name}</h5>
                 </div>
             </div>
             <div className="flex items-center gap-6">
-                <div className="text-right">
+                <div className="text-right shrink-0">
                     {!hideB2bPrice && <div className="text-[9px] text-slate-300 font-bold line-through leading-none mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
                     <span className="text-[14px] font-black text-slate-900 tracking-tight">{fmt(p.priceResolved)}</span>
                 </div>
-                <button onClick={() => addToCart(p, 1)} className="w-[42px] h-[42px] rounded-xl border border-blue-200 text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-all shadow-sm">
+                <button onClick={() => addToCart(p, 1)} className="w-[42px] h-[42px] rounded-xl border border-blue-200 text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-all shadow-sm shrink-0">
                     <Plus size={18} strokeWidth={3} />
                 </button>
             </div>
