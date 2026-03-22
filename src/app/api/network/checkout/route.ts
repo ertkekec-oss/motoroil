@@ -123,12 +123,18 @@ export async function POST(req: Request) {
                     price: true, // Decimal(10,2)
                     stock: true, // Int
                     reservedStock: true, // YENI
+                    category: true,
+                    brand: true,
+                    imageUrl: true,
                     variants: { select: { stock: true } },
                     ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                 }
             })
 
             const byId = new Map<string, any>(products.map((p) => [p.id, p]))
+
+            const campaigns = await tx.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null, campaignType: "BUY_X_GET_Y" } });
+
 
             // Fetch explicit dealer catalog prices
             const catItems = await tx.dealerCatalogItem.findMany({

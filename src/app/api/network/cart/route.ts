@@ -26,6 +26,9 @@ export async function GET() {
                                 price: true,
                                 stock: true,
                                 reservedStock: true,
+                                category: true,
+                                brand: true,
+                                imageUrl: true,
                                 unit: true,
                                 variants: { select: { stock: true } },
                             },
@@ -120,12 +123,12 @@ export async function GET() {
             if (appliedCampaign) {
                 const bq = Number(appliedCampaign.conditions.buyQuantity || 1);
                 const rq = Number(appliedCampaign.conditions.rewardQuantity || 1);
-                const bundleSize = bq + rq;
+                const bundleSize = bq; // X AL
                 const freeCount = Math.floor(item.quantity / bundleSize) * rq;
                 if (freeCount > 0) {
                     campaignDiscount = freeCount * effectivePrice;
                     lineDiscount += campaignDiscount;
-                    campaignMessage = `${bundleSize} Aldınız ${bq} Ödeyeceksiniz! ${freeCount} Adet Ürün Bedelsiz!`;
+                    campaignMessage = `${bundleSize} Aldınız ${bundleSize - rq} Ödeyeceksiniz! ${freeCount} Adet Ürün Bedelsiz!`;
                 }
             }
 

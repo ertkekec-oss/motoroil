@@ -278,8 +278,18 @@ export default function CartPage() {
                         </div>
 
                         <div className="p-6 space-y-4">
-                            <Row label="Ara Toplam" value={fmt(cart?.summary?.grandTotal ?? 0)} />
-                            <Row label="Kargo Tutarı" value="Alıcı Ödemeli (—)" />
+                            <Row label="Ara Toplam" value={fmt(cart?.summary?.subTotal ?? 0)} />
+                            {cart?.summary?.totalDiscount > 0 && (
+                                <Row label="İndirimler" value={`-${fmt(cart?.summary?.totalDiscount)}`} />
+                            )}
+                            <Row 
+                                label="Kargo Tutarı" 
+                                value={
+                                    cart?.summary?.shippingFee > 0 
+                                        ? fmt(cart.summary.shippingFee) 
+                                        : (cart?.summary?.shippingCost > 0 ? "Ücretsiz Kargo 🎉" : "Alıcı Ödemeli (—)")
+                                } 
+                            />
                             <div className="pt-4 border-t border-slate-100" />
                             <Row
                                 label="Genel Toplam"
