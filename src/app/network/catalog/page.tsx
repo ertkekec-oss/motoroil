@@ -25,9 +25,12 @@ export default function NetworkCatalogPage() {
     const [featuredIndex, setFeaturedIndex] = useState(0)
 
     useEffect(() => {
-        // Randomize featured product on each mount/load
-        setFeaturedIndex(Math.floor(Math.random() * 1000))
-    }, [])
+        // Step auto-rotate featured product index every 5 seconds
+        const timer = setInterval(() => {
+            setFeaturedIndex(prev => prev + 1);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
         setHideB2bPrice(localStorage.getItem('hideB2bPrice') === 'true')
@@ -324,22 +327,22 @@ export default function NetworkCatalogPage() {
 
                                                                 {/* Featured Wide Product (Slots 3 & 4) */}
                                                                 {useFeatured ? (
-                                                                    <div className="md:col-span-2 bg-white rounded-[32px] shadow-xl flex flex-row relative group/feat border border-slate-200 h-[460px] overflow-hidden">
+                                                                    <div className="md:col-span-2 bg-white rounded-[32px] shadow-xl flex flex-row relative group/feat border border-slate-200 h-[460px] overflow-hidden transition-all duration-500">
                                                                         {/* Background Highlight */}
-                                                                        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-50/30 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-60 pointer-events-none" />
+                                                                        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-50/20 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-60 pointer-events-none" />
                                                                         
-                                                                        {/* LEFT: Image Area */}
-                                                                        <div className="w-[40%] bg-white p-6 flex flex-col relative shrink-0 border-r border-slate-100 h-full">
-                                                                            <div className="flex-1 flex items-center justify-center relative bg-white">
-                                                                                <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[240px] object-contain filter drop-shadow-sm group-hover/feat:scale-105 transition-transform duration-700" style={{ mixBlendMode: 'multiply' }} />
+                                                                        {/* LEFT: Image Area (40%) */}
+                                                                        <div className="w-[40%] bg-white p-6 flex flex-col relative shrink-0 border-r border-slate-50">
+                                                                            <div className="flex-1 flex items-center justify-center relative bg-white min-h-0">
+                                                                                <img key={featuredProduct.id} src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full max-h-[260px] object-contain filter drop-shadow-sm group-hover/feat:scale-105 transition-all duration-1000 animate-in fade-in zoom-in-95" style={{ mixBlendMode: 'multiply' }} />
                                                                                 
                                                                                 {/* BADGES Overlay Layer */}
                                                                                 <div className="absolute top-0 left-0 flex flex-col gap-2 z-20">
                                                                                     {featuredProduct.campaign && (
-                                                                                        <div className="bg-emerald-600 text-white rounded-xl px-3 py-2.5 shadow-xl border border-white/20 flex items-center gap-2">
+                                                                                        <div className="bg-emerald-600 text-white rounded-xl px-4 py-2.5 shadow-xl border border-white/20 flex items-center gap-2 animate-in slide-in-from-left-4 duration-500">
                                                                                             <ShoppingCart className="w-4 h-4" />
                                                                                             <div className="flex flex-col">
-                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase">KAMPANYA</span>
+                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-wider">KAMPANYA</span>
                                                                                                 <span className="text-[12px] font-black uppercase tracking-tight leading-none">
                                                                                                     {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
                                                                                                 </span>
@@ -347,11 +350,11 @@ export default function NetworkCatalogPage() {
                                                                                         </div>
                                                                                     )}
                                                                                     {featuredProduct.pointsRate > 0 && (
-                                                                                        <div className="bg-amber-500 text-white rounded-xl px-3 py-2.5 shadow-xl border border-white/20 flex items-center gap-2">
+                                                                                        <div className="bg-amber-500 text-white rounded-xl px-4 py-2.5 shadow-xl border border-white/20 flex items-center gap-2 animate-in slide-in-from-left-4 duration-700">
                                                                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                                                             <div className="flex flex-col">
-                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase text-nowrap">KAZANILACAK PUAN</span>
-                                                                                                <span className="text-[12px] font-black uppercase tracking-tight leading-none">
+                                                                                                <span className="text-[10px] font-bold opacity-80 leading-none mb-0.5 uppercase tracking-wider">KAZANILACAK PUAN</span>
+                                                                                                <span className="text-[12px] font-black uppercase tracking-tight leading-none text-nowrap">
                                                                                                     +{Math.floor(featuredProduct.priceResolved * featuredProduct.pointsRate).toLocaleString('tr-TR')} PARAPUAN
                                                                                                 </span>
                                                                                             </div>
@@ -361,36 +364,35 @@ export default function NetworkCatalogPage() {
                                                                             </div>
                                                                         </div>
 
-                                                                        {/* RIGHT: Content & Actions */}
-                                                                        <div className="flex-1 p-8 flex flex-col bg-white relative h-full">
+                                                                        {/* RIGHT: Content & Actions (60%) */}
+                                                                        <div className="flex-1 p-10 flex flex-col bg-white relative">
                                                                             <div className="flex-1">
-                                                                                <div className="flex items-center gap-2 mb-4">
+                                                                                <div className="flex items-center gap-2 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
                                                                                     <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-3 py-1 rounded-full">GÜNÜN FIRSATI</span>
-                                                                                    <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
-                                                                                    <span className="text-[10px] font-bold text-slate-400 tracking-widest truncate max-w-[150px]">
+                                                                                    <div className="w-1.5 h-1.5 bg-slate-100 rounded-full" />
+                                                                                    <span className="text-[11px] font-bold text-slate-400 tracking-widest truncate max-w-[150px]">
                                                                                         {(featuredProduct.sku || "").substring(0, 25)}
                                                                                     </span>
                                                                                 </div>
-                                                                                <h3 className="text-2xl font-black text-slate-900 leading-[1.2] mb-5 group-hover/feat:text-indigo-600 transition-colors">
+                                                                                <h3 key={`name-${featuredProduct.id}`} className="text-3xl font-black text-slate-900 leading-[1.1] mb-5 group-hover/feat:text-indigo-600 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-700 delay-75">
                                                                                     {(featuredProduct.name || "").substring(0, 25)}
-                                                                                    {(featuredProduct.name || "").length > 25 ? "..." : ""}
                                                                                 </h3>
-                                                                                <div className="w-12 h-1 bg-indigo-500 rounded-full mb-6" />
+                                                                                <div className="w-12 h-1.5 bg-indigo-500 rounded-full mb-8" />
                                                                                 
-                                                                                <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
-                                                                                    <p className="text-[14px] text-slate-600 font-medium leading-relaxed italic line-clamp-4">
+                                                                                <div className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100/50 relative overflow-hidden group/desc">
+                                                                                    <p key={`desc-${featuredProduct.id}`} className="text-[15px] text-slate-600 font-medium leading-[1.6] italic line-clamp-4 animate-in fade-in duration-1000">
                                                                                         {featuredProduct.b2bDescription || featuredProduct.description || "Kampanyalı ürünümüz için özel b2b detayları yakında eklenecektir."}
                                                                                     </p>
                                                                                 </div>
                                                                             </div>
 
                                                                             {/* Action Bar */}
-                                                                            <div className="mt-auto pt-8 border-t border-slate-100">
-                                                                                <div className="flex items-center justify-between gap-4">
+                                                                            <div className="mt-8 pt-8 border-t border-slate-100/80">
+                                                                                <div className="flex items-center justify-between gap-6">
                                                                                     <div className="flex flex-col min-w-0">
-                                                                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 leading-none">ÖZEL NET FİYAT</span>
+                                                                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1 leading-none">ÖZEL NET FİYAT</span>
                                                                                         <div className="flex items-baseline gap-2">
-                                                                                            <span className="text-3xl font-black text-slate-900 tracking-tighter leading-none">
+                                                                                            <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none animate-in zoom-in-95 duration-500">
                                                                                                 {fmt(featuredProduct.priceResolved)}
                                                                                             </span>
                                                                                         </div>
@@ -399,16 +401,16 @@ export default function NetworkCatalogPage() {
                                                                                     <div className="flex items-center gap-3 shrink-0">
                                                                                         <button 
                                                                                             onClick={() => router.push('/network/catalog/' + featuredProduct.id)}
-                                                                                            className="h-12 px-6 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-black text-[13px] transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+                                                                                            className="h-14 px-8 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-black text-[14px] transition-all active:scale-95 flex items-center gap-2 shadow-sm"
                                                                                         >
                                                                                             İNCELE
                                                                                         </button>
                                                                                         <button 
                                                                                             disabled={addingToCart === featuredProduct.id || featuredProduct.stock <= 0}
                                                                                             onClick={() => addToCart(featuredProduct, 1)}
-                                                                                            className={`h-12 px-8 rounded-2xl font-black text-[13px] tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 min-w-[160px] ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+                                                                                            className={`h-14 px-10 rounded-2xl font-black text-[14px] tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/20 min-w-[180px] ${addingToCart === featuredProduct.id ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
                                                                                         >
-                                                                                            {addingToCart === featuredProduct.id ? <><Check className="w-5 h-5" /> EKLENDİ</> : <><Plus className="w-5 h-5" /> SEPETE EKLE</>}
+                                                                                            {addingToCart === featuredProduct.id ? <><Check className="w-6 h-6" /> EKLENDİ</> : <><Plus className="w-6 h-6" /> SEPETE EKLE</>}
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
@@ -420,39 +422,6 @@ export default function NetworkCatalogPage() {
                                                                     firstRow.slice(2, 4).map(p => (
                                                                         <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
                                                                     ))
-                                                                )}
-
-                                                                {/* FEATURED CATEGORIES STRIP (To fill the gap) */}
-                                                                {useFeatured && (
-                                                                    <div className="col-span-full py-4 mt-2">
-                                                                        <div className="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide">
-                                                                            <div className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-indigo-600/20 shrink-0">
-                                                                                <Filter className="w-4 h-4" />
-                                                                                <span className="text-sm font-black whitespace-nowrap">ÖNERİLEN KATEGORİLER:</span>
-                                                                            </div>
-                                                                            {[
-                                                                                { label: 'Yağ ve Sıvılar', icon: '🛢️' },
-                                                                                { label: 'Fren Sistemleri', icon: '⚙️' },
-                                                                                { label: 'Aydınlatma Grubu', icon: '💡' },
-                                                                                { label: 'Motor Parçaları', icon: '🔧' },
-                                                                                { label: 'Filtreler', icon: '💨' },
-                                                                                { label: 'Dış Aksesuar', icon: '🚗' },
-                                                                                { label: 'Elektrik Sistemi', icon: '🔋' }
-                                                                            ].map((cat, i) => (
-                                                                                <button 
-                                                                                    key={i}
-                                                                                    onClick={() => setCategoryFilter(cat.label)}
-                                                                                    className="flex items-center gap-2 bg-white hover:bg-indigo-50 border border-slate-100 hover:border-indigo-200 px-5 py-3 rounded-2xl text-slate-600 hover:text-indigo-600 font-bold text-sm transition-all shadow-sm shrink-0 active:scale-95"
-                                                                                >
-                                                                                    <span className="text-lg">{cat.icon}</span>
-                                                                                    {cat.label}
-                                                                                </button>
-                                                                            ))}
-                                                                            <button className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 px-5 py-3 rounded-2xl text-slate-400 font-bold text-sm transition-all shrink-0">
-                                                                                Tümünü Gör <ArrowRight className="w-4 h-4" />
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
                                                                 )}
 
                                                                 {/* Remaining Products */}
