@@ -9,11 +9,12 @@ export const dynamic = "force-dynamic";
 function StatusBadge({ status }: { status: string }) {
     const statusMap: Record<string, { label: string, colorClass: string }> = {
         DRAFT: { label: "Taslak", colorClass: "bg-slate-100 text-slate-600" },
-        PUBLISHED: { label: "Teklif Bekliyor", colorClass: "bg-amber-100 text-amber-700" },
-        NEGOTIATING: { label: "Müzakere", colorClass: "bg-blue-100 text-blue-700" },
+        SENT: { label: "Teklif Bekliyor", colorClass: "bg-amber-100 text-amber-700" },
+        RESPONDED: { label: "Müzakere", colorClass: "bg-blue-100 text-blue-700" },
         ACCEPTED: { label: "Kabul Edildi", colorClass: "bg-emerald-100 text-emerald-700" },
         REJECTED: { label: "Reddedildi", colorClass: "bg-red-100 text-red-700" },
-        EXPIRED: { label: "Süresi Doldu", colorClass: "bg-red-100 text-red-700" }
+        EXPIRED: { label: "Süresi Doldu", colorClass: "bg-red-100 text-red-700" },
+        CANCELLED: { label: "İptal Edildi", colorClass: "bg-slate-200 text-slate-600" }
     };
 
     const s = statusMap[status] || { label: status, colorClass: "bg-slate-100 text-slate-600" };
@@ -41,7 +42,7 @@ export default async function BuyerRfqListPage() {
         orderBy: { createdAt: "desc" }
     });
 
-    const activeRfqsCount = rfqs.filter(r => r.status === 'PUBLISHED' || r.status === 'NEGOTIATING').length;
+    const activeRfqsCount = rfqs.filter(r => r.status === 'SENT' || r.status === 'RESPONDED').length;
 
     return (
         <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">

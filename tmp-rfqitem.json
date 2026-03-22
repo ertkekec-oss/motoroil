@@ -1,0 +1,105 @@
+[
+  {
+    "name": "id",
+    "kind": "scalar",
+    "isList": false,
+    "isRequired": true,
+    "isUnique": false,
+    "isId": true,
+    "isReadOnly": false,
+    "hasDefaultValue": true,
+    "type": "String",
+    "default": {
+      "name": "cuid",
+      "args": []
+    },
+    "isGenerated": false,
+    "isUpdatedAt": false
+  },
+  {
+    "name": "rfqId",
+    "kind": "scalar",
+    "isList": false,
+    "isRequired": true,
+    "isUnique": false,
+    "isId": false,
+    "isReadOnly": true,
+    "hasDefaultValue": false,
+    "type": "String",
+    "isGenerated": false,
+    "isUpdatedAt": false
+  },
+  {
+    "name": "productId",
+    "kind": "scalar",
+    "isList": false,
+    "isRequired": true,
+    "isUnique": false,
+    "isId": false,
+    "isReadOnly": false,
+    "hasDefaultValue": false,
+    "type": "String",
+    "isGenerated": false,
+    "isUpdatedAt": false
+  },
+  {
+    "name": "sellerCompanyId",
+    "kind": "scalar",
+    "isList": false,
+    "isRequired": true,
+    "isUnique": false,
+    "isId": false,
+    "isReadOnly": false,
+    "hasDefaultValue": false,
+    "type": "String",
+    "isGenerated": false,
+    "isUpdatedAt": false
+  },
+  {
+    "name": "quantity",
+    "kind": "scalar",
+    "isList": false,
+    "isRequired": true,
+    "isUnique": false,
+    "isId": false,
+    "isReadOnly": false,
+    "hasDefaultValue": false,
+    "type": "Int",
+    "isGenerated": false,
+    "isUpdatedAt": false
+  },
+  {
+    "name": "targetPrice",
+    "kind": "scalar",
+    "isList": false,
+    "isRequired": false,
+    "isUnique": false,
+    "isId": false,
+    "isReadOnly": false,
+    "hasDefaultValue": false,
+    "type": "Decimal",
+    "isGenerated": false,
+    "isUpdatedAt": false
+  },
+  {
+    "name": "rfq",
+    "kind": "object",
+    "isList": false,
+    "isRequired": true,
+    "isUnique": false,
+    "isId": false,
+    "isReadOnly": false,
+    "hasDefaultValue": false,
+    "type": "Rfq",
+    "relationName": "RfqToRfqItem",
+    "relationFromFields": [
+      "rfqId"
+    ],
+    "relationToFields": [
+      "id"
+    ],
+    "relationOnDelete": "Cascade",
+    "isGenerated": false,
+    "isUpdatedAt": false
+  }
+]

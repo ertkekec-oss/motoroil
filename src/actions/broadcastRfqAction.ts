@@ -60,7 +60,7 @@ export async function broadcastRfqAction(globalProductId: string, quantity: numb
         const rfq = await tx.rfq.create({
             data: {
                 buyerCompanyId,
-                status: "PUBLISHED", // Immediately published to network, no DRAFT step required
+                status: "SENT", // Immediately published to network (SENT)
             }
         });
 
