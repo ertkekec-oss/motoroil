@@ -31,8 +31,9 @@ export default async function ProductDetailPage({ params }: { params: { productI
     const listings = await prisma.networkListing.findMany({
         where: { globalProductId: productId, status: "ACTIVE" },
         include: { company: true },
-        orderBy: { price: "asc" }
-    });
+        orderBy: { price: "asc" },
+        adminBypass: true // Necessary to bypass ERP isolation so buyers can see OTHER companies' products
+    } as any);
 
     return (
         <div className="min-h-screen bg-[#F6F7F9] text-slate-900 p-6 font-sans">
@@ -97,9 +98,9 @@ export default async function ProductDetailPage({ params }: { params: { productI
                                         {listings.length === 0 ? (
                                             <tr><td colSpan={5} className="p-6 text-center text-slate-500">Currently out of stock or not available for B2B procurement.</td></tr>
                                         ) : (
-                                            listings.map(l => {
+                                            listings.map((l: any) => {
                                                 const isOOS = l.availableQty < l.minQty;
-                                                const isNotReady = !l.price || l.price.equals(0);
+                                                const isNotReady = !l.price || Number(l.price) === 0;
 
                                                 return (
                                                     <tr key={l.id} className={`hover:bg-slate-50 transition-colors group ${isOOS ? 'opacity-60' : ''}`}>
