@@ -91,165 +91,173 @@ export default function CatalogProductDetailPage() {
     const fmt = (v: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(v);
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-24">
+        <div className="min-h-screen bg-white text-slate-900 font-sans pb-24">
             
             {/* Top Navigation Bar / Breadcrumb */}
-            <div className="max-w-7xl mx-auto px-6 py-6 border-b border-slate-200 bg-white flex items-center justify-between shadow-sm">
+            <div className="max-w-[1400px] mx-auto px-6 py-6 border-b border-slate-100 flex items-center justify-between">
                 <button 
                     onClick={() => router.push('/network/catalog')}
-                    className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors"
+                    className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
                 >
                     <ChevronLeft className="w-4 h-4" />
                     Kataloğa Dön
                 </button>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col lg:flex-row items-start gap-12">
+            <div className="max-w-[1400px] mx-auto px-6 py-8 flex flex-col lg:flex-row items-start gap-12">
                 
                 {/* Left side: Image */}
-                <div className="w-full lg:w-[45%] shrink-0 flex items-center justify-center rounded-[32px] bg-white border border-slate-200 p-12 min-h-[500px] relative shadow-lg group overflow-hidden">
+                <div className="w-full lg:w-[40%] shrink-0 flex items-center justify-center rounded-3xl bg-slate-50 border border-slate-100 p-8 min-h-[450px] relative">
                     {product.image ? (
                         <img 
                             src={product.image} 
                             alt={product.name} 
-                            className="w-full h-full object-contain max-h-[450px] filter drop-shadow-2xl select-none group-hover:scale-105 transition-transform duration-700"
+                            className="w-full h-full object-contain max-h-[500px] filter drop-shadow-xl select-none"
                             draggable={false}
                         />
                     ) : (
                         <div className="text-slate-300 flex flex-col items-center gap-4">
                             <PackageOpen className="w-24 h-24" strokeWidth={1} />
-                            <span className="text-base font-bold tracking-wide">Ürün Görseli Yok</span>
-                        </div>
-                    )}
-                    
-                    {product.campaign && (
-                        <div className="absolute top-6 right-6 bg-emerald-100/90 text-emerald-600 text-[11px] font-black px-4 py-2 rounded-xl border border-emerald-200 shadow-sm uppercase z-10 backdrop-blur-sm">
-                            {product.campaign.name || `${product.campaign.buyQuantity + product.campaign.rewardQuantity} AL ${product.campaign.buyQuantity} ÖDE`}
+                            <span className="text-base font-medium tracking-wide">Ürün Görseli Yok</span>
                         </div>
                     )}
                 </div>
 
                 {/* Right side: Product Content */}
-                <div className="w-full lg:w-[55%] flex flex-col pt-2 space-y-8">
+                <div className="w-full lg:w-[60%] flex flex-col pt-2">
                     
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <span className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-black text-slate-400 uppercase tracking-tighter">{product.sku}</span>
-                            <span className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-black text-slate-400 uppercase tracking-tighter">{product.category || "Diğer"}</span>
-                        </div>
-                        <h1 className="text-4xl sm:text-[44px] font-black text-slate-900 leading-[1.1] tracking-tight">
-                            {product.name}
-                        </h1>
-                    </div>
+                    {/* Title */}
+                    <h1 className="text-4xl sm:text-5xl font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-8">
+                        {product.name}
+                    </h1>
 
-                    {/* Price Area */}
-                    <div className="flex flex-wrap items-end gap-10 bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm">
-                        <div className="flex flex-col">
-                            {!hideB2bPrice && (
-                                <div className="space-y-1 mb-2">
-                                    <span className="text-[11px] font-black text-slate-400 tracking-wider uppercase mb-1 block">Liste Fiyatı</span>
-                                    <span className="text-2xl font-bold text-slate-300 line-through">
+                    {/* Price & Labels */}
+                    <div className="flex flex-wrap items-end gap-6 mb-8">
+                        {hideB2bPrice ? (
+                            <div className="flex flex-col">
+                                <span className="text-[13px] font-bold text-slate-400 tracking-wider uppercase mb-1">Satış Fiyatı</span>
+                                <span className="text-4xl font-black text-[#1a1a1a] tracking-tight">
+                                    {fmt(product.basePrice || product.priceResolved)}
+                                </span>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="flex flex-col">
+                                    <span className="text-[13px] font-bold text-slate-400 tracking-wider uppercase mb-1">Liste Fiyatı</span>
+                                    <span className="text-2xl font-bold text-slate-400 line-through">
                                         {fmt(product.basePrice || product.priceResolved)}
                                     </span>
                                 </div>
-                            )}
-                            <div className="space-y-1">
-                                <span className="text-[11px] font-black text-blue-600 tracking-wider uppercase mb-1 flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" /> 
-                                    Size Özel
-                                </span>
-                                <span className="text-[48px] font-black text-slate-900 leading-none tracking-tighter">
-                                    {fmt(product.priceResolved)}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* PARAPUAN & KAMPANYA BOXES (SIDE BY SIDE IN DETAIL) */}
-                        <div className="flex flex-col gap-3 min-w-[200px]">
-                            {earnPoints > 0 && (
-                                <div className="bg-amber-50 text-amber-600 text-[11px] font-black px-5 py-3 rounded-2xl border border-amber-100 flex items-center gap-3 shadow-sm">
-                                    <Coins size={18} strokeWidth={3} />
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] uppercase tracking-widest opacity-70">Parapuan</span>
-                                        <span>+{earnPoints.toLocaleString('tr-TR')} PUAN</span>
-                                    </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[13px] font-bold text-slate-500 tracking-wider uppercase mb-1 flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Size Özel</span>
+                                    <span className="text-4xl font-black text-[#1a1a1a] tracking-tight">
+                                        {fmt(product.priceResolved)}
+                                    </span>
                                 </div>
-                            )}
-                            {product.campaign && (
-                                <div className="bg-emerald-50 text-emerald-600 text-[11px] font-black px-5 py-3 rounded-2xl border border-emerald-100 flex items-center gap-3 shadow-sm">
-                                    <ShoppingCart size={18} strokeWidth={3} />
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] uppercase tracking-widest opacity-70">Kampanya</span>
-                                        <span>{product.campaign.name || "KAMPANYA AKTİF"}</span>
-                                    </div>
+                                
+                                {/* PARAPUAN & KAMPANYA BOXES SIDE-BY-SIDE */}
+                                <div className="flex items-center gap-3 pb-1">
+                                    {earnPoints > 0 && (
+                                        <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-4 py-3 rounded-xl border border-amber-100 flex items-center gap-2 shadow-sm whitespace-nowrap">
+                                            <Coins size={16} strokeWidth={3} />
+                                            <div className="flex flex-col">
+                                                <span className="opacity-70 text-[8px] uppercase leading-none mb-1">PARAPUAN</span>
+                                                <span className="leading-none">+{earnPoints.toLocaleString('tr-TR')} PUAN</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {product.campaign && (
+                                        <div className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-4 py-3 rounded-xl border border-emerald-100 flex items-center gap-2 shadow-sm whitespace-nowrap">
+                                            <ShoppingCart size={16} strokeWidth={3} />
+                                            <div className="flex flex-col">
+                                                <span className="opacity-70 text-[8px] uppercase leading-none mb-1">KAMPANYA</span>
+                                                <span className="leading-none">{product.campaign.name || "AKTİF"}</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Description Paragraph */}
-                    <div className="space-y-3">
-                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Açıklama</span>
-                        <p className="text-slate-500 text-[16px] leading-relaxed whitespace-pre-wrap font-medium">
+                    <div className="mb-10">
+                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Açıklama</span>
+                        <p className="text-slate-500 text-[15px] leading-relaxed whitespace-pre-wrap font-medium">
                             {product.description || "Bu ürün için detaylı açıklama bulunmuyor. Özellikleri ve ticari avantajları hakkında satıcı bayiniz ile iletişime geçebilirsiniz."}
                         </p>
                     </div>
 
                     {/* Meta Grid */}
-                    <div className="grid grid-cols-2 gap-6 bg-slate-100/50 p-6 rounded-2xl">
-                        <div className="space-y-1">
-                            <div className="font-black text-slate-400 text-[10px] tracking-widest uppercase">STOK DURUMU</div>
-                            <div className={`font-black text-[15px] uppercase flex items-center gap-2 ${stock > 0 ? "text-emerald-500" : "text-rose-500"}`}>
-                                <div className={`w-2 h-2 rounded-full ${stock > 0 ? "bg-emerald-500" : "bg-rose-500"}`} />
-                                {stock > 0 ? `STOK: ${stock} ADET` : "STOKTA YOK"}
-                            </div>
+                    <div className="grid grid-cols-[120px_1fr] gap-y-4 text-[13px] mb-10 border-t border-slate-100 pt-8">
+                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">STOK DURUMU:</div>
+                        <div className={`font-bold uppercase tracking-wider ${stock > 0 ? "text-emerald-500" : "text-red-500"}`}>
+                            {stock > 0 ? `Stok: ${stock} adet` : "Stokta Yok"}
                         </div>
-                        <div className="space-y-1">
-                            <div className="font-black text-slate-400 text-[10px] tracking-widest uppercase">SKU / KOD</div>
-                            <div className="font-black text-slate-800 text-[15px] uppercase">{product.sku || "—"}</div>
-                        </div>
+
+                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">SKU / KOD:</div>
+                        <div className="font-medium text-slate-500 uppercase">{product.sku || "—"}</div>
+                        
+                        <div className="font-extrabold text-[#1a1a1a] tracking-wide">KATEGORİ:</div>
+                        <div className="font-medium text-slate-500">{product.category || "Diğer"}</div>
                     </div>
 
                     {/* Add to Cart Area */}
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
-                        <div className="flex items-center justify-between p-1.5 w-full sm:w-[160px] h-[64px] rounded-2xl bg-white border border-slate-200 shadow-sm grow-0">
-                            <button 
-                                onClick={() => setQuantity(Math.max(product.minOrderQty || 1, quantity - 1))}
-                                className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-4 h-14">
+                            {/* Quantity Selector */}
+                            <div className="flex items-center justify-between px-2 w-[140px] h-full rounded-[14px] border border-slate-200 bg-white shadow-sm grow-0">
+                                <button 
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="w-10 h-10 flex flex-col items-center justify-center text-slate-400 hover:text-[#1a1a1a] hover:bg-slate-50 rounded-lg text-lg transition-colors font-medium"
+                                >
+                                    -
+                                </button>
+                                <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={localQtyStr !== null ? localQtyStr : quantity.toString()}
+                                    onChange={(e) => setLocalQtyStr(e.target.value)}
+                                    onBlur={(e) => {
+                                        let n = parseInt(e.target.value, 10);
+                                        if (isNaN(n) || n < 1) n = 1;
+                                        setQuantity(n);
+                                        setLocalQtyStr(null);
+                                    }}
+                                    className="text-[17px] font-black text-[#1a1a1a] w-12 text-center bg-transparent border-none outline-none focus:ring-0 p-0 mx-auto"
+                                />
+                                <button 
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-[#1a1a1a] hover:bg-slate-50 rounded-lg text-lg transition-colors font-medium"
+                                >
+                                    +
+                                </button>
+                            </div>
+
+                            {/* Add to Cart Button */}
+                            <button
+                                disabled={outOfStock || addingToCart}
+                                onClick={handleAddToCart}
+                                className={`flex-1 h-full rounded-[14px] text-[15px] font-extrabold uppercase tracking-wide transition-all flex items-center justify-center gap-2 ${
+                                    outOfStock 
+                                    ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                                    : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-500/10"
+                                }`}
                             >
-                                <Minus size={20} />
-                            </button>
-                            <input
-                                type="text"
-                                inputMode="numeric"
-                                value={localQtyStr !== null ? localQtyStr : quantity.toString()}
-                                onChange={(e) => setLocalQtyStr(e.target.value)}
-                                onBlur={(e) => {
-                                    let n = parseInt(e.target.value, 10);
-                                    if (isNaN(n) || n < 1) n = 1;
-                                    setQuantity(n);
-                                    setLocalQtyStr(null);
-                                }}
-                                className="text-xl font-black text-slate-900 w-12 text-center bg-transparent border-none focus:ring-0 p-0"
-                            />
-                            <button 
-                                onClick={() => setQuantity(quantity + 1)}
-                                className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                            >
-                                <Plus size={20} />
+                                {addingToCart ? <Loader2 className="animate-spin w-5 h-5" /> : "SEPETE EKLE"}
                             </button>
                         </div>
 
+                        {/* Buy It Now Button */}
                         <button
                             disabled={outOfStock || addingToCart}
-                            onClick={handleAddToCart}
-                            className={`flex-1 h-[64px] rounded-2xl text-[16px] font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-3 ${
+                            className={`w-full h-14 rounded-[14px] border-2 text-[15px] font-black uppercase tracking-wide transition-all ${
                                 outOfStock 
-                                ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
-                                : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] shadow-blue-500/20"
+                                ? "border-slate-200 text-slate-300"
+                                : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white shadow-sm"
                             }`}
                         >
-                            {addingToCart ? <Loader2 className="animate-spin" /> : <><ShoppingCart size={20} strokeWidth={3} /> SEPETE EKLE</>}
+                            HEMEN AL
                         </button>
                     </div>
 
