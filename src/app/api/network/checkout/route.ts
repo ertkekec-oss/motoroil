@@ -133,7 +133,8 @@ export async function POST(req: Request) {
 
             const byId = new Map<string, any>(products.map((p) => [p.id, p]))
 
-            const campaigns = await tx.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null }, orderBy: { priority: "desc" } });
+            const allCampaigns = await tx.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null }, orderBy: { priority: "desc" } });
+            const campaigns = allCampaigns.filter((c: any) => !c.channels || c.channels.length === 0 || c.channels.includes("B2B") || c.channels.includes("GLOBAL"));
 
 
             // Fetch explicit dealer catalog prices
