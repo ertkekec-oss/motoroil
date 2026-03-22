@@ -34,8 +34,8 @@ export default async function SellerProductEditPage({ params }: { params: Promis
 
     if (!erpProduct) {
         return (
-            <div className="p-10 text-center text-slate-500">
-                ERP Product not found or unauthorized. <Link href="/seller/products" className="text-[#1F3A5F] underline">Go back</Link>
+            <div className="p-10 text-center text-slate-500 font-medium">
+                Sistemde bu ürün bulunamadı veya erişim yetkiniz yok. <Link href="/seller/products" className="text-blue-600 hover:underline font-bold">Geri Dön</Link>
             </div>
         );
     }
@@ -43,26 +43,28 @@ export default async function SellerProductEditPage({ params }: { params: Promis
     const listing = erpProduct.networkListings[0] || null;
 
     return (
-        <div className="min-h-screen bg-[#F6F7F9] text-slate-900 p-6 font-sans">
-            <div className="max-w-[800px] mx-auto space-y-6">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 p-6 font-sans">
+            <div className="max-w-[800px] mx-auto space-y-8 animate-in fade-in duration-300 pt-4">
 
                 {/* Header / Breadcrumb */}
-                <div className="flex items-center gap-2 text-sm text-slate-500 border-b border-slate-200 pb-4">
-                    <Link href="/seller/products" className="hover:text-[#1F3A5F] hover:underline">Seller Products</Link>
-                    <span>/</span>
-                    <span className="font-semibold text-slate-800">{erpProduct.name}</span>
+                <div className="flex items-center gap-2 text-[13px] text-slate-500 border-b border-slate-200 dark:border-white/10 pb-4">
+                    <Link href="/seller/products" className="hover:text-blue-600 font-semibold transition-colors">Yayınlanan Ürünler</Link>
+                    <span className="text-slate-300">/</span>
+                    <span className="font-bold text-slate-900 dark:text-white truncate max-w-[400px]">{erpProduct.name}</span>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-md p-6">
-                    <h2 className="text-lg font-bold text-[#1F3A5F] mb-4">
-                        {listing ? "Manage Network Listing" : "Publish to B2B Catalog"}
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-8">
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">
+                        {listing ? "Katalog Kaydını Güncelle" : "B2B Ağında Ürün Yayınla"}
                     </h2>
 
-                    <div className="mb-6 p-4 bg-slate-50 border border-slate-100 rounded-md space-y-1 text-sm text-slate-600">
-                        <div className="font-semibold text-slate-800">ERP Info Reference:</div>
-                        <div><span className="font-semibold text-slate-400">Code:</span> {erpProduct.code}</div>
-                        <div><span className="font-semibold text-slate-400">Category:</span> {erpProduct.category || '-'}</div>
-                        <div><span className="font-semibold text-slate-400">Current Stock:</span> {erpProduct.stock}</div>
+                    <div className="mb-8 p-5 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-xl space-y-2.5 text-sm text-slate-600 dark:text-slate-300 shadow-inner">
+                        <div className="font-black text-slate-900 dark:text-white uppercase tracking-widest text-[10px] mb-3 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> ERP Entegrasyon Referansı
+                        </div>
+                        <div className="flex items-center justify-between"><span className="font-bold text-slate-400">Stok Kodu (SKU):</span> <span className="font-bold text-slate-800 dark:text-white bg-white dark:bg-[#0f172a] px-2 py-0.5 rounded border border-slate-100 dark:border-white/10">{erpProduct.code}</span></div>
+                        <div className="flex items-center justify-between"><span className="font-bold text-slate-400">Kategori:</span> <span className="font-bold uppercase tracking-tight">{erpProduct.category || '-'}</span></div>
+                        <div className="flex items-center justify-between"><span className="font-bold text-slate-400">SistemdekiFiziksel Stok:</span> <span className="font-black text-blue-600 dark:text-blue-400 text-[15px]">{erpProduct.stock} Adet</span></div>
                     </div>
 
                     <SellerProductForm erpProduct={erpProduct} existingListing={listing} />
