@@ -270,8 +270,8 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
             <div className="min-h-[220px] max-h-[220px] bg-white rounded-xl mb-4 flex items-center justify-center relative border border-slate-50 p-6 overflow-hidden">
                 <img src={p.image} className="max-h-full max-w-full object-contain" />
                 {p.campaign && (
-                    <div className="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-emerald-200 shadow-sm uppercase z-10">
-                        {p.campaign.name || `${p.campaign.buyQuantity + p.campaign.rewardQuantity} AL ${p.campaign.buyQuantity} ÖDE`}
+                    <div className="absolute top-2 right-2 bg-emerald-100/90 text-emerald-700 text-[10px] font-black px-2.5 py-1.5 rounded border border-emerald-200 shadow-sm uppercase z-10 backdrop-blur-sm">
+                        {p.campaign.name || "KAMPANYALI ÜRÜN"}
                     </div>
                 )}
             </div>
@@ -330,6 +330,11 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
                 <div className="absolute top-4 left-4 z-10">
                     <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-md uppercase">VİTRİN ÖZEL</span>
                 </div>
+                {p.campaign && (
+                    <div className="absolute top-4 right-4 bg-emerald-100/90 text-emerald-700 text-[10px] font-black px-3 py-1.5 rounded border border-emerald-200 shadow-sm uppercase z-10 backdrop-blur-sm">
+                        {p.campaign.name || "KAMPANYALI ÜRÜN"}
+                    </div>
+                )}
                 <img src={p.image} className="max-h-[320px] max-w-full object-contain filter group-hover:scale-105 transition-transform duration-700" />
             </div>
             <div className="flex-1 p-8 flex flex-col min-w-0">
@@ -376,6 +381,11 @@ function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }
     return (
         <div className="bg-white rounded-[16px] border border-slate-200 p-5 flex items-center gap-6 shadow-sm hover:shadow-md transition-all group h-[160px] relative overflow-hidden">
             <div className="w-24 h-24 bg-white border border-slate-50 rounded-xl p-2 shrink-0 flex items-center justify-center relative">
+                {p.campaign && (
+                    <div className="absolute -top-1 -right-1 bg-emerald-100/90 text-emerald-700 text-[8px] font-black px-1.5 py-0.5 rounded border border-emerald-200 shadow-sm uppercase z-10">
+                        % KMP
+                    </div>
+                )}
                 <img src={p.image} className="max-h-full max-w-full object-contain" />
             </div>
             <div className="flex-1 min-w-0">

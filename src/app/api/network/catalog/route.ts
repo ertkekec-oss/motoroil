@@ -99,8 +99,7 @@ export async function GET(req: Request) {
             where: { 
                 tenantId: membership.tenantId, 
                 isActive: true, 
-                deletedAt: null, 
-                campaignType: { in: ["BUY_X_GET_Y", "POINTS"] }
+                deletedAt: null 
             } 
         });
 
@@ -120,21 +119,33 @@ export async function GET(req: Request) {
             }
 
             // 2. Check stock (total or variant)
-            const resolvedStock = prod.stock;
+            const variantValues = Array.isArray(prod.variants) ? prod.variants : []
+            const variantStock = variantValues.reduce((acc: number, v: any) => acc + (v.stock || 0), 0);
+            const resolvedStock = prod.stock + variantStock;
 
             // 3. Find if any campaign matches this product
-            const campaign = campaigns.find(c => {
-                if (c.targetType === "ALL") return true;
-                if (c.targetType === "CATEGORY" && prod.category === c.targetValue) return true;
-                if (c.targetType === "PRODUCT" && prod.id === c.targetValue) return true;
-                return false;
-            });
+            let appliedCampaign = null;
+            let appliedPointsCampaign = null;
 
-            // If it's a POINTS campaign, apply the pointsRate
-            let resolvedPointsRate = 0;
-            if (campaign && campaign.campaignType === "POINTS") {
-                resolvedPointsRate = Number(campaign.pointsRate || 0);
-            }
+            campaigns.forEach(c => {
+                if(!c.conditions) return;
+                const { targetType, targetValue } = c.conditions as any || { targetType: c.targetType, targetValue: c.targetValue };
+                let match = false;
+                
+                if(targetType === "ALL" || !targetType) match = true;
+                else if(targetType === "BRAND" && prod.brand === targetValue) match = true;
+                else if(targetType === "CATEGORY" && prod.category === targetValue) match = true;
+                else if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue || prod.id === targetValue)) match = true;
+
+                if (match) {
+                    const cType = (c.campaignType || c.type || "").toUpperCase();
+                    if (cType === "LOYALTY_POINTS" || cType === "POINTS") {
+                        appliedPointsCampaign = c;
+                    } else {
+                        appliedCampaign = c;
+                    }
+                }
+            });
 
             return {
                 id: prod.id,
@@ -148,13 +159,15 @@ export async function GET(req: Request) {
                 brand: prod.brand,
                 description: prod.description,
                 b2bDescription: prod.b2bDescription,
-                pointsRate: resolvedPointsRate,
+                pointsRate: appliedPointsCampaign ? (appliedPointsCampaign.pointsRate || appliedPointsCampaign.discountRate || 0) : 0,
                 minOrderQty: item.minOrderQty || 1,
-                campaign: (campaign && campaign.campaignType === "BUY_X_GET_Y") ? {
-                    id: campaign.id,
-                    name: campaign.name,
-                    buyQuantity: campaign.buyQuantity,
-                    rewardQuantity: campaign.rewardQuantity
+                campaign: appliedCampaign ? {
+                    id: appliedCampaign.id,
+                    name: appliedCampaign.name,
+                    buyQuantity: appliedCampaign.conditions?.buyQuantity || appliedCampaign.buyQuantity,
+                    rewardQuantity: appliedCampaign.conditions?.rewardQuantity || appliedCampaign.rewardQuantity,
+                    type: appliedCampaign.campaignType || appliedCampaign.type,
+                    discountRate: appliedCampaign.discountRate
                 } : null,
                 catalogItemId: item.id
             }
