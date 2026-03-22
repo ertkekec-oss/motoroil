@@ -10,6 +10,7 @@ type Me = {
     supplierName: string
     creditLimit: number
     balance: number
+    points: number
     currency: "TRY"
     supplierEmail?: string | null
     supplierPhone?: string | null
@@ -151,20 +152,40 @@ export default function NetworkDashboardPage() {
                         </div>
                     </div>
 
-                    {/* KPI 3 */}
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/20 to-transparent group-hover:from-amber-500/40 transition-colors" />
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
-                                <Activity className="w-5 h-5" strokeWidth={1.5} />
+                    {/* KPI 3 - Split into 2 */}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden group flex">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-transparent group-hover:from-amber-500/40 group-hover:via-purple-500/40 transition-colors" />
+                        
+                        {/* Sol Kısım: Kullanım */}
+                        <div className="flex-1 p-6 border-r border-slate-100/80">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
+                                    <Activity className="w-5 h-5" strokeWidth={1.5} />
+                                </div>
+                            </div>
+                            <div className="text-[13px] font-medium text-slate-500 mb-1">Limit Kullanım</div>
+                            <div className="text-2xl font-bold text-slate-900 tracking-tight">
+                                {loading ? "..." : percentUsage(me?.balance ?? 0, me?.creditLimit ?? 0)}
+                            </div>
+                            <div className="mt-3 text-[12px] text-slate-500 line-clamp-1">
+                                Aktif kullanım {loading ? "..." : percentUsage(me?.balance ?? 0, me?.creditLimit ?? 0) === "—" ? "yok" : "oranı"}
                             </div>
                         </div>
-                        <div className="text-[13px] font-medium text-slate-500 mb-1">Kullanım</div>
-                        <div className="text-2xl font-bold text-slate-900 tracking-tight">
-                            {loading ? "..." : percentUsage(me?.balance ?? 0, me?.creditLimit ?? 0)}
-                        </div>
-                        <div className="mt-3 text-[13px] text-slate-500">
-                            Aktif kullanım {loading ? "..." : percentUsage(me?.balance ?? 0, me?.creditLimit ?? 0) === "—" ? "yok" : "oranı"}
+
+                        {/* Sağ Kısım: Parapuan */}
+                        <div className="flex-1 p-6 bg-slate-50/30">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100">
+                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                </div>
+                            </div>
+                            <div className="text-[13px] font-medium text-slate-500 mb-1">Parapuan</div>
+                            <div className="text-2xl font-bold text-purple-700 tracking-tight">
+                                {loading ? "..." : formatMoney(me?.points ?? 0, me?.currency ?? "TRY")}
+                            </div>
+                            <div className="mt-3 text-[12px] text-slate-500 line-clamp-1">
+                                Kullanılabilir puan
+                            </div>
                         </div>
                     </div>
                 </div>

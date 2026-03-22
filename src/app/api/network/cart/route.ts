@@ -49,12 +49,31 @@ export async function GET() {
         // İskonto hesaplaması 
         const membership = await prismaRaw.dealerMembership.findUnique({
             where: { id: ctx.activeMembershipId },
-            select: { categoryId: true, priceRule: { select: { discount: true, isActive: true } } },
+            select: { categoryId: true, tenantId: true, dealerUser: { select: { email: true } }, dealerCompany: { select: { taxNumber: true } }, priceRule: { select: { discount: true, isActive: true } } },
         })
 
         const rule = membership?.priceRule?.isActive ? membership.priceRule : null
         const discountPct = rule ? toNumber(rule.discount) : 0
 
+        
+        let availablePoints = 0;
+        let crmCustomer = null;
+        if (membership?.dealerUser?.email) {
+            crmCustomer = await prismaRaw.customer.findFirst({
+                where: { email: membership.dealerUser.email, company: { tenantId: membership.tenantId }, deletedAt: null },
+                select: { points: true }
+            });
+        }
+        if (!crmCustomer && membership?.dealerCompany?.taxNumber) {
+            crmCustomer = await prismaRaw.customer.findFirst({
+                where: { taxNumber: membership.dealerCompany.taxNumber, company: { tenantId: membership.tenantId }, deletedAt: null },
+                select: { points: true }
+            });
+        }
+        if (crmCustomer) {
+            availablePoints = typeof crmCustomer.points === "object" ? Number(crmCustomer.points) : Number(crmCustomer.points || 0);
+        }
+        
         let priceListId = null;
         if (membership && membership.categoryId) {
             const custCat = await prismaRaw.customerCategory.findUnique({ where: { id: membership.categoryId } });

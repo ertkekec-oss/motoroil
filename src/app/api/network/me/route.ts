@@ -29,6 +29,7 @@ export async function GET() {
                 : membership.creditLimit
 
         let balance = 0;
+        let points = 0;
         let customerId = null;
         
         // 1) Match by Email
@@ -40,7 +41,7 @@ export async function GET() {
                     company: { tenantId: membership.tenantId },
                     deletedAt: null 
                 },
-                select: { id: true, balance: true }
+                select: { id: true, balance: true, points: true }
             })
         }
         
@@ -52,12 +53,13 @@ export async function GET() {
                     company: { tenantId: membership.tenantId },
                     deletedAt: null 
                 },
-                select: { id: true, balance: true }
+                select: { id: true, balance: true, points: true }
             })
         }
         
         if (crmCustomer) {
             balance = typeof crmCustomer.balance === "object" ? Number(crmCustomer.balance) : Number(crmCustomer.balance || 0);
+            points = typeof crmCustomer.points === "object" ? Number(crmCustomer.points) : Number(crmCustomer.points || 0);
             customerId = crmCustomer.id;
         }
 
@@ -79,6 +81,7 @@ export async function GET() {
                 customerId,
                 creditLimit,
                 balance,
+                points,
                 exposureBase,
                 currency: "TRY",
                 supplierEmail: membership.tenant?.ownerEmail ?? null,

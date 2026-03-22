@@ -22,7 +22,7 @@ type CartItem = {
 type CartData = {
     id: string
     items: CartItem[]
-    summary: { grandTotal: number; currency?: "TRY" }
+    summary: { grandTotal: number; subTotal: number; totalDiscount: number; shippingFee: number; shippingCost: number; freeShippingThreshold: number; availablePoints?: number; currency?: "TRY" }
 }
 
 export default function CartPage() {
@@ -34,6 +34,7 @@ export default function CartPage() {
     const [err, setErr] = useState<string | null>(null)
     const [busyItemId, setBusyItemId] = useState<string | null>(null)
     const [checkingOut, setCheckingOut] = useState(false)
+    const [usePoints, setUsePoints] = useState(false)
 
     async function load(isBgLoad = false) {
         if (!isBgLoad) setLoading(true)
@@ -128,10 +129,22 @@ export default function CartPage() {
         setCheckingOut(true)
         setErr(null)
 
+        if (!cart) {
+            setErr("Sepet bilgisi bulunamadı.")
+            setCheckingOut(false)
+            return
+        }
+
+        const installments = 0; // Assuming 0 installments if not explicitly managed by state
         const res = await fetch("/api/network/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idempotencyKey: crypto.randomUUID(), paymentMode }),
+            body: JSON.stringify({
+                cartId: cart.id,
+                paymentMode,
+                installments,
+                usePoints,
+            }),
             cache: "no-store",
         })
 
@@ -153,6 +166,9 @@ export default function CartPage() {
         // Success redirect
         window.location.href = getPath(`/network/orders/${data.orderId}`)
     }
+
+    const effectiveCredit = credit?.availableCredit || 0;
+    const isAccountBlockedWithPoints = paymentMode === "ON_ACCOUNT" && Math.max(0, (cart?.summary?.grandTotal ?? 0) - (usePoints ? (cart?.summary?.availablePoints ?? 0) : 0)) > effectiveCredit;
 
     return (
         <div className="min-h-screen bg-background px-4 py-10">
@@ -277,6 +293,21 @@ export default function CartPage() {
                             <div className="mt-1 text-[13px] text-slate-500 font-medium">Sipariş öncesi canlı hesap</div>
                         </div>
 
+                        {cart?.summary?.availablePoints && cart.summary.availablePoints > 0 ? (
+                            <div className="p-5 border-b border-slate-100 bg-purple-50/50">
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <div className="relative flex items-center justify-center shrink-0">
+                                        <input type="checkbox" checked={usePoints} onChange={e => setUsePoints(e.target.checked)} className="peer w-5 h-5 appearance-none border-2 border-purple-200 rounded-md checked:bg-purple-600 checked:border-purple-600 transition-colors" />
+                                        <svg className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 mix-blend-plus-lighter pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-purple-900 text-[14px]">Parapuan Kullan</div>
+                                        <div className="text-[12px] text-purple-700/80 font-medium">Cüzdanda {fmt(cart.summary.availablePoints)} değerinde puan var.</div>
+                                    </div>
+                                </label>
+                            </div>
+                        ) : null}
+
                         <div className="p-6 space-y-4">
                             <Row label="Ara Toplam" value={fmt(cart?.summary?.subTotal ?? 0)} />
                             {cart?.summary?.totalDiscount > 0 && (
@@ -291,11 +322,24 @@ export default function CartPage() {
                                 } 
                             />
                             <div className="pt-4 border-t border-slate-100" />
-                            <Row
-                                label="Genel Toplam"
-                                value={fmt(cart?.summary?.grandTotal ?? 0)}
-                                strong
-                            />
+                            {usePoints && cart?.summary?.availablePoints && cart.summary.availablePoints > 0 ? (
+                                <>
+                                    <Row label="İndirimsiz Toplam" value={fmt(cart?.summary?.grandTotal ?? 0)} />
+                                    <Row label="Parapuan İndirimi" value={`-${fmt(Math.min(cart.summary.grandTotal, cart.summary.availablePoints))}`} />
+                                    <div className="pt-2" />
+                                    <Row
+                                        label="Kalan Tutar"
+                                        value={fmt(Math.max(0, (cart?.summary?.grandTotal ?? 0) - (cart?.summary?.availablePoints ?? 0)))}
+                                        strong
+                                    />
+                                </>
+                            ) : (
+                                <Row
+                                    label="Genel Toplam"
+                                    value={fmt(cart?.summary?.grandTotal ?? 0)}
+                                    strong
+                                />
+                            )}
 
                             {credit && (
                                 <div className="pt-5 border-t border-slate-100 space-y-4 mt-5">
