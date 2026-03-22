@@ -153,15 +153,15 @@ export default function CatalogProductDetailPage() {
                                 </div>
                                 {product.pointsCampaign && (
                                     <div className="flex flex-col justify-end pb-1.5 pl-4">
-                                        <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200/60 rounded-xl px-4 py-2 flex items-center gap-3">
-                                            <div className="bg-purple-500/10 p-1.5 rounded-lg">
+                                        <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200/60 rounded-xl px-4 flex items-center gap-3 h-[52px] min-w-[170px]">
+                                            <div className="bg-purple-500/10 p-1.5 rounded-lg shrink-0">
                                                 <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                             </div>
-                                            <div>
-                                                <span className="block text-[10px] font-extrabold text-purple-600 uppercase tracking-widest leading-none mb-1">Kazanılacak Parapuan</span>
-                                                <span className="block text-sm font-bold text-purple-950 leading-none">
+                                            <div className="flex flex-col justify-center">
+                                                <span className="block text-[10px] font-extrabold text-purple-600 uppercase tracking-widest leading-none mb-1 whitespace-nowrap">Parapuan</span>
+                                                <span className="block text-sm font-bold text-purple-950 leading-none whitespace-nowrap">
                                                     +{Math.floor(product.priceResolved * quantity * (product.pointsCampaign?.discountRate || 0)).toLocaleString('tr-TR')} Puan
                                                 </span>
                                             </div>
@@ -170,15 +170,15 @@ export default function CatalogProductDetailPage() {
                                 )}
                                 {product.campaign && product.campaign.type !== 'LOYALTY_POINTS' && (
                                     <div className="flex flex-col justify-end pb-1.5 pl-4">
-                                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl px-4 py-2 flex items-center gap-3">
-                                            <div className="bg-emerald-500/10 p-1.5 rounded-lg">
+                                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl px-4 flex items-center gap-3 h-[52px] min-w-[170px]">
+                                            <div className="bg-emerald-500/10 p-1.5 rounded-lg shrink-0">
                                                 <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                                                 </svg>
                                             </div>
-                                            <div>
-                                                <span className="block text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest leading-none mb-1">Kampanya</span>
-                                                <span className="block text-sm font-bold text-emerald-950 leading-none">
+                                            <div className="flex flex-col justify-center">
+                                                <span className="block text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest leading-none mb-1 whitespace-nowrap">Kampanya</span>
+                                                <span className="block text-sm font-bold text-emerald-950 leading-none whitespace-nowrap">
                                                     {product.campaign.type === 'BUY_X_GET_Y' 
                                                         ? `${product.campaign.buyQuantity} Al ${product.campaign.rewardQuantity} Öde` 
                                                         : product.campaign.type === 'PERCENT_DISCOUNT' 
