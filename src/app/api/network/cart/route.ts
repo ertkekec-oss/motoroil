@@ -113,14 +113,26 @@ export async function GET() {
         const campaigns = allCampaigns.filter((c: any) => !c.channels || c.channels.length === 0 || c.channels.includes("B2B") || c.channels.includes("GLOBAL"));
         const items = cart.items.map((item) => {
             let appliedCampaign = null;
+            let appliedPointsCampaign = null;
+
             campaigns.forEach(c => {
                 if(!c.conditions) return;
-                const { targetType, targetValue, buyQuantity, rewardQuantity } = c.conditions;
+                const { targetType, targetValue } = c.conditions;
                 const prod = item.product;
-                if(targetType === "ALL") { appliedCampaign = c; return; }
-                if(targetType === "BRAND" && prod.brand === targetValue) { appliedCampaign = c; return; }
-                if(targetType === "CATEGORY" && prod.category === targetValue) { appliedCampaign = c; return; }
-                if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) { appliedCampaign = c; return; }
+                let match = false;
+                
+                if(targetType === "ALL") match = true;
+                else if(targetType === "BRAND" && prod.brand === targetValue) match = true;
+                else if(targetType === "CATEGORY" && prod.category === targetValue) match = true;
+                else if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) match = true;
+
+                if (match) {
+                    if (c.campaignType === "LOYALTY_POINTS" || c.type === "LOYALTY_POINTS") {
+                        appliedPointsCampaign = c;
+                    } else {
+                        appliedCampaign = c;
+                    }
+                }
             });
             const listPriceRaw = productPriceMap.get(item.productId);
             const listPriceMapped = listPriceRaw !== undefined ? listPriceRaw : null;
@@ -162,6 +174,13 @@ export async function GET() {
             subTotal += lineListTotal
             totalDiscount += lineDiscount
             grandTotal += trueLineEffectiveTotal
+            
+            if (appliedPointsCampaign) {
+                const pointsRate = appliedPointsCampaign.pointsRate || appliedPointsCampaign.discountRate || 0;
+                if (pointsRate > 0) {
+                    earnablePoints += (trueLineEffectiveTotal * pointsRate) / 100;
+                }
+            }
 
             return {
                 id: item.id, // Cart item ID

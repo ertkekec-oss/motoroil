@@ -120,7 +120,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 maxOrderQty: catalogItem.maxOrderQty,
                 catalogItemId: catalogItem.id,
                 campaign: appliedCampaign ? { name: appliedCampaign.name, type: appliedCampaign.campaignType || appliedCampaign.type, buyQuantity: appliedCampaign.conditions?.buyQuantity, rewardQuantity: appliedCampaign.conditions?.rewardQuantity, discountRate: appliedCampaign.discountRate } : null,
-                pointsCampaign: appliedPointsCampaign ? { name: appliedPointsCampaign.name, type: appliedPointsCampaign.campaignType || appliedPointsCampaign.type, discountRate: appliedPointsCampaign.discountRate } : null
+                pointsCampaign: appliedPointsCampaign ? { name: appliedPointsCampaign.name, type: appliedPointsCampaign.campaignType || appliedPointsCampaign.type, discountRate: appliedPointsCampaign.pointsRate || appliedPointsCampaign.discountRate } : null
             }
         });
 

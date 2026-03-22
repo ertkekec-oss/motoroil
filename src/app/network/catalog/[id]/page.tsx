@@ -24,7 +24,7 @@ export default function CatalogProductDetailPage() {
     useEffect(() => {
         async function fetchProduct() {
             try {
-                const res = await fetch(`/api/network/catalog/${params.id}`)
+                const res = await fetch(`/api/network/catalog/${params.id}`, { cache: "no-store", headers: { 'Cache-Control': 'no-cache' } })
                 const data = await res.json()
                 if (data.ok) {
                     setProduct(data.product)
@@ -160,9 +160,9 @@ export default function CatalogProductDetailPage() {
                                                 </svg>
                                             </div>
                                             <div>
-                                                <span className="block text-[10px] font-extrabold text-purple-600 uppercase tracking-widest leading-none mb-1">Parapuan</span>
+                                                <span className="block text-[10px] font-extrabold text-purple-600 uppercase tracking-widest leading-none mb-1">Kazanılacak Parapuan</span>
                                                 <span className="block text-sm font-bold text-purple-950 leading-none">
-                                                    %{(product.pointsCampaign.discountRate || 0)} Kazanım
+                                                    +{Math.floor((product.priceResolved * quantity * (product.pointsCampaign.discountRate || 0)) / 100).toLocaleString('tr-TR')} Puan
                                                 </span>
                                             </div>
                                         </div>
