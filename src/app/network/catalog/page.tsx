@@ -400,7 +400,12 @@ function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }
                         {!hideB2bPrice && <div className="text-[9px] text-slate-300 font-bold line-through truncate">{fmt(p.basePrice || p.priceResolved)}</div>}
                         <span className="text-xl font-black text-slate-900 leading-none truncate">{fmt(p.priceResolved)}</span>
                     </div>
-                    <button onClick={() => addToCart(p, 1)} className="h-9 px-5 bg-blue-600 text-white rounded-xl font-bold text-[11px] hover:bg-blue-700 transition-all shadow-sm shrink-0">Ekle</button>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-9 h-9 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm shrink-0">
+                            <Search size={14} strokeWidth={2.5} />
+                        </button>
+                        <button onClick={() => addToCart(p, 1)} className="h-9 px-5 bg-blue-600 text-white rounded-xl font-bold text-[11px] hover:bg-blue-700 transition-all shadow-sm shrink-0">Ekle</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -434,9 +439,14 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                     {!hideB2bPrice && <div className="text-[9px] text-slate-300 font-bold line-through leading-none mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
                     <span className="text-[14px] font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</span>
                 </div>
-                <button onClick={() => addToCart(p, 1)} className="w-[38px] h-[38px] rounded-xl border border-blue-200 text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-all shrink-0">
-                    <Plus size={18} strokeWidth={3} />
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-xl border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-slate-50 transition-all shrink-0 bg-white">
+                        <Search size={16} />
+                    </button>
+                    <button onClick={() => addToCart(p, 1)} className="w-[38px] h-[38px] rounded-xl border border-blue-200 text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-all shrink-0 bg-white">
+                        <Plus size={18} strokeWidth={3} />
+                    </button>
+                </div>
             </div>
         </div>
     )
