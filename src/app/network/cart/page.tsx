@@ -401,24 +401,49 @@ function QtyControl({
 }) {
     const canDec = value > 1 && !disabled
     const canInc = value < max && !disabled
+    const [localVal, setLocalVal] = useState(value.toString())
+    
+    useEffect(() => {
+        setLocalVal(value.toString())
+    }, [value])
+
+    const commitChange = (raw: string) => {
+        let n = parseInt(raw, 10);
+        if (isNaN(n) || n < 1) n = 1;
+        if (n > max) n = max;
+        setLocalVal(n.toString());
+        if (n !== value) onChange(n);
+    }
 
     return (
-        <div className="flex items-center rounded-xl border border-input bg-background overflow-hidden h-10 shadow-sm">
+        <div className="flex items-center rounded-xl border border-input bg-background overflow-hidden h-10 shadow-sm w-32 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow">
             <button
-                className="h-full w-10 hover:bg-muted/40 disabled:opacity-50 text-muted-foreground outline-none focus:bg-muted/40"
+                className="h-full w-10 hover:bg-muted/40 disabled:opacity-50 text-muted-foreground outline-none focus:bg-muted/40 shrink-0"
                 disabled={!canDec}
-                onClick={() => onChange(value - 1)}
+                onClick={() => commitChange((value - 1).toString())}
                 type="button"
             >
                 −
             </button>
-            <div className="h-full w-10 flex items-center justify-center text-sm font-medium">
-                {value}
-            </div>
+            <input 
+                type="text" 
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className="h-full w-12 text-center text-sm font-medium border-none p-0 outline-none focus:ring-0 bg-transparent text-slate-900 mx-auto disabled:opacity-50"
+                value={localVal}
+                onChange={(e) => setLocalVal(e.target.value)}
+                onBlur={(e) => commitChange(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        e.currentTarget.blur();
+                    }
+                }}
+                disabled={disabled}
+            />
             <button
-                className="h-full w-10 hover:bg-muted/40 disabled:opacity-50 text-muted-foreground outline-none focus:bg-muted/40"
+                className="h-full w-10 hover:bg-muted/40 disabled:opacity-50 text-muted-foreground outline-none focus:bg-muted/40 shrink-0"
                 disabled={!canInc}
-                onClick={() => onChange(value + 1)}
+                onClick={() => commitChange((value + 1).toString())}
                 type="button"
             >
                 +
@@ -427,9 +452,9 @@ function QtyControl({
     )
 }
 
-function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+function Row({ label, value, strong, className }: { label: string; value: string; strong?: boolean; className?: string }) {
     return (
-        <div className="flex items-center justify-between">
+        <div className={`flex items-center justify-between ${className || ''}`}>
             <div className="text-sm text-muted-foreground">{label}</div>
             <div className={strong ? "text-lg font-semibold text-foreground" : "text-sm font-medium"}>{value}</div>
         </div>

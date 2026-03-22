@@ -13,6 +13,7 @@ export default function CatalogProductDetailPage() {
     const [product, setProduct] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [quantity, setQuantity] = useState(1)
+    const [localQtyStr, setLocalQtyStr] = useState<string | null>(null)
     const [addingToCart, setAddingToCart] = useState(false)
     const [hideB2bPrice, setHideB2bPrice] = useState(false)
 
@@ -203,9 +204,26 @@ export default function CatalogProductDetailPage() {
                                 >
                                     -
                                 </button>
-                                <span className="text-[17px] font-black text-[#1a1a1a] w-10 text-center select-none block leading-[40px] pt-1">
-                                    {quantity}
-                                </span>
+                                <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    value={localQtyStr !== null ? localQtyStr : quantity.toString()}
+                                    onChange={(e) => setLocalQtyStr(e.target.value)}
+                                    onBlur={(e) => {
+                                        let n = parseInt(e.target.value, 10);
+                                        const min = product.minOrderQty || 1;
+                                        const max = product.maxOrderQty || 9999;
+                                        if (isNaN(n) || n < min) n = min;
+                                        if (n > max) n = max;
+                                        setQuantity(n);
+                                        setLocalQtyStr(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') e.currentTarget.blur();
+                                    }}
+                                    className="text-[17px] font-black text-[#1a1a1a] w-12 text-center bg-transparent border-none outline-none focus:ring-0 p-0 mx-auto leading-[40px]"
+                                />
                                 <button 
                                     onClick={() => setQuantity(Math.min(product.maxOrderQty || 9999, quantity + 1))}
                                     className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-[#1a1a1a] hover:bg-slate-50 rounded-lg text-lg transition-colors font-medium"
