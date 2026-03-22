@@ -242,7 +242,7 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
             <div className="min-h-[220px] max-h-[220px] bg-white rounded-xl mb-4 flex items-center justify-center relative border border-slate-50 p-6 overflow-hidden">
                 <img src={p.image} className="max-h-full max-w-full object-contain" />
                 {p.campaign && (
-                    <div className="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-emerald-200 shadow-sm uppercase z-10 flex items-center gap-1">
+                    <div className="absolute top-2 right-2 bg-emerald-100/90 text-emerald-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-emerald-200 shadow-sm uppercase z-10">
                         {p.campaign.name || `${p.campaign.buyQuantity + p.campaign.rewardQuantity} AL ${p.campaign.buyQuantity} ÖDE`}
                     </div>
                 )}
@@ -253,7 +253,7 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                     <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded tracking-tight">{p.sku}</span>
                     <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded tracking-tight uppercase">{p.category || "DİĞER"}</span>
                 </div>
-                <h3 className="text-[14px] font-bold text-slate-800 line-clamp-2 h-10">{p.name}</h3>
+                <h3 className="text-[14px] font-bold text-slate-800 line-clamp-2 h-10 leading-tight">{p.name}</h3>
                 <div className="flex items-center gap-1.5 mt-auto mb-2">
                     <div className={`w-2 h-2 rounded-full ${stockStatus}`} />
                     <span className="text-[11px] font-bold text-slate-500">Stok: {stockText}</span>
@@ -262,12 +262,12 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                 {/* PARAPUAN & KAMPANYA BOXES */}
                 <div className="flex flex-wrap gap-2">
                     {earnPoints > 0 && (
-                        <div className="bg-amber-50 text-amber-600 text-[9px] font-black px-2 py-1 rounded-md border border-amber-100 flex items-center gap-1.5 shadow-sm">
+                        <div className="bg-amber-50 text-amber-600 text-[9px] font-black px-2.5 py-1.5 rounded-md border border-amber-100 flex items-center gap-1.5 shadow-sm">
                             <Coins size={12} strokeWidth={3} /> {earnPoints.toLocaleString('tr-TR')} PARAPUAN
                         </div>
                     )}
                     {p.campaign && (
-                        <div className="bg-emerald-50 text-emerald-600 text-[9px] font-black px-2 py-1 rounded-md border border-emerald-100 flex items-center gap-1.5 shadow-sm">
+                        <div className="bg-emerald-50 text-emerald-600 text-[9px] font-black px-2.5 py-1.5 rounded-md border border-emerald-100 flex items-center gap-1.5 shadow-sm">
                             <ShoppingCart size={12} strokeWidth={3} /> {p.campaign.name || "KAMPANYA"}
                         </div>
                     )}
@@ -277,7 +277,7 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
             <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between">
                 <div className="flex flex-col">
                     {!hideB2bPrice && (
-                        <div className="text-[10px] text-slate-400 font-bold uppercase mb-0.5" title="Liste Fiyatı">
+                        <div className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">
                             L. Fiyatı: <span className="line-through">{fmt(p.basePrice || p.priceResolved)}</span>
                         </div>
                     )}
@@ -285,9 +285,8 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[42px] h-[42px] bg-white text-slate-400 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"><Search size={18} /></button>
-                    <button disabled={addingToCart === p.id} onClick={() => addToCart(p, 1)} className="h-[42px] px-5 bg-white border border-blue-400 text-blue-600 rounded-xl hover:bg-blue-50 active:scale-95 transition-all text-[12px] font-bold flex items-center gap-2">
-                        {addingToCart === p.id ? <Check size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={3} />}
-                        Ekle
+                    <button disabled={addingToCart === p.id} onClick={() => addToCart(p, 1)} className="h-[42px] px-5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:scale-95 transition-all text-[12px] font-bold flex items-center gap-2 shadow-sm">
+                        <Plus size={16} strokeWidth={3} /> Ekle
                     </button>
                 </div>
             </div>
@@ -305,23 +304,23 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
                 </div>
                 <img src={p.image} className="max-h-[300px] max-w-full object-contain filter group-hover:scale-105 transition-transform duration-700" />
             </div>
-            <div className="flex-1 p-8 flex flex-col justify-center">
+            <div className="flex-1 p-8 flex flex-col min-w-0">
                 <div className="flex gap-2 mb-3">
                     <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded truncate max-w-[120px]">{p.sku}</span>
                     <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded uppercase truncate max-w-[150px]">{p.category}</span>
                 </div>
-                <h3 className="text-[20px] font-black text-slate-900 mb-4 leading-tight truncate">{p.name}</h3>
-                <p className="text-sm text-slate-500 mb-8 line-clamp-3 leading-relaxed">{p.b2bDescription || p.description || "Periodya özel katalog ürünü."}</p>
+                <h3 className="text-[20px] font-black text-slate-900 mb-2 leading-tight truncate w-full">{p.name}</h3>
+                <p className="text-sm text-slate-400 mb-6 line-clamp-2 leading-relaxed h-10 w-full">{p.b2bDescription || p.description || "Periodya özel katalog ürünü."}</p>
                 
-                {/* PARAPUAN & KAMPANYA BOXES */}
-                <div className="flex items-center gap-3 mb-10 overflow-hidden">
+                {/* PARAPUAN & KAMPANYA BOXES (EQUAL SIZE) */}
+                <div className="flex flex-wrap items-center gap-3 mb-8 overflow-hidden">
                     {earnPoints > 0 && (
-                        <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-4 py-2 rounded-xl border border-amber-100 flex items-center gap-2 shadow-sm whitespace-nowrap">
+                        <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-4 py-2 rounded-xl border border-amber-100 flex items-center gap-2 shadow-sm whitespace-nowrap min-w-[140px] justify-center">
                             <Coins size={14} strokeWidth={3} /> {earnPoints.toLocaleString('tr-TR')} PARAPUAN
                         </div>
                     )}
                     {p.campaign && (
-                        <div className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-100 flex items-center gap-2 shadow-sm whitespace-nowrap">
+                        <div className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-100 flex items-center gap-2 shadow-sm whitespace-nowrap min-w-[140px] justify-center">
                             <ShoppingCart size={14} strokeWidth={3} /> {p.campaign.name || "KAMPANYA"}
                         </div>
                     )}
@@ -329,13 +328,13 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
 
                 <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between gap-4">
                     <div className="flex flex-col">
-                        {!hideB2bPrice && <div className="text-[10px] text-slate-400 font-bold line-through mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
-                        <div className="text-3xl font-black text-slate-900 tracking-tight">{fmt(p.priceResolved)}</div>
+                        {!hideB2bPrice && <div className="text-[11px] text-slate-300 font-bold line-through mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
+                        <div className="text-3xl font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</div>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[48px] h-[48px] border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all"><Search size={22} /></button>
+                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[48px] h-[48px] border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm"><Search size={22} /></button>
                         <button onClick={() => addToCart(p, 1)} className="h-[48px] px-8 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 shadow-md flex items-center gap-2">
-                            <Plus size={16} strokeWidth={3} /> EKLE
+                            <Plus size={18} strokeWidth={3} /> EKLE
                         </button>
                     </div>
                 </div>
@@ -350,14 +349,13 @@ function BestSellerBox({ p, router, addingToCart, addToCart, fmt }: any) {
         <div className="bg-white rounded-[16px] border border-slate-200 p-5 flex items-center gap-6 shadow-sm hover:shadow-md transition-all group h-[160px] relative overflow-hidden">
             <div className="w-24 h-24 bg-white border border-slate-50 rounded-xl p-2 shrink-0 flex items-center justify-center relative">
                 <img src={p.image} className="max-h-full max-w-full object-contain" />
-                {p.campaign && <div className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full border border-white">KMP</div>}
             </div>
             <div className="flex-1 min-w-0">
                 <span className="text-[9px] font-black text-blue-600 tracking-[0.2em] uppercase mb-1 block">HER AYIN FAVORİSİ</span>
-                <h4 className="text-[15px] font-black text-slate-800 truncate mb-2">{p.name}</h4>
+                <h4 className="text-[15px] font-black text-slate-800 truncate mb-1.5">{p.name}</h4>
                 <div className="flex flex-wrap gap-2 mb-2">
-                     {earnPoints > 0 && <div className="text-[9px] font-extrabold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 flex items-center gap-1"><Coins size={10} /> +{earnPoints}</div>}
-                     {p.campaign && <div className="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 flex items-center gap-1"><ShoppingCart size={10} /> KMP</div>}
+                     {earnPoints > 0 && <div className="text-[9px] font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-100 flex items-center gap-1 shadow-sm"><Coins size={10} /> {earnPoints} Puan</div>}
+                     {p.campaign && <div className="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-100 flex items-center gap-1 shadow-sm"><ShoppingCart size={10} /> KMP</div>}
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-xl font-black text-slate-900 leading-none">{fmt(p.priceResolved)}</span>
@@ -381,19 +379,19 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">{p.sku}</span>
                         <div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'} shrink-0`} />
-                        <span className="text-[9px] font-bold text-slate-400 truncate">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
+                        <span className="text-[9px] font-bold text-slate-400">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mt-1">
                         <h5 className="text-[13px] font-bold text-slate-800 truncate">{p.name}</h5>
-                        {earnPoints > 0 && <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 flex items-center gap-0.5 shrink-0"><Coins size={8} /> +{earnPoints}</span>}
-                        {p.campaign && <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 shrink-0">KAMPANYA</span>}
+                        {earnPoints > 0 && <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 flex items-center gap-1 shrink-0 shadow-sm"><Coins size={8} /> +{earnPoints}</span>}
+                        {p.campaign && <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 shrink-0 shadow-sm">KAMPANYA</span>}
                     </div>
                 </div>
             </div>
             <div className="flex items-center gap-4 ml-4">
                 <div className="text-right shrink-0">
                     {!hideB2bPrice && <div className="text-[9px] text-slate-300 font-bold line-through leading-none mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
-                    <span className="text-[14px] font-black text-slate-900 tracking-tight">{fmt(p.priceResolved)}</span>
+                    <span className="text-[14px] font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</span>
                 </div>
                 <button onClick={() => addToCart(p, 1)} className="w-[38px] h-[38px] rounded-xl border border-blue-200 text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-all shrink-0">
                     <Plus size={18} strokeWidth={3} />
