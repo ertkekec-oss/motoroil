@@ -1,0 +1,1 @@
+import { PrismaClient } from '@prisma/client'; const prisma = new PrismaClient(); import * as fs from 'fs'; async function run() { const list = await prisma.networkListing.findMany({ include: { globalProduct: true } }); fs.writeFileSync('catalog_out2.json', JSON.stringify(list, null, 2), 'utf-8'); } run();

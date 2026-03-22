@@ -1,0 +1,1 @@
+import { PrismaClient } from '@prisma/client'; const prisma = new PrismaClient(); async function run() { const res = await prisma.globalProduct.updateMany({ where: { status: 'PENDING' }, data: { status: 'APPROVED' } }); console.log('Approved:', res.count); } run();

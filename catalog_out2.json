@@ -1,0 +1,83 @@
+[
+  {
+    "id": "cmn26rr4i00016rhl24qxzhsk",
+    "globalProductId": "cmn26kcv80001lzcatkf632f7",
+    "sellerCompanyId": "cmmqvlxis0005ips96a93jf0h",
+    "erpProductId": "cmmsgda2s0003ko16xi2doz1f",
+    "price": "450",
+    "availableQty": 10,
+    "minQty": 1,
+    "leadTimeDays": 0,
+    "status": "ACTIVE",
+    "visibility": "NETWORK",
+    "packSize": 1,
+    "createdAt": "2026-03-22T20:05:08.755Z",
+    "updatedAt": "2026-03-22T20:05:08.755Z",
+    "globalProduct": {
+      "id": "cmn26kcv80001lzcatkf632f7",
+      "name": "STK-00001 - Ofis Yazıcı Kağıdı A4 80gr 500’lü",
+      "categoryId": null,
+      "description": null,
+      "barcode": null,
+      "imageUrl": null,
+      "status": "DRAFT",
+      "approvalNote": null,
+      "createdAt": "2026-03-22T19:59:23.684Z",
+      "updatedAt": "2026-03-22T19:59:23.684Z"
+    }
+  },
+  {
+    "id": "cmn26t6ek000367rndw3nd12x",
+    "globalProductId": "cmn26t642000167rn57q5ooaj",
+    "sellerCompanyId": "cmmqvlxis0005ips96a93jf0h",
+    "erpProductId": "cmms9qnds00032esyw2sijr6a",
+    "price": "54.65",
+    "availableQty": 63,
+    "minQty": 1,
+    "leadTimeDays": 0,
+    "status": "ACTIVE",
+    "visibility": "NETWORK",
+    "packSize": 1,
+    "createdAt": "2026-03-22T20:06:15.212Z",
+    "updatedAt": "2026-03-22T20:06:15.212Z",
+    "globalProduct": {
+      "id": "cmn26t642000167rn57q5ooaj",
+      "name": "9 Ledli Pilli El Feneri",
+      "categoryId": null,
+      "description": null,
+      "barcode": null,
+      "imageUrl": null,
+      "status": "DRAFT",
+      "approvalNote": null,
+      "createdAt": "2026-03-22T20:06:14.834Z",
+      "updatedAt": "2026-03-22T20:06:14.834Z"
+    }
+  },
+  {
+    "id": "cmn26v5z10003e2hmfxwjbv7c",
+    "globalProductId": "cmn26v5ol0001e2hmu9x92wb9",
+    "sellerCompanyId": "cmmqvlxis0005ips96a93jf0h",
+    "erpProductId": "cmmqvyac900m7jdzkkxhkxvhq",
+    "price": "10480",
+    "availableQty": 5,
+    "minQty": 1,
+    "leadTimeDays": 0,
+    "status": "ACTIVE",
+    "visibility": "NETWORK",
+    "packSize": 1,
+    "createdAt": "2026-03-22T20:07:47.965Z",
+    "updatedAt": "2026-03-22T20:07:47.965Z",
+    "globalProduct": {
+      "id": "cmn26v5ol0001e2hmu9x92wb9",
+      "name": "XRS066",
+      "categoryId": null,
+      "description": null,
+      "barcode": null,
+      "imageUrl": null,
+      "status": "DRAFT",
+      "approvalNote": null,
+      "createdAt": "2026-03-22T20:07:47.589Z",
+      "updatedAt": "2026-03-22T20:07:47.589Z"
+    }
+  }
+]

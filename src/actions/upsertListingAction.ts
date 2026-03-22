@@ -77,6 +77,7 @@ export async function upsertListingAction(formData: FormData) {
                     barcode: erpProduct.barcode || null,
                     categoryId: null, // GlobalProduct expects categoryId relation, not a string
                     description: erpProduct.description || null,
+                    status: "DRAFT", // Waits for Platform Admin approval (Required Feature)
                 }
             });
         }
