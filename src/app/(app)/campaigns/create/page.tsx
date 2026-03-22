@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MoveLeft, Save, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ export default function CreateCampaign() {
     const { showSuccess, showError, showWarning } = useModal();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [targetOptions, setTargetOptions] = useState<any[]>([]);
     const [formData, setFormData] = useState({
         name: "",
         campaignType: "PERCENT_DISCOUNT",
@@ -26,6 +27,25 @@ export default function CreateCampaign() {
         targetType: 'ALL',
         targetValue: '',
     });
+
+    useEffect(() => {
+        if (formData.targetType !== "ALL" && formData.targetValue.length > 1) {
+            const timer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/campaigns/targets?type=${formData.targetType}&q=${encodeURIComponent(formData.targetValue)}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setTargetOptions(data);
+                    }
+                } catch (e) {
+                    console.error("Option load error", e);
+                }
+            }, 300);
+            return () => clearTimeout(timer);
+        } else {
+            setTargetOptions([]);
+        }
+    }, [formData.targetValue, formData.targetType]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,7 +114,7 @@ export default function CreateCampaign() {
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="col-span-1 md:col-span-2">
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Kampanya Adı <span className="text-rose-500">*</span></label>
-                    <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} type="text" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Örn: Hafta Sonu Fiyat Avantajı" />
+                    <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} list="target-options" type="text" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Örn: Hafta Sonu Fiyat Avantajı" />
                 </div>
 
                 <div>
@@ -138,7 +158,17 @@ export default function CreateCampaign() {
                                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">
                                     Hedef Adı / Kodu <span className="text-rose-500">*</span>
                                 </label>
-                                <input required value={formData.targetValue} onChange={e => setFormData({ ...formData, targetValue: e.target.value })} type="text" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/50 text-[14px] font-medium" placeholder={`Örn: ${formData.targetType === 'PRODUCT' ? 'Motul 5W30 4L' : formData.targetType === 'CATEGORY' ? 'Motor Yağı' : 'Castrol'}`} />
+                                <input list="target-options" required value={formData.targetValue} onChange={e => setFormData({ ...formData, targetValue: e.target.value })} type="text" className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/50 text-[14px] font-medium" placeholder={`Örn: ${formData.targetType === 'PRODUCT' ? 'Motul 5W30 4L' : formData.targetType === 'CATEGORY' ? 'Motor Yağı' : 'Castrol'}`} />
+                                <datalist id="target-options">
+                                    {targetOptions.map((opt, i) => (
+                                        <option key={i} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </datalist>
+                                <datalist id="target-options">
+                                    {targetOptions.map((opt, i) => (
+                                        <option key={i} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </datalist>
                             </div>
                         ) : (
                              <div></div>
