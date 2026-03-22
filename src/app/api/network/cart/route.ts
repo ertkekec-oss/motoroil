@@ -89,7 +89,7 @@ export async function GET() {
         let totalDiscount = 0
         let grandTotal = 0
 
-        const campaigns = await prismaRaw.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null, campaignType: "BUY_X_GET_Y" } });
+        const campaigns = await prismaRaw.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null }, orderBy: { priority: "desc" } });
         const items = cart.items.map((item) => {
             let appliedCampaign = null;
             campaigns.forEach(c => {

@@ -133,7 +133,7 @@ export async function POST(req: Request) {
 
             const byId = new Map<string, any>(products.map((p) => [p.id, p]))
 
-            const campaigns = await tx.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null, campaignType: "BUY_X_GET_Y" } });
+            const campaigns = await tx.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null }, orderBy: { priority: "desc" } });
 
 
             // Fetch explicit dealer catalog prices
