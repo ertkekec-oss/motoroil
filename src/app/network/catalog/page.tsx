@@ -382,8 +382,8 @@ function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }
         <div className="bg-white rounded-[16px] border border-slate-200 p-5 flex items-center gap-6 shadow-sm hover:shadow-md transition-all group h-[160px] relative overflow-hidden">
             <div className="w-24 h-24 bg-white border border-slate-50 rounded-xl p-2 shrink-0 flex items-center justify-center relative">
                 {p.campaign && (
-                    <div className="absolute -top-1 -right-1 bg-emerald-100/90 text-emerald-700 text-[8px] font-black px-1.5 py-0.5 rounded border border-emerald-200 shadow-sm uppercase z-10">
-                        % KMP
+                    <div className="absolute -top-2 -right-2 bg-emerald-100/90 text-emerald-700 text-[9px] font-black px-2 py-1 rounded border border-emerald-200 shadow-sm uppercase z-10 max-w-[80px] truncate text-center">
+                        {p.campaign.name || "KAMPANYA"}
                     </div>
                 )}
                 <img src={p.image} className="max-h-full max-w-full object-contain" />
@@ -393,7 +393,7 @@ function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }
                 <h4 className="text-[15px] font-black text-slate-800 truncate mb-1.5">{p.name}</h4>
                 <div className="flex flex-wrap gap-2 mb-2">
                      {earnPoints > 0 && <div className="text-[9px] font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-100 flex items-center gap-1 shadow-sm"><Coins size={10} /> {earnPoints} Puan</div>}
-                     {p.campaign && <div className="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-100 flex items-center gap-1 shadow-sm"><ShoppingCart size={10} /> KMP</div>}
+                     {p.campaign && <div className="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-100 flex items-center gap-1 shadow-sm max-w-[120px] truncate"><ShoppingCart size={10} className="shrink-0" /> <span className="truncate">{p.campaign.name || "KAMPANYA"}</span></div>}
                 </div>
                 <div className="flex items-center gap-2 overflow-hidden">
                     <div className="flex flex-col min-w-0 flex-1">
@@ -422,10 +422,10 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                         <div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'} shrink-0`} />
                         <span className="text-[9px] font-bold text-slate-400">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
                     </div>
-                    <div className="flex items-center gap-2 mt-1 min-w-0">
+                    <div className="flex items-center gap-2 mt-1 min-w-0 pr-2">
                         <h5 className="text-[13px] font-bold text-slate-800 truncate flex-1">{p.name}</h5>
                         {earnPoints > 0 && <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 flex items-center gap-0.5 shrink-0 shadow-sm"><Coins size={8} /> +{earnPoints}</span>}
-                        {p.campaign && <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 shrink-0 shadow-sm">KAMPANYA</span>}
+                        {p.campaign && <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 shrink-0 shadow-sm max-w-[90px] truncate uppercase">{p.campaign.name || "KAMPANYA"}</span>}
                     </div>
                 </div>
             </div>
