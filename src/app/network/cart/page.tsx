@@ -233,38 +233,48 @@ export default function CartPage() {
                                         {/* Left Side: Image + Details */}
                                         <div className="flex items-start gap-4 flex-1 w-full">
                                             {/* Image */}
-                                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border border-slate-200 bg-white p-2 flex flex-col items-center justify-center shrink-0 shadow-sm relative overflow-hidden group-hover:border-blue-200 transition-colors">
+                                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border border-slate-200 bg-white p-2.5 flex flex-col items-center justify-center shrink-0 shadow-sm relative overflow-hidden group-hover:border-blue-300 group-hover:shadow-md transition-all duration-300">
                                                 {it.imageUrl ? (
-                                                    <img src={it.imageUrl} alt={it.name} className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-500 mix-blend-multiply" />
+                                                    <img src={it.imageUrl} alt={it.name} className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-110 transition-transform duration-500 mix-blend-multiply" />
                                                 ) : (
-                                                    <PackageOpen className="text-slate-200 w-10 h-10" strokeWidth={1.5} />
+                                                    <PackageOpen className="text-slate-200 w-10 h-10" strokeWidth={1.2} />
                                                 )}
                                                 {it.stockQty <= 5 && it.stockQty > 0 && (
-                                                    <div className="absolute bottom-0 left-0 right-0 bg-orange-100/95 backdrop-blur-sm p-0.5 text-center text-[9px] font-bold text-orange-600 uppercase tracking-widest border-t border-orange-200/50 py-1">
-                                                        Son {it.stockQty}
+                                                    <div className="absolute top-0 left-0 right-0 bg-rose-500 p-0.5 text-center text-[8px] font-black text-white uppercase tracking-[0.15em] py-1 shadow-sm">
+                                                        AZALDI
                                                     </div>
                                                 )}
                                             </div>
 
                                             {/* Core Info */}
-                                            <div className="flex flex-col flex-1 min-w-0 pt-1">
-                                                <div className="font-extrabold text-slate-800 text-[15px] sm:text-[16px] leading-snug mb-2 group-hover:text-blue-600 transition-colors pr-2 break-words line-clamp-2">
+                                            <div className="flex flex-col flex-1 min-w-0 pt-0.5">
+                                                <div className="font-bold text-slate-900 text-[15px] sm:text-[17px] leading-tight mb-2 group-hover:text-blue-600 transition-colors pr-2 break-words line-clamp-2 tracking-tight">
                                                     {it.name}
                                                 </div>
                                                 
-                                                <div className="flex flex-wrap items-center gap-2 mb-3">
-                                                    {it.code && <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-1 rounded-md border border-slate-200/60 leading-none">{it.code}</span>}
-                                                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 border border-emerald-100/60 leading-none">
-                                                        <div className={`w-1.5 h-1.5 rounded-full ${it.stockQty > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
-                                                        <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Stok: {it.stockQty}</span>
+                                                <div className="flex flex-wrap items-center gap-2 mb-4">
+                                                    {it.code && (
+                                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-md border border-slate-200/50 leading-none">
+                                                            {it.code}
+                                                        </span>
+                                                    )}
+                                                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border leading-none ${it.stockQty > 0 ? 'bg-emerald-50 border-emerald-100/60' : 'bg-rose-50 border-rose-100/60'}`}>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${it.stockQty > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${it.stockQty > 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                                            {it.stockQty > 0 ? `Stokta ${it.stockQty} ${it.unit ?? "Adet"}` : "Stok Yok"}
+                                                        </span>
                                                     </div>
                                                 </div>
                                                 
-                                                <div className="flex items-end gap-2">
-                                                    <span className="font-black text-[18px] text-slate-900 tracking-tight leading-none">{fmt(it.effectivePrice)}</span>
-                                                    <span className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">/ {it.unit ?? "ADET"}</span>
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="bg-slate-900 text-white px-2 py-1 rounded-lg">
+                                                        <span className="font-black text-[16px] sm:text-[18px] tracking-tight">{fmt(it.effectivePrice)}</span>
+                                                        <span className="text-[10px] font-bold opacity-60 uppercase ml-1">/ {it.unit ?? "ADET"}</span>
+                                                    </div>
                                                     {it.effectivePrice !== it.listPrice && (
-                                                        <span className="text-[13px] font-semibold text-slate-400 line-through ml-2 mb-0.5">{fmt(it.listPrice)}</span>
+                                                        <span className="text-[12px] font-medium text-slate-400 line-through decoration-slate-300">
+                                                            {fmt(it.listPrice)}
+                                                        </span>
                                                     )}
                                                 </div>
 
