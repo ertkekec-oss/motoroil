@@ -79,13 +79,25 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         const allCampaigns = await prisma.campaign.findMany({ where: { tenantId: membership.tenantId, isActive: true, deletedAt: null } });
         const campaigns = allCampaigns.filter(c => !c.channels || c.channels.length === 0 || c.channels.includes("B2B") || c.channels.includes("GLOBAL"));
         let appliedCampaign = null;
+        let appliedPointsCampaign = null;
+
         campaigns.forEach(c => {
             if(!c.conditions) return;
-            const { targetType, targetValue, buyQuantity, rewardQuantity } = c.conditions;
-            if(targetType === "ALL") { appliedCampaign = c; return; }
-            if(targetType === "BRAND" && prod.brand === targetValue) { appliedCampaign = c; return; }
-            if(targetType === "CATEGORY" && prod.category === targetValue) { appliedCampaign = c; return; }
-            if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) { appliedCampaign = c; return; }
+            const { targetType, targetValue } = c.conditions;
+            let match = false;
+            
+            if(targetType === "ALL") match = true;
+            else if(targetType === "BRAND" && prod.brand === targetValue) match = true;
+            else if(targetType === "CATEGORY" && prod.category === targetValue) match = true;
+            else if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) match = true;
+
+            if (match) {
+                if (c.campaignType === "LOYALTY_POINTS" || c.type === "LOYALTY_POINTS") {
+                    appliedPointsCampaign = c;
+                } else {
+                    appliedCampaign = c;
+                }
+            }
         });
 
         const variantValues = Array.isArray(prod.variants) ? prod.variants : []
@@ -107,7 +119,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 minOrderQty: catalogItem.minOrderQty,
                 maxOrderQty: catalogItem.maxOrderQty,
                 catalogItemId: catalogItem.id,
-                campaign: appliedCampaign ? { name: appliedCampaign.name, type: appliedCampaign.campaignType || appliedCampaign.type, buyQuantity: appliedCampaign.conditions.buyQuantity, rewardQuantity: appliedCampaign.conditions.rewardQuantity, discountRate: appliedCampaign.discountRate } : null
+                campaign: appliedCampaign ? { name: appliedCampaign.name, type: appliedCampaign.campaignType || appliedCampaign.type, buyQuantity: appliedCampaign.conditions?.buyQuantity, rewardQuantity: appliedCampaign.conditions?.rewardQuantity, discountRate: appliedCampaign.discountRate } : null,
+                pointsCampaign: appliedPointsCampaign ? { name: appliedPointsCampaign.name, type: appliedPointsCampaign.campaignType || appliedPointsCampaign.type, discountRate: appliedPointsCampaign.discountRate } : null
             }
         });
 

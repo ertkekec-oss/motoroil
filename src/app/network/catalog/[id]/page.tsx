@@ -151,7 +151,7 @@ export default function CatalogProductDetailPage() {
                                         {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(product.priceResolved)}
                                     </span>
                                 </div>
-                                {product.campaign && product.campaign.type === 'LOYALTY_POINTS' && (
+                                {product.pointsCampaign && (
                                     <div className="flex flex-col justify-end pb-1.5 pl-4">
                                         <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200/60 rounded-xl px-4 py-2 flex items-center gap-3">
                                             <div className="bg-purple-500/10 p-1.5 rounded-lg">
@@ -162,7 +162,7 @@ export default function CatalogProductDetailPage() {
                                             <div>
                                                 <span className="block text-[10px] font-extrabold text-purple-600 uppercase tracking-widest leading-none mb-1">Parapuan</span>
                                                 <span className="block text-sm font-bold text-purple-950 leading-none">
-                                                    %{(product.campaign.discountRate || 0)} Kazanım
+                                                    %{(product.pointsCampaign.discountRate || 0)} Kazanım
                                                 </span>
                                             </div>
                                         </div>

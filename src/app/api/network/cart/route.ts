@@ -213,7 +213,8 @@ export async function GET() {
                     shippingFee,
                     shippingCost,
                     freeShippingThreshold,
-                    earnablePoints
+                    earnablePoints,
+                    availablePoints
                 },
             },
         })
