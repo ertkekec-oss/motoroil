@@ -64,11 +64,12 @@ export default async function BuyerRfqListPage() {
                         >
                             Kataloğa Dön
                         </Link>
-                        <button
+                        <Link
+                            href="/rfq/create"
                             className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 transition-colors shadow-sm gap-2"
                         >
                             <span>+</span> Yeni İhale / RFQ Oluştur
-                        </button>
+                        </Link>
                     </div>
                 </div>
 
