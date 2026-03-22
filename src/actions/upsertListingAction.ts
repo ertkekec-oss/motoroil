@@ -75,7 +75,7 @@ export async function upsertListingAction(formData: FormData) {
                 data: {
                     name: erpProduct.name,
                     barcode: erpProduct.barcode || null,
-                    category: erpProduct.category || null,
+                    categoryId: null, // GlobalProduct expects categoryId relation, not a string
                     description: erpProduct.description || null,
                 }
             });
