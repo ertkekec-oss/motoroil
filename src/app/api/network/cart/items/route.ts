@@ -21,7 +21,12 @@ export async function POST(req: Request) {
                 company: { tenantId: ctx.supplierTenantId }, // supplier kısıtlaması
                 deletedAt: null,
             },
-            select: { id: true, stock: true, reservedStock: true }, // "stockQty" şemada "stock"
+            select: { 
+                id: true, 
+                stock: true, 
+                reservedStock: true,
+                variants: { select: { stock: true } }
+            },
         } as any)
 
         if (!product) {
@@ -60,11 +65,14 @@ export async function POST(req: Request) {
 
         // Eğer zaten o ürün sepette varsa üzerine ekleyelim
         if (existingItem) {
-            finalQuantity = existingItem.quantity + quantity
+            finalQuantity = body.isUpdate ? quantity : existingItem.quantity + quantity
         }
 
         // Stok sınırını aşamaz
-        const available = Number(product.stock) - Number(product.reservedStock)
+        const variantStock = Array.isArray(product.variants) ? product.variants.reduce((acc: number, v: any) => acc + (v.stock || 0), 0) : 0
+        const totalStock = Number(product.stock) + variantStock
+        const available = totalStock - Number(product.reservedStock)
+        
         if (finalQuantity > available) {
             return NextResponse.json({ ok: false, error: "INSUFFICIENT_STOCK" }, { status: 400 })
         }

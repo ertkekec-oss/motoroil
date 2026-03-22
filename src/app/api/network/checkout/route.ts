@@ -123,6 +123,7 @@ export async function POST(req: Request) {
                     price: true, // Decimal(10,2)
                     stock: true, // Int
                     reservedStock: true, // YENI
+                    variants: { select: { stock: true } },
                     ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                 }
             })
@@ -147,9 +148,10 @@ export async function POST(req: Request) {
                 const p = byId.get(ci.productId)
                 if (!p) throw new HttpErr(404, "PRODUCT_NOT_FOUND_IN_SCOPE", { productId: ci.productId })
 
-                const stock = toNumber(p.stock)
+                const variantStock = Array.isArray(p.variants) ? p.variants.reduce((acc: number, v: any) => acc + (v.stock || 0), 0) : 0;
+                const totalStock = toNumber(p.stock) + variantStock;
                 const reservedStock = toNumber(p.reservedStock)
-                const available = stock - reservedStock
+                const available = totalStock - reservedStock
                 if (ci.quantity > available) {
                     throw new HttpErr(409, "INSUFFICIENT_STOCK", { productId: p.id, available, requested: ci.quantity })
                 }

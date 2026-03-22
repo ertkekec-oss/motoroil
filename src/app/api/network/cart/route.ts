@@ -25,7 +25,9 @@ export async function GET() {
                                 code: true,
                                 price: true,
                                 stock: true,
+                                reservedStock: true,
                                 unit: true,
+                                variants: { select: { stock: true } },
                             },
                         },
                     },
@@ -102,6 +104,10 @@ export async function GET() {
             const lineEffectiveTotal = effectivePrice * item.quantity
             const lineDiscount = lineListTotal - lineEffectiveTotal
 
+            const variantStock = Array.isArray(item.product.variants) ? item.product.variants.reduce((acc: number, v: any) => acc + (v.stock || 0), 0) : 0;
+            const totalStock = Number(item.product.stock) + variantStock;
+            const availableStock = Math.max(0, totalStock - Number(item.product.reservedStock || 0));
+
             subTotal += lineListTotal
             totalDiscount += lineDiscount
             grandTotal += lineEffectiveTotal
@@ -111,7 +117,7 @@ export async function GET() {
                 productId: item.productId,
                 name: item.product.name,
                 code: item.product.code,
-                stockQty: toNumber(item.product.stock),
+                stockQty: availableStock,
                 unit: item.product.unit,
                 quantity: item.quantity,
                 listPrice,

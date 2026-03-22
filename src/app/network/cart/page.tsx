@@ -87,7 +87,7 @@ export default function CartPage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             cache: "no-store",
-            body: JSON.stringify({ productId, quantity: nextQty }),
+            body: JSON.stringify({ productId, quantity: nextQty, isUpdate: true }),
         })
         const data = await res.json().catch(() => null)
         setBusyItemId(null)
