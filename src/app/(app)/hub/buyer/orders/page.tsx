@@ -68,7 +68,14 @@ export default async function BuyerOrdersPage({
     if (!user) redirect("/login");
 
     const perms: string[] = user.permissions || [];
-    if (!perms.includes("network_buy") && user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER") {
+    const role = user.role?.toUpperCase?.() || "";
+    if (
+        !perms.includes("network_buy") && 
+        role !== "SUPER_ADMIN" && 
+        role !== "ADMIN" && 
+        role !== "PLATFORM_ADMIN" && 
+        role !== "OWNER"
+    ) {
         redirect("/403");
     }
 

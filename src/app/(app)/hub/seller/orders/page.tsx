@@ -68,7 +68,15 @@ export default async function SellerOrdersPage({
     if (!user) redirect("/login");
 
     const perms: string[] = user.permissions || [];
-    if (!perms.includes("sales_archive") && user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER") {
+    const role = user.role?.toUpperCase?.() || "";
+    if (
+        !perms.includes("sales_archive") && 
+        !perms.includes("network_seller") && 
+        role !== "SUPER_ADMIN" && 
+        role !== "ADMIN" && 
+        role !== "PLATFORM_ADMIN" && 
+        role !== "OWNER"
+    ) {
         redirect("/403");
     }
 
