@@ -197,8 +197,8 @@ export default function NetworkCatalogPage() {
 
                                     {imageProducts.length > 5 && (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <BestSellerBox p={imageProducts[5]} router={router} addingToCart={addingToCart} addToCart={addToCart} fmt={fmt} />
-                                            {imageProducts.length > 6 && <BestSellerBox p={imageProducts[6]} router={router} addingToCart={addingToCart} addToCart={addToCart} fmt={fmt} />}
+                                            <BestSellerBox p={imageProducts[5]} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                            {imageProducts.length > 6 && <BestSellerBox p={imageProducts[6]} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />}
                                         </div>
                                     )}
 
@@ -215,7 +215,7 @@ export default function NetworkCatalogPage() {
                                     </div>
                                     
                                     {noImageProducts.length > 0 && (
-                                        <div className="border-t border-slate-200 pt-8 pt-10">
+                                        <div className="border-t border-slate-200 pt-10">
                                             <h4 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
                                                 <PackageOpen size={22} className="text-slate-400" />
                                                 Görsel Bekleyen Ürünler
@@ -287,6 +287,7 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                     <span className="text-[11px] font-bold text-slate-500">Stok: {stockText}</span>
                 </div>
                 
+                {/* PARAPUAN & KAMPANYA BOXES */}
                 <div className="flex flex-wrap gap-2">
                     {earnPoints > 0 && (
                         <div className="bg-amber-50 text-amber-600 text-[9px] font-black px-2.5 py-1.5 rounded-md border border-amber-100 flex items-center gap-1.5 shadow-sm">
@@ -339,6 +340,7 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
                 <h3 className="text-[22px] font-black text-slate-900 mb-2 leading-tight truncate w-full">{p.name}</h3>
                 <p className="text-sm text-slate-400 mb-6 line-clamp-2 leading-relaxed h-11 w-full">{p.b2bDescription || p.description || "Periodya özel katalog ürünü."}</p>
                 
+                {/* PARAPUAN & KAMPANYA BOXES (EQUAL SIZE) */}
                 <div className="flex flex-wrap items-center gap-3 mb-8">
                     {earnPoints > 0 && (
                         <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-4 py-2 rounded-xl border border-amber-100 flex items-center gap-2 shadow-sm min-w-[140px] justify-center">
@@ -352,15 +354,15 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
                     )}
                 </div>
 
-                <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between gap-4">
-                    <div className="flex flex-col">
-                        {!hideB2bPrice && <div className="text-[11px] text-slate-300 font-bold line-through mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
-                        <div className="text-3xl font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</div>
+                <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between gap-2 overflow-hidden">
+                    <div className="flex flex-col flex-1 min-w-0">
+                        {!hideB2bPrice && <div className="text-[11px] text-slate-300 font-bold line-through mb-0.5 truncate">{fmt(p.basePrice || p.priceResolved)}</div>}
+                        <div className="text-3xl font-black text-slate-900 tracking-tight leading-none truncate">{fmt(p.priceResolved)}</div>
                     </div>
-                    <div className="flex gap-2 ml-auto">
+                    <div className="flex gap-2 shrink-0">
                         <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[48px] h-[48px] border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm shrink-0"><Search size={22} /></button>
-                        <button onClick={() => addToCart(p, 1)} className="h-[48px] px-8 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 shadow-md flex items-center gap-2 shrink-0">
-                            <Plus size={18} strokeWidth={3} /> EKLE
+                        <button onClick={() => addToCart(p, 1)} className="h-[48px] px-6 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 shadow-md flex items-center gap-2 shrink-0">
+                             Ekle
                         </button>
                     </div>
                 </div>
@@ -369,7 +371,7 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
     )
 }
 
-function BestSellerBox({ p, router, addingToCart, addToCart, fmt }: any) {
+function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
     const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     return (
         <div className="bg-white rounded-[16px] border border-slate-200 p-5 flex items-center gap-6 shadow-sm hover:shadow-md transition-all group h-[160px] relative overflow-hidden">
@@ -383,9 +385,12 @@ function BestSellerBox({ p, router, addingToCart, addToCart, fmt }: any) {
                      {earnPoints > 0 && <div className="text-[9px] font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-100 flex items-center gap-1 shadow-sm"><Coins size={10} /> {earnPoints} Puan</div>}
                      {p.campaign && <div className="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-100 flex items-center gap-1 shadow-sm"><ShoppingCart size={10} /> KMP</div>}
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-xl font-black text-slate-900 leading-none">{fmt(p.priceResolved)}</span>
-                    <button onClick={() => addToCart(p, 1)} className="h-9 px-5 bg-blue-600 text-white rounded-xl font-bold text-[11px] hover:bg-blue-700 transition-all ml-auto shadow-sm">Ekle</button>
+                <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="flex flex-col min-w-0 flex-1">
+                        {!hideB2bPrice && <div className="text-[9px] text-slate-300 font-bold line-through truncate">{fmt(p.basePrice || p.priceResolved)}</div>}
+                        <span className="text-xl font-black text-slate-900 leading-none truncate">{fmt(p.priceResolved)}</span>
+                    </div>
+                    <button onClick={() => addToCart(p, 1)} className="h-9 px-5 bg-blue-600 text-white rounded-xl font-bold text-[11px] hover:bg-blue-700 transition-all shadow-sm shrink-0">Ekle</button>
                 </div>
             </div>
         </div>
@@ -397,7 +402,7 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
     return (
         <div className="bg-white rounded-2xl p-4 flex items-center justify-between border border-slate-100 shadow-sm transition-all group">
             <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-50 relative overflow-hidden">
+                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 border border-slate-50 relative overflow-hidden">
                     <img src={p.image} className="max-h-8 max-w-8 object-contain" />
                     {!p.image && "NO IMG"}
                 </div>
@@ -405,7 +410,7 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">{p.sku}</span>
                         <div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'} shrink-0`} />
-                        <span className="text-[9px] font-bold text-slate-400 truncate">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
+                        <span className="text-[9px] font-bold text-slate-400">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-1 min-w-0">
                         <h5 className="text-[13px] font-bold text-slate-800 truncate flex-1">{p.name}</h5>
@@ -414,7 +419,7 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                     </div>
                 </div>
             </div>
-            <div className="flex items-center gap-4 ml-4">
+            <div className="flex items-center gap-4 ml-4 shrink-0">
                 <div className="text-right shrink-0">
                     {!hideB2bPrice && <div className="text-[9px] text-slate-300 font-bold line-through leading-none mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
                     <span className="text-[14px] font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</span>
