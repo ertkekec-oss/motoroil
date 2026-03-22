@@ -324,22 +324,23 @@ export default function NetworkCatalogPage() {
 
                                                                 {/* Featured Wide Product (Slots 3 & 4) */}
                                                                 {useFeatured ? (
-                                                                    <div className="md:col-span-2 bg-white rounded-2xl overflow-hidden shadow-md flex flex-col md:flex-row relative group/feat border border-slate-200 h-[435px]">
-                                                                        {/* Background Decorative Element */}
-                                                                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-70" />
+                                                                    <div className="md:col-span-2 bg-slate-50 rounded-2xl overflow-hidden shadow-md flex flex-col md:flex-row relative group/feat border border-slate-200 h-[435px]">
+                                                                        {/* Background Decorative Element - Subtle white highlight instead of indigo */}
+                                                                        <div className="absolute top-0 right-0 w-64 h-64 bg-white blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 opacity-50" />
                                                                         
-                                                                        {/* Image Part */}
-                                                                        <div className="w-full md:w-[42%] bg-slate-50 p-8 flex items-center justify-center relative overflow-hidden shrink-0 border-r border-slate-100">
+                                                                        {/* Image Part - Matching the Slate-50 background */}
+                                                                        <div className="w-full md:w-[42%] bg-slate-50/50 p-8 flex items-center justify-center relative overflow-hidden shrink-0 border-r border-slate-200/60">
                                                                             <img src={featuredProduct.image} alt={featuredProduct.name} className="w-full h-full object-contain filter drop-shadow-md group-hover/feat:scale-110 transition-transform duration-700 mix-blend-multiply" />
                                                                             {featuredProduct.campaign && (
-                                                                                <div className="absolute top-4 left-4 bg-amber-500 text-white text-[10px] font-black px-2 py-1 rounded shadow-sm uppercase tracking-widest z-10">
-                                                                                    GÜNÜN FIRSATI
+                                                                                <div className="absolute top-4 left-4 bg-emerald-600 text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg shadow-lg uppercase tracking-[0.1em] z-10 flex items-center gap-1.5 border border-emerald-500/20">
+                                                                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                                                                                    {featuredProduct.campaign.buyQuantity + featuredProduct.campaign.rewardQuantity} AL {featuredProduct.campaign.buyQuantity} ÖDE
                                                                                 </div>
                                                                             )}
                                                                         </div>
 
                                                                         {/* Content Part */}
-                                                                        <div className="flex-1 p-6 md:p-8 flex flex-col relative bg-white">
+                                                                        <div className="flex-1 p-6 md:p-8 flex flex-col relative bg-white/40 backdrop-blur-sm">
                                                                             <div className="flex items-center gap-2 mb-3">
                                                                                 <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-2 py-0.5 rounded">Vitrindeki Ürün</span>
                                                                                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
