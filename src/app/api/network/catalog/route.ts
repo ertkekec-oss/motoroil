@@ -76,6 +76,7 @@ export async function GET(req: Request) {
                         stock: true,
                         imageUrl: true,
                         category: true,
+                        brand: true,
                         description: true,
                         ...(priceListId ? { productPrices: { where: { priceListId: priceListId }, select: { price: true } } } : {}),
                         variants: {
@@ -92,6 +93,7 @@ export async function GET(req: Request) {
             }
         });
 
+        const campaigns = await prisma.campaign.findMany({ where: { tenantId: membership.tenantId, isActive: true, deletedAt: null, campaignType: "BUY_X_GET_Y" } });
         let nextCursor: string | undefined = undefined;
         if (catalogItems.length > take) {
             const nextItem = catalogItems.pop();
@@ -112,6 +114,16 @@ export async function GET(req: Request) {
                 ? listPrice 
                 : Number(item.price ?? prod.price ?? 0);
 
+            let appliedCampaign = null;
+            campaigns.forEach(c => {
+                if(!c.conditions) return;
+                const { targetType, targetValue, buyQuantity, rewardQuantity } = c.conditions;
+                if(targetType === "ALL") { appliedCampaign = c; return; }
+                if(targetType === "BRAND" && prod.brand === targetValue) { appliedCampaign = c; return; }
+                if(targetType === "CATEGORY" && prod.category === targetValue) { appliedCampaign = c; return; }
+                if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) { appliedCampaign = c; return; }
+            });
+
             const variantValues = Array.isArray(prod.variants) ? prod.variants : []
             const variantStock = variantValues.reduce((acc: number, v: any) => acc + (v.stock || 0), 0);
             const totalStock = prod.stock + variantStock; // Main stock + variant stock
@@ -128,7 +140,8 @@ export async function GET(req: Request) {
                 priceResolved,
                 minOrderQty: item.minOrderQty,
                 maxOrderQty: item.maxOrderQty,
-                catalogItemId: item.id
+                catalogItemId: item.id,
+                campaign: appliedCampaign ? { name: appliedCampaign.name, buyQuantity: appliedCampaign.conditions.buyQuantity, rewardQuantity: appliedCampaign.conditions.rewardQuantity } : null
             }
         });
 

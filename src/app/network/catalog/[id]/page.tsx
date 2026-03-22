@@ -150,6 +150,23 @@ export default function CatalogProductDetailPage() {
                                         {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(product.priceResolved)}
                                     </span>
                                 </div>
+                                {product.campaign && (
+                                    <div className="flex flex-col justify-end pb-1.5 pl-4">
+                                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl px-4 py-2 flex items-center gap-3">
+                                            <div className="bg-emerald-500/10 p-1.5 rounded-lg">
+                                                <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <span className="block text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest leading-none mb-1">Kampanya</span>
+                                                <span className="block text-sm font-bold text-emerald-950 leading-none">
+                                                    {product.campaign.buyQuantity} Al {product.campaign.rewardQuantity} Öde
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>

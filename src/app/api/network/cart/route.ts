@@ -86,7 +86,18 @@ export async function GET() {
         let totalDiscount = 0
         let grandTotal = 0
 
+        const campaigns = await prismaRaw.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null, campaignType: "BUY_X_GET_Y" } });
         const items = cart.items.map((item) => {
+            let appliedCampaign = null;
+            campaigns.forEach(c => {
+                if(!c.conditions) return;
+                const { targetType, targetValue, buyQuantity, rewardQuantity } = c.conditions;
+                const prod = item.product;
+                if(targetType === "ALL") { appliedCampaign = c; return; }
+                if(targetType === "BRAND" && prod.brand === targetValue) { appliedCampaign = c; return; }
+                if(targetType === "CATEGORY" && prod.category === targetValue) { appliedCampaign = c; return; }
+                if(targetType === "PRODUCT" && (prod.code === targetValue || prod.name === targetValue)) { appliedCampaign = c; return; }
+            });
             const listPriceRaw = productPriceMap.get(item.productId);
             const listPriceMapped = listPriceRaw !== undefined ? listPriceRaw : null;
 
@@ -102,7 +113,23 @@ export async function GET() {
 
             const lineListTotal = listPrice * item.quantity
             const lineEffectiveTotal = effectivePrice * item.quantity
-            const lineDiscount = lineListTotal - lineEffectiveTotal
+            let lineDiscount = lineListTotal - lineEffectiveTotal;
+            let campaignDiscount = 0;
+            let campaignMessage = null;
+
+            if (appliedCampaign) {
+                const bq = Number(appliedCampaign.conditions.buyQuantity || 1);
+                const rq = Number(appliedCampaign.conditions.rewardQuantity || 1);
+                const bundleSize = bq + rq;
+                const freeCount = Math.floor(item.quantity / bundleSize) * rq;
+                if (freeCount > 0) {
+                    campaignDiscount = freeCount * effectivePrice;
+                    lineDiscount += campaignDiscount;
+                    campaignMessage = `${bundleSize} Aldınız ${bq} Ödeyeceksiniz! ${freeCount} Adet Ürün Bedelsiz!`;
+                }
+            }
+
+            const trueLineEffectiveTotal = lineEffectiveTotal - campaignDiscount;
 
             const variantStock = Array.isArray(item.product.variants) ? item.product.variants.reduce((acc: number, v: any) => acc + (v.stock || 0), 0) : 0;
             const totalStock = Number(item.product.stock) + variantStock;
@@ -110,7 +137,7 @@ export async function GET() {
 
             subTotal += lineListTotal
             totalDiscount += lineDiscount
-            grandTotal += lineEffectiveTotal
+            grandTotal += trueLineEffectiveTotal
 
             return {
                 id: item.id, // Cart item ID
@@ -122,7 +149,8 @@ export async function GET() {
                 quantity: item.quantity,
                 listPrice,
                 effectivePrice,
-                lineTotal: lineEffectiveTotal,
+                lineTotal: trueLineEffectiveTotal,
+                campaignMessage,
             }
         })
 

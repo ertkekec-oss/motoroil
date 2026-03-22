@@ -218,6 +218,11 @@ export default function CartPage() {
                                                 <span className="font-semibold text-primary">{fmt(it.effectivePrice)}</span>
                                                 <span className="text-xs text-muted-foreground"> / {it.unit ?? "adet"}</span>
                                             </div>
+                                            {(it as any).campaignMessage && (
+                                                <div className="mt-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded inline-block border border-emerald-100">
+                                                    🎉 {(it as any).campaignMessage}
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0 justify-between">

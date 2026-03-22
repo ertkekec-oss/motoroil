@@ -317,6 +317,11 @@ export default function NetworkCatalogPage() {
                                                                     {(p.minOrderQty > 1) && (
                                                                       <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">MOQ: {p.minOrderQty}</span>
                                                                     )}
+                                                                    {p.campaign && (
+                                                                        <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm uppercase tracking-wide">
+                                                                            X Al Y Öde
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                                 <h3 className="text-[15px] font-semibold text-slate-900 leading-snug line-clamp-2 mb-4 group-hover:text-blue-600 transition-colors">{p.name}</h3>
                                                                 <div className="mt-auto flex items-end justify-between pt-4 border-t border-slate-100/50">
