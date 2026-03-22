@@ -212,7 +212,7 @@ export default function CartPage() {
                             <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{loading ? "Yükleniyor…" : `${cart?.items?.length || 0} kalem`}</span>
                         </div>
 
-                        <div className="divide-y divide-slate-100">
+                        <div className="flex flex-col">
                             {loading && !cart ? (
                                 <div className="p-16 flex flex-col items-center justify-center gap-4 text-slate-400">
                                     <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -228,58 +228,86 @@ export default function CartPage() {
                                 </div>
                             ) : (
                                 cart!.items.map((it) => (
-                                    <div key={it.id} className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:bg-slate-50/50 transition-colors group">
-                                        <div className="w-20 h-20 rounded-2xl border border-slate-200 bg-white p-2 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-                                            {it.imageUrl ? (
-                                                <img src={it.imageUrl} alt={it.name} className="w-full h-full object-contain mix-blend-multiply filter drop-shadow-sm group-hover:scale-105 transition-transform duration-300" />
-                                            ) : (
-                                                <PackageOpen className="text-slate-300 w-8 h-8" strokeWidth={1.5} />
-                                            )}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <div className="font-bold text-slate-900 text-[15px] truncate mb-1.5 group-hover:text-blue-600 transition-colors">{it.name}</div>
-                                            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 flex-wrap mb-2">
-                                                {it.code && <span className="uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md text-slate-500">{it.code}</span>}
-                                                <span className="flex items-center gap-1.5"><div className={`w-1.5 h-1.5 rounded-full ${it.stockQty > 0 ? 'bg-emerald-500' : 'bg-red-500'}`} /> Stok: {it.stockQty} {it.unit ?? "Adet"}</span>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                {it.effectivePrice !== it.listPrice && (
-                                                    <span className="text-xs font-semibold text-slate-400 line-through">
-                                                        {fmt(it.listPrice)}
-                                                    </span>
+                                    <div key={it.id} className="p-4 sm:p-5 flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6 hover:bg-slate-50/70 transition-colors group border-b border-slate-100 last:border-b-0">
+                                        
+                                        {/* Left Side: Image + Details */}
+                                        <div className="flex items-start gap-4 flex-1 w-full">
+                                            {/* Image */}
+                                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border border-slate-200 bg-white p-2 flex flex-col items-center justify-center shrink-0 shadow-sm relative overflow-hidden group-hover:border-blue-200 transition-colors">
+                                                {it.imageUrl ? (
+                                                    <img src={it.imageUrl} alt={it.name} className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-500 mix-blend-multiply" />
+                                                ) : (
+                                                    <PackageOpen className="text-slate-200 w-10 h-10" strokeWidth={1.5} />
                                                 )}
-                                                <span className="font-black text-[17px] text-slate-900 tracking-tight">{fmt(it.effectivePrice)}</span>
-                                                <span className="text-[11px] font-bold text-slate-400/80 uppercase tracking-widest bg-slate-100/50 px-1.5 py-0.5 rounded"> / {it.unit ?? "ADET"}</span>
+                                                {it.stockQty <= 5 && it.stockQty > 0 && (
+                                                    <div className="absolute bottom-0 left-0 right-0 bg-orange-100/95 backdrop-blur-sm p-0.5 text-center text-[9px] font-bold text-orange-600 uppercase tracking-widest border-t border-orange-200/50 py-1">
+                                                        Son {it.stockQty}
+                                                    </div>
+                                                )}
                                             </div>
-                                            {(it as any).campaignMessage && (
-                                                <div className="mt-3 text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/60 inline-flex items-center gap-2 shadow-sm uppercase tracking-wide">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                    {(it as any).campaignMessage}
+
+                                            {/* Core Info */}
+                                            <div className="flex flex-col flex-1 min-w-0 pt-1">
+                                                <div className="font-extrabold text-slate-800 text-[15px] sm:text-[16px] leading-snug mb-2 group-hover:text-blue-600 transition-colors pr-2 break-words line-clamp-2">
+                                                    {it.name}
                                                 </div>
-                                            )}
+                                                
+                                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                                    {it.code && <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-1 rounded-md border border-slate-200/60 leading-none">{it.code}</span>}
+                                                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 border border-emerald-100/60 leading-none">
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${it.stockQty > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+                                                        <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Stok: {it.stockQty}</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex items-end gap-2">
+                                                    <span className="font-black text-[18px] text-slate-900 tracking-tight leading-none">{fmt(it.effectivePrice)}</span>
+                                                    <span className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">/ {it.unit ?? "ADET"}</span>
+                                                    {it.effectivePrice !== it.listPrice && (
+                                                        <span className="text-[13px] font-semibold text-slate-400 line-through ml-2 mb-0.5">{fmt(it.listPrice)}</span>
+                                                    )}
+                                                </div>
+
+                                                {(it as any).campaignMessage && (
+                                                    <div className="mt-3 w-fit text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/60 inline-flex items-center gap-2 shadow-sm uppercase tracking-wide">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                        {(it as any).campaignMessage}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <div className="flex items-center gap-6 w-full sm:w-auto mt-4 sm:mt-0 justify-between sm:justify-end shrink-0">
-                                            <QtyControl
-                                                value={it.quantity}
-                                                disabled={busyItemId === it.productId || busyItemId === it.id}
-                                                onChange={(v) => updateQty(it.productId, v)}
-                                                max={it.stockQty}
-                                            />
-
-                                            <div className="text-right w-28 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
-                                                <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5">Tutar</div>
-                                                <div className="font-black text-[#1a1a1a]">{fmt(it.lineTotal)}</div>
+                                        {/* Right Side: Actions & Totals */}
+                                        <div className="flex items-center justify-between lg:justify-end gap-4 w-full lg:w-auto mt-2 lg:mt-0 pt-4 lg:pt-0 border-t border-slate-100 lg:border-transparent shrink-0">
+                                            
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest pl-1 lg:hidden">Miktar</span>
+                                                <div className="shadow-sm rounded-xl overflow-hidden bg-white">
+                                                    <QtyControl
+                                                        value={it.quantity}
+                                                        disabled={busyItemId === it.productId || busyItemId === it.id}
+                                                        onChange={(v) => updateQty(it.productId, v)}
+                                                        max={it.stockQty}
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <button
-                                                onClick={() => removeItem(it.id)}
-                                                disabled={busyItemId === it.id}
-                                                className="w-10 h-10 rounded-xl border border-rose-200 bg-rose-50 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 disabled:opacity-50 transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-rose-500"
-                                                title="Sepetten çıkar"
-                                            >
-                                                {busyItemId === it.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" strokeWidth={2.5} />}
-                                            </button>
+                                            <div className="flex items-center gap-2 sm:gap-6">
+                                                <div className="flex flex-col items-end min-w-[90px] sm:min-w-[120px] bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100/80">
+                                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5">Toplam</span>
+                                                    <span className="font-black text-[18px] text-slate-800 tracking-tight leading-none">{fmt(it.lineTotal)}</span>
+                                                </div>
+
+                                                <button
+                                                    onClick={() => removeItem(it.id)}
+                                                    disabled={busyItemId === it.id}
+                                                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-transparent sm:bg-white sm:border sm:border-slate-200 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-colors disabled:opacity-50 shrink-0"
+                                                    title="Sepetten çıkar"
+                                                >
+                                                    {busyItemId === it.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4.5 h-4.5" strokeWidth={2} />}
+                                                </button>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 ))
