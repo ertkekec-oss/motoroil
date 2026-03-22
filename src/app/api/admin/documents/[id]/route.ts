@@ -7,7 +7,7 @@ import { randomUUID } from 'crypto';
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getSession();
-        if (!session || session.user.role !== "SUPER_ADMIN" && user.role !== "OWNER") {
+        if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "OWNER")) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         const { id } = await params;
@@ -36,7 +36,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getSession();
-        if (!session || session.user.role !== "SUPER_ADMIN" && user.role !== "OWNER") {
+        if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "OWNER")) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

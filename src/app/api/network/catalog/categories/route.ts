@@ -21,30 +21,25 @@ export async function GET(req: Request) {
             return NextResponse.json({ ok: false, error: "MEMBERSHIP_NOT_FOUND" }, { status: 404 })
         }
 
-        // Fetch all categories for visible catalog items
-        // Since Prisma doesn't support grouping by joined selection easily,
-        // we'll fetch the items and map them uniquely.
-        // It's B2B so a few hundred/thousand active items is typical and fast to distinct.
-        const items = await prisma.dealerCatalogItem.findMany({
+        // Optimize: Find distinct categories from products that are in the catalog
+        const products = await prisma.product.findMany({
             where: {
-                supplierTenantId: membership.tenantId,
-                visibility: "VISIBLE",
-                product: {
-                    category: {
-                        not: null
-                    }
+                category: { not: null },
+                id: {
+                    in: (await prisma.dealerCatalogItem.findMany({
+                        where: {
+                            supplierTenantId: membership.tenantId,
+                            visibility: "VISIBLE",
+                        },
+                        select: { productId: true }
+                    })).map(c => c.productId)
                 }
             },
-            select: {
-                product: {
-                    select: {
-                        category: true
-                    }
-                }
-            }
+            select: { category: true },
+            distinct: ['category']
         });
 
-        const categories = Array.from(new Set(items.map(item => item.product.category))).filter(Boolean);
+        const categories = products.map(p => p.category).filter(Boolean);
 
         return NextResponse.json({
             ok: true,

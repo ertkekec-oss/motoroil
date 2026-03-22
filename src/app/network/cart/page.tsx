@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import { useNetworkPath } from "@/hooks/useNetworkPath"
 import { Trash2, PackageOpen, ShoppingCart, Loader2 } from "lucide-react"
@@ -418,28 +418,44 @@ function QtyControl({
     disabled?: boolean
     max: number
 }) {
-    const canDec = value > 1 && !disabled
-    const canInc = value < max && !disabled
     const [localVal, setLocalVal] = useState(value.toString())
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
     
+    // Yalnızca dışarıdan gelen value ilk yüklendiğinde VEYA farklıysa güncelle (debouncer çalışmıyorken)
     useEffect(() => {
-        setLocalVal(value.toString())
+        if (!timerRef.current) {
+            setLocalVal(value.toString())
+        }
     }, [value])
 
-    const commitChange = (raw: string) => {
+    const commitChange = (raw: string, bypassDebounce = false) => {
         let n = parseInt(raw, 10);
         if (isNaN(n) || n < 1) n = 1;
         if (n > max) n = max;
         setLocalVal(n.toString());
-        if (n !== value) onChange(n);
+        
+        if (timerRef.current) clearTimeout(timerRef.current);
+        
+        if (bypassDebounce) {
+            if (n !== value) onChange(n);
+        } else {
+            timerRef.current = setTimeout(() => {
+                if (n !== value) onChange(n);
+                timerRef.current = null;
+            }, 600); // 600ms debounce
+        }
     }
+
+    const currentN = parseInt(localVal, 10) || 1;
+    const canDec = currentN > 1 && !disabled;
+    const canInc = currentN < max && !disabled;
 
     return (
         <div className="flex items-center rounded-xl border border-input bg-background overflow-hidden h-10 shadow-sm w-32 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow">
             <button
                 className="h-full w-10 hover:bg-muted/40 disabled:opacity-50 text-muted-foreground outline-none focus:bg-muted/40 shrink-0"
                 disabled={!canDec}
-                onClick={() => commitChange((value - 1).toString())}
+                onClick={() => commitChange((currentN - 1).toString())}
                 type="button"
             >
                 −
@@ -450,11 +466,15 @@ function QtyControl({
                 pattern="[0-9]*"
                 className="h-full w-12 text-center text-sm font-medium border-none p-0 outline-none focus:ring-0 bg-transparent text-slate-900 mx-auto disabled:opacity-50"
                 value={localVal}
-                onChange={(e) => setLocalVal(e.target.value)}
-                onBlur={(e) => commitChange(e.target.value)}
+                onChange={(e) => {
+                    setLocalVal(e.target.value);
+                    if (timerRef.current) clearTimeout(timerRef.current);
+                }}
+                onBlur={(e) => commitChange(e.target.value, false)}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         e.currentTarget.blur();
+                        commitChange(e.currentTarget.value, true);
                     }
                 }}
                 disabled={disabled}
@@ -462,7 +482,7 @@ function QtyControl({
             <button
                 className="h-full w-10 hover:bg-muted/40 disabled:opacity-50 text-muted-foreground outline-none focus:bg-muted/40 shrink-0"
                 disabled={!canInc}
-                onClick={() => commitChange((value + 1).toString())}
+                onClick={() => commitChange((currentN + 1).toString())}
                 type="button"
             >
                 +
