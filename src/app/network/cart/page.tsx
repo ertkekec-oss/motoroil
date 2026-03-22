@@ -22,7 +22,7 @@ type CartItem = {
 type CartData = {
     id: string
     items: CartItem[]
-    summary: { grandTotal: number; subTotal: number; totalDiscount: number; shippingFee: number; shippingCost: number; freeShippingThreshold: number; availablePoints?: number; currency?: "TRY" }
+    summary: { grandTotal: number; subTotal: number; totalDiscount: number; shippingFee: number; shippingCost: number; freeShippingThreshold: number; availablePoints?: number; earnablePoints?: number; currency?: "TRY" }
 }
 
 export default function CartPage() {
@@ -340,6 +340,25 @@ export default function CartPage() {
                                     strong
                                 />
                             )}
+
+                            {cart?.summary?.earnablePoints && cart.summary.earnablePoints > 0 ? (
+                                <div className="mt-4 bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200/60 rounded-xl p-4 flex items-center justify-between shadow-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-purple-500/10 p-2 rounded-xl">
+                                            <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-purple-900 text-[14px]">Kazanılacak Parapuan</div>
+                                            <div className="text-[12px] text-purple-700/80 font-medium">Bu siparişten hemen sonra cüzdanınıza eklenir</div>
+                                        </div>
+                                    </div>
+                                    <div className="font-black text-purple-700 text-[16px]">
+                                        +{cart.summary.earnablePoints.toFixed(0)}
+                                    </div>
+                                </div>
+                            ) : null}
 
                             {credit && (
                                 <div className="pt-5 border-t border-slate-100 space-y-4 mt-5">

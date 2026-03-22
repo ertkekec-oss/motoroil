@@ -76,7 +76,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             ? listPrice 
             : Number(catalogItem.price ?? prod.price ?? 0);
 
-        const campaigns = await prisma.campaign.findMany({ where: { tenantId: membership.tenantId, isActive: true, deletedAt: null, campaignType: "BUY_X_GET_Y" } });
+        const allCampaigns = await prisma.campaign.findMany({ where: { tenantId: membership.tenantId, isActive: true, deletedAt: null } });
+        const campaigns = allCampaigns.filter(c => !c.channels || c.channels.length === 0 || c.channels.includes("B2B") || c.channels.includes("GLOBAL"));
         let appliedCampaign = null;
         campaigns.forEach(c => {
             if(!c.conditions) return;
@@ -106,7 +107,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 minOrderQty: catalogItem.minOrderQty,
                 maxOrderQty: catalogItem.maxOrderQty,
                 catalogItemId: catalogItem.id,
-                campaign: appliedCampaign ? { name: appliedCampaign.name, buyQuantity: appliedCampaign.conditions.buyQuantity, rewardQuantity: appliedCampaign.conditions.rewardQuantity } : null
+                campaign: appliedCampaign ? { name: appliedCampaign.name, type: appliedCampaign.campaignType || appliedCampaign.type, buyQuantity: appliedCampaign.conditions.buyQuantity, rewardQuantity: appliedCampaign.conditions.rewardQuantity, discountRate: appliedCampaign.discountRate } : null
             }
         });
 

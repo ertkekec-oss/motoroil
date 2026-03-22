@@ -107,6 +107,7 @@ export async function GET() {
         let subTotal = 0
         let totalDiscount = 0
         let grandTotal = 0
+        let earnablePoints = 0
 
         const allCampaigns = await prismaRaw.campaign.findMany({ where: { tenantId: ctx.supplierTenantId, isActive: true, deletedAt: null }, orderBy: { priority: "desc" } });
         const campaigns = allCampaigns.filter((c: any) => !c.channels || c.channels.length === 0 || c.channels.includes("B2B") || c.channels.includes("GLOBAL"));
@@ -211,7 +212,8 @@ export async function GET() {
                     discountPct,
                     shippingFee,
                     shippingCost,
-                    freeShippingThreshold
+                    freeShippingThreshold,
+                    earnablePoints
                 },
             },
         })

@@ -151,7 +151,24 @@ export default function CatalogProductDetailPage() {
                                         {new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(product.priceResolved)}
                                     </span>
                                 </div>
-                                {product.campaign && (
+                                {product.campaign && product.campaign.type === 'LOYALTY_POINTS' && (
+                                    <div className="flex flex-col justify-end pb-1.5 pl-4">
+                                        <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200/60 rounded-xl px-4 py-2 flex items-center gap-3">
+                                            <div className="bg-purple-500/10 p-1.5 rounded-lg">
+                                                <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <span className="block text-[10px] font-extrabold text-purple-600 uppercase tracking-widest leading-none mb-1">Parapuan</span>
+                                                <span className="block text-sm font-bold text-purple-950 leading-none">
+                                                    %{(product.campaign.discountRate || 0)} Kazanım
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {product.campaign && product.campaign.type !== 'LOYALTY_POINTS' && (
                                     <div className="flex flex-col justify-end pb-1.5 pl-4">
                                         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl px-4 py-2 flex items-center gap-3">
                                             <div className="bg-emerald-500/10 p-1.5 rounded-lg">
@@ -162,7 +179,13 @@ export default function CatalogProductDetailPage() {
                                             <div>
                                                 <span className="block text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest leading-none mb-1">Kampanya</span>
                                                 <span className="block text-sm font-bold text-emerald-950 leading-none">
-                                                    {product.campaign.buyQuantity} Al {product.campaign.rewardQuantity} Öde
+                                                    {product.campaign.type === 'BUY_X_GET_Y' 
+                                                        ? `${product.campaign.buyQuantity} Al ${product.campaign.rewardQuantity} Öde` 
+                                                        : product.campaign.type === 'PERCENT_DISCOUNT' 
+                                                            ? `%${product.campaign.discountRate} İndirim`
+                                                            : product.campaign.type === 'FIXED_DISCOUNT'
+                                                                ? `${product.campaign.discountRate} TL İndirim`
+                                                                : product.campaign.name}
                                                 </span>
                                             </div>
                                         </div>
