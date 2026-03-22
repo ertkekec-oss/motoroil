@@ -207,21 +207,49 @@ export default function NetworkCatalogPage() {
                                             {imageProducts.slice(7, 11).map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
                                         </div>
                                     )}
-
+                                </>
+                            ) : (
+                                <div className="space-y-8">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {imageProducts.map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                    </div>
+                                    
                                     {noImageProducts.length > 0 && (
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-                                            <div className="space-y-3">
-                                                {noImageProducts.slice(0, 4).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
-                                            </div>
-                                            <div className="space-y-3">
-                                                {noImageProducts.slice(4, 8).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                        <div className="border-t border-slate-200 pt-8 pt-10">
+                                            <h4 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                                                <PackageOpen size={22} className="text-slate-400" />
+                                                Görsel Bekleyen Ürünler
+                                            </h4>
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                <div className="space-y-2.5">
+                                                    {noImageProducts.slice(0, Math.ceil(noImageProducts.length/2)).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                                </div>
+                                                <div className="space-y-2.5">
+                                                    {noImageProducts.slice(Math.ceil(noImageProducts.length/2)).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                                </div>
                                             </div>
                                         </div>
                                     )}
-                                </>
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {products.map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                </div>
+                            )}
+
+                            {/* HOME PAGE NO IMAGE PRODUCTS LIST (ALWAYS SHOWING) */}
+                            {isHomePage && noImageProducts.length > 0 && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 pt-8 border-t border-slate-100">
+                                    <div className="space-y-3">
+                                        {noImageProducts.slice(0, 4).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                    </div>
+                                    <div className="space-y-3">
+                                        {noImageProducts.slice(4, 8).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                    </div>
+                                </div>
+                            )}
+
+                            {!isHomePage && totalPages > 1 && (
+                                <div className="flex justify-center gap-4 mt-10">
+                                    <button disabled={page === 1} onClick={() => setPage(page-1)} className="px-6 py-2 border border-slate-200 rounded-xl bg-white font-bold text-xs hover:bg-slate-50 disabled:opacity-50">Geri</button>
+                                    <span className="py-2 text-xs font-black text-slate-400">Sayfa {page} / {totalPages}</span>
+                                    <button disabled={page === totalPages} onClick={() => setPage(page+1)} className="px-6 py-2 border border-slate-200 rounded-xl bg-white font-bold text-xs hover:bg-slate-50 disabled:opacity-50">İleri</button>
                                 </div>
                             )}
                         </div>
@@ -242,7 +270,7 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
             <div className="min-h-[220px] max-h-[220px] bg-white rounded-xl mb-4 flex items-center justify-center relative border border-slate-50 p-6 overflow-hidden">
                 <img src={p.image} className="max-h-full max-w-full object-contain" />
                 {p.campaign && (
-                    <div className="absolute top-2 right-2 bg-emerald-100/90 text-emerald-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-emerald-200 shadow-sm uppercase z-10">
+                    <div className="absolute top-2 right-2 bg-emerald-100 text-emerald-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg border border-emerald-200 shadow-sm uppercase z-10">
                         {p.campaign.name || `${p.campaign.buyQuantity + p.campaign.rewardQuantity} AL ${p.campaign.buyQuantity} ÖDE`}
                     </div>
                 )}
@@ -259,7 +287,6 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                     <span className="text-[11px] font-bold text-slate-500">Stok: {stockText}</span>
                 </div>
                 
-                {/* PARAPUAN & KAMPANYA BOXES */}
                 <div className="flex flex-wrap gap-2">
                     {earnPoints > 0 && (
                         <div className="bg-amber-50 text-amber-600 text-[9px] font-black px-2.5 py-1.5 rounded-md border border-amber-100 flex items-center gap-1.5 shadow-sm">
@@ -302,25 +329,24 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
                 <div className="absolute top-4 left-4 z-10">
                     <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-md uppercase">VİTRİN ÖZEL</span>
                 </div>
-                <img src={p.image} className="max-h-[300px] max-w-full object-contain filter group-hover:scale-105 transition-transform duration-700" />
+                <img src={p.image} className="max-h-[320px] max-w-full object-contain filter group-hover:scale-105 transition-transform duration-700" />
             </div>
             <div className="flex-1 p-8 flex flex-col min-w-0">
                 <div className="flex gap-2 mb-3">
                     <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded truncate max-w-[120px]">{p.sku}</span>
                     <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded uppercase truncate max-w-[150px]">{p.category}</span>
                 </div>
-                <h3 className="text-[20px] font-black text-slate-900 mb-2 leading-tight truncate w-full">{p.name}</h3>
-                <p className="text-sm text-slate-400 mb-6 line-clamp-2 leading-relaxed h-10 w-full">{p.b2bDescription || p.description || "Periodya özel katalog ürünü."}</p>
+                <h3 className="text-[22px] font-black text-slate-900 mb-2 leading-tight truncate w-full">{p.name}</h3>
+                <p className="text-sm text-slate-400 mb-6 line-clamp-2 leading-relaxed h-11 w-full">{p.b2bDescription || p.description || "Periodya özel katalog ürünü."}</p>
                 
-                {/* PARAPUAN & KAMPANYA BOXES (EQUAL SIZE) */}
-                <div className="flex flex-wrap items-center gap-3 mb-8 overflow-hidden">
+                <div className="flex flex-wrap items-center gap-3 mb-8">
                     {earnPoints > 0 && (
-                        <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-4 py-2 rounded-xl border border-amber-100 flex items-center gap-2 shadow-sm whitespace-nowrap min-w-[140px] justify-center">
+                        <div className="bg-amber-50 text-amber-600 text-[10px] font-black px-4 py-2 rounded-xl border border-amber-100 flex items-center gap-2 shadow-sm min-w-[140px] justify-center">
                             <Coins size={14} strokeWidth={3} /> {earnPoints.toLocaleString('tr-TR')} PARAPUAN
                         </div>
                     )}
                     {p.campaign && (
-                        <div className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-100 flex items-center gap-2 shadow-sm whitespace-nowrap min-w-[140px] justify-center">
+                        <div className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-100 flex items-center gap-2 shadow-sm min-w-[140px] justify-center">
                             <ShoppingCart size={14} strokeWidth={3} /> {p.campaign.name || "KAMPANYA"}
                         </div>
                     )}
@@ -331,9 +357,9 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
                         {!hideB2bPrice && <div className="text-[11px] text-slate-300 font-bold line-through mb-0.5">{fmt(p.basePrice || p.priceResolved)}</div>}
                         <div className="text-3xl font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</div>
                     </div>
-                    <div className="flex gap-2">
-                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[48px] h-[48px] border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm"><Search size={22} /></button>
-                        <button onClick={() => addToCart(p, 1)} className="h-[48px] px-8 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 shadow-md flex items-center gap-2">
+                    <div className="flex gap-2 ml-auto">
+                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[48px] h-[48px] border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm shrink-0"><Search size={22} /></button>
+                        <button onClick={() => addToCart(p, 1)} className="h-[48px] px-8 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 shadow-md flex items-center gap-2 shrink-0">
                             <Plus size={18} strokeWidth={3} /> EKLE
                         </button>
                     </div>
@@ -371,7 +397,7 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
     return (
         <div className="bg-white rounded-2xl p-4 flex items-center justify-between border border-slate-100 shadow-sm transition-all group">
             <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 border border-slate-50 relative overflow-hidden">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-50 relative overflow-hidden">
                     <img src={p.image} className="max-h-8 max-w-8 object-contain" />
                     {!p.image && "NO IMG"}
                 </div>
@@ -379,12 +405,12 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">{p.sku}</span>
                         <div className={`w-1.5 h-1.5 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'} shrink-0`} />
-                        <span className="text-[9px] font-bold text-slate-400">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
+                        <span className="text-[9px] font-bold text-slate-400 truncate">Stok: {p.stock > 0 ? `${p.stock} ad.` : "Yok"}</span>
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                        <h5 className="text-[13px] font-bold text-slate-800 truncate">{p.name}</h5>
-                        {earnPoints > 0 && <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 flex items-center gap-1 shrink-0 shadow-sm"><Coins size={8} /> +{earnPoints}</span>}
-                        {p.campaign && <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 shrink-0 shadow-sm">KAMPANYA</span>}
+                    <div className="flex items-center gap-2 mt-1 min-w-0">
+                        <h5 className="text-[13px] font-bold text-slate-800 truncate flex-1">{p.name}</h5>
+                        {earnPoints > 0 && <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 flex items-center gap-0.5 shrink-0 shadow-sm"><Coins size={8} /> +{earnPoints}</span>}
+                        {p.campaign && <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 shrink-0 shadow-sm">KAMPANYA</span>}
                     </div>
                 </div>
             </div>
