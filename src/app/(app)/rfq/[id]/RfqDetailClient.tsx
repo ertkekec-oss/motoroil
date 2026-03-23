@@ -7,6 +7,7 @@ import { acceptOfferAction } from "@/actions/rfqResponseActions";
 
 import RoutingWidget from "./RoutingWidget";
 import { useModal } from "@/contexts/ModalContext";
+import { Package, Send, CheckCircle2, FileText, Clock } from "lucide-react";
 
 export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, items: any[], offers: any[] }) {
     const [isPending, startTransition] = useTransition();
@@ -14,33 +15,29 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
     const { showSuccess, showError, showConfirm } = useModal();
 
     const handleSubmit = () => {
-        showConfirm("Confirm Submission", "Submit this RFQ to all selected suppliers?", () => {
-
-        startTransition(async () => {
-            // const { showSuccess, showError, showWarning } = useModal();
-            try {
-                await submitRfqAction(rfq.id);
-                showSuccess("Bilgi", "RFQ sent successfully.");
-            } catch (err: any) {
-                showError("Uyarı", err.message || "Failed to submit RFQ.");
-            }
-        });
+        showConfirm("Onay Gerekli", "Seçili tüm ağ tedarikçilerine resmi ihale paketi gönderilsin mi?", () => {
+            startTransition(async () => {
+                try {
+                    await submitRfqAction(rfq.id);
+                    showSuccess("Başarılı", "İhale tüm tedarikçilere başarıyla fırlatıldı.");
+                } catch (err: any) {
+                    showError("Hata", err.message || "İhale başlatılamadı.");
+                }
+            });
         });
     };
 
     const handleAcceptOffer = (offerId: string) => {
-        showConfirm("Confirm Acceptance", "Are you sure you want to ACCEPT this offer? It will create an immediate Network Order.", () => {
-
-        startTransition(async () => {
-            // const { showSuccess, showError, showWarning } = useModal();
-            try {
-                await acceptOfferAction(offerId);
-                showSuccess("Bilgi", "Offer accepted! Order created. Proceed to Buyer Orders to checkout.");
-                router.push("/hub/buyer/orders");
-            } catch (err: any) {
-                showError("Uyarı", err.message || "Failed to accept offer.");
-            }
-        });
+        showConfirm("Teklif Kabul Edilecek", "Bu teklifi kabul etmek istediğinize emin misiniz? Kabul edildiğinde otomatik olarak B2B Ağ Siparişi (Network Order) oluşturulacaktır.", () => {
+            startTransition(async () => {
+                try {
+                    await acceptOfferAction(offerId);
+                    showSuccess("Kabul Edildi", "Teklif başarıyla onaylandı ve siparişe dönüştürüldü. Lütfen Satınalma paneline geçiniz.");
+                    router.push("/hub/buyer/orders");
+                } catch (err: any) {
+                    showError("Hata", err.message || "Teklif kabul edilemedi.");
+                }
+            });
         });
     };
 
@@ -48,95 +45,132 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
         <div className="space-y-6">
             <RoutingWidget rfqId={rfq.id} />
 
-            <div className="bg-white border border-slate-200 rounded-md p-6">
-                <h2 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">RFQ Details</h2>
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+                    <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <Package className="w-5 h-5 text-indigo-500" />
+                        İhale Kalemleri
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Bu ihale paketinde yer alan ağ ürünleri ve istenen tedarikçiler listesi.</p>
+                </div>
 
-                <div className="overflow-x-auto border border-slate-200 rounded-md mb-6">
-                    <table className="min-w-full text-left text-sm whitespace-nowrap">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full text-left text-sm whitespace-nowrap border-collapse">
                         <thead className="bg-[#1F3A5F] text-white">
                             <tr>
-                                <th className="px-4 py-2 font-semibold">Product</th>
-                                <th className="px-4 py-2 font-semibold">Supplier Requested</th>
-                                <th className="px-4 py-2 font-semibold text-center">Qty</th>
+                                <th className="px-6 py-3 font-semibold text-xs tracking-wider uppercase">Ürün Adı</th>
+                                <th className="px-6 py-3 font-semibold text-xs tracking-wider uppercase">Ağ Tedarikçisi</th>
+                                <th className="px-6 py-3 font-semibold text-xs tracking-wider uppercase text-center">Hedef Miktar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-slate-700 dark:text-slate-300">
                             {items.map(item => (
-                                <tr key={item.id}>
-                                    <td className="px-4 py-3 font-medium text-slate-900">{item.productName}</td>
-                                    <td className="px-4 py-3 text-slate-600">{item.sellerName}</td>
-                                    <td className="px-4 py-3 text-center font-mono">{item.quantity}</td>
+                                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{item.productName}</td>
+                                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{item.sellerName}</td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span className="inline-flex px-3 py-1 font-mono font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-md border border-slate-200 dark:border-slate-700">
+                                            {item.quantity} Adet
+                                        </span>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                {rfq.status === "DRAFT" && (
-                    <div className="flex justify-end">
-                        <button
-                            onClick={handleSubmit}
-                            disabled={isPending}
-                            className="px-6 py-2 bg-black text-white text-sm font-semibold rounded-md hover:opacity-90 active:scale-95 transition-transform disabled:opacity-50"
-                        >
-                            {isPending ? "Submitting..." : "Submit RFQ Request"}
-                        </button>
+            {rfq.status === "DRAFT" && (
+                <div className="flex justify-end mt-4">
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isPending}
+                        className="flex items-center gap-2 px-6 py-3 bg-black dark:bg-white text-white dark:text-slate-900 text-sm font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-95 transition-all shadow-sm disabled:opacity-50 disabled:active:scale-100"
+                    >
+                        <Send className="w-4 h-4" />
+                        {isPending ? "Fırlatılıyor..." : "Talebi Tedarikçilere Fırlat"}
+                    </button>
+                </div>
+            )}
+
+            {rfq.status !== "DRAFT" && (
+                <div className="mt-8">
+                    <div className="mb-6">
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-indigo-500" />
+                            Gelen Satıcı Teklifleri
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Ağ üzerinden tarafınıza sunulan fiyat ve kurşun süresi (lead time) teklifleri.</p>
                     </div>
-                )}
 
-                {rfq.status !== "DRAFT" && (
-                    <div className="mt-8">
-                        <h2 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Supplier Offers</h2>
-
-                        {offers.length === 0 ? (
-                            <p className="text-slate-500 italic">Waiting for supplier responses...</p>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {offers.map(offer => (
-                                    <div key={offer.id} className="border border-slate-200 rounded-md p-5 bg-[#F6F7F9]">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <h3 className="font-bold text-[#1F3A5F]">{offer.sellerName}</h3>
-                                            <span className={`text-xs font-bold px-2 py-0.5 rounded ${offer.status === 'ACCEPTED' ? 'bg-emerald-100 text-emerald-700' :
-                                                offer.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-                                                    offer.status === 'COUNTERED' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600'
-                                                }`}>
-                                                {offer.status}
+                    {offers.length === 0 ? (
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-12 text-center shadow-sm">
+                            <Clock className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4 animate-pulse" />
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-2">Tedarikçi Yanıtları Bekleniyor</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                                Henüz hiçbir tedarikçi geri dönüş yapmadı. Ağ üzerindeki satıcılar talebinizi inceleyip karşı teklif verdiklerinde burada belirecektir.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {offers.map(offer => (
+                                <div key={offer.id} className="relative bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group flex flex-col">
+                                    <div className="flex justify-between items-start mb-4 gap-4">
+                                        <h3 className="font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
+                                            {offer.sellerName}
+                                        </h3>
+                                        <span className={`shrink-0 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded border ${
+                                            offer.status === 'ACCEPTED' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' :
+                                            offer.status === 'REJECTED' ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-500/20' :
+                                            offer.status === 'COUNTERED' ? 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20' : 
+                                            'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-white/10'
+                                        }`}>
+                                            {offer.status === 'COUNTERED' ? 'YENİ TEKLİF' : 
+                                             offer.status === 'ACCEPTED' ? 'KABUL EDİLDİ' : 
+                                             offer.status === 'REJECTED' ? 'REDDEDİLDİ' : offer.status}
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="bg-slate-50 dark:bg-[#0f172a] rounded-xl p-4 mb-5 border border-slate-100 dark:border-white/5 flex-1">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sunulan Toplam Tutar</span>
+                                            <span className="font-mono text-lg font-bold text-emerald-600 dark:text-emerald-400 block">
+                                                {Number(offer.totalPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                             </span>
                                         </div>
-                                        <div className="text-sm text-slate-700 space-y-2 mb-4">
-                                            <div className="flex justify-between">
-                                                <span>Total Offer Value:</span>
-                                                <span className="font-mono font-bold">{Number(offer.totalPrice).toFixed(2)} TRY</span>
-                                            </div>
-                                            {offer.expiresAt && (
-                                                <div className="flex justify-between text-xs text-slate-500">
-                                                    <span>Valid Until:</span>
-                                                    <span>{new Date(offer.expiresAt).toLocaleDateString()}</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {offer.status === "COUNTERED" && rfq.status !== "ACCEPTED" && (
-                                            <button
-                                                onClick={() => handleAcceptOffer(offer.id)}
-                                                disabled={isPending}
-                                                className="w-full py-2 bg-emerald-600 text-white text-sm font-semibold rounded-md hover:bg-emerald-700 active:scale-95 transition-transform disabled:opacity-50"
-                                            >
-                                                Accept & Create Order
-                                            </button>
-                                        )}
-                                        {offer.status === "ACCEPTED" && (
-                                            <div className="text-center text-sm font-semibold text-emerald-700 mt-2">
-                                                This offer was accepted.
+                                        {offer.expiresAt && (
+                                            <div className="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-white/5 mt-2">
+                                                <span className="text-[11px] text-slate-500 dark:text-slate-500 font-medium">Geçerlilik Tarihi</span>
+                                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                    {new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(offer.expiresAt))}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
+
+                                    {offer.status === "COUNTERED" && rfq.status !== "ACCEPTED" && (
+                                        <button
+                                            onClick={() => handleAcceptOffer(offer.id)}
+                                            disabled={isPending}
+                                            className="w-full flex items-center justify-center gap-2 py-3 bg-[#1F3A5F] hover:bg-[#152a47] dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-sm font-bold rounded-xl active:scale-95 transition-all shadow-sm disabled:opacity-50"
+                                        >
+                                            <CheckCircle2 className="w-4 h-4" />
+                                            Kabul Et ve Siparişe Çevir
+                                        </button>
+                                    )}
+                                    
+                                    {offer.status === "ACCEPTED" && (
+                                        <div className="flex items-center justify-center gap-1.5 text-center text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl py-3">
+                                            <CheckCircle2 className="w-4 h-4" />
+                                            Bu teklif onaylandı.
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
