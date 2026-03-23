@@ -78,13 +78,18 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     {/* LEFT COL: Product General Info */}
                     <div className="xl:col-span-1 space-y-6">
                         <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
-                            {product.imageUrl ? (
-                                <img src={product.imageUrl} alt={product.name} className="w-full aspect-square object-cover rounded-xl border border-slate-100 dark:border-white/5 mb-5 shadow-sm" />
-                            ) : (
-                                <div className="w-full aspect-square bg-slate-50 dark:bg-[#0f172a] border border-slate-100 dark:border-white/5 rounded-xl flex items-center justify-center text-slate-300 dark:text-slate-600 font-bold mb-5 shadow-inner">
-                                    <Box className="w-16 h-16 opacity-50" />
-                                </div>
-                            )}
+                            {(() => {
+                                const imgSafe = (product as any).imageUrl || (product as any).image || ((product as any).images && (product as any).images[0]) || (product as any).coverImage || (product as any).thumbnail;
+                                if (imgSafe) {
+                                    return <img src={imgSafe} alt={product.name} className="w-full aspect-square object-cover rounded-xl border border-slate-200 dark:border-white/10 mb-5 shadow-sm bg-white" />;
+                                }
+                                return (
+                                    <div className="w-full aspect-[4/3] bg-slate-50 dark:bg-[#0f172a] border border-slate-100 dark:border-white/5 rounded-xl flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 font-bold mb-5 shadow-inner">
+                                        <Box className="w-16 h-16 opacity-50 mb-3" />
+                                        <span className="text-[10px] uppercase tracking-widest text-slate-400">Görsel Eklenmemiş</span>
+                                    </div>
+                                );
+                            })()}
 
                             <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight mb-4">
                                 {product.name}
