@@ -298,19 +298,22 @@ const masterTaxonomy = [
     ]
   },
   {
-    name: "Oyuncak & Hobi",
+    name: "Oyuncak",
     children: [
-      { name: "Araçlar & Modeller", children: [
-        { name: "Oyuncak Araçlar" }, { name: "Uzaktan Kumandalı Cihazlar" }, { name: "Model Yapımı ve Hobi Gereçleri" }
+      { name: "Bebek ve Küçük Çocuk Oyuncakları", children: [
+        { name: "Aktivite Merkezleri" }, { name: "Banyo Oyuncakları" }, { name: "Bebek Oyuncakları" }, { name: "Ev Tipi Tırmanma ve Oyun Parkurları" }, { name: "Hacıyatmaz Oyuncaklar" }, { name: "İpli Çekmeli Kuklalar" }, { name: "Motor Beceri Oyuncakları" }, { name: "Oyun Halıları ve Matları" }, { name: "Salıncaklar" }, { name: "Salıncaklı Oyuncak Atlar ve Hayvanlar" }, { name: "Sesli Oyuncaklar" }, { name: "Sopalı At Kafaları" }, { name: "Topaçlar" }
       ]},
-      { name: "Bebek & Pelüş", children: [
-        { name: "Bebek ve Küçük Çocuk Oyuncakları" }, { name: "Dolgu ve Pelüş Oyuncaklar" }, { name: "Oyuncak Bebekler ve Aksesuarları" }
+      { name: "Oyuncak Figürler ve Figür Setleri", children: [
+        { name: "Aksiyon Figürleri" }, { name: "Dinozorlar ve Tarih Öncesi Canlılar" }, { name: "Esnek Figürler" }, { name: "Fantastik Canavarlar" }, { name: "Hayvanlar" }, { name: "İnsanlar" }, { name: "Oyun Setleri" }, { name: "Oyuncak Figür Araçlar" }, { name: "Yapılar ve Dekorlar" }
       ]},
-      { name: "Eğitim & Oyun", children: [
-        { name: "Eğitim ve Bilim Oyuncakları" }, { name: "Elektronik Oyuncaklar" }, { name: "Yapbozlar ve Bulmacalar" }, { name: "Oyunlar ve Oyun Aksesuarları" }, { name: "Yapı İnşa Oyunları" }, { name: "Yap-İnan Oyunları" }
+      { name: "Oyunlar ve Oyun Aksesuarları", children: [
+        { name: "Dama" }, { name: "DVD Oyunları" }, { name: "Elde Taşınır Oyunlar" }, { name: "Elektronik Oyunlar" }, { name: "Kart Oyunları" }, { name: "Kutu Oyunları" }, { name: "Kutu Oyunu Koleksiyonları" }, { name: "Langırt" }, { name: "Masa Üstü Bilardoları" }, { name: "Masa Üstü ve Minyatür Oyunlar" }, { name: "Misketler" }, { name: "Oyun Aksesuarları" }, { name: "Satranç" }, { name: "Tavla" }, { name: "Topaç Çarpıştırma" }, { name: "Yerde Oynanan Oyunlar" }
       ]},
-      { name: "Hobi & Eğlence", children: [
-        { name: "İlginç Oyuncaklar ve Şaka Oyuncakları" }, { name: "Koleksiyon Ürünleri" }, { name: "Kuklalar ve Kukla Tiyatroları" }, { name: "Oyuncak Figürler" }, { name: "Oyuncak Müzik Aletleri" }, { name: "Parti Malzemeleri" }, { name: "Resim ve El İşi" }, { name: "Spor ve Açık Hava" }
+      { name: "Resim ve El İşi", children: [
+        { name: "Baskı ve Damgalar" }, { name: "Çıkartmalar" }, { name: "Çizim ve Resim Malzemeleri" }, { name: "Çizim ve Yazı Tahtaları" }, { name: "El İşi Setleri" }, { name: "Kil ve Oyun Hamurları" }, { name: "Mandalalar" }, { name: "Mozaik Setleri" }, { name: "Ütü Boncukları" }
+      ]},
+      { name: "Yapı İnşa Oyuncakları", children: [
+        { name: "Dişli Setleri" }, { name: "Figürler" }, { name: "İnşa Setleri" }, { name: "Manyetik Yapı" }, { name: "Üst Üste Dizilen Bloklar" }
       ]}
     ]
   },
