@@ -66,10 +66,44 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
                 }
             }
 
-            // If it was already "Diğer" and we couldn't find a better match, skip updating it
-            if (!foundMatch && product.category === "Diğer") {
-                continue;
+            // --- 2. ATTRIBUTE EXTRACTION ENGINE (NLP/Regex Mock) ---
+            // If the name contains standard sizes (S, M, L, XL, XXL) or numeric inches
+            const sizeMatch = analysisString.match(/\b(xxs|xs|s|m|l|xl|xxl|3xl|4xl|[0-9]{2}\s?(numara|jant|inch|inç))\b/i);
+            const extractedSize = sizeMatch ? sizeMatch[0].toUpperCase() : null;
+            
+            // Common colors
+            const colors = ["siyah", "beyaz", "kırmızı", "mavi", "yeşil", "sarı", "gri", "antrasit", "şeffaf", "mat"];
+            const extractedColor = colors.find(c => analysisString.includes(c)) || null;
+
+            // Brand auto-correction dictionary (Data Cleansing for common typos)
+            const brandCorrections: Record<string, string> = {
+                "snmsng": "Samsung", "samsng": "Samsung", "nln": "Nolan", 
+                "slcn": "Salcano", "michelin": "Michelin", "motl": "Motul",
+                "ls2": "LS2", "zfl": "Zefal"
+            };
+            let derivedBrand = product.brand;
+            for (const [typo, correct] of Object.entries(brandCorrections)) {
+                if (analysisString.includes(typo)) {
+                    derivedBrand = correct;
+                    break;
+                }
             }
+
+            // --- 3. SEO DATA CLEANSING (Vitrin İsmi Yenileme) ---
+            // Reconstruct a beautiful B2B title: [Brand] [Product Root] [Attributes] [Category Path]
+            const cleanCategoryWord = matchedCategoryName !== "Diğer" ? matchedCategoryName.split('>').pop()?.trim() : "";
+            
+            // Minimal mock logic to build a clean title string
+            const seoTitleParts = [
+                derivedBrand || "", 
+                cleanCategoryWord,
+                extractedColor ? `(${extractedColor.charAt(0).toUpperCase() + extractedColor.slice(1)})` : "",
+                extractedSize ? `[${extractedSize}]` : ""
+            ].filter(Boolean);
+
+            const seoVitrinName = seoTitleParts.length > 1 ? seoTitleParts.join(" ") : product.name;
+
+            // --- DB TRANSACTIONS ---
 
             // Find or create the ERPProductCategory representing this name locally
             let erpCategory = await prisma.eRPProductCategory.findFirst({
@@ -102,10 +136,17 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
             const finalGlobalId = erpCategory.mappings.length > 0 ? erpCategory.mappings[0].globalCategoryId : matchedGlobalId;
 
             // Update product in DB
+            const existingTags = product.tags ? String(product.tags).split(',').map(t=>t.trim()) : [];
+            const newTags = new Set([...existingTags, extractedColor, extractedSize].filter(Boolean));
+            
             await prisma.product.update({
                 where: { id: product.id },
                 data: {
                     ...(updateLocalNames && matchedCategoryName !== "Diğer" ? { category: matchedCategoryName } : {}),
+                    ...(updateLocalNames && seoTitleParts.length > 1 ? { name: seoVitrinName } : {}),
+                    brand: derivedBrand,
+                    b2bDescription: seoVitrinName,
+                    tags: Array.from(newTags).join(", "),
                     ...(finalGlobalId ? { globalCategoryId: finalGlobalId } : {})
                 }
             });
