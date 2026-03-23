@@ -580,7 +580,9 @@ function StepOtherInfo({ data, onChange, categories, globalCategories }: any) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Global Kategori</label>
+                    <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">
+                        Lokal (ERP) Kategori
+                    </label>
                     <select 
                         value={(globalCategories && globalCategories.length > 0) ? (data.globalCategoryId || '') : (data.category || '')} 
                         onChange={e => {
@@ -594,13 +596,16 @@ function StepOtherInfo({ data, onChange, categories, globalCategories }: any) {
                         }} 
                         className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:bg-[#0f172a] shadow-sm"
                     >
-                        <option value="" disabled>Ağaçtan Kategori Seç...</option>
+                        <option value="" disabled>Kategori Seçiniz...</option>
                         {globalCategories && globalCategories.length > 0 ? (
                             globalCategories.map((c: any) => (
                                 <option key={c.id} value={c.id}>{c.path}</option>
                             ))
                         ) : (
-                            (categories && categories.length > 0 ? categories : ["Motosiklet", "Otomobil", "Aksesuar", "Yedek Parça", "Genel"]).map((c: string) => (
+                            Array.from(new Set([
+                                ...(categories && categories.length > 0 ? categories : ["Motosiklet", "Otomobil", "Aksesuar", "Yedek Parça", "Genel"]),
+                                data.category
+                            ])).filter(Boolean).map((c: any) => (
                                 <option key={c} value={c}>{c}</option>
                             ))
                         )}
