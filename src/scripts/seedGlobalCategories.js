@@ -3,17 +3,91 @@ const prisma = new PrismaClient();
 
 const masterTaxonomy = [
   {
-    name: "Bilgisayar & Teknoloji",
+    name: "Elektronik & Bilgisayar",
     children: [
-      { name: "Bilgisayar", children: [
-        { name: "Masaüstü Bilgisayarlar" }, { name: "Dizüstü Bilgisayarlar" }, { name: "Tabletler" }, { name: "Sunucular" }, { name: "Barebone Bilgisayarlar" }
+      { name: "Bilgisayarlar, Bileşenleri ve Aksesuarları", children: [
+        { name: "Masaüstü Bilgisayarlar" }, { name: "Dizüstü Bilgisayarlar" }, { name: "Tabletler" }, { name: "Sunucular" }, { name: "Barebone Bilgisayarlar" }, { name: "Ağ Cihazları" }, { name: "3D Yazıcılar" }
       ]},
-      { name: "Donanım & Bileşenler", children: [
-        { name: "Bileşenler (RAM/CPU/Anakart)" }, { name: "Veri Depolama" }, { name: "Monitörler" }, { name: "Ağ Cihazları" }
-      ]},
-      { name: "Çevre Birimleri", children: [
-        { name: "Yazıcılar ve Aksesuarları" }, { name: "Tarayıcılar" }, { name: "3D Yazıcılar" }, { name: "Aksesuarlar (Klavye/Mouse vb.)" }
-      ]}
+      { name: "Cep Telefonları ve Aksesuarlar", children: [] },
+      { name: "E-kitap Okuyucular ve Aksesuarları", children: [] },
+      { name: "Giyilebilir Teknoloji", children: [] },
+      { name: "GPS, Navigasyon ve Aksesuarları", children: [] },
+      { name: "Güç Aksesuarları", children: [] },
+      { name: "Kameralar ve Fotoğraf Makineleri", children: [] },
+      { name: "Kulaklıklar ve Aksesuarları", children: [] },
+      { name: "Oto ve Araç Elektroniği", children: [] },
+      { name: "Piller ve Pil Şarj Aletleri", children: [] },
+      { name: "Ses Sistemleri ve Hoparlörler", children: [] },
+      { name: "Taşınabilir Ses ve Görüntü", children: [] },
+      { name: "Telefonlar, VoIP ve Aksesuarları", children: [] },
+      { name: "Televizyonlar ve Ev Sinema Sistemleri", children: [] },
+      { name: "Telsiz İletişim Ürünleri", children: [] }
+    ]
+  },
+  {
+    name: "Kitap",
+    children: [
+      { name: "Aile ve Yaşam", children: [] },
+      { name: "Aşk Romanları", children: [] },
+      { name: "Başvuru Kaynakları", children: [] },
+      { name: "Bilgisayarlar ve İnternet", children: [] },
+      { name: "Bilim, Doğa ve Matematik", children: [] },
+      { name: "Bilim Kurgu ve Fantastik", children: [] },
+      { name: "Biyografiler ve Anılar", children: [] },
+      { name: "Çizgi Romanlar, Manga ve Grafik Romanlar", children: [] },
+      { name: "Çocuk Kitapları", children: [] },
+      { name: "Ders ve Alıştırma Kitapları", children: [] },
+      { name: "Din ve Maneviyat", children: [] },
+      { name: "Edebiyat ve Kurgu", children: [] },
+      { name: "Eğitim Araştırmaları ve Öğretim Kitapları", children: [] },
+      { name: "Ev, Bahçe ve Hobi", children: [] },
+      { name: "Gençler ve Genç Yetişkinler", children: [] },
+      { name: "Gizem, Gerilim ve Şüphe", children: [] },
+      { name: "Güzel Sanatlar ve Fotoğraf", children: [] },
+      { name: "Hukuk", children: [] },
+      { name: "İş ve Ekonomi", children: [] },
+      { name: "Mizah ve Eğlence", children: [] },
+      { name: "Mühendislik ve Ulaştırma", children: [] },
+      { name: "Sağlık, Fitness ve Beslenme", children: [] },
+      { name: "Seyahat ve Turizm", children: [] },
+      { name: "Siyaset, Felsefe ve Sosyal Bilimler", children: [] },
+      { name: "Spor ve Outdoor", children: [] },
+      { name: "Takvimler ve Yıllıklar", children: [] },
+      { name: "Tarih", children: [] },
+      { name: "Tıp ve Hemşirelik", children: [] },
+      { name: "Yemek Pişirme, Yiyecekler ve Şarap", children: [] }
+    ]
+  },
+  {
+    name: "Ev ve Yaşam",
+    children: [
+      { name: "Aydınlatma", children: [] },
+      { name: "Banyo", children: [] },
+      { name: "Dini ve Manevi Ürünler", children: [] },
+      { name: "Ev Aletleri", children: [] },
+      { name: "Ev Dekorasyonu", children: [] },
+      { name: "Ev İçin Düzenleme ve Depolama Ürünleri", children: [] },
+      { name: "Ev Tekstili ve Uyku Setleri", children: [] },
+      { name: "Mobilyalar", children: [] },
+      { name: "Resimler, Posterler ve Heykeller", children: [] },
+      { name: "Temizlik Aletleri", children: [] },
+      { name: "Temizlik Malzemeleri", children: [] }
+    ]
+  },
+  {
+    name: "Yapı Market",
+    children: [
+      { name: "Badana, Boya ve Duvar Kağıdı Malzemeleri", children: [] },
+      { name: "Çim Biçiciler ve Elektrikli Aletler", children: [] },
+      { name: "Depolama Sistemleri", children: [] },
+      { name: "Elektrik Malzemeleri", children: [] },
+      { name: "Elektrikli Aletler ve El Aletleri", children: [] },
+      { name: "Güvenlik ve Koruma", children: [] },
+      { name: "Hırdavat", children: [] },
+      { name: "İnşaat Ürünleri", children: [] },
+      { name: "Mutfak ve Banyo Armatürleri", children: [] },
+      { name: "Sıhhi tesisat", children: [] },
+      { name: "Şömineler", children: [] }
     ]
   },
   {
@@ -70,20 +144,6 @@ const masterTaxonomy = [
       { name: "Motosiklet", children: [{ name: "Motosiklet Aksesuarları" }, { name: "Motor Aksamı" }, { name: "Kask & Güvenlik" }] },
       { name: "Bisiklet", children: [{ name: "Dağ Bisikleti" }, { name: "Şehir Bisikleti" }, { name: "Yedek Parça & Vites" }] },
       { name: "Oto Yedek Parça", children: [{ name: "Aydınlatma (Far/Stop)" }, { name: "Mekanik (Motor/Fren)" }] }
-    ]
-  },
-  {
-    name: "Mobilya & Ev Yaşam",
-    children: [
-      { name: "Oturma Odası", children: [{ name: "Koltuk Takımı" }, { name: "Sehpa & TV Ünitesi" }] },
-      { name: "Yatak Odası", children: [{ name: "Yatak & Baza" }] }
-    ]
-  },
-  {
-    name: "Endüstri & Hırdavat",
-    children: [
-      { name: "El Aletleri", children: [{ name: "Matkap & Vidalama" }, { name: "Pense & Anahtar" }] },
-      { name: "İş Güvenliği", children: [{ name: "Baret & Yelek" }, { name: "Çelik Burunlu Ayakkabı" }] }
     ]
   }
 ];
