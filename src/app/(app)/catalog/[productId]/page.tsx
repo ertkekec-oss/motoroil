@@ -135,13 +135,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
                             <div className="overflow-x-auto">
                                 <table className="min-w-full text-left text-sm whitespace-nowrap border-collapse">
-                                    <thead className="bg-[#1F3A5F] text-white">
+                                    <thead className="bg-slate-800 dark:bg-slate-900 text-white">
                                         <tr>
-                                            <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Ağ Satıcısı (Tedarikçi)</th>
-                                            <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Birim Fiyat (TL)</th>
-                                            <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">Ağ Stoğu</th>
-                                            <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">Kurşun Süresi</th>
-                                            <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center w-32">Operasyon</th>
+                                            <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider">Ağ Satıcısı (Tedarikçi)</th>
+                                            <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-right">Birim Fiyat (TL)</th>
+                                            <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-center">Ağ Stoğu</th>
+                                            <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-center">Kurşun Süresi</th>
+                                            <th className="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-center w-32">Operasyon</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -164,43 +164,46 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                                                 const isNotReady = !l.price || Number(l.price) === 0;
                                                 const isBestPrice = index === 0 && !isOOS && !isNotReady;
 
+                                                const rawName = l.company?.name || "Kayıtsız Tedarikçi";
+                                                const shortName = rawName.length > 25 ? rawName.substring(0, 25) + "..." : rawName;
+
                                                 return (
                                                     <tr key={l.id} className={`hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group ${isOOS ? 'opacity-60 bg-slate-50 dark:bg-slate-900/50 grayscale-[50%]' : ''}`}>
-                                                        <td className="px-6 py-5">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                                                    {l.company?.name || "Kayıtsız Tedarikçi"}
+                                                        <td className="px-6 py-3">
+                                                            <div className="flex flex-col">
+                                                                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2" title={rawName}>
+                                                                    {shortName}
                                                                     {isBestPrice && (
-                                                                        <span className="bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded border border-amber-200 dark:border-amber-500/20 uppercase tracking-widest hidden sm:inline-block">En İyi Fiyat</span>
+                                                                        <span className="bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[9px] font-bold px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-500/20 uppercase tracking-widest hidden sm:inline-block shrink-0">En İyi Fiyat</span>
                                                                     )}
                                                                 </div>
+                                                                {l.minQty > 1 && <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 uppercase tracking-wider">Min: <span className="font-bold text-slate-700 dark:text-slate-300">{l.minQty} Adet</span></div>}
                                                             </div>
-                                                            {l.minQty > 1 && <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 uppercase tracking-wider">Min. Sipariş: <span className="font-bold text-slate-700 dark:text-slate-300">{l.minQty} Adet</span></div>}
                                                         </td>
-                                                        <td className="px-6 py-5 font-mono font-bold text-right text-slate-900 dark:text-emerald-400 text-lg">
+                                                        <td className="px-6 py-3 font-mono font-bold text-right text-slate-900 dark:text-emerald-400 text-base">
                                                             {isNotReady ? <span className="text-sm text-slate-400">Fiyat Yok</span> : `${Number(l.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺`}
                                                         </td>
-                                                        <td className="px-6 py-5 text-center">
+                                                        <td className="px-6 py-3 text-center">
                                                             {l.availableQty >= l.minQty ? (
-                                                                <span className="inline-flex items-center px-3 py-1 font-mono text-sm font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 rounded-md border border-emerald-200 dark:border-emerald-500/20 shadow-sm">
+                                                                <span className="inline-flex items-center px-2 py-0.5 font-mono text-sm font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 rounded-md border border-emerald-200 dark:border-emerald-500/20 shadow-sm">
                                                                     {l.availableQty}
                                                                 </span>
                                                             ) : (
-                                                                <span className="inline-flex items-center px-2 py-1 font-mono text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 rounded border border-rose-200 dark:border-rose-500/20">
+                                                                <span className="inline-flex items-center px-2 py-0.5 font-mono text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 rounded border border-rose-200 dark:border-rose-500/20">
                                                                     {l.availableQty > 0 ? `Stok Az (${l.availableQty})` : 'Tükendi'}
                                                                 </span>
                                                             )}
                                                         </td>
-                                                        <td className="px-6 py-5 text-center">
-                                                            <div className="inline-flex items-center justify-center bg-slate-100 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm">
+                                                        <td className="px-6 py-3 text-center">
+                                                            <div className="inline-flex items-center justify-center bg-slate-100 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-2 py-1 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300 shadow-sm">
                                                                 {l.leadTimeDays === 0 ? (
-                                                                    <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> Aynı Gün</span>
+                                                                    <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><Truck className="w-3 h-3" /> Aynı Gün</span>
                                                                 ) : (
-                                                                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-slate-400" /> {l.leadTimeDays} Gün İçinde</span>
+                                                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-slate-400" /> {l.leadTimeDays} Gün İçinde</span>
                                                                 )}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-5 text-center">
+                                                        <td className="px-6 py-3 text-center">
                                                             <AddToCartButton
                                                                 productId={product.id}
                                                                 sellerCompanyId={l.sellerCompanyId}
