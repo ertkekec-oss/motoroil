@@ -35,21 +35,26 @@ export async function mapCategoryAction(localCategoryName: string, globalCategor
         // Check if mapping exists
         const existingMap = await prisma.categoryMapping.findFirst({
             where: {
-                erpCategoryId: erpCategory.id,
-                globalCategoryId: globalCategoryId
+                erpCategory: { id: erpCategory.id },
+                globalCategory: { id: globalCategoryId }
             }
         });
 
         if (!existingMap) {
             // Delete any existing mappings for this local category to ensure 1-to-1 sync
-            await prisma.categoryMapping.deleteMany({
-                where: { erpCategoryId: erpCategory.id }
+            // Assuming erpCategory deleteMany relies on the same object structure if scalar isn't present
+            // Wait, deleteMany usually works differently. We can filter by the relation.
+            const oldMappings = await prisma.categoryMapping.findMany({
+                where: { erpCategory: { id: erpCategory.id } }
             });
+            for (const old of oldMappings) {
+                await prisma.categoryMapping.delete({ where: { id: old.id } });
+            }
 
             await prisma.categoryMapping.create({
                 data: {
-                    erpCategoryId: erpCategory.id,
-                    globalCategoryId: globalCategoryId
+                    erpCategory: { connect: { id: erpCategory.id } },
+                    globalCategory: { connect: { id: globalCategoryId } }
                 }
             });
         }
