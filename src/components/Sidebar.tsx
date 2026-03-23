@@ -192,9 +192,8 @@ export default function Sidebar() {
                             ] : []),
 
                             ...(isBuyer ? [
-                                { name: 'SATIN ALMA', href: '' },
-                                { name: 'Satınalma: RFQ', href: '/rfq' },
-                                { name: 'Satınalma: Sözleşmeler', href: '/contracts' }
+                                { name: 'B2B SATINALMA', href: '' },
+                                { name: 'RFQ & Sözleşmeler', href: '/rfq' }
                             ] : [])
                         ]
                     },
