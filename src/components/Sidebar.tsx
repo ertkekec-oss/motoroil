@@ -182,8 +182,9 @@ export default function Sidebar() {
                             ] : []),
 
                             { name: 'KATALOG', href: '' },
-                            ...(isSeller ? [{ name: 'Katalog (Ürünlerim)', href: '/seller/products' }] : []),
-                            ...(isBuyer ? [{ name: 'Katalog (B2B Keşfet)', href: '/catalog' }] : []),
+                            ...((isSeller || isBuyer) ? [
+                                { name: 'B2B Katalog', href: '/catalog' }
+                            ] : []),
 
                             { name: 'FİNANS', href: '' },
                             { name: 'Finance (B2B)', href: '/hub/finance' },

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import HubCatalogTabs from "@/components/network/HubCatalogTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +71,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
     return (
         <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+                <HubCatalogTabs />
+                
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
                     <div>
