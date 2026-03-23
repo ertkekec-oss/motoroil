@@ -53,8 +53,9 @@ export async function mapCategoryAction(localCategoryName: string, globalCategor
 
             await prisma.categoryMapping.create({
                 data: {
-                    erpCategory: { connect: { id: erpCategory.id } },
-                    globalCategory: { connect: { id: globalCategoryId } }
+                    erpCategoryId: erpCategory.id,
+                    globalCategoryId: globalCategoryId,
+                    companyId: companyId
                 }
             });
         }
