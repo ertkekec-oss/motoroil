@@ -1482,42 +1482,6 @@ function InventoryContent() {
 
         {activeTab === "all" && (
           <>
-            <div className="mb-8 relative overflow-hidden group bg-slate-900 border border-indigo-500/30 rounded-[1.5rem] p-6 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 cursor-pointer hover:border-indigo-400/50 transition-all" onClick={handleAiMap}>
-              {/* Animated Radar/Ping Waves */}
-              <div className="absolute top-1/2 left-16 -translate-y-1/2 w-[250px] h-[250px] rounded-full border border-indigo-500/20 animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-              <div className="absolute top-1/2 left-16 -translate-y-1/2 w-[350px] h-[350px] rounded-full border border-indigo-400/10 animate-[ping_5s_cubic-bezier(0,0,0.2,1)_infinite] delay-[1000ms]"></div>
-              
-              <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-indigo-500/20 to-transparent"></div>
-              
-              <div className="flex items-center gap-6 relative z-10 w-full">
-                {/* Globe Icon */}
-                <div className="relative shrink-0 flex items-center justify-center w-[72px] h-[72px] rounded-full bg-slate-950 border border-indigo-400/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                  <div className="absolute inset-0 rounded-full border-2 border-indigo-500/60 border-dashed animate-[spin_8s_linear_infinite] opacity-50"></div>
-                  <div className="absolute inset-2 rounded-full border border-teal-500 animate-[spin_4s_linear_infinite_reverse] opacity-40"></div>
-                  <div className="absolute inset-0 rounded-full bg-indigo-500/10 animate-pulse"></div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-300 relative z-10"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
-                </div>
-                
-                <div className="flex-1">
-                  <h3 className="text-xl font-black text-white flex items-center gap-3 mb-1">
-                    Periodya AI Akıllı Eşleştirme Motoru
-                    <span className="px-2 py-[2px] rounded text-[9px] bg-teal-500/20 text-teal-300 font-bold uppercase tracking-[0.2em] border border-teal-500/30 shadow-[0_0_10px_rgba(20,184,166,0.3)]">
-                      Sistem Aktif
-                    </span>
-                  </h3>
-                  <p className="text-indigo-100/70 text-[13px] max-w-2xl font-medium leading-relaxed mt-1">
-                    <span className="text-indigo-200">Ürünlerinizi Periodya Global Kategorileri ile eşleştirin.</span> <br className="hidden md:block"/>Tüm ürünlerinizi Periodya Hub dünyasında satışa açmak için ilk adımı atın.
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative z-10 shrink-0 w-full md:w-auto mt-4 md:mt-0">
-                <button disabled={isProcessing} className="w-full h-[52px] px-8 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-[13px] uppercase tracking-widest shadow-[0_4px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
-                  {isProcessing ? 'Haritalanıyor...' : 'Şimdi Eşleştir'}
-                  {!isProcessing && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>}
-                </button>
-              </div>
-            </div>
 
             <InventoryTable
               products={paginatedProducts}

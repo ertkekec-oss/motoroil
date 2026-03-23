@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-export async function runAiMappingAction() {
+export async function runAiMappingAction(updateLocalNames: boolean = false) {
     try {
         const session: any = await getSession();
         const user = session?.user || session;
@@ -104,8 +104,8 @@ export async function runAiMappingAction() {
             // Update product in DB
             await prisma.product.update({
                 where: { id: product.id },
-                data: { 
-                    category: matchedCategoryName,
+                data: {
+                    ...(updateLocalNames && matchedCategoryName !== "Diğer" ? { category: matchedCategoryName } : {}),
                     ...(finalGlobalId ? { globalCategoryId: finalGlobalId } : {})
                 }
             });

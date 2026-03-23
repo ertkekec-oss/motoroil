@@ -90,6 +90,58 @@ export default function CategoryMappingClient({
                     </div>
                 </div>
 
+                <div className="mb-8 relative overflow-hidden group bg-slate-900 border border-indigo-500/30 rounded-[1.5rem] p-6 shadow-2xl flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 hover:border-indigo-400/50 transition-all">
+                    <div className="absolute top-1/2 left-16 -translate-y-1/2 w-[250px] h-[250px] rounded-full border border-indigo-500/20 animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                    <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-indigo-500/20 to-transparent"></div>
+                    
+                    <div className="flex items-center gap-6 relative z-10 w-full xl:w-auto">
+                        <div className="relative shrink-0 flex items-center justify-center w-[72px] h-[72px] rounded-full bg-slate-950 border border-indigo-400/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                            <div className="absolute inset-0 rounded-full border-2 border-indigo-500/60 border-dashed animate-[spin_8s_linear_infinite] opacity-50"></div>
+                            <Sparkles className="w-8 h-8 text-indigo-300 relative z-10" />
+                        </div>
+                        
+                        <div>
+                            <h3 className="text-xl font-black text-white flex items-center gap-3 mb-1">
+                                Otonom AI Kurtarma Sürücüsü
+                                <span className="px-2 py-[2px] rounded text-[9px] bg-teal-500/20 text-teal-300 font-bold uppercase tracking-[0.2em] border border-teal-500/30 shadow-[0_0_10px_rgba(20,184,166,0.3)]">AI Aktif</span>
+                            </h3>
+                            <p className="text-indigo-100/70 text-[13px] max-w-2xl font-medium leading-relaxed mt-1">
+                                Etiketsiz ("Diğer" veya boş) ürünlerinizi tarar ve Hub'a çıkmaları için köprüler. <br className="hidden md:block"/> Özel deponuza (ERP'nize) dokunup dokunmamasını siz seçebilirsiniz.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full xl:w-auto mt-4 xl:mt-0">
+                        <button disabled={isPending} onClick={() => {
+                            startTransition(async () => {
+                                const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
+                                const res = await runAiMappingAction(false);
+                                if (res.success) {
+                                    showSuccess("Gümrük Çözüldü!", `${res.count} adet etiketlenmemiş ürün, özel deponuz bozulmadan başarıyla Hub'a bağlandı.`);
+                                } else {
+                                    showError("Hata", res.error);
+                                }
+                            });
+                        }} className="h-[52px] px-6 bg-slate-800 hover:bg-slate-700 text-white font-black text-[11px] rounded-xl uppercase tracking-widest border border-slate-700 hover:border-slate-500 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap group disabled:opacity-50">
+                            🔒 Lokalime Dokunma, <br/>Sadece Hub'a Bağla
+                        </button>
+
+                        <button disabled={isPending} onClick={() => {
+                            startTransition(async () => {
+                                const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
+                                const res = await runAiMappingAction(true);
+                                if (res.success) {
+                                    showSuccess("Düzen Sağlandı!", `${res.count} ürün tespit edildi. Hem Hub'a bağlandı hem de kendi klasör isimleriniz tek tip modernize edildi.`);
+                                } else {
+                                    showError("Hata", res.error);
+                                }
+                            });
+                        }} className="h-[52px] px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[11px] rounded-xl uppercase tracking-widest shadow-[0_4px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50">
+                            ✨ Lokalimi de Düzelt <br/>ve Hub'a Bağla
+                        </button>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Sol Kısım: Map Edilecek Lokal Kategoriler */}
                     <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col h-[600px]">
