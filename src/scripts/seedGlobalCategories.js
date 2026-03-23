@@ -5,8 +5,18 @@ const masterTaxonomy = [
   {
     name: "Elektronik & Bilgisayar",
     children: [
-      { name: "Bilgisayarlar, Bileşenleri ve Aksesuarları", children: [
-        { name: "Masaüstü Bilgisayarlar" }, { name: "Dizüstü Bilgisayarlar" }, { name: "Tabletler" }, { name: "Sunucular" }, { name: "Barebone Bilgisayarlar" }, { name: "Ağ Cihazları" }, { name: "3D Yazıcılar" }
+      { name: "Dizüstü Bilgisayarlar", children: [
+        { name: "Mac" }, { name: "Windows" }, { name: "Oyun" }, { name: "Çantalar" }, { name: "Kılıflar" }
+      ]},
+      { name: "Masaüstü Bilgisayarlar" },
+      { name: "Ağ Cihazları", children: [
+        { name: "Ağ Adaptörleri" }, { name: "Ağ Alıcı Vericileri" }, { name: "Ağ Anahtarları" }, { name: "Ağ Antenleri" }, { name: "Ağ Hub'ları" }, { name: "Kablosuz Erişim Noktaları" }, { name: "Kablosuz Mesh Ağlar" }, { name: "Mobil İnternet Cihazları" }, { name: "Modemler" }, { name: "Yazdırma Sunucuları" }, { name: "Yineleyiciler" }, { name: "Yönlendiriciler" }
+      ]},
+      { name: "Bilgisayar Aksesuarları", children: [
+        { name: "3D Yazıcı Malzemeleri" }, { name: "3D Yazıcı Parçaları ve Aksesuarları" }, { name: "Adaptörler" }, { name: "Bilgisayar Bellek Kartı Aksesuarları" }, { name: "Dizüstü Bilgisayar Aksesuarları" }, { name: "Güvenlik Kabloları" }, { name: "Kablolar ve Aksesuarlar" }, { name: "Kesintisiz Güç Kaynakları" }, { name: "Klavyeler, Fareler ve Giriş Cihazları" }, { name: "Küçük USB Araçları" }, { name: "Medya Depolama Ürünleri" }, { name: "Monitör Aksesuarları" }, { name: "PC için Oyun Aksesuarları" }, { name: "Sabit Sürücü Aksesuarları" }, { name: "Ses ve Video Aksesuarları" }, { name: "Tablet Aksesuarları" }, { name: "Tamir Setleri" }, { name: "USB Hub'ları" }, { name: "Yazıcı Aksesuarları" }, { name: "Yazılabilir Medya" }
+      ]},
+      { name: "Bilgisayar Bileşenleri", children: [
+        { name: "Bilgisayar Vidaları" }, { name: "Dahili Bileşenler" }, { name: "Dizüstü Bilgisayar Bileşenleri" }, { name: "Harici Bileşenler" }, { name: "Tablet Bileşenleri ve Yedek Parçaları" }
       ]},
       { name: "Cep Telefonları ve Aksesuarlar", children: [] },
       { name: "E-kitap Okuyucular ve Aksesuarları", children: [] },
@@ -239,7 +249,7 @@ const masterTaxonomy = [
         { name: "Clog ve Mule Terlik" }, { name: "İlk Adım Ayakkabısı" }, { name: "Patik" }, { name: "Sandalet" }, { name: "Spor ve Outdoor Ayakkabılar" }
       ]},
       { name: "Erkek Bebek Ayakkabı", children: [
-        { name: "İlk Adım Ayakkabısı" }, { name: "Patik" }, { name: "Sandalet" }, { name: "Spor ve Outdoor Ayakkabılar" }
+        { name: "Clog ve Mule Terlik" }, { name: "İlk Adım Ayakkabısı" }, { name: "Oxford ve Loafer" }, { name: "Patik" }, { name: "Sandalet" }, { name: "Spor ve Outdoor Ayakkabılar" }, { name: "Terlik" }
       ]}
     ]
   },
