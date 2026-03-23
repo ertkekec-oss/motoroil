@@ -36,10 +36,17 @@ const masterTaxonomy = [
         { name: "Cep Telefonları" }, { name: "Kılıflar" }, { name: "Akıllı Saatler" }, { name: "Kulaklıklar" }, { name: "Powerbank'ler" }, { name: "Aksesuarlar" }
       ]},
       { name: "E-kitap Okuyucular ve Aksesuarları", children: [] },
-      { name: "Giyilebilir Teknoloji", children: [] },
+      { name: "Elektronik Aksesuarlar", children: [
+        { name: "Telefon" }, { name: "Tablet" }, { name: "Fotoğraf" }, { name: "Kulaklık" }, { name: "Oto-Araç" }, { name: "Ev-Ses" }
+      ]},
+      { name: "Giyilebilir Teknoloji", children: [
+        { name: "Akıllı Saatler" }, { name: "Aktivite Takipçileri" }, { name: "Aksiyon Kameraları" }, { name: "Akıllı Gözlükler" }, { name: "VR Gözlükleri" }, { name: "Kulaklıklar" }
+      ]},
       { name: "GPS, Navigasyon ve Aksesuarları", children: [] },
       { name: "Güç Aksesuarları", children: [] },
-      { name: "Kameralar ve Fotoğraf Makineleri", children: [] },
+      { name: "Kameralar ve Fotoğraf Makineleri", children: [
+        { name: "Dijital Fotoğraf Makineleri" }, { name: "Analog Makineler" }, { name: "Video Kameralar" }, { name: "Aksiyon Kameraları" }, { name: "Drone'lar" }, { name: "Lensler" }, { name: "Flaşlar" }, { name: "Tripodlar ve Monopodlar" }
+      ]},
       { name: "Kulaklıklar ve Aksesuarları", children: [] },
       { name: "Oto ve Araç Elektroniği", children: [] },
       { name: "Piller ve Pil Şarj Aletleri", children: [] },
@@ -127,7 +134,14 @@ const masterTaxonomy = [
       { name: "Çim Biçiciler ve Elektrikli Aletler", children: [] },
       { name: "Depolama Sistemleri", children: [] },
       { name: "Elektrik Malzemeleri", children: [] },
-      { name: "Elektrikli Aletler ve El Aletleri", children: [] },
+      { name: "Elektrikli Aletler ve El Aletleri", children: [
+        { name: "Elektrikli Aletler", children: [
+          { name: "Akülü Vidalama Aletleri" }, { name: "Alet Setleri" }, { name: "Beton Aletleri" }, { name: "Cila Makineleri" }, { name: "Çiviler ve Zımbalar" }, { name: "Çok İşlevli Aletler" }, { name: "Darbeli Anahtarlar" }, { name: "Delme Makineleri" }, { name: "Döner Çekiçler" }, { name: "Elektrikli Freze Makineleri" }, { name: "Fayans Kesiciler" }, { name: "Hava Kompresörleri" }, { name: "Islak Kuru Elektrikli Süpürgeler" }, { name: "Karıştırıcılar" }, { name: "Karma Kitler" }, { name: "Kaynak Ekipmanları" }, { name: "Keskiler" }, { name: "Lehimleme Ekipmanları" }, { name: "Makaslar" }, { name: "Matkaplar" }, { name: "Matkap Tezgahları" }, { name: "Metal Levha İşleme Cihazları" }, { name: "Oyma Takımları" }, { name: "Plaka Birleştiricileri" }, { name: "Planyalar" }, { name: "Planya Tezgahları" }, { name: "Salınımlı Aletler" }, { name: "Sert Lehim Ekipmanları" }, { name: "Sıcak Hava Tabancaları" }, { name: "Silikon Tabancaları" }, { name: "Taşlama Makineleri" }, { name: "Testereler" }, { name: "Toz Toplayıcı ve Hava Temizleyiciler" }, { name: "Yönelticiler" }, { name: "Zımpara Cihazları" }
+        ]},
+        { name: "El Aletleri", children: [
+          { name: "Alet Takımları" }, { name: "Anahtarlar ve İngiliz Anahtarları" }, { name: "Bant Aplikatörleri" }, { name: "Bıçaklar, Parçalar ve Aksesuarlar" }, { name: "Çekiçler ve Tokmaklar" }, { name: "Çok Fonksiyonlu Aletler ve Aksesuarları" }, { name: "Duvarcılık ve Karo Kaplama Aletleri" }, { name: "Eğeler ve Törpüler" }, { name: "El Fenerleri" }, { name: "El Matkapları" }, { name: "El Rendeleri" }, { name: "El Zımbaları" }, { name: "Endüstriyel Cımbızlar" }, { name: "İş Tutma Cihazları" }, { name: "Kablo Ucu Penseleri" }, { name: "Kazıyıcılar" }, { name: "Kerpetenler" }, { name: "Kesiciler" }, { name: "Keskiler" }, { name: "Kılavuzlar ve Paftalar" }, { name: "Kıskaçlar" }, { name: "Köpük Püskürtme Tabancaları" }, { name: "Levyeler" }, { name: "Macun Malaları" }, { name: "Makaslar" }, { name: "Mengene Çektirme Aletleri" }, { name: "Penseler" }, { name: "Perçin Çekici" }, { name: "Sac Metal Makasları" }, { name: "Sıyırıcılar" }, { name: "Silikon Tabancaları" }, { name: "Soketler ve Soket Takımları" }, { name: "Tel Fırçalar" }, { name: "Testereler ve Aksesuarları" }, { name: "Tornavidalar ve Somun Anahtarları" }
+        ]}
+      ]},
       { name: "Güvenlik ve Koruma", children: [] },
       { name: "Hırdavat", children: [] },
       { name: "İnşaat Ürünleri", children: [] },
