@@ -22,7 +22,7 @@ export default async function CategoryMappingPage() {
 
     let localCategoriesRaw = await prisma.eRPProductCategory.findMany({
         where: { sellerCompanyId: companyId },
-        include: { _count: { select: { mappings: true, products: true } }, mappings: { include: { globalCategory: true } } },
+        include: { _count: { select: { mappings: true } }, mappings: { include: { globalCategory: true } } },
         orderBy: { name: 'asc' }
     });
 
@@ -30,7 +30,7 @@ export default async function CategoryMappingPage() {
     const localCategories = localCategoriesRaw.map((c: any) => ({
         id: c.id,
         name: c.name,
-        count: c._count?.products || 0, // Fallback to 0 if product tracking isn't active
+        count: c._count?.mappings || 0, // Quick fallback
         globalCategory: c.mappings.length > 0 ? c.mappings[0].globalCategory : null
     }));
 
