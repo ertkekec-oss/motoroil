@@ -532,6 +532,19 @@ function InventoryContent() {
     }
   };
 
+  const handleAiMap = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      showSuccess(
+        "AI Motoru Tetiklendi",
+        "Eşleşmeyen tüm ürünleriniz için arka planda Global Sözlük haritalama görevi başlatıldı. Ürün sayılarına göre bu işlem birkaç dakika sürebilir."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const approveTransferDirectly = async (data: any) => {
     if (isProcessing) return;
     setIsProcessing(true);
@@ -1317,6 +1330,9 @@ function InventoryContent() {
             </button>
             <button onClick={exportToExcel} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               İndir
+            </button>
+            <button onClick={handleAiMap} disabled={isProcessing} className="h-[42px] px-4 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-400 font-bold rounded-[10px] text-[13px] hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap group disabled:opacity-50">
+              <span className="group-hover:animate-pulse">✨</span> AI Eşleştir
             </button>
             <button onClick={startCount} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               Stok Sayımı
