@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import HubCatalogTabs from "@/components/network/HubCatalogTabs";
-import { Network, ArrowRightLeft, Database, CheckCircle2, AlertCircle } from "lucide-react";
+import { Network, ArrowRightLeft, Database, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import { mapCategoryAction } from "@/actions/mapCategoryAction";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CategoryMappingClient({ 
     localCategories, 
@@ -14,10 +16,27 @@ export default function CategoryMappingClient({
     mappingStats: { total: number, mapped: number, pending: number }
 }) {
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedLocal, setSelectedLocal] = useState<any>(null);
+    const { showSuccess, showError } = useModal();
+    const [isPending, startTransition] = useTransition();
 
     const filteredGlobal = globalCategories.filter((g: any) => 
         g.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const handleMap = (globalId: string, globalName: string) => {
+        if (!selectedLocal) return;
+
+        startTransition(async () => {
+            const res = await mapCategoryAction(selectedLocal.name, globalId);
+            if (res.success) {
+                showSuccess("Ağ Entegrasyonu Tamamlandı", `Tüm "${selectedLocal.name}" envanteri başarıyla "${globalName}" global dizinine bağlandı ve yayın havuzuna aktarıldı!`);
+                setSelectedLocal(null);
+            } else {
+                showError("Entegrasyon Hatası", res.error);
+            }
+        });
+    };
 
     return (
         <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen pb-16 w-full font-sans">
@@ -92,28 +111,44 @@ export default function CategoryMappingClient({
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    {localCategories.map((cat: any) => (
-                                        <div key={cat.id || cat.name} className="flex items-center justify-between p-3.5 bg-white dark:bg-[#0f172a] rounded-xl border border-slate-200 dark:border-white/5 hover:border-indigo-300 dark:hover:border-indigo-500/30 cursor-pointer transition-all shadow-sm group">
+                                    {localCategories.map((cat: any) => {
+                                        const isSelected = selectedLocal?.name === cat.name;
+                                        return (
+                                        <div 
+                                            key={cat.id || cat.name} 
+                                            onClick={() => !cat.globalCategory && setSelectedLocal(isSelected ? null : cat)}
+                                            className={`flex items-center justify-between p-3.5 rounded-xl border transition-all shadow-sm group ${
+                                                cat.globalCategory 
+                                                    ? 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 opacity-80 cursor-default'
+                                                    : isSelected 
+                                                        ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-400 dark:border-indigo-500 ring-2 ring-indigo-500/20 cursor-pointer scale-[1.01]' 
+                                                        : 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/5 hover:border-indigo-300 dark:hover:border-indigo-500/30 cursor-pointer'
+                                            }`}
+                                        >
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 font-medium border border-slate-100 dark:border-white/5">
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-medium border ${
+                                                    isSelected ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 border-indigo-200 dark:border-indigo-500/30' : 'bg-slate-50 dark:bg-white/5 text-slate-400 group-hover:text-indigo-500 border-slate-100 dark:border-white/5'
+                                                }`}>
                                                     🏷️
                                                 </div>
                                                 <div>
-                                                    <div className="text-[13px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{cat.name}</div>
+                                                    <div className={`text-[13px] font-bold transition-colors ${isSelected ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'}`}>{cat.name}</div>
                                                     <div className="text-[11px] text-slate-500 font-medium">{cat._count?.id || cat.count || 0} Ürün bağlandı</div>
                                                 </div>
                                             </div>
                                             {cat.globalCategory ? (
-                                                <button className="h-8 px-3 rounded text-[11px] font-bold tracking-widest uppercase bg-emerald-50 text-emerald-600 border border-emerald-100 cursor-default">
+                                                <button disabled className="h-8 px-3 rounded text-[11px] font-bold tracking-widest uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border border-emerald-100 dark:border-emerald-500/20 cursor-default">
                                                     Eşleşti 
                                                 </button>
                                             ) : (
-                                                <button className="h-8 px-3 rounded text-[11px] font-bold tracking-widest uppercase bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors border border-indigo-100">
-                                                    Eşle &rarr;
+                                                <button className={`h-8 px-3 rounded text-[11px] font-bold tracking-widest uppercase transition-colors border ${
+                                                    isSelected ? 'bg-indigo-600 text-white border-indigo-600 shadow-md scale-105' : 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 border-indigo-100 dark:border-indigo-500/20 group-hover:bg-indigo-600 group-hover:text-white'
+                                                }`}>
+                                                    {isSelected ? 'Seçildi' : 'Eşle \u2192'}
                                                 </button>
                                             )}
                                         </div>
-                                    ))}
+                                    )})}
                                 </div>
                             )}
                         </div>
@@ -153,9 +188,23 @@ export default function CategoryMappingClient({
                             ) : (
                                 <div className="space-y-4">
                                     {filteredGlobal.map((gc: any) => (
-                                        <div key={gc.id} className="p-4 bg-white dark:bg-[#0f172a] rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
-                                            <div className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{gc.name}</div>
-                                            <div className="text-[11px] text-slate-500 mt-1">Slug: {gc.slug}</div>
+                                        <div key={gc.id} className={`p-4 rounded-xl border shadow-sm transition-all flex items-center justify-between ${
+                                            selectedLocal ? 'bg-white dark:bg-[#0f172a] border-indigo-200 dark:border-indigo-500/30 hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md' : 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/5 opacity-50 grayscale'
+                                        }`}>
+                                            <div>
+                                                <div className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{gc.name}</div>
+                                                <div className="text-[11px] text-slate-500 mt-1">Slug: {gc.slug}</div>
+                                            </div>
+                                            {selectedLocal && (
+                                                <button 
+                                                    disabled={isPending}
+                                                    onClick={() => handleMap(gc.id, gc.name)}
+                                                    className="shrink-0 flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:opacity-90 active:scale-95 shadow-sm transition-all disabled:opacity-50"
+                                                >
+                                                    {isPending ? 'Bağlanıyor...' : 'Otoyola Bağla'}
+                                                    {!isPending && <Sparkles className="w-3.5 h-3.5" />}
+                                                </button>
+                                            )}
                                         </div>
                                     ))}
                                     
