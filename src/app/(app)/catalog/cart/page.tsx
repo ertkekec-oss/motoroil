@@ -48,12 +48,12 @@ export default async function CartPage() {
 
     return (
         <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
 
                 <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-white/10 pb-4 mb-6">
                     <Link href="/catalog" className="hover:text-slate-900 dark:hover:text-white transition-colors">B2B Ortak Katalog</Link>
                     <span>/</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">Sepet</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">Ağ Sepetim</span>
                 </div>
 
                 <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
