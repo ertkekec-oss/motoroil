@@ -77,6 +77,27 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
             <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300 flex-1">
                 <HubCatalogTabs />
                 
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-4">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span className="text-indigo-600 dark:text-indigo-400">🌍</span>
+                            B2B Tedarik Kataloğu <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] bg-blue-500/10 text-blue-600 font-bold uppercase tracking-widest border border-blue-500/20">Global Ağ</span>
+                        </h1>
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
+                            Pazaryerindeki onaylı tedarikçilerin stoklarında bulunan ve anında sipariş edilebilir premium donanım ve malzeme ürünleri havuzu.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                        <Link
+                            href="/catalog"
+                            className="h-8 px-4 inline-flex items-center justify-center rounded-lg text-[12px] font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm gap-2 whitespace-nowrap"
+                        >
+                            Tüm Lüks Konsorsiyum Ağı
+                        </Link>
+                    </div>
+                </div>
+
                 {/* Search / Filter Section */}
                 <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm p-4 mb-10 flex flex-col sm:flex-row gap-4 items-center justify-between relative overflow-hidden mt-4">
                     <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-indigo-500/10 to-transparent"></div>

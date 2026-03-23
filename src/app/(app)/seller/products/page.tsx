@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import HubCatalogTabs from "@/components/network/HubCatalogTabs";
+import { Store, Database, CheckCircle2, PauseCircle, ShieldAlert } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -39,19 +40,20 @@ export default async function SellerProductsPage() {
                 <HubCatalogTabs />
                 
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <Store className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             Katalog (Ürünlerim) / B2B Mağaza
                         </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
                             Lokal ERP deponuzdaki fiziksel ürünleri B2B global dağıtım ağına açın, fiyatlandırın ve listeleyin.
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
                         <button
-                            className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm gap-2"
+                            className="h-8 px-4 inline-flex items-center justify-center rounded-lg text-[12px] font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm gap-2"
                         >
                             <span>+</span> Lokal Ürün Ekle
                         </button>
@@ -59,22 +61,45 @@ export default async function SellerProductsPage() {
                 </div>
 
                 {/* Dashboard Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Lokal ERP Toplam Ürün</p>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{products.length}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-white dark:bg-[#1e293b] px-5 py-4 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm flex items-center gap-4">
+                        <div className="w-10 h-10 bg-slate-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center text-slate-500 shrink-0">
+                            <Database className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Lokal ERP Toplam Ürün</div>
+                            <div className="text-lg font-black text-slate-900 dark:text-white leading-none">{products.length} <span className="text-xs font-semibold text-slate-500 ml-1">Kayıt</span></div>
+                        </div>
                     </div>
-                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Ağda Satışta (Aktif)</p>
-                        <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{listedCount}</p>
+
+                    <div className="bg-emerald-50/50 dark:bg-emerald-500/5 px-5 py-4 rounded-xl border border-emerald-100 dark:border-emerald-500/10 shadow-sm flex items-center gap-4">
+                        <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <CheckCircle2 className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest mb-0.5">Ağda Satışta (Aktif)</div>
+                            <div className="text-lg font-black text-emerald-700 dark:text-emerald-400 leading-none">{listedCount} <span className="text-xs font-semibold text-emerald-600/70 ml-1">Ürün</span></div>
+                        </div>
                     </div>
-                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Durdurulan İlanlar</p>
-                        <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{pausedCount}</p>
+
+                    <div className="bg-amber-50/50 dark:bg-amber-500/5 px-5 py-4 rounded-xl border border-amber-100 dark:border-amber-500/10 shadow-sm flex items-center gap-4">
+                        <div className="w-10 h-10 bg-amber-100 dark:bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                            <PauseCircle className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-[10px] font-bold text-amber-600/70 dark:text-amber-400/70 uppercase tracking-widest mb-0.5">Durdurulan İlanlar</div>
+                            <div className="text-lg font-black text-amber-700 dark:text-amber-400 leading-none">{pausedCount} <span className="text-xs font-semibold text-amber-600/70 ml-1">Ürün</span></div>
+                        </div>
                     </div>
-                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">B2B Ağına Kapalı</p>
-                        <p className="text-3xl font-bold text-slate-400 dark:text-slate-500">{unlistedCount}</p>
+
+                    <div className="bg-slate-50/50 dark:bg-slate-900/50 px-5 py-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                        <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0">
+                            <ShieldAlert className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-0.5">B2B Ağına Kapalı</div>
+                            <div className="text-lg font-black text-slate-700 dark:text-slate-300 leading-none">{unlistedCount} <span className="text-xs font-semibold text-slate-500 ml-1">Ürün</span></div>
+                        </div>
                     </div>
                 </div>
 
