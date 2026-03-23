@@ -406,10 +406,10 @@ async function seedGlobalCategories() {
   console.log("🌱 Periodya Universal B2B Taxonomy Seeder Başlatılıyor...");
   
   // Clean start (optional, maybe dangerous in prod, but fine for seed phase)
-  // await prisma.globalCategory.deleteMany({});
+  await prisma.globalCategory.deleteMany({});
   
   for (const root of masterTaxonomy) {
-    const rSlug = root.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    const rSlug = root.name.toLowerCase().replace(/[^a-z0-9ğüşöçİĞÜŞÖÇ\s]/g, '').replace(/\s+/g, '-').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/-+/g, '-');
     const rootNode = await prisma.globalCategory.upsert({
       where: { slug: rSlug },
       update: { name: root.name },
@@ -420,7 +420,8 @@ async function seedGlobalCategories() {
     });
 
     for (const l2 of root.children) {
-      const l2Slug = l2.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+      const baseL2 = l2.name.toLowerCase().replace(/[^a-z0-9ğüşöçİĞÜŞÖÇ\s]/g, '').replace(/\s+/g, '-').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/-+/g, '-');
+      const l2Slug = `${rSlug}-${baseL2}`;
       const l2Node = await prisma.globalCategory.upsert({
         where: { slug: l2Slug },
         update: { name: l2.name, parentId: rootNode.id },
@@ -433,7 +434,8 @@ async function seedGlobalCategories() {
 
       if (l2.children) {
         for (const l3 of l2.children) {
-          const l3Slug = l3.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+          const baseL3 = l3.name.toLowerCase().replace(/[^a-z0-9ğüşöçİĞÜŞÖÇ\s]/g, '').replace(/\s+/g, '-').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/-+/g, '-');
+          const l3Slug = `${l2Slug}-${baseL3}`;
           const l3Node = await prisma.globalCategory.upsert({
             where: { slug: l3Slug },
             update: { name: l3.name, parentId: l2Node.id },
@@ -446,7 +448,8 @@ async function seedGlobalCategories() {
           
           if (l3.children) {
             for (const l4 of l3.children) {
-              const l4Slug = l4.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+              const baseL4 = l4.name.toLowerCase().replace(/[^a-z0-9ğüşöçİĞÜŞÖÇ\s]/g, '').replace(/\s+/g, '-').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/-+/g, '-');
+              const l4Slug = `${l3Slug}-${baseL4}`;
               await prisma.globalCategory.upsert({
                 where: { slug: l4Slug },
                 update: { name: l4.name, parentId: l3Node.id },
