@@ -112,8 +112,11 @@ export default async function BuyerRfqPage({ params }: { params: Promise<{ id: s
                         </Link>
                     </div>
                 </div>
-
-                <RfqDetailClient rfq={rfq} items={itemsEnhanced} offers={offersEnhanced} />
+                <RfqDetailClient 
+                    rfq={JSON.parse(JSON.stringify(rfq))} 
+                    items={JSON.parse(JSON.stringify(itemsEnhanced))} 
+                    offers={JSON.parse(JSON.stringify(offersEnhanced))} 
+                />
 
             </div>
         </div>

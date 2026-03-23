@@ -88,7 +88,11 @@ export default async function SellerRfqDetailPage({ params }: { params: Promise<
                     </div>
                 </div>
 
-                <CounterClient rfq={rfq} items={itemsEnhanced} offer={offer} />
+                <CounterClient 
+                    rfq={JSON.parse(JSON.stringify(rfq))} 
+                    items={JSON.parse(JSON.stringify(itemsEnhanced))} 
+                    offer={offer ? JSON.parse(JSON.stringify(offer)) : null} 
+                />
 
             </div>
         </div>
