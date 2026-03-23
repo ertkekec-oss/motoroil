@@ -538,8 +538,29 @@ function InventoryContent() {
     try {
       showSuccess(
         "AI Motoru Tetiklendi",
-        "Eşleşmeyen tüm ürünleriniz için arka planda Global Sözlük haritalama görevi başlatıldı. Ürün sayılarına göre bu işlem birkaç dakika sürebilir."
+        "Eşleşmeyen ürünleriniz için işlem başlatıldı. Lütfen bekleyin..."
       );
+      // Wait for React to render the toast before freezing the thread with a heavy server action
+      await new Promise(r => setTimeout(r, 800));
+
+      const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
+      const res = await runAiMappingAction();
+
+      if (res && res.success) {
+         if (res.count && res.count > 0) {
+             showSuccess("Haritalama Başarılı", `Bütün ham veriler tarandı. ${res.count} ürünün kategorisi AI tarafından otomatik algılanıp dolduruldu!`);
+             const pRes = await fetch("/api/products");
+             const pData = await pRes.json();
+             if (pData.success) setProducts(pData.products);
+         } else {
+             showWarning("Tarama Tamamlandı", res.message || "Tüm ürünleriniz zaten bir kategoriye sahip.");
+         }
+      } else {
+         showError("İşlem Başarısız", res?.error || "AI motoruna bağlanılamadı.");
+      }
+    } catch (e) {
+      console.error(e);
+      showError("Sistem Hatası", "AI eşleştirmesi sırasında bir hata oluştu.");
     } finally {
       setIsProcessing(false);
     }
