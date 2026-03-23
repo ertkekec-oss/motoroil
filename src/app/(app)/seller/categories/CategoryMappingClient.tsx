@@ -90,28 +90,48 @@ export default function CategoryMappingClient({
                     </div>
                 </div>
 
-                <div className="mb-8 relative overflow-hidden group bg-slate-900 border border-indigo-500/30 rounded-[1.5rem] p-6 shadow-2xl flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 hover:border-indigo-400/50 transition-all">
-                    <div className="absolute top-1/2 left-16 -translate-y-1/2 w-[250px] h-[250px] rounded-full border border-indigo-500/20 animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                    <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-indigo-500/20 to-transparent"></div>
+                <div className="mb-8 relative overflow-hidden group bg-slate-900 border border-indigo-500/30 rounded-2xl p-5 shadow-2xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 hover:border-indigo-400/50 transition-all">
+                    {/* Background Ambience */}
+                    <div className="absolute top-1/2 left-20 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-indigo-500/10 animate-[ping_5s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-600/20 blur-[80px] rounded-full"></div>
                     
-                    <div className="flex items-center gap-6 relative z-10 w-full xl:w-auto">
-                        <div className="relative shrink-0 flex items-center justify-center w-[72px] h-[72px] rounded-full bg-slate-950 border border-indigo-400/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                            <div className="absolute inset-0 rounded-full border-2 border-indigo-500/60 border-dashed animate-[spin_8s_linear_infinite] opacity-50"></div>
-                            <Sparkles className="w-8 h-8 text-indigo-300 relative z-10" />
+                    <div className="flex items-center gap-5 relative z-10 w-full lg:w-auto flex-1">
+                        
+                        {/* Custom Periodya 'P' AI Core Avatar */}
+                        <div className="relative shrink-0 flex items-center justify-center w-[64px] h-[64px] rounded-full bg-slate-950/80 backdrop-blur-sm border border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.4)] group-hover:shadow-[0_0_40px_rgba(99,102,241,0.6)] transition-all overflow-hidden">
+                            {/* Animated Galaxy Nebula */}
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,theme(colors.indigo.600/0.5)_0%,transparent_70%)] animate-pulse"></div>
+                            
+                            {/* Counter-rotating Orbit Rings */}
+                            <div className="absolute inset-1 rounded-full border border-indigo-400/30 border-dashed animate-[spin_8s_linear_infinite]"></div>
+                            <div className="absolute inset-[6px] rounded-full border border-indigo-300/20 border-dotted animate-[spin_12s_linear_infinite_reverse]"></div>
+
+                            {/* The Glowing 'P' Heartbeat */}
+                            <div className="relative z-10 font-black text-3xl font-serif italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-indigo-200 to-indigo-600 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-[pulse_1.5s_ease-in-out_infinite]">
+                                P
+                            </div>
+
+                            {/* Deep Space Pinging Stars */}
+                            <div className="absolute w-[3px] h-[3px] bg-white rounded-full top-2 left-3 animate-ping" style={{ animationDuration: '2s' }}></div>
+                            <div className="absolute w-[4px] h-[4px] bg-indigo-300 rounded-full bottom-2 right-2 animate-ping" style={{ animationDuration: '3s', animationDelay: '0.5s' }}></div>
+                            <div className="absolute w-[2px] h-[2px] bg-indigo-100 rounded-full top-4 right-3 animate-pulse" style={{ animationDuration: '1s' }}></div>
                         </div>
                         
                         <div>
-                            <h3 className="text-xl font-black text-white flex items-center gap-3 mb-1">
+                            <h3 className="text-lg font-black text-white flex items-center gap-3 mb-1">
                                 Otonom AI Kurtarma Sürücüsü
-                                <span className="px-2 py-[2px] rounded text-[9px] bg-teal-500/20 text-teal-300 font-bold uppercase tracking-[0.2em] border border-teal-500/30 shadow-[0_0_10px_rgba(20,184,166,0.3)]">AI Aktif</span>
+                                <span className="px-2 py-[2px] rounded text-[9px] bg-teal-500/20 text-teal-300 font-bold uppercase tracking-[0.2em] border border-teal-500/30 shadow-[0_0_10px_rgba(20,184,166,0.3)] flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+                                    AI Aktif
+                                </span>
                             </h3>
-                            <p className="text-indigo-100/70 text-[13px] max-w-2xl font-medium leading-relaxed mt-1">
-                                Etiketsiz ("Diğer" veya boş) ürünlerinizi tarar ve Hub'a çıkmaları için köprüler. <br className="hidden md:block"/> Özel deponuza (ERP'nize) dokunup dokunmamasını siz seçebilirsiniz.
+                            <p className="text-indigo-100/70 text-[13px] font-medium leading-relaxed max-w-xl">
+                                Etiketsiz ("Diğer" veya boş) ürünlerinizi tarar ve Hub'a çıkmaları için köprüler. Özel deponuza (ERP'nize) dokunup dokunmamasını siz seçebilirsiniz.
                             </p>
                         </div>
                     </div>
 
-                    <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full xl:w-auto mt-4 xl:mt-0">
+                    <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full lg:w-auto">
                         <button disabled={isPending} onClick={() => {
                             startTransition(async () => {
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
@@ -122,8 +142,8 @@ export default function CategoryMappingClient({
                                     showError("Hata", res.error);
                                 }
                             });
-                        }} className="h-[52px] px-6 bg-slate-800 hover:bg-slate-700 text-white font-black text-[11px] rounded-xl uppercase tracking-widest border border-slate-700 hover:border-slate-500 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap group disabled:opacity-50">
-                            🔒 Lokalime Dokunma, <br/>Sadece Hub'a Bağla
+                        }} className="w-full sm:w-auto h-[44px] px-5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-[11px] rounded-xl uppercase tracking-widest border border-slate-700 hover:border-slate-500 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50">
+                            🔒 Sadece Hub'a Bağla
                         </button>
 
                         <button disabled={isPending} onClick={() => {
@@ -131,13 +151,13 @@ export default function CategoryMappingClient({
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
                                 const res = await runAiMappingAction(true);
                                 if (res.success) {
-                                    showSuccess("Düzen Sağlandı!", `${res.count} ürün tespit edildi. Hem Hub'a bağlandı hem de kendi klasör isimleriniz tek tip modernize edildi.`);
+                                    showSuccess("Düzen Sağlandı!", `${res.count} ürün tespit edildi. Hem Hub'a bağlandı hem de kendi klasör isimleriniz modernize edildi.`);
                                 } else {
                                     showError("Hata", res.error);
                                 }
                             });
-                        }} className="h-[52px] px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[11px] rounded-xl uppercase tracking-widest shadow-[0_4px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50">
-                            ✨ Lokalimi de Düzelt <br/>ve Hub'a Bağla
+                        }} className="w-full sm:w-auto h-[44px] px-5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] rounded-xl uppercase tracking-widest shadow-[0_4px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50">
+                            ✨ Lokalimi Düzelt & Bağla
                         </button>
                     </div>
                 </div>
