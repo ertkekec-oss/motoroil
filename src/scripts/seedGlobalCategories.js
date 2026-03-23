@@ -132,8 +132,12 @@ const masterTaxonomy = [
     children: [
       { name: "Badana, Boya ve Duvar Kağıdı Malzemeleri", children: [] },
       { name: "Çim Biçiciler ve Elektrikli Aletler", children: [] },
-      { name: "Depolama Sistemleri", children: [] },
-      { name: "Elektrik Malzemeleri", children: [] },
+      { name: "Depolama Sistemleri", children: [
+        { name: "Alet Düzenleyicileri" }, { name: "Çok Amaçlı Raflar" }, { name: "Dış Mekan Saklama Çözümleri" }, { name: "Garajlar İçin Saklama Çözümleri" }, { name: "Saklama Dolapları" }
+      ]},
+      { name: "Elektrik Malzemeleri", children: [
+        { name: "Aletler ve Aygıtlar" }, { name: "Buat Bağlantı Parçaları" }, { name: "Çoklu Prizler" }, { name: "Dağıtıcılar, Devre Kesiciler, Sigortalar" }, { name: "Dahili Haberleşme Sistemleri" }, { name: "Duvar Prizleri" }, { name: "Duylar" }, { name: "Elektrik Akımı Ekipmanları" }, { name: "Elektrik Anahtarları ve Dimmerlar" }, { name: "Elektrik Fişleri ve Prizleri" }, { name: "Elektrik Konnektörleri" }, { name: "Elektrik Kutuları, Buatlar ve Bağlantı Parçaları" }, { name: "Elektrik Motorları" }, { name: "Elektrik Sayaçları" }, { name: "Elektrik Telleri" }, { name: "Ev Otomasyonu" }, { name: "Fişler" }, { name: "Kablo Düzenleyiciler" }, { name: "Kapı Zilleri ve Çanları" }, { name: "Montaj Parçaları" }, { name: "Prizler" }, { name: "Radyo Duvar Vericileri" }, { name: "Sıva Üstü Elektrik Tesisatı" }, { name: "Transformatörler" }, { name: "Uluslararası Güç Adaptörleri" }, { name: "Uzatma Kabloları" }, { name: "Zamanlayıcılar" }
+      ]},
       { name: "Elektrikli Aletler ve El Aletleri", children: [
         { name: "Elektrikli Aletler", children: [
           { name: "Akülü Vidalama Aletleri" }, { name: "Alet Setleri" }, { name: "Beton Aletleri" }, { name: "Cila Makineleri" }, { name: "Çiviler ve Zımbalar" }, { name: "Çok İşlevli Aletler" }, { name: "Darbeli Anahtarlar" }, { name: "Delme Makineleri" }, { name: "Döner Çekiçler" }, { name: "Elektrikli Freze Makineleri" }, { name: "Fayans Kesiciler" }, { name: "Hava Kompresörleri" }, { name: "Islak Kuru Elektrikli Süpürgeler" }, { name: "Karıştırıcılar" }, { name: "Karma Kitler" }, { name: "Kaynak Ekipmanları" }, { name: "Keskiler" }, { name: "Lehimleme Ekipmanları" }, { name: "Makaslar" }, { name: "Matkaplar" }, { name: "Matkap Tezgahları" }, { name: "Metal Levha İşleme Cihazları" }, { name: "Oyma Takımları" }, { name: "Plaka Birleştiricileri" }, { name: "Planyalar" }, { name: "Planya Tezgahları" }, { name: "Salınımlı Aletler" }, { name: "Sert Lehim Ekipmanları" }, { name: "Sıcak Hava Tabancaları" }, { name: "Silikon Tabancaları" }, { name: "Taşlama Makineleri" }, { name: "Testereler" }, { name: "Toz Toplayıcı ve Hava Temizleyiciler" }, { name: "Yönelticiler" }, { name: "Zımpara Cihazları" }
@@ -142,10 +146,16 @@ const masterTaxonomy = [
           { name: "Alet Takımları" }, { name: "Anahtarlar ve İngiliz Anahtarları" }, { name: "Bant Aplikatörleri" }, { name: "Bıçaklar, Parçalar ve Aksesuarlar" }, { name: "Çekiçler ve Tokmaklar" }, { name: "Çok Fonksiyonlu Aletler ve Aksesuarları" }, { name: "Duvarcılık ve Karo Kaplama Aletleri" }, { name: "Eğeler ve Törpüler" }, { name: "El Fenerleri" }, { name: "El Matkapları" }, { name: "El Rendeleri" }, { name: "El Zımbaları" }, { name: "Endüstriyel Cımbızlar" }, { name: "İş Tutma Cihazları" }, { name: "Kablo Ucu Penseleri" }, { name: "Kazıyıcılar" }, { name: "Kerpetenler" }, { name: "Kesiciler" }, { name: "Keskiler" }, { name: "Kılavuzlar ve Paftalar" }, { name: "Kıskaçlar" }, { name: "Köpük Püskürtme Tabancaları" }, { name: "Levyeler" }, { name: "Macun Malaları" }, { name: "Makaslar" }, { name: "Mengene Çektirme Aletleri" }, { name: "Penseler" }, { name: "Perçin Çekici" }, { name: "Sac Metal Makasları" }, { name: "Sıyırıcılar" }, { name: "Silikon Tabancaları" }, { name: "Soketler ve Soket Takımları" }, { name: "Tel Fırçalar" }, { name: "Testereler ve Aksesuarları" }, { name: "Tornavidalar ve Somun Anahtarları" }
         ]}
       ]},
-      { name: "Güvenlik ve Koruma", children: [] },
-      { name: "Hırdavat", children: [] },
+      { name: "Güvenlik ve Koruma", children: [
+        { name: "Anahtar Dolapları" }, { name: "Asma Kilitler ve Kilit Menteşeleri" }, { name: "Kasalar ve Güvenlik Aksesuarları" }, { name: "Ev Alarmları" }, { name: "Ev Güvenlik Sistemleri" }, { name: "Güvenlik Aydınlatması" }, { name: "İşaret Sinyalleri" }, { name: "İş Güvenliği Ekipmanları ve Aygıtları" }, { name: "Kasalar" }, { name: "Kilitlenebilir Pencere Kolları" }, { name: "Yangın Güvenliği" }, { name: "Kamp Fenerleri" }
+      ]},
+      { name: "Hırdavat", children: [
+        { name: "Asma Kilitler ve Kilit Menteşeleri" }, { name: "Bağlama Askıları" }, { name: "Banyo Ekipmanları" }, { name: "Çiviler, Vidalar, Bağlantı Elemanları" }, { name: "El Fenerleri" }, { name: "Etajer Ekipmanları" }, { name: "Ev Numaraları, Levhalar ve İşaretler" }, { name: "Garaj Kapısı Ekipmanları" }, { name: "Kancalar" }, { name: "Kapı Ekipmanları" }, { name: "Kapı Ekipmanları ve Kilitler" }, { name: "Menteşeler" }, { name: "Mobilya Ekipmanları" }, { name: "Pencere Ekipmanları" }, { name: "Posta Kutuları" }, { name: "Raf Dirsekleri ve Destekleri" }, { name: "Yapıştırıcılar ve Sızdırmazlık Sağlayıcılar" }
+      ]},
       { name: "İnşaat Ürünleri", children: [] },
-      { name: "Mutfak ve Banyo Armatürleri", children: [] },
+      { name: "Mutfak ve Banyo Armatürleri", children: [
+        { name: "Banyo Armatürleri" }, { name: "Çamaşır Odası Armatürleri" }, { name: "Mutfak Armatürleri" }, { name: "Su Filtreleme ve Kireç Gidericiler" }, { name: "Su Sebilleri ve Soğutucular" }
+      ]},
       { name: "Sıhhi tesisat", children: [] },
       { name: "Şömineler", children: [] }
     ]
