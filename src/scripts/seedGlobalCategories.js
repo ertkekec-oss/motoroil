@@ -61,12 +61,20 @@ const masterTaxonomy = [
   {
     name: "Ev ve Yaşam",
     children: [
-      { name: "Aydınlatma", children: [] },
+      { name: "Aydınlatma", children: [
+        { name: "Ampuller" }, { name: "Dış Mekan Aydınlatma" }, { name: "İç Mekan Aydınlatma" }, { name: "LED Hortumlar" }, { name: "Ticari Aydınlatma Ürünleri" }, { name: "Yılbaşı Işıklandırmaları" }
+      ]},
       { name: "Banyo", children: [] },
       { name: "Dini ve Manevi Ürünler", children: [] },
-      { name: "Ev Aletleri", children: [] },
-      { name: "Ev Dekorasyonu", children: [] },
-      { name: "Ev İçin Düzenleme ve Depolama Ürünleri", children: [] },
+      { name: "Ev Aletleri", children: [
+        { name: "Beyaz Eşya Parça ve Aksesuarları" }, { name: "Bulaşık Makineleri ve Bulaşık Kurutucuları" }, { name: "Çamaşır Makineleri ve Kurutucular" }, { name: "Çöp, Kompost ve Geri Dönüşüm" }, { name: "Dondurucular ve Buzdolapları" }, { name: "Fırınlar ve Ocaklar" }, { name: "Kompakt Mutfak Üniteleri" }
+      ]},
+      { name: "Ev Dekorasyonu", children: [
+        { name: "Aynalar" }, { name: "Bebek Odası Dekorasyonu" }, { name: "Çocuk Odası Dekorasyonu" }, { name: "Dekoratif Aksesuarlar" }, { name: "Duvar ve Masa Saatleri" }, { name: "Fotoğraf Albümleri, Çerçeveler ve Aksesuarlar" }, { name: "Halılar, Pedler ve Koruyucular" }, { name: "İç Mekan Fıskiye Aksesuarları" }, { name: "İç Mekan Fıskiyeleri" }, { name: "Kapı Altı Rüzgar Önleyiciler" }, { name: "Kumbaralar" }, { name: "Kurutulmuş ve Korunmuş Flora" }, { name: "Magnetler" }, { name: "Mevsimlik Süsler" }, { name: "Misafir Defterleri" }, { name: "Mobilya ve Koltuk Kılıfları" }, { name: "Mumlar, Mumluklar ve Aksesuarları" }, { name: "Not Tahtaları" }, { name: "Oda Kokuları" }, { name: "Perde ve Güneşlik Aksesuarları" }, { name: "Perdeler, Jaluziler ve Panjurlar" }, { name: "Rüya Yakalayıcılar" }, { name: "Tabela ve Levhalar" }, { name: "Vazolar" }, { name: "Yapay ve Kurutulmuş Bitkiler" }
+      ]},
+      { name: "Ev İçin Düzenleme ve Depolama Ürünleri", children: [
+        { name: "Askı Kancaları" }, { name: "Banyo İçin Düzenleme ve Depolama Ürünleri" }, { name: "Çamaşır Odası Ürünleri" }, { name: "Çöp ve Geri Dönüşüm Kutuları" }, { name: "Ev-Ofis Saklama Çözümleri" }, { name: "Garajlar İçin Saklama Çözümleri" }, { name: "Giysi ve Dolap İçi Saklama Çözümleri" }, { name: "Mutfak Saklama ve Düzenleme" }, { name: "Raflar ve Çekmeceler" }, { name: "Sepetler ve Kovalar" }, { name: "Yılbaşı Dekorasyonu Saklama Çözümleri" }
+      ]},
       { name: "Ev Tekstili ve Uyku Setleri", children: [] },
       { name: "Mobilyalar", children: [] },
       { name: "Resimler, Posterler ve Heykeller", children: [] },
