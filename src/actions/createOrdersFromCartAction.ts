@@ -120,8 +120,6 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
                         itemsHash,
                         items: orderItems,
                         networkItems: { create: orderItems },
-                        sourceType: hasContractItems ? "CONTRACT" : "CART",
-                        sourceId: contractId,
                     }
                 });
 
