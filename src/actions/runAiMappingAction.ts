@@ -18,7 +18,7 @@ export async function runAiMappingAction() {
             return { success: false, error: "Company ID missing" };
         }
 
-        // Fetch products that don't have a category
+        // Fetch products that don't have a category or are mapped to fallback "Diğer"
         const unmappedProducts = await prisma.product.findMany({
             where: {
                 companyId,
@@ -26,6 +26,7 @@ export async function runAiMappingAction() {
                     { category: null },
                     { category: "" },
                     { category: "-" },
+                    { category: "Diğer" },
                 ]
             }
         });
@@ -37,23 +38,33 @@ export async function runAiMappingAction() {
         // Simulate AI Processing (NLP Keyword Vector matching Mock)
         let processedCount = 0;
         
-        // Let's create an AI dictionary to classify based on keywords in name
+        // Expanded dictionary heuristics for the mock AI
         const aiRules = [
-            { keywords: ["zefal", "matara", "kafes", "çamurluk", "bisiklet", "xrs"], targetCategory: "BİSİKLET" },
-            { keywords: ["zincir", "sprey", "yağ", "motul", "motor", "fırça"], targetCategory: "Motosiklet" },
-            { keywords: ["kask", "eldiven", "dizlik"], targetCategory: "Aksesuar" }
+            { keywords: ["zefal", "matara", "kafes", "çamurluk", "bisiklet", "xrs", "slcn", "totem", "prenses", "ilgaz", "nova", "flex", "wolf", "xr600", "xr-600", "ürgüp", "üsküp", "salcano", "jant", "kadro", "pedal", "sele"], targetCategory: "BİSİKLET" },
+            { keywords: ["zincir", "sprey", "yağ", "motul", "motor", "fırça", "wings", "wind", "motosiklet", "scooter"], targetCategory: "MOTOSİKLET" },
+            { keywords: ["kask", "çenesiz", "eldiven", "dizlik", "koruma"], targetCategory: "KASK & KORUMA EKİPMANLARI" },
+            { keywords: ["far", "stop", "ampul", "led", "aydınlatma", "pilli"], targetCategory: "AYDINLATMA & ELEKTRONİK" },
+            { keywords: ["kilit", "şifreli kilit", "spiral", "urba kilit", "vona", "auvray", "güvenlik"], targetCategory: "GÜVENLİK & KİLİT SİSTEMLERİ" }
         ];
 
         for (const product of unmappedProducts) {
-            const productName = String(product.name).toLowerCase();
-            let matchedCategory = "Diğer"; // default fallback
+            // Include brand in the analysis string so the "AI" sees it
+            const analysisString = `${String(product.name).toLowerCase()} ${String(product.brand || "").toLowerCase()} ${String(product.code || "").toLowerCase()}`;
+            let matchedCategory = product.category || "Diğer"; 
+            let foundMatch = false;
 
             // Semantic string matching
             for (const rule of aiRules) {
-                if (rule.keywords.some(kw => productName.includes(kw))) {
+                if (rule.keywords.some(kw => analysisString.includes(kw))) {
                     matchedCategory = rule.targetCategory;
+                    foundMatch = true;
                     break;
                 }
+            }
+
+            // If it was already "Diğer" and we couldn't find a better match, skip updating it
+            if (!foundMatch && product.category === "Diğer") {
+                continue;
             }
 
             // Update product in DB
