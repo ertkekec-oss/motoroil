@@ -75,10 +75,18 @@ const masterTaxonomy = [
       { name: "Ev İçin Düzenleme ve Depolama Ürünleri", children: [
         { name: "Askı Kancaları" }, { name: "Banyo İçin Düzenleme ve Depolama Ürünleri" }, { name: "Çamaşır Odası Ürünleri" }, { name: "Çöp ve Geri Dönüşüm Kutuları" }, { name: "Ev-Ofis Saklama Çözümleri" }, { name: "Garajlar İçin Saklama Çözümleri" }, { name: "Giysi ve Dolap İçi Saklama Çözümleri" }, { name: "Mutfak Saklama ve Düzenleme" }, { name: "Raflar ve Çekmeceler" }, { name: "Sepetler ve Kovalar" }, { name: "Yılbaşı Dekorasyonu Saklama Çözümleri" }
       ]},
-      { name: "Ev Tekstili ve Uyku Setleri", children: [] },
-      { name: "Mobilyalar", children: [] },
-      { name: "Resimler, Posterler ve Heykeller", children: [] },
-      { name: "Temizlik Aletleri", children: [] },
+      { name: "Ev Tekstili ve Uyku Setleri", children: [
+        { name: "Banyo Tekstili" }, { name: "Çocuk Yatak Takımları" }, { name: "Dekoratif Minderler, Minder Kılıfları ve Aksesuarları" }, { name: "Halılar ve Kilimler" }, { name: "Kreş Yatak Takımları" }, { name: "Mutfak Tekstili" }, { name: "Perdeler ve Güneşlikler" }, { name: "Perde ve Güneşlik Aksesuarları" }, { name: "Şişme Yataklar, Yastıklar ve Aksesuarları" }, { name: "Uyku Setleri" }, { name: "Yatak Aksesuarları" }, { name: "Yatak Odası Tekstili" }
+      ]},
+      { name: "Mobilyalar", children: [
+        { name: "Antre Mobilyaları" }, { name: "Bahçe Mobilyaları ve Aksesuarları" }, { name: "Banyo Mobilyaları" }, { name: "Bebek Odası Mobilyaları" }, { name: "Çocuk Mobilyaları" }, { name: "Ev İçin Bar Mobilyaları" }, { name: "Ev-Ofis Mobilyaları" }, { name: "Mobilya Garantileri" }, { name: "Mutfak Mobilyaları" }, { name: "Oturma Odası Mobilyaları" }, { name: "Yatak Odası Mobilyaları" }, { name: "Yemek Odası Mobilyaları" }
+      ]},
+      { name: "Resimler, Posterler ve Heykeller", children: [
+        { name: "Baskılar ve Posterler" }, { name: "Duvar Çıkartmaları ve Resimleri" }, { name: "Duvar Kilim ve Örtüleri" }, { name: "Fotoğraflar" }, { name: "Heykeller" }, { name: "Tablolar" }
+      ]},
+      { name: "Temizlik Aletleri", children: [
+        { name: "Buharlı Temizleyici Aksesuarları" }, { name: "Buharlı Temizleyiciler ve Zemin Cila Makineleri" }, { name: "Elektrikli Süpürge Aksesuarları" }, { name: "Elektrikli Süpürgeler" }, { name: "Faraş ve Fırça Takımları" }, { name: "Fırçalar" }, { name: "Halı Yıkayıcı Aksesuarları" }, { name: "Halı Yıkayıcılar" }, { name: "Kovalar" }, { name: "Paspaslar" }, { name: "Saplı Süpürgeler ve Süpürücüler" }, { name: "Silecekler" }, { name: "Süngerler" }, { name: "Süpürme Parçaları ve Aksesuarları" }, { name: "Teleskopik Saplar" }, { name: "Temizlik Bezleri" }, { name: "Toz Alma Püskülleri" }
+      ]},
       { name: "Temizlik Malzemeleri", children: [] }
     ]
   },
