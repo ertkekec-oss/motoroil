@@ -109,14 +109,61 @@ const masterTaxonomy = [
   {
     name: "Moda & Giyim",
     children: [
-      { name: "Kadın Giyim", children: [
-        { name: "Bluz ve Gömlek" }, { name: "Dış Giyim" }, { name: "Elbise" }, { name: "Etek" }, { name: "Hamile" }, { name: "Jean" }, { name: "Pantolon" }, { name: "Spor Giyim" }, { name: "Sweatshirt" }, { name: "Triko" }, { name: "Üst ve T-shirt" }, { name: "Plaj Giyim" }
+      { name: "Kadın Kıyafet", children: [
+        { name: "Çorap ve Külotlu Çorap" },
+        { name: "Dış Giyim", children: [
+          { name: "Ceket" }, { name: "Mont ve Kaban" }, { name: "Yağmurluk" }, { name: "Yelek" }
+        ]},
+        { name: "Elbise", children: [
+          { name: "Abiye" }, { name: "Gelinlik" }, { name: "Günlük" }, { name: "İş" }, { name: "Kokteyl" }, { name: "Parti" }
+        ]},
+        { name: "Etek" },
+        { name: "Ev Giyimi, İç Çamaşırı ve İç Giyim" },
+        { name: "Hamile", children: [
+          { name: "Elbise" }, { name: "Emzirme" }, { name: "Etek" }, { name: "İç Çamaşırı ve İç Giyim" }, { name: "Jean" }, { name: "Montlar, Ceketler ve Yelekler" }, { name: "Pantolon" }, { name: "Plaj Giyim" }, { name: "Spor Giyim" }, { name: "Sweatshirt" }, { name: "Şort" }, { name: "Takım" }, { name: "Tayt" }, { name: "Triko" }, { name: "Uyku Giyimi" }, { name: "Üst ve T-shirt" }
+        ]},
+        { name: "Jean" },
+        { name: "Kapüşonlu ve Kapüşonsuz Sweatshirt" },
+        { name: "Kar ve Yağmur Kıyafeti" },
+        { name: "Pantolon" },
+        { name: "Plaj Giyim", children: [
+          { name: "Bikini" }, { name: "Döküntü Koruma" }, { name: "Gömlekleri" }, { name: "Döküntü Koruyucu Setler" }, { name: "Mayo" }, { name: "Monokiniler" }, { name: "Plaj Elbisesi ve Pareo" }, { name: "Şort" }, { name: "Tankini" }
+        ]},
+        { name: "Salopet" },
+        { name: "Spor Giyim", children: [
+          { name: "Elbise" }, { name: "Eşofman Altı" }, { name: "Eşofman Üstü" }, { name: "Etek ve Şort Etek" }, { name: "Kapüşonlu ve Kapüşonsuz Sweatshirt" }, { name: "Tozluklar" }, { name: "Spor Atlet ve İç Giyim" }, { name: "Spor Çorabı" }, { name: "Şort" }, { name: "Takım" }, { name: "Triko" }, { name: "T-shirt ve Polo Yaka T-shirt" }, { name: "Yelek" }, { name: "İçlik ve Kompresyon" }
+        ]},
+        { name: "Şort" },
+        { name: "Takım Elbise ve Blazer Ceket" },
+        { name: "Tayt" },
+        { name: "Tesettür Giyim" },
+        { name: "Triko", children: [
+          { name: "Askılı Triko" }, { name: "Hırka" }, { name: "Hırka Ceket" }, { name: "İkili Takım" }, { name: "Kazak" }, { name: "Panço ve Pelerin" }
+        ]},
+        { name: "Tulum" },
+        { name: "Üst ve T-shirt", children: [
+          { name: "Askılı Bluz ve Kolsuz Üst" }, { name: "Bluz ve Gömlek" }, { name: "Polo Yaka T-shirt" }, { name: "T-shirt" }, { name: "Tunik" }
+        ]}
       ]},
       { name: "Kadın Ayakkabı", children: [
         { name: "Babet" }, { name: "Topuklu Ayakkabı" }, { name: "Bot ve Çizme" }, { name: "Spor ve Outdoor Ayakkabısı" }, { name: "Sneaker" }, { name: "Sandalet" }, { name: "Terlik" }
       ]},
-      { name: "Erkek Giyim", children: [
-        { name: "Dış Giyim" }, { name: "Gömlek" }, { name: "Sweatshirt" }, { name: "Jean" }, { name: "Pantolon" }, { name: "Takım ve Blazer" }, { name: "Spor Giyim" }, { name: "Triko" }, { name: "Üst ve T-shirt" }, { name: "Ev Kıyafeti" }, { name: "Plaj Giyim" }
+      { name: "Erkek Kıyafet", children: [
+        { name: "Dış Giyim", children: [
+          { name: "Ceket" }, { name: "Mont ve Kaban" }, { name: "Yağmurluk" }, { name: "Yelek" }
+        ]},
+        { name: "Gömlek" },
+        { name: "Sweatshirt" },
+        { name: "Jean" },
+        { name: "Pantolon" },
+        { name: "Takım ve Blazer" },
+        { name: "Spor Giyim" },
+        { name: "Triko" },
+        { name: "Üst ve Tişört", children: [
+          { name: "Polo Yaka Tişört" }, { name: "Tişört" }, { name: "Yakası Düğmeli Gömlekler" }, { name: "Yelek" }
+        ]},
+        { name: "Ev Kıyafeti" },
+        { name: "Plaj Giyim" }
       ]},
       { name: "Erkek Ayakkabı", children: [
         { name: "Bağcıklı Ayakkabı" }, { name: "Bot ve Çizme" }, { name: "Düz Ayakkabı" }, { name: "Sandalet" }, { name: "Sneaker" }, { name: "Spor ve Outdoor Ayakkabısı" }
@@ -196,7 +243,7 @@ async function seedGlobalCategories() {
       if (l2.children) {
         for (const l3 of l2.children) {
           const l3Slug = l3.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-          await prisma.globalCategory.upsert({
+          const l3Node = await prisma.globalCategory.upsert({
             where: { slug: l3Slug },
             update: { name: l3.name, parentId: l2Node.id },
             create: {
@@ -205,6 +252,21 @@ async function seedGlobalCategories() {
               parentId: l2Node.id
             }
           });
+          
+          if (l3.children) {
+            for (const l4 of l3.children) {
+              const l4Slug = l4.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+              await prisma.globalCategory.upsert({
+                where: { slug: l4Slug },
+                update: { name: l4.name, parentId: l3Node.id },
+                create: {
+                  name: l4.name,
+                  slug: l4Slug,
+                  parentId: l3Node.id
+                }
+              });
+            }
+          }
         }
       }
     }
