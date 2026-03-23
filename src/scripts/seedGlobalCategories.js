@@ -314,6 +314,18 @@ const masterTaxonomy = [
       ]},
       { name: "Yapı İnşa Oyuncakları", children: [
         { name: "Dişli Setleri" }, { name: "Figürler" }, { name: "İnşa Setleri" }, { name: "Manyetik Yapı" }, { name: "Üst Üste Dizilen Bloklar" }
+      ]},
+      { name: "Eğitim ve Bilim Oyuncakları", children: [
+        { name: "Bilim Setleri" }, { name: "Dedektiflik" }, { name: "Eğitici Elektronik Oyuncaklar" }, { name: "Eğitici Kartlar" }, { name: "Güneş Enerjisi Oyuncakları" }, { name: "Haritalar" }, { name: "Keşif Oyuncakları" }, { name: "Mıknatıslar ve Mıknatıslı Oyuncaklar" }, { name: "Misket Kaydırakları" }, { name: "Motor Beceri Oyuncakları" }, { name: "Okuma ve Yazma" }, { name: "Özel İhtiyacı Olan Çocuklar İçin Gelişim Oyuncakları" }, { name: "Teleskoplar" }
+      ]},
+      { name: "Oyuncak Bebekler ve Aksesuarları", children: [
+        { name: "Bebekler" }, { name: "Kağıt ve Mıknatıslı Bebekler" }, { name: "Oyun Setleri" }, { name: "Oyuncak Bebek Aksesuarları" }, { name: "Oyuncak Ev Aksesuarları" }, { name: "Oyuncak Evler" }, { name: "Yumuşak Bebekler" }
+      ]},
+      { name: "Spor ve Açık Hava", children: [
+        { name: "Bahçe Aletleri" }, { name: "Beden Eğitimi ve Jimnastik" }, { name: "Bisikletler ve Arabalar" }, { name: "Deniz Malzemeleri ve Oyuncakları" }, { name: "Kabarcık Yapıcılar" }, { name: "Kum Havuzları ve Plaj Oyuncakları" }, { name: "Oyun Çadırları" }, { name: "Oyun Evleri" }, { name: "Oyun Parkı Ekipmanları" }, { name: "Rüzgar Gülleri" }, { name: "Spor Oyuncakları" }, { name: "Su Tabancaları ve Köpük Oyunları" }, { name: "Şişme Oyun Parkları" }, { name: "Top Havuzları ve Aksesuarları" }, { name: "Uçurtmalar ve Aksesuarları" }, { name: "Uyku Tulumları" }
+      ]},
+      { name: "Yapbozlar ve Bulmacalar", children: [
+        { name: "3 Boyutlu Yapbozlar" }, { name: "Çerçeveli Yapbozlar" }, { name: "Yapboz Aksesuarları" }, { name: "Yapboz Çerçeveleri" }, { name: "Yapboz Oyun Halıları" }, { name: "Yapbozlar" }, { name: "Yer Yapbozları" }, { name: "Zeka Oyunları" }
       ]}
     ]
   },
