@@ -59,7 +59,7 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
     const uniqueSellersCount = new Set(items.map(i => i.sellerCompanyId)).size;
 
     return (
-        <div className="flex flex-col md:flex-row gap-6 lg:gap-8 w-full items-start">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_400px] gap-6 lg:gap-8 items-start">
             {items.length === 0 ? (
                 <div className="w-full bg-white dark:bg-[#1e293b]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl shadow-lg py-32 text-center flex flex-col items-center justify-center">
                     <div className="w-24 h-24 bg-slate-50 dark:bg-[#0f172a] rounded-3xl flex items-center justify-center shadow-inner mb-6 border border-slate-100 dark:border-white/5 transform rotate-3">
@@ -153,7 +153,7 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
                     </div>
 
                     {/* RIGHT COLUMN: Order Summary Sidebar */}
-                    <div className="w-full md:w-[320px] lg:w-[380px] shrink-0 sticky top-6">
+                    <div className="w-full sticky top-6">
                         <div className="bg-white dark:bg-[#1e293b] rounded-3xl p-6 sm:p-8 shadow-lg border border-slate-200 dark:border-white/10">
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-white/10 pb-5 mb-6 flex items-center gap-3">
                                 <Save className="w-6 h-6 text-emerald-500" />
