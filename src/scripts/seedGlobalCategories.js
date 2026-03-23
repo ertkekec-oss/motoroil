@@ -344,6 +344,26 @@ const masterTaxonomy = [
       { name: "Bisiklet", children: [{ name: "Dağ Bisikleti" }, { name: "Şehir Bisikleti" }, { name: "Yedek Parça & Vites" }] },
       { name: "Oto Yedek Parça", children: [{ name: "Aydınlatma (Far/Stop)" }, { name: "Mekanik (Motor/Fren)" }] }
     ]
+  },
+  {
+    name: "Kişisel Bakım ve Kozmetik",
+    children: [
+      { name: "Cilt Bakımı", children: [
+        { name: "Boyun ve Dekolte Bakım Ürünleri" }, { name: "Dudak Bakımı" }, { name: "El ve Ayak Bakımı" }, { name: "Göz Çevresi Bakımı" }, { name: "Güneş Bakım Ürünleri" }, { name: "Hamileler İçin Ürünler" }, { name: "Hediye Setleri" }, { name: "Makyaj Temizleyicileri" }, { name: "Vücut Bakım Ürünleri" }, { name: "Yüz Bakımı" }
+      ]},
+      { name: "Makyaj Fırçaları ve Aksesuarları", children: [
+        { name: "Aynalar" }, { name: "Boş Seyahat Şişeleri" }, { name: "Boş Sprey Şişeler" }, { name: "Cilt Bakım Aletleri" }, { name: "Kaş Düzeltme Makasları" }, { name: "Makyaj Çantaları ve Kutuları" }, { name: "Makyaj Fırçaları, Aynalar ve Diğer Aksesuarlar" }, { name: "Makyaj Temizleme ve Kulak Pamukları" }, { name: "Piercing ve Dövme Malzemeleri" }
+      ]},
+      { name: "Saç Bakımı", children: [
+        { name: "Bakım Yağları" }, { name: "Dolanmış Saç Açıcılar" }, { name: "Kafa Derisi Tedavileri" }, { name: "Maskeler" }, { name: "Parfümler" }, { name: "Permalar, Düzleştiriciler ve Yatıştırıcılar" }, { name: "Postişler, Peruklar ve Aksesuarlar" }, { name: "Saç Boyama Ürünleri" }, { name: "Saç Dökülmesine Karşı Ürünler" }, { name: "Saç Kesim Aletleri" }, { name: "Saç Şekillendirme Aksesuarları" }, { name: "Setler ve Takımlar" }, { name: "Seyahat Setleri" }, { name: "Şampuan ve Saç Kremi" }, { name: "Şekillendirme Aletleri" }, { name: "Şekillendirme Ürünleri" }
+      ]},
+      { name: "Tıraş ve Epilasyon", children: [
+        { name: "Epilasyon" }, { name: "Makaslar" }, { name: "Manuel Tıraş" }, { name: "Saç Sakal Kesme, Tüy Temizleme Makineleri" }, { name: "Tıraş Makineleri" }, { name: "Tıraş ve Epilasyon Öncesi" }, { name: "Tıraş ve Epilasyon Sonrası Ürünleri" }
+      ]},
+      { name: "Vücut Bakımı ve Banyo Ürünleri", children: [
+        { name: "Banyo Lifleri, Süngerleri ve Fırçaları" }, { name: "Banyo Tuzları, Köpükleri ve Yağları" }, { name: "Deodorantlar ve Antiperspirantlar" }, { name: "Jeller, Yağlar ve Dezenfektanlar" }, { name: "Peeling ve Vücut Bakım Ürünleri" }, { name: "Setler" }
+      ]}
+    ]
   }
 ];
 
