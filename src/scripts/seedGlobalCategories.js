@@ -3,11 +3,64 @@ const prisma = new PrismaClient();
 
 const masterTaxonomy = [
   {
+    name: "Bilgisayar & Teknoloji",
+    children: [
+      { name: "Bilgisayar", children: [
+        { name: "Masaüstü Bilgisayarlar" }, { name: "Dizüstü Bilgisayarlar" }, { name: "Tabletler" }, { name: "Sunucular" }, { name: "Barebone Bilgisayarlar" }
+      ]},
+      { name: "Donanım & Bileşenler", children: [
+        { name: "Bileşenler (RAM/CPU/Anakart)" }, { name: "Veri Depolama" }, { name: "Monitörler" }, { name: "Ağ Cihazları" }
+      ]},
+      { name: "Çevre Birimleri", children: [
+        { name: "Yazıcılar ve Aksesuarları" }, { name: "Tarayıcılar" }, { name: "3D Yazıcılar" }, { name: "Aksesuarlar (Klavye/Mouse vb.)" }
+      ]}
+    ]
+  },
+  {
+    name: "Moda & Giyim",
+    children: [
+      { name: "Kadın Giyim", children: [
+        { name: "Bluz ve Gömlek" }, { name: "Dış Giyim" }, { name: "Elbise" }, { name: "Etek" }, { name: "Hamile" }, { name: "Jean" }, { name: "Pantolon" }, { name: "Spor Giyim" }, { name: "Sweatshirt" }, { name: "Triko" }, { name: "Üst ve T-shirt" }, { name: "Plaj Giyim" }
+      ]},
+      { name: "Kadın Ayakkabı", children: [
+        { name: "Babet" }, { name: "Topuklu Ayakkabı" }, { name: "Bot ve Çizme" }, { name: "Spor ve Outdoor Ayakkabısı" }, { name: "Sneaker" }, { name: "Sandalet" }, { name: "Terlik" }
+      ]},
+      { name: "Erkek Giyim", children: [
+        { name: "Dış Giyim" }, { name: "Gömlek" }, { name: "Sweatshirt" }, { name: "Jean" }, { name: "Pantolon" }, { name: "Takım ve Blazer" }, { name: "Spor Giyim" }, { name: "Triko" }, { name: "Üst ve T-shirt" }, { name: "Ev Kıyafeti" }, { name: "Plaj Giyim" }
+      ]},
+      { name: "Erkek Ayakkabı", children: [
+        { name: "Bağcıklı Ayakkabı" }, { name: "Bot ve Çizme" }, { name: "Düz Ayakkabı" }, { name: "Sandalet" }, { name: "Sneaker" }, { name: "Spor ve Outdoor Ayakkabısı" }
+      ]},
+      { name: "Aksesuarlar", children: [
+        { name: "Güneş Gözlüğü" }, { name: "Şapka" }, { name: "Çanta" }, { name: "Cüzdan ve Kartlık" }, { name: "Kemer" }
+      ]},
+      { name: "Çocuk & Bebek Giyim", children: [
+        { name: "Kız Çocuk Kıyafet" }, { name: "Erkek Çocuk Kıyafet" }, { name: "Kız Çocuk Ayakkabı" }, { name: "Erkek Çocuk Ayakkabı" }, { name: "Bebek Kıyafet ve Aksesuar" }
+      ]}
+    ]
+  },
+  {
+    name: "Oyuncak & Hobi",
+    children: [
+      { name: "Araçlar & Modeller", children: [
+        { name: "Oyuncak Araçlar" }, { name: "Uzaktan Kumandalı Cihazlar" }, { name: "Model Yapımı ve Hobi Gereçleri" }
+      ]},
+      { name: "Bebek & Pelüş", children: [
+        { name: "Bebek ve Küçük Çocuk Oyuncakları" }, { name: "Dolgu ve Pelüş Oyuncaklar" }, { name: "Oyuncak Bebekler ve Aksesuarları" }
+      ]},
+      { name: "Eğitim & Oyun", children: [
+        { name: "Eğitim ve Bilim Oyuncakları" }, { name: "Elektronik Oyuncaklar" }, { name: "Yapbozlar ve Bulmacalar" }, { name: "Oyunlar ve Oyun Aksesuarları" }, { name: "Yapı İnşa Oyunları" }, { name: "Yap-İnan Oyunları" }
+      ]},
+      { name: "Hobi & Eğlence", children: [
+        { name: "İlginç Oyuncaklar ve Şaka Oyuncakları" }, { name: "Koleksiyon Ürünleri" }, { name: "Kuklalar ve Kukla Tiyatroları" }, { name: "Oyuncak Figürler" }, { name: "Oyuncak Müzik Aletleri" }, { name: "Parti Malzemeleri" }, { name: "Resim ve El İşi" }, { name: "Spor ve Açık Hava" }
+      ]}
+    ]
+  },
+  {
     name: "Gıda & Tarım Ürünleri",
     children: [
       { name: "Kuruyemiş & Çerez", children: [{ name: "Kavrulmuş Kuruyemiş" }, { name: "Çiğ Kuruyemiş" }] },
       { name: "Et & Kasap Ürünleri", children: [{ name: "Kırmızı Et (Dana/Kuzu)" }, { name: "Beyaz Et" }, { name: "İşlenmiş Et" }] },
-      { name: "Süt ve Süt Ürünleri", children: [{ name: "Peynir Çeşitleri" }, { name: "Günlük Süt & Yoğurt" }] },
       { name: "Tarımsal Ürünler", children: [{ name: "Gübre & Zirai İlaç" }, { name: "Tohum" }] }
     ]
   },
@@ -15,7 +68,7 @@ const masterTaxonomy = [
     name: "Taşıtlar & Otomotiv",
     children: [
       { name: "Motosiklet", children: [{ name: "Motosiklet Aksesuarları" }, { name: "Motor Aksamı" }, { name: "Kask & Güvenlik" }] },
-      { name: "Bisiklet", children: [{ name: "Dağ Bisikleti" }, { name: "Yedek Parça & Vites" }] },
+      { name: "Bisiklet", children: [{ name: "Dağ Bisikleti" }, { name: "Şehir Bisikleti" }, { name: "Yedek Parça & Vites" }] },
       { name: "Oto Yedek Parça", children: [{ name: "Aydınlatma (Far/Stop)" }, { name: "Mekanik (Motor/Fren)" }] }
     ]
   },
@@ -23,15 +76,7 @@ const masterTaxonomy = [
     name: "Mobilya & Ev Yaşam",
     children: [
       { name: "Oturma Odası", children: [{ name: "Koltuk Takımı" }, { name: "Sehpa & TV Ünitesi" }] },
-      { name: "Yatak Odası", children: [{ name: "Yatak & Baza" }, { name: "Gardırop" }] },
-      { name: "Aydınlatma", children: [{ name: "Avize & Sarkıt" }, { name: "Ampul & LED" }] }
-    ]
-  },
-  {
-    name: "Elektronik & Bilgisayar",
-    children: [
-      { name: "Bilgisayar & Donanım", children: [{ name: "Mikroçip & Devre (Çip)" }, { name: "Bileşenler (RAM/CPU)" }] },
-      { name: "Telefon & Aksesuar", children: [{ name: "Cep Telefonu" }, { name: "Kılıf & Şarj" }] }
+      { name: "Yatak Odası", children: [{ name: "Yatak & Baza" }] }
     ]
   },
   {
