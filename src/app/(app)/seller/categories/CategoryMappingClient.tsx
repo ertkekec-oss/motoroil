@@ -114,7 +114,10 @@ export default function CategoryMappingClient({
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
                                 const res = await runAiMappingAction(false);
                                 if (res.success) {
-                                    showSuccess("Gümrük Çözüldü!", `${res.count} adet etiketlenmemiş ürün başarıyla Hub'a bağlandı.`);
+                                    showSuccess(
+                                        res.count !== undefined ? "Gümrük Çözüldü!" : "Aksiyon Tamamlandı", 
+                                        res.message || `${res.count} adet etiketlenmemiş ürün başarıyla Hub'a bağlandı.`
+                                    );
                                 } else {
                                     showError("Hata", res.error);
                                 }
@@ -128,7 +131,10 @@ export default function CategoryMappingClient({
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
                                 const res = await runAiMappingAction(true);
                                 if (res.success) {
-                                    showSuccess("Düzen Sağlandı!", `${res.count} ürün tespit edildi. Lokaliniz modernize edilerek ağa eklendi.`);
+                                    showSuccess(
+                                        res.count !== undefined ? "Düzen Sağlandı!" : "Aksiyon Tamamlandı", 
+                                        res.message || `${res.count} ürün tespit edildi. Lokaliniz modernize edilerek ağa eklendi.`
+                                    );
                                 } else {
                                     showError("Hata", res.error);
                                 }
