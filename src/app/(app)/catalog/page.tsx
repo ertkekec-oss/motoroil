@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import HubCatalogTabs from "@/components/network/HubCatalogTabs";
@@ -18,7 +18,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
     const HIDE_LT_MIN = process.env.CATALOG_HIDE_IF_AVAILABLE_LT_MINQTY !== "false"; // Default true
 
     // Query active network listings joined with their APPROVED GlobalProduct
-    const listings = await prisma.networkListing.findMany({
+    // FIX: Must use prismaRaw to bypass the row-level security / isolation that ordinarily filters out other tenants.
+    const listings = await prismaRaw.networkListing.findMany({
         where: {
             status: "ACTIVE",
             globalProduct: {
