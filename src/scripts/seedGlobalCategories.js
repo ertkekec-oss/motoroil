@@ -8,7 +8,12 @@ const masterTaxonomy = [
       { name: "Dizüstü Bilgisayarlar", children: [
         { name: "Mac" }, { name: "Windows" }, { name: "Oyun" }, { name: "Çantalar" }, { name: "Kılıflar" }
       ]},
-      { name: "Masaüstü Bilgisayarlar" },
+      { name: "Masaüstü Bilgisayarlar", children: [
+        { name: "All-in-one" }, { name: "Kule Tipi" }, { name: "Oyun" }, { name: "Ofis" }, { name: "Mini" }
+      ]},
+      { name: "Monitörler", children: [
+        { name: "Ofis" }, { name: "Oyun" }, { name: "Curved" }, { name: "UHD" }
+      ]},
       { name: "Ağ Cihazları", children: [
         { name: "Ağ Adaptörleri" }, { name: "Ağ Alıcı Vericileri" }, { name: "Ağ Anahtarları" }, { name: "Ağ Antenleri" }, { name: "Ağ Hub'ları" }, { name: "Kablosuz Erişim Noktaları" }, { name: "Kablosuz Mesh Ağlar" }, { name: "Mobil İnternet Cihazları" }, { name: "Modemler" }, { name: "Yazdırma Sunucuları" }, { name: "Yineleyiciler" }, { name: "Yönlendiriciler" }
       ]},
@@ -16,7 +21,13 @@ const masterTaxonomy = [
         { name: "3D Yazıcı Malzemeleri" }, { name: "3D Yazıcı Parçaları ve Aksesuarları" }, { name: "Adaptörler" }, { name: "Bilgisayar Bellek Kartı Aksesuarları" }, { name: "Dizüstü Bilgisayar Aksesuarları" }, { name: "Güvenlik Kabloları" }, { name: "Kablolar ve Aksesuarlar" }, { name: "Kesintisiz Güç Kaynakları" }, { name: "Klavyeler, Fareler ve Giriş Cihazları" }, { name: "Küçük USB Araçları" }, { name: "Medya Depolama Ürünleri" }, { name: "Monitör Aksesuarları" }, { name: "PC için Oyun Aksesuarları" }, { name: "Sabit Sürücü Aksesuarları" }, { name: "Ses ve Video Aksesuarları" }, { name: "Tablet Aksesuarları" }, { name: "Tamir Setleri" }, { name: "USB Hub'ları" }, { name: "Yazıcı Aksesuarları" }, { name: "Yazılabilir Medya" }
       ]},
       { name: "Bilgisayar Bileşenleri", children: [
-        { name: "Bilgisayar Vidaları" }, { name: "Dahili Bileşenler" }, { name: "Dizüstü Bilgisayar Bileşenleri" }, { name: "Harici Bileşenler" }, { name: "Tablet Bileşenleri ve Yedek Parçaları" }
+        { name: "İşlemciler" }, { name: "Anakartlar" }, { name: "RAM'ler" }, { name: "Ekran Kartları" }, { name: "Bilgisayar Kasaları" }, { name: "Dahili Sabit Sürücüler" }, { name: "Bilgisayar Vidaları" }, { name: "Dahili Bileşenler" }, { name: "Dizüstü Bilgisayar Bileşenleri" }, { name: "Harici Bileşenler" }, { name: "Tablet Bileşenleri ve Yedek Parçaları" }
+      ]},
+      { name: "Veri Depolama", children: [
+        { name: "SSD'ler" }, { name: "Harici Diskler" }, { name: "Dahili Sabit Sürücüler" }, { name: "USB Bellekler" }
+      ]},
+      { name: "Oyun Bilgisayarları", children: [
+        { name: "Dizüstü" }, { name: "Masaüstü" }, { name: "Monitörler" }, { name: "Kulaklıklar" }, { name: "Mouse'lar" }, { name: "Klavyeler" }
       ]},
       { name: "Cep Telefonları ve Aksesuarlar", children: [] },
       { name: "E-kitap Okuyucular ve Aksesuarları", children: [] },
