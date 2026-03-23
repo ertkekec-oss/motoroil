@@ -24,23 +24,20 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
             globalProduct: {
                 status: "APPROVED" // Only approved products in catalog
             },
-            // If we are NOT showing out of stock, enforce availableQty > 0
-            // More strict minQty check handled in JS loop for better precision
-            // ...(SHOW_OOS ? {} : { availableQty: { gt: 0 } }) // TS Issue workaround -> Prisma does not perfectly handle conditional where spread with relation. We filter it anyway in map.
             ...(SHOW_OOS ? {} : { availableQty: { gt: 0 } })
         },
         include: {
             globalProduct: true,
+            erpProduct: true // Included to steal local images as fallback!
         },
     });
 
     // Group by GlobalProduct
-    const catalogMap = new Map<string, { product: any; minPrice: number; maxPrice: number; sellersCount: number; availableQty: number }>();
+    const catalogMap = new Map<string, { product: any; minPrice: number; maxPrice: number; sellersCount: number; availableQty: number; localFallbackImage: string | null }>();
 
     for (const listing of listings) {
         if (!listing.globalProduct) continue;
 
-        // Post-fetch gating: Hide if available < minQty unless SHOW_OOS is on
         if (!SHOW_OOS && HIDE_LT_MIN && listing.availableQty < listing.minQty) {
             continue;
         }
@@ -48,6 +45,10 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
         const gId = listing.globalProduct.id;
         const p = Number(listing.price);
         const qty = listing.availableQty;
+        
+        // Extract seller's local image representation
+        const ep = listing.erpProduct as any;
+        let localImage = ep?.imageUrl || ep?.image || (ep?.images && ep.images[0]) || ep?.coverImage || ep?.thumbnail || null;
 
         if (catalogMap.has(gId)) {
             const entry = catalogMap.get(gId)!;
@@ -55,6 +56,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
             entry.maxPrice = Math.max(entry.maxPrice, p);
             entry.sellersCount += 1;
             entry.availableQty += qty;
+            if (!entry.localFallbackImage && localImage) entry.localFallbackImage = localImage;
         } else {
             catalogMap.set(gId, {
                 product: listing.globalProduct,
@@ -62,6 +64,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                 maxPrice: p,
                 sellersCount: 1,
                 availableQty: qty,
+                localFallbackImage: localImage
             });
         }
     }
@@ -69,33 +72,12 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
     const items = Array.from(catalogMap.values());
 
     return (
-        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen pb-16 w-full font-sans">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen flex flex-col w-full font-sans">
+            <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300 flex-1">
                 <HubCatalogTabs />
                 
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
-                            B2B Tedarik Kataloğu <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 tracking-widest uppercase">Global Ağ</span>
-                        </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
-                            Pazaryerindeki onaylı tedarikçilerin stoklarında bulunan ve anında sipariş edilebilir hazır ürünler tablosu.
-                        </p>
-                    </div>
-
-                    <div className="flex bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
-                        <Link
-                            href="/catalog"
-                            className="px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm"
-                        >
-                            Tüm Lüks Konsorsiyum Ağı
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Filtre Strip */}
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm p-4 mb-10 flex flex-col sm:flex-row gap-4 items-center justify-between relative overflow-hidden">
+                {/* Search / Filter Section */}
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm p-4 mb-10 flex flex-col sm:flex-row gap-4 items-center justify-between relative overflow-hidden mt-4">
                     <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-indigo-500/10 to-transparent"></div>
                     <div className="relative w-full sm:w-96 flex-shrink-0 z-10">
                         <input
@@ -115,7 +97,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                     </div>
                 </div>
 
-                {/* Bölüm 1: Premium Görselli Kartlar (4 Kolon, max 12) */}
+                {/* Section 1: Premium Image Cards (2 Rows, 4 Cols, max 8) */}
                 <div className="mb-12">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
@@ -126,9 +108,9 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {(() => {
-                            const itemsWithImages = items.filter(t => t.product.imageUrl || t.product.images?.length > 0 || t.product.image || t.product.coverImage || t.product.thumbnail).slice(0, 12);
+                            const itemsWithImages = items.filter(t => t.product.imageUrl || t.product.images?.length > 0 || t.product.image || t.product.coverImage || t.product.thumbnail || t.localFallbackImage)
+                                                         .slice(0, 8); // Strictly 8 items
                             
-                            // If DB magically has no images, mock a few just to show the UI as requested
                             const renderItems = itemsWithImages.length > 0 ? itemsWithImages : items.slice(0, 8);
                             
                             if (renderItems.length === 0) {
@@ -136,7 +118,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                             }
 
                             return renderItems.map((item, idx) => {
-                                const imgSafe = item.product.imageUrl || item.product.image || (item.product.images && item.product.images[0]) || item.product.coverImage || item.product.thumbnail || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2000&auto=format&fit=crop";
+                                const imgSafe = item.product.imageUrl || item.product.image || (item.product.images && item.product.images[0]) || item.product.coverImage || item.product.thumbnail || item.localFallbackImage || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2000&auto=format&fit=crop";
                                 return (
                                 <div key={idx} className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all group overflow-hidden flex flex-col">
                                     <div className="relative aspect-[4/3] bg-slate-100 dark:bg-[#0f172a] overflow-hidden">
@@ -182,8 +164,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                     </div>
                 </div>
 
-                {/* Bölüm 2: Görselsiz Ürünler (2 Kolon, Şık Liste) */}
-                <div>
+                {/* Section 2: Image-less sleek lists (2 Cols, max 8 items) */}
+                <div className="pb-10">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                             <span className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-300 flex items-center justify-center">📋</span>
@@ -193,9 +175,10 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {(() => {
-                            const itemsWithoutImages = items.filter(t => !(t.product.imageUrl || t.product.images?.length > 0 || t.product.image || t.product.coverImage || t.product.thumbnail)).slice(0, 8);
+                            const itemsWithoutImages = items.filter(t => !(t.product.imageUrl || t.product.images?.length > 0 || t.product.image || t.product.coverImage || t.product.thumbnail || t.localFallbackImage))
+                                                          .slice(0, 8); // Strictly 8 items
                             
-                            const renderList = itemsWithoutImages.length > 0 ? itemsWithoutImages : items.slice(0, 8); // Fallback so grid doesn't stay empty if all have images
+                            const renderList = itemsWithoutImages.length > 0 ? itemsWithoutImages : items.slice(0, 8); // Fallback so grid doesn't stay empty
                             
                             if (renderList.length === 0) return null;
 
@@ -237,6 +220,30 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                                 </div>
                             ));
                         })()}
+                    </div>
+                </div>
+            </div>
+
+            {/* Sleek B2B Footer Menu */}
+            <div className="w-full bg-white dark:bg-[#1e293b] border-t border-slate-200 dark:border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] dark:shadow-none pointer-events-auto">
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-6">
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Pazar Yeri İşlemleri:</span>
+                            <div className="flex gap-4 text-[13px] font-semibold text-slate-600 dark:text-slate-300">
+                                <Link href="/catalog" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tedarik Kataloğu</Link>
+                                <span className="text-slate-200 dark:text-slate-700">|</span>
+                                <Link href="/rfq/create" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Özel RFQ İhalesi</Link>
+                                <span className="text-slate-200 dark:text-slate-700">|</span>
+                                <Link href="/seller/offers" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Veri Besleme Cihazı</Link>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 border border-slate-800 dark:border-white/10 rounded-xl font-bold text-xs uppercase tracking-widest shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors group flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Hub Canlı
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
