@@ -215,16 +215,31 @@ const masterTaxonomy = [
         { name: "Pantolon" },
         { name: "Pijama ve Bornoz" },
         { name: "Plaj Giyim" },
-        { name: "Spor Giyim" },
+        { name: "Spor Giyim", children: [
+          { name: "Eşofman Altı" }, { name: "Eşofman Üstü" }, { name: "İç Giyim" }, { name: "Kapüşonlu ve Kapüşonsuz Sweatshirt" }, { name: "Tozluklar" }, { name: "Spor Çorabı" }, { name: "Şort" }, { name: "Takım" }, { name: "Triko" }, { name: "T-shirt ve Polo Yaka T-shirt" }, { name: "İçlik ve Kompresyon" }, { name: "Yelek" }
+        ]},
         { name: "Şort" },
         { name: "Takım" },
-        { name: "Takım Elbise ve Blazer Ceket" },
+        { name: "Takım Elbise ve Blazer Ceket", children: [
+          { name: "Blazer Ceket" }, { name: "Smokin" }, { name: "Takım Ceketi" }, { name: "Takım Elbise" }, { name: "Takım Pantolonu" }, { name: "Takım Yeleği" }
+        ]},
         { name: "Triko" },
         { name: "Tulum" },
-        { name: "Üst ve T-shirt" }
+        { name: "Üst ve T-shirt", children: [
+          { name: "Gömlek" }, { name: "Kolsuz Üst" }, { name: "Polo Yaka T-shirt" }, { name: "T-shirt" }
+        ]}
       ]},
-      { name: "Bebek ve Çocuk Ayakkabı", children: [
-          { name: "Kız Çocuk Ayakkabı" }, { name: "Erkek Çocuk Ayakkabı" }, { name: "Bebek Ayakkabısı" }
+      { name: "Kız Bebek Kıyafet", children: [
+        { name: "Alt Giyim" }, { name: "Body ve Tek Parça Kıyafet" }, { name: "Çorap ve Külotlu Çorap" }, { name: "Dış Giyim" }, { name: "Elbise" }, { name: "İç Giyim" }, { name: "Kar ve Yağmur Kıyafeti" }, { name: "Pijama ve Bornoz" }, { name: "Plaj Giyim" }, { name: "Sweatshirt ve Eşofman" }, { name: "Takım" }, { name: "Triko" }, { name: "Üst" }
+      ]},
+      { name: "Erkek Bebek Kıyafet", children: [
+        { name: "Alt Giyim" }, { name: "Çorap ve Külotlu Çorap" }, { name: "Dış Giyim" }, { name: "İç Giyim" }, { name: "Pijama ve Bornoz" }, { name: "Plaj Giyim" }, { name: "Sweatshirt ve Eşofman" }, { name: "Takım" }, { name: "Takım Elbise ve Blazer Ceket" }, { name: "Triko" }, { name: "Üst" }, { name: "Zıbın ve Tek Parça Kıyafet" }
+      ]},
+      { name: "Kız Bebek Ayakkabı", children: [
+        { name: "Clog ve Mule Terlik" }, { name: "İlk Adım Ayakkabısı" }, { name: "Patik" }, { name: "Sandalet" }, { name: "Spor ve Outdoor Ayakkabılar" }
+      ]},
+      { name: "Erkek Bebek Ayakkabı", children: [
+        { name: "İlk Adım Ayakkabısı" }, { name: "Patik" }, { name: "Sandalet" }, { name: "Spor ve Outdoor Ayakkabılar" }
       ]}
     ]
   },
