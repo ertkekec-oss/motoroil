@@ -24,9 +24,15 @@ export default function CheckoutClient({ previewData }: { previewData: any }) {
 
         startTransition(async () => {
             try {
-                await createOrdersFromCartAction(attemptKey);
+                const res = await createOrdersFromCartAction(attemptKey);
+                
+                if (res?.error) {
+                    showError("İşlem Başarısız", res.error);
+                    return;
+                }
+
                 showSuccess("Sipariş Onaylandı", "Başarıyla Ağ Açık Hesabı (Escrow Mimarisi) üzerinden B2B sipariş fırlatıldı!");
-                router.push("/b2b/buyer/orders");
+                router.push("/hub/buyer/orders");
             } catch (err: any) {
                 showError("İşlem Başarısız", err.message || "Ödeme veya sipariş aktarımı sırasında bir hata oluştu.");
             }
