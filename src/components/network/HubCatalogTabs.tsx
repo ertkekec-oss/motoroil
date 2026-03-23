@@ -14,27 +14,26 @@ export default function HubCatalogTabs() {
     ];
 
     return (
-        <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/10 p-2 mb-8 shadow-sm flex flex-wrap gap-2">
+        <div className="flex items-center gap-1 border-b border-slate-200 dark:border-white/10 mb-8 pb-px">
             {tabs.map((tab) => {
-                // Determine if active. For /catalog, we also want to match /catalog/* except if it's explicitly matched by another tab. 
-                // Since my-products is /seller/products, we can just do exact or startsWith logic depending on the routes.
-                // Simple startsWith works well in our case, except /catalog is the root.
                 const isActive = pathname === tab.href || (tab.href !== "/catalog" ? pathname.startsWith(tab.href + "/") : pathname.startsWith("/catalog/"));
-
                 const Icon = tab.icon;
 
                 return (
                     <Link
                         key={tab.id}
                         href={tab.href}
-                        className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 flex-1 sm:flex-none justify-center ${
+                        className={`flex items-center gap-2 px-5 py-3 text-[13px] font-bold transition-all relative ${
                             isActive
-                                ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-                                : "text-slate-500 hover:bg-slate-50 dark:hover:bg-white/[0.02] hover:text-slate-700 dark:hover:text-slate-300"
+                                ? "text-indigo-600 dark:text-indigo-400"
+                                : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                         }`}
                     >
-                        <Icon className={`w-5 h-5 ${isActive ? "text-blue-500" : "opacity-60"}`} />
+                        <Icon className={`w-4 h-4 ${isActive ? "opacity-100" : "opacity-50"}`} />
                         {tab.name}
+                        {isActive && (
+                            <div className="absolute bottom-0 left-0 w-full h-[3px] bg-indigo-600 dark:bg-indigo-500 rounded-t-full shadow-[0_-2px_8px_rgba(79,70,229,0.4)]"></div>
+                        )}
                     </Link>
                 );
             })}

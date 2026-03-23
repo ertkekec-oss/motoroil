@@ -43,106 +43,83 @@ export default function CategoryMappingClient({
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 <HubCatalogTabs />
 
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                        <Network className="w-7 h-7 text-indigo-600 dark:text-indigo-400 p-1 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg" />
+                <div className="mb-6">
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Network className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                         Ağ Kategori Haritalama (Mapping Engine)
                     </h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-3xl">
-                        Kendi muhasebe/ERP sisteminizdeki lokal kategorilerinizi, Periodya B2B Global Kategori ağacına eşleştirin. Böylece ürünleriniz B2B keşfet ekranlarında doğru sınıflandırmayla global satıcılara ulaşabilir.
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
+                        Kendi ERP sisteminizdeki lokal kategorilerinizi, Periodya B2B Global Kategori ağacına eşleştirerek envanterinizi hub'a entegre edin.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-400">
-                                <Database className="w-5 h-5" />
-                            </div>
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">LOKAL (ERP)</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white dark:bg-[#1e293b] px-5 py-4 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm flex items-center gap-4">
+                        <div className="w-10 h-10 bg-slate-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center text-slate-500 shrink-0">
+                            <Database className="w-5 h-5" />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{mappingStats.total}</h3>
-                        <p className="text-sm text-slate-500 font-medium mt-1">Sisteminizdeki Klasör/Kategori</p>
+                        <div className="flex-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Lokal (ERP) Kategoriler</div>
+                            <div className="text-lg font-black text-slate-900 dark:text-white leading-none">{mappingStats.total} <span className="text-xs font-semibold text-slate-500 ml-1">Kayıt</span></div>
+                        </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm relative overflow-hidden group">
-                        <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
-                        <div className="flex items-center justify-between mb-4 relative z-10">
-                            <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                                <CheckCircle2 className="w-5 h-5" />
-                            </div>
-                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded uppercase tracking-widest">Haritalandı</span>
+                    <div className="bg-emerald-50/50 dark:bg-emerald-500/5 px-5 py-4 rounded-xl border border-emerald-100 dark:border-emerald-500/10 shadow-sm flex items-center gap-4">
+                        <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <CheckCircle2 className="w-5 h-5" />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white relative z-10">{mappingStats.mapped}</h3>
-                        <p className="text-sm text-slate-500 font-medium mt-1 relative z-10">Global'e Eşleşen</p>
+                        <div className="flex-1">
+                            <div className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest mb-0.5">Global'e Eşleşen</div>
+                            <div className="text-lg font-black text-emerald-700 dark:text-emerald-400 leading-none">{mappingStats.mapped} <span className="text-xs font-semibold text-emerald-600/70 ml-1">Kayıt</span></div>
+                        </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-rose-200 dark:border-rose-900/30 shadow-sm relative overflow-hidden group">
-                        <div className="absolute -right-6 -top-6 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
-                        <div className="flex items-center justify-between mb-4 relative z-10">
-                            <div className="w-10 h-10 bg-rose-50 dark:bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-600 dark:text-rose-400">
-                                <AlertCircle className="w-5 h-5" />
-                            </div>
-                            <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-1 rounded uppercase tracking-widest">Bekliyor</span>
+                    <div className="bg-rose-50/50 dark:bg-rose-500/5 px-5 py-4 rounded-xl border border-rose-100 dark:border-rose-500/10 shadow-sm flex items-center gap-4">
+                        <div className="w-10 h-10 bg-rose-100 dark:bg-rose-500/20 rounded-lg flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+                            <AlertCircle className="w-5 h-5" />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white relative z-10">{mappingStats.pending}</h3>
-                        <p className="text-sm text-slate-500 font-medium mt-1 relative z-10">Eşleşme Bekleyen Kategori</p>
+                        <div className="flex-1">
+                            <div className="text-[10px] font-bold text-rose-600/70 dark:text-rose-400/70 uppercase tracking-widest mb-0.5">Eşleşme Bekleyen</div>
+                            <div className="text-lg font-black text-rose-700 dark:text-rose-400 leading-none">{mappingStats.pending} <span className="text-xs font-semibold text-rose-600/70 ml-1">Kayıt</span></div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="mb-8 relative overflow-hidden group bg-slate-900 border border-indigo-500/30 rounded-2xl p-5 shadow-2xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 hover:border-indigo-400/50 transition-all">
-                    {/* Background Ambience */}
-                    <div className="absolute top-1/2 left-20 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-indigo-500/10 animate-[ping_5s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-600/20 blur-[80px] rounded-full"></div>
-                    
-                    <div className="flex items-center gap-5 relative z-10 w-full lg:w-auto flex-1">
-                        
-                        {/* Custom Periodya 'P' AI Core Avatar */}
-                        <div className="relative shrink-0 flex items-center justify-center w-[64px] h-[64px] rounded-full bg-slate-950/80 backdrop-blur-sm border border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.4)] group-hover:shadow-[0_0_40px_rgba(99,102,241,0.6)] transition-all overflow-hidden">
-                            {/* Animated Galaxy Nebula */}
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,theme(colors.indigo.600/0.5)_0%,transparent_70%)] animate-pulse"></div>
-                            
-                            {/* Counter-rotating Orbit Rings */}
-                            <div className="absolute inset-1 rounded-full border border-indigo-400/30 border-dashed animate-[spin_8s_linear_infinite]"></div>
-                            <div className="absolute inset-[6px] rounded-full border border-indigo-300/20 border-dotted animate-[spin_12s_linear_infinite_reverse]"></div>
-
-                            {/* The Glowing 'P' Heartbeat */}
-                            <div className="relative z-10 font-black text-3xl font-serif italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-indigo-200 to-indigo-600 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-[pulse_1.5s_ease-in-out_infinite]">
-                                P
-                            </div>
-
-                            {/* Deep Space Pinging Stars */}
-                            <div className="absolute w-[3px] h-[3px] bg-white rounded-full top-2 left-3 animate-ping" style={{ animationDuration: '2s' }}></div>
-                            <div className="absolute w-[4px] h-[4px] bg-indigo-300 rounded-full bottom-2 right-2 animate-ping" style={{ animationDuration: '3s', animationDelay: '0.5s' }}></div>
-                            <div className="absolute w-[2px] h-[2px] bg-indigo-100 rounded-full top-4 right-3 animate-pulse" style={{ animationDuration: '1s' }}></div>
+                <div className="mb-6 bg-slate-900 dark:bg-slate-950 border border-indigo-500/30 rounded-xl px-4 py-3 shadow-md flex items-center justify-between gap-4 w-full">
+                    <div className="flex items-center gap-3 shrink-0">
+                        {/* Compact Periodya AI Icon */}
+                        <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 border border-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.3)]">
+                            <div className="absolute inset-0 bg-indigo-500/20 rounded-full animate-pulse"></div>
+                            <div className="relative z-10 font-bold text-lg font-serif italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-indigo-400">P</div>
                         </div>
                         
-                        <div>
-                            <h3 className="text-lg font-black text-white flex items-center gap-3 mb-1">
-                                Otonom AI Kurtarma Sürücüsü
-                                <span className="px-2 py-[2px] rounded text-[9px] bg-teal-500/20 text-teal-300 font-bold uppercase tracking-[0.2em] border border-teal-500/30 shadow-[0_0_10px_rgba(20,184,166,0.3)] flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-white whitespace-nowrap">Otonom AI Kurtarma Sürücüsü</span>
+                                <span className="px-1.5 py-[2px] rounded text-[8px] bg-teal-500/20 text-teal-300 font-bold uppercase tracking-wider border border-teal-500/30 shadow-sm flex items-center gap-1 shrink-0">
+                                    <span className="w-1 h-1 rounded-full bg-teal-400 animate-pulse"></span>
                                     AI Aktif
                                 </span>
-                            </h3>
-                            <p className="text-indigo-100/70 text-[13px] font-medium leading-relaxed max-w-xl">
-                                Etiketsiz ("Diğer" veya boş) ürünlerinizi tarar ve Hub'a çıkmaları için köprüler. Özel deponuza (ERP'nize) dokunup dokunmamasını siz seçebilirsiniz.
-                            </p>
+                            </div>
                         </div>
                     </div>
+                    
+                    <div className="hidden lg:block flex-1 text-indigo-100/70 text-[12px] font-medium leading-tight truncate px-4 border-l border-white/10">
+                        Etiketsiz ürünlerinizi tarar ve Hub'a çıkmaları için köprüler. Lokal envanterinize dokunulmaz.
+                    </div>
 
-                    <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full lg:w-auto">
+                    <div className="flex items-center gap-2 shrink-0">
                         <button disabled={isPending} onClick={() => {
                             startTransition(async () => {
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
                                 const res = await runAiMappingAction(false);
                                 if (res.success) {
-                                    showSuccess("Gümrük Çözüldü!", `${res.count} adet etiketlenmemiş ürün, özel deponuz bozulmadan başarıyla Hub'a bağlandı.`);
+                                    showSuccess("Gümrük Çözüldü!", `${res.count} adet etiketlenmemiş ürün başarıyla Hub'a bağlandı.`);
                                 } else {
                                     showError("Hata", res.error);
                                 }
                             });
-                        }} className="w-full sm:w-auto h-[44px] px-5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-[11px] rounded-xl uppercase tracking-widest border border-slate-700 hover:border-slate-500 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50">
+                        }} className="h-8 px-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-[10px] rounded-lg uppercase tracking-wider border border-slate-700 transition-colors shadow flex items-center justify-center whitespace-nowrap disabled:opacity-50">
                             🔒 Sadece Hub'a Bağla
                         </button>
 
@@ -151,12 +128,12 @@ export default function CategoryMappingClient({
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
                                 const res = await runAiMappingAction(true);
                                 if (res.success) {
-                                    showSuccess("Düzen Sağlandı!", `${res.count} ürün tespit edildi. Hem Hub'a bağlandı hem de kendi klasör isimleriniz modernize edildi.`);
+                                    showSuccess("Düzen Sağlandı!", `${res.count} ürün tespit edildi. Lokaliniz modernize edilerek ağa eklendi.`);
                                 } else {
                                     showError("Hata", res.error);
                                 }
                             });
-                        }} className="w-full sm:w-auto h-[44px] px-5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] rounded-xl uppercase tracking-widest shadow-[0_4px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50">
+                        }} className="h-8 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg uppercase tracking-wider shadow-sm transition-colors flex items-center justify-center whitespace-nowrap disabled:opacity-50">
                             ✨ Lokalimi Düzelt & Bağla
                         </button>
                     </div>
