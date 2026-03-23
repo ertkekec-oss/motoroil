@@ -97,51 +97,51 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
                         <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-3xl shadow-sm overflow-hidden flex flex-col">
                             <div className="divide-y divide-slate-100 dark:divide-white/5">
                                 {items.map((item, index) => (
-                                    <div key={`${item.productId}-${item.sellerCompanyId}`} className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-colors group">
+                                    <div key={`${item.productId}-${item.sellerCompanyId}`} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-colors group">
                                         
-                                        {/* Product Info */}
-                                        <div className="flex-1 min-w-0 w-full sm:w-auto flex items-center gap-3">
+                                        {/* Product Info (Always strictly Left/Row) */}
+                                        <div className="flex-1 min-w-0 flex items-center gap-3">
                                             <span className="w-6 h-6 shrink-0 rounded bg-slate-100 dark:bg-white/5 flex items-center justify-center text-[10px] font-black text-slate-400 dark:text-slate-500">
                                                 {index + 1}
                                             </span>
                                             <div className="flex flex-col min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <h4 className="font-bold text-slate-900 dark:text-white text-base truncate" title={item.productName}>{item.productName}</h4>
-                                                    <span className="hidden lg:inline-block shrink-0 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 uppercase tracking-widest px-2 py-0.5 rounded">B2B NETWORK</span>
+                                                    <span className="hidden sm:inline-block shrink-0 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 uppercase tracking-widest px-2 py-0.5 rounded">B2B NETWORK</span>
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
                                                     <Building2 className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                                                    <span className="truncate" title={item.sellerName}>{item.sellerName}</span>
+                                                    <span className="truncate max-w-[150px] sm:max-w-xs" title={item.sellerName}>{item.sellerName}</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Pricing & Controls */}
-                                        <div className="flex items-center justify-between sm:justify-end gap-4 2xl:gap-8 w-full sm:w-auto shrink-0 bg-slate-50 dark:bg-[#0f172a]/40 sm:bg-transparent sm:dark:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border border-slate-100 dark:border-white/5 sm:border-none">
+                                        {/* Pricing & Controls (Always strictly Right/Row) */}
+                                        <div className="flex items-center justify-end gap-3 sm:gap-6 shrink-0">
                                             
-                                            <div className="hidden lg:block w-24 border-r border-slate-200 dark:border-white/10 pr-5 text-right shrink-0">
+                                            <div className="hidden lg:block border-r border-slate-200 dark:border-white/10 pr-5 text-right shrink-0">
                                                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Birim Fiyat</div>
-                                                <div className="font-mono font-bold text-slate-700 dark:text-slate-300 text-sm">{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                                <div className="font-mono font-bold text-slate-700 dark:text-slate-300 text-sm whitespace-nowrap">{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
                                             </div>
 
                                             <div className="flex items-center gap-1 bg-white dark:bg-[#1e293b] sm:dark:bg-[#0f172a] rounded-xl border border-slate-200 dark:border-white/10 p-1 shadow-sm shrink-0">
-                                                <button onClick={() => updateQty(item.productId, item.sellerCompanyId, item.qty - 1)} className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white group-active:scale-95 border border-slate-200/50 dark:border-white/5">
-                                                    <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                <button onClick={() => updateQty(item.productId, item.sellerCompanyId, item.qty - 1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white group-active:scale-95 border border-slate-200/50 dark:border-white/5">
+                                                    <Minus className="w-4 h-4" />
                                                 </button>
-                                                <span className="w-8 sm:w-10 text-center font-mono font-bold text-sm text-slate-900 dark:text-white select-none">{item.qty}</span>
-                                                <button onClick={() => updateQty(item.productId, item.sellerCompanyId, item.qty + 1)} className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white group-active:scale-95 border border-slate-200/50 dark:border-white/5">
-                                                    <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                <span className="w-10 text-center font-mono font-bold text-sm text-slate-900 dark:text-white select-none">{item.qty}</span>
+                                                <button onClick={() => updateQty(item.productId, item.sellerCompanyId, item.qty + 1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white group-active:scale-95 border border-slate-200/50 dark:border-white/5">
+                                                    <Plus className="w-4 h-4" />
                                                 </button>
                                             </div>
 
-                                            <div className="w-24 sm:w-28 text-right shrink-0">
+                                            <div className="text-right shrink-0">
                                                 <div className="text-[10px] font-bold text-emerald-600/80 dark:text-emerald-500/80 uppercase tracking-widest mb-1">Ara Toplam</div>
-                                                <div className="font-mono font-black text-emerald-700 dark:text-emerald-400 text-base sm:text-lg">{(item.price * item.qty).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</div>
+                                                <div className="font-mono font-black text-emerald-700 dark:text-emerald-400 text-base sm:text-lg whitespace-nowrap">{(item.price * item.qty).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</div>
                                             </div>
 
                                             <button 
                                                 onClick={() => updateQty(item.productId, item.sellerCompanyId, 0)}
-                                                className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:shadow-sm transition-all ml-1"
+                                                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:shadow-sm transition-all ml-1 sm:ml-2"
                                                 title="Sepetten Çıkar"
                                             >
                                                 <Trash2 className="w-5 h-5" />
