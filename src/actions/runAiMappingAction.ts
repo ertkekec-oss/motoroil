@@ -67,25 +67,33 @@ export async function runAiMappingAction() {
                 continue;
             }
 
-            // Update product in DB
-            await prisma.product.update({
-                where: { id: product.id },
-                data: { category: matchedCategory }
+            // First, find or create the ERPProductCategory
+            let erpCategory = await prisma.eRPProductCategory.findFirst({
+                where: { sellerCompanyId: companyId, name: matchedCategory },
+                include: { mappings: true }
             });
 
-            // Also ensure ERPProductCategory exists so the Mapping Engine picks it up
-            const existsEnp = await prisma.eRPProductCategory.findFirst({
-                where: { sellerCompanyId: companyId, name: matchedCategory }
-            });
-
-            if (!existsEnp) {
-                await prisma.eRPProductCategory.create({
+            if (!erpCategory) {
+                erpCategory = await prisma.eRPProductCategory.create({
                     data: {
                         sellerCompanyId: companyId,
                         name: matchedCategory
-                    }
+                    },
+                    include: { mappings: true }
                 });
             }
+
+            // If the user already synced this ERPCategory to a Global Category, grab the ID.
+            const mappedGlobalId = erpCategory.mappings.length > 0 ? erpCategory.mappings[0].globalCategoryId : null;
+
+            // Update product in DB
+            await prisma.product.update({
+                where: { id: product.id },
+                data: { 
+                    category: matchedCategory,
+                    ...(mappedGlobalId ? { globalCategoryId: mappedGlobalId } : {})
+                }
+            });
 
             processedCount++;
         }

@@ -582,7 +582,7 @@ function StepOtherInfo({ data, onChange, categories, globalCategories }: any) {
                 <div className="space-y-2">
                     <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold">Global Kategori</label>
                     <select 
-                        value={data.globalCategoryId || data.category || ''} 
+                        value={(globalCategories && globalCategories.length > 0) ? (data.globalCategoryId || '') : (data.category || '')} 
                         onChange={e => {
                             const val = e.target.value;
                             const selectedCat = globalCategories?.find((c: any) => c.id === val);
