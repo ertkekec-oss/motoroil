@@ -180,8 +180,51 @@ const masterTaxonomy = [
       { name: "Aksesuarlar", children: [
         { name: "Güneş Gözlüğü" }, { name: "Şapka" }, { name: "Çanta" }, { name: "Cüzdan ve Kartlık" }, { name: "Kemer" }
       ]},
-      { name: "Çocuk & Bebek Giyim", children: [
-        { name: "Kız Çocuk Kıyafet" }, { name: "Erkek Çocuk Kıyafet" }, { name: "Kız Çocuk Ayakkabı" }, { name: "Erkek Çocuk Ayakkabı" }, { name: "Bebek Kıyafet ve Aksesuar" }
+      { name: "Kız Çocuk Kıyafet", children: [
+        { name: "Çorap, Külotlu Çorap ve Tayt" },
+        { name: "Dış Giyim" },
+        { name: "Elbise" },
+        { name: "Etek ve Şort Etek" },
+        { name: "İç Giyim" },
+        { name: "Jean" },
+        { name: "Kapüşonlu ve Kapüşonsuz Sweatshirt" },
+        { name: "Kar ve Yağmur Kıyafeti" },
+        { name: "Pantolon" },
+        { name: "Pijama ve Bornoz", children: [
+          { name: "Pijama Altı" }, { name: "Pijama Takımı" }, { name: "Tulum" }
+        ]},
+        { name: "Plaj Giyim" },
+        { name: "Spor Giyim", children: [
+          { name: "Elbise" }, { name: "Eşofman Altı" }, { name: "Eşofman Üstü" }, { name: "Etek ve Şort Etek" }, { name: "Kapüşonlu ve Kapüşonsuz Sweatshirt" }, { name: "Tozluklar" }, { name: "Külot ve Sütyen" }, { name: "Spor Çorap" }, { name: "Şort" }, { name: "Takım" }, { name: "Triko" }, { name: "T-shirt ve Polo Yaka T-shirt" }, { name: "İçlik ve Kompresyon" }
+        ]},
+        { name: "Şort" },
+        { name: "Takım" },
+        { name: "Triko" },
+        { name: "Tulum" },
+        { name: "Üst ve T-shirt" }
+      ]},
+      { name: "Erkek Çocuk Kıyafet", children: [
+        { name: "Çorap ve İç Çamaşırı" },
+        { name: "Dış Giyim", children: [
+          { name: "Ceket" }, { name: "Mont ve Kaban" }, { name: "Yağmurluk" }, { name: "Yelek" }
+        ]},
+        { name: "İç Giyim" },
+        { name: "Jean" },
+        { name: "Kapüşonlu ve Kapüşonsuz Sweatshirt" },
+        { name: "Kar ve Yağmur Kıyafeti" },
+        { name: "Pantolon" },
+        { name: "Pijama ve Bornoz" },
+        { name: "Plaj Giyim" },
+        { name: "Spor Giyim" },
+        { name: "Şort" },
+        { name: "Takım" },
+        { name: "Takım Elbise ve Blazer Ceket" },
+        { name: "Triko" },
+        { name: "Tulum" },
+        { name: "Üst ve T-shirt" }
+      ]},
+      { name: "Bebek ve Çocuk Ayakkabı", children: [
+          { name: "Kız Çocuk Ayakkabı" }, { name: "Erkek Çocuk Ayakkabı" }, { name: "Bebek Ayakkabısı" }
       ]}
     ]
   },
