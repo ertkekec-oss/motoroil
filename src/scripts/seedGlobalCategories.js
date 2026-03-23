@@ -362,6 +362,41 @@ const masterTaxonomy = [
       ]},
       { name: "Vücut Bakımı ve Banyo Ürünleri", children: [
         { name: "Banyo Lifleri, Süngerleri ve Fırçaları" }, { name: "Banyo Tuzları, Köpükleri ve Yağları" }, { name: "Deodorantlar ve Antiperspirantlar" }, { name: "Jeller, Yağlar ve Dezenfektanlar" }, { name: "Peeling ve Vücut Bakım Ürünleri" }, { name: "Setler" }
+      ]},
+      { name: "Makyaj", children: [
+        { name: "Dudak" }, { name: "Göz" }, { name: "Makyaj Paletleri" }, { name: "Makyaj Setleri" }, { name: "Vücut" }, { name: "Yüz" }
+      ]}
+    ]
+  },
+  {
+    name: "Video Oyunu ve Konsol",
+    children: [
+      { name: "Xbox Series X ve S", children: [
+        { name: "Aksesuarlar" }, { name: "Konsollar" }, { name: "Oyunlar" }
+      ]},
+      { name: "PlayStation 5", children: [
+        { name: "Aksesuarlar" }, { name: "Konsollar" }, { name: "Oyunlar" }
+      ]},
+      { name: "Nintendo Switch 2", children: [
+        { name: "Aksesuarlar" }, { name: "İndirilebilir İçerik" }, { name: "Konsollar" }, { name: "Oyunlar" }
+      ]},
+      { name: "Nintendo Switch", children: [
+        { name: "Aksesuarlar" }, { name: "Konsollar" }, { name: "Oyunlar" }
+      ]},
+      { name: "Xbox One", children: [
+        { name: "Aksesuarlar" }, { name: "İnteraktif Oyun Figürleri" }, { name: "Konsollar" }, { name: "Oyunlar" }
+      ]},
+      { name: "PlayStation 4", children: [
+        { name: "Aksesuarlar" }, { name: "İnteraktif Oyun Figürleri" }, { name: "Konsollar" }, { name: "Oyunlar" }, { name: "PlayStation VR Donanımı" }
+      ]},
+      { name: "PC", children: [
+        { name: "Aksesuarlar" }, { name: "Oyunlar" }
+      ]},
+      { name: "Eski Sistemler", children: [
+        { name: "Handheld Oyun Sistemleri" }, { name: "Nintendo Sistemleri" }, { name: "PlayStation Sistemleri" }, { name: "Xbox Sistemleri" }
+      ]},
+      { name: "Elde Taşınabilir Oyun Sistemleri", children: [
+        { name: "ROG Ally" }, { name: "Steam Deck" }
       ]}
     ]
   }
