@@ -48,7 +48,7 @@ export default function Sidebar() {
         const expandMap: Record<string, string[]> = {
             'b2b-global-parent': [
                 '/support/tickets', '/hub/orders', '/hub/seller/orders', '/hub/buyer/orders',
-                '/seller/products', '/catalog', '/hub/finance', '/hub/finance/dashboard', '/hub/trust-score',
+                '/seller/products', '/catalog', '/seller/categories', '/hub/finance', '/hub/finance/dashboard', '/hub/trust-score',
                 '/seller/boost', '/seller/boost/analytics', '/rfq', '/seller/rfqs', '/contracts', '/hub/buyer',
                 '/hub-dashboard'
             ],

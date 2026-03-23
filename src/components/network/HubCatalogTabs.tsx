@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Store } from "lucide-react";
+import { Search, Store, LayoutGrid } from "lucide-react";
 
 export default function HubCatalogTabs() {
     const pathname = usePathname();
@@ -10,6 +10,7 @@ export default function HubCatalogTabs() {
     const tabs = [
         { id: "explore", name: "B2B Keşfet", icon: Search, href: "/catalog" },
         { id: "my-products", name: "Benim Ürünlerim", icon: Store, href: "/seller/products" },
+        { id: "categories", name: "Kategori Eşleştirme", icon: LayoutGrid, href: "/seller/categories" }
     ];
 
     return (
