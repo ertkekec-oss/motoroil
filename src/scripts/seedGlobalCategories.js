@@ -29,7 +29,12 @@ const masterTaxonomy = [
       { name: "Oyun Bilgisayarları", children: [
         { name: "Dizüstü" }, { name: "Masaüstü" }, { name: "Monitörler" }, { name: "Kulaklıklar" }, { name: "Mouse'lar" }, { name: "Klavyeler" }
       ]},
-      { name: "Cep Telefonları ve Aksesuarlar", children: [] },
+      { name: "Yazıcılar ve Tarayıcılar", children: [
+        { name: "Lazer Yazıcılar" }, { name: "All-In-One Yazıcılar" }, { name: "Mürekkepli Yazıcılar" }, { name: "Tarayıcılar" }, { name: "Toner ve Kartuşlar" }, { name: "Yazıcı Aksesuarları" }
+      ]},
+      { name: "Cep Telefonları ve Aksesuarlar", children: [
+        { name: "Cep Telefonları" }, { name: "Kılıflar" }, { name: "Akıllı Saatler" }, { name: "Kulaklıklar" }, { name: "Powerbank'ler" }, { name: "Aksesuarlar" }
+      ]},
       { name: "E-kitap Okuyucular ve Aksesuarları", children: [] },
       { name: "Giyilebilir Teknoloji", children: [] },
       { name: "GPS, Navigasyon ve Aksesuarları", children: [] },
@@ -38,10 +43,14 @@ const masterTaxonomy = [
       { name: "Kulaklıklar ve Aksesuarları", children: [] },
       { name: "Oto ve Araç Elektroniği", children: [] },
       { name: "Piller ve Pil Şarj Aletleri", children: [] },
-      { name: "Ses Sistemleri ve Hoparlörler", children: [] },
+      { name: "Ses Sistemleri ve Hoparlörler", children: [
+        { name: "Ev Sineması" }, { name: "Amfiler" }, { name: "Hoparlör Sistemleri" }, { name: "Taşınabilir Hoparlörler" }, { name: "Hi-fi Hoparlörler" }, { name: "Soundbarlar" }
+      ]},
       { name: "Taşınabilir Ses ve Görüntü", children: [] },
       { name: "Telefonlar, VoIP ve Aksesuarları", children: [] },
-      { name: "Televizyonlar ve Ev Sinema Sistemleri", children: [] },
+      { name: "Televizyonlar ve Ev Sinema Sistemleri", children: [
+        { name: "Televizyonlar" }, { name: "Ev Sineması" }, { name: "Projektörler" }, { name: "AV Alıcılar" }, { name: "Hoparlörler" }, { name: "Uydu Sistemleri" }
+      ]},
       { name: "Telsiz İletişim Ürünleri", children: [] }
     ]
   },
