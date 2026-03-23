@@ -6,6 +6,7 @@ import { updateCartItemQtyAction, clearCartAction } from "@/actions/cartActions"
 import { processCheckoutAction } from "@/actions/checkoutAction";
 import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
+import { ShoppingBag, Trash2, ArrowRight, Save, Truck, Package, RotateCcw } from "lucide-react";
 
 type CartItemDisplay = {
     productId: string;
@@ -40,8 +41,8 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
 
     const handleClear = () => {
         showConfirm(
-            "Empty Cart",
-            "Are you sure you want to empty your cart?",
+            "Sepeti Boşalt",
+            "Sepetinizdeki tüm ürünleri silmek istediğinize emin misiniz?",
             async () => {
                 setItems([]);
                 await clearCartAction();
@@ -58,107 +59,111 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
     const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
     return (
-        <div className="min-h-[50vh] bg-white border border-slate-200 rounded-md p-6">
-            <h1 className="text-2xl font-bold tracking-tight text-[#1F3A5F] mb-6 border-b border-slate-100 pb-4">
-                Sepetim (B2B Cart)
-            </h1>
-
+        <div className="flex flex-col lg:flex-row gap-8">
             {items.length === 0 ? (
-                <div className="text-center py-10">
-                    <p className="text-slate-500 mb-4">Your cart is empty.</p>
-                    <Link href="/catalog" className="px-4 py-2 bg-black text-white rounded-md text-sm font-medium hover:bg-slate-800">
-                        Continue Shopping
+                <div className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
+                    <div className="w-20 h-20 bg-slate-50 dark:bg-[#0f172a] rounded-full flex items-center justify-center mb-6">
+                        <ShoppingBag className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Sepetiniz Boş</h2>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-sm">Ağ üzerinde aradığınız ürünleri sepetinize ekleyerek çoklu tedarik siparişi veya ihale oluşturabilirsiniz.</p>
+                    <Link href="/catalog" className="inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm">
+                        Kataloğa Git <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="md:col-span-2 space-y-4">
-                        <div className="overflow-x-auto border border-slate-200 rounded-md">
-                            <table className="min-w-full text-left text-sm whitespace-nowrap">
-                                <thead className="bg-[#F6F7F9] text-slate-700">
-                                    <tr>
-                                        <th className="px-4 py-3 font-semibold">Product</th>
-                                        <th className="px-4 py-3 font-semibold">Supplier</th>
-                                        <th className="px-4 py-3 font-semibold text-right">Price</th>
-                                        <th className="px-4 py-3 font-semibold text-center">Qty</th>
-                                        <th className="px-4 py-3 font-semibold text-right">Total</th>
-                                        <th className="px-4 py-3 font-semibold text-center">Remove</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 text-slate-700">
-                                    {items.map(item => (
-                                        <tr key={`${item.productId}-${item.sellerCompanyId}`}>
-                                            <td className="px-4 py-3 font-medium text-slate-900">{item.productName}</td>
-                                            <td className="px-4 py-3 text-[#1F3A5F]">{item.sellerName}</td>
-                                            <td className="px-4 py-3 font-mono text-right">{item.price.toFixed(2)}</td>
-                                            <td className="px-4 py-3 text-center">
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    value={item.qty}
-                                                    onChange={e => updateQty(item.productId, item.sellerCompanyId, Number(e.target.value))}
-                                                    className="w-16 px-2 py-1 border border-slate-300 rounded text-center focus:outline-none focus:border-[#1F3A5F]"
-                                                />
-                                            </td>
-                                            <td className="px-4 py-3 font-mono font-bold text-right">
-                                                {(item.price * item.qty).toFixed(2)}
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <button
-                                                    onClick={() => updateQty(item.productId, item.sellerCompanyId, 0)}
-                                                    className="text-red-500 hover:text-red-700 font-bold"
-                                                    title="Remove from cart"
-                                                >
-                                                    ×
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="flex justify-between items-center mt-4">
-                            <button onClick={handleClear} className="text-sm text-red-600 hover:underline">
-                                Empty Cart
-                            </button>
-                            <Link href="/catalog" className="text-sm text-[#1F3A5F] hover:underline">
-                                ← Continue Shopping
-                            </Link>
+                <>
+                    <div className="lg:col-span-2 w-full lg:w-2/3 space-y-6">
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                            <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between">
+                                <h2 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                    <Package className="w-4 h-4 text-indigo-500" />
+                                    Eklenen Tedarik Kalemleri ({items.length})
+                                </h2>
+                                <button onClick={handleClear} className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    Sepeti Boşalt
+                                </button>
+                            </div>
+
+                            <div className="p-0 sm:p-2 divide-y divide-slate-100 dark:divide-white/5">
+                                {items.map(item => (
+                                    <div key={`${item.productId}-${item.sellerCompanyId}`} className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors rounded-xl mx-2">
+                                        <div className="flex-1 min-w-0 w-full">
+                                            <h4 className="font-bold text-slate-900 dark:text-white text-base mb-1 truncate">{item.productName}</h4>
+                                            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                Tedarikçi: <span className="text-indigo-600 dark:text-indigo-400 break-words">{item.sellerName}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto shrink-0 mt-3 sm:mt-0">
+                                            <div className="text-right">
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Birim Fiyat</div>
+                                                <div className="font-mono font-bold text-slate-700 dark:text-slate-300">{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                            </div>
+                                            
+                                            <div className="flex items-center gap-2 bg-slate-50 dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/10 p-1 shadow-sm">
+                                                <button onClick={() => updateQty(item.productId, item.sellerCompanyId, item.qty - 1)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition-colors text-slate-700 dark:text-slate-300">-</button>
+                                                <span className="w-8 text-center font-mono font-bold text-sm text-slate-900 dark:text-white">{item.qty}</span>
+                                                <button onClick={() => updateQty(item.productId, item.sellerCompanyId, item.qty + 1)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold transition-colors text-slate-700 dark:text-slate-300">+</button>
+                                            </div>
+
+                                            <div className="text-right w-24">
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ara Toplam</div>
+                                                <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-base">{(item.price * item.qty).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                            </div>
+
+                                            <button 
+                                                onClick={() => updateQty(item.productId, item.sellerCompanyId, 0)}
+                                                className="w-8 h-8 flex items-center justify-center rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                                                title="Ürünü Sil"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    <div className="md:col-span-1">
-                        <div className="bg-[#F6F7F9] rounded-md p-6 border border-slate-200 flex flex-col gap-4">
-                            <h2 className="text-lg font-bold text-slate-900 border-b border-slate-300 pb-2">Order Summary</h2>
-                            <div className="flex justify-between text-sm text-slate-600">
-                                <span>Subtotal</span>
-                                <span className="font-mono font-medium">{subtotal.toFixed(2)} TRY</span>
+                    <div className="lg:col-span-1 w-full lg:w-1/3">
+                        <div className="bg-white dark:bg-[#1e293b] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 sticky top-6">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-white/5 pb-4 mb-6 flex items-center gap-2">
+                                <Save className="w-5 h-5 text-emerald-500" />
+                                Sipariş Özeti
+                            </h2>
+                            <div className="space-y-4 mb-6">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400 font-medium">Ara Toplam (KDV Hariç)</span>
+                                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1"><Truck className="w-4 h-4" /> Lojistik / Kargo</span>
+                                    <span className="font-mono text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">Sonra Hesaplanacak</span>
+                                </div>
                             </div>
-                            <div className="flex justify-between text-sm text-slate-600">
-                                <span>Shipping (Est.)</span>
-                                <span className="font-mono text-slate-400">Calculated Later</span>
-                            </div>
-                            <div className="flex justify-between text-base font-bold text-slate-900 pt-4 border-t border-slate-300">
-                                <span>Total Estimate</span>
-                                <span className="font-mono">{subtotal.toFixed(2)} TRY</span>
+                            
+                            <div className="flex justify-between items-end border-t border-slate-100 dark:border-white/5 pt-6 mb-8">
+                                <span className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">Tahmini Tutar</span>
+                                <span className="font-mono text-xl font-bold text-emerald-600 dark:text-emerald-400">{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
                             </div>
 
                             <button
                                 onClick={handleCheckout}
                                 disabled={isPending}
-                                className="mt-4 w-full py-2.5 bg-black text-white text-sm font-bold uppercase tracking-wide rounded-md hover:bg-slate-800 active:scale-95 transition-transform disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 py-3.5 bg-emerald-600 text-white text-sm font-bold uppercase tracking-wide rounded-xl hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-sm disabled:opacity-50"
                             >
-                                {isPending ? "Processing..." : "Submit Order"}
+                                {isPending ? "İşleniyor..." : "Siparişi Tamamla (Direkt Alım)"}
                             </button>
 
-                            <p className="text-[10px] text-slate-500 text-center mt-2 leading-tight">
-                                By submitting, you agree to create a B2B network order ticket directly to the suppliers.
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center mt-3 font-medium">
+                                İleri adımda ödeme yönteminizi (Açık Hesap / Kredi Kartı) seçerek PO (Purchase Order) oluşturacaksınız.
                             </p>
 
-                            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-300">
-                                <div className="flex-1 h-[1px] bg-slate-200"></div>
-                                <span className="text-xs text-slate-400 font-semibold italic">OR</span>
-                                <div className="flex-1 h-[1px] bg-slate-200"></div>
+                            <div className="relative flex items-center gap-3 py-6">
+                                <div className="flex-1 h-[1px] bg-slate-200 dark:bg-white/10"></div>
+                                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">VEYA</span>
+                                <div className="flex-1 h-[1px] bg-slate-200 dark:bg-white/10"></div>
                             </div>
 
                             <button
@@ -168,24 +173,24 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
                                         try {
                                             const { createRfqFromCartAction } = await import("@/actions/rfqActions");
                                             const res = await createRfqFromCartAction();
-                                            showSuccess("Bilgi", "RFQ Created successfully!");
+                                            showSuccess("İhale Başlatıldı", "Sepetteki ürünlerden başarıyla çoklu ihale (RFQ) talebi fırlatıldı!");
                                             router.push(`/rfq/${res.rfqId}`);
                                         } catch (e: any) {
-                                            showError("Uyarı", e.message || "Failed to create RFQ");
+                                            showError("İhale Hatası", e.message || "İhale oluşturulamadı.");
                                         }
                                     });
                                 }}
                                 disabled={isPending}
-                                className="w-full py-2 bg-white border border-slate-300 text-slate-700 text-sm font-bold uppercase tracking-wide rounded-md hover:bg-slate-50 active:scale-95 transition-transform disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 py-3 bg-white dark:bg-[#0f172a] border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs font-bold uppercase tracking-wide rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10 active:scale-[0.98] transition-all shadow-sm flex-col leading-tight disabled:opacity-50"
                             >
-                                Request Quote (RFQ)
+                                <span className="flex items-center gap-1.5"><RotateCcw className="w-3.5 h-3.5" /> Çoklu Teklif İste (RFQ)</span>
                             </button>
-                            <p className="text-[10px] text-slate-500 text-center leading-tight">
-                                Want to negotiate bulk pricing? Start an RFQ to seek offers from these suppliers.
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center mt-3 font-medium">
+                                Fiyatlarda pazarlık yapmak mı istiyorsunuz? Ağa fırlatın ve bekleyin.
                             </p>
                         </div>
                     </div>
-                </div>
+                </>
             )}
         </div>
     );
