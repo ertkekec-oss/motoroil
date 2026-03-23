@@ -6,7 +6,7 @@ import AddToCartButton from "./AddToCartButton";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductDetailPage({ params }: { params: { productId: string } }) {
+export default async function ProductDetailPage({ params }: { params: Promise<{ productId: string }> }) {
     const session: any = await getSession();
     const user = session?.user || session;
 
@@ -14,7 +14,7 @@ export default async function ProductDetailPage({ params }: { params: { productI
         redirect("/login");
     }
 
-    const { productId } = params;
+    const { productId } = await params;
 
     const product = await prisma.globalProduct.findUnique({
         where: { id: productId },
