@@ -40,20 +40,20 @@ export default function CheckoutClient({ previewData }: { previewData: any }) {
     };
 
     return (
-        <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_400px] gap-6 lg:gap-8 items-start">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_400px] gap-6 lg:gap-8 items-start">
             
             {/* LEFT COLUMN: Seller Groups */}
             <div className="w-full space-y-6">
                 {previewData.groups.map((group: any) => (
                     <div key={group.sellerCompanyId} className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
                         <div className="p-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-3">
+                            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-3 min-w-0">
                                 <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
                                     <Store className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                                 </div>
-                                <span className="flex flex-col">
+                                <span className="flex flex-col min-w-0">
                                     <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-0.5">Satıcı / Tedarikçi</span>
-                                    <span className="text-base text-indigo-700 dark:text-indigo-300">{group.sellerName}</span>
+                                    <span className="text-base text-indigo-700 dark:text-indigo-300 truncate" title={group.sellerName}>{group.sellerName}</span>
                                 </span>
                             </h3>
                             <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 px-3 py-1.5 bg-white dark:bg-[#0f172a]/50 rounded-lg border border-slate-200 dark:border-white/10 uppercase tracking-widest shadow-sm">

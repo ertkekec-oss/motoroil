@@ -59,7 +59,7 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
     const uniqueSellersCount = new Set(items.map(i => i.sellerCompanyId)).size;
 
     return (
-        <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_400px] gap-6 lg:gap-8 items-start">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_400px] gap-6 lg:gap-8 items-start">
             {items.length === 0 ? (
                 <div className="w-full bg-white dark:bg-[#1e293b]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl shadow-lg py-32 text-center flex flex-col items-center justify-center">
                     <div className="w-24 h-24 bg-slate-50 dark:bg-[#0f172a] rounded-3xl flex items-center justify-center shadow-inner mb-6 border border-slate-100 dark:border-white/5 transform rotate-3">
@@ -105,8 +105,8 @@ export default function CartClient({ initialItems }: { initialItems: CartItemDis
                                                 {index + 1}
                                             </span>
                                             <div className="flex flex-col min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <h4 className="font-bold text-slate-900 dark:text-white text-base truncate" title={item.productName}>{item.productName}</h4>
+                                                <div className="flex items-center gap-2 mb-1 min-w-0 w-full">
+                                                    <h4 className="font-bold text-slate-900 dark:text-white text-base truncate flex-shrink" title={item.productName}>{item.productName}</h4>
                                                     <span className="hidden sm:inline-block shrink-0 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 uppercase tracking-widest px-2 py-0.5 rounded">B2B NETWORK</span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
