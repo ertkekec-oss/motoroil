@@ -3,6 +3,7 @@ import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { FileText, Inbox, Clock, ChevronRight } from "lucide-react";
+import HubOrdersTabs from "@/components/network/HubOrdersTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,7 @@ export default async function SellerRfqsListPage() {
     return (
         <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+                <HubOrdersTabs />
                 
                 {/* Header */}
                 <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">

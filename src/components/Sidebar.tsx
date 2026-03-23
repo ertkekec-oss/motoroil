@@ -47,7 +47,7 @@ export default function Sidebar() {
     useEffect(() => {
         const expandMap: Record<string, string[]> = {
             'b2b-global-parent': [
-                '/support/tickets', '/hub/seller/orders', '/hub/buyer/orders',
+                '/support/tickets', '/hub/orders', '/hub/seller/orders', '/hub/buyer/orders',
                 '/seller/products', '/catalog', '/hub/finance', '/hub/trust-score',
                 '/seller/boost', '/seller/boost/analytics', '/rfq', '/seller/rfqs', '/contracts', '/hub/buyer',
                 '/hub-dashboard'
@@ -177,11 +177,9 @@ export default function Sidebar() {
                             { name: 'Hub Paneli', href: '/hub-dashboard' },
                             { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
                             { name: 'SİPARİŞ & TEKLİF', href: '' },
-                            ...(isSeller ? [
-                                { name: 'Gelen Müzakereler (RFQ)', href: '/seller/rfqs' },
-                                { name: 'Alınan Siparişler', href: '/hub/seller/orders' }
+                            ...((isSeller || isBuyer) ? [
+                                { name: 'Talepler & Siparişler', href: '/hub/orders' }
                             ] : []),
-                            ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/hub/buyer/orders' }] : []),
 
                             { name: 'KATALOG', href: '' },
                             ...(isSeller ? [{ name: 'Katalog (Ürünlerim)', href: '/seller/products' }] : []),
