@@ -35,28 +35,32 @@ export async function runAiMappingAction() {
             return { success: true, message: "Tüm ürünleriniz zaten kategorize edilmiş durumda." };
         }
 
-        // Simulate AI Processing (NLP Keyword Vector matching Mock)
-        let processedCount = 0;
+        // Fetch all REAL Global Categories from the Database
+        const globalCats = await prisma.globalCategory.findMany();
         
-        // Expanded dictionary heuristics for the mock AI
-        const aiRules = [
-            { keywords: ["zefal", "matara", "kafes", "çamurluk", "bisiklet", "xrs", "slcn", "totem", "prenses", "ilgaz", "nova", "flex", "wolf", "xr600", "xr-600", "ürgüp", "üsküp", "salcano", "jant", "kadro", "pedal", "sele"], targetCategory: "BİSİKLET" },
-            { keywords: ["zincir", "sprey", "yağ", "motul", "motor", "fırça", "wings", "wind", "motosiklet", "scooter"], targetCategory: "MOTOSİKLET" },
-            { keywords: ["kask", "çenesiz", "eldiven", "dizlik", "koruma"], targetCategory: "KASK & KORUMA EKİPMANLARI" },
-            { keywords: ["far", "stop", "ampul", "led", "aydınlatma", "pilli"], targetCategory: "AYDINLATMA & ELEKTRONİK" },
-            { keywords: ["kilit", "şifreli kilit", "spiral", "urba kilit", "vona", "auvray", "güvenlik"], targetCategory: "GÜVENLİK & KİLİT SİSTEMLERİ" }
-        ];
+        let processedCount = 0;
 
         for (const product of unmappedProducts) {
-            // Include brand in the analysis string so the "AI" sees it
             const analysisString = `${String(product.name).toLowerCase()} ${String(product.brand || "").toLowerCase()} ${String(product.code || "").toLowerCase()}`;
-            let matchedCategory = product.category || "Diğer"; 
+            let matchedGlobalId = null;
+            let matchedCategoryName = product.category || "Diğer"; 
             let foundMatch = false;
 
-            // Semantic string matching
-            for (const rule of aiRules) {
-                if (rule.keywords.some(kw => analysisString.includes(kw))) {
-                    matchedCategory = rule.targetCategory;
+            // Simple semantic matcher against actual Database Global Categories
+            for (const gc of globalCats) {
+                // Extract searchable literal words from global category name
+                const keywords = gc.name.toLowerCase().split(/[\s,&]+/).filter((w: string) => w.length > 3);
+                
+                // Add specific extra hints if we recognize standard names natively
+                if (gc.name.toLowerCase().includes("aydınlatma")) keywords.push(...["far", "stop", "ampul", "led", "pilli"]);
+                if (gc.name.toLowerCase().includes("kilit")) keywords.push(...["şifreli", "spiral", "urba", "güvenlik"]);
+                if (gc.name.toLowerCase().includes("bisiklet")) keywords.push(...["zefal", "matara", "kafes", "çamurluk", "xrs", "slcn", "totem", "prenses", "ilgaz", "nova", "salcano", "jant", "kadro", "pedal"]);
+                if (gc.name.toLowerCase().includes("motosiklet")) keywords.push(...["zincir", "sprey", "yağ", "motul", "motor", "scooter"]);
+                if (gc.name.toLowerCase().includes("kask")) keywords.push(...["çenesiz", "eldiven", "dizlik", "koruma"]);
+
+                if (keywords.some((kw: string) => analysisString.includes(kw))) {
+                    matchedCategoryName = gc.name; // Use the exact Global Category name
+                    matchedGlobalId = gc.id;
                     foundMatch = true;
                     break;
                 }
@@ -67,9 +71,9 @@ export async function runAiMappingAction() {
                 continue;
             }
 
-            // First, find or create the ERPProductCategory
+            // Find or create the ERPProductCategory representing this name locally
             let erpCategory = await prisma.eRPProductCategory.findFirst({
-                where: { sellerCompanyId: companyId, name: matchedCategory },
+                where: { sellerCompanyId: companyId, name: matchedCategoryName },
                 include: { mappings: true }
             });
 
@@ -77,21 +81,32 @@ export async function runAiMappingAction() {
                 erpCategory = await prisma.eRPProductCategory.create({
                     data: {
                         sellerCompanyId: companyId,
-                        name: matchedCategory
+                        name: matchedCategoryName
                     },
                     include: { mappings: true }
                 });
             }
 
-            // If the user already synced this ERPCategory to a Global Category, grab the ID.
-            const mappedGlobalId = erpCategory.mappings.length > 0 ? erpCategory.mappings[0].globalCategoryId : null;
+            // If we found a Global Match via AI, and the ERP category isn't mapped to it yet, link it now!
+            if (matchedGlobalId && erpCategory.mappings.length === 0) {
+                await prisma.categoryMapping.create({
+                    data: {
+                        erpCategoryId: erpCategory.id,
+                        globalCategoryId: matchedGlobalId,
+                        companyId: companyId
+                    }
+                });
+            }
+
+            // The absolute mapped global ID to inject
+            const finalGlobalId = erpCategory.mappings.length > 0 ? erpCategory.mappings[0].globalCategoryId : matchedGlobalId;
 
             // Update product in DB
             await prisma.product.update({
                 where: { id: product.id },
                 data: { 
-                    category: matchedCategory,
-                    ...(mappedGlobalId ? { globalCategoryId: mappedGlobalId } : {})
+                    category: matchedCategoryName,
+                    ...(finalGlobalId ? { globalCategoryId: finalGlobalId } : {})
                 }
             });
 
