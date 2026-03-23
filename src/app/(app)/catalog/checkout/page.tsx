@@ -38,33 +38,34 @@ export default async function CheckoutPage() {
 
     return (
         <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
 
                 <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-white/10 pb-4 mb-6">
                     <Link href="/catalog" className="hover:text-slate-900 dark:hover:text-white transition-colors">B2B Ortak Katalog</Link>
                     <span>/</span>
-                    <Link href="/catalog/cart" className="hover:text-slate-900 dark:hover:text-white transition-colors">Sepet</Link>
+                    <Link href="/catalog/cart" className="hover:text-slate-900 dark:hover:text-white transition-colors">Ağ Sepetim</Link>
                     <span>/</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-200">Sipariş Onayı ve Ödeme</span>
                 </div>
 
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 md:p-8 shadow-sm">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-                            <CreditCard className="w-6 h-6 text-emerald-500" />
+                <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+                            <CreditCard className="w-8 h-8 text-emerald-500" />
                             B2B Tedarik Onayı (Checkout)
                         </h1>
-                        <Link href="/catalog/cart" className="inline-flex items-center justify-center gap-2 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm shrink-0">
-                            <ArrowLeft className="w-4 h-4" />
-                            Kurşun Süreleri Değiştir
-                        </Link>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-2xl text-balance">
+                            Lütfen çoklu satıcı tedarik listenizi son kez gözden geçirin. Ağ açık hesabı veya güvenli emanet transferi (Escrow) yöntemiyle satın almayı tamamlayın.
+                        </p>
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 border-b border-slate-100 dark:border-white/5 pb-6">
-                        Lütfen çoklu satıcı tedarik listenizi son kez gözden geçirin. Ağ açık hesabı veya güvenli emanet transferi (Escrow) yöntemiyle satın almayı tamamlayın.
-                    </p>
-
-                    <CheckoutClient previewData={previewData} />
+                    <Link href="/catalog/cart" className="inline-flex items-center justify-center gap-2 bg-white dark:bg-[#1e293b] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm shrink-0">
+                        <ArrowLeft className="w-4 h-4" />
+                        Kurşun Süreleri Değiştir
+                    </Link>
                 </div>
+
+                <CheckoutClient previewData={previewData} />
+
             </div>
         </div>
     );
