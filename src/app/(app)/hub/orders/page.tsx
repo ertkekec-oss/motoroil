@@ -40,7 +40,7 @@ export default async function HubOrdersDashboard() {
             }
         }),
         // Kabul edilen ihaleler (Satıcının teklif verdiği ve Alıcının kabul ettiği ihaleler)
-        prisma.rfqOffer.count({
+        prisma.sellerOffer.count({
             where: {
                 sellerCompanyId: companyId,
                 status: "ACCEPTED"
