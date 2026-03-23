@@ -48,7 +48,7 @@ export default function Sidebar() {
         const expandMap: Record<string, string[]> = {
             'b2b-global-parent': [
                 '/support/tickets', '/hub/orders', '/hub/seller/orders', '/hub/buyer/orders',
-                '/seller/products', '/catalog', '/hub/finance', '/hub/trust-score',
+                '/seller/products', '/catalog', '/hub/finance', '/hub/finance/dashboard', '/hub/trust-score',
                 '/seller/boost', '/seller/boost/analytics', '/rfq', '/seller/rfqs', '/contracts', '/hub/buyer',
                 '/hub-dashboard'
             ],
@@ -186,12 +186,9 @@ export default function Sidebar() {
                                 { name: 'B2B Katalog', href: '/catalog' }
                             ] : []),
 
-                            { name: 'FİNANS', href: '' },
-                            { name: 'Finance (B2B)', href: '/hub/finance' },
-                            ...(isSeller ? [
-                                { name: 'Growth: Boost Yönetimi', href: '/seller/boost' },
-                                { name: 'Growth: Boost Analiz', href: '/seller/boost/analytics' },
-                                { name: 'Growth: Güven Skoru', href: '/hub/trust-score' }
+                            { name: 'FİNANS & BÜYÜME', href: '' },
+                            ...((isSeller || isBuyer) ? [
+                                { name: 'Finans & Büyüme (Growth)', href: '/hub/finance/dashboard' }
                             ] : []),
 
                             ...(isBuyer ? [

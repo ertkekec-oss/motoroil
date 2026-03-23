@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import FinanceStatusBanner from "@/components/FinanceStatusBanner";
 
+import HubFinanceTabs from "@/components/network/HubFinanceTabs";
+
 export default function BoostPage() {
     const [loading, setLoading] = useState(true);
     const [boostData, setBoostData] = useState<any>(null);
@@ -34,8 +36,10 @@ export default function BoostPage() {
     const formatDate = (dateString: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "long" }).format(new Date(dateString));
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <div className="flex justify-between items-center mb-6">
+        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen pb-16 w-full font-sans">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+                <HubFinanceTabs />
+                <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">🚀 Boost Yönetimi</h1>
                 <Link href="/seller/boost/analytics">
                     <button className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">Performans Raporu 📊</button>
@@ -125,6 +129,7 @@ export default function BoostPage() {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     );
 }

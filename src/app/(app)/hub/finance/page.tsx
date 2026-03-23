@@ -7,6 +7,8 @@ import PayoutsPage from '../payouts/page';
 import NetworkPaymentsPage from '../payments/page';
 import BoostInvoicesPage from '../../billing/boost-invoices/page';
 
+import HubFinanceTabs from "@/components/network/HubFinanceTabs";
+
 function FinanceTabs() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -32,6 +34,9 @@ function FinanceTabs() {
     return (
         <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] w-full font-sans">
             <div className="max-w-[1600px] mx-auto pt-8">
+                <div className="px-4 sm:px-6 lg:px-8">
+                    <HubFinanceTabs />
+                </div>
                 {/* Header & Tabs */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8 px-4 sm:px-6 lg:px-8">
                     <div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import FinanceStatusBanner from "@/components/FinanceStatusBanner";
+import HubFinanceTabs from "@/components/network/HubFinanceTabs";
 
 export default function TrustScorePage() {
     const [loading, setLoading] = useState(true);
@@ -64,6 +65,7 @@ export default function TrustScorePage() {
     return (
         <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+                <HubFinanceTabs />
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">Satıcı Güven Skoru (Trust Score)</h1>
