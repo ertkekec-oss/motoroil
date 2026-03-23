@@ -156,17 +156,26 @@ const masterTaxonomy = [
         { name: "Sweatshirt" },
         { name: "Jean" },
         { name: "Pantolon" },
-        { name: "Takım ve Blazer" },
-        { name: "Spor Giyim" },
+        { name: "Takım Elbise ve Blazer Ceket", children: [
+          { name: "Blazer Ceket" }, { name: "Smokin" }, { name: "Takım Ceketi" }, { name: "Takım Elbise" }, { name: "Takım Pantolonu" }, { name: "Takım Yeleği" }
+        ]},
+        { name: "Spor Giyim", children: [
+          { name: "Eşofman Altı" }, { name: "Eşofman Üstü" }, { name: "Kapüşonlu ve Kapüşonsuz Sweatshirt" }, { name: "Tozluklar" }, { name: "Spor Atlet ve İç Giyim" }, { name: "Spor Çorabı" }, { name: "Şort" }, { name: "Takım" }, { name: "Triko" }, { name: "T-shirt ve Polo Yaka T-shirt" }, { name: "İçlik ve Kompresyon" }, { name: "Yelekler" }
+        ]},
         { name: "Triko" },
         { name: "Üst ve Tişört", children: [
           { name: "Polo Yaka Tişört" }, { name: "Tişört" }, { name: "Yakası Düğmeli Gömlekler" }, { name: "Yelek" }
         ]},
-        { name: "Ev Kıyafeti" },
+        { name: "Ev Giyimi", children: [
+          { name: "Bornoz" }, { name: "Günlük Şort" }, { name: "Pijama Altı" }, { name: "Pijama Takımı" }, { name: "Pijama Üstü" }
+        ]},
         { name: "Plaj Giyim" }
       ]},
       { name: "Erkek Ayakkabı", children: [
-        { name: "Bağcıklı Ayakkabı" }, { name: "Bot ve Çizme" }, { name: "Düz Ayakkabı" }, { name: "Sandalet" }, { name: "Sneaker" }, { name: "Spor ve Outdoor Ayakkabısı" }
+        { name: "Bağcıklı Ayakkabı" }, { name: "Bot ve Çizme" }, { name: "Düz Ayakkabı" }, { name: "Sandalet" }, { name: "Sneaker" }, 
+        { name: "Spor ve Outdoor Ayakkabısı", children: [
+          { name: "Basketbol Ayakkabısı" }, { name: "Bisiklet Ayakkabısı" }, { name: "Cross Training Ayakkabısı" }, { name: "Fitness Ayakkabısı" }, { name: "Futbol Ayakkabısı" }, { name: "Havuz Ayakkabısı" }, { name: "Hentbol Ayakkabısı" }, { name: "Jimnastik Ayakkabısı" }, { name: "Kapalı Alan Ayakkabısı" }, { name: "Kaykay Ayakkabısı" }, { name: "Koşu Ayakkabısı" }, { name: "Yürüyüş Ayakkabısı" }, { name: "Salon Futbolu Ayakkabısı" }, { name: "Spor ve Outdoor Sandaleti" }, { name: "Tenis Ayakkabısı" }, { name: "Tırmanış Ayakkabısı" }, { name: "Trekking ve Yürüyüş" }, { name: "Triatlon Ayakkabısı" }, { name: "Voleybol Ayakkabısı" }
+        ]}
       ]},
       { name: "Aksesuarlar", children: [
         { name: "Güneş Gözlüğü" }, { name: "Şapka" }, { name: "Çanta" }, { name: "Cüzdan ve Kartlık" }, { name: "Kemer" }
