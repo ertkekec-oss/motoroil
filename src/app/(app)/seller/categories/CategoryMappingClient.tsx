@@ -20,9 +20,20 @@ export default function CategoryMappingClient({
     const { showSuccess, showError } = useModal();
     const [isPending, startTransition] = useTransition();
 
-    const filteredGlobal = globalCategories.filter((g: any) => 
-        g.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const getFullName = (g: any) => {
+        const parts = [g.name];
+        let p = g.parent;
+        while (p) {
+            parts.unshift(p.name);
+            p = p.parent;
+        }
+        return parts.join(" > ");
+    };
+
+    const filteredGlobal = globalCategories
+        .map(g => ({ ...g, fullName: getFullName(g) }))
+        .filter((g: any) => g.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
+        .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
     const handleMap = (globalId: string, globalName: string) => {
         if (!selectedLocal) return;
@@ -246,13 +257,13 @@ export default function CategoryMappingClient({
                                     {filteredGlobal.slice(0, 75).map((gc: any) => (
                                         <div key={gc.id} className="p-4 rounded-xl border shadow-sm transition-all flex items-center justify-between bg-white dark:bg-[#0f172a] border-indigo-200 dark:border-indigo-500/30 hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md pointer-events-none">
                                             <div className="pointer-events-auto px-2">
-                                                <div className="text-[13px] font-bold text-slate-800 dark:text-slate-200 select-none pointer-events-none">{gc.name}</div>
+                                                <div className="text-[12px] font-bold text-slate-800 dark:text-slate-200 select-none pointer-events-none">{gc.fullName}</div>
                                                 <div className="text-[10px] text-slate-400 mt-1 uppercase font-mono tracking-widest select-none pointer-events-none">ID: {gc.id.split('-')[0]}-PROTECTED</div>
                                             </div>
                                             {selectedLocal && (
                                                 <button 
                                                     disabled={isPending}
-                                                    onClick={() => handleMap(gc.id, gc.name)}
+                                                    onClick={() => handleMap(gc.id, gc.fullName)}
                                                     className="pointer-events-auto shrink-0 flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-wider hover:opacity-90 active:scale-95 shadow-sm transition-all disabled:opacity-50"
                                                 >
                                                     {isPending ? 'Bağlanıyor...' : 'EŞLEŞTİR \u2192'}

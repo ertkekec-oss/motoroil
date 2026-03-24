@@ -41,6 +41,13 @@ export default async function CategoryMappingPage() {
     // 2. Fetch Global Categories
     const globalCategories = await prisma.globalCategory.findMany({
         orderBy: { name: 'asc' },
+        include: {
+            parent: {
+                include: {
+                    parent: true
+                }
+            }
+        }
     });
 
     let localCategoriesRaw = await prisma.eRPProductCategory.findMany({
