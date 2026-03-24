@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import ConfirmDeliveryAction from "./ConfirmDeliveryAction";
+import PaymentSimulationAction from "./PaymentSimulationAction";
 
 function formatDateTR(d: Date | null | undefined) {
     if (!d) return "-";
@@ -146,6 +147,8 @@ export default async function BuyerOrderDetailPage({
 
                 {/* Sağ Kolon: Action Sidebar */}
                 <div className="md:col-span-1 space-y-6">
+                    <PaymentSimulationAction orderId={order.id} currentStatus={order.status} />
+
                     <ConfirmDeliveryAction
                         orderId={order.id}
                         allShipmentsDelivered={allDelivered}
