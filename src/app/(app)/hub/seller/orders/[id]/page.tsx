@@ -44,7 +44,14 @@ export default async function SellerOrderDetailPage({
 
     // Seller yetki kontrolü
     const perms: string[] = user.permissions || [];
-    if (!perms.includes("network_sell") && user.role !== "SUPER_ADMIN" && user.role !== "admin" && user.role !== "OWNER") {
+    const role = user.role?.toUpperCase?.() || "";
+    if (
+        !perms.includes("network_sell") && 
+        role !== "SUPER_ADMIN" && 
+        role !== "ADMIN" && 
+        role !== "PLATFORM_ADMIN" && 
+        role !== "OWNER"
+    ) {
         redirect("/403");
     }
 
