@@ -99,69 +99,72 @@ export async function acceptOfferAction(offerId: string) {
         throw new Error("Offer expired");
     }
 
-    // Convert to NetworkOrder inside Transaction
-    await prisma.$transaction(async (tx) => {
-        // Mark Offer Accepted
-        await tx.sellerOffer.update({
-            where: { id: offerId },
-            data: { status: "ACCEPTED" }
+    try {
+        await prisma.$transaction(async (tx) => {
+            // Mark Offer Accepted
+            await tx.sellerOffer.update({
+                where: { id: offerId },
+                data: { status: "ACCEPTED" }
+            });
+
+            const subtotalAmount = Number(offer.totalPrice);
+            const commissionAmount = subtotalAmount * 0.05; // 5% mock
+            const escrowFee = subtotalAmount * 0.01; // 1% escrow fee mock
+            const totalAmount = subtotalAmount + escrowFee;
+
+            const orderItems = offer.items.map(i => ({
+                globalProductId: i.productId,
+                name: "RFQ Bundle Item", // Needs populate from GlobalProduct in full version
+                price: Number(i.unitPrice),
+                qty: i.quantity,
+                total: Number(i.unitPrice) * i.quantity
+            }));
+
+            const itemsHash = offerId; // Simple idempotency hash
+
+            const networkOrder = await tx.networkOrder.create({
+                data: {
+                    buyerCompanyId,
+                    sellerCompanyId: offer.sellerCompanyId,
+                    subtotalAmount,
+                    shippingAmount: 0,
+                    commissionAmount,
+                    totalAmount,
+                    currency: "TRY",
+                    status: "INIT",
+                    itemsHash,
+                    items: orderItems,
+                }
+            });
+
+            // Initialize Escrow Payment mock
+            await tx.networkPayment.create({
+                data: {
+                    networkOrderId: networkOrder.id,
+                    provider: "MOCK", // Hardcoded per provider mode
+                    mode: "ESCROW",
+                    status: "INITIATED",
+                    amount: totalAmount,
+                    currency: "TRY",
+                    attemptKey: `chk_rfq_${offerId}`, // Lock ID
+                }
+            });
+
+            // Create Shipment sequence 1 Root
+            await tx.shipment.create({
+                data: {
+                    networkOrderId: networkOrder.id,
+                    mode: "MANUAL",
+                    status: "CREATED",
+                    carrierCode: "UNASSIGNED",
+                    sequence: 1,
+                    items: orderItems
+                }
+            });
         });
-
-        const subtotalAmount = Number(offer.totalPrice);
-        const commissionAmount = subtotalAmount * 0.05; // 5% mock
-        const escrowFee = subtotalAmount * 0.01; // 1% escrow fee mock
-        const totalAmount = subtotalAmount + escrowFee;
-
-        const orderItems = offer.items.map(i => ({
-            globalProductId: i.productId,
-            name: "RFQ Bundle Item", // Needs populate from GlobalProduct in full version
-            price: Number(i.unitPrice),
-            qty: i.quantity,
-            total: Number(i.unitPrice) * i.quantity
-        }));
-
-        const itemsHash = offerId; // Simple idempotency hash
-
-        const networkOrder = await tx.networkOrder.create({
-            data: {
-                buyerCompanyId,
-                sellerCompanyId: offer.sellerCompanyId,
-                subtotalAmount,
-                shippingAmount: 0,
-                commissionAmount,
-                totalAmount,
-                currency: "TRY",
-                status: "INIT",
-                itemsHash,
-                items: orderItems,
-            }
-        });
-
-        // Initialize Escrow Payment mock
-        await tx.networkPayment.create({
-            data: {
-                networkOrderId: networkOrder.id,
-                provider: "MOCK", // Hardcoded per provider mode
-                mode: "ESCROW",
-                status: "INITIATED",
-                amount: totalAmount,
-                currency: "TRY",
-                attemptKey: `chk_rfq_${offerId}`, // Lock ID
-            }
-        });
-
-        // Create Shipment sequence 1 Root
-        await tx.shipment.create({
-            data: {
-                networkOrderId: networkOrder.id,
-                mode: "MANUAL",
-                status: "CREATED",
-                carrierCode: "UNASSIGNED",
-                sequence: 1,
-                items: orderItems
-            }
-        });
-    });
+    } catch (dbError: any) {
+        throw new Error("DB_ERROR: " + (dbError.message || dbError.toString()));
+    }
 
     // We leave the RFQ explicitly open if buyer has items from OTHER sellers they haven't decided on yet.
     // If we wanted we could mark RFQ ACCEPTED if all sellers accepted.
