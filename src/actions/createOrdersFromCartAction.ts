@@ -125,17 +125,16 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
                     }
                 });
 
-                // Create NetworkPayment under ESCROW mode (Mock Provider)
+                // 3. Create Escrow Payment Mock per order
                 await tx.networkPayment.create({
                     data: {
                         networkOrderId: networkOrder.id,
-
-                        provider: "MOCK",
+                        provider: "ODEL", // Fixed from MOCK mapping
                         mode: "ESCROW",
                         status: "INITIATED",
                         amount: totalAmount,
                         currency: "TRY",
-                        attemptKey: checkoutAttemptKey + "-" + sellerId,
+                        attemptKey: checkoutAttemptKey + "-" + sellerId, // Reverted to original as `attemptId` is undefined
                     }
                 });
 

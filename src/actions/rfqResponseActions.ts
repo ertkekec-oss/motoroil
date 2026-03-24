@@ -141,7 +141,7 @@ export async function acceptOfferAction(offerId: string) {
             await tx.networkPayment.create({
                 data: {
                     networkOrderId: networkOrder.id,
-                    provider: "MOCK", // Hardcoded per provider mode
+                    provider: "ODEL", // Hardcoded per provider mode
                     mode: "ESCROW",
                     status: "INITIATED",
                     amount: totalAmount,
