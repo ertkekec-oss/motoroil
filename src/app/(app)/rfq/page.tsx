@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import HubPurchasingTabs from "@/components/network/HubPurchasingTabs";
+import { SearchCode } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -50,58 +51,52 @@ export default async function BuyerRfqListPage() {
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 <HubPurchasingTabs />
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <SearchCode className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             Özel Fiyat Teklifleri (RFQ)
                         </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
                             B2B ağındaki tedarikçilerden toplu alım ve ihale usulü fiyat teklifi (Request For Quotation) süreçlerini yönetin.
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
+                        <div className="hidden lg:flex bg-white dark:bg-[#1e293b] p-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 shrink-0">
+                            <div className="px-4 py-1.5 flex flex-col items-center justify-center border-r border-slate-100 dark:border-white/5">
+                                <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Müzakere</span>
+                                <span className="text-base font-black text-blue-600 dark:text-blue-400 leading-none mt-0.5">{activeRfqsCount}</span>
+                            </div>
+                            <div className="px-4 py-1.5 flex flex-col items-center justify-center border-r border-slate-100 dark:border-white/5">
+                                <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Teklif</span>
+                                <span className="text-base font-black text-amber-600 dark:text-amber-400 leading-none mt-0.5">
+                                    {rfqs.reduce((acc, r) => acc + r.offers.filter(o => o.status !== "REJECTED").length, 0)}
+                                </span>
+                            </div>
+                            <div className="px-4 py-1.5 flex flex-col items-center justify-center">
+                                <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Toplam</span>
+                                <span className="text-base font-black text-slate-800 dark:text-white leading-none mt-0.5">{rfqs.length}</span>
+                            </div>
+                        </div>
+
                         <Link
                             href="/catalog"
-                            className="h-10 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:text-white transition-colors shadow-sm"
+                            className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1e293b] transition-colors shadow-sm"
                         >
                             Kataloğa Dön
                         </Link>
                         <Link
                             href="/rfq/create"
-                            className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 transition-colors shadow-sm gap-2"
+                            className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-indigo-600 text-white hover:bg-slate-800 dark:hover:bg-indigo-700 transition-colors shadow-sm gap-2"
                         >
-                            <span>+</span> Yeni İhale / RFQ Oluştur
+                            <span>+</span> Yeni RFQ oluştur
                         </Link>
                     </div>
                 </div>
 
-                {/* Stat Strip */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Toplam İhale (RFQ)</p>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{rfqs.length}</p>
-                    </div>
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Aktif Müzakere</p>
-                        <p className="text-3xl font-bold text-blue-600">{activeRfqsCount}</p>
-                    </div>
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Gelen Teklif</p>
-                        <p className="text-3xl font-bold text-amber-600">
-                            {rfqs.reduce((acc, r) => acc + r.offers.filter(o => o.status !== "REJECTED").length, 0)}
-                        </p>
-                    </div>
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Onaylanan Alımlar</p>
-                        <p className="text-3xl font-bold text-emerald-600">
-                            {rfqs.filter(r => r.status === 'ACCEPTED').length}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Ana Tablo Konteyner */}
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden">
+                {/* Ana Tablo Kon्टर */}
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b]/50 flex items-center justify-between">
                         <div>
                             <h2 className="text-base font-semibold text-slate-900 dark:text-white">RFQ Operasyon Tablosu</h2>

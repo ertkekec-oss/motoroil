@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import HubOrdersTabs from "@/components/network/HubOrdersTabs";
+import { ShoppingBag } from "lucide-react";
 
 type SearchParams = { status?: string; cursor?: string };
 
@@ -121,12 +122,13 @@ export default async function BuyerOrdersPage({
                 <HubOrdersTabs />
                 
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white dark:text-white tracking-tight mb-1">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <ShoppingBag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             Verilen Siparişler (Açık Siparişler)
                         </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-300 dark:text-slate-300">
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
                             Satın alma operasyonları dahilinde verdiğiniz tüm tedarik taleplerini ve sipariş durumlarını izleyin.
                         </p>
                     </div>

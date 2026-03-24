@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import FinanceStatusBanner from "@/components/FinanceStatusBanner";
-
 import HubFinanceTabs from "@/components/network/HubFinanceTabs";
+import { TrendingUp, BarChart } from "lucide-react";
 
 export default function BoostPage() {
     const [loading, setLoading] = useState(true);
@@ -39,12 +39,24 @@ export default function BoostPage() {
         <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 <HubFinanceTabs />
-                <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">🚀 Boost Yönetimi</h1>
-                <Link href="/seller/boost/analytics">
-                    <button className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">Performans Raporu 📊</button>
-                </Link>
-            </div>
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            Boost Yönetimi
+                        </h1>
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
+                            B2B Katalog sponsorlu ürün gösterim paketlerinizi ve kotalarınızı yönetin.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                        <Link href="/seller/boost/analytics">
+                            <button className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-indigo-600 text-white hover:bg-slate-800 dark:hover:bg-indigo-700 transition-colors shadow-sm gap-2">
+                                <BarChart className="w-4 h-4" /> Performans Raporu
+                            </button>
+                        </Link>
+                    </div>
+                </div>
             <FinanceStatusBanner />
 
             {loading ? (

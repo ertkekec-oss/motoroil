@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import FinanceStatusBanner from "@/components/FinanceStatusBanner";
-
 import HubFinanceTabs from "@/components/network/HubFinanceTabs";
+import { LineChart, SearchCode } from "lucide-react";
 
 export default function BoostAnalyticsPage() {
     const [loading, setLoading] = useState(true);
@@ -50,14 +50,23 @@ export default function BoostAnalyticsPage() {
         <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 <HubFinanceTabs />
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">📈 Boost Performansı</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Sponsorlu ürün gösterimleriniz ve etkileşim analiziniz</p>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6">
+                <div className="flex-1">
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <LineChart className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        Boost Performansı (Analitik)
+                    </h1>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
+                        Sponsorlu ürün gösterimleriniz ve etkileşim analiziniz.
+                    </p>
                 </div>
-                <Link href="/seller/boost">
-                    <button className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">Geri Dön</button>
-                </Link>
+                <div className="flex items-center gap-3 shrink-0">
+                    <Link href="/seller/boost">
+                        <button className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1e293b] transition-colors shadow-sm gap-2">
+                           Yönetime Geri Dön
+                        </button>
+                    </Link>
+                </div>
             </div>
 
             <FinanceStatusBanner />

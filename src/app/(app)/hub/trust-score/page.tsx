@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import FinanceStatusBanner from "@/components/FinanceStatusBanner";
 import HubFinanceTabs from "@/components/network/HubFinanceTabs";
+import { ShieldCheck } from "lucide-react";
 
 export default function TrustScorePage() {
     const [loading, setLoading] = useState(true);
@@ -67,9 +68,16 @@ export default function TrustScorePage() {
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 <HubFinanceTabs />
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">Satıcı Güven Skoru (Trust Score)</h1>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">Platform içerisindeki performansınızı ve finansal itibarınızı belirleyen temel metrikler.</p>
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            Satıcı Güven Skoru (Trust Score)
+                        </h1>
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
+                            Platform içerisindeki performansınızı ve finansal itibarınızı belirleyen temel metrikler.
+                        </p>
+                    </div>
                 </div>
 
                 <div className="mb-8">

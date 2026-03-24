@@ -2,6 +2,7 @@
 
 import React, { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Wallet } from 'lucide-react';
 import NetworkEarningsPage from '../earnings/page';
 import PayoutsPage from '../payouts/page';
 import NetworkPaymentsPage from '../payments/page';
@@ -38,22 +39,23 @@ function FinanceTabs() {
                     <HubFinanceTabs />
                 </div>
                 {/* Header & Tabs */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8 px-4 sm:px-6 lg:px-8">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6 px-4 sm:px-6 lg:px-8">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <Wallet className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             B2B Finansal Operasyon Merkezi (Finance Gateway)
                         </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
                             Pazaryeri tahsilatları, escrow hakediş blokajları, komisyon faturaları ve nakit (payout) çıkış talepleri paneli.
                         </p>
                     </div>
 
-                    <div className="flex bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden p-1 shrink-0">
+                    <div className="flex bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
                         {tabs?.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => router.push(`?tab=${tab.id}`)}
-                                className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${activeTab === tab.id ? 'bg-slate-900 text-white shadow-sm' : 'bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50'}`}
+                                className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${activeTab === tab.id ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm' : 'bg-transparent text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                             >
                                 {tab.label}
                             </button>

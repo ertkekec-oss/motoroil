@@ -50,24 +50,28 @@ export default async function CartPage() {
         <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
 
-                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-white/10 pb-4 mb-6">
-                    <Link href="/catalog" className="hover:text-slate-900 dark:hover:text-white transition-colors">B2B Ortak Katalog</Link>
-                    <span>/</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">Ağ Sepetim</span>
-                </div>
-
-                <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-                            <ShoppingCart className="w-6 h-6 text-indigo-500" />
-                            Alışveriş Sepeti (B2B Cart)
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+                            <Link href="/catalog" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">B2B Ortak Katalog</Link>
+                            <span>/</span>
+                            <span className="text-slate-700 dark:text-slate-300">Ağ Sepetim</span>
+                        </div>
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <ShoppingCart className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            Ağ Sepetim (B2B Cart)
                         </h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Ağ üzerinden farklı tedarikçilerden sepete eklediğiniz ürünlerin listesi.</p>
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
+                            Ağ üzerinden farklı tedarikçilerden sepete eklediğiniz ürünlerin listesi.
+                        </p>
                     </div>
-                    <Link href="/catalog" className="inline-flex items-center justify-center gap-2 bg-white dark:bg-[#1e293b] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm shrink-0">
-                        <ArrowLeft className="w-4 h-4" />
-                        Alışverişe Devam Et
-                    </Link>
+
+                    <div className="flex items-center gap-3 shrink-0 mt-4 md:mt-0">
+                        <Link href="/catalog" className="h-8 px-4 inline-flex items-center justify-center rounded-lg text-[12px] font-bold bg-white dark:bg-[#1e293b] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm gap-2">
+                            <ArrowLeft className="w-3.5 h-3.5" />
+                            Alışverişe Devam Et
+                        </Link>
+                    </div>
                 </div>
 
                 <CartClient initialItems={validItems} />

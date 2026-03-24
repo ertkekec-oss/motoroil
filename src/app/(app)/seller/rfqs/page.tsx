@@ -47,24 +47,25 @@ export default async function SellerRfqsListPage() {
                 <HubOrdersTabs />
                 
                 {/* Header */}
-                <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight flex items-center gap-3">
-                            <Inbox className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6">
+                    <div className="flex-1">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <Inbox className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             Gelen İhaleler (Müzakereler)
                         </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-2xl">
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
                             Ağ alıcılarından size özel olarak yönlendirilen B2B teklif taleplerini inceleyin ve anında kendi rekabetçi faturanızı sunun.
                         </p>
                     </div>
+
                     <div className="flex bg-white dark:bg-[#1e293b] p-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 shrink-0">
-                        <div className="px-4 py-2 flex flex-col items-center justify-center border-r border-slate-100 dark:border-white/5">
-                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Bekleyen</span>
-                            <span className="text-lg font-bold text-amber-600 dark:text-amber-400">{rfqsEnhanced.filter(r => r.offers.length === 0).length}</span>
+                        <div className="px-4 py-1.5 flex flex-col items-center justify-center border-r border-slate-100 dark:border-white/5">
+                            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Bekleyen</span>
+                            <span className="text-base font-black text-amber-600 dark:text-amber-400 leading-none mt-0.5">{rfqsEnhanced.filter(r => r.offers.length === 0).length}</span>
                         </div>
-                        <div className="px-4 py-2 flex flex-col items-center justify-center">
-                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Toplam</span>
-                            <span className="text-lg font-bold text-slate-800 dark:text-white">{rfqsEnhanced.length}</span>
+                        <div className="px-4 py-1.5 flex flex-col items-center justify-center">
+                            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Toplam</span>
+                            <span className="text-base font-black text-slate-800 dark:text-white leading-none mt-0.5">{rfqsEnhanced.length}</span>
                         </div>
                     </div>
                 </div>
