@@ -252,7 +252,6 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                     </div>
                 </div>
             </div>
-            </div>
         </div>
     );
 }
