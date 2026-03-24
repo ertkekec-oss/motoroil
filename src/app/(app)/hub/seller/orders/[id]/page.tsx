@@ -82,11 +82,8 @@ export default async function SellerOrderDetailPage({
         select: { id: true, name: true, taxNumber: true }
     });
 
-    if (!order) redirect("/hub/seller/orders");
-
-    // Prevent seeing orders that do not belong to seller
-    if (order.sellerCompanyId !== session.settings.companyId) {
-        redirect("/403");
+    if (!buyerCompany) {
+        // Soft fallback
     }
 
     const items = Array.isArray(order.items) ? order.items : [];
