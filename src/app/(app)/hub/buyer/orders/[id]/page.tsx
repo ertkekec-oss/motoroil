@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -59,7 +59,6 @@ export default async function BuyerOrderDetailPage({
     const order = await prisma.networkOrder.findUnique({
         where: { id },
         include: {
-            sellerCompany: { select: { id: true, name: true, taxNumber: true } },
             shipments: {
                 orderBy: { sequence: 'asc' }
             },
@@ -71,6 +70,18 @@ export default async function BuyerOrderDetailPage({
     });
 
     if (!order) redirect("/hub/buyer/orders");
+
+    // Güvenlik Kontrolü
+    if (order.buyerCompanyId !== user.companyId && role !== "SUPER_ADMIN" && role !== "OWNER" && !user?.tenantId?.includes("ADMIN")) {
+        redirect("/403");
+    }
+
+    // Tenant-isolated RLS nedeniyle (Satici ile Alici farkli tenantlarda olabilir),
+    // Satici (Seller) sirket verisini iliskiye degil ayri bir raw sorguya emanet ediyoruz.
+    const sellerCompany = await prismaRaw.company.findUnique({
+        where: { id: order.sellerCompanyId },
+        select: { id: true, name: true, taxNumber: true }
+    });
 
     const latestPayment = order.payments[0];
 
@@ -102,8 +113,8 @@ export default async function BuyerOrderDetailPage({
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <p className="text-xs text-gray-500 font-medium">Satıcı Firma</p>
-                                <p className="text-sm text-gray-900 font-semibold">{order.sellerCompany.name}</p>
-                                <p className="text-xs text-gray-500 font-mono">VKN: {order.sellerCompany.taxNumber || '-'}</p>
+                                <p className="text-sm text-gray-900 font-semibold">{sellerCompany?.name || 'Bilinmeyen B2B Satıcısı'}</p>
+                                <p className="text-xs text-gray-500 font-mono">VKN: {sellerCompany?.taxNumber || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-xs text-gray-500 font-medium">Toplam Tutar</p>

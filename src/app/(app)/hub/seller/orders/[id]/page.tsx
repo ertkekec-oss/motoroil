@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -58,7 +58,6 @@ export default async function SellerOrderDetailPage({
     const order = await prisma.networkOrder.findUnique({
         where: { id },
         include: {
-            buyerCompany: { select: { id: true, name: true, taxNumber: true } },
             shipments: {
                 orderBy: { sequence: 'asc' }
             },
@@ -67,6 +66,20 @@ export default async function SellerOrderDetailPage({
                 take: 1
             }
         },
+    });
+
+    if (!order) redirect("/hub/seller/orders");
+
+    // Prevent seeing orders that do not belong to seller
+    if (order.sellerCompanyId !== session?.companyId && role !== "SUPER_ADMIN" && role !== "OWNER") {
+        redirect("/403");
+    }
+
+    // Tenant-isolated RLS nedeniyle (Satici ile Alici farkli tenantlarda olabilir),
+    // Alici verisini iliskiye degil ayri bir raw sorguya emanet ediyoruz.
+    const buyerCompany = await prismaRaw.company.findUnique({
+        where: { id: order.buyerCompanyId },
+        select: { id: true, name: true, taxNumber: true }
     });
 
     if (!order) redirect("/hub/seller/orders");
@@ -109,8 +122,8 @@ export default async function SellerOrderDetailPage({
                     <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-6">
                         <div className="flex-1">
                             <p className="text-xs text-gray-500 font-medium tracking-wider uppercase mb-1">Müşteri (Alıcı)</p>
-                            <p className="text-base text-gray-900 font-semibold">{order.buyerCompany.name}</p>
-                            <p className="text-xs text-gray-500 font-mono mt-1">VKN: {order.buyerCompany.taxNumber || 'Belirtilmedi'}</p>
+                            <p className="text-base text-gray-900 font-semibold">{buyerCompany?.name || 'Bilinmeyen B2B Müşterisi'}</p>
+                            <p className="text-xs text-gray-500 font-mono mt-1">VKN: {buyerCompany?.taxNumber || 'Belirtilmedi'}</p>
                         </div>
                         <div className="w-px bg-gray-100 hidden md:block"></div>
                         <div className="flex-1">
