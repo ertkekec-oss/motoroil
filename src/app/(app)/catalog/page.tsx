@@ -78,51 +78,52 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
             <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300 flex-1">
                 <HubCatalogTabs />
                 
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-4">
-                    <div className="flex-1">
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Globe className="text-indigo-600 dark:text-indigo-400 w-5 h-5"/>
-                            B2B Tedarik Kataloğu <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] bg-blue-500/10 text-blue-600 font-bold uppercase tracking-widest border border-blue-500/20">Global Ağ</span>
-                        </h1>
-                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
-                            Pazaryerindeki onaylı tedarikçilerin stoklarında bulunan ve anında sipariş edilebilir premium donanım ve malzeme ürünleri havuzu.
-                        </p>
-                    </div>
+                {/* Header Title Area */}
+                <div className="flex justify-between items-center mb-6 mt-4">
+                     <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                         <Globe className="text-indigo-600 dark:text-indigo-400 w-5 h-5"/>
+                         B2B Tedarik Kataloğu 
+                         <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] bg-indigo-500/10 text-indigo-500 font-bold uppercase tracking-widest border border-indigo-500/20">Global Ağ</span>
+                     </h1>
                 </div>
 
-                {/* Dynamic Search & Filter Bar */}
-                <div className="flex flex-col md:flex-row items-center gap-3 mb-10 mt-2">
-                    <div className="relative flex-1 w-full group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                {/* Aesthetic Centered Search & Filter Hub */}
+                <div className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm mb-12 overflow-hidden flex flex-col">
+                    {/* Top row: Search input + Buttons */}
+                    <div className="flex flex-col md:flex-row items-center p-2 gap-2">
+                        <div className="relative flex-1 w-full">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <Search className="h-5 w-5 text-indigo-500/70" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Marka, referans no veya ürün kodu yazın..."
+                                className="w-full h-12 pl-12 pr-4 bg-transparent border-none text-[14px] font-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-0"
+                            />
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Tedarik ağında marka, SKU veya ürün adı arayın..."
-                            className="w-full h-11 pl-11 pr-4 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
-                        />
-                        <div className="absolute inset-y-0 right-1.5 flex items-center">
-                            <button className="h-8 px-3 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-[11px] font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-colors uppercase tracking-widest hidden sm:block">
-                                ARAMA
+                        
+                        <div className="w-full md:w-px h-px md:h-8 bg-slate-200 dark:bg-white/10 mx-2"></div>
+                        
+                        <div className="flex items-center gap-2 w-full md:w-auto px-2 md:px-0 pb-2 md:pb-0">
+                            <button className="flex-1 md:flex-none h-10 px-5 inline-flex items-center justify-center bg-slate-50 dark:bg-[#0f172a] shadow-inner border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 text-[13px] font-semibold rounded-xl transition-all whitespace-nowrap gap-2">
+                                <SlidersHorizontal className="w-4 h-4" /> Detaylı Filtre
+                            </button>
+                            <button className="flex-1 md:flex-none h-10 px-8 inline-flex items-center justify-center bg-indigo-600 text-white text-[13px] font-bold rounded-xl hover:bg-indigo-500 transition-colors shadow-md shadow-indigo-600/20 whitespace-nowrap">
+                                Kataloğu Tara
                             </button>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 custom-scrollbar shrink-0">
-                        {/* Dynamic Categories */}
-                        <div className="flex gap-2 mr-2">
-                            {['Elektronik', 'Hırdavat', 'Otomotiv', 'Makine'].map((cat, i) => (
-                                <button key={i} className="h-11 px-4 inline-flex items-center justify-center bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-500/30 text-[12px] font-semibold rounded-xl transition-all shadow-sm whitespace-nowrap">
+                    {/* Bottom row: Categories Quick Links */}
+                    <div className="px-5 py-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0f172a]/50 flex items-center gap-4 overflow-x-auto custom-scrollbar">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 shrink-0">HIZLI KATEGORİLER:</span>
+                        <div className="flex items-center gap-1">
+                            {['Rulman & Güç Aktarımı', 'Elektromekanik', 'Sensör', 'CNC Ekipmanları', 'Bağlantı Elemanı', 'Pnömatik'].map((cat, i) => (
+                                <button key={i} className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-[#1e293b] hover:text-indigo-600 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all whitespace-nowrap">
                                     {cat}
                                 </button>
                             ))}
                         </div>
-
-                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1 hidden md:block"></div>
-
-                        <button className="h-11 px-4 inline-flex items-center justify-center bg-slate-900 dark:bg-blue-600 text-white text-[12px] font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-colors shadow-sm gap-2 whitespace-nowrap">
-                            <SlidersHorizontal className="w-4 h-4" /> Filtreler
-                        </button>
                     </div>
                 </div>
 
