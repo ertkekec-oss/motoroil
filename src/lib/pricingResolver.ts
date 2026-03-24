@@ -1,4 +1,4 @@
-import { prisma as defaultPrisma } from "@/lib/prisma";
+import { prisma as defaultPrisma, prismaRaw } from "@/lib/prisma";
 
 export async function resolveContractPrice(buyerCompanyId: string, sellerCompanyId: string, productId: string, qty: number, db: any = defaultPrisma) {
     let resolvedPrice: number | null = null;
@@ -37,8 +37,8 @@ export async function resolveContractPrice(buyerCompanyId: string, sellerCompany
     }
 
     if (resolvedPrice === null) {
-        // Fallback to standard network listing price
-        const listing = await db.networkListing.findFirst({
+        // Fallback to standard network listing price using prismaRaw to bypass RLS tenant isolation
+        const listing = await prismaRaw.networkListing.findFirst({
             where: {
                 sellerCompanyId,
                 globalProductId: productId,

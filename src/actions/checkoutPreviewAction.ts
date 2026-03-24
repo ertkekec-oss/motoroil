@@ -33,7 +33,7 @@ export async function checkoutPreviewAction() {
     for (const [sellerId, items] of sellerGroups.entries()) {
         let subtotalAmount = 0;
 
-        const seller = await prisma.company.findUnique({ where: { id: sellerId } });
+        const seller = await prisma.company.findUnique({ where: { id: sellerId }, adminBypass: true } as any);
         const sellerName = seller?.name || "Unknown Seller";
 
         for (const item of items) {

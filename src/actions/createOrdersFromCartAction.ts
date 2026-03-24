@@ -60,8 +60,9 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
                             globalProductId: item.productId,
                             status: "ACTIVE"
                         },
-                        include: { globalProduct: true }
-                    });
+                        include: { globalProduct: true },
+                        adminBypass: true
+                    } as any);
 
                     if (!listing) {
                         throw new Error(`Item missing or inactive from catalog.`);
@@ -94,8 +95,9 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
                     // Standard stock deduction
                     await tx.networkListing.update({
                         where: { id: listing.id },
-                        data: { availableQty: { decrement: item.qty } }
-                    });
+                        data: { availableQty: { decrement: item.qty } },
+                        adminBypass: true
+                    } as any);
                 }
 
                 const commissionAmount = subtotalAmount * 0.05; // 5% mock commission
