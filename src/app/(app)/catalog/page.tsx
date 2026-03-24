@@ -35,7 +35,16 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
     });
 
     // Group by GlobalProduct
-    const catalogMap = new Map<string, { product: any; minPrice: number; maxPrice: number; sellersCount: number; availableQty: number; localFallbackImage: string | null }>();
+    const catalogMap = new Map<string, { 
+        product: any; 
+        minPrice: number; 
+        maxPrice: number; 
+        sellersCount: number; 
+        availableQty: number; 
+        localFallbackImage: string | null;
+        hasOwnListing: boolean;
+        hasOtherSellers: boolean;
+    }>();
 
     for (const listing of listings) {
         if (!listing.globalProduct) continue;
@@ -52,6 +61,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
         const ep = listing.erpProduct as any;
         let localImage = ep?.imageUrl || ep?.image || (ep?.images && ep.images[0]) || ep?.coverImage || ep?.thumbnail || null;
 
+        const isOwn = listing.companyId === user.companyId || listing.tenantId === user.tenantId;
+
         if (catalogMap.has(gId)) {
             const entry = catalogMap.get(gId)!;
             entry.minPrice = Math.min(entry.minPrice, p);
@@ -59,6 +70,10 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
             entry.sellersCount += 1;
             entry.availableQty += qty;
             if (!entry.localFallbackImage && localImage) entry.localFallbackImage = localImage;
+            
+            if (isOwn) entry.hasOwnListing = true;
+            else entry.hasOtherSellers = true;
+            
         } else {
             catalogMap.set(gId, {
                 product: listing.globalProduct,
@@ -66,7 +81,9 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                 maxPrice: p,
                 sellersCount: 1,
                 availableQty: qty,
-                localFallbackImage: localImage
+                localFallbackImage: localImage,
+                hasOwnListing: isOwn,
+                hasOtherSellers: !isOwn
             });
         }
     }
@@ -186,12 +203,14 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-2 mt-5">
-                                            <Link href={`/catalog/${item.product.id}`} className="flex items-center justify-center py-2.5 border-2 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                                İncele
+                                            <Link href={`/catalog/${item.product.id}`} className={item.hasOwnListing && !item.hasOtherSellers ? "col-span-2 flex items-center justify-center py-2.5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-colors" : "flex items-center justify-center py-2.5 border-2 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"}>
+                                                {item.hasOwnListing && !item.hasOtherSellers ? "Sizin İlanınız (İncele)" : "İncele"}
                                             </Link>
-                                            <button className="flex items-center justify-center py-2.5 bg-indigo-600 text-white font-bold text-xs rounded-xl hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20">
-                                                Sepete Ekle
-                                            </button>
+                                            {!(item.hasOwnListing && !item.hasOtherSellers) && (
+                                                <button className="flex items-center justify-center py-2.5 bg-indigo-600 text-white font-bold text-xs rounded-xl hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20">
+                                                    Sepete Ekle
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -246,11 +265,13 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                                     </div>
 
                                     <div className="flex flex-col gap-1.5 shrink-0 pl-2">
-                                        <button className="h-7 px-3 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg hover:bg-indigo-600 hover:text-white transition-colors uppercase tracking-widest whitespace-nowrap border border-indigo-100 dark:border-indigo-500/20">
-                                            Sepet
-                                        </button>
-                                        <Link href={`/catalog/${item.product.id}`} className="h-7 px-3 flex flex-col items-center justify-center border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors uppercase tracking-widest whitespace-nowrap">
-                                            İncele
+                                        {!(item.hasOwnListing && !item.hasOtherSellers) && (
+                                            <button className="h-7 px-3 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg hover:bg-indigo-600 hover:text-white transition-colors uppercase tracking-widest whitespace-nowrap border border-indigo-100 dark:border-indigo-500/20">
+                                                Sepet
+                                            </button>
+                                        )}
+                                        <Link href={`/catalog/${item.product.id}`} className={item.hasOwnListing && !item.hasOtherSellers ? "h-10 px-3 flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-400 font-bold text-[9px] uppercase tracking-widest rounded-lg transition-colors cursor-pointer" : "h-7 px-3 flex flex-col items-center justify-center border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors uppercase tracking-widest whitespace-nowrap"}>
+                                            {item.hasOwnListing && !item.hasOtherSellers ? "Sizin İlanınız" : "İncele"}
                                         </Link>
                                     </div>
                                 </div>

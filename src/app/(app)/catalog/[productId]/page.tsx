@@ -208,13 +208,19 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                                                                 )}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-3 text-center">
-                                                            <AddToCartButton
-                                                                productId={product.id}
-                                                                sellerCompanyId={l.sellerCompanyId}
-                                                                maxQty={l.availableQty}
-                                                                disabled={isOOS || isNotReady}
-                                                            />
+                                                        <td className="px-6 py-3 text-center w-40">
+                                                            {l.sellerCompanyId === user.companyId ? (
+                                                                <span className="inline-flex items-center justify-center py-2 px-3 bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 font-bold text-[10px] rounded-xl cursor-not-allowed border border-slate-200 dark:border-white/10 uppercase tracking-widest w-full text-center">
+                                                                    Sizin İlanınız
+                                                                </span>
+                                                            ) : (
+                                                                <AddToCartButton
+                                                                    productId={product.id}
+                                                                    sellerCompanyId={l.sellerCompanyId}
+                                                                    maxQty={l.availableQty}
+                                                                    disabled={isOOS || isNotReady}
+                                                                />
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 );
