@@ -60,12 +60,12 @@ export async function submitRfqAction(rfqId: string) {
     const user = session?.user || session;
 
     if (!user) {
-        throw new Error("Unauthorized");
+        return { success: false, error: "Unauthorized" };
     }
 
     const buyerCompanyId = user.companyId || session?.companyId;
     if (!buyerCompanyId) {
-        throw new Error("Buyer company context missing");
+        return { success: false, error: "Buyer company context missing" };
     }
 
     const rfq = await prisma.rfq.findUnique({
@@ -73,11 +73,11 @@ export async function submitRfqAction(rfqId: string) {
     });
 
     if (!rfq || rfq.buyerCompanyId !== buyerCompanyId) {
-        throw new Error("RFQ not found or access denied.");
+        return { success: false, error: "RFQ not found or access denied." };
     }
 
     if (rfq.status !== "DRAFT") {
-        throw new Error("RFQ has already been submitted or is not in DRAFT state.");
+        return { success: false, error: "RFQ has already been submitted or is not in DRAFT state." };
     }
 
     await prisma.rfq.update({
@@ -88,5 +88,5 @@ export async function submitRfqAction(rfqId: string) {
     revalidatePath(`/rfq/${rfqId}`);
     revalidatePath(`/rfq`);
 
-    return { success: true };
+    return { success: true, error: null };
 }

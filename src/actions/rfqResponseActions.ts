@@ -74,7 +74,7 @@ export async function acceptOfferAction(offerId: string) {
     const user = session?.user || session;
 
     if (!user) {
-        throw new Error("Unauthorized");
+        return { success: false, error: "Unauthorized" };
     }
 
     const buyerCompanyId = user.companyId || session?.companyId;
@@ -88,15 +88,15 @@ export async function acceptOfferAction(offerId: string) {
     });
 
     if (!offer || offer.rfq.buyerCompanyId !== buyerCompanyId) {
-        throw new Error("Offer not found or unauthorized");
+        return { success: false, error: "Offer not found or unauthorized" };
     }
 
     if (offer.status === "ACCEPTED") {
-        throw new Error("Offer already accepted");
+        return { success: false, error: "Offer already accepted" };
     }
 
     if (offer.expiresAt && offer.expiresAt < new Date()) {
-        throw new Error("Offer expired");
+        return { success: false, error: "Offer expired" };
     }
 
     try {
@@ -163,7 +163,7 @@ export async function acceptOfferAction(offerId: string) {
             });
         });
     } catch (dbError: any) {
-        throw new Error("DB_ERROR: " + (dbError.message || dbError.toString()));
+        return { success: false, error: "DB_ERROR: " + (dbError.message || dbError.toString()) };
     }
 
     // We leave the RFQ explicitly open if buyer has items from OTHER sellers they haven't decided on yet.
@@ -172,5 +172,5 @@ export async function acceptOfferAction(offerId: string) {
     revalidatePath(`/rfq/${offer.rfqId}`);
     revalidatePath("/hub/buyer/orders");
 
-    return { success: true };
+    return { success: true, error: null };
 }

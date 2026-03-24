@@ -18,7 +18,8 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
         showConfirm("Onay Gerekli", "Seçili tüm ağ tedarikçilerine resmi ihale paketi gönderilsin mi?", () => {
             startTransition(async () => {
                 try {
-                    await submitRfqAction(rfq.id);
+                    const res = await submitRfqAction(rfq.id);
+                    if (res && res.error) throw new Error(res.error);
                     showSuccess("Başarılı", "İhale tüm tedarikçilere başarıyla fırlatıldı.");
                 } catch (err: any) {
                     showError("Hata", err.message || "İhale başlatılamadı.");
@@ -31,7 +32,8 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
         showConfirm("Teklif Kabul Edilecek", "Bu teklifi kabul etmek istediğinize emin misiniz? Kabul edildiğinde otomatik olarak B2B Ağ Siparişi (Network Order) oluşturulacaktır.", () => {
             startTransition(async () => {
                 try {
-                    await acceptOfferAction(offerId);
+                    const res = await acceptOfferAction(offerId);
+                    if (res && res.error) throw new Error(res.error);
                     showSuccess("Kabul Edildi", "Teklif başarıyla onaylandı ve siparişe dönüştürüldü. Lütfen Satınalma paneline geçiniz.");
                     router.push("/hub/buyer/orders");
                 } catch (err: any) {
