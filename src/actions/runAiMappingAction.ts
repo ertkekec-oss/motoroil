@@ -125,9 +125,9 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
             if (matchedGlobalId && erpCategory.mappings.length === 0) {
                 await prisma.categoryMapping.create({
                     data: {
-                        erpCategoryId: erpCategory.id,
-                        globalCategoryId: matchedGlobalId,
-                        companyId: companyId
+                        erpCategory: { connect: { id: erpCategory.id } },
+                        globalCategory: { connect: { id: matchedGlobalId } },
+                        company: { connect: { id: companyId } }
                     }
                 });
             }
