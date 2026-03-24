@@ -221,7 +221,16 @@ export default async function BuyerOrdersPage({
                                                 {formatDateTR(o.createdAt)}
                                             </td>
                                             <td className="px-6 py-4 text-[13px] font-medium text-slate-600 dark:text-slate-300 dark:text-slate-300">
-                                                {formatDateTR((o as any).paidAt)}
+                                                {(o.status === "INIT" || o.status === "PENDING_PAYMENT") ? (
+                                                    <Link href={`/hub/buyer/orders/${o.id}`} className="inline-flex items-center justify-center bg-indigo-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-500 transition-colors shadow-sm">
+                                                        ÖDEME YAP &rarr;
+                                                    </Link>
+                                                ) : (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-emerald-600 font-semibold text-[11px]">ÖDENDİ</span>
+                                                        <span className="text-[11px] text-slate-500">{formatDateTR((o as any).paidAt)}</span>
+                                                    </div>
+                                                )}
                                             </td>
                                         </tr>
                                     ))
