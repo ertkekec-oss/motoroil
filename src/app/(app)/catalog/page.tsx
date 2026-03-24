@@ -73,6 +73,12 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
 
     const items = Array.from(catalogMap.values());
 
+    // Fetch REAL categories from the database for the fast-filter menu
+    const realCategories = await prismaRaw.globalCategory.findMany({
+        take: 8,
+        orderBy: { name: 'asc' }
+    });
+
     return (
         <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen flex flex-col w-full font-sans">
             <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300 flex-1">
@@ -87,11 +93,11 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                      </h1>
                 </div>
 
-                {/* Aesthetic Centered Search & Filter Hub */}
-                <div className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm mb-12 overflow-hidden flex flex-col">
-                    {/* Top row: Search input + Buttons */}
-                    <div className="flex flex-col md:flex-row items-center p-2 gap-2">
-                        <div className="relative flex-1 w-full">
+                {/* Desktop-optimized Aesthetic Centered Search & Filter Hub */}
+                <div className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm mb-12 overflow-hidden">
+                    {/* Top Row */}
+                    <div className="flex flex-col lg:flex-row lg:items-center p-2 gap-2">
+                        <div className="relative flex-1 min-w-0">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <Search className="h-5 w-5 text-indigo-500/70" />
                             </div>
@@ -102,25 +108,25 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                             />
                         </div>
                         
-                        <div className="w-full md:w-px h-px md:h-8 bg-slate-200 dark:bg-white/10 mx-2"></div>
+                        <div className="hidden lg:block w-px h-8 bg-slate-200 dark:bg-white/10 mx-2 shrink-0"></div>
                         
-                        <div className="flex items-center gap-2 w-full md:w-auto px-2 md:px-0 pb-2 md:pb-0">
-                            <button className="flex-1 md:flex-none h-10 px-5 inline-flex items-center justify-center bg-slate-50 dark:bg-[#0f172a] shadow-inner border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 text-[13px] font-semibold rounded-xl transition-all whitespace-nowrap gap-2">
+                        <div className="flex items-center gap-2 pt-2 lg:pt-0 shrink-0 w-full lg:w-auto px-2 lg:px-0">
+                            <button className="flex-1 lg:flex-none h-10 px-5 inline-flex items-center justify-center bg-slate-50 dark:bg-[#0f172a] shadow-inner border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 text-[13px] font-semibold rounded-xl transition-all whitespace-nowrap gap-2">
                                 <SlidersHorizontal className="w-4 h-4" /> Detaylı Filtre
                             </button>
-                            <button className="flex-1 md:flex-none h-10 px-8 inline-flex items-center justify-center bg-indigo-600 text-white text-[13px] font-bold rounded-xl hover:bg-indigo-500 transition-colors shadow-md shadow-indigo-600/20 whitespace-nowrap">
+                            <button className="flex-1 lg:flex-none h-10 px-8 inline-flex items-center justify-center bg-indigo-600 text-white text-[13px] font-bold rounded-xl hover:bg-indigo-500 transition-colors shadow-md shadow-indigo-600/20 whitespace-nowrap">
                                 Kataloğu Tara
                             </button>
                         </div>
                     </div>
 
-                    {/* Bottom row: Categories Quick Links */}
+                    {/* Bottom row: Categories Quick Links (Real DB Data) */}
                     <div className="px-5 py-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0f172a]/50 flex items-center gap-4 overflow-x-auto custom-scrollbar">
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 shrink-0">HIZLI KATEGORİLER:</span>
                         <div className="flex items-center gap-1">
-                            {['Rulman & Güç Aktarımı', 'Elektromekanik', 'Sensör', 'CNC Ekipmanları', 'Bağlantı Elemanı', 'Pnömatik'].map((cat, i) => (
-                                <button key={i} className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-[#1e293b] hover:text-indigo-600 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all whitespace-nowrap">
-                                    {cat}
+                            {realCategories.map((cat, i) => (
+                                <button key={i} className="px-3 py-1.5 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-[#1e293b] hover:text-indigo-600 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all whitespace-nowrap">
+                                    {cat.name}
                                 </button>
                             ))}
                         </div>
