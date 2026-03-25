@@ -440,12 +440,14 @@ function InventoryContent() {
           setIsCounting(false);
           setCountValues({});
           setAuditReport(null);
+          router.replace("/inventory/warehouses");
         },
       );
     } else {
       setIsCounting(false);
       setCountValues({});
       setAuditReport(null);
+      router.replace("/inventory/warehouses");
     }
   };
 
@@ -517,9 +519,9 @@ function InventoryContent() {
       const pData = await pRes.json();
       if (pData.success) setProducts(pData.products);
 
-      setIsCounting(false);
-      setCountValues({});
-      setAuditReport(null);
+      // Redirect back to Warehouse instead of staying in Inventory list
+      router.replace("/inventory/warehouses");
+      
       showSuccess(
         "Stoklar Güncellendi",
         "Sayım sonuçları başarıyla işlendi ve stoklar güncellendi.",
