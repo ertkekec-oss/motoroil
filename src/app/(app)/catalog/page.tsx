@@ -367,7 +367,7 @@ export default async function CatalogPage({
                   src={getImg(monolithItem)}
                   alt={monolithItem.product.name}
                   className="w-full object-contain mix-blend-multiply dark:mix-blend-lighten max-h-[300px] filter contrast-125"
-                  onError={(e: any) => (e.target.style.display = "none")}
+                  
                 />
               ) : (
                 <div className="w-32 h-32 flex items-center justify-center text-slate-200 dark:text-white/5">
@@ -467,7 +467,7 @@ export default async function CatalogPage({
                       src={getImg(item)}
                       alt=""
                       className="w-full h-full object-contain p-2 mix-blend-multiply dark:mix-blend-lighten filter contrast-110 group-hover:scale-105 transition-transform duration-500"
-                      onError={(e: any) => (e.target.style.display = "none")}
+                      
                     />
                   ) : (
                     <ImageIcon className="w-8 h-8 text-slate-200 dark:text-white/5" />
@@ -534,9 +534,6 @@ export default async function CatalogPage({
                                 src={getImg(item)}
                                 alt=""
                                 className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-lighten opacity-70 group-hover:opacity-100 transition-opacity"
-                                onError={(e: any) =>
-                                  (e.target.style.display = "none")
-                                }
                               />
                             ) : (
                               <span className="text-slate-400 dark:text-slate-600 block text-[10px]">
