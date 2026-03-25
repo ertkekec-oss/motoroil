@@ -535,28 +535,41 @@ function InventoryContent() {
   const handleAiMap = async () => {
     if (isProcessing) return;
     setIsProcessing(true);
+    let totalProcessed = 0;
     try {
       showSuccess(
         "AI Motoru Tetiklendi",
-        "Eşleşmeyen ürünleriniz için işlem başlatıldı. Lütfen bekleyin..."
+        "Eşleşmeyen ürünleriniz için döngüsel zeka başlatıldı. Tüm envanter taranana kadar lütfen bekleyin..."
       );
-      // Wait for React to render the toast before freezing the thread with a heavy server action
       await new Promise(r => setTimeout(r, 800));
 
       const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
-      const res = await runAiMappingAction();
+      
+      let running = true;
+      while(running) {
+          const res = await runAiMappingAction();
 
-      if (res && res.success) {
-         if (res.count && res.count > 0) {
-             showSuccess("Haritalama Başarılı", `Bütün ham veriler tarandı. ${res.count} ürünün kategorisi AI tarafından otomatik algılanıp dolduruldu!`);
-             const pRes = await fetch("/api/products");
-             const pData = await pRes.json();
-             if (pData.success) setProducts(pData.products);
-         } else {
-             showWarning("Tarama Tamamlandı", res.message || "Tüm ürünleriniz zaten bir kategoriye sahip.");
-         }
-      } else {
-         showError("İşlem Başarısız", res?.error || "AI motoruna bağlanılamadı.");
+          if (res && res.success) {
+            totalProcessed += (res.count || 0);
+
+            if ((res.count || 0) < 200) {
+                 if (totalProcessed > 0) {
+                     showSuccess("Haritalama Bitti", `Toplam ${totalProcessed} ürünün tüm SEO ve B2B haritası çizildi.`);
+                 } else {
+                     showWarning("Tamamlandı", res.message || "Eşleştirilecek ürün kalmadı.");
+                 }
+                 const pRes = await fetch("/api/products");
+                 const pData = await pRes.json();
+                 if (pData.success) setProducts(pData.products);
+                 running = false;
+            } else {
+                showSuccess("Döngü Çalışıyor", `Şu ana kadar ${totalProcessed} ürün bağlandı. Kalan parti çekiliyor...`);
+                await new Promise(r => setTimeout(r, 1500));
+            }
+          } else {
+             showError("İşlem Başarısız", res?.error || "AI motoruna bağlanılamadı.");
+             running = false;
+          }
       }
     } catch (e) {
       console.error(e);

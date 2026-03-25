@@ -123,14 +123,25 @@ export default function CategoryMappingClient({
                         <button disabled={isPending} onClick={() => {
                             startTransition(async () => {
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
-                                const res = await runAiMappingAction(false);
-                                if (res.success) {
-                                    showSuccess(
-                                        res.count !== undefined ? "Gümrük Çözüldü!" : "Aksiyon Tamamlandı", 
-                                        res.message || `${res.count} adet etiketlenmemiş ürün başarıyla Hub'a bağlandı.`
-                                    );
-                                } else {
-                                    showError("Hata", res.error);
+                                let totalProcessed = 0;
+                                let running = true;
+                                while(running) {
+                                    const res = await runAiMappingAction(false);
+                                    if (!res.success) {
+                                        showError("Hata", res.error);
+                                        break;
+                                    }
+                                    totalProcessed += (res.count || 0);
+                                    if ((res.count || 0) < 200) {
+                                        showSuccess(
+                                            totalProcessed > 0 ? "Gümrük Çözüldü!" : "Aksiyon Tamamlandı", 
+                                            `Toplam ${totalProcessed} adet etiketlenmemiş ürün başarıyla Hub'a bağlandı.`
+                                        );
+                                        running = false;
+                                    } else {
+                                        showSuccess("AI Tarıyor...", `Şu ana kadar ${totalProcessed} ürün eşlendi. Sıradaki parti başlıyor...`);
+                                        await new Promise(r => setTimeout(r, 1500));
+                                    }
                                 }
                             });
                         }} className="h-8 px-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-[10px] rounded-lg uppercase tracking-wider border border-slate-700 transition-colors shadow flex items-center justify-center whitespace-nowrap disabled:opacity-50">
@@ -140,14 +151,25 @@ export default function CategoryMappingClient({
                         <button disabled={isPending} onClick={() => {
                             startTransition(async () => {
                                 const { runAiMappingAction } = await import("@/actions/runAiMappingAction");
-                                const res = await runAiMappingAction(true);
-                                if (res.success) {
-                                    showSuccess(
-                                        res.count !== undefined ? "Düzen Sağlandı!" : "Aksiyon Tamamlandı", 
-                                        res.message || `${res.count} ürün tespit edildi. Lokaliniz modernize edilerek ağa eklendi.`
-                                    );
-                                } else {
-                                    showError("Hata", res.error);
+                                let totalProcessed = 0;
+                                let running = true;
+                                while(running) {
+                                    const res = await runAiMappingAction(true);
+                                    if (!res.success) {
+                                        showError("Hata", res.error);
+                                        break;
+                                    }
+                                    totalProcessed += (res.count || 0);
+                                    if ((res.count || 0) < 200) {
+                                        showSuccess(
+                                            totalProcessed > 0 ? "Düzen Sağlandı!" : "Aksiyon Tamamlandı", 
+                                            `Toplam ${totalProcessed} ürün tespit edildi ve yerel kategorileriniz modernize edilerek ağa eklendi.`
+                                        );
+                                        running = false;
+                                    } else {
+                                        showSuccess("AI Tarıyor...", `Şu ana kadar ${totalProcessed} ürün lokalde düzeltildi. Döngü devam ediyor...`);
+                                        await new Promise(r => setTimeout(r, 1500));
+                                    }
                                 }
                             });
                         }} className="h-8 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg uppercase tracking-wider shadow-sm transition-colors flex items-center justify-center whitespace-nowrap disabled:opacity-50">
