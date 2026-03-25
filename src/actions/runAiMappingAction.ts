@@ -47,6 +47,10 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
 
         // Semantic Engine Route with Google Gemini
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+        if (!GEMINI_API_KEY) {
+             return { success: false, error: "Vercel Settings panelinde GEMINI_API_KEY tanımlanmamış. Deep-B2B zekasının çalışması için Google AI Studio anahtarınızı Vercel Environment Variables kısmına kaydedin." };
+        }
+        
         if (GEMINI_API_KEY) {
             
             const payload = unmappedProducts.map(p => ({
