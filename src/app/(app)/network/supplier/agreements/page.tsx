@@ -39,7 +39,7 @@ export default async function SupplierAgreementsPage() {
         >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <EnterpriseCard className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400">
+                    <div className="w-12 h-12 rounded-full bg-green-100  flex items-center justify-center text-green-600 ">
                         <FileText className="w-6 h-6" />
                     </div>
                     <div>
@@ -48,7 +48,7 @@ export default async function SupplierAgreementsPage() {
                     </div>
                 </EnterpriseCard>
                 <EnterpriseCard className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                    <div className="w-12 h-12 rounded-full bg-orange-100  flex items-center justify-center text-orange-600 ">
                         <AlertCircle className="w-6 h-6" />
                     </div>
                     <div>
@@ -57,7 +57,7 @@ export default async function SupplierAgreementsPage() {
                     </div>
                 </EnterpriseCard>
                 <EnterpriseCard className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400">
+                    <div className="w-12 h-12 rounded-full bg-red-100  flex items-center justify-center text-red-600 ">
                         <LinkIcon className="w-6 h-6" />
                     </div>
                     <div>
@@ -68,8 +68,8 @@ export default async function SupplierAgreementsPage() {
             </div>
 
             <EnterpriseCard noPadding>
-                <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-t-xl">
-                    <h3 className="font-medium text-slate-800 dark:text-slate-200">Sözleşme Ağı (Network Map)</h3>
+                <div className="p-4 border-b border-slate-200  flex justify-between items-center bg-slate-50  rounded-t-xl">
+                    <h3 className="font-medium text-slate-800 ">Sözleşme Ağı (Network Map)</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <EnterpriseTable headers={['Bayi Kodu', 'Sözleşme No', 'Durum', 'Güncel Kural Modeli', 'Vade/Limit', 'Oluşturulma']}>
@@ -78,8 +78,8 @@ export default async function SupplierAgreementsPage() {
                         ) : agreements.map(agr => {
                             const terms = agr.policySnapshot?.termsJson as any;
                             return (
-                                <tr key={agr.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
-                                    <td className="p-4 font-medium text-sm text-slate-900 dark:text-slate-100">{agr.membershipId}</td>
+                                <tr key={agr.id} className="hover:bg-slate-50 :bg-slate-800">
+                                    <td className="p-4 font-medium text-sm text-slate-900 ">{agr.membershipId}</td>
                                     <td className="p-4 text-sm text-slate-500">{agr.contractId || '-'}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${agr.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : agr.status === 'SENT' ? 'bg-yellow-100 text-yellow-800' : 'bg-slate-100 text-slate-800'}`}>

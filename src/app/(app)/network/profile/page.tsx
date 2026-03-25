@@ -95,7 +95,7 @@ export default function NetworkProfilePage() {
     if (isLoading) {
         return (
             <EnterprisePageShell title="Network Profili">
-                <EnterpriseCard><div className="h-64 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-lg" /></EnterpriseCard>
+                <EnterpriseCard><div className="h-64 animate-pulse bg-slate-100  rounded-lg" /></EnterpriseCard>
             </EnterprisePageShell>
         );
     }
@@ -124,24 +124,24 @@ export default function NetworkProfilePage() {
             <EnterpriseCard>
                 <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-xl bg-slate-100  border border-slate-200  flex items-center justify-center">
                             {/* Logo Placeholder */}
                             <Building2 className="w-8 h-8 text-slate-400" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                            <h2 className="text-lg font-bold text-slate-900  leading-tight">
                                 {profile.displayName || 'İsimsiz Şirket'}
                             </h2>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">Hub Kimliği: {profile.slug}</p>
-                            <div className="flex gap-4 mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
-                                <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                                    Trust Score: <span className="text-slate-900 dark:text-white ml-1">{profile.trustScore?.score || 0}</span>
+                            <p className="text-sm text-slate-500 ">Hub Kimliği: {profile.slug}</p>
+                            <div className="flex gap-4 mt-2 border-t border-slate-100  pt-2">
+                                <div className="text-xs font-semibold text-slate-600 ">
+                                    Trust Score: <span className="text-slate-900  ml-1">{profile.trustScore?.score || 0}</span>
                                 </div>
-                                <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                                    Profil Doluluğu: <span className="text-slate-900 dark:text-white ml-1">%{(profile as any).profileCompleteness || 0}</span>
+                                <div className="text-xs font-semibold text-slate-600 ">
+                                    Profil Doluluğu: <span className="text-slate-900  ml-1">%{(profile as any).profileCompleteness || 0}</span>
                                 </div>
-                                <div className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                                    Bağlantı Sayısı: <span className="text-slate-900 dark:text-white ml-1">{((profile as any)._count?.sourceRelationships || 0) + ((profile as any)._count?.targetRelationships || 0)}</span>
+                                <div className="text-xs font-semibold text-slate-600 ">
+                                    Bağlantı Sayısı: <span className="text-slate-900  ml-1">{((profile as any)._count?.sourceRelationships || 0) + ((profile as any)._count?.targetRelationships || 0)}</span>
                                 </div>
                             </div>
                         </div>
@@ -151,14 +151,14 @@ export default function NetworkProfilePage() {
                             {profile.verificationStatus}
                         </span>
                         {profile.trustScore?.badge && (
-                            <span className="px-3 py-1 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded uppercase tracking-wider">
+                            <span className="px-3 py-1 text-[10px] font-bold bg-slate-100  text-slate-700  rounded uppercase tracking-wider">
                                 {profile.trustScore.badge.replace('_', ' ')}
                             </span>
                         )}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-200 ">
                     <div className="space-y-4">
                         <EnterpriseSectionHeader title="Temel Bilgiler" subtitle="Firma unvanı ve iletişim verileri." />
                         <EnterpriseInput

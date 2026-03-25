@@ -33,7 +33,7 @@ function FinanceTabs() {
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] w-full font-sans">
+        <div className="bg-slate-50 min-h-screen  w-full font-sans">
             <div className="max-w-[1600px] mx-auto pt-8">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <HubFinanceTabs />
@@ -41,21 +41,21 @@ function FinanceTabs() {
                 {/* Header & Tabs */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-6 px-4 sm:px-6 lg:px-8">
                     <div className="flex-1">
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Wallet className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <h1 className="text-xl font-bold text-slate-900  flex items-center gap-2">
+                            <Wallet className="w-5 h-5 text-indigo-600 " />
                             B2B Finansal Operasyon Merkezi (Finance Gateway)
                         </h1>
-                        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-4xl">
+                        <p className="text-[13px] text-slate-500  mt-1.5 max-w-4xl">
                             Pazaryeri tahsilatları, escrow hakediş blokajları, komisyon faturaları ve nakit (payout) çıkış talepleri paneli.
                         </p>
                     </div>
 
-                    <div className="flex bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
+                    <div className="flex bg-white  rounded-lg border border-slate-200  shadow-sm overflow-hidden p-1 shrink-0">
                         {tabs?.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => router.push(`?tab=${tab.id}`)}
-                                className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${activeTab === tab.id ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm' : 'bg-transparent text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${activeTab === tab.id ? 'bg-slate-900  text-white  shadow-sm' : 'bg-transparent text-slate-700  hover:text-slate-900 :text-white hover:bg-slate-50 :bg-slate-800'}`}
                             >
                                 {tab.label}
                             </button>
@@ -75,10 +75,10 @@ function FinanceTabs() {
 export default function UnifiedFinancePage() {
     return (
         <Suspense fallback={
-            <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] flex items-center justify-center p-12">
-                <div className="bg-white dark:bg-[#0f172a] p-12 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-slate-200 dark:border-white/5 border-t-slate-900 rounded-full animate-spin mb-4"></div>
-                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">Finans Modülleri Başlatılıyor...</span>
+            <div className="bg-slate-50 min-h-screen  flex items-center justify-center p-12">
+                <div className="bg-white  p-12 rounded-2xl border border-slate-200  shadow-sm flex flex-col justify-center items-center">
+                    <div className="w-8 h-8 border-4 border-slate-200  border-t-slate-900 rounded-full animate-spin mb-4"></div>
+                    <span className="text-sm font-medium text-slate-500  uppercase tracking-widest">Finans Modülleri Başlatılıyor...</span>
                 </div>
             </div>
         }>

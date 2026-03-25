@@ -114,7 +114,7 @@ export default function NetworkConnectionsPage() {
                             const isIncoming = rel.targetTenantId === 'current_id_placeholder'; // Simplification
 
                             return (
-                                <tr key={rel.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                <tr key={rel.id} className="hover:bg-slate-50 :bg-slate-800 transition-colors">
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200 shrink-0">
@@ -131,7 +131,7 @@ export default function NetworkConnectionsPage() {
                                         </div>
                                     </td>
                                     <td className="p-4">
-                                        <span className="text-xs font-semibold px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">
+                                        <span className="text-xs font-semibold px-2 py-1 bg-slate-100  rounded">
                                             {rel.relationshipType}
                                         </span>
                                     </td>

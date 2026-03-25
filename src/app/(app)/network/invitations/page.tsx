@@ -144,9 +144,9 @@ export default function NetworkInvitationsPage() {
                         {displayList.map((item: any) => {
                             const otherProfile = isIncoming ? item.fromProfile : item.toProfile;
                             return (
-                                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <tr key={item.id} className="hover:bg-slate-50 :bg-slate-800/50 transition-colors">
                                     <td className="p-4">
-                                        <div className="font-semibold text-sm text-slate-900 dark:text-white">
+                                        <div className="font-semibold text-sm text-slate-900 ">
                                             {otherProfile?.displayName || 'Bilinmeyen'}
                                         </div>
                                         {item.message && (
@@ -156,7 +156,7 @@ export default function NetworkInvitationsPage() {
                                         )}
                                     </td>
                                     <td className="p-4">
-                                        <div className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                                        <div className="text-xs font-medium text-slate-600 ">
                                             {item.proposedRelationshipType}
                                         </div>
                                     </td>
@@ -187,7 +187,7 @@ export default function NetworkInvitationsPage() {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <div className="text-xs text-slate-400 dark:text-slate-500 pr-2">-</div>
+                                            <div className="text-xs text-slate-400  pr-2">-</div>
                                         )}
                                     </td>
                                 </tr>

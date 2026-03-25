@@ -63,13 +63,13 @@ export default function AddToCartButton({
                      value={qty}
                      onChange={e => setQty(Number(e.target.value))}
                      disabled={disabled || loading}
-                     className="w-16 px-2 py-2 border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] rounded-lg text-sm font-bold font-mono text-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white disabled:opacity-50"
+                     className="w-16 px-2 py-2 border border-slate-300  bg-white  rounded-lg text-sm font-bold font-mono text-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all  disabled:opacity-50"
                  />
             </div>
             <button
                 onClick={handleAdd}
                 disabled={loading || maxQty < 1 || disabled}
-                className="flex flex-1 items-center justify-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[11px] uppercase tracking-wider font-bold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98] transition-all shadow-sm disabled:opacity-50 disabled:active:scale-100"
+                className="flex flex-1 items-center justify-center gap-2 px-4 py-2 bg-slate-900  text-white  text-[11px] uppercase tracking-wider font-bold rounded-lg hover:bg-slate-800 :bg-slate-100 active:scale-[0.98] transition-all shadow-sm disabled:opacity-50 disabled:active:scale-100"
             >
                 {loading ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

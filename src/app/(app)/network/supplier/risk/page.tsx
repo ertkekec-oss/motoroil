@@ -25,7 +25,7 @@ export default async function GateSummaryRiskPage() {
         >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <EnterpriseCard className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400">
+                    <div className="w-12 h-12 rounded-full bg-red-100  flex items-center justify-center text-red-600 ">
                         <ShieldAlert className="w-6 h-6" />
                     </div>
                     <div>
@@ -35,7 +35,7 @@ export default async function GateSummaryRiskPage() {
                 </EnterpriseCard>
 
                 <EnterpriseCard className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                    <div className="w-12 h-12 rounded-full bg-orange-100  flex items-center justify-center text-orange-600 ">
                         <ArrowRight className="w-6 h-6" />
                     </div>
                     <div>
@@ -45,7 +45,7 @@ export default async function GateSummaryRiskPage() {
                 </EnterpriseCard>
 
                 <EnterpriseCard className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400">
+                    <div className="w-12 h-12 rounded-full bg-green-100  flex items-center justify-center text-green-600 ">
                         <Unlock className="w-6 h-6" />
                     </div>
                     <div>
@@ -56,8 +56,8 @@ export default async function GateSummaryRiskPage() {
             </div>
 
             <EnterpriseCard noPadding>
-                <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-t-xl">
-                    <h3 className="font-medium text-slate-800 dark:text-slate-200">En Son Eligibility Taramaları</h3>
+                <div className="p-4 border-b border-slate-200  flex justify-between items-center bg-slate-50  rounded-t-xl">
+                    <h3 className="font-medium text-slate-800 ">En Son Eligibility Taramaları</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <EnterpriseTable headers={['Zaman', 'Bayi Membership ID', 'Sonuç', 'Nedeni (ReasonCodes)', 'Detay']}>
@@ -66,7 +66,7 @@ export default async function GateSummaryRiskPage() {
                         ) : gateResults.map(gate => {
                             const reasons = Array.isArray(gate.reasonCodesJson) ? gate.reasonCodesJson : [];
                             return (
-                                <tr key={gate.id} className="hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <tr key={gate.id} className="hover:bg-slate-50 :bg-slate-800">
                                     <td className="p-4 text-xs font-mono text-slate-500">{new Date(gate.createdAt).toLocaleString('tr-TR')}</td>
                                     <td className="p-4 text-sm font-medium">{gate.membershipId}</td>
                                     <td className="p-4">

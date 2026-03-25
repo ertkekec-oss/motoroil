@@ -138,14 +138,14 @@ export default function NetworkDiscoverPage() {
             {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3, 4, 5, 6].map(i => (
-                        <EnterpriseCard key={i} className="h-48 animate-pulse bg-slate-50 dark:bg-slate-800" />
+                        <EnterpriseCard key={i} className="h-48 animate-pulse bg-slate-50 " />
                     ))}
                 </div>
             ) : (
                 <>
                     {recommendations.length > 0 && !searchTerm && !cityFilter && !sectorFilter && (
                         <div className="mb-10">
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                            <h2 className="text-lg font-bold text-slate-800  mb-4 flex items-center gap-2">
                                 <span className="text-xl">✨</span> Sizin İçin Önerilenler
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -158,10 +158,10 @@ export default function NetworkDiscoverPage() {
                                     if (badgeStr === 'VERIFIED_BUSINESS') badgeColor = 'bg-emerald-100 text-emerald-700 border-emerald-200';
 
                                     return (
-                                        <EnterpriseCard key={c.id} className="flex flex-col gap-4 border-emerald-100 dark:border-emerald-900 shadow-sm hover:shadow-md bg-emerald-50/30 dark:bg-emerald-900/10">
+                                        <EnterpriseCard key={c.id} className="flex flex-col gap-4 border-emerald-100  shadow-sm hover:shadow-md bg-emerald-50/30 ">
                                             <div className="flex justify-between items-start">
-                                                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
-                                                    <Building2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                                <div className="w-10 h-10 bg-emerald-100  rounded-lg flex items-center justify-center border border-emerald-200 ">
+                                                    <Building2 className="w-5 h-5 text-emerald-600 " />
                                                 </div>
                                                 <div className="text-right">
                                                     <span className={`px-2 py-1 text-[9px] font-bold rounded tracking-widest uppercase border ${badgeColor}`}>
@@ -171,7 +171,7 @@ export default function NetworkDiscoverPage() {
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 className="text-[14px] font-bold text-slate-900 dark:text-white leading-tight">{c.displayName}</h3>
+                                                <h3 className="text-[14px] font-bold text-slate-900  leading-tight">{c.displayName}</h3>
                                                 <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">{rec.reason}</p>
                                             </div>
                                             <EnterpriseButton variant="secondary" className="w-full justify-center mt-auto" onClick={() => handleSendInvite(c.tenantId, c.displayName)}>
@@ -185,7 +185,7 @@ export default function NetworkDiscoverPage() {
                     )}
 
                     <div>
-                        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">{searchTerm || cityFilter || sectorFilter ? 'Arama Sonuçları' : 'Keşfet'}</h2>
+                        <h2 className="text-lg font-bold text-slate-800  mb-4">{searchTerm || cityFilter || sectorFilter ? 'Arama Sonuçları' : 'Keşfet'}</h2>
                         {companies.length === 0 ? (
                             <EnterpriseCard noPadding className="p-12">
                                 <EnterpriseEmptyState
@@ -212,7 +212,7 @@ export default function NetworkDiscoverPage() {
                                     return (
                                         <EnterpriseCard key={c.id} className="flex flex-col gap-4 hover:shadow-md transition-shadow">
                                             <div className="flex justify-between items-start">
-                                                <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                                                <div className="w-12 h-12 bg-slate-50  rounded-lg flex items-center justify-center border border-slate-200 ">
                                                     <Building2 className="w-6 h-6 text-slate-400" />
                                                 </div>
                                                 <div className="flex flex-col items-end gap-2">
@@ -224,13 +224,13 @@ export default function NetworkDiscoverPage() {
                                                             {badgeStr.replace('_', ' ')}
                                                         </span>
                                                     </div>
-                                                    <div className="text-[10px] font-semibold text-slate-500 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded">
+                                                    <div className="text-[10px] font-semibold text-slate-500 bg-slate-50  px-2 py-0.5 rounded">
                                                         Score: <span className={score >= 70 ? 'text-emerald-600' : 'text-slate-700'}>{score}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white leading-tight mb-1">{c.displayName}</h3>
+                                                <h3 className="text-[15px] font-bold text-slate-900  leading-tight mb-1">{c.displayName}</h3>
                                                 <p className="text-xs text-slate-500 line-clamp-2">
                                                     {c.shortDescription || 'Bu firma hakkında kısa bir açıklama bulunmuyor.'}
                                                 </p>
@@ -242,16 +242,16 @@ export default function NetworkDiscoverPage() {
                                                     <span>Profil Doluluğu</span>
                                                     <span>{completion}%</span>
                                                 </div>
-                                                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                <div className="w-full h-1.5 bg-slate-100  rounded-full overflow-hidden">
                                                     <div className={`h-full ${completion > 80 ? 'bg-emerald-500' : completion > 50 ? 'bg-blue-500' : 'bg-slate-300'}`} style={{ width: `${completion}%` }} />
                                                 </div>
                                             </div>
 
-                                            <div className="flex justify-between items-center text-[11px] font-medium mt-auto border-t border-slate-100 dark:border-slate-800 pt-3 text-slate-600 dark:text-slate-400">
+                                            <div className="flex justify-between items-center text-[11px] font-medium mt-auto border-t border-slate-100  pt-3 text-slate-600 ">
                                                 <div className="flex items-center gap-1">
                                                     <span>📍 {c.city ? `${c.city} / ${c.country}` : 'Gzili'}</span>
                                                 </div>
-                                                <div className="font-semibold px-2 py-0.5 bg-slate-50 dark:bg-slate-800 rounded">
+                                                <div className="font-semibold px-2 py-0.5 bg-slate-50  rounded">
                                                     {relCount} Bağlantı
                                                 </div>
                                             </div>
