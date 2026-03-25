@@ -59,7 +59,63 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
         }
     }
 
-    const items = Array.from(catalogMap.values());
+    let items = Array.from(catalogMap.values());
+
+    // DEMO VERİ (Görseli tamamen doldurmak için)
+    if (items.length < 15) {
+        const mockData = [
+            {
+                product: { id: 'm1', name: 'Castrol EDGE 5W-30 Tam Sentetik Motor Yağı (208 Litre Varil)', category: 'Motor Yağları', imageUrl: 'https://images.unsplash.com/photo-1635293414920-53e7f9f31ab4?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 42500, maxPrice: 45000, sellersCount: 8, availableQty: 125, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm2', name: 'VARTA Promotive EFB Ağır Vasıta Aküsü 190Ah', category: 'Aküler', imageUrl: 'https://images.unsplash.com/photo-1620050854497-2fedd6a8f654?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 8500, maxPrice: 9200, sellersCount: 4, availableQty: 840, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm3', name: 'SKF Endüstriyel Rulman Aksesuar Kiti (100 Kutu, Toptan)', category: 'Kayış & Rulman', imageUrl: 'https://images.unsplash.com/photo-1590518465064-071a93e36eab?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 1250, maxPrice: 1400, sellersCount: 12, availableQty: 3200, hasOwnListing: true, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm4', name: 'Brembo Xtra Performans Çelik Karbon Fren Diski', category: 'Fren Sistemi', imageUrl: 'https://images.unsplash.com/photo-1588636254707-16447cde6c57?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 3400, maxPrice: 3800, sellersCount: 6, availableQty: 540, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm5', name: 'Michelin Pilot Sport 4S 245/40R19 (Yaz Lastiği Palet - 100 Adet)', category: 'Lastikler', imageUrl: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 650000, maxPrice: 680000, sellersCount: 3, availableQty: 15, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm6', name: 'Delphi Dizel Common Rail Enjektör Seti', category: 'Yakıt Sistemi', imageUrl: 'https://images.unsplash.com/photo-1533423719223-2cb97914e6fa?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 12500, maxPrice: 13000, sellersCount: 5, availableQty: 120, hasOwnListing: true, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm7', name: 'Würth DPF Partikül Filtre Temizleyici (24\\'lü Koli)', category: 'Kimyasallar', imageUrl: 'https://images.unsplash.com/photo-1604514813560-1e4f57261a29?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 4200, maxPrice: 4450, sellersCount: 15, availableQty: 850, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm8', name: 'NGK Lazer İridyum Buji Seti (Performans)', category: 'Ateşleme Sistemi', imageUrl: 'https://images.unsplash.com/photo-1549419163-95295c5db9bc?q=80&w=800&auto=format&fit=crop' },
+                minPrice: 1800, maxPrice: 2000, sellersCount: 9, availableQty: 1100, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm9', name: 'MANN-FILTER Gelişmiş Yağ Filtresi (Toptan Sipariş Pakedi)', category: 'Filtreler', imageUrl: null },
+                minPrice: 345, maxPrice: 400, sellersCount: 22, availableQty: 50000, hasOwnListing: true, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm10', name: 'Valeo Silecek Süpürge Braket Takımı', category: 'Dış Aksam', imageUrl: null },
+                minPrice: 280, maxPrice: 310, sellersCount: 18, availableQty: 12500, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm11', name: 'Otomotiv Sanayi Tip Halojen Farlar (OEM Standart)', category: 'Aydınlatma', imageUrl: null },
+                minPrice: 950, maxPrice: 1100, sellersCount: 4, availableQty: 800, hasOwnListing: false, hasOtherSellers: true
+            },
+            {
+                product: { id: 'm12', name: 'Akü Şasi Bağlantı Kabloları (Ağır Hizmet)', category: 'Elektrik', imageUrl: null },
+                minPrice: 120, maxPrice: 150, sellersCount: 7, availableQty: 4200, hasOwnListing: false, hasOtherSellers: true
+            }
+        ];
+        items = [...items, ...mockData];
+    }
+    
     const realCategories = await prismaRaw.globalCategory.findMany({ take: 8, orderBy: { name: 'asc' } });
 
     // Split items for layout
