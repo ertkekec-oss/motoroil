@@ -175,8 +175,7 @@ Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bı
                             data: {
                                 erpCategory: { connect: { id: erpCat.id } },
                                 globalCategory: { connect: { id: matchedGlobalId } },
-                                company: { connect: { id: companyId } },
-                                confidence: 'HIGH'
+                                company: { connect: { id: companyId } }
                             }
                         });
                     }
