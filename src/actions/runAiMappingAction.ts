@@ -20,7 +20,7 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
                 companyId,
                 OR: [{ category: null }, { category: "" }, { category: "-" }, { category: "Diğer" }, { globalCategoryId: null }]
             },
-            take: 25 // Limit batch size for OpenAI context & speed
+            take: 200 // Increased batch size for Gemini 2.5 Flash context capacity
         });
 
         if (unmappedProducts.length === 0) {
