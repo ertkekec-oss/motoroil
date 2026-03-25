@@ -20,23 +20,24 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
                 companyId,
                 OR: [{ category: null }, { category: "" }, { category: "-" }, { category: "Diğer" }, { globalCategoryId: null }]
             },
-            take: 200 // Increased batch size for Gemini 2.5 Flash context capacity
+            take: 50 // Reduced batch size to pass through heavy load Google constraints
         });
 
         if (unmappedProducts.length === 0) {
-            return { success: true, message: "Tüm ürünleriniz zaten Global Ağa entegre edilmiştir." };
+            return { success: true, count: 0, message: "Eşleştirilecek ürün bulunamadı." };
         }
 
         const globalCats = await prisma.globalCategory.findMany({
-            include: { parent: { include: { parent: true } } }
+            where: { isLeaf: true }
         });
 
-        const getFullName = (g: any) => {
-            const parts = [g.name];
-            let p = g.parent;
-            while (p) {
-                parts.unshift(p.name);
-                p = p.parent;
+        const getFullName = (cat: any): string => {
+            let parts = [cat.name];
+            let current = cat;
+            while (current.parentId) {
+                const parent = globalCats.find(g => g.id === current.parentId);
+                if (parent) { parts.unshift(parent.name); current = parent; }
+                else break;
             }
             return parts.join(" > ");
         };
@@ -70,19 +71,47 @@ ${JSON.stringify(globalCatList)}
 LOKAL ÜRÜNLER:
 ${JSON.stringify(payload)}`;
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
-                })
-            });
+            let response;
+            let retries = 3;
+            let successFetch = false;
+            
+            while(retries > 0 && !successFetch) {
+                try {
+                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
+                        })
+                    });
+                    
+                    if (response.status === 503 || response.status === 429) {
+                        retries--;
+                        if (retries === 0) break;
+                        await new Promise(r => setTimeout(r, 4000)); // Wait 4s before retry
+                    } else {
+                        successFetch = true;
+                    }
+                } catch (err) {
+                    retries--;
+                    if (retries === 0) break;
+                    await new Promise(r => setTimeout(r, 4000));
+                }
+            }
+
+            if (!response) {
+                return { success: false, error: "Google Gemini sunucularına ulaşılamadı. Sunucular aşırı yoğun." };
+            }
 
             const data = await response.json();
             
             if (data.error) {
                 console.error("Gemini API Error:", data.error);
+                // If it's a high demand error, give a friendly message rather than crashing
+                if (data.error.message && data.error.message.includes("high demand")) {
+                     return { success: false, error: "Google Yapay Zeka sunucuları anlık olarak aşırı yoğun (High Demand). Lütfen 1-2 dakika bekleyip tekrar deneyin." }
+                }
                 return { success: false, error: `Gemini API Hatası: ${data.error.message}` };
             }
 
