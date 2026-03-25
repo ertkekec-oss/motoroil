@@ -66,7 +66,7 @@ export function B2BLaunchpadModal({ isOpen, onClose, productIds, products, onCon
                             <p className="text-sm font-medium text-slate-500 mt-2">Periodya RAG ürünleri tarıyor...</p>
                         </div>
                         <div className="w-48 h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-indigo-600 transition-all duration-100 ease-out" style={{ width: \`\${progress}%\` }}></div>
+                            <div className="h-full bg-indigo-600 transition-all duration-100 ease-out" style={{ width: `${progress}%` }}></div>
                         </div>
                     </div>
                 )}
@@ -78,7 +78,7 @@ export function B2BLaunchpadModal({ isOpen, onClose, productIds, products, onCon
                         </div>
                         
                         <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
-                            {count > 1 ? \`\${count} Ürün Yayına Hazır\` : targetProduct?.name}
+                            {count > 1 ? `${count} Ürün Yayına Hazır` : targetProduct?.name}
                         </h2>
                         <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-400 mb-8 max-w-[80%] mx-auto">
                             Periodya B2B ağ gereklilikleri tarandı. Hub algoritmaları bu ürünler için yeterince rekabetçi bir pozisyon öngörüyor.
