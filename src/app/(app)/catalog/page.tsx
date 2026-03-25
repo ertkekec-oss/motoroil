@@ -339,100 +339,119 @@ export default async function CatalogPage({
       <div className="max-w-[1600px] w-full mx-auto px-6 lg:px-10 py-8 flex-1 animate-in fade-in duration-500">
         <HubCatalogTabs />
 
-        {/* ADVANCED SEARCH CONSOLE */}
-        <div className="w-full bg-white  border border-slate-200  rounded-2xl mb-8 flex items-center p-2 shadow-sm transition-all focus-within:ring-1 focus-within:ring-indigo-500/50 focus-within:border-indigo-500/50 mt-4">
-          <Search className="h-4 w-4 text-slate-400 ml-3 shrink-0" />
-          <input
-            type="text"
-            placeholder="Terminal araması (SKU, OEM, Marka)..."
-            className="flex-1 bg-transparent border-none text-[13px] font-medium text-slate-900  placeholder:text-slate-500 focus:outline-none focus:ring-0 ml-3 h-10"
-          />
-          <div className="w-px h-6 bg-slate-200  mx-3"></div>
-          <button className="h-9 px-4 inline-flex items-center justify-center bg-slate-100  hover:bg-slate-200 :bg-white/10 text-slate-700  text-xs font-bold rounded-lg transition-colors gap-2">
-            <SlidersHorizontal className="w-3 h-3" /> Filters
-          </button>
+        {/* THE VANGUARD (Intelligence Map & Search Header) */}
+        <div className="relative w-full rounded-[2rem] overflow-hidden bg-[#f4f7f9] border border-slate-200 mb-12 shadow-[inset_0_2px_15px_rgba(0,0,0,0.02)] min-h-[360px] flex flex-col items-center justify-end pb-8">
+            
+            {/* Visionary Map Background */}
+            <div className="absolute inset-0 pointer-events-none opacity-50">
+                {/* Pure CSS dot matrix to emulate a minimalist map density */}
+                <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_10%,transparent_100%)]"></div>
+                
+                {/* Abstract World SVG Paths representing trade routes */}
+                <svg className="absolute w-full h-full opacity-40 mix-blend-multiply" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid slice">
+                    <path d="M 150 180 Q 300 80, 550 200 T 900 120" fill="none" stroke="#94a3b8" strokeWidth="2" strokeDasharray="6 6" />
+                    <path d="M 100 240 Q 500 280, 850 60" fill="none" stroke="#cbd5e1" strokeWidth="1.5" />
+                    <path d="M 400 60 Q 600 250, 950 180" fill="none" stroke="#e2e8f0" strokeWidth="1" />
+                </svg>
+            </div>
+
+            {/* Nodes (Glowing Ping Indicators) */}
+            <div className="absolute w-full h-full inset-0 pointer-events-none">
+                {/* Europe/Marmara Node */}
+                <div className="absolute top-[28%] left-[28%] flex flex-col items-center animate-bounce-slow">
+                    <div className="bg-slate-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md mb-1 relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-[3px] after:border-transparent after:border-t-slate-700">
+                        2437
+                    </div>
+                    <div className="w-3.5 h-3.5 rounded-full bg-slate-700 border-2 border-[#f4f7f9] flex items-center justify-center">
+                        <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div>
+                    </div>
+                </div>
+                
+                {/* Asia/Anatolia Node */}
+                <div className="absolute top-[45%] right-[32%] flex flex-col items-center">
+                    <div className="bg-rose-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md mb-1 relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-[3px] after:border-transparent after:border-t-rose-400">
+                        1723
+                    </div>
+                    <div className="w-3.5 h-3.5 rounded-full bg-rose-400 border-2 border-[#f4f7f9] flex items-center justify-center">
+                        <div className="w-1 h-1 rounded-full bg-white animate-pulse"></div>
+                    </div>
+                </div>
+
+                {/* MENA Node */}
+                <div className="absolute top-[65%] right-[42%] flex flex-col items-center">
+                    <div className="bg-amber-400 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md mb-1 relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-[3px] after:border-transparent after:border-t-amber-400">
+                        948
+                    </div>
+                    <div className="w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-[#f4f7f9] flex items-center justify-center">
+                        <div className="w-1 h-1 rounded-full bg-white animate-pulse"></div>
+                    </div>
+                </div>
+                
+                <div className="absolute top-[75%] left-[35%] flex flex-col items-center">
+                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-400 border-2 border-[#f4f7f9]"></div>
+                </div>
+            </div>
+
+            {/* Branding Watermark */}
+            <div className="absolute top-10 left-1/2 -translate-x-1/2 text-center select-none pointer-events-none opacity-[0.85]">
+                <h1 className="text-[40px] font-black text-slate-700 tracking-tight leading-none mb-1">periodya <span className="text-slate-400/80 font-bold uppercase tracking-widest text-3xl">Hub</span></h1>
+                <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-[0.25em]">B2B Ticaret Ağı Modülü</p>
+            </div>
+
+            {/* Floating Search Console */}
+            <div className="relative z-10 w-11/12 max-w-4xl bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-[1.25rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] p-2 hover:shadow-[0_20px_45px_-10px_rgba(0,0,0,0.08)] transition-shadow duration-500 pointer-events-auto">
+                <div className="flex flex-col md:flex-row items-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
+                    
+                    {/* Search Keyword */}
+                    <div className="flex-1 w-full flex flex-col py-2 px-5 group">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 group-focus-within:text-slate-600 transition-colors">Anahtar Kelime</label>
+                        <div className="flex items-center">
+                            <input 
+                                type="text" 
+                                placeholder="Terminal araması (SKU, OEM)..." 
+                                className="w-full bg-transparent border-none p-0 text-[13px] font-semibold text-slate-800 placeholder:text-slate-300 placeholder:font-medium focus:outline-none focus:ring-0"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Category Filter */}
+                    <div className="flex-1 w-full flex flex-col py-2 px-5 group">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 group-focus-within:text-slate-600 transition-colors">Sektör / Kategori</label>
+                        <div className="flex items-center">
+                            <select className="w-full bg-transparent border-none p-0 text-[13px] font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-0 appearance-none">
+                                <option value="">Tüm Sektör Göstergeleri</option>
+                                <option value="motor-yaglari">Otomotiv & Yedek Parça</option>
+                                <option value="fren">Endüstriyel Rulmanlar</option>
+                                <option value="lastik">Global Kauçuk & Lastik</option>
+                            </select>
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-300 rotate-90 ml-2 shrink-0 pointer-events-none" />
+                        </div>
+                    </div>
+
+                    {/* Location Filter */}
+                    <div className="flex-1 w-full flex flex-col py-2 px-5 group">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 group-focus-within:text-slate-600 transition-colors">Ağ Lokasyonu</label>
+                        <div className="flex items-center">
+                            <select className="w-full bg-transparent border-none p-0 text-[13px] font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-0 appearance-none">
+                                <option value="">Global Dağıtım Ağı</option>
+                                <option value="tr-marmara">TR Marmara Lojistik Merkezi</option>
+                                <option value="tr-ege">TR Ege Liman Göstergesi</option>
+                                <option value="avrupa">HUB Avrupa Operasyonu</option>
+                            </select>
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-300 rotate-90 ml-2 shrink-0 pointer-events-none" />
+                        </div>
+                    </div>
+
+                    {/* Action Area */}
+                    <div className="w-full md:w-auto p-1.5 shrink-0">
+                        <button className="w-full md:w-auto bg-slate-400/20 hover:bg-slate-400/30 text-slate-700 font-bold text-[11px] uppercase tracking-widest px-8 h-[48px] rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-sm">
+                            <Search className="w-3.5 h-3.5" /> Ağı Tara
+                        </button>
+                    </div>
+
+                </div>
+            </div>
         </div>
-
-        {/* THE HIGHLIGHT (Refined Monolith) */}
-        {monolithItem && (
-          <div className="w-full bg-white  border border-slate-200  rounded-2xl overflow-hidden flex flex-col md:flex-row mb-10 shadow-sm transition-colors hover:border-slate-300 :border-white/10 group min-h-[300px]">
-            {/* Compact Spotlight Image */}
-            <div className="w-full md:w-5/12 bg-slate-50  relative flex items-center justify-center p-8 group-hover:bg-slate-100 :bg-[#050b16] transition-colors border-b md:border-b-0 md:border-r border-slate-100 ">
-              <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-rose-500/10  text-rose-600  border border-rose-500/20 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm">
-                <span className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span>{" "}
-                Market Hot
-              </div>
-              {getImg(monolithItem) ? (
-                <img
-                  src={getImg(monolithItem)}
-                  alt={monolithItem.product.name}
-                  className="w-full object-contain mix-blend-multiply  max-h-[300px] filter contrast-125"
-                  
-                />
-              ) : (
-                <div className="w-32 h-32 flex items-center justify-center text-slate-200 ">
-                  <Box className="w-16 h-16" />
-                </div>
-              )}
-            </div>
-
-            {/* Compact Spotlight Identity */}
-            <div className="w-full md:w-7/12 p-8 lg:p-12 pl-8 lg:pl-16 flex flex-col justify-center">
-              <div className="flex flex-col mb-6">
-                <span className="text-[10px] font-black text-indigo-600  uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                  <Activity className="w-3 h-3" />{" "}
-                  {monolithItem.product.category || "GLOBAL TIER"}
-                </span>
-                <h2 className="text-2xl lg:text-3xl font-semibold text-slate-900  tracking-tight leading-tight">
-                  {monolithItem.product.name}
-                </h2>
-                <span className="font-mono text-xs text-slate-400 mt-2">
-                  SKU: {monolithItem.product.id.slice(0, 8).toUpperCase()}
-                </span>
-              </div>
-
-              <div className="flex items-baseline gap-2 mb-8">
-                <span className="text-4xl font-mono font-bold text-slate-900  tracking-tighter">
-                  {formatPrice(monolithItem.minPrice)}
-                  <span className="text-xl text-slate-500">₺</span>
-                </span>
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-2">
-                  / Birim
-                </span>
-              </div>
-
-              <div className="flex items-center gap-6 border-t border-slate-100  pt-6 mt-auto">
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                    Network Supply
-                  </span>
-                  <span className="text-lg font-mono font-bold text-emerald-600  flex items-center gap-1.5">
-                    {formatSmallInt(monolithItem.availableQty)}{" "}
-                    <ShieldCheck className="w-4 h-4" />
-                  </span>
-                </div>
-                <div className="w-px h-8 bg-slate-200 "></div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                    Sellers
-                  </span>
-                  <span className="text-lg font-mono font-bold text-blue-600 ">
-                    {monolithItem.sellersCount}
-                  </span>
-                </div>
-                <div className="ml-auto">
-                  <Link
-                    href={`/catalog/${monolithItem.product.id}`}
-                    className="h-10 px-6 inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-widest rounded-lg transition-all gap-2 group"
-                  >
-                    Terminal{" "}
-                    <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* THE MATRIX (Compact Bento Grid) */}
         <div className="mb-12">
