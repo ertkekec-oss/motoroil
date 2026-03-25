@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
 import { useApp } from "@/contexts/AppContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useModal } from "@/contexts/ModalContext";
@@ -22,7 +24,7 @@ import TransferTabContent from "../components/TransferTabContent";
 export default function WarehouseManagementPage() {
   const { theme } = useTheme();
   const { hasPermission, branches, currentUser } = useApp();
-  const { showSuccess, showError } = useModal();
+  const { showSuccess, showError, showWarning } = useModal();
   const isLight = theme === "light";
 
   const [products, setProducts] = useState<any[]>([]);
@@ -32,6 +34,140 @@ export default function WarehouseManagementPage() {
 
   const [activeTab, setActiveTab] = useState("general");
   const isSystemAdmin = !currentUser || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || currentUser.role?.toLowerCase().includes('admin');
+  
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessing(true); // Show loading state
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: "binary" });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data: any[] = XLSX.utils.sheet_to_json(ws);
+
+        const productsToImport: any[] = [];
+        const currentProducts = [...(products || [])];
+
+        data.forEach((row: any, index) => {
+          if (!row["Ürün Adı"]) {
+            return;
+          }
+
+          let code = row["Stok Kodu"] ? String(row["Stok Kodu"]).trim() : "";
+          if (!code) {
+            let suffix = 1;
+            let candidateCode = "";
+            do {
+              candidateCode = `OTO-${(currentProducts.length + index + suffix).toString().padStart(5, "0")}`;
+              suffix++;
+            } while (
+              currentProducts.some((p) => p.code === candidateCode) ||
+              productsToImport.some((p) => p.code === candidateCode)
+            );
+            code = candidateCode;
+          }
+
+          const sVatInc = row["Satış Dahil"]?.toString().toUpperCase() === "E";
+          const pVatInc = row["Alış Dahil"]?.toString().toUpperCase() === "E";
+
+          productsToImport.push({
+            name: row["Ürün Adı"],
+            code: code,
+            barcode: (row["Barkod"] || "").toString(),
+            category: row["Kategori"] || "Genel",
+            brand: row["Marka"] || "Bilinmiyor",
+            buyPrice: parseFloat(row["Alış Fiyatı"]) || 0,
+            purchaseVat: parseInt(row["Alış KDV"]) || 20,
+            purchaseVatIncluded: pVatInc,
+            price: parseFloat(row["Satış Fiyatı"]) || 0,
+            salesVat: parseInt(row["Satış KDV"]) || 20,
+            salesVatIncluded: sVatInc,
+            stock: parseInt(row["Stok"]) || 0,
+            supplier: row["Tedarikçi"] || "",
+            branch: row["Şube"] || "Merkez",
+          });
+        });
+
+        if (productsToImport.length > 0) {
+          showSuccess(
+            "Yükleniyor...",
+            `${productsToImport.length} ürün işleniyor, lütfen bekleyin.`,
+          );
+
+          const res = await fetch("/api/products/import", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ products: productsToImport }),
+          });
+
+          const result = await res.json();
+
+          if (result.success) {
+            fetchProducts();
+            showSuccess(
+              "İşlem Tamamlandı",
+              `${result.results.created} yeni ürün eklendi. ${result.results.updated} ürün güncellendi.` +
+              (result.results.errors.length > 0
+                ? `\n${result.results.errors.length} hata oluştu.`
+                : ""),
+            );
+          } else {
+            showError("Yükleme Hatası", result.error || "Bilinmeyen hata");
+          }
+        } else {
+          showWarning(
+            "Geçerli Ürün Bulunamadı",
+            "Dosyada eklenecek geçerli ürün verisi bulunamadı.",
+          );
+        }
+      } catch (error: any) {
+        console.error("Excel parse error:", error);
+        showError(
+          "Dosya Hatası",
+          "Excel dosyası okunurken bir hata oluştu: " + error.message,
+        );
+      } finally {
+        setIsProcessing(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
+  const exportToExcel = () => {
+    const data = products.map((p) => ({
+      "Stok Kodu": p.code,
+      Barkod: p.barcode || "",
+      "Ürün Adı": p.name,
+      Kategori: p.category,
+      Marka: p.brand,
+      Stok: p.stock,
+      "Birim Fiyat": p.price,
+      "Alış Fiyatı": p.buyPrice,
+      "KDV (%)": p.salesVat,
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Depo_Envanteri");
+    XLSX.writeFile(
+      wb,
+      `Depo_Stok_Raporu_${new Date().toLocaleDateString()}.xlsx`,
+    );
+    showSuccess("Excel İndiriliyor", "Dosya indirme işlemi başlatıldı.");
+  };
+
+  const startCount = () => {
+     router.push('/inventory?action=count'); // Redirect to Inventory Count view
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -111,6 +247,24 @@ export default function WarehouseManagementPage() {
           <p className={`text-[13px] mt-1 font-medium ${textLabelClass}`}>
             Şubeler arası stokları izleyin, depo transferlerini gerçekleştirin ve envanteri yönetin.
           </p>
+        </div>
+        
+        {/* ACTION BUTTONS FROM INVENTORY */}
+        <div className="flex items-center justify-start xl:justify-end gap-3 flex-wrap xl:flex-nowrap w-full xl:w-auto mt-4 xl:mt-0">
+          <input type="file" ref={fileInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls" className="hidden" />
+          <button onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            {isProcessing ? "İşleniyor..." : "Yükle"}
+          </button>
+          <button onClick={exportToExcel} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            İndir
+          </button>
+          <button onClick={startCount} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            Stok Sayımı
+          </button>
+          <button onClick={() => router.push('/inventory/labels')} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+            Etiket Yazdır
+          </button>
         </div>
       </div>
 

@@ -1,0 +1,5 @@
+{"Mai Category":"Appliances"}
+{"Mai Category":"Appliances","Subcategory 1":"Dishwashers"}
+{"Mai Category":"Appliances","Subcategory 1":"Dishwashers","Subcategory 2":"Built-In Dishwashers"}
+{"Mai Category":"Appliances","Subcategory 1":"Dishwashers","Subcategory 2":"Countertop Dishwashers"}
+{"Mai Category":"Appliances","Subcategory 1":"Dishwashers","Subcategory 2":"Portable Dishwashers"}
