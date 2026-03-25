@@ -46,7 +46,7 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
         let processedCount = 0;
 
         // Semantic Engine Route with Google Gemini
-        const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyCQPyjKTqQXn38pfwthpRylpD0g4kcTT30";
+        const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         if (GEMINI_API_KEY) {
             
             const payload = unmappedProducts.map(p => ({
