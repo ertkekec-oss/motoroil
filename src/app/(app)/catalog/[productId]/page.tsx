@@ -3,7 +3,7 @@ import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import AddToCartButton from "./AddToCartButton";
-import { ArrowLeft, Box, CheckCircle2, Package, ShoppingCart, Truck, AlertCircle, BarChart3, ArrowRight, Clock } from "lucide-react";
+import { ArrowLeft, Box, CheckCircle2, Package, ShoppingCart, Truck, AlertCircle, BarChart3, ArrowRight, Clock, FileText } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -18,7 +19,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
         const banner = await prisma.networkBanner.updateMany({
             where: {
-                id: params.id,
+                id: id,
                 tenantId
             },
             data: {
@@ -41,8 +42,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -55,7 +57,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
         const banner = await prisma.networkBanner.deleteMany({
             where: {
-                id: params.id,
+                id: id,
                 tenantId
             }
         });

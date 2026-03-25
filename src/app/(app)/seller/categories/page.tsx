@@ -17,7 +17,7 @@ export default async function CategoryMappingPage() {
 
     // 1. Auto-discover and materialize any dynamically typed categories from the Product table
     const distinctProductCats = await prisma.product.findMany({
-        where: { companyId, deletedAt: null, category: { not: null, not: "" } },
+        where: { companyId, deletedAt: null, category: { not: "" } },
         select: { category: true },
     });
 

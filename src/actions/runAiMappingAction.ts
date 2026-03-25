@@ -109,7 +109,7 @@ Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bı
                     }
 
                     const existingMapping = await prisma.categoryMapping.findFirst({
-                        where: { localCategoryId: erpCategory.id, globalCategoryId: finalGlobalId }
+                        where: { erpCategoryId: erpCategory.id, globalCategoryId: finalGlobalId }
                     });
 
                     if (!existingMapping) {
@@ -167,15 +167,16 @@ Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bı
                     }
 
                     const existingMap = await prisma.categoryMapping.findFirst({
-                        where: { localCategoryId: erpCat.id, globalCategoryId: matchedGlobalId }
+                        where: { erpCategoryId: erpCat.id, globalCategoryId: matchedGlobalId }
                     });
 
                     if (!existingMap) {
                         await prisma.categoryMapping.create({
                             data: {
-                                localCategoryId: erpCat.id,
+                                erpCategoryId: erpCat.id,
                                 globalCategoryId: matchedGlobalId,
-                                companyId
+                                companyId: companyId, // Assuming currentUser.companyId is equivalent to companyId here
+                                confidence: 'HIGH'
                             }
                         });
                     }

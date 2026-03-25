@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function run() {
     const products = await prisma.product.findMany({
-        where: { category: { not: null, not: "" } },
+        where: { category: { not: "" } },
         select: { id: true, category: true, companyId: true }
     });
 
