@@ -76,6 +76,12 @@ ${JSON.stringify(payload)}`;
             });
 
             const data = await response.json();
+            
+            if (data.error) {
+                console.error("Gemini API Error:", data.error);
+                return { success: false, error: `Gemini API Hatası: ${data.error.message}` };
+            }
+
             const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{"results":[]}';
             const parsed = JSON.parse(textResponse);
             
