@@ -45,46 +45,39 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
 
         let processedCount = 0;
 
-        // Semantic Engine Route
-        if (process.env.OPENAI_API_KEY) {
-            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        // Semantic Engine Route with Google Gemini
+        const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyCQPyjKTqQXn38pfwthpRylpD0g4kcTT30";
+        if (GEMINI_API_KEY) {
             
             const payload = unmappedProducts.map(p => ({
                 id: p.id, name: p.name, brand: p.brand || "", category: p.category || ""
             }));
 
-            const response = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
-                response_format: { type: "json_object" },
-                messages: [
-                    {
-                        role: "system",
-                        content: `Sen Periodya B2B ağının akıllı 'Otonom Semantic Motoru'sun.
+            const prompt = `Sen Periodya B2B ağının akıllı 'Otonom Semantic Motoru'sun.
 Aşağıdaki 'LOKAL ÜRÜNLER' listesindeki ERP kayıtlarını analiz et. Her biri için 'GLOBAL KATEGORİ LİSTESİ'nden EN UYGUN kategorinin 'id'sini tespit et.
-1. 'derivedBrand': 'brand' alanını profesyonelce düzelt (örn: 'motl' -> 'Motul', 'slcn' -> 'Salcano').
-2. 'seoTitle': B2B pazar yeri vitrini için ürüne mantıklı ve temizleştirilmiş bir isim üret ([Brand] [ProductType] [Attributes]).
-3. Yanıtın aşağıdaki KESİN formatta bir JSON objesi olmalıdır:
-{
-  "results": [
-    {
-      "id": "ürün-id-buraya", 
-      "globalCategoryId": "eşleşen-kategori-idsi-buraya", 
-      "derivedBrand": "Düzeltilmiş Marka", 
-      "seoTitle": "Düzeltilmiş SEO Başlığı"
-    }
-  ]
-}
-Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bırak.`
-                    },
-                    {
-                        role: "user",
-                        content: `GLOBAL KATEGORİ LİSTESİ:\n${JSON.stringify(globalCatList)}\n\nLOKAL ÜRÜNLER:\n${JSON.stringify(payload)}`
-                    }
-                ],
-                temperature: 0.1
+1. 'derivedBrand': 'brand' alanını profesyonelce düzelt.
+2. 'seoTitle': B2B pazar yeri için ürüne mantıklı ve temizleştirilmiş bir isim üret.
+3. Yanıtın KESİN formatta bir JSON objesi olmalıdır: { "results": [ { "id": "ürün-id-buraya", "globalCategoryId": "eşleşen-kategori-idsi", "derivedBrand": "Düzeltilmiş", "seoTitle": "SEO Başlığı" } ] }
+Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bırak.
+
+GLOBAL KATEGORİ LİSTESİ:
+${JSON.stringify(globalCatList)}
+
+LOKAL ÜRÜNLER:
+${JSON.stringify(payload)}`;
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
+                })
             });
 
-            const parsed = JSON.parse(response.choices[0].message.content || '{"results":[]}');
+            const data = await response.json();
+            const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{"results":[]}';
+            const parsed = JSON.parse(textResponse);
             
             for (const result of parsed.results) {
                 const p = unmappedProducts.find(x => x.id === result.id);
@@ -194,8 +187,7 @@ Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bı
 
         revalidatePath("/inventory");
         revalidatePath("/seller/categories");
-        
-        return { success: true, count: processedCount, message: process.env.OPENAI_API_KEY ? `${processedCount} ürün Semantic Vektörlerle B2B ağına çıkarıldı!` : `${processedCount} ürün Klasik Motorla (OpenAI bağlantısı yok) tarandı ve bağlandı.` };
+        return { success: true, count: processedCount, message: GEMINI_API_KEY ? `${processedCount} ürün Gemini Semantik Vektörlerle B2B ağına çıkarıldı!` : `${processedCount} ürün Klasik Motorla tarandı ve bağlandı.` };
 
     } catch (e: any) {
         console.error("runAiMappingAction ERROR: ", e);
