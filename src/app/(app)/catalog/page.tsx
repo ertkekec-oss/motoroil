@@ -89,7 +89,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                 minPrice: 12500, maxPrice: 13000, sellersCount: 5, availableQty: 120, hasOwnListing: true, hasOtherSellers: true
             },
             {
-                product: { id: 'm7', name: 'Würth DPF Partikül Filtre Temizleyici (24\\'lü Koli)', category: 'Kimyasallar', imageUrl: 'https://images.unsplash.com/photo-1604514813560-1e4f57261a29?q=80&w=800&auto=format&fit=crop' },
+                product: { id: 'm7', name: "Würth DPF Partikül Filtre Temizleyici (24'lü Koli)", category: 'Kimyasallar', imageUrl: 'https://images.unsplash.com/photo-1604514813560-1e4f57261a29?q=80&w=800&auto=format&fit=crop' },
                 minPrice: 4200, maxPrice: 4450, sellersCount: 15, availableQty: 850, hasOwnListing: false, hasOtherSellers: true
             },
             {
