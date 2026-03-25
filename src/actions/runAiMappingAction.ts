@@ -27,16 +27,18 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
             return { success: true, count: 0, message: "Eşleştirilecek ürün bulunamadı." };
         }
 
-        const globalCats = await prisma.globalCategory.findMany({
-            where: { isLeaf: true }
-        });
+        const allGlobalCats = await prisma.globalCategory.findMany({});
+        
+        // Find only nodes that do NOT have any children (leaf nodes)
+        const globalCats = allGlobalCats.filter(c => !allGlobalCats.some(other => other.parentId === c.id));
 
         const getFullName = (cat: any): string => {
             let parts = [cat.name];
             let current = cat;
-            while (current.parentId) {
-                const parent = globalCats.find(g => g.id === current.parentId);
-                if (parent) { parts.unshift(parent.name); current = parent; }
+            let infiniteLoopGuard = 0;
+            while (current.parentId && infiniteLoopGuard < 10) {
+                const parent = allGlobalCats.find(g => g.id === current.parentId);
+                if (parent) { parts.unshift(parent.name); current = parent; infiniteLoopGuard++; }
                 else break;
             }
             return parts.join(" > ");
