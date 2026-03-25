@@ -173,9 +173,9 @@ Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bı
                     if (!existingMap) {
                         await prisma.categoryMapping.create({
                             data: {
-                                erpCategoryId: erpCat.id,
-                                globalCategoryId: matchedGlobalId,
-                                companyId: companyId, // Assuming currentUser.companyId is equivalent to companyId here
+                                erpCategory: { connect: { id: erpCat.id } },
+                                globalCategory: { connect: { id: matchedGlobalId } },
+                                company: { connect: { id: companyId } },
                                 confidence: 'HIGH'
                             }
                         });
