@@ -26,6 +26,7 @@ interface InventoryTableProps {
     countValues: Record<string | number, number>;
     onCountChange: (id: string | number, val: number) => void;
     onProductClick: (product: Product) => void;
+    onPublishB2B?: () => void;
 }
 
 const InventoryTable: React.FC<InventoryTableProps> = ({
@@ -36,7 +37,8 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
     onSelectionChange,
     countValues,
     onCountChange,
-    onProductClick
+    onProductClick,
+    onPublishB2B
 }) => {
     const handleHeaderCheckboxChange = (eField: React.ChangeEvent<HTMLInputElement>) => {
         if (eField.target.checked) {
@@ -54,7 +56,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                     <div className="flex items-center gap-2 border-l border-slate-700 pl-4">
                         <button className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors">Toplu Fiyat Güncelle</button>
                         <button className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors">Toplu Transfer</button>
-                        <button className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors text-blue-400">B2B Ağına Gönder</button>
+                        <button onClick={onPublishB2B} className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors text-blue-400">B2B Ağına Gönder</button>
                         <button className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors text-rose-400">Pasife Al</button>
                     </div>
                 </div>

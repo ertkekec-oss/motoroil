@@ -419,6 +419,11 @@ function StepPricingTax({ data, onChange }: any) {
                                     <option value="CHF">CHF</option><option value="RUB">RUB</option><option value="AED">AED</option><option value="SAR">SAR</option><option value="QAR">QAR</option><option value="CNY">CNY</option>
                                 </select>
                             </div>
+                            {data.salesVatIncluded === false && Number(data.price || 0) > 0 && (
+                                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-1.5 animate-in fade-in duration-200">
+                                    ✓ KDV Dahil Müşteri Tahsilatı: {(Number(data.price || 0) * (1 + Number(data.salesVat || 20) / 100)).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} {data.currency || 'TRY'}
+                                </div>
+                            )}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
@@ -514,6 +519,11 @@ function StepPricingTax({ data, onChange }: any) {
                                     <option value="CHF">CHF</option><option value="RUB">RUB</option><option value="AED">AED</option><option value="SAR">SAR</option><option value="QAR">QAR</option><option value="CNY">CNY</option>
                                 </select>
                             </div>
+                            {data.purchaseVatIncluded === false && Number(data.buyPrice || 0) > 0 && (
+                                <div className="text-[11px] text-amber-600 dark:text-amber-500 font-bold mt-1.5 animate-in fade-in duration-200">
+                                    ✓ KDV Dahil Gerçek (Fiili) Maliyet: {(Number(data.buyPrice || 0) * (1 + Number(data.purchaseVat || 20) / 100)).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} {data.purchaseCurrency || 'TRY'}
+                                </div>
+                            )}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
@@ -979,9 +989,81 @@ function StepB2BDetails({ mode, data, onChange }: any) {
                     ></textarea>
                     
                     <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl flex gap-3 items-start mt-auto">
-                        <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-                            Bu alana girilen detaylı ürün yazısı, doğrudan B2B Özel Kataloğu ve Periodya Satış Hubı üzerindeki İncele ekranlarında müşterilerinize sunulacaktır. Boş bırakmanız halinde detay sayfası gösterilmeyecektir.
+                        <p className="text-[13px] font-medium text-emerald-800 dark:text-emerald-300">
+                            💡 Gelişmiş içerik editörü ile müşterilerinize Periodya Hub üzerinde ürünün güvenini ve zenginliğini aşılayın.
                         </p>
+                    </div>
+
+                    {/* B2B Hacim (Koli/Palet) İskonto Yapılandırmacısı */}
+                    <div className="mt-4 p-5 bg-gradient-to-br from-slate-50 to-white dark:from-[#1e293b] dark:to-[#0f172a] border-2 border-dashed border-indigo-200 dark:border-indigo-500/30 rounded-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 dark:bg-indigo-400/10 rounded-full blur-[40px] pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
+                        
+                        <div className="relative z-10 flex justify-between items-start mb-5">
+                            <div>
+                                <h4 className="text-[15px] font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span className="text-indigo-600 bg-indigo-50 p-1.5 rounded-lg">📦</span>
+                                    Kademeli Hacim İskontosu (B2B Hub)
+                                </h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 uppercase tracking-wider">
+                                    Ağ üzerindeki Toptan Koli / Palet Alımları Teşvik Edin
+                                </p>
+                            </div>
+                            <button className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow border-b-[3px] border-indigo-800 active:translate-y-[2px] active:border-b-0 transition-all flex items-center gap-1 uppercase tracking-widest">
+                                <span>+ Kural Ekle</span>
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3">
+                           {/* Kural 1 Modeli */}
+                           <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-colors">
+                              <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black text-sm">10+</div>
+                                  <div className="flex flex-col">
+                                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Alım Koşulu</span>
+                                     <span className="font-bold text-slate-900 dark:text-white text-[13px]">10 Adet</span>
+                                  </div>
+                              </div>
+                              <div className="text-right">
+                                 <span className="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-0.5">Sepet İndirimi</span>
+                                 <div className="flex items-center justify-end gap-2">
+                                     <span className="inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 rounded-md font-black text-[13px] border border-indigo-200 dark:border-indigo-500/20">
+                                        %5
+                                     </span>
+                                     <button className="text-slate-400 hover:text-rose-500 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                     </button>
+                                 </div>
+                              </div>
+                           </div>
+
+                           {/* Kural 2 Modeli */}
+                           <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-colors">
+                              <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black text-sm">50+</div>
+                                  <div className="flex flex-col">
+                                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Koli Alım Koşulu</span>
+                                     <span className="font-bold text-slate-900 dark:text-white text-[13px]">50 Adet (Koli)</span>
+                                  </div>
+                              </div>
+                              <div className="text-right">
+                                 <span className="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-0.5">Sepet İndirimi</span>
+                                 <div className="flex items-center justify-end gap-2">
+                                     <span className="inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 rounded-md font-black text-[13px] border border-indigo-200 dark:border-indigo-500/20">
+                                        %12
+                                     </span>
+                                     <button className="text-slate-400 hover:text-rose-500 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                     </button>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="text-center bg-slate-100 dark:bg-[#0f172a]/50 py-1.5 rounded w-full border border-slate-200 dark:border-white/5">
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">
+                                *SADECE PERİODYA B2B HUB SATIŞLARINDA OTOMATİK DEVREYE GİRER.
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

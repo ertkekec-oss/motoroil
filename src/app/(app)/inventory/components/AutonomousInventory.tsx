@@ -203,14 +203,14 @@ export function FocusQueueTab({ products }: { products: any[] }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                            {anomalies.length === 0 && (
+                            {finalAnomalies.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
                                         Müdahale edilecek bir anomali bulunamadı.
                                     </td>
                                 </tr>
                             )}
-                            {anomalies.map((a, i) => (
+                            {finalAnomalies.map((a, i) => (
                                 <tr key={i} className="hover:bg-slate-50 dark:bg-[#1e293b] transition-colors group">
                                     <td className="px-4 py-3">
                                         <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${i === 0 ? 'bg-rose-50 text-rose-600 border border-rose-100' : i === 1 ? 'bg-amber-50 text-amber-600 border border-amber-100' : i === 2 ? 'bg-slate-50 text-slate-600 border border-slate-200' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>{a.type}</span>
@@ -224,7 +224,7 @@ export function FocusQueueTab({ products }: { products: any[] }) {
                                         {a.action}
                                     </td>
                                     <td className="px-4 py-3 text-right whitespace-nowrap">
-                                        <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm inline-flex items-center gap-1">
+                                        <button onClick={a.onClick} className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm inline-flex items-center gap-1">
                                             Hemen Uygula
                                         </button>
                                         <button className="px-3 py-1.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 rounded-lg text-xs font-bold transition-colors shadow-sm ml-2">

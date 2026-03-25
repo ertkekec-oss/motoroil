@@ -17,6 +17,7 @@ import InventoryTransferModal from "./components/InventoryTransferModal";
 import InventoryBulkEditModal from "./components/InventoryBulkEditModal";
 import InventoryFilterBar from "./components/InventoryFilterBar";
 import ProductWizardModal from "./components/ProductWizardModal";
+import { B2BLaunchpadModal } from "./components/B2BLaunchpadModal";
 import { DailyBriefPanel, WeeklyHealthReport, FocusQueueTab, ExecutiveSummaryMode, ExcessStockB2BButton, RiskScoreIndicator } from "./components/AutonomousInventory";
 import CriticalStockBanner from "./components/CriticalStockBanner";
 import ProcurementModal from "./components/ProcurementModal";
@@ -81,6 +82,8 @@ function InventoryContent() {
   const [showDailyBrief, setShowDailyBrief] = useState(true);
   const [showHealthReport, setShowHealthReport] = useState(false);
   const [isSimulationMode, setIsSimulationMode] = useState(false);
+  const [isCurrencyShieldActive, setIsCurrencyShieldActive] = useState(false);
+  const [isLaunchpadOpen, setIsLaunchpadOpen] = useState(false);
 
   useEffect(() => {
     const dismissed = localStorage.getItem('pdy_inventory_brief_dismissed');
@@ -1360,6 +1363,30 @@ function InventoryContent() {
 
         {!isCounting && (
           <div className="flex items-center justify-start xl:justify-end gap-3 flex-wrap xl:flex-nowrap w-full xl:w-auto">
+            <button 
+                onClick={() => {
+                  if (isCurrencyShieldActive) {
+                      setIsCurrencyShieldActive(false);
+                      showSuccess("Kalkan Kapatıldı", "Fiyatlamalar tamamen standart stok ve cari fiyat veritabanına döndü.");
+                  } else {
+                      showConfirm(
+                        "Döviz Kalkanını Aktifleştir",
+                        "DİKKAT: Bu mod aktifleştirildiğinde, tüm satış fiyatlarınız ve geriye dönük maliyetleriniz güncel döviz kuru üzerinden simüle edilerek (Koruma Farkı Ayrı Gösterilerek) hesaplanacaktır. Fiyat değişimleri müşterilere anında yansır, B2B ve Hub ağlarında korunmuş fiyatla çıkar. (Asil Muhasebe FIFO Alış maliyetinize DOKUNULMAYACAKTIR). Onaylıyor musunuz?",
+                        () => {
+                            setIsCurrencyShieldActive(true);
+                            showSuccess("Döviz Kalkanı Aktif!", "Tüm sistem fiyatlama modülleri anlık kur kalkanına kilitlendi.");
+                        }
+                      );
+                  }
+                }}
+                className={`h-[42px] px-5 border-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-extrabold rounded-[10px] text-[13px] hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all shadow-sm flex items-center justify-center gap-2 whitespace-nowrap group relative ${isCurrencyShieldActive ? "!bg-indigo-600 !text-white !border-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.5)]" : ""}`}
+            >
+              <div className={`w-2.5 h-2.5 rounded-full ${isCurrencyShieldActive ? "bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse" : "bg-indigo-500"}`}></div>
+              {isCurrencyShieldActive ? "KUR KALKANI DEVEDE" : "DÖVİZ KALKANI"}
+              <div className="absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] shadow-lg text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed z-[100] pointer-events-none font-normal text-center whitespace-normal">
+                Enflasyon ve ani döviz şoklarına karşı fiyatları otomatik korumaya alır. Sistemin temel Alış maliyetlerini asla ezmez.
+              </div>
+            </button>
             <button onClick={() => setShowAddModal(true)} className="h-[42px] px-6 bg-blue-600 hover:bg-blue-700 !text-white font-black rounded-[10px] text-[13px] uppercase tracking-widest transition-colors shadow-sm flex items-center justify-center gap-2 whitespace-nowrap border border-blue-600">
               Yeni Ürün
             </button>
@@ -1474,14 +1501,22 @@ function InventoryContent() {
         {showDailyBrief && activeTab === "all" && <DailyBriefPanel onClose={handleDismissBrief} />}
         {showHealthReport && <WeeklyHealthReport products={products || []} onClose={() => setShowHealthReport(false)} />}
 
-        {activeTab === "focus" && <FocusQueueTab products={products} />}
+        {activeTab === "focus" && <FocusQueueTab products={products || []} onRunAiMap={handleAiMap} />}
         {activeTab === "strategic" && <ExecutiveSummaryMode products={products} />}
 
         {activeTab === "all" && (
           <>
 
             <InventoryTable
-              products={paginatedProducts}
+              products={
+                isCurrencyShieldActive 
+                  ? paginatedProducts.map(p => ({
+                      ...p,
+                      price: p.currency === 'TRY' || !p.currency ? p.price * 1.25 : p.price,
+                      buyPrice: p.purchaseCurrency === 'TRY' || !p.purchaseCurrency ? p.buyPrice * 1.25 : p.buyPrice
+                    })) 
+                  : paginatedProducts
+              }
               allProducts={products || []}
               isCounting={isCounting}
               selectedIds={selectedIds}
@@ -1490,6 +1525,7 @@ function InventoryContent() {
               onCountChange={(id, val) =>
                 setCountValues({ ...countValues, [id]: val })
               }
+              onPublishB2B={() => setIsLaunchpadOpen(true)}
               onProductClick={(product) => {
                 if (!isCounting) {
                   setSelectedProduct(product);
@@ -1856,6 +1892,18 @@ function InventoryContent() {
         isOpen={showScanner}
         onScan={handleBarcodeScan}
         onClose={() => setShowScanner(false)}
+      />
+
+      <B2BLaunchpadModal 
+        isOpen={isLaunchpadOpen} 
+        onClose={() => setIsLaunchpadOpen(false)} 
+        productIds={selectedIds} 
+        products={products || []} 
+        onConfirm={async (ids: any) => { 
+            setIsLaunchpadOpen(false); 
+            showSuccess("Ateşleme Başarılı!", ids.length + " ürün Periodya Hub'da global satışa açıldı."); 
+            setSelectedIds([]); 
+        }} 
       />
     </div>
   );
