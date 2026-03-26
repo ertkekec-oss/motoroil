@@ -1,3 +1,4 @@
+import NetworkRadar from "@/components/network/NetworkRadar";
 import Link from "next/link";
 import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
@@ -351,248 +352,55 @@ export default async function CatalogPage({
 
         {/* NEW ELEGANT MAP HERO & SEARCH */}
         <div className="relative w-full overflow-hidden mb-12 min-h-[550px] flex flex-col items-center justify-between pt-8 pb-4">
-          {/* Turkey Map SVG Background */}
-          <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-multiply bg-center bg-no-repeat bg-contain"
-            style={{
-              backgroundImage:
-                "url('https://upload.wikimedia.org/wikipedia/commons/b/bc/BlankMap-Turkey.svg')",
-              backgroundPosition: "center",
-              backgroundSize: "90% auto",
-            }}
-          ></div>
-          {/* Central "P" Node (Periodya Octopus Center) */}
-          <div className="absolute top-1/2 left-[52%] -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center group/center">
-            {/* Outer pulsating rings */}
-            <div className="absolute w-[300px] h-[300px] bg-blue-500/5 rounded-full animate-ping duration-1000"></div>
-            <div className="absolute w-[150px] h-[150px] bg-blue-500/10 rounded-full animate-pulse"></div>
-
-            {/* The Core P */}
-            <div className="relative w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.6)] border-4 border-white/20 z-10 hover:scale-110 transition-transform cursor-pointer">
-              <span className="text-white text-4xl font-black italic drop-shadow-md">
-                P
-              </span>
-
-              {/* Core Status Label */}
-              <div className="absolute -top-8 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg opacity-0 group-hover/center:opacity-100 group-hover/center:-translate-y-1 transition-all pointer-events-none">
-                HUB MERKEZİ AKTİF
-              </div>
-            </div>
-          </div>
-          {/* Logistics Network Lines (Ahtapot Kolları) */}
-          <svg className="absolute inset-0 w-full h-full z-10 pointer-events-none opacity-40">
-            <defs>
-              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity="0.2" />
-              </linearGradient>
-              <style>
-                {`
-                  @keyframes mydash {
-                    to { stroke-dashoffset: -12; }
-                  }
-                  .animate-lines {
-                    animation: mydash 1.5s linear infinite;
-                  }
-                `}
-              </style>
-            </defs>
-            {[
-              { x: "25%", y: "28%" }, // Istanbul
-              { x: "12%", y: "45%" }, // Izmir
-              { x: "38%", y: "38%" }, // Ankara
-              { x: "28%", y: "65%" }, // Antalya
-              { x: "65%", y: "68%" }, // Adana
-              { x: "82%", y: "55%" }, // Diyarbakir
-              { x: "78%", y: "25%" }, // Trabzon
-              { x: "90%", y: "35%" }, // Erzurum
-              { x: "55%", y: "20%" }, // Samsun
-            ].map((p, i) => (
-              <g key={i}>
-                <line
-                  x1="52%"
-                  y1="50%"
-                  x2={p.x}
-                  y2={p.y}
-                  stroke="url(#lineGrad)"
-                  strokeWidth="2"
-                  strokeDasharray="6 6"
-                  className="animate-lines"
-                />
-                <circle
-                  cx={p.x}
-                  cy={p.y}
-                  r="3"
-                  fill="#3b82f6"
-                  className="animate-pulse"
-                />
-              </g>
-            ))}
-          </svg>
-          {/* Glowing Signals on Map (Sprinkled Demands across Turkey) */}
-          <div className="absolute w-full h-full inset-0 mx-auto pointer-events-none z-10">
-            {[
-              // Istanbul
-              {
-                top: "28%",
-                left: "25%",
-                color: "bg-blue-500",
-                shadow: "shadow-[0_0_15px_rgba(59,130,246,0.8)]",
-                delay: "0s",
-                count: "128k Talep",
-              },
-              // Izmir
-              {
-                top: "45%",
-                left: "12%",
-                color: "bg-indigo-500",
-                shadow: "shadow-[0_0_15px_rgba(99,102,241,0.8)]",
-                delay: "1s",
-                count: "45k Talep",
-              },
-              // Ankara
-              {
-                top: "38%",
-                left: "38%",
-                color: "bg-blue-400",
-                shadow: "shadow-[0_0_15px_rgba(96,165,250,0.8)]",
-                delay: "2s",
-                count: "310k İşlem",
-              },
-              // Antalya
-              {
-                top: "65%",
-                left: "28%",
-                color: "bg-teal-500",
-                shadow: "shadow-[0_0_15px_rgba(20,184,166,0.8)]",
-                delay: "0.5s",
-                count: "12k Talep",
-              },
-              // Adana
-              {
-                top: "68%",
-                left: "65%",
-                color: "bg-slate-400",
-                shadow: "shadow-[0_0_15px_rgba(148,163,184,0.8)]",
-                delay: "1.5s",
-                count: "8.1k Teklif",
-              },
-              // Diyarbakir
-              {
-                top: "55%",
-                left: "82%",
-                color: "bg-indigo-400",
-                shadow: "shadow-[0_0_10px_rgba(129,140,248,0.8)]",
-                delay: "0.2s",
-                count: "8k Talep",
-              },
-              // Trabzon
-              {
-                top: "25%",
-                left: "78%",
-                color: "bg-blue-500",
-                shadow: "shadow-[0_0_15px_rgba(59,130,246,0.8)]",
-                delay: "2.5s",
-                count: "3.5k Talep",
-              },
-              // Erzurum
-              {
-                top: "35%",
-                left: "90%",
-                color: "bg-slate-400",
-                shadow: "shadow-[0_0_15px_rgba(148,163,184,0.8)]",
-                delay: "1.1s",
-                count: "1.2k İşlem",
-              },
-              // Samsun
-              {
-                top: "20%",
-                left: "55%",
-                color: "bg-indigo-400",
-                shadow: "shadow-[0_0_15px_rgba(129,140,248,0.8)]",
-                delay: "0.8s",
-                count: "6.4k Talep",
-              },
-            ].map((pos, idx) => (
-              <div
-                key={idx}
-                className="absolute flex items-center group pointer-events-auto mix-blend-multiply"
-                style={{
-                  top: pos.top,
-                  left: pos.left,
-                  transform: "translate(-50%, -50%)",
-                }}
-              >
-                {/* Yanıp Sönen Nokta */}
-                <div
-                  className="w-10 h-10 rounded-full bg-blue-100/30 flex items-center justify-center animate-pulse relative z-10 border border-white/40 backdrop-blur-[1px] group-hover:scale-125 transition-transform"
-                  style={{ animationDelay: pos.delay, animationDuration: "2s" }}
-                >
-                  <div
-                    className={`w-3 h-3 rounded-full ${pos.color} ${pos.shadow}`}
-                  ></div>
-                </div>
-
-                {/* Talep Sayısı Etiketi (Şık HUD Badge) */}
-                <div className="absolute left-[80%] whitespace-nowrap ml-2 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/80 shadow-[0_4px_15px_rgba(0,0,0,0.08)] flex items-center z-20 group-hover:scale-110 transition-all cursor-pointer">
-                  <div
-                    className={`w-2 h-2 rounded-full mr-2 animate-pulse ${pos.color}`}
-                  ></div>
-                  <span className="text-[10px] font-black font-mono tracking-wide text-slate-800">
-                    {pos.count}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <NetworkRadar />
           <div className="flex-1"></div> {/* Spacer to push search down */}
           {/* Elegant Search Container (Moved to Absolute Bottom of the Hero) */}
-          <div className="relative z-30 w-[95%] max-w-[650px] mb-2 animate-in slide-in-from-bottom-5 duration-700 pointer-events-auto">
-            <div className="w-full bg-white/95 backdrop-blur-xl rounded-[16px] shadow-[0_20px_50px_-15px_rgba(0,30,80,0.12)] border border-slate-200/70 p-2.5 h-[4.5rem] flex flex-row items-center ring-4 ring-white/50">
+          <div className="relative z-40 w-[95%] max-w-[500px] mb-2 animate-in slide-in-from-bottom-5 duration-700 pointer-events-auto">
+            <div className="w-full bg-white/95 backdrop-blur-xl rounded-[16px] shadow-[0_20px_50px_-15px_rgba(0,30,80,0.12)] border border-slate-200/70 p-2 h-[3.8rem] flex flex-row items-center ring-4 ring-white/50">
               {/* Keyword */}
-              <div className="flex-1 flex items-center h-full px-5">
-                <Grid className="w-5 h-5 text-blue-600 mr-4 shrink-0" />
+              <div className="flex-1 flex items-center h-full px-4">
+                <Grid className="w-4 h-4 text-blue-600 mr-3 shrink-0" />
                 <input
                   type="text"
-                  placeholder="Terminal Araması (Marka, Ürün Kodu, OEM)"
-                  className="flex-1 h-full w-full bg-transparent border-none p-0 text-[15px] font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0"
+                  placeholder="Terminal Araması (Ürün, OEM...)"
+                  className="flex-1 h-full w-full bg-transparent border-none p-0 text-[14px] font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0"
                 />
               </div>
 
               {/* Search Button */}
               <div className="h-full shrink-0">
-                <button className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all text-white font-bold text-[14px] px-10 rounded-[10px] flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(59,130,246,0.35)] active:scale-95 duration-200 border border-blue-400/30">
-                  <Search className="w-4 h-4" /> Ağı Tara
+                <button className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all text-white font-bold text-[13px] px-8 rounded-[12px] flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(59,130,246,0.35)] active:scale-95 duration-200 border border-blue-400/30">
+                  <Search className="w-3.5 h-3.5" /> Ağı Tara
                 </button>
               </div>
             </div>
 
             {/* Popular Searches (Pill Tags) */}
-            <div className="flex items-center justify-center gap-2.5 mt-5 text-[11px] font-medium text-slate-500 select-none overflow-x-auto pb-2 px-1">
-              <span className="font-extrabold text-slate-800 shrink-0 mr-1 flex items-center gap-1.5 uppercase tracking-wider text-[10px] bg-white/50 px-2 py-1 rounded-full border border-slate-200">
-                <TrendingUp className="w-3.5 h-3.5 text-orange-500" /> Trendler
+            <div className="flex items-center justify-center gap-2 mt-4 text-[10px] font-medium text-slate-500 select-none overflow-x-auto pb-2 px-1">
+              <span className="font-extrabold text-slate-800 shrink-0 mr-1 flex items-center gap-1 uppercase tracking-wider bg-white/60 px-2 py-0.5 rounded-full border border-slate-200 shadow-sm">
+                <TrendingUp className="w-3 h-3 text-orange-500" /> Trend
               </span>
               <a
                 href="#"
-                className="px-3 py-1 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
+                className="px-2.5 py-0.5 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
               >
                 Fren Balatası
               </a>
               <a
                 href="#"
-                className="px-3 py-1 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
+                className="px-2.5 py-0.5 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
               >
                 Motor Yağı
               </a>
               <a
                 href="#"
-                className="px-3 py-1 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
+                className="px-2.5 py-0.5 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
               >
                 Dizel Enjektör
               </a>
               <a
                 href="#"
-                className="px-3 py-1 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
+                className="px-2.5 py-0.5 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-400 hover:text-blue-700 hover:shadow-md transition-all shrink-0 font-bold"
               >
                 Buji Seti
               </a>
