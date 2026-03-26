@@ -45,42 +45,56 @@ export default function NetworkRadar() {
 
   return (
     <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden">
-      {/* Futuristic Animated Turkey Map Overlay */}
+      {/* PERFECT TURKEY MAP USING SVG MASK (Guarantees visibility with exact colors) */}
       <div
-        className="absolute inset-0 opacity-20 pointer-events-none bg-center bg-no-repeat bg-contain"
+        className="absolute inset-0 z-0 bg-slate-300/80 mix-blend-multiply pointer-events-none"
         style={{
-          backgroundImage:
-            "url('https://upload.wikimedia.org/wikipedia/commons/b/bc/BlankMap-Turkey.svg')",
-          backgroundPosition: "center",
-          backgroundSize: "85% auto",
-          filter: "grayscale(1) contrast(1.2)",
+          maskImage: "url('/turkey-map.svg')",
+          WebkitMaskImage: "url('/turkey-map.svg')",
+          maskPosition: "center",
+          WebkitMaskPosition: "center",
+          maskSize: "85% auto",
+          WebkitMaskSize: "85% auto",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
         }}
       ></div>
 
       {/* Central "P" Node (Periodya Octopus Center) */}
       <div className="absolute top-1/2 left-[50%] -translate-x-1/2 -translate-y-1/2 z-30 flex items-center justify-center group/center pointer-events-auto">
+        {/* Core Radar Scanner (Sweeping Effect) */}
+        <div className="absolute w-[800px] h-[800px] rounded-full bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(59,130,246,0.2)_360deg)] animate-[spin_6s_linear_infinite] mix-blend-multiply opacity-50 z-0"></div>
+
         {/* Outer Tech Rings */}
-        <div className="absolute w-[400px] h-[400px] rounded-full border border-blue-500/10 animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-        <div className="absolute w-[250px] h-[250px] rounded-full border border-blue-400/20 animate-[pulse_2s_ease-in-out_infinite]"></div>
+        <div className="absolute w-[500px] h-[500px] rounded-full border border-blue-600/10 animate-[ping_5s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+        <div className="absolute w-[350px] h-[350px] rounded-full border border-blue-500/15 animate-[pulse_3s_ease-in-out_infinite] bg-blue-500/5"></div>
+        <div
+          className="absolute w-[240px] h-[240px] rounded-full border-[1px] border-indigo-500/30 animate-[spin_12s_linear_infinite_reverse]"
+          style={{ borderStyle: "dotted", borderWidth: "4px" }}
+        ></div>
 
         {/* Rotating Radar Rings */}
-        <div
-          className="absolute w-[180px] h-[180px] rounded-full border-t-2 border-r-2 border-blue-500/30 animate-[spin_8s_linear_infinite]"
-          style={{ borderStyle: "dashed" }}
-        ></div>
-        <div className="absolute w-[130px] h-[130px] rounded-full border-b-4 border-indigo-400/40 animate-[spin_3s_linear_infinite_reverse]"></div>
+        <div className="absolute w-[180px] h-[180px] rounded-full border-[3px] border-l-transparent border-blue-500/70 animate-[spin_4s_linear_infinite]"></div>
+        <div className="absolute w-[140px] h-[140px] rounded-full border-[2px] border-r-transparent border-indigo-500/60 animate-[spin_2s_linear_infinite_reverse]"></div>
 
         {/* The Core P */}
-        <div className="relative w-24 h-24 bg-gradient-to-br from-blue-700 to-indigo-900 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(37,99,235,0.7)] border-[3px] border-blue-300/50 z-10 hover:scale-110 transition-transform cursor-pointer overflow-hidden group-hover/center:shadow-[0_0_80px_rgba(59,130,246,1)]">
-          <div className="absolute inset-0 bg-blue-400/20 animate-pulse mix-blend-overlay"></div>
-          <span className="text-white text-[56px] font-black italic drop-shadow-[0_2px_15px_rgba(255,255,255,0.8)] pr-1.5 leading-none">
+        <div className="relative w-28 h-28 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600 via-indigo-800 to-slate-900 rounded-full flex items-center justify-center shadow-[0_0_80px_rgba(37,99,235,0.7)] border-[4px] border-blue-300/60 z-10 hover:scale-110 transition-transform cursor-pointer overflow-hidden group-hover/center:shadow-[0_0_120px_rgba(59,130,246,1)] ring-8 ring-blue-500/20 backdrop-blur-2xl">
+          <div className="absolute inset-0 bg-blue-400/30 animate-[pulse_1.5s_ease-in-out_infinite] mix-blend-overlay"></div>
+
+          {/* Scanline overlay inside P */}
+          <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(255,255,255,0.08)_50%)] bg-[length:100%_4px] pointer-events-none"></div>
+
+          <span
+            className="text-white text-[70px] font-black italic pr-1.5 leading-none z-10 relative"
+            style={{ textShadow: "0 0 10px #60a5fa, 0 0 30px #3b82f6" }}
+          >
             P
           </span>
 
           {/* Core Status Label */}
-          <div className="absolute -top-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[11px] font-bold px-5 py-2 rounded-full whitespace-nowrap shadow-[0_10px_25px_rgba(0,30,100,0.3)] opacity-0 group-hover/center:opacity-100 group-hover/center:-translate-y-2 transition-all pointer-events-none flex items-center gap-2 border border-blue-400/30">
-            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></div>
-            HUB MERKEZİ AKTİF
+          <div className="absolute -top-14 bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-[11px] font-black px-5 py-2 rounded-full whitespace-nowrap shadow-[0_15px_30px_rgba(0,30,120,0.4)] opacity-0 group-hover/center:opacity-100 group-hover/center:-translate-y-2 transition-all pointer-events-none flex items-center gap-3 border border-blue-300/40 tracking-widest z-50">
+            <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></div>
+            NETWORK CORE ONLINE
           </div>
         </div>
       </div>
