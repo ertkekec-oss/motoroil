@@ -347,7 +347,7 @@ export default async function CatalogPage({
         <div className="relative w-full overflow-hidden mb-12 min-h-[460px] flex flex-col items-center justify-center pt-8 pb-10">
           {/* Extremely Subtle World Map SVG Background */}
           <div
-            className="absolute inset-x-0 inset-y-0 opacity-[0.03] pointer-events-none mix-blend-multiply bg-center bg-no-repeat bg-cover md:bg-contain"
+            className="absolute inset-x-0 inset-y-0 opacity-[0.03] pointer-events-none mix-blend-multiply bg-center bg-no-repeat bg-cover"
             style={{
               backgroundImage:
                 "url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')",
@@ -365,6 +365,7 @@ export default async function CatalogPage({
                 color: "bg-blue-500",
                 shadow: "shadow-[0_0_15px_rgba(59,130,246,0.6)]",
                 delay: "0s",
+                count: "128 Talep",
               },
               // Europe / Germany
               {
@@ -373,6 +374,7 @@ export default async function CatalogPage({
                 color: "bg-indigo-500",
                 shadow: "shadow-[0_0_15px_rgba(99,102,241,0.6)]",
                 delay: "1s",
+                count: "45 Talep",
               },
               // North America / New York
               {
@@ -381,6 +383,7 @@ export default async function CatalogPage({
                 color: "bg-blue-400",
                 shadow: "shadow-[0_0_15px_rgba(96,165,250,0.6)]",
                 delay: "2s",
+                count: "310 İşlem",
               },
               // Middle East / Dubai
               {
@@ -389,22 +392,25 @@ export default async function CatalogPage({
                 color: "bg-teal-500",
                 shadow: "shadow-[0_0_15px_rgba(20,184,166,0.6)]",
                 delay: "0.5s",
+                count: "12 Talep",
               },
               // Asia / China
               {
                 top: "42%",
                 left: "80%",
-                color: "bg-slate-400",
+                color: "bg-[#94a3b8]",
                 shadow: "shadow-[0_0_15px_rgba(148,163,184,0.6)]",
                 delay: "1.5s",
+                count: "2.1k Teklif",
               },
               // South America / Brazil
               {
                 top: "70%",
                 left: "30%",
-                color: "bg-slate-300",
+                color: "bg-[#cbd5e1]",
                 shadow: "shadow-[0_0_10px_rgba(203,213,225,0.5)]",
                 delay: "0.2s",
+                count: "8 Talep",
               },
               // Africa / South Africa
               {
@@ -413,14 +419,16 @@ export default async function CatalogPage({
                 color: "bg-blue-500",
                 shadow: "shadow-[0_0_15px_rgba(59,130,246,0.6)]",
                 delay: "2.5s",
+                count: "3 Talep",
               },
               // East Europe / Poland
               {
                 top: "28%",
                 left: "58%",
-                color: "bg-slate-400",
+                color: "bg-[#94a3b8]",
                 shadow: "shadow-[0_0_15px_rgba(148,163,184,0.6)]",
                 delay: "1.1s",
+                count: "250 İşlem",
               },
               // US West Coast
               {
@@ -429,27 +437,36 @@ export default async function CatalogPage({
                 color: "bg-indigo-400",
                 shadow: "shadow-[0_0_15px_rgba(129,140,248,0.6)]",
                 delay: "0.8s",
+                count: "64 Talep",
               },
             ].map((pos, idx) => (
               <div
                 key={idx}
-                className="absolute flex flex-col items-center"
+                className="absolute flex items-center group"
                 style={{ top: pos.top, left: pos.left }}
               >
+                {/* Yanıp Sönen Nokta */}
                 <div
-                  className="w-8 h-8 rounded-full bg-slate-100/20 flex items-center justify-center animate-pulse"
+                  className="w-8 h-8 rounded-full bg-[#f1f5f9]/20 flex items-center justify-center animate-pulse relative z-10"
                   style={{ animationDelay: pos.delay, animationDuration: "3s" }}
                 >
                   <div
                     className={`w-2.5 h-2.5 rounded-full ${pos.color} ${pos.shadow}`}
                   ></div>
                 </div>
+
+                {/* Talep Sayısı Etiketi (Noktanın hemen yanında gösterilecek) */}
+                <div className="absolute left-[80%] whitespace-nowrap ml-1 bg-white/80 backdrop-blur-[2px] px-2 py-0.5 rounded-[4px] border border-[#f1f5f9] shadow-sm flex items-center">
+                  <span className="text-[9px] font-bold text-[#0f172a] opacity-80">
+                    {pos.count}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Elegant Search Container */}
-          <div className="relative z-10 w-[95%] max-w-[700px] mt-10 mb-4 animate-in slide-in-from-bottom-5 duration-700">
+          <div className="relative z-10 w-[95%] max-w-[550px] mt-10 mb-4 animate-in slide-in-from-bottom-5 duration-700">
             <div className="w-full bg-white rounded-xl shadow-[0_12px_45px_-8px_rgba(0,0,0,0.06)] border border-slate-200/60 p-2 h-[4rem] flex flex-row items-center">
               {/* Keyword */}
               <div className="flex-1 flex items-center h-full px-5">
