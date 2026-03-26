@@ -321,7 +321,10 @@ export default async function CatalogPage({
     null;
 
   return (
-    <div className="!bg-[#f8fafc] !text-[#0f172a] min-h-screen flex flex-col w-full font-sans transition-colors duration-200">
+    <div
+      className="relative w-full min-h-[100dvh] pb-32 font-sans transition-colors duration-200"
+      style={{ backgroundColor: "#f8fafc", color: "#0f172a" }}
+    >
       {/* TERMINAL HEADER */}
       <div className="w-full bg-[#030712] border-b border-white/5 h-8 flex items-center shrink-0 overflow-hidden font-mono text-[10px] uppercase tracking-widest text-slate-500 shadow-sm z-50">
         <div className="flex animate-[marquee_25s_linear_infinite] whitespace-nowrap items-center">
@@ -340,7 +343,10 @@ export default async function CatalogPage({
         </div>
       </div>
 
-      <div className="max-w-[1600px] w-full mx-auto px-6 lg:px-10 py-8 flex-1 animate-in fade-in duration-500">
+      <div
+        className="max-w-[1600px] w-full mx-auto px-6 lg:px-10 py-8 relative animate-in fade-in duration-500"
+        style={{ backgroundColor: "#f8fafc" }}
+      >
         <HubCatalogTabs />
 
         {/* NEW ELEGANT MAP HERO & SEARCH */}
