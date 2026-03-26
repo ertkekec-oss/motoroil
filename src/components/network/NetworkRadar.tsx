@@ -45,20 +45,21 @@ export default function NetworkRadar() {
 
   return (
     <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden">
-      {/* PERFECT TURKEY MAP USING SVG MASK (Guarantees visibility with exact colors) */}
-      <div
-        className="absolute inset-0 z-0 bg-slate-300/80 mix-blend-multiply pointer-events-none"
-        style={{
-          maskImage: "url('/turkey-map.svg')",
-          WebkitMaskImage: "url('/turkey-map.svg')",
-          maskPosition: "center",
-          WebkitMaskPosition: "center",
-          maskSize: "85% auto",
-          WebkitMaskSize: "85% auto",
-          maskRepeat: "no-repeat",
-          WebkitMaskRepeat: "no-repeat",
-        }}
-      ></div>
+      {/* CUSTOM TURKEY DATA MAP (User Provided) 
+          Invert(1) turns the black background to white so it blends seamlessly into the light UI.
+          Hue-rotate(180deg) brings the inverted cyan color back to its original stunning copper/red!
+          Mix-blend-multiply ensures the pure white (#fff) background becomes totally transparent.
+      */}
+      <div className="absolute inset-0 z-0 opacity-[0.85] mix-blend-multiply pointer-events-none transition-all duration-1000 flex items-center justify-center pointer-events-none">
+        <div
+          className="w-[105%] md:w-[85%] h-full bg-center bg-no-repeat bg-contain"
+          style={{
+            backgroundImage: "url('/custom-turkey-map.jpg')",
+            filter:
+              "invert(1) hue-rotate(180deg) contrast(1.1) brightness(1.2)",
+          }}
+        ></div>
+      </div>
 
       {/* Central "P" Node (Periodya Octopus Center) */}
       <div className="absolute top-1/2 left-[50%] -translate-x-1/2 -translate-y-1/2 z-30 flex items-center justify-center group/center pointer-events-auto">
