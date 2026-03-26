@@ -3,6 +3,7 @@ import { prisma, prismaRaw } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import HubCatalogTabs from "@/components/network/HubCatalogTabs";
+import CategoryCarousel from "@/components/network/CategoryCarousel";
 import {
   Search,
   SlidersHorizontal,
@@ -502,67 +503,17 @@ export default async function CatalogPage({
               </a>
             </div>
           </div>
+        </div>
 
-          {/* Quick Categories Bar (Kibar Kutular) */}
-          <div className="relative z-10 w-full max-w-[1300px] mt-10 grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-4 px-2">
-            {[
-              {
-                title: "Sıvı & Kimyasallar",
-                jobs: "2 Yeni İşlemler",
-                color: "text-blue-500",
-                icon: <Box className="w-5 h-5" />,
-              },
-              {
-                title: "Filtre ve Aksam",
-                jobs: "5 Kritik Talep",
-                color: "text-indigo-500",
-                icon: <Grid className="w-5 h-5" />,
-              },
-              {
-                title: "Fren Sistemi",
-                jobs: "Sipariş Yok",
-                color: "text-slate-500",
-                icon: <Activity className="w-5 h-5" />,
-              },
-              {
-                title: "Motor Parçaları",
-                jobs: "12 Stokta",
-                color: "text-blue-500",
-                icon: <Briefcase className="w-5 h-5" />,
-              },
-              {
-                title: "Lastik Modülü",
-                jobs: "Sipariş Yok",
-                color: "text-slate-500",
-                icon: <MapPin className="w-5 h-5" />,
-              },
-            ].map((c, i) => (
-              <div
-                key={i}
-                className="flex items-center bg-white border border-slate-100/80 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 rounded-xl p-3.5 px-4 cursor-pointer group"
-              >
-                <div
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center bg-slate-50/50 group-hover:bg-blue-50/30 transition-colors mr-4 ${c.color}`}
-                >
-                  {c.icon}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[14.5px] font-bold text-slate-800 tracking-tight group-hover:text-blue-600 transition-colors">
-                    {c.title}
-                  </span>
-                  <span className="text-[12px] font-medium text-slate-400 tracking-tight mt-0.5">
-                    {c.jobs}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* NEW HOVER-DROPDOWN CATEGORY MENU (Requested by User) */}
+        <div className="w-full relative z-30">
+          <CategoryCarousel />
         </div>
 
         {/* THE MATRIX (Compact Bento Grid) */}
-        <div className="mb-12">
+        <div className="mb-12 relative z-10 bg-[#f8fafc]">
           <div className="flex items-center justify-between mb-4 px-1">
-            <h3 className="text-sm font-bold text-slate-900  uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-sm font-bold text-[#0f172a] uppercase tracking-widest flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-slate-400" /> B2B Index - High
               Liquidity
             </h3>
@@ -571,7 +522,7 @@ export default async function CatalogPage({
             </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-3 lg:gap-4 relative z-0">
             {sixPackItems.map((item: any, idx: number) => (
               <div
                 key={idx}
@@ -586,7 +537,7 @@ export default async function CatalogPage({
                   </span>
                 </div>
 
-                <div className="w-full h-28 bg-slate-50  rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                <div className="w-full h-28 bg-[#f8fafc] rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
                   {getImg(item) ? (
                     <img
                       src={getImg(item)}
