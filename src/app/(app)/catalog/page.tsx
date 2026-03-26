@@ -354,18 +354,97 @@ export default async function CatalogPage({
             }}
           ></div>
 
-          {/* Glowing Signals on Map */}
-          <div className="absolute w-full h-full inset-0 pointer-events-none perspective-[1000px] z-0">
-            <div className="absolute top-[40%] left-[55%] flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center animate-pulse">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)]"></div>
+          {/* Glowing Signals on Map (Sprinkled Demands) */}
+          <div className="absolute w-[95%] max-w-[1200px] h-full inset-0 mx-auto pointer-events-none z-0">
+            {[
+              // Turkey / Istanbul
+              {
+                top: "35%",
+                left: "55%",
+                color: "bg-blue-500",
+                shadow: "shadow-[0_0_15px_rgba(59,130,246,0.6)]",
+                delay: "0s",
+              },
+              // Europe / Germany
+              {
+                top: "30%",
+                left: "48%",
+                color: "bg-indigo-500",
+                shadow: "shadow-[0_0_15px_rgba(99,102,241,0.6)]",
+                delay: "1s",
+              },
+              // North America / New York
+              {
+                top: "45%",
+                left: "22%",
+                color: "bg-blue-400",
+                shadow: "shadow-[0_0_15px_rgba(96,165,250,0.6)]",
+                delay: "2s",
+              },
+              // Middle East / Dubai
+              {
+                top: "52%",
+                left: "65%",
+                color: "bg-teal-500",
+                shadow: "shadow-[0_0_15px_rgba(20,184,166,0.6)]",
+                delay: "0.5s",
+              },
+              // Asia / China
+              {
+                top: "42%",
+                left: "80%",
+                color: "bg-slate-400",
+                shadow: "shadow-[0_0_15px_rgba(148,163,184,0.6)]",
+                delay: "1.5s",
+              },
+              // South America / Brazil
+              {
+                top: "70%",
+                left: "30%",
+                color: "bg-slate-300",
+                shadow: "shadow-[0_0_10px_rgba(203,213,225,0.5)]",
+                delay: "0.2s",
+              },
+              // Africa / South Africa
+              {
+                top: "65%",
+                left: "52%",
+                color: "bg-blue-500",
+                shadow: "shadow-[0_0_15px_rgba(59,130,246,0.6)]",
+                delay: "2.5s",
+              },
+              // East Europe / Poland
+              {
+                top: "28%",
+                left: "58%",
+                color: "bg-slate-400",
+                shadow: "shadow-[0_0_15px_rgba(148,163,184,0.6)]",
+                delay: "1.1s",
+              },
+              // US West Coast
+              {
+                top: "40%",
+                left: "15%",
+                color: "bg-indigo-400",
+                shadow: "shadow-[0_0_15px_rgba(129,140,248,0.6)]",
+                delay: "0.8s",
+              },
+            ].map((pos, idx) => (
+              <div
+                key={idx}
+                className="absolute flex flex-col items-center"
+                style={{ top: pos.top, left: pos.left }}
+              >
+                <div
+                  className="w-8 h-8 rounded-full bg-slate-100/20 flex items-center justify-center animate-pulse"
+                  style={{ animationDelay: pos.delay, animationDuration: "3s" }}
+                >
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full ${pos.color} ${pos.shadow}`}
+                  ></div>
+                </div>
               </div>
-            </div>
-            <div className="absolute top-[32%] left-[48%] flex flex-col items-center">
-              <div className="w-6 h-6 rounded-full bg-slate-400/20 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Elegant Search Container */}
