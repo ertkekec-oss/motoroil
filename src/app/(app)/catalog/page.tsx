@@ -27,7 +27,7 @@ export default async function CatalogPage({
   const session: any = await getSession();
   const user = session?.user || session;
 
-  if (!user) {
+  if (false && !user) {
     redirect("/login");
   }
 
