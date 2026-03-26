@@ -368,46 +368,35 @@ export default async function CatalogPage({
                 </div>
             </div>
 
-            {/* Elegant Search Container */}
+                {/* Elegant Search Container */}
             <div className="relative z-10 w-[95%] max-w-[1000px] mt-10 mb-4 animate-in slide-in-from-bottom-5 duration-700">
-                <div className="w-full bg-white rounded-xl shadow-[0_12px_45px_-8px_rgba(0,0,0,0.06)] border border-slate-200/60 p-2 h-[4.5rem] flex flex-col md:flex-row items-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
+                <div className="w-full bg-white rounded-xl shadow-[0_12px_45px_-8px_rgba(0,0,0,0.06)] border border-slate-200/60 p-2 h-auto md:h-[4.5rem] flex flex-col md:flex-row items-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
                     
                     {/* Industry */}
-                    <div className="flex-1 flex items-center h-full px-5 hover:bg-slate-50/50 transition-colors rounded-l-lg group">
-                        <Briefcase className="w-4 h-4 text-slate-400 mr-3 group-hover:text-blue-500 transition-colors" />
-                        <select className="flex-1 h-full bg-transparent border-none text-[14px] font-semibold text-slate-600 focus:outline-none focus:ring-0 appearance-none cursor-pointer">
+                    <div className="w-full md:w-[35%] flex items-center h-12 md:h-full px-5 hover:bg-slate-50/50 transition-colors rounded-t-lg md:rounded-l-lg md:rounded-tr-none group">
+                        <Briefcase className="w-4 h-4 text-slate-400 mr-3 group-hover:text-blue-500 transition-colors shrink-0" />
+                        <select className="w-full h-full bg-transparent border-none text-[14px] font-semibold text-slate-600 focus:outline-none focus:ring-0 appearance-none cursor-pointer">
                             <option value="">Endüstri & Sektör</option>
                             <option value="1">Otomotiv Yedek Parça</option>
                             <option value="2">Endüstriyel Rulmanlar</option>
                             <option value="3">Sıvı & Kimyasallar</option>
                         </select>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-300 rotate-90 ml-1" />
-                    </div>
-
-                    {/* Location */}
-                    <div className="flex-[0.8] flex items-center h-full px-5 hover:bg-slate-50/50 transition-colors group">
-                        <MapPin className="w-4 h-4 text-slate-400 mr-3 group-hover:text-blue-500 transition-colors" />
-                        <select className="flex-1 h-full bg-transparent border-none text-[14px] font-semibold text-slate-600 focus:outline-none focus:ring-0 appearance-none cursor-pointer">
-                            <option value="">Lokasyon</option>
-                            <option value="tr">Türkiye Merkez Ağı</option>
-                            <option value="eu">Avrupa Ağı</option>
-                        </select>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-300 rotate-90 ml-1" />
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-300 rotate-90 ml-1 shrink-0" />
                     </div>
 
                     {/* Keyword */}
-                    <div className="flex-[1.2] flex items-center h-full px-5 hover:bg-slate-50/50 transition-colors group">
-                        <Grid className="w-4 h-4 text-slate-400 mr-3 group-focus-within:text-blue-500 transition-colors" />
+                    <div className="w-full md:flex-1 flex items-center h-12 md:h-full px-5 hover:bg-slate-50/50 transition-colors group">
+                        <Grid className="w-4 h-4 text-slate-400 mr-3 group-focus-within:text-blue-500 transition-colors shrink-0" />
                         <input 
                             type="text" 
-                            placeholder="Terminal Araması (OEM, SKU)" 
-                            className="flex-1 h-full w-full bg-transparent border-none p-0 text-[14px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-0"
+                            placeholder="Terminal Araması (Marka, Ürün Kodu, OEM)" 
+                            className="w-full h-full bg-transparent border-none p-0 text-[14px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-0"
                         />
                     </div>
 
                     {/* Search Button */}
-                    <div className="h-full pl-3 pr-1 py-1 shrink-0">
-                        <button className="h-full bg-[#3b82f6] hover:bg-[#2563eb] transition-colors text-white font-bold text-[14px] px-8 rounded-lg flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(59,130,246,0.25)] active:scale-95 duration-200">
+                    <div className="w-full md:w-auto h-14 md:h-full pl-0 pt-2 md:pt-0 md:pl-3 pr-1 py-1 shrink-0">
+                        <button className="w-full h-full bg-[#3b82f6] hover:bg-[#2563eb] transition-colors text-white font-bold text-[14px] px-8 rounded-lg flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(59,130,246,0.25)] active:scale-95 duration-200">
                             <Search className="w-4 h-4" /> Ara
                         </button>
                     </div>
