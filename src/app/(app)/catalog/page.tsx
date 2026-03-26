@@ -436,7 +436,7 @@ export default async function CatalogPage({
                     { title: "Lastik Modülü", jobs: "Sipariş Yok", color: "text-slate-500", icon: <MapPin className="w-5 h-5" /> }
                 ].map((c, i) => (
                     <div key={i} className="flex items-center bg-white border border-slate-100/80 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 rounded-xl p-3.5 px-4 cursor-pointer group">
-                        <div className={\`w-12 h-12 rounded-lg flex items-center justify-center bg-slate-50/50 group-hover:bg-blue-50/30 transition-colors mr-4 \${c.color}\`}>
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-slate-50/50 group-hover:bg-blue-50/30 transition-colors mr-4 ${c.color}`}>
                             {c.icon}
                         </div>
                         <div className="flex flex-col">
