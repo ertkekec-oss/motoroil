@@ -46,17 +46,17 @@ export default function NetworkRadar() {
   return (
     <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden flex items-center justify-center">
       {/* CUSTOM TURKEY DATA MAP (User Provided) 
-          Invert(1) turns the black background to white so it blends seamlessly into the light UI.
-          Hue-rotate(180deg) brings the inverted cyan color back to its original stunning copper/red!
-          Mix-blend-darken ensures the pure white (#fff) background becomes totally transparent over #f8fafc.
+          To definitively solve the white bounding box in all browser engines:
+          We give the container the EXACT background color of the catalog page (#f8fafc).
+          Then we multiply the inverted white background against it to perfectly inherit the color!
       */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none bg-[#f8fafc]">
+        {/* We use scale-125 and 140% sizing to make the map significantly larger */}
         <div
-          className="w-[130%] h-[130%] md:w-[110%] md:h-[110%] bg-center bg-no-repeat bg-contain scale-110 transition-all duration-1000 opacity-90"
+          className="w-[150%] h-[150%] md:w-[130%] md:h-[130%] bg-center bg-no-repeat bg-contain scale-[1.2] md:scale-125 transition-all duration-1000 opacity-[0.9] mix-blend-multiply"
           style={{
             backgroundImage: "url('/custom-turkey-map.jpg')",
-            filter: "invert(1) hue-rotate(180deg) contrast(2) brightness(1.3)",
-            mixBlendMode: "multiply",
+            filter: "invert(1) hue-rotate(180deg) brightness(1.2)",
           }}
         ></div>
       </div>
