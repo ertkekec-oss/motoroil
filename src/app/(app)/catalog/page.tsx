@@ -321,7 +321,7 @@ export default async function CatalogPage({
     null;
 
   return (
-    <div className="bg-slate-50  min-h-screen flex flex-col w-full font-sans transition-colors duration-200">
+    <div className="!bg-[#f8fafc] !text-[#0f172a] min-h-screen flex flex-col w-full font-sans transition-colors duration-200">
       {/* TERMINAL HEADER */}
       <div className="w-full bg-[#030712] border-b border-white/5 h-8 flex items-center shrink-0 overflow-hidden font-mono text-[10px] uppercase tracking-widest text-slate-500 shadow-sm z-50">
         <div className="flex animate-[marquee_25s_linear_infinite] whitespace-nowrap items-center">
@@ -511,7 +511,7 @@ export default async function CatalogPage({
         </div>
 
         {/* THE MATRIX (Compact Bento Grid) */}
-        <div className="mb-12 relative z-10 bg-[#f8fafc]">
+        <div className="mb-12 relative z-10">
           <div className="flex items-center justify-between mb-4 px-1">
             <h3 className="text-sm font-bold text-[#0f172a] uppercase tracking-widest flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-slate-400" /> B2B Index - High
@@ -552,12 +552,12 @@ export default async function CatalogPage({
                 <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest line-clamp-1 mb-1">
                   {item.product.category || "OEM"}
                 </span>
-                <h4 className="text-[12px] font-medium text-slate-900  leading-tight line-clamp-2 mb-3 flex-1 group-hover:text-indigo-600 :text-indigo-400 transition-colors">
+                <h4 className="text-[12px] font-medium text-[#0f172a]  leading-tight line-clamp-2 mb-3 flex-1 group-hover:text-indigo-600 :text-indigo-400 transition-colors">
                   {item.product.name}
                 </h4>
 
                 <div className="mt-auto pt-3 border-t border-slate-100  flex items-center justify-between">
-                  <div className="font-mono text-base font-bold text-slate-900 ">
+                  <div className="font-mono text-base font-bold text-[#0f172a] ">
                     {formatPrice(item.minPrice)}
                     <span className="text-[10px] text-slate-400">₺</span>
                   </div>
@@ -577,7 +577,7 @@ export default async function CatalogPage({
         {ledgerItems.length > 0 && (
           <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex items-center justify-between mb-4 px-1">
-              <h3 className="text-sm font-bold text-slate-900  uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-sm font-bold text-[#0f172a]  uppercase tracking-widest flex items-center gap-2">
                 <BarChart2 className="w-4 h-4 text-slate-400" /> Order Book
                 (Toptan Sipariş Defteri)
               </h3>
@@ -587,7 +587,7 @@ export default async function CatalogPage({
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                   <thead>
-                    <tr className="bg-slate-50  border-b border-slate-200  text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                    <tr className="bg-[#f8fafc]  border-b border-slate-200  text-[10px] uppercase tracking-widest font-bold text-slate-500">
                       <th className="px-5 py-3 w-10">Asset</th>
                       <th className="px-5 py-3">Description</th>
                       <th className="px-5 py-3">Category</th>
@@ -600,7 +600,7 @@ export default async function CatalogPage({
                     {ledgerItems.map((item: any, idx: number) => (
                       <tr
                         key={idx}
-                        className="border-b border-slate-100  last:border-0 hover:bg-slate-50 :bg-white/[0.02] transition-colors group"
+                        className="border-b border-slate-100  last:border-0 hover:bg-[#f8fafc] :bg-white/[0.02] transition-colors group"
                       >
                         <td className="px-5 py-2.5">
                           <div className="w-7 h-7 bg-slate-100  rounded flex items-center justify-center overflow-hidden">
@@ -617,7 +617,7 @@ export default async function CatalogPage({
                             )}
                           </div>
                         </td>
-                        <td className="px-5 py-2.5 text-slate-900  font-semibold truncate max-w-[250px]">
+                        <td className="px-5 py-2.5 text-[#0f172a]  font-semibold truncate max-w-[250px]">
                           {item.product.name}
                           <div className="font-mono text-[9px] text-slate-400 font-normal">
                             ID: {item.product.id.slice(0, 8)}
@@ -632,7 +632,7 @@ export default async function CatalogPage({
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                           </span>
                         </td>
-                        <td className="px-5 py-2.5 text-right font-mono font-bold text-slate-900 ">
+                        <td className="px-5 py-2.5 text-right font-mono font-bold text-[#0f172a] ">
                           {formatPrice(item.minPrice)}
                           <span className="text-[10px] text-slate-400 font-sans ml-0.5">
                             ₺
