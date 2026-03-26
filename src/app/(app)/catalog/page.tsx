@@ -362,11 +362,11 @@ export default async function CatalogPage({
           ></div>
 
           {/* Glowing Signals on Map (Sprinkled Demands) */}
-          <div className="absolute w-[95%] max-w-[1200px] h-full inset-0 mx-auto pointer-events-none z-0">
+          <div className="absolute w-[95%] max-w-[1200px] h-full inset-0 mx-auto pointer-events-none z-10">
             {[
-              // Turkey / Istanbul
+              // Turkey / Istanbul (Yukarı kaydırıldı)
               {
-                top: "35%",
+                top: "32%",
                 left: "55%",
                 color: "bg-blue-500",
                 shadow: "shadow-[0_0_15px_rgba(59,130,246,0.6)]",
@@ -375,25 +375,25 @@ export default async function CatalogPage({
               },
               // Europe / Germany
               {
-                top: "30%",
+                top: "28%",
                 left: "48%",
                 color: "bg-indigo-500",
                 shadow: "shadow-[0_0_15px_rgba(99,102,241,0.6)]",
                 delay: "1s",
                 count: "45 Talep",
               },
-              // North America / New York
+              // North America / New York (Kenara Çekildi)
               {
-                top: "45%",
-                left: "22%",
+                top: "42%",
+                left: "18%",
                 color: "bg-blue-400",
                 shadow: "shadow-[0_0_15px_rgba(96,165,250,0.6)]",
                 delay: "2s",
                 count: "310 İşlem",
               },
-              // Middle East / Dubai
+              // Middle East / Dubai (Aşağı çekildi)
               {
-                top: "52%",
+                top: "62%",
                 left: "65%",
                 color: "bg-teal-500",
                 shadow: "shadow-[0_0_15px_rgba(20,184,166,0.6)]",
@@ -402,8 +402,8 @@ export default async function CatalogPage({
               },
               // Asia / China
               {
-                top: "42%",
-                left: "80%",
+                top: "40%",
+                left: "82%",
                 color: "bg-[#94a3b8]",
                 shadow: "shadow-[0_0_15px_rgba(148,163,184,0.6)]",
                 delay: "1.5s",
@@ -411,7 +411,7 @@ export default async function CatalogPage({
               },
               // South America / Brazil
               {
-                top: "70%",
+                top: "72%",
                 left: "30%",
                 color: "bg-[#cbd5e1]",
                 shadow: "shadow-[0_0_10px_rgba(203,213,225,0.5)]",
@@ -420,7 +420,7 @@ export default async function CatalogPage({
               },
               // Africa / South Africa
               {
-                top: "65%",
+                top: "68%",
                 left: "52%",
                 color: "bg-blue-500",
                 shadow: "shadow-[0_0_15px_rgba(59,130,246,0.6)]",
@@ -429,7 +429,7 @@ export default async function CatalogPage({
               },
               // East Europe / Poland
               {
-                top: "28%",
+                top: "25%",
                 left: "58%",
                 color: "bg-[#94a3b8]",
                 shadow: "shadow-[0_0_15px_rgba(148,163,184,0.6)]",
@@ -438,8 +438,8 @@ export default async function CatalogPage({
               },
               // US West Coast
               {
-                top: "40%",
-                left: "15%",
+                top: "38%",
+                left: "10%",
                 color: "bg-indigo-400",
                 shadow: "shadow-[0_0_15px_rgba(129,140,248,0.6)]",
                 delay: "0.8s",
@@ -453,7 +453,7 @@ export default async function CatalogPage({
               >
                 {/* Yanıp Sönen Nokta */}
                 <div
-                  className="w-8 h-8 rounded-full bg-[#f1f5f9]/20 flex items-center justify-center animate-pulse relative z-10"
+                  className="w-8 h-8 rounded-full bg-blue-100/10 flex items-center justify-center animate-pulse relative z-10 border border-white/20 backdrop-blur-[1px]"
                   style={{ animationDelay: pos.delay, animationDuration: "3s" }}
                 >
                   <div
@@ -461,9 +461,9 @@ export default async function CatalogPage({
                   ></div>
                 </div>
 
-                {/* Talep Sayısı Etiketi (Noktanın hemen yanında gösterilecek) */}
-                <div className="absolute left-[80%] whitespace-nowrap ml-1 bg-white/80 backdrop-blur-[2px] px-2 py-0.5 rounded-[4px] border border-[#f1f5f9] shadow-sm flex items-center">
-                  <span className="text-[9px] font-bold text-[#0f172a] opacity-80">
+                {/* Talep Sayısı Etiketi (Şık HUD Badge) */}
+                <div className="absolute left-[70%] whitespace-nowrap ml-1 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full border border-slate-200/60 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all">
+                  <span className="text-[9px] font-extrabold font-mono tracking-wide text-slate-700">
                     {pos.count}
                   </span>
                 </div>
@@ -472,55 +472,52 @@ export default async function CatalogPage({
           </div>
 
           {/* Elegant Search Container */}
-          <div className="relative z-10 w-[95%] max-w-[550px] mt-10 mb-4 animate-in slide-in-from-bottom-5 duration-700">
-            <div className="w-full bg-white rounded-xl shadow-[0_12px_45px_-8px_rgba(0,0,0,0.06)] border border-slate-200/60 p-2 h-[4rem] flex flex-row items-center">
+          <div className="relative z-30 w-[95%] max-w-[550px] mt-12 mb-6 animate-in slide-in-from-bottom-5 duration-700">
+            <div className="w-full bg-white/90 backdrop-blur-lg rounded-[14px] shadow-[0_20px_40px_-15px_rgba(0,30,80,0.06)] border border-white/60 p-2 h-[4rem] flex flex-row items-center ring-1 ring-slate-100/50">
               {/* Keyword */}
               <div className="flex-1 flex items-center h-full px-5">
-                <Grid className="w-5 h-5 text-slate-400 mr-4 shrink-0" />
+                <Grid className="w-5 h-5 text-blue-500/70 mr-4 shrink-0" />
                 <input
                   type="text"
                   placeholder="Terminal Araması (Marka, Ürün Kodu, OEM)"
-                  className="flex-1 h-full w-full bg-transparent border-none p-0 text-[15px] font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0"
+                  className="flex-1 h-full w-full bg-transparent border-none p-0 text-[14.5px] font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0"
                 />
               </div>
 
               {/* Search Button */}
               <div className="h-full pl-3 pr-1 py-1 shrink-0">
-                <button className="h-full bg-[#3b82f6] hover:bg-[#2563eb] transition-colors text-white font-bold text-[14px] px-10 rounded-md flex items-center justify-center gap-2 shadow-[0_3px_10px_rgba(59,130,246,0.2)] active:scale-95 duration-200">
+                <button className="h-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all text-white font-bold text-[14px] px-10 rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(59,130,246,0.3)] active:scale-95 duration-200 border border-blue-400/20">
                   <Search className="w-4 h-4" /> Ara
                 </button>
               </div>
             </div>
 
-            {/* Popular Searches */}
-            <div className="flex items-center justify-start md:justify-center gap-[6px] mt-6 text-[12px] font-medium text-slate-500 select-none overflow-x-auto pb-2 px-1">
-              <span className="font-bold text-slate-600 shrink-0 mr-1">
-                Popüler Taramalar:
+            {/* Popular Searches (Pill Tags) */}
+            <div className="flex items-center justify-start md:justify-center gap-2 mt-5 text-[11px] font-medium text-slate-500 select-none overflow-x-auto pb-2 px-1">
+              <span className="font-bold text-slate-800 shrink-0 mr-1 flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-orange-500" /> Trend:
               </span>
               <a
                 href="#"
-                className="text-slate-500 hover:text-blue-600 border-b border-transparent hover:border-blue-600 transition-all shrink-0"
+                className="px-3 py-1 bg-white/60 backdrop-blur-sm border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-300 hover:text-blue-600 hover:shadow-sm transition-all shrink-0"
               >
                 Fren Balatası
               </a>
-              <span className="text-slate-300">,</span>
               <a
                 href="#"
-                className="text-slate-500 hover:text-blue-600 border-b border-transparent hover:border-blue-600 transition-all shrink-0"
+                className="px-3 py-1 bg-white/60 backdrop-blur-sm border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-300 hover:text-blue-600 hover:shadow-sm transition-all shrink-0"
               >
-                Tam Sentetik Motor Yağı
+                Motor Yağı
               </a>
-              <span className="text-slate-300">,</span>
               <a
                 href="#"
-                className="text-slate-500 hover:text-blue-600 border-b border-transparent hover:border-blue-600 transition-all shrink-0"
+                className="px-3 py-1 bg-white/60 backdrop-blur-sm border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-300 hover:text-blue-600 hover:shadow-sm transition-all shrink-0"
               >
                 Dizel Enjektör
               </a>
-              <span className="text-slate-300">,</span>
               <a
                 href="#"
-                className="text-slate-500 hover:text-blue-600 border-b border-transparent hover:border-blue-600 transition-all shrink-0"
+                className="px-3 py-1 bg-white/60 backdrop-blur-sm border border-slate-200/80 rounded-full hover:bg-white hover:border-blue-300 hover:text-blue-600 hover:shadow-sm transition-all shrink-0"
               >
                 Buji Seti
               </a>
