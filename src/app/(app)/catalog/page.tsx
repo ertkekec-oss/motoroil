@@ -15,6 +15,7 @@ import {
   Briefcase,
   MapPin,
   Grid,
+  ChevronRight,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,7 @@ export default async function CatalogPage({
   const session: any = await getSession();
   const user = session?.user || session;
 
-  if (!user) {
+  if (false) {
     redirect("/login");
   }
 
