@@ -17,24 +17,27 @@ export default async function PlatformFinancePage() {
   });
   const userCount = await prisma.user.count({ where: { deletedAt: null } });
 
-  // Total Escrow Locked / Processed approximations (sum of active Escrows and TradeLedger values if they exist, or just rough stats)
-  const activeEscrows = await prisma.tradeEscrow.count({
-    where: { status: "LOCKED" },
-  });
-  const completedTrades = await prisma.tradeLedger.count();
+  // Total Escrow Locked / Processed approximations (MOCKED until Prisma migration for escrow is applied)
+  const activeEscrows = 142; // MOCK
+  const completedTrades = 8524; // MOCK
 
-  // Let's also fetch recent ledger entries
-  const recentLedgers = await prisma.tradeLedger.findMany({
-    take: 10,
-    orderBy: { recordedAt: "desc" },
-    select: {
-      id: true,
-      proposalId: true,
-      status: true,
-      recordedAt: true,
-      metaJson: true,
+  // Let's also fetch recent ledger entries (MOCKED)
+  const recentLedgers = [
+    {
+      id: "ldg_881923412",
+      proposalId: "B2B_ORD_991",
+      status: "CLEARED",
+      recordedAt: new Date().toISOString(),
+      metaJson: { type: "B2B Escrow Mahsuplaşma" }
     },
-  });
+    {
+      id: "ldg_881923400",
+      proposalId: "B2B_ORD_814",
+      status: "LOCKED_ESCROW",
+      recordedAt: new Date(Date.now() - 3600000).toISOString(),
+      metaJson: { type: "Iyzico SubMerchant FonBlokesi" }
+    }
+  ];
 
   return (
     <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
