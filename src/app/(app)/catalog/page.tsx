@@ -417,26 +417,26 @@ export default async function CatalogPage({
         <div className="mb-12 relative z-10">
           <div className="flex items-center justify-between mb-4 px-1">
             <h3 className="text-sm font-bold text-[#0f172a] uppercase tracking-widest flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-slate-400" /> B2B Index - High
-              Liquidity
+              <TrendingUp className="w-4 h-4 text-slate-400" /> B2B Endeksi -
+              Yüksek Likidite
             </h3>
             <span className="text-[10px] font-mono text-slate-500 uppercase">
-              Live Quotes
+              Canlı Teklifler
             </span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-3 lg:gap-4 relative z-0">
-            {sixPackItems.map((item: any, idx: number) => (
+            {sixPackItems.slice(0, 10).map((item: any, idx: number) => (
               <div
                 key={idx}
-                className="bg-white  border border-slate-200  rounded-[1rem] p-4 flex flex-col hover:border-indigo-500/30 hover:shadow-[0_4px_20px_rgba(79,70,229,0.05)] transition-all group"
+                className="bg-white border border-slate-200 rounded-[1rem] p-4 flex flex-col hover:border-indigo-500/30 hover:shadow-[0_4px_20px_rgba(79,70,229,0.05)] transition-all group"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="px-2 py-0.5 bg-slate-100  rounded text-[9px] font-mono font-bold text-slate-500  border border-slate-200 ">
-                    {item.sellersCount} OFFERS
+                  <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-mono font-bold text-slate-500 border border-slate-200">
+                    {item.sellersCount} TEKLİF
                   </span>
                   <span className="text-[10px] text-slate-400">
-                    {formatSmallInt(item.availableQty)} qty
+                    {formatSmallInt(item.availableQty)} Adet
                   </span>
                 </div>
 
@@ -445,34 +445,82 @@ export default async function CatalogPage({
                     <img
                       src={getImg(item)}
                       alt=""
-                      className="w-full h-full object-contain p-2 mix-blend-multiply  filter contrast-110 group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain p-2 mix-blend-multiply filter contrast-110 group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
-                    <ImageIcon className="w-8 h-8 text-slate-200 " />
+                    <ImageIcon className="w-8 h-8 text-slate-200" />
                   )}
                 </div>
 
                 <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest line-clamp-1 mb-1">
                   {item.product.category || "OEM"}
                 </span>
-                <h4 className="text-[12px] font-medium text-[#0f172a]  leading-tight line-clamp-2 mb-3 flex-1 group-hover:text-indigo-600 :text-indigo-400 transition-colors">
+                <h4 className="text-[12px] font-medium text-[#0f172a] leading-tight line-clamp-2 mb-3 flex-1 group-hover:text-indigo-600 transition-colors">
                   {item.product.name}
                 </h4>
 
-                <div className="mt-auto pt-3 border-t border-slate-100  flex items-center justify-between">
-                  <div className="font-mono text-base font-bold text-[#0f172a] ">
+                <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div className="font-mono text-base font-bold text-[#0f172a]">
                     {formatPrice(item.minPrice)}
                     <span className="text-[10px] text-slate-400">₺</span>
                   </div>
                   <Link
                     href={`/catalog/${item.product.id}`}
-                    className="w-7 h-7 rounded-md bg-slate-100  hover:bg-indigo-600 hover:text-white text-slate-600  flex items-center justify-center transition-colors"
+                    className="w-7 h-7 rounded-md bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-600 flex items-center justify-center transition-colors"
                   >
                     <ChevronRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>
             ))}
+
+            {/* EN ÇOK SATANLAR VİTRİNİ (Col span 2) */}
+            {sixPackItems.length > 10 && (
+              <div className="col-span-2 md:col-span-4 lg:col-span-2 2xl:col-span-2 bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 rounded-[1rem] p-4 flex flex-col relative overflow-hidden group hover:shadow-[0_10px_30px_rgba(79,70,229,0.2)] transition-all">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full translate-x-10 -translate-y-10 group-hover:bg-blue-400/30 transition-colors duration-700"></div>
+                <div className="flex items-center justify-between mb-3 relative z-10">
+                  <span className="px-2.5 py-1 bg-orange-500/10 rounded-full text-[10px] font-black text-orange-400 border border-orange-500/20 flex items-center gap-1.5 uppercase tracking-widest animate-pulse">
+                    <TrendingUp className="w-3 h-3" /> LİDER VİTRİN
+                  </span>
+                  <span className="text-[9px] text-indigo-300 font-mono opacity-60">
+                    ID: {sixPackItems[10]?.product.id.slice(0, 6)}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-4 flex-1 relative z-10 w-full">
+                  <div className="w-20 h-20 bg-white/10 rounded-xl flex items-center justify-center p-2 backdrop-blur-md border border-white/5 shrink-0 group-hover:scale-105 transition-transform duration-500">
+                    {getImg(sixPackItems[10]) ? (
+                      <img
+                        src={getImg(sixPackItems[10])}
+                        alt=""
+                        className="w-full h-full object-contain filter drop-shadow-lg"
+                      />
+                    ) : (
+                      <ImageIcon className="w-6 h-6 text-white/20" />
+                    )}
+                  </div>
+                  <div className="flex flex-col h-full py-1 flex-1 min-w-0">
+                    <span className="text-[9px] font-bold text-blue-400 uppercase tracking-widest mb-1 truncate">
+                      {sixPackItems[10]?.product.category || "EN ÇOK SATAN"}
+                    </span>
+                    <h4 className="text-[13px] font-bold text-white leading-tight line-clamp-2 mb-2 group-hover:text-blue-300 transition-colors">
+                      {sixPackItems[10]?.product.name}
+                    </h4>
+                    <div className="mt-auto flex items-end justify-between w-full gap-2">
+                      <div className="font-mono text-[15px] font-black text-emerald-400">
+                        {formatPrice(sixPackItems[10]?.minPrice)}₺
+                      </div>
+                      <Link
+                        href={`/catalog/${sixPackItems[10]?.product.id}`}
+                        className="px-4 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-[11px] font-bold shadow-lg transition-colors whitespace-nowrap"
+                      >
+                        İNCELE
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -480,54 +528,54 @@ export default async function CatalogPage({
         {ledgerItems.length > 0 && (
           <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex items-center justify-between mb-4 px-1">
-              <h3 className="text-sm font-bold text-[#0f172a]  uppercase tracking-widest flex items-center gap-2">
-                <BarChart2 className="w-4 h-4 text-slate-400" /> Order Book
-                (Toptan Sipariş Defteri)
+              <h3 className="text-sm font-bold text-[#0f172a] uppercase tracking-widest flex items-center gap-2">
+                <BarChart2 className="w-4 h-4 text-slate-400" /> Toptan Sipariş
+                Defteri
               </h3>
             </div>
 
-            <div className="bg-white  border border-slate-200  rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
               <div className="w-full overflow-x-auto">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                   <thead>
-                    <tr className="bg-[#f8fafc]  border-b border-slate-200  text-[10px] uppercase tracking-widest font-bold text-slate-500">
-                      <th className="px-5 py-3 w-10">Asset</th>
-                      <th className="px-5 py-3">Description</th>
-                      <th className="px-5 py-3">Category</th>
-                      <th className="px-5 py-3 text-right">Supply</th>
-                      <th className="px-5 py-3 text-right">Floor Price</th>
-                      <th className="px-5 py-3 w-20 text-center">Action</th>
+                    <tr className="bg-[#f8fafc] border-b border-slate-200 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                      <th className="px-5 py-3 w-10">Varlık</th>
+                      <th className="px-5 py-3">Açıklama</th>
+                      <th className="px-5 py-3">Kategori</th>
+                      <th className="px-5 py-3 text-right">Arz</th>
+                      <th className="px-5 py-3 text-right">Taban Fiyat</th>
+                      <th className="px-5 py-3 w-20 text-center">İşlem</th>
                     </tr>
                   </thead>
-                  <tbody className="text-[13px] font-medium text-slate-700 ">
+                  <tbody className="text-[13px] font-medium text-slate-700">
                     {ledgerItems.map((item: any, idx: number) => (
                       <tr
                         key={idx}
-                        className="border-b border-slate-100  last:border-0 hover:bg-[#f8fafc] :bg-white/[0.02] transition-colors group"
+                        className="border-b border-slate-100 last:border-0 hover:bg-[#f8fafc] transition-colors group"
                       >
                         <td className="px-5 py-2.5">
-                          <div className="w-7 h-7 bg-slate-100  rounded flex items-center justify-center overflow-hidden">
+                          <div className="w-7 h-7 bg-slate-100 rounded flex items-center justify-center overflow-hidden">
                             {getImg(item) ? (
                               <img
                                 src={getImg(item)}
                                 alt=""
-                                className="w-full h-full object-cover mix-blend-multiply  opacity-70 group-hover:opacity-100 transition-opacity"
+                                className="w-full h-full object-cover mix-blend-multiply opacity-70 group-hover:opacity-100 transition-opacity"
                               />
                             ) : (
-                              <span className="text-slate-400  block text-[10px]">
+                              <span className="text-slate-400 block text-[10px]">
                                 #
                               </span>
                             )}
                           </div>
                         </td>
-                        <td className="px-5 py-2.5 text-[#0f172a]  font-semibold truncate max-w-[250px]">
+                        <td className="px-5 py-2.5 text-[#0f172a] font-semibold truncate max-w-[250px]">
                           {item.product.name}
                           <div className="font-mono text-[9px] text-slate-400 font-normal">
                             ID: {item.product.id.slice(0, 8)}
                           </div>
                         </td>
                         <td className="px-5 py-2.5 text-[11px] text-slate-500">
-                          {item.product.category || "N/A"}
+                          {item.product.category || "Yok"}
                         </td>
                         <td className="px-5 py-2.5 text-right">
                           <span className="inline-flex items-center gap-1.5 font-mono text-xs">
@@ -535,7 +583,7 @@ export default async function CatalogPage({
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                           </span>
                         </td>
-                        <td className="px-5 py-2.5 text-right font-mono font-bold text-[#0f172a] ">
+                        <td className="px-5 py-2.5 text-right font-mono font-bold text-[#0f172a]">
                           {formatPrice(item.minPrice)}
                           <span className="text-[10px] text-slate-400 font-sans ml-0.5">
                             ₺
@@ -544,9 +592,9 @@ export default async function CatalogPage({
                         <td className="px-5 py-2.5 text-center">
                           <Link
                             href={`/catalog/${item.product.id}`}
-                            className="text-[10px] font-bold text-indigo-600  hover:text-indigo-700 :text-indigo-300 uppercase tracking-widest border border-indigo-200  bg-indigo-50  px-3 py-1.5 rounded hover:bg-indigo-100 :bg-indigo-500/20 transition-colors inline-block"
+                            className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 uppercase tracking-widest border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded hover:bg-indigo-100 transition-colors inline-block"
                           >
-                            View
+                            İncele
                           </Link>
                         </td>
                       </tr>
