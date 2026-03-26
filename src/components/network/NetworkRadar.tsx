@@ -44,19 +44,19 @@ export default function NetworkRadar() {
   }, []);
 
   return (
-    <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden flex items-center justify-center">
       {/* CUSTOM TURKEY DATA MAP (User Provided) 
           Invert(1) turns the black background to white so it blends seamlessly into the light UI.
           Hue-rotate(180deg) brings the inverted cyan color back to its original stunning copper/red!
-          Mix-blend-multiply ensures the pure white (#fff) background becomes totally transparent.
+          Mix-blend-darken ensures the pure white (#fff) background becomes totally transparent over #f8fafc.
       */}
-      <div className="absolute inset-0 z-0 opacity-[0.85] mix-blend-multiply pointer-events-none transition-all duration-1000 flex items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
         <div
-          className="w-[105%] md:w-[85%] h-full bg-center bg-no-repeat bg-contain"
+          className="w-[130%] h-[130%] md:w-[110%] md:h-[110%] bg-center bg-no-repeat bg-contain scale-110 transition-all duration-1000 opacity-90"
           style={{
             backgroundImage: "url('/custom-turkey-map.jpg')",
-            filter:
-              "invert(1) hue-rotate(180deg) contrast(1.1) brightness(1.2)",
+            filter: "invert(1) hue-rotate(180deg) contrast(2) brightness(1.3)",
+            mixBlendMode: "multiply",
           }}
         ></div>
       </div>
