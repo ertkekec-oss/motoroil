@@ -47,7 +47,7 @@ export default function HubFinanceTabs() {
   ];
 
   return (
-    <div className="flex items-center gap-6 border-b border-slate-200 dark:border-white/10 mb-8 px-2 overflow-x-auto custom-scrollbar">
+    <div className="flex items-center gap-6 border-b border-slate-200  mb-8 px-2 overflow-x-auto custom-scrollbar">
       {tabs.map((tab) => {
         const isActive =
           pathname === tab.href ||
@@ -62,8 +62,8 @@ export default function HubFinanceTabs() {
             href={tab.href}
             className={`flex items-center gap-2 pb-3 pt-1 font-semibold text-[13px] whitespace-nowrap transition-colors relative ${
               isActive
-                ? "text-indigo-600 dark:text-indigo-400"
-                : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-300"
+                ? "text-indigo-600 "
+                : "text-slate-500 hover:text-slate-900 :text-slate-300"
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -71,7 +71,7 @@ export default function HubFinanceTabs() {
 
             {/* Active Indicator */}
             {isActive && (
-              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-indigo-600 dark:bg-indigo-400 rounded-t-full" />
+              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-indigo-600  rounded-t-full" />
             )}
           </Link>
         );

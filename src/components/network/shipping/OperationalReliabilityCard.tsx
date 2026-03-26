@@ -62,14 +62,14 @@ export function OperationalReliabilityCard() {
 
         <div className="grid grid-cols-2 gap-4">
           {score.explanation.keyMetrics?.map((m, i) => (
-            <div key={i} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
+            <div key={i} className="bg-gray-50  p-3 rounded-md">
               <p className="text-xs text-gray-500">{m.label}</p>
               <p className="text-lg font-semibold">{m.value}</p>
             </div>
           ))}
         </div>
 
-        <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 p-3 rounded-md text-sm leading-relaxed">
+        <div className="bg-blue-50  text-blue-700  p-3 rounded-md text-sm leading-relaxed">
           <strong>Öneri:</strong> {score.explanation.recommendation}
         </div>
 
