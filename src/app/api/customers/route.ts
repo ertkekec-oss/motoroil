@@ -46,6 +46,12 @@ export async function GET(request: Request) {
             ];
         }
 
+        // Apply Category Filter Explicitly
+        const categoryIdParam = url.searchParams.get('categoryId');
+        if (categoryIdParam) {
+            where.categoryId = categoryIdParam;
+        }
+
         // Apply Category Isolation if staff has assignments
         if (isStaff && assignedCategoryIds.length > 0) {
             where.categoryId = { in: assignedCategoryIds };

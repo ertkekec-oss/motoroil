@@ -49,6 +49,44 @@ export default function AdminRoutesPage() {
         } catch (e) { console.error(e); }
     };
 
+    const handleAddByCategory = async (categoryId: string) => {
+        if (!categoryId) return;
+        setIsProcessing(true);
+        try {
+            const res = await fetch(`/api/customers?categoryId=${categoryId}`);
+            if (res.ok) {
+                const data = await res.json();
+                const customersToAdd = data.customers || [];
+                if (customersToAdd.length === 0) {
+                    showError('Bilgi', 'Bu kategoriye ait müşteri bulunmamaktadır.');
+                    return;
+                }
+                
+                // Merge without duplicates
+                const newSelection = [...selectedCustomers];
+                let addedCount = 0;
+                customersToAdd.forEach((c: any) => {
+                    if (!newSelection.find(sc => sc.id === c.id)) {
+                        newSelection.push(c);
+                        addedCount++;
+                    }
+                });
+                
+                if (addedCount > 0) {
+                    setSelectedCustomers(newSelection);
+                    showSuccess('Başarılı', `${addedCount} müşteri şablona eklendi.`);
+                } else {
+                    showError('Bilgi', 'Kategorideki tüm müşteriler zaten şablonda mevcut.');
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            showError('Hata', 'Kategori müşterileri getirilirken hata oluştu.');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const handleCreateTemplate = async () => {
         if (!newTemplateName || selectedCustomers.length === 0) {
             showError('Hata', 'Şablon adı girin ve en az bir müşteri seçin.');
@@ -138,6 +176,8 @@ export default function AdminRoutesPage() {
         );
     };
 
+    const [customerCategories, setCustomerCategories] = useState<any[]>([]);
+
     useEffect(() => {
         if (!isLoading && !isAuthenticated) { router.push('/login'); return; }
         fetchData();
@@ -145,11 +185,12 @@ export default function AdminRoutesPage() {
 
     const fetchData = async () => {
         try {
-            const [routesRes, staffRes, templatesRes, campaignsRes] = await Promise.all([
+            const [routesRes, staffRes, templatesRes, campaignsRes, categoriesRes] = await Promise.all([
                 fetch('/api/field-sales/routes'),
                 fetch('/api/staff'),
                 fetch('/api/field-sales/templates'),
                 fetch('/api/campaigns'),
+                fetch('/api/customers/categories')
             ]);
 
             if (routesRes.ok) setRoutes(await routesRes.json());
@@ -163,6 +204,10 @@ export default function AdminRoutesPage() {
                 const camps = Array.isArray(data) ? data : (data.campaigns || []);
                 const now = new Date();
                 setActiveCampaigns(camps.filter((c: any) => c.isActive && (!c.endDate || new Date(c.endDate) >= now)));
+            }
+            if (categoriesRes.ok) {
+                const data = await categoriesRes.json();
+                setCustomerCategories(data.data || []);
             }
         } catch (error) {
             console.error('Error fetching data', error);
@@ -675,7 +720,36 @@ export default function AdminRoutesPage() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <label className={`block text-[11px] font-bold uppercase tracking-wide ml-1 ${textMuted}`}>Müşteri Ara & Ekle</label>
+                                        <label className={`block text-[11px] font-bold uppercase tracking-wide ml-1 ${textMuted}`}>Kategoriden Toplu Ekle</label>
+                                        <div className="flex gap-2">
+                                            <select
+                                                id="category-add-select"
+                                                className={`flex-1 h-[48px] px-4 rounded-[12px] border text-[13px] font-medium transition-all outline-none shadow-sm appearance-none ${isLight ? 'bg-white border-slate-200 focus:border-blue-500 text-slate-800' : 'bg-[#0f172a] border-white/10 focus:border-blue-500/50 text-slate-200'}`}
+                                            >
+                                                <option value="">Bir kategori seçin...</option>
+                                                {customerCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                            </select>
+                                            <button 
+                                                onClick={() => {
+                                                    const selectEl = document.getElementById('category-add-select') as HTMLSelectElement;
+                                                    if(selectEl && selectEl.value) {
+                                                        handleAddByCategory(selectEl.value);
+                                                        selectEl.value = "";
+                                                    }
+                                                }}
+                                                disabled={isProcessing}
+                                                className={`h-[48px] px-5 rounded-[12px] text-[13px] font-bold transition-all flex items-center shrink-0 disabled:opacity-50 ${isLight ? 'bg-slate-800 text-white hover:bg-slate-900' : 'bg-slate-700 text-white hover:bg-slate-600'}`}
+                                            >
+                                                Şablona Ekle
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className={`block text-[11px] font-bold uppercase tracking-wide ml-1 flex items-center justify-between ${textMuted}`}>
+                                            <span>Müşteri Ara & Ekle</span>
+                                            <span className="text-[9px] font-semibold opacity-60">veya tek tek ekle</span>
+                                        </label>
                                         <div className="relative">
                                             <input
                                                 type="text"
