@@ -128,7 +128,7 @@ export async function POST(request: Request) {
             if (!isAccountTransaction && supplierId && type === 'Payment') {
                 await tx.supplier.update({
                     where: { id: String(supplierId) },
-                    data: { balance: { decrement: amount } }
+                    data: { balance: { increment: amount } }
                 });
             }
 
@@ -323,11 +323,10 @@ export async function DELETE(request: Request) {
                 }
             }
 
-            // 3. Reverse Supplier
             if (oldTransaction.supplierId && oldTransaction.type === 'Payment') {
                 await tx.supplier.update({
                     where: { id: oldTransaction.supplierId },
-                    data: { balance: { increment: amount } }
+                    data: { balance: { decrement: amount } }
                 });
             }
 

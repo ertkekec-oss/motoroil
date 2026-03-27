@@ -121,7 +121,7 @@ export default function ReconciliationWizard({
                 {/* Header */}
                 <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', background: 'var(--bg-panel, rgba(255,255,255,0.02))' }}>
                     <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-main, white)' }}>
-                        B2B Kari Mutabakat Sihirbazı
+                        B2B Cari Mutabakatı
                     </h2>
                     <div style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', marginTop: '4px' }}>
                         {customer.name} ({customer.taxNumber || 'V.N Yok'})

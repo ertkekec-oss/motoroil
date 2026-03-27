@@ -12,7 +12,8 @@ export async function createReconciliation(params: {
         where: {
             customerId: params.accountId,
             date: { gte: params.periodStart, lte: params.periodEnd },
-            companyId: params.tenantId
+            companyId: params.tenantId,
+            deletedAt: null
         },
         orderBy: { date: 'asc' }
     });
@@ -21,8 +22,11 @@ export async function createReconciliation(params: {
     let totalCredit = 0;
 
     const items = transactions.map(tx => {
-        const debit = tx.type === 'ALACAK' ? Number(tx.amount) : 0; // In Turkish accounting for customers: Alacak increases customer balance (our receivable)
-        const credit = tx.type === 'BORÇ' ? Number(tx.amount) : 0;   // Borç decreases balance (payment received)
+        const debitTypes = ['Sales', 'Invoice', 'Adjustment', 'ALACAK'];
+        const creditTypes = ['Tahsilat', 'Payment', 'Refund', 'BORÇ'];
+        
+        const debit = debitTypes.includes(tx.type) ? Number(tx.amount) : 0; 
+        const credit = creditTypes.includes(tx.type) ? Number(tx.amount) : 0;
 
         totalDebit += debit;
         totalCredit += credit;

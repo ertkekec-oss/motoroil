@@ -28,10 +28,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
                 });
             }
             if (check.type === 'Out' && check.supplierId) {
-                // We debited supplier (decreased balance). Now increase it back.
+                // We debited supplier (decreased debt by incrementing balance). Now decrease it back.
                 await prisma.supplier.update({
                     where: { id: check.supplierId },
-                    data: { balance: { increment: check.amount } }
+                    data: { balance: { decrement: check.amount } }
                 });
             }
         }

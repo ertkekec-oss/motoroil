@@ -2100,7 +2100,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {
                 invoiceModalOpen && selectedOrder && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <EnterpriseCard className="w-[1200px] max-w-[98vw] flex flex-col h-[90vh] overflow-hidden !p-0 shadow-2xl">
+                        <div className="w-[1200px] max-w-[98vw] flex flex-col h-[90vh] overflow-hidden bg-white dark:bg-[#080a0f] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl">
                             {/* Header */}
                             <div className="px-6 pt-4 pb-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
                                 <div className="flex items-center gap-3">
@@ -2642,7 +2642,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     )}
                                 </EnterpriseButton>
                             </div>
-                        </EnterpriseCard>
+                        </div>
                     </div>
                 )
             }

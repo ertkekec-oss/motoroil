@@ -16,8 +16,8 @@ export async function createReconAction(data: {
         const recon = await createReconciliation({
             tenantId: data.tenantId,
             accountId: data.accountId,
-            periodStart: new Date(data.periodStart),
-            periodEnd: new Date(data.periodEnd)
+            periodStart: new Date(`${data.periodStart}T00:00:00.000Z`),
+            periodEnd: new Date(`${data.periodEnd}T23:59:59.999Z`)
         });
 
         // Add audit log

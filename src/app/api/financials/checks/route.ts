@@ -153,7 +153,7 @@ export async function POST(req: Request) {
             if (isOutgoing && supplierId) {
                 await tx.supplier.update({
                     where: { id: supplierId },
-                    data: { balance: { decrement: amt } }
+                    data: { balance: { increment: amt } }
                 });
 
                 // 2. Create Transaction
