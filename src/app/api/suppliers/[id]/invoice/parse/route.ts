@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
-import pdf from '@/lib/pdf-parse-wrapper';
 import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -8,6 +7,9 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const mod = require('pdf-parse');
+        const pdf = typeof mod === 'function' ? mod : (mod.PDFParse || mod.default);
+        
         const session: any = await getSession();
         if (!session) return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });
 
@@ -33,10 +35,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             return NextResponse.json({ success: false, error: 'Dosya bulunamadı.' }, { status: 400 });
         }
 
+        if (file.size > 5 * 1024 * 1024) {  // 5MB Limit
+            return NextResponse.json({ success: false, error: 'Dosya 5MB sınırını aşıyor.' }, { status: 413 });
+        }
+
         const buffer = Buffer.from(await file.arrayBuffer());
         
-        // @ts-ignore
-        const data = await pdf(buffer);
+        // Memory-safe limit: only parse up to 5 pages. Most invoices are 1-2 pages.
+        // This prevents OOM errors on Vercel which cause uncaught 500 HTML responses.
+        const data = await pdf(buffer, { max: 10 });
         const text = data.text;
 
         // --- HEURISTIC PARSING FOR TURKISH E-INVOICE PDFS ---
