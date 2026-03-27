@@ -734,7 +734,6 @@ export default function AdminRoutesPage() {
                                                     const selectEl = document.getElementById('category-add-select') as HTMLSelectElement;
                                                     if(selectEl && selectEl.value) {
                                                         handleAddByCategory(selectEl.value);
-                                                        selectEl.value = "";
                                                     }
                                                 }}
                                                 disabled={isProcessing}

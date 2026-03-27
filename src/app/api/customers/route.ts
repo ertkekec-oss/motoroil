@@ -46,10 +46,37 @@ export async function GET(request: Request) {
             ];
         }
 
-        // Apply Category Filter Explicitly
+        // Apply Category Filter Explicitly (Smart Map string vs UUID)
         const categoryIdParam = url.searchParams.get('categoryId');
         if (categoryIdParam) {
-            where.categoryId = categoryIdParam;
+            try {
+                const cat = await prisma.customerCategory.findUnique({ where: { id: categoryIdParam } });
+                if (cat) {
+                    const catCondition = {
+                        OR: [
+                            { categoryId: categoryIdParam },
+                            { customerClass: { equals: cat.name, mode: 'insensitive' } },
+                            { supplierClass: { equals: cat.name, mode: 'insensitive' } }
+                        ]
+                    };
+                    if (where.AND) {
+                        where.AND.push(catCondition);
+                    } else {
+                        where.AND = [catCondition];
+                    }
+                } else {
+                    where.categoryId = categoryIdParam;
+                }
+            } catch (e) {
+                // Not a valid UUID or DB error
+                where.customerClass = categoryIdParam;
+            }
+        }
+
+        // Apply Customer Class Filter
+        const customerClassParam = url.searchParams.get('customerClass');
+        if (customerClassParam) {
+            where.customerClass = customerClassParam;
         }
 
         // Apply Category Isolation if staff has assignments
