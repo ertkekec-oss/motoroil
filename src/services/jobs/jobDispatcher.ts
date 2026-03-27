@@ -1,6 +1,4 @@
 import { PrismaClient, SystemJobStatus } from '@prisma/client';
-import { JobRegistry } from './jobRegistry';
-
 const prisma = new PrismaClient();
 
 export class JobDispatcher {
@@ -12,6 +10,7 @@ export class JobDispatcher {
         idempotencyKey?: string,
         priority?: 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL'
     }) {
+        const { JobRegistry } = await import('./jobRegistry');
         const def = JobRegistry.getJobDefinition(input.jobType);
         if (!def) throw new Error(`JOB_HANDLER_NOT_REGISTERED: ${input.jobType}`);
 
@@ -49,6 +48,7 @@ export class JobDispatcher {
         tenantId?: string,
         idempotencyKey?: string
     }) {
+        const { JobRegistry } = await import('./jobRegistry');
         const def = JobRegistry.getJobDefinition(input.jobType);
         if (!def || !def.supportsScheduling) throw new Error(`Scheduling not supported for ${input.jobType}`);
 
