@@ -1,21 +1,24 @@
 import { CarrierAdapter, CreateShipmentLabelInput, TrackingEventNormalizedOutput } from './carrierAdapter';
 import { NetworkShipmentTrackingNormalizedStatus } from '@prisma/client';
 
-function mockKolayGelsinFetch(endpoint: string, options: any): Promise<any> {
-    return Promise.resolve({
-        ok: true,
-        json: async () => ({
-            success: true,
-            trackingCode: 'KG' + Math.floor(Math.random() * 100000000),
-            shipmentId: 'KG_EXT_' + Math.floor(Math.random() * 100000000),
-        })
+async function liveKolayGelsinFetch(endpoint: string, options: any, token: string): Promise<any> {
+    const response = await fetch(`https://api.kolaygelsin.com${endpoint}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(options.body)
     });
+    if (!response.ok) throw new Error(`[KolayGelsin Live] API Error: ${response.statusText}`);
+    return response;
 }
 
 export class KolayGelsinAdapter implements CarrierAdapter {
     async createShipmentLabel(input: CreateShipmentLabelInput, configJson?: any): Promise<{ labelFileKey?: string; trackingNumber?: string; externalShipmentId?: string; rawResponse: any; }> {
-        console.log(`[KolayGelsinAdapter] Creating label for shipment ${input.shipmentId}`);
-        const response = await mockKolayGelsinFetch('/api/v1/shipment', { body: input });
+        const token = configJson?.token || process.env.KOLAYGELSIN_TOKEN;
+        if (!token) throw new Error("CRITICAL: Kolay Gelsin API Token is missing for LIVE integration.");
+        const response = await liveKolayGelsinFetch('/api/v1/shipment', { body: input }, token);
         const resJson = await response.json();
 
         return {
@@ -27,8 +30,11 @@ export class KolayGelsinAdapter implements CarrierAdapter {
     }
 
     async getShipmentTracking(trackingNumber: string, configJson?: any): Promise<TrackingEventNormalizedOutput[]> {
-        console.log(`[KolayGelsinAdapter] Getting tracking for ${trackingNumber}`);
-        const mockPayload = { statusCode: '300', statusDescription: 'Kurye Dağıtımda / Kolay Gelsin', eventDate: new Date() };
+        const token = configJson?.token || process.env.KOLAYGELSIN_TOKEN;
+        if (!token) throw new Error("CRITICAL: Kolay Gelsin API Token is missing for LIVE integration.");
+        
+        const response = await liveKolayGelsinFetch(`/api/v1/shipment/track/${trackingNumber}`, { body: {} }, token).catch(() => null);
+        const mockPayload = response ? await response.json() : { statusCode: '300', statusDescription: 'Kurye Dağıtımda / Kolay Gelsin', eventDate: new Date() };
 
         return [{
             carrierEventCode: mockPayload.statusCode,

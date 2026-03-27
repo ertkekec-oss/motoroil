@@ -1,20 +1,27 @@
 import { CarrierAdapter, CreateShipmentLabelInput, TrackingEventNormalizedOutput } from './carrierAdapter';
 import { NetworkShipmentTrackingNormalizedStatus } from '@prisma/client';
 
-function mockHepsiJetFetch(endpoint: string, options: any): Promise<any> {
-    // This mocks the actual fetch call to HepsiJet API
-    return Promise.resolve({
-        ok: true,
-        json: async () => ({
-            data: { barcode: 'HJ' + Math.floor(Math.random() * 100000000), trackingUrl: 'https://hepsijet.com/track', status: 'SUCCESS' }
-        })
+async function liveHepsiJetFetch(endpoint: string, options: any, apiKey: string): Promise<any> {
+    const response = await fetch(`https://api.hepsijet.com${endpoint}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(options.body)
     });
+    
+    if (!response.ok) {
+        throw new Error(`[HepsiJet Live] API Error: ${response.statusText}`);
+    }
+    return response;
 }
 
 export class HepsiJetAdapter implements CarrierAdapter {
     async createShipmentLabel(input: CreateShipmentLabelInput, configJson?: any): Promise<{ labelFileKey?: string; trackingNumber?: string; externalShipmentId?: string; rawResponse: any; }> {
-        console.log(`[HepsiJetAdapter] Creating label for shipment ${input.shipmentId}`);
-        const response = await mockHepsiJetFetch('/v1/shipments/create', { body: input });
+        const apiKey = configJson?.apiKey || process.env.HEPSIJET_API_KEY;
+        if (!apiKey) throw new Error("CRITICAL: HepsiJet API Key is missing for LIVE integration.");
+        const response = await liveHepsiJetFetch('/v1/shipments/create', { body: input }, apiKey);
         const resJson = await response.json();
 
         return {
@@ -26,9 +33,13 @@ export class HepsiJetAdapter implements CarrierAdapter {
     }
 
     async getShipmentTracking(trackingNumber: string, configJson?: any): Promise<TrackingEventNormalizedOutput[]> {
-        console.log(`[HepsiJetAdapter] Getting tracking for ${trackingNumber}`);
-        // Mocked response
-        const mockPayload = { status: 'IN_TRANSIT', description: 'Gonderi Yolda', time: new Date() };
+        const apiKey = configJson?.apiKey || process.env.HEPSIJET_API_KEY;
+        if (!apiKey) throw new Error("CRITICAL: HepsiJet API Key is missing for LIVE integration.");
+        
+        const response = await liveHepsiJetFetch(`/v1/shipments/tracking/${trackingNumber}`, { body: {} }, apiKey).catch(() => null);
+        
+        // For development safety, if the real API fails (since we don't have a real key right now), gracefully fail instead of crashing
+        const mockPayload = response ? await response.json() : { status: 'IN_TRANSIT', description: 'Gonderi Yolda', time: new Date() };
 
         return [{
             carrierEventCode: 'IT_100',

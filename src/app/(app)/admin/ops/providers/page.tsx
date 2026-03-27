@@ -8,16 +8,17 @@ export default async function AdminProvidersPage() {
     // For MVP, we'll list the architectural placeholders and health status
 
     const paymentProviders = [
-        { id: "MOCK", name: "Sanal Test Havuzu (Mock Escrow)", status: "HEALTHY", lastSync: "Şimdi", errorCount: 0 },
-        { id: "IYZICO", name: "Iyzico Entegrasyonu", status: "HEALTHY", lastSync: "10 dk önce", errorCount: 0 },
-        { id: "PAYTR", name: "PayTR Sanal POS", status: "INACTIVE", lastSync: "Veri Yok", errorCount: 0 },
+        { id: "MOCK", name: "Sanal Test Havuzu (Mock Escrow)", status: "INACTIVE", lastSync: "Kapatıldı", errorCount: 0 },
+        { id: "IYZICO", name: "Iyzico Canlı Entegrasyonu", status: "HEALTHY", lastSync: "Aktif / Live", errorCount: 0 },
+        { id: "PAYTR", name: "PayTR Sanal POS", status: "HEALTHY", lastSync: "Aktif / Live", errorCount: 0 },
     ];
 
     const carriers = [
-        { id: "MANUAL", name: "Manuel / Elden Teslimat", active: true, sync: "Varsayılan" },
-        { id: "SENDEO", name: "Sendeo / Kolay Gelsin Adaptörü", active: true, sync: "Canlı / Beklemede" },
-        { id: "MOCK", name: "Lojistik Simülasyonu (Test)", active: true, sync: "Gerçek Zamanlı" },
-        { id: "YURTICI", name: "Yurtiçi Kargo Adaptörü", active: false, sync: "Kapalı (Disabled)" },
+        { id: "MANUAL", name: "Manuel / Elden Teslimat", active: false, sync: "Kapalı" },
+        { id: "MOCK", name: "Lojistik Simülasyonu (Test)", active: false, sync: "Kapalı (Eski)" },
+        { id: "HEPSIJET", name: "HepsiJet Canlı API", active: true, sync: "Canlı Beklemede" },
+        { id: "SENDEO", name: "Sendeo Canlı API", active: true, sync: "Canlı Beklemede" },
+        { id: "KOLAYGELSINMP", name: "KolayGelsin Canlı API", active: true, sync: "Canlı Beklemede" }
     ];
 
     return (

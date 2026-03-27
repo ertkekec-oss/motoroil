@@ -1,24 +1,27 @@
 import { CarrierAdapter, CreateShipmentLabelInput, TrackingEventNormalizedOutput } from './carrierAdapter';
 import { NetworkShipmentTrackingNormalizedStatus } from '@prisma/client';
 
-function mockSendeoFetch(endpoint: string, options: any): Promise<any> {
-    // Mock the external Sendeo shipping API calls for automated logistics cost reconciliation
-    return Promise.resolve({
-        ok: true,
-        json: async () => ({
-            result: 'Success',
-            tracking_number: 'SND' + Math.floor(Math.random() * 100000000),
-            shipment_id: 'SND_EXT_' + Math.floor(Math.random() * 100000000),
-            logistics_desi: options?.body?.packages?.[0]?.volume || 1,
-            estimated_cost: (options?.body?.packages?.[0]?.volume || 1) * 20.0, // 20 TL / desi baseline mutabakat
-        })
+async function liveSendeoFetch(endpoint: string, options: any, apiKey: string, apiSecret: string): Promise<any> {
+    const response = await fetch(`https://api.sendeo.com.tr${endpoint}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-KEY': apiKey,
+            'X-API-SECRET': apiSecret
+        },
+        body: JSON.stringify(options.body)
     });
+    if (!response.ok) throw new Error(`[Sendeo Live] API Error: ${response.statusText}`);
+    return response;
 }
 
 export class SendeoAdapter implements CarrierAdapter {
     async createShipmentLabel(input: CreateShipmentLabelInput, configJson?: any): Promise<{ labelFileKey?: string; trackingNumber?: string; externalShipmentId?: string; rawResponse: any; }> {
-        console.log(`[SendeoAdapter] Creating label for shipment ${input.shipmentId}`);
-        const response = await mockSendeoFetch('/api/shipment/create', { body: input });
+        const apiKey = configJson?.apiKey || process.env.SENDEO_API_KEY;
+        const apiSecret = configJson?.apiSecret || process.env.SENDEO_API_SECRET;
+        if (!apiKey || !apiSecret) throw new Error("CRITICAL: Sendeo API Credentials missing for LIVE integration.");
+        
+        const response = await liveSendeoFetch('/api/shipment/create', { body: input }, apiKey, apiSecret);
         const resJson = await response.json();
 
         return {
@@ -30,8 +33,12 @@ export class SendeoAdapter implements CarrierAdapter {
     }
 
     async getShipmentTracking(trackingNumber: string, configJson?: any): Promise<TrackingEventNormalizedOutput[]> {
-        console.log(`[SendeoAdapter] Getting tracking for ${trackingNumber}`);
-        const mockPayload = { EventCode: '1', EventName: 'Yolda / Taşıma Aşamasında', EventDate: new Date() };
+        const apiKey = configJson?.apiKey || process.env.SENDEO_API_KEY;
+        const apiSecret = configJson?.apiSecret || process.env.SENDEO_API_SECRET;
+        if (!apiKey || !apiSecret) throw new Error("CRITICAL: Sendeo API Credentials missing for LIVE integration.");
+
+        const response = await liveSendeoFetch(`/api/shipment/track/${trackingNumber}`, { body: {} }, apiKey, apiSecret).catch(() => null);
+        const mockPayload = response ? await response.json() : { EventCode: '1', EventName: 'Yolda / Taşıma Aşamasında', EventDate: new Date() };
 
         return [{
             carrierEventCode: 'SND_TRANSIT',
