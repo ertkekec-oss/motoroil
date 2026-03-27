@@ -29,8 +29,8 @@ export default function AccountingModals({
         category: '',
         // Check specific
         dueDate: '',
-        bankName: '',
-        checkNo: '',
+        bank: '',
+        number: '',
         // Account specific
         accountName: '',
         accountType: 'cash', // cash, bank
@@ -320,6 +320,30 @@ export default function AccountingModals({
                                             className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none focus:border-primary/50"
                                             value={formData.dueDate}
                                             onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Banka Adı</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Örn: Garanti"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none focus:border-primary/50"
+                                            value={formData.bank}
+                                            onChange={e => setFormData({ ...formData, bank: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Çek / Senet No</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Seri / Belge No"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none focus:border-primary/50"
+                                            value={formData.number}
+                                            onChange={e => setFormData({ ...formData, number: e.target.value })}
                                         />
                                     </div>
                                 </div>
