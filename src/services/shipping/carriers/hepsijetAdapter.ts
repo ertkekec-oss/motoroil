@@ -1,6 +1,5 @@
 import { CarrierAdapter, CreateShipmentLabelInput, TrackingEventNormalizedOutput } from './carrierAdapter';
 import { NetworkShipmentTrackingNormalizedStatus } from '@prisma/client';
-import { registerCarrierAdapter } from './carrierRegistry';
 
 function mockHepsiJetFetch(endpoint: string, options: any): Promise<any> {
     // This mocks the actual fetch call to HepsiJet API
@@ -61,5 +60,4 @@ export class HepsiJetAdapter implements CarrierAdapter {
     }
 }
 
-// Auto-register
-registerCarrierAdapter('HEPSIJET', new HepsiJetAdapter());
+// Auto-register via registry

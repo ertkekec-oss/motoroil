@@ -1,6 +1,5 @@
 import { CarrierAdapter, CreateShipmentLabelInput, TrackingEventNormalizedOutput } from './carrierAdapter';
 import { NetworkShipmentTrackingNormalizedStatus } from '@prisma/client';
-import { registerCarrierAdapter } from './carrierRegistry';
 
 function mockSendeoFetch(endpoint: string, options: any): Promise<any> {
     // Mock the external Sendeo shipping API calls for automated logistics cost reconciliation
@@ -64,5 +63,4 @@ export class SendeoAdapter implements CarrierAdapter {
     }
 }
 
-// Auto-register Sendeo Mutabakat and API Integration Provider
-registerCarrierAdapter('SENDEO', new SendeoAdapter());
+// Auto-register via registry

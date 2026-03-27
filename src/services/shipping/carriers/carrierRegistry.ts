@@ -1,8 +1,11 @@
 import { CarrierAdapter } from './carrierAdapter';
-import './hepsijetAdapter';
-import './sendeoAdapter';
+import { HepsiJetAdapter } from './hepsijetAdapter';
+import { SendeoAdapter } from './sendeoAdapter';
 
-const adapters: Record<string, CarrierAdapter> = {};
+const adapters: Record<string, CarrierAdapter> = {
+    'HEPSIJET': new HepsiJetAdapter(),
+    'SENDEO': new SendeoAdapter()
+};
 
 export function registerCarrierAdapter(carrierCode: string, adapter: CarrierAdapter) {
     adapters[carrierCode] = adapter;
