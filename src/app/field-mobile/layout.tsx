@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { useSyncMasterData } from '@/hooks/useSyncMasterData';
 import { useSyncUplink } from '@/hooks/useSyncUplink';
 
+import { Map, Zap, Users, LayoutDashboard, User } from 'lucide-react';
+
 export default function FieldMobileLayout({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading, user } = useAuth();
     const router = useRouter();
@@ -23,12 +25,11 @@ export default function FieldMobileLayout({ children }: { children: React.ReactN
     if (isLoading) return <div className="h-screen bg-[#0f111a] flex items-center justify-center text-white">Yükleniyor...</div>;
 
     const navItems = [
-        { href: '/field-mobile/routes', icon: '🏁', label: 'Rotalar' },
-        { href: '/field-mobile/intelligence', icon: '🧠', label: 'SalesX' },
-        { href: '/field-mobile/customers', icon: '👥', label: 'Müşteriler' },
-        { href: '/field-mobile/targets', icon: '🎯', label: 'Hedefler' },
-        { href: '/field-mobile/reports', icon: '📊', label: 'Raporlar' },
-        { href: '/field-mobile/profile', icon: '👤', label: 'Profil' },
+        { href: '/field-mobile/routes', icon: <Map className="w-[22px] h-[22px]" />, label: 'Rotalarım' },
+        { href: '/field-mobile/intelligence', icon: <Zap className="w-[22px] h-[22px]" />, label: 'SalesX' },
+        { href: '/field-mobile/customers', icon: <Users className="w-[22px] h-[22px]" />, label: 'Müşteriler' },
+        { href: '/staff/me', icon: <LayoutDashboard className="w-[22px] h-[22px]" />, label: 'Dashboard' },
+        { href: '/field-mobile/profile', icon: <User className="w-[22px] h-[22px]" />, label: 'Profil' },
     ];
 
     return (
@@ -49,18 +50,20 @@ export default function FieldMobileLayout({ children }: { children: React.ReactN
 
             {/* Bottom Navigation */}
             <nav className="fixed bottom-0 left-0 right-0 bg-[#161b22] border-t border-white/10 pb-safe-bottom z-50">
-                <div className="flex justify-around items-center h-16">
+                <div className="flex justify-around items-center h-[72px]">
                     {navItems.map((item) => {
-                        const isActive = pathname.startsWith(item.href);
+                        const isActive = pathname === item.href || (item.href !== '/staff/me' && pathname.startsWith(item.href));
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isActive ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'
+                                className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isActive ? 'text-blue-400' : 'text-slate-400 hover:text-slate-300'
                                     }`}
                             >
-                                <span className={`text-2xl mb-1 ${isActive ? 'scale-110' : ''} transition-transform`}>{item.icon}</span>
-                                <span className="text-[10px] font-bold uppercase tracking-wide">{item.label}</span>
+                                <div className={`flex justify-center items-center mb-1.5 ${isActive ? 'scale-110' : ''} transition-transform`}>
+                                    {item.icon}
+                                </div>
+                                <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-70'}`}>{item.label}</span>
                             </Link>
                         );
                     })}

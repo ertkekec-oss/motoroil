@@ -788,10 +788,94 @@ const ProfileSettingsView = ({ user }: any) => {
     );
 };
 
+// ─── REPORTS VIEW ──────────────────────────────────────────────────────
+const ReportsView = ({ user }: any) => {
+    const [report, setReport] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [dateRange, setDateRange] = useState({
+        startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
+    });
+
+    const fetchReport = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/staff/reports?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`);
+            const data = await res.json();
+            if (res.ok) setReport(data);
+            else setReport({ error: data.error || 'Bilinmeyen bir hata oluştu.' });
+        } catch (err: any) {
+            setReport({ error: err.message || 'Bağlantı hatası' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchReport(); }, [dateRange]);
+
+    return (
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+            <ProfileHeader user={user} title="Performans ve Aksiyon" dataCount="AKTİF" dataLabel="Analiz" />
+            
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <EnterpriseCard className="h-full flex flex-col">
+                    <EnterpriseSectionHeader title="Dönemsel Operasyon Raporu" icon="📊" />
+                    
+                    <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/30 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                        <div className="flex gap-4 w-full sm:w-auto">
+                            <EnterpriseInput label="Başlangıç" type="date" value={dateRange.startDate} onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })} />
+                            <EnterpriseInput label="Bitiş" type="date" value={dateRange.endDate} onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })} />
+                        </div>
+                    </div>
+
+                    <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
+                        {loading ? (
+                            <div className="py-12 text-center text-[13px] font-bold text-slate-400">Rapor hesaplanıyor...</div>
+                        ) : report?.error ? (
+                            <div className="py-12 text-center text-[13px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 rounded-xl border border-rose-200">
+                                {report.error === 'Staff not found' ? 'Personel hesabınız bulunamadı.' : report.error}
+                            </div>
+                        ) : report?.summary ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-50 to-white dark:from-blue-500/10 dark:to-slate-800/50 border-blue-200 dark:border-blue-500/20">
+                                    <div className="flex justify-between items-center mb-4 text-blue-500">
+                                        <div className="text-3xl">💰</div>
+                                        <div className="text-[11px] font-black uppercase tracking-widest">Toplam Satış</div>
+                                    </div>
+                                    <div className="text-3xl font-black text-slate-900 dark:text-white">₺{report.summary.totalSales.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[12px] font-bold mt-2 text-slate-500">{report.summary.salesCount} Başarılı Sipariş</div>
+                                </div>
+                                
+                                <div className="p-6 rounded-2xl border bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-500/10 dark:to-slate-800/50 border-emerald-200 dark:border-emerald-500/20">
+                                    <div className="flex justify-between items-center mb-4 text-emerald-500">
+                                        <div className="text-3xl">💳</div>
+                                        <div className="text-[11px] font-black uppercase tracking-widest">Tahsilatlar</div>
+                                    </div>
+                                    <div className="text-3xl font-black text-slate-900 dark:text-white">₺{report.summary.totalCollections.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[12px] font-bold mt-2 text-slate-500">{report.summary.collectionsCount} Tamamlanan İşlem</div>
+                                </div>
+                                
+                                <div className="p-6 rounded-2xl border bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                                    <div className="flex justify-between items-center mb-4 text-slate-500">
+                                        <div className="text-3xl">📍</div>
+                                        <div className="text-[11px] font-black uppercase tracking-widest">Saha Ziyareti</div>
+                                    </div>
+                                    <div className="text-3xl font-black text-slate-900 dark:text-white">{report.summary.totalVisits}</div>
+                                    <div className="text-[12px] font-bold mt-2 text-slate-500">Gerçekleşen Müşteri Görüşmesi</div>
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                </EnterpriseCard>
+            </div>
+        </div>
+    );
+};
+
 // ─── MAIN PAGE ───────────────────────────────────────────────────────
 export default function PersonelPanel() {
     const { currentUser } = useApp();
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'targets' | 'tasks' | 'leave' | 'payroll' | 'shifts' | 'profile'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'targets' | 'tasks' | 'reports' | 'leave' | 'payroll' | 'shifts' | 'profile'>('dashboard');
     const [loading, setLoading] = useState(true);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
 
@@ -929,7 +1013,7 @@ export default function PersonelPanel() {
                     <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
                         {[
                             { group: 'GENEL', items: [{ id: 'dashboard', label: 'Özet / PDKS' }] },
-                            { group: 'OPERASYON', items: [{ id: 'tasks', label: 'Görevler' }, { id: 'targets', label: 'Hedefler' }] },
+                            { group: 'OPERASYON', items: [{ id: 'tasks', label: 'Görevler' }, { id: 'targets', label: 'Hedefler' }, { id: 'reports', label: 'Raporlar' }] },
                             { group: 'ZAMAN', items: [{ id: 'shifts', label: 'Vardiya' }, { id: 'leave', label: 'İzinler' }] },
                             { group: 'FİNANS', items: [{ id: 'payroll', label: 'Bordro' }] },
                             { group: 'HESAP', items: [{ id: 'profile', label: 'Profil' }] },
@@ -958,6 +1042,7 @@ export default function PersonelPanel() {
                 {activeTab === 'dashboard' && <DashboardView handleQrCheckin={handleQrCheckin} handleGpsCheckin={handleGpsCheckin} isScannerOpen={isScannerOpen} setIsScannerOpen={setIsScannerOpen} onQrScan={onQrScan} pdksStatus={pdksStatus} handleCheckout={handleCheckout} targets={targets} statsData={statsData} turnover={turnover} shifts={shifts} payrolls={payrolls} tasks={tasks} user={currentUser} />}
                 {activeTab === 'targets' && <TargetsView targets={targets} statsData={statsData} user={currentUser} />}
                 {activeTab === 'tasks' && <TasksView user={currentUser} tasks={tasks} fetchTasks={fetchCoreData} loading={loading} />}
+                {activeTab === 'reports' && <ReportsView user={currentUser} />}
                 {activeTab === 'leave' && <LeavesView user={currentUser} leaves={leaves} fetchLeaves={fetchCoreData} loading={loading} />}
                 {activeTab === 'payroll' && <PayrollView payrolls={payrolls} user={currentUser} />}
                 {activeTab === 'shifts' && <ShiftsView shifts={shifts} user={currentUser} />}
