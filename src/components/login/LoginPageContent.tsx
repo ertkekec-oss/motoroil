@@ -181,14 +181,18 @@ function DemoModal({ onClose }: { onClose: () => void }) {
 /* ── Ana Layout ── */
 export default function LoginPageContent() {
     const router = useRouter();
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isAuthenticated, isLoading, user } = useAuth();
     const [showDemo, setShowDemo] = useState(false);
 
     useEffect(() => {
-        if (!isLoading && isAuthenticated) {
-            router.push('/desktop');
+        if (!isLoading && isAuthenticated && user) {
+            if (user.role && user.role.toUpperCase().includes('SAHA')) {
+                router.push('/staff/me');
+            } else {
+                router.push('/desktop');
+            }
         }
-    }, [isLoading, isAuthenticated, router]);
+    }, [isLoading, isAuthenticated, user, router]);
 
     // URL'de ?demo=true varsa direkt modal aç
     useEffect(() => {

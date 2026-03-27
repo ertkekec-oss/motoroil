@@ -119,8 +119,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     // Redirect based on setupState and permissions
                     if (userData.setupState === 'PENDING') {
                         router.push('/onboarding');
+                    } else if (userData.role && userData.role.toUpperCase().includes('SAHA')) {
+                        router.push('/staff/me');
                     } else {
-                        // All authorized users land on /desktop
                         router.push('/desktop');
                     }
                 }, 100);
