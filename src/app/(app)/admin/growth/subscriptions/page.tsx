@@ -1,3 +1,4 @@
+﻿"use client";
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { Layers, RefreshCw, ShieldAlert, CheckCircle, Lock, Key, AlertTriangle, Activity, CreditCard } from "lucide-react";
@@ -23,15 +24,15 @@ export default function AdminGrowthSubscriptions() {
     };
 
     const handleAction = (id: string, action: string) => {
-        const confirmMsg = `Bu işlem YAPILACAKTIR: Abonelik ${action} (Mali Denetime Bildirilecektir). Devam edilsin mi?`;
+        const confirmMsg = `Bu iÅŸlem YAPILACAKTIR: Abonelik ${action} (Mali Denetime Bildirilecektir). Devam edilsin mi?`;
         
-        showConfirm("Abonelik İşlemi", confirmMsg, () => {
+        showConfirm("Abonelik Ä°ÅŸlemi", confirmMsg, () => {
             showPrompt(
-                "İşlem Gerekçesi",
-                "İptal / Askı / Kilit Açma sebebi (Audit Log için zorunlu, Min 5 karakter):",
+                "Ä°ÅŸlem GerekÃ§esi",
+                "Ä°ptal / AskÄ± / Kilit AÃ§ma sebebi (Audit Log iÃ§in zorunlu, Min 5 karakter):",
                 (reason) => {
                     if (!reason || reason.length < 5) {
-                        showWarning("Uyarı", "Lütfen en az 5 karakterlik bir sebep giriniz.");
+                        showWarning("UyarÄ±", "LÃ¼tfen en az 5 karakterlik bir sebep giriniz.");
                         return;
                     }
                     executeAction(id, action, reason);
@@ -49,14 +50,14 @@ export default function AdminGrowthSubscriptions() {
                 body: JSON.stringify({ reason })
             });
             if (res.ok) {
-                showSuccess("Bilgi", "İşlem başarıyla tamamlandı.");
+                showSuccess("Bilgi", "Ä°ÅŸlem baÅŸarÄ±yla tamamlandÄ±.");
                 fetchSubs();
             } else {
                 const err = await res.json();
                 showError("Hata", `Hata: ${err.error}`);
             }
         } catch (err) {
-            showError("Hata", "Sunucu hatası oluştu.");
+            showError("Hata", "Sunucu hatasÄ± oluÅŸtu.");
         } finally {
             setSaving(false);
         }
@@ -78,7 +79,7 @@ export default function AdminGrowthSubscriptions() {
     return (
         <EnterprisePageShell
             title="Boost Hub Abonelikleri"
-            description="Hub network üzerindeki finansal dondurma (billingBlocked) durumları ve kota limit tahsislerinin yönetimi."
+            description="Hub network Ã¼zerindeki finansal dondurma (billingBlocked) durumlarÄ± ve kota limit tahsislerinin yÃ¶netimi."
             actions={actions}
             className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
             titleIcon={<Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />}
@@ -87,14 +88,14 @@ export default function AdminGrowthSubscriptions() {
                 <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b] flex items-center justify-between">
                     <h2 className="text-[13px] font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 uppercase tracking-widest">
                         <CreditCard className="w-4 h-4 text-slate-400" />
-                        Abonelik & Tahsilat İstihbaratı
+                        Abonelik & Tahsilat Ä°stihbaratÄ±
                     </h2>
                 </div>
                 
                 {loading ? (
                     <div className="p-16 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400">
                         <RefreshCw className="w-8 h-8 animate-spin text-indigo-500 mb-4" />
-                        <span className="text-[11px] font-black tracking-widest uppercase">Abonelik Ağı Yükleniyor...</span>
+                        <span className="text-[11px] font-black tracking-widest uppercase">Abonelik AÄŸÄ± YÃ¼kleniyor...</span>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -102,11 +103,11 @@ export default function AdminGrowthSubscriptions() {
                             <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-white/5">
                                 <tr>
                                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Firma (Tenant) & Sub ID</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Güven Skoru (Trust Tier)</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 min-w-[200px]">Tüketim Limitleri</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">GÃ¼ven Skoru (Trust Tier)</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 min-w-[200px]">TÃ¼ketim Limitleri</th>
                                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Billing Durumu</th>
                                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Son Fatura Durumu</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-right">Müdahale Aksiyonları</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-right">MÃ¼dahale AksiyonlarÄ±</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-sm">
@@ -139,18 +140,18 @@ export default function AdminGrowthSubscriptions() {
                                                 ></div>
                                             </div>
                                             <div className="flex justify-between items-center text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                                                <span>{s.quotaUsed} Tüketildi</span>
-                                                <span>{s.quotaTotal} Hak Gösterildi</span>
+                                                <span>{s.quotaUsed} TÃ¼ketildi</span>
+                                                <span>{s.quotaTotal} Hak GÃ¶sterildi</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             {s.billingBlocked ? (
                                                 <span className="bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 font-black px-2.5 py-1 rounded-lg text-[10px] flex items-center gap-1.5 w-max tracking-widest uppercase">
-                                                    <Lock className="w-3.5 h-3.5" /> FİNANSDAN KİLİTLİ
+                                                    <Lock className="w-3.5 h-3.5" /> FÄ°NANSDAN KÄ°LÄ°TLÄ°
                                                 </span>
                                             ) : (
                                                 <span className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 font-black px-2.5 py-1 rounded-lg text-[10px] flex items-center gap-1.5 w-max tracking-widest uppercase">
-                                                    <CheckCircle className="w-3.5 h-3.5" /> AÇIK & AKTİF
+                                                    <CheckCircle className="w-3.5 h-3.5" /> AÃ‡IK & AKTÄ°F
                                                 </span>
                                             )}
                                             <div className="text-[10px] font-mono tracking-widest font-bold text-slate-400 dark:text-slate-500 mt-2 flex items-center gap-1 uppercase">
@@ -176,7 +177,7 @@ export default function AdminGrowthSubscriptions() {
                                                     onClick={() => handleAction(s.subscriptionId, 'unblock')} 
                                                     className="h-8 px-3 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-black tracking-widest uppercase text-[10px] rounded-lg border border-amber-200 dark:border-amber-500/30 disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-1.5 ml-auto shadow-sm"
                                                 >
-                                                    <ShieldAlert className="w-3.5 h-3.5" /> Kilidi Kaldır
+                                                    <ShieldAlert className="w-3.5 h-3.5" /> Kilidi KaldÄ±r
                                                 </button>
                                             )}
                                         </td>
@@ -187,8 +188,8 @@ export default function AdminGrowthSubscriptions() {
                                         <td colSpan={6} className="p-16">
                                             <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 space-y-3">
                                                 <AlertTriangle className="w-10 h-10 opacity-20" />
-                                                <p className="text-[13px] font-black tracking-widest uppercase text-slate-900 dark:text-white">Kayıtlı Abonelik Bekleniyor</p>
-                                                <p className="text-[11px] font-bold uppercase tracking-widest">Sistemde henüz aktif bir fatura döngüsü veya abonelik bulunamadı.</p>
+                                                <p className="text-[13px] font-black tracking-widest uppercase text-slate-900 dark:text-white">KayÄ±tlÄ± Abonelik Bekleniyor</p>
+                                                <p className="text-[11px] font-bold uppercase tracking-widest">Sistemde henÃ¼z aktif bir fatura dÃ¶ngÃ¼sÃ¼ veya abonelik bulunamadÄ±.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -201,3 +202,4 @@ export default function AdminGrowthSubscriptions() {
         </EnterprisePageShell>
     );
 }
+
