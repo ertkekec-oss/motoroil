@@ -557,7 +557,7 @@ export default function CustomersPage() {
                                         <td className="px-4 py-3 align-middle">
                                             <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
                                                 }`}>
-                                                {cust.category || 'Genel'}
+                                                {cust.customerClass || cust.category || 'Genel'}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 align-middle">
@@ -626,7 +626,7 @@ export default function CustomersPage() {
                                         </span>
                                         <span className={`px-2 py-1 text-[10px] font-semibold border rounded-[6px] ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
                                             }`}>
-                                            {cust.category || 'Genel'}
+                                            {cust.customerClass || cust.category || 'Genel'}
                                         </span>
                                     </div>
 
