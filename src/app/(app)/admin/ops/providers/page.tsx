@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Server, Zap, Globe, Package, RefreshCw, Layers } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -7,66 +8,98 @@ export default async function AdminProvidersPage() {
     // For MVP, we'll list the architectural placeholders and health status
 
     const paymentProviders = [
-        { id: "MOCK", name: "Internal Mock Escrow", status: "HEALTHY", lastSync: "Now", errorCount: 0 },
-        { id: "IYZICO", name: "Iyzico Integration", status: "HEALTHY", lastSync: "10m ago", errorCount: 0 },
+        { id: "MOCK", name: "Sanal Test Havuzu (Mock Escrow)", status: "HEALTHY", lastSync: "Şimdi", errorCount: 0 },
+        { id: "IYZICO", name: "Iyzico Entegrasyonu", status: "HEALTHY", lastSync: "10 dk önce", errorCount: 0 },
+        { id: "PAYTR", name: "PayTR Sanal POS", status: "INACTIVE", lastSync: "Veri Yok", errorCount: 0 },
     ];
 
     const carriers = [
-        { id: "MANUAL", name: "Manual Pickup/Delivery", active: true, sync: "N/A" },
-        { id: "MOCK", name: "Simulation Runner", active: true, sync: "Realtime" },
-        { id: "YURTICI", name: "Yurtiçi Kargo Adaptor", active: false, sync: "Disabled" },
+        { id: "MANUAL", name: "Manuel / Elden Teslimat", active: true, sync: "Varsayılan" },
+        { id: "SENDEO", name: "Sendeo / Kolay Gelsin Adaptörü", active: true, sync: "Canlı / Beklemede" },
+        { id: "MOCK", name: "Lojistik Simülasyonu (Test)", active: true, sync: "Gerçek Zamanlı" },
+        { id: "YURTICI", name: "Yurtiçi Kargo Adaptörü", active: false, sync: "Kapalı (Disabled)" },
     ];
 
     return (
-        <div className="p-6 bg-[#F6F7F9] min-h-screen text-slate-800 font-sans">
-            <div className="max-w-6xl mx-auto space-y-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-[#1F3A5F]">Infrastructure Control Panel</h1>
-                    <p className="text-sm text-slate-500">Monitor and govern payment gateways and logistics adapters.</p>
+        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16">
+            <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+                            <Server className="w-6 h-6 text-indigo-500" />
+                            Ana Altyapı Şalter Odası (Switchboard)
+                        </h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                            Periodya B2B Ağının dış sistemlerle (Ödeme & Lojistik API'leri) veri alışverişini sağlayan temel protokol anahtarları.
+                        </p>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
                     {/* Payment Gateways */}
-                    <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                        <div className="p-4 bg-slate-50 border-b font-bold text-[#1F3A5F] flex justify-between">
-                            <span>Payment Providers</span>
-                            <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">All Systems Green</span>
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#111c30] flex justify-between items-center">
+                            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <Zap className="w-4 h-4 text-emerald-500" />
+                                1. Ödeme Sağlayıcıları (PSPs)
+                            </h2>
+                            <span className="text-[10px] uppercase font-bold tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800/50">
+                                SİSTEM SAĞLIKLI
+                            </span>
                         </div>
-                        <div className="divide-y">
-                            {paymentProviders?.map(p => (
-                                <div key={p.id} className="p-4 flex justify-between items-center hover:bg-slate-50">
-                                    <div>
-                                        <div className="font-bold text-sm">{p.name}</div>
-                                        <div className="text-[10px] text-slate-400 font-mono italic">ID: {p.id}</div>
+                        <div className="divide-y divide-slate-100 dark:divide-white/5">
+                            {paymentProviders?.map(p => {
+                                const isHealthy = p.status === "HEALTHY";
+                                return (
+                                    <div key={p.id} className="p-6 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <div className="flex gap-4 items-center">
+                                            <div className={`w-2.5 h-2.5 rounded-full ${isHealthy ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-300 dark:bg-slate-600'}`}></div>
+                                            <div>
+                                                <div className="font-bold text-sm text-slate-900 dark:text-white">{p.name}</div>
+                                                <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono mt-0.5 uppercase tracking-wider">Adaptör ID: {p.id}</div>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className={`text-[11px] font-bold tracking-wider uppercase ${isHealthy ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-500"}`}>{p.status}</div>
+                                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Senk: {p.lastSync}</div>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <div className={`text-[10px] font-bold ${p.status === "HEALTHY" ? "text-emerald-600" : "text-amber-600"}`}>{p.status}</div>
-                                        <div className="text-[10px] text-slate-400">Sync: {p.lastSync}</div>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
                     {/* Logistics Carriers */}
-                    <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                        <div className="p-4 bg-slate-50 border-b font-bold text-[#1F3A5F] flex justify-between">
-                            <span>Logistics Carriers</span>
-                            <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded">3 Adapters Loaded</span>
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#111c30] flex justify-between items-center">
+                            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <Package className="w-4 h-4 text-indigo-500" />
+                                2. Lojistik Taşıyıcı Adaptörleri (3PL)
+                            </h2>
+                            <span className="text-[10px] uppercase font-bold tracking-wider bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800/50">
+                                4 Adaptör Yüklü
+                            </span>
                         </div>
-                        <div className="divide-y">
+                        <div className="divide-y divide-slate-100 dark:divide-white/5">
                             {carriers?.map(c => (
-                                <div key={c.id} className="p-4 flex justify-between items-center hover:bg-slate-50">
-                                    <div>
-                                        <div className="font-bold text-sm">{c.name}</div>
-                                        <div className="text-[10px] text-slate-400 font-mono italic">Adapter: {c.id}</div>
+                                <div key={c.id} className="p-6 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                    <div className="flex gap-4 items-center">
+                                        <div className={`relative inline-flex items-center cursor-pointer ${c.active ? 'opacity-100' : 'opacity-60'}`}>
+                                            <div className={`w-10 h-5 md:w-11 md:h-6 rounded-full peer transition-colors ${c.active ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}>
+                                                <div className={`absolute top-[2px] left-[2px] bg-white border-gray-300 border rounded-full h-[16px] w-[16px] md:h-[20px] md:w-[20px] transition-transform ${c.active ? 'translate-x-full border-white' : ''}`}></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className={`font-bold text-sm ${c.active ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-500'}`}>{c.name}</div>
+                                            <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono mt-0.5 uppercase tracking-wider">Adaptör ID: {c.id}</div>
+                                        </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className={`text-[10px] font-bold ${c.active ? "text-emerald-600" : "text-slate-400"}`}>
-                                            {c.active ? "ENABLED" : "DISABLED"}
+                                        <div className={`text-[11px] font-bold tracking-wider uppercase ${c.active ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500"}`}>
+                                            {c.active ? "ŞALTER AÇIK" : "ŞALTER KAPALI"}
                                         </div>
-                                        <div className="text-[10px] text-slate-400">State: {c.sync}</div>
+                                        <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Durum: {c.sync}</div>
                                     </div>
                                 </div>
                             ))}

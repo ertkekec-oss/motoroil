@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useNetworkPath } from "@/hooks/useNetworkPath"
-import { Wallet, Landmark, Activity, LayoutGrid, ShoppingCart, ClipboardList, ArrowRight } from "lucide-react"
+import { ShoppingCart, Package, CreditCard, ChevronRight, Activity, TrendingUp, AlertCircle, FileText, MapPin } from "lucide-react"
 
 type Me = {
     dealerCompanyName: string | null
@@ -45,13 +45,15 @@ export default function NetworkDashboardPage() {
         })()
     }, [])
 
+    const availableLimit = Math.max(0, (me?.creditLimit || 0) - (me?.balance || 0));
+    const usagePercent = percentUsage(me?.balance ?? 0, me?.creditLimit ?? 0);
+
     return (
-        <div className="font-sans">
-            <div className="mx-auto w-full max-w-7xl px-6 py-10 space-y-8">
+        <div className="font-sans min-h-screen bg-slate-50 pb-16 w-full">
+            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 
-                {/* Error Banner */}
                 {err && (
-                    <div className="rounded-xl border border-rose-200/60 bg-rose-50 p-4 text-sm flex items-start gap-3">
+                    <div className="rounded-xl border border-rose-200/60 bg-rose-50 p-4 text-sm flex items-start gap-3 mb-6">
                         <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center">
                             <span className="text-rose-600 text-[11px] font-bold">!</span>
                         </div>
@@ -62,208 +64,236 @@ export default function NetworkDashboardPage() {
                     </div>
                 )}
 
-                {/* 1. HERO / COMPANY CONTEXT CARD */}
-                <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col md:flex-row md:items-start justify-between gap-6 overflow-hidden">
-                    {/* Subtle Abstract Pattern Background */}
-                    <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50/50 via-white/0 to-white/0 pointer-events-none" />
-                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
-
-                    <div className="relative z-10 flex-1">
-                        <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-slate-200 pb-6">
+                    <div>
+                        <div className="inline-block px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md font-bold text-[10px] uppercase tracking-widest mb-3">
                             Periodya Dealer Network
                         </div>
-                        <h1 className="text-2xl font-bold text-slate-900 leading-tight mb-2" title={me?.supplierName ?? ""}>
-                            {me?.supplierName ? (me.supplierName.length > 20 ? me.supplierName.substring(0, 20) + '...' : me.supplierName) : "..."}
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                            {me?.supplierName ? (me.supplierName.length > 25 ? me.supplierName.substring(0, 25) + '...' : me.supplierName) : "B2B Bayi Portalı"}
                         </h1>
-
-                        <div className="mt-4 flex flex-wrap items-center gap-y-3 px-4 py-3 bg-slate-50/80 border border-slate-100 rounded-xl text-[13px] text-slate-600 font-medium w-fit max-w-full">
-                           {/* Supplier Email */}
-                           <div className="flex items-center gap-2 pr-4 border-r border-slate-200/80">
-                                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                               <span className="truncate max-w-[150px] sm:max-w-none">{me?.supplierEmail || 'E-posta belirtilmedi'}</span>
-                           </div>
-
-                           {/* Supplier Phone */}
-                           <div className="flex items-center gap-2 pl-4 pr-4 border-r border-slate-200/80 shrink-0">
-                                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                               <span className="tracking-wide">{me?.supplierPhone || 'Telefon belirtilmedi'}</span>
-                           </div>
-
-                           {/* Supplier VKN */}
-                           <div className="flex items-center gap-2 pl-4 pr-4 border-r border-slate-200/80 shrink-0">
-                                <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                               <span>
-                                   VD: <strong className="text-slate-700">{me?.supplierTaxOffice || '-'}</strong> / VKN: <strong className="text-slate-700">{me?.supplierVkn || '-'}</strong>
-                               </span>
-                           </div>
-
-                            {/* Dealer Company Name */}
-                           <div className="flex items-center gap-2 pl-4 shrink-0 text-blue-700 bg-blue-50 -my-3 py-3 -mr-4 pr-4 rounded-r-xl border-l border-blue-100">
-                               <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse"></span>
-                               <span>Cari: <strong className="font-bold text-blue-800">{me?.dealerCompanyName || "Yükleniyor..."}</strong></span>
-                           </div>
-                        </div>
-                    </div>
-
-                    <div className="relative z-10 shrink-0">
-                        <Link
-                            href={getPath("/network/select-supplier")}
-                            className="inline-flex items-center gap-2 h-11 px-5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-sm active:scale-[0.98]"
-                        >
-                            Tedarikçi Değiştir
-                            <ArrowRight className="w-4 h-4 text-slate-400" />
-                        </Link>
-                    </div>
-                </div>
-
-                {/* 2. KPI CARDS */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    {/* KPI 1 */}
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/20 to-transparent group-hover:from-blue-500/40 transition-colors" />
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-                                <Wallet className="w-5 h-5" strokeWidth={1.5} />
-                            </div>
-                        </div>
-                        <div className="text-[13px] font-medium text-slate-500 mb-1">Kredi Limiti</div>
-                        <div className="text-2xl font-bold text-slate-900 tracking-tight">
-                            {loading ? "..." : formatMoney(me?.creditLimit ?? 0, me?.currency ?? "TRY")}
-                        </div>
-                        <div className="mt-3 text-[13px] text-slate-500">
-                            Kullanılabilir Limit: <span className="font-semibold text-slate-700">{loading ? "..." : formatMoney(me?.creditLimit ?? 0, me?.currency ?? "TRY")}</span>
-                        </div>
-                    </div>
-
-                    {/* KPI 2 */}
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/20 to-transparent group-hover:from-emerald-500/40 transition-colors" />
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-                                <Landmark className="w-5 h-5" strokeWidth={1.5} />
-                            </div>
-                        </div>
-                        <div className="text-[13px] font-medium text-slate-500 mb-1">Bakiye</div>
-                        <div className="text-2xl font-bold text-slate-900 tracking-tight">
-                            {loading ? "..." : formatMoney(me?.balance ?? 0, me?.currency ?? "TRY")}
-                        </div>
-                        <div className="mt-3 text-[13px] text-slate-500">
-                            Toplam Bakiye
-                        </div>
-                    </div>
-
-                    {/* KPI 3 - Split into 2 */}
-                    <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden group flex">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-transparent group-hover:from-amber-500/40 group-hover:via-purple-500/40 transition-colors" />
-                        
-                        {/* Sol Kısım: Kullanım */}
-                        <div className="flex-1 p-6 border-r border-slate-100/80">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
-                                    <Activity className="w-5 h-5" strokeWidth={1.5} />
-                                </div>
-                            </div>
-                            <div className="text-[13px] font-medium text-slate-500 mb-1">Limit Kullanım</div>
-                            <div className="text-2xl font-bold text-slate-900 tracking-tight">
-                                {loading ? "..." : percentUsage(me?.balance ?? 0, me?.creditLimit ?? 0)}
-                            </div>
-                            <div className="mt-3 text-[12px] text-slate-500 line-clamp-1">
-                                Aktif kullanım {loading ? "..." : percentUsage(me?.balance ?? 0, me?.creditLimit ?? 0) === "—" ? "yok" : "oranı"}
-                            </div>
-                        </div>
-
-                        {/* Sağ Kısım: Parapuan */}
-                        <div className="flex-1 p-6 bg-slate-50/30">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100">
-                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                </div>
-                            </div>
-                            <div className="text-[13px] font-medium text-slate-500 mb-1">Parapuan</div>
-                            <div className="text-2xl font-bold text-purple-700 tracking-tight">
-                                {loading ? "..." : formatMoney(me?.points ?? 0, me?.currency ?? "TRY")}
-                            </div>
-                            <div className="mt-3 text-[12px] text-slate-500 line-clamp-1">
-                                Kullanılabilir puan
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 3. QUICK ACTIONS */}
-                <div>
-                    <div className="mb-6">
-                        <h2 className="text-lg font-bold text-slate-900">Hızlı İşlemler</h2>
-                        <p className="text-[14px] text-slate-500 mt-1">
-                            Kataloğu görüntüle, ürünleri incele ve siparişlerini yönet.
+                        <p className="text-sm text-slate-500 mt-2">
+                            Alıcı cari özetiniz, aktif teslimatlarınız ve toptan sipariş işlemleriniz.
                         </p>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Action 1 */}
+                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                        <Link 
+                            href={getPath("/network/select-supplier")}
+                            className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors shadow-sm"
+                        >
+                            Tedarikçi Değiştir
+                        </Link>
                         <Link 
                             href={getPath("/network/catalog")}
-                            className="group flex items-center justify-between bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_10px_rgb(0,0,0,0.01)] hover:shadow-md hover:border-slate-300 transition-all duration-200 active:scale-[0.99]"
+                            className="px-5 py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow-sm hover:bg-indigo-700 transition-colors flex items-center gap-2"
                         >
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-blue-50 group-hover:border-blue-100 group-hover:text-blue-600 transition-colors shrink-0">
-                                    <LayoutGrid className="w-6 h-6 text-slate-500 group-hover:text-blue-600 transition-colors" strokeWidth={1.5} />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-0.5">Kataloğa Git</h3>
-                                    <p className="text-[13px] text-slate-500">Ürünleri görüntüle ve incele</p>
-                                </div>
-                            </div>
-                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all shrink-0 ml-4">
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
-                            </div>
-                        </Link>
-
-                        {/* Action 2 */}
-                        <Link 
-                            href={getPath("/network/cart")}
-                            className="group flex items-center justify-between bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_10px_rgb(0,0,0,0.01)] hover:shadow-md hover:border-slate-300 transition-all duration-200 active:scale-[0.99]"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-blue-50 group-hover:border-blue-100 group-hover:text-blue-600 transition-colors shrink-0">
-                                    <ShoppingCart className="w-6 h-6 text-slate-500 group-hover:text-blue-600 transition-colors" strokeWidth={1.5} />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-0.5">Sepete Git</h3>
-                                    <p className="text-[13px] text-slate-500">Ürün ekle ve sipariş oluştur</p>
-                                </div>
-                            </div>
-                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all shrink-0 ml-4">
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
-                            </div>
-                        </Link>
-
-                        {/* Action 3 */}
-                        <Link 
-                            href={getPath("/network/orders")}
-                            className="group flex items-center justify-between bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_10px_rgb(0,0,0,0.01)] hover:shadow-md hover:border-slate-300 transition-all duration-200 active:scale-[0.99]"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-blue-50 group-hover:border-blue-100 group-hover:text-blue-600 transition-colors shrink-0">
-                                    <ClipboardList className="w-6 h-6 text-slate-500 group-hover:text-blue-600 transition-colors" strokeWidth={1.5} />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-0.5">Siparişlerim</h3>
-                                    <p className="text-[13px] text-slate-500">Mevcut siparişleri görüntüle</p>
-                                </div>
-                            </div>
-                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all shrink-0 ml-4">
-                                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
-                            </div>
+                            Kataloğa Git
+                            <ChevronRight className="w-4 h-4" />
                         </Link>
                     </div>
                 </div>
 
-                {/* Footer Text */}
-                <div className="mt-14 text-center pb-8 border-t border-slate-200/50 pt-8">
-                    <p className="text-sm font-medium text-slate-500">
-                        Periodya B2B — Kurumsal ticaret altyapısı ile işinizi büyütün.
-                    </p>
+                {/* Top KPI Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    {/* Kredi Limiti */}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl -translate-y-10 translate-x-10 group-hover:bg-indigo-500/20 transition-colors"></div>
+                        <div className="flex items-center justify-between mb-4 relative">
+                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kredi Limiti</h3>
+                            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                                <CreditCard className="w-4 h-4" />
+                            </div>
+                        </div>
+                        <p className="text-2xl font-mono font-bold text-slate-900 mb-1 relative">
+                            {loading ? "..." : formatMoney(me?.creditLimit ?? 0, me?.currency ?? "TRY")}
+                        </p>
+                        <div className="flex items-center gap-2 text-[11px] font-semibold mt-2">
+                            <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">
+                                Açık Hesap (B2B)
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Bakiye */}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl -translate-y-10 translate-x-10 group-hover:bg-rose-500/20 transition-colors"></div>
+                        <div className="flex items-center justify-between mb-4 relative">
+                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Açık Bakiye (Borç)</h3>
+                            <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
+                                <AlertCircle className="w-4 h-4" />
+                            </div>
+                        </div>
+                        <div className="flex items-baseline gap-2 mb-1 relative">
+                            <p className="text-2xl font-mono font-bold text-rose-600">
+                                {loading ? "..." : formatMoney(me?.balance ?? 0, me?.currency ?? "TRY")}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] font-semibold mt-2">
+                            <span className="text-slate-500 px-1.5 py-0.5 rounded outline outline-1 outline-slate-200">
+                                Toplam bekleyen bakiye
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Limit Kullanımı */}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                        <div className="flex items-center justify-between mb-4 relative">
+                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kredi Kullanımı</h3>
+                            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                                <Activity className="w-4 h-4" />
+                            </div>
+                        </div>
+                        <p className="text-2xl font-mono font-bold text-slate-900 mb-1 relative">
+                            {loading ? "..." : usagePercent !== "—" ? `${usagePercent}` : "Yok"}
+                        </p>
+                        <div className="flex items-center gap-2 text-[11px] font-semibold mt-2">
+                            <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded outline outline-1 outline-emerald-200">
+                                {loading ? "..." : formatMoney(availableLimit, me?.currency ?? "TRY")} kullanılabilir
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Parapuan */}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl -translate-y-10 translate-x-10 group-hover:bg-amber-500/20 transition-colors"></div>
+                        <div className="flex items-center justify-between mb-4 relative">
+                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kazanılan B2B Puan</h3>
+                            <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                                <TrendingUp className="w-4 h-4" />
+                            </div>
+                        </div>
+                        <p className="text-2xl font-mono font-bold text-slate-900 mb-1 relative">
+                            {loading ? "..." : formatMoney(me?.points ?? 0, "TRY")}
+                        </p>
+                        <div className="flex items-center gap-2 text-[11px] font-semibold mt-2">
+                            <span className="text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
+                                Bekleyen Puan Bakiyesi
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Grid area */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    {/* Açık Siparişler */}
+                    <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div className="px-6 py-5 border-b border-slate-100">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                    <Package className="w-4 h-4 text-indigo-500" />
+                                    Aktif Sipariş / Sevkiyatlar
+                                </h2>
+                                <Link href={getPath("/network/orders")} className="text-xs font-bold text-indigo-600 hover:underline">
+                                    Tümünü Gör
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="p-0 flex-1">
+                            {loading ? (
+                                <div className="p-12 text-center text-slate-500 text-sm font-semibold">Sipariş verileri yükleniyor...</div>
+                            ) : (
+                                <table className="w-full text-left text-sm whitespace-nowrap">
+                                    <thead className="bg-slate-50/80 text-xs text-slate-500 font-bold border-b border-slate-100">
+                                        <tr>
+                                            <th className="px-6 py-4">Sipariş No</th>
+                                            <th className="px-6 py-4">Tarih</th>
+                                            <th className="px-6 py-4 text-right">Tutar</th>
+                                            <th className="px-6 py-4 text-center">Durum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {/* Mock Data (Can be replaced with real orders later) */}
+                                        <tr className="hover:bg-slate-50 transition-colors group cursor-pointer">
+                                            <td className="px-6 py-5 font-mono font-bold text-indigo-600">
+                                                B2B-{new Date().getFullYear()}-0014
+                                            </td>
+                                            <td className="px-6 py-5 text-slate-700">
+                                                Bugün, 11:30
+                                            </td>
+                                            <td className="px-6 py-5 text-right font-mono font-bold text-slate-900">
+                                                12.450,00 ₺
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <div className="flex justify-center">
+                                                    <span className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md flex items-center gap-1.5 shadow-sm">
+                                                        <MapPin className="w-3 h-3" /> YOLDA
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr className="hover:bg-slate-50 transition-colors group cursor-pointer">
+                                            <td className="px-6 py-5 font-mono font-bold text-indigo-600">
+                                                B2B-{new Date().getFullYear()}-0011
+                                            </td>
+                                            <td className="px-6 py-5 text-slate-700">
+                                                Dün, 16:45
+                                            </td>
+                                            <td className="px-6 py-5 text-right font-mono font-bold text-slate-900">
+                                                4.200,00 ₺
+                                            </td>
+                                            <td className="px-6 py-5 flex justify-center">
+                                                <span className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 border border-amber-200 rounded-md shadow-sm">
+                                                    HAZIRLANIYOR
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Fatura & Cari */}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div className="px-6 py-5 border-b border-slate-100">
+                            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-emerald-500" />
+                                Hızlı İşlemler & Cari
+                            </h2>
+                        </div>
+                        <div className="p-6 flex-1 flex flex-col gap-4">
+                            
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-1 items-center justify-center text-center">
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Açık Cari Kaydınız</span>
+                                <span className="font-bold text-blue-700 text-lg">{me?.dealerCompanyName || "Cari Yükleniyor"}</span>
+                            </div>
+
+                            <Link href={getPath("/network/cart")} className="group flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                        <ShoppingCart className="w-5 h-5" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-bold text-sm text-slate-900">Aktif Sepetiniz</p>
+                                        <p className="text-xs text-slate-500 font-semibold mt-0.5">Sipariş oluşturun</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                            </Link>
+
+                            <Link href={getPath("/network/orders")} className="group flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                        <Package className="w-5 h-5" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-bold text-sm text-slate-900">Geçmiş Siparişler</p>
+                                        <p className="text-xs text-slate-500 font-semibold mt-0.5">Teslimatları takip edin</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+                            </Link>
+
+                            <div className="mt-auto pt-4 border-t border-slate-100">
+                                <button className="w-full py-3 bg-slate-900 text-white font-bold text-sm rounded-xl shadow-sm hover:translate-y-[-1px] hover:shadow-md active:translate-y-[1px] transition-all">
+                                    Tüm Faturaları Gör
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>

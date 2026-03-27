@@ -1,16 +1,21 @@
 "use client";
 
 import { Shield } from "lucide-react";
+import { EnterprisePageShell, EnterpriseCard } from "@/components/ui/enterprise";
 
 export default function AdminB2BSettingsPage() {
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Platform B2B Portal Kuralları</h1>
-            <p className="text-gray-500">Bayi portalı genel kural seti ve global OTP login politikaları (Sadece Super Admin).</p>
-            <div className="mt-8 p-6 bg-slate-50 text-slate-700 rounded-xl flex items-center gap-4 border border-slate-100 shadow-sm">
-                <Shield className="w-6 h-6" />
-                <span>Authentication (OTP/Parola) mode ayarları Platform Policy olarak buradan yönetilir. Tenantlar kendi seviyelerinde bunu değiştiremez.</span>
+        <EnterprisePageShell
+            title="Platform B2B Portal Kuralları"
+            description="Bayi portalı genel kural seti ve global OTP login politikaları (Sadece Super Admin)."
+            className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
+        >
+            <div className="mt-8">
+                <EnterpriseCard className="p-6 bg-slate-50 dark:bg-slate-800/30 text-slate-700 dark:text-slate-300 flex items-center gap-4 text-[11px] uppercase" padding="none">
+                    <Shield className="w-6 h-6 shrink-0 text-indigo-500" />
+                    <span className="leading-relaxed font-black tracking-widest text-[11px] uppercase">Authentication (OTP/Parola) mode ayarları Platform Policy olarak buradan yönetilir. Tenantlar kendi seviyelerinde bunu değiştiremez.</span>
+                </EnterpriseCard>
             </div>
-        </div>
+        </EnterprisePageShell>
     );
 }

@@ -1,6 +1,6 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
+import { EnterprisePageShell, EnterpriseCard } from "@/components/ui/enterprise";
 
 export default function AdminBoostRules() {
     const { showSuccess, showError, showWarning, showPrompt } = useModal();
@@ -65,7 +65,7 @@ export default function AdminBoostRules() {
     };
 
     const handleAction = async (id: string, action: 'disable' | 'expire-now') => {
-        showPrompt("İşem Onayı", "İşlem nedenini giriniz (Audit log için zorunlu):", async (r) => {
+        showPrompt("İşlem Onayı", "İşlem nedenini giriniz (Audit log için zorunlu):", async (r) => {
             if (!r || r.length < 5) return showError("Uyarı", "Geçerli bir sebep girilmeli (min 5 karakter).");
 
             try {
@@ -92,235 +92,231 @@ export default function AdminBoostRules() {
         disabled: rules.filter((r) => r.status === 'DISABLED').length,
     };
 
+    const actions = (
+        <div className="flex items-center gap-3 shrink-0">
+            <button
+                onClick={() => setShowModal(true)}
+                className="h-10 px-5 inline-flex items-center justify-center rounded-xl text-[11px] uppercase tracking-widest font-black bg-slate-900 dark:bg-emerald-600 text-white hover:bg-slate-800 dark:hover:bg-emerald-700 transition-colors shadow-sm gap-2"
+            >
+                <span>⚡</span> Yeni Kural Üret
+            </button>
+        </div>
+    );
+
     return (
-        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
+        <EnterprisePageShell
+            title="Boost Reklam Motoru (Growth Engine)"
+            description="Kategori, listeleme veya satıcı bazlı suni B2B görünürlük çarpanı ve sponsorluk yönetimi."
+            actions={actions}
+            className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
+            titleIcon={<span className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">⚡</span>}
+        >
+            {/* Dashboard Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none group-hover:bg-emerald-500/10 dark:group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+                    <p className="text-[11px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest mb-4 z-10">AKTİF ÇARPANLAR</p>
+                    <p className="text-[32px] font-black tracking-tighter text-emerald-600 dark:text-emerald-500 z-10">{stats.active} <span className="text-[14px] text-emerald-600/60 dark:text-emerald-500/60 font-medium tracking-normal">Kural</span></p>
+                </div>
+                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 dark:bg-amber-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none group-hover:bg-amber-500/10 dark:group-hover:bg-amber-500/20 transition-all duration-500"></div>
+                    <p className="text-[11px] font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-4 z-10">PLANLI (SCHEDULED)</p>
+                    <p className="text-[32px] font-black tracking-tighter text-amber-600 dark:text-amber-500 z-10">{stats.scheduled} <span className="text-[14px] text-amber-600/60 dark:text-amber-500/60 font-medium tracking-normal">Kural</span></p>
+                </div>
+                <div className="bg-slate-100 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 dark:bg-slate-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none group-hover:bg-slate-500/10 dark:group-hover:bg-slate-500/20 transition-all duration-500"></div>
+                    <p className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 z-10">PASİF / İPTAL EDİLEN</p>
+                    <p className="text-[32px] font-black tracking-tighter text-slate-600 dark:text-slate-300 z-10">{stats.disabled} <span className="text-[14px] text-slate-400/60 dark:text-slate-500/60 font-medium tracking-normal">Kural</span></p>
+                </div>
+            </div>
+
+            {/* Ana Veri Tablosu */}
+            <EnterpriseCard padding="none">
+                <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
-                            Boost Reklam Motoru (Growth Engine)
-                        </h1>
-                        <p className="text-sm text-slate-600">
-                            Kategori, listeleme veya satıcı bazlı suni B2B görünürlük çarpanı ve sponsorluk yönetimi.
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm gap-2"
-                        >
-                            <span>⚡</span> Yeni Kural Üret
-                        </button>
+                        <h2 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Aktif Konfigürasyonlar ve Algoritma Kriterleri</h2>
+                        <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Platform içi görünürlüğü manipüle eden onaylı tüm kurallar dizini.</p>
                     </div>
                 </div>
 
-                {/* Dashboard Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-emerald-800 uppercase tracking-widest mb-1">AKTİF ÇARPANLAR</p>
-                        <p className="text-3xl font-bold text-emerald-600">{stats.active} Kural</p>
+                {loading ? (
+                    <div className="p-16 flex flex-col items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-slate-900 dark:border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+                        <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">KURAL VERİ TABANI SORGULANIYOR...</span>
                     </div>
-                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-amber-800 uppercase tracking-widest mb-1">PLANLI (SCHEDULED)</p>
-                        <p className="text-3xl font-bold text-amber-600">{stats.scheduled} Kural</p>
-                    </div>
-                    <div className="bg-slate-100 border border-slate-200 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-1">PASİF / İPTAL EDİLEN</p>
-                        <p className="text-3xl font-bold text-slate-600">{stats.disabled} Kural</p>
-                    </div>
-                </div>
-
-                {/* Ana Veri Tablosu */}
-                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h2 className="text-base font-semibold text-slate-900">Aktif Konfigürasyonlar ve Algoritma Kriterleri</h2>
-                            <p className="text-[13px] text-slate-500 mt-1">Platform içi görünürlüğü manipüle eden onaylı tüm kurallar dizini.</p>
+                ) : rules.length === 0 ? (
+                    <div className="p-16 text-center">
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-[#0f172a] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 dark:border-white/5 shadow-sm">
+                            📊
                         </div>
+                        <p className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">Aktif Kural Bulunamadı</p>
+                        <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 max-w-sm mx-auto uppercase tracking-widest leading-relaxed">Sistemde yürürlükte veya planlanmış herhangi bir gösterim manipülasyonu bulunmuyor.</p>
                     </div>
-
-                    {loading ? (
-                        <div className="p-16 flex flex-col items-center justify-center">
-                            <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-4"></div>
-                            <span className="text-sm font-medium text-slate-500 uppercase tracking-widest">KURAL VERİ TABANI SORGULANIYOR...</span>
-                        </div>
-                    ) : rules.length === 0 ? (
-                        <div className="p-16 text-center">
-                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 shadow-sm">
-                                📊
-                            </div>
-                            <p className="text-[15px] font-semibold text-slate-900">Aktif Kural Bulunamadı</p>
-                            <p className="text-[13px] text-slate-500 max-w-sm mx-auto mt-1">Sistemde yürürlükte veya planlanmış herhangi bir gösterim manipülasyonu bulunmuyor.</p>
-                        </div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left table-auto">
-                                <thead className="bg-white border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wide">
-                                    <tr>
-                                        <th className="px-6 py-4 font-bold">Kural Tipi & Hedef ID</th>
-                                        <th className="px-6 py-4 font-bold text-right">Güç Çarpanı (x)</th>
-                                        <th className="px-6 py-4 font-bold text-center">Günlük Gösterim Limiti</th>
-                                        <th className="px-6 py-4 font-bold text-center">Tarihsel Geçerlilik</th>
-                                        <th className="px-6 py-4 font-bold text-center">Statü</th>
-                                        <th className="px-6 py-4 font-bold text-right">Devre Dışı Bırak / İptal E.</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 text-[14px]">
-                                    {rules?.map(r => (
-                                        <tr key={r.id} className="hover:bg-slate-50 transition-colors group">
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-bold tracking-widest bg-blue-100 text-blue-700 uppercase border border-blue-200">
-                                                        {r.targetType}
-                                                    </span>
-                                                </div>
-                                                <div className="font-mono text-[11px] text-slate-500 mt-1.5">{r.targetId || 'SYSTEM_GLOBAL'}</div>
-                                            </td>
-
-                                            <td className="px-6 py-4 text-right">
-                                                <span className="inline-flex items-center justify-center px-3 py-1 bg-emerald-50 border border-emerald-200 rounded font-mono text-[15px] font-bold text-emerald-700">
-                                                    x{r.multiplier}
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse whitespace-nowrap">
+                            <thead>
+                                <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-white/5">
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Kural Tipi & Hedef ID</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-right">Güç Çarpanı (x)</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Günlük Gösterim Limiti</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Tarihsel Geçerlilik</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Statü</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-right">Aksiyonlar</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-sm">
+                                {rules?.map(r => (
+                                    <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <span className="inline-flex px-2 py-0.5 rounded-lg text-[10px] font-black tracking-widest bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 uppercase border border-blue-200 dark:border-blue-500/30">
+                                                    {r.targetType}
                                                 </span>
-                                            </td>
-
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="inline-flex px-2 py-1 rounded bg-slate-50 border border-slate-200 text-[12px] font-bold text-slate-700">
-                                                    {r.maxImpressionsPerDay || 'Limitsiz ∞'}
-                                                </span>
-                                            </td>
-
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="text-[12px] font-medium text-slate-900">{new Date(r.startsAt).toLocaleDateString()}</div>
-                                                <div className="text-[10px] uppercase font-bold text-slate-400 my-0.5">Bitiş</div>
-                                                <div className="text-[12px] font-medium text-slate-900">{new Date(r.endsAt).toLocaleDateString()}</div>
-                                            </td>
-
-                                            <td className="px-6 py-4 text-center">
-                                                <span className={`inline-flex px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-widest border ${r.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
-                                                    r.status === 'SCHEDULED' ? 'bg-amber-100 text-amber-800 border-amber-200' :
-                                                        r.status === 'EXPIRED' ? 'bg-slate-50 text-slate-500 border-slate-200' :
-                                                            'bg-red-100 text-red-800 border-red-200'
-                                                    }`}>
-                                                    {r.status}
-                                                </span>
-                                            </td>
-
-                                            <td className="px-6 py-4 text-right">
-                                                {(r.status === 'ACTIVE' || r.status === 'SCHEDULED') ? (
-                                                    <div className="flexitems-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button
-                                                            onClick={() => handleAction(r.id, 'expire-now')}
-                                                            className="inline-flex items-center justify-center h-8 px-3 mr-2 bg-amber-50 border border-amber-200 text-amber-700 text-[12px] font-bold rounded-lg hover:bg-amber-100 transition-colors shadow-sm"
-                                                        >
-                                                            Erken Bitir
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleAction(r.id, 'disable')}
-                                                            className="inline-flex items-center justify-center h-8 px-3 bg-red-50 border border-red-200 text-red-700 text-[12px] font-bold rounded-lg hover:bg-red-100 transition-colors shadow-sm"
-                                                        >
-                                                            Kapat / İptal
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-300 text-[12px] font-bold italic">-</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
-
-                {/* Kural Ekleme Modalı */}
-                {showModal && (
-                    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
-                        <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-                            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
-                                <div>
-                                    <h2 className="text-lg font-bold text-slate-900">Platform İçi Kural Tanımlama Yönergesi</h2>
-                                    <p className="text-[13px] text-slate-500">Idempotency-key destekli kayıt ataması.</p>
-                                </div>
-                                <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-700 text-2xl font-light">&times;</button>
-                            </div>
-
-                            <div className="p-6 overflow-y-auto">
-                                {(targetType === 'SELLER') && (
-                                    <div className="mb-6 bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3 items-start">
-                                        <span className="text-blue-500 mt-0.5">ℹ️</span>
-                                        <div>
-                                            <p className="text-[13px] text-blue-900 font-bold uppercase tracking-wide mb-1">Risk Protokolü Uyarı Sistemi</p>
-                                            <p className="text-[13px] text-blue-800 leading-relaxed font-medium">Hedef satıcı <span className="font-bold border-b border-blue-300">"D" (Riskli)</span> tier grubunda ise, sistem otomatik olarak bu çarpan etkisini (x1.0) baz değerine geri dengeleyecektir (Platform Finansal Koruma İlkesi gereği). Satıcı ürünü yalnızca "reklamlı" etiketinde sponsorluk amblemi ile sergiler.</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <form id="boostRuleForm" onSubmit={handleCreate} className="space-y-5">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div>
-                                            <label className="block text-[13px] font-bold text-slate-700 mb-1.5">Hedef Metodolojisi / Hedef Tipi</label>
-                                            <select required value={targetType} onChange={e => setTargetType(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-colors font-medium">
-                                                <option value="GLOBAL">GLOBAL (Tüm Sistem Ağı)</option>
-                                                <option value="CATEGORY">KATALOG KATEGORİSİ (Category)</option>
-                                                <option value="LISTING">SPESİFİK LİSTELEME (Listing)</option>
-                                                <option value="SELLER">TEDARİKÇİ / SATICI (Tenant)</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-[13px] font-bold text-slate-700 mb-1.5">Benzersiz Hedef ID (UUID) {targetType !== 'GLOBAL' && <span className="text-red-500">*</span>}</label>
-                                            <input disabled={targetType === 'GLOBAL'} required={targetType !== 'GLOBAL'} type="text" value={targetId} onChange={e => setTargetId(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-mono" placeholder="örn. 123e4567-e89b-12d3..." />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div>
-                                            <label className="block text-[13px] font-bold text-slate-700 mb-1.5">Görünürlük Çarpanı (Multiplier)</label>
-                                            <div className="relative">
-                                                <input required type="number" step="0.1" min="1.0" max="3.0" value={multiplier} onChange={e => setMultiplier(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-colors font-mono pl-8" />
-                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">x</span>
                                             </div>
-                                            <p className="text-[11px] text-slate-500 mt-1">Sert manipülasyonları engellemek adında Max 3.0 ile limitlenmiştir.</p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-[13px] font-bold text-slate-700 mb-1.5">Günlük Gösterim Limiti (Impression Cap)</label>
-                                            <input type="number" value={maxImp} onChange={e => setMaxImp(e.target.value)} placeholder="Limit Yok ise Boş Bırakınız" className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-colors font-mono" />
-                                        </div>
-                                    </div>
+                                            <div className="font-mono text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1.5 tracking-widest">{r.targetId || 'SYSTEM_GLOBAL'}</div>
+                                        </td>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div>
-                                            <label className="block text-[13px] font-bold text-slate-700 mb-1.5">Harekete Geçiş Zamanı (Starts At)</label>
-                                            <input required type="datetime-local" value={startsAt} onChange={e => setStartsAt(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-colors" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[13px] font-bold text-slate-700 mb-1.5">İptal Edilme Zamanı (Ends At)</label>
-                                            <input required type="datetime-local" value={endsAt} onChange={e => setEndsAt(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-colors" />
-                                        </div>
-                                    </div>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="inline-flex items-center justify-center px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg font-mono text-[13px] font-black text-emerald-700 dark:text-emerald-400">
+                                                x{r.multiplier}
+                                            </span>
+                                        </td>
 
-                                    <div className="pt-2">
-                                        <label className="block text-[13px] font-bold text-red-600 mb-1.5 uppercase tracking-wide">Güvenlik: İşlem / Kayıt Sebebi (Audit Log)</label>
-                                        <textarea required minLength={5} value={reason} onChange={e => setReason(e.target.value)} rows={3} className="w-full px-3 py-2 border border-red-200 bg-red-50 rounded-lg text-sm placeholder-red-300 focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-500/20 transition-colors font-medium text-red-900" placeholder="Bu kural neden oluşturuluyor? Zorunlu alan, min 5 karakter."></textarea>
-                                    </div>
-                                </form>
-                            </div>
+                                        <td className="px-6 py-4 text-center">
+                                            <span className="inline-flex px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest shadow-[inset_0_1px_4px_rgba(0,0,0,0.1)]">
+                                                {r.maxImpressionsPerDay || 'LİMİTSİZ ∞'}
+                                            </span>
+                                        </td>
 
-                            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/80 flex items-center justify-end gap-3 rounded-b-2xl">
-                                <button type="button" onClick={() => setShowModal(false)} className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-                                    Pencereyi Kapat
-                                </button>
-                                <button type="submit" form="boostRuleForm" disabled={saving} className="h-10 px-6 inline-flex items-center justify-center rounded-lg text-[13px] font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {saving ? 'AĞA İŞLENİYOR...' : 'KURAL PROTOKOLÜNÜ ONAYLA'}
-                                </button>
-                            </div>
-                        </div>
+                                        <td className="px-6 py-4 text-center">
+                                            <div className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest">{new Date(r.startsAt).toLocaleDateString()}</div>
+                                            <div className="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 my-1.5 tracking-widest">Bitiş</div>
+                                            <div className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest">{new Date(r.endsAt).toLocaleDateString()}</div>
+                                        </td>
+
+                                        <td className="px-6 py-4 text-center">
+                                            <span className={`inline-flex px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${r.status === 'ACTIVE' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30' :
+                                                r.status === 'SCHEDULED' ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border-amber-200 dark:border-amber-500/30' :
+                                                    r.status === 'EXPIRED' ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/5' :
+                                                        'bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-500/30'
+                                                }`}>
+                                                {r.status}
+                                            </span>
+                                        </td>
+
+                                        <td className="px-6 py-4 text-right">
+                                            {(r.status === 'ACTIVE' || r.status === 'SCHEDULED') ? (
+                                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => handleAction(r.id, 'expire-now')}
+                                                        className="inline-flex items-center justify-center h-8 px-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] tracking-widest uppercase font-black rounded-lg hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors shadow-sm"
+                                                    >
+                                                        Erken Bitir
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction(r.id, 'disable')}
+                                                        className="inline-flex items-center justify-center h-8 px-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-[10px] tracking-widest uppercase font-black rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors shadow-sm"
+                                                    >
+                                                        İptal Et
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-300 dark:text-slate-600 text-[12px] font-bold italic">-</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
+            </EnterpriseCard>
 
-            </div>
-        </div>
+            {/* Kural Ekleme Modalı */}
+            {showModal && (
+                <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-xl w-full max-w-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e293b] z-10">
+                            <div>
+                                <h2 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Platform İçi Kural Tanımlama Yönergesi</h2>
+                                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">Idempotency-key destekli kayıt ataması.</p>
+                            </div>
+                            <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white text-2xl font-light transition-colors">&times;</button>
+                        </div>
+
+                        <div className="p-6 overflow-y-auto">
+                            {(targetType === 'SELLER') && (
+                                <div className="mb-6 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 p-4 rounded-2xl flex gap-4 items-start shadow-sm">
+                                    <span className="text-blue-500 dark:text-blue-400 mt-0.5 text-lg">ℹ️</span>
+                                    <div>
+                                        <p className="text-[11px] font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-1">Risk Protokolü Uyarı Sistemi</p>
+                                        <p className="text-[10px] text-blue-800 dark:text-blue-300 font-bold uppercase tracking-widest">Hedef satıcı <span className="font-black border-b border-blue-300 dark:border-blue-500/50">"D" (Riskli)</span> tier grubunda ise, sistem otomatik olarak bu çarpan etkisini (x1.0) baz değerine geri dengeleyecektir (Platform Finansal Koruma İlkesi gereği). Satıcı ürünü yalnızca "reklamlı" etiketinde sponsorluk amblemi ile sergiler.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <form id="boostRuleForm" onSubmit={handleCreate} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Hedef Metodolojisi / Tipi</label>
+                                        <select required value={targetType} onChange={e => setTargetType(e.target.value)} className="w-full px-4 py-3 border border-slate-300 dark:border-white/10 rounded-xl text-[13px] bg-slate-50 dark:bg-[#0f172a] focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors font-bold text-slate-900 dark:text-white">
+                                            <option value="GLOBAL">GLOBAL (Tüm Sistem Ağı)</option>
+                                            <option value="CATEGORY">KATALOG KATEGORİSİ (Category)</option>
+                                            <option value="LISTING">SPESİFİK LİSTELEME (Listing)</option>
+                                            <option value="SELLER">TEDARİKÇİ / SATICI (Tenant)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Benzersiz Hedef ID (UUID) {targetType !== 'GLOBAL' && <span className="text-red-500">*</span>}</label>
+                                        <input disabled={targetType === 'GLOBAL'} required={targetType !== 'GLOBAL'} type="text" value={targetId} onChange={e => setTargetId(e.target.value)} className="w-full px-4 py-3 border border-slate-300 dark:border-white/10 rounded-xl text-[13px] bg-slate-50 dark:bg-[#0f172a] focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-mono text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="örn. 123e4567-e89b-12d3..." />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Gösterim Çarpanı (Multiplier)</label>
+                                        <div className="relative">
+                                            <input required type="number" step="0.1" min="1.0" max="3.0" value={multiplier} onChange={e => setMultiplier(Number(e.target.value))} className="w-full px-4 py-3 border border-slate-300 dark:border-white/10 rounded-xl text-[13px] bg-slate-50 dark:bg-[#0f172a] focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors font-mono font-black text-emerald-700 dark:text-emerald-400 pl-8" />
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-500 font-black">x</span>
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2">Sert manipülasyonları engellemek adına Max 3.0 limiti.</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Günlük Gösterim Limiti (Imp. Cap)</label>
+                                        <input type="number" value={maxImp} onChange={e => setMaxImp(e.target.value)} placeholder="Limit Yok ise Boş Bırakınız" className="w-full px-4 py-3 border border-slate-300 dark:border-white/10 rounded-xl text-[13px] bg-slate-50 dark:bg-[#0f172a] focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors font-mono font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 tracking-widest uppercase" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Başlangıç Zamanı</label>
+                                        <input required type="datetime-local" value={startsAt} onChange={e => setStartsAt(e.target.value)} className="w-full px-4 py-3 border border-slate-300 dark:border-white/10 rounded-xl text-[13px] font-bold bg-slate-50 dark:bg-[#0f172a] focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Bitiş Zamanı</label>
+                                        <input required type="datetime-local" value={endsAt} onChange={e => setEndsAt(e.target.value)} className="w-full px-4 py-3 border border-slate-300 dark:border-white/10 rounded-xl text-[13px] font-bold bg-slate-50 dark:bg-[#0f172a] focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors text-slate-900 dark:text-white" />
+                                    </div>
+                                </div>
+
+                                <div className="pt-2">
+                                    <label className="block text-[11px] font-black text-red-600 dark:text-red-400 mb-2 uppercase tracking-widest">Güvenlik: İşlem Sebebi (Audit Log)</label>
+                                    <textarea required minLength={5} value={reason} onChange={e => setReason(e.target.value)} rows={3} className="w-full px-4 py-3 border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 rounded-xl text-[13px] placeholder-red-300 dark:placeholder-red-400/50 focus:outline-none focus:border-red-400 dark:focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-colors font-bold text-red-900 dark:text-red-400" placeholder="Bu kural neden oluşturuluyor? Zorunlu alan, min 5 karakter."></textarea>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#1e293b] flex items-center justify-end gap-3 rounded-b-2xl">
+                            <button type="button" onClick={() => setShowModal(false)} className="h-10 px-5 inline-flex items-center justify-center rounded-xl text-[11px] font-black uppercase tracking-widest border border-slate-300 dark:border-white/10 bg-white dark:bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#0f172a] transition-colors shadow-sm">
+                                Vazgeç
+                            </button>
+                            <button type="submit" form="boostRuleForm" disabled={saving} className="h-10 px-6 inline-flex items-center justify-center rounded-xl text-[11px] font-black uppercase tracking-widest bg-emerald-600 dark:bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                {saving ? 'AĞA İŞLENİYOR...' : 'KURAL PROTOKOLÜNÜ ONAYLA'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </EnterprisePageShell>
     );
 }

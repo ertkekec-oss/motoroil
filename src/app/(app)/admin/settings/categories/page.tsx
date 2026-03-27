@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { createCategoryAction } from "@/actions/adminGovernanceActions";
 import { Layers, Network, Tag, ChevronRight, FolderTree } from "lucide-react";
+import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader, EnterpriseButton } from "@/components/ui/enterprise";
 
 export const dynamic = "force-dynamic";
 
@@ -33,21 +33,21 @@ export default async function AdminCategoriesPage() {
         await createCategoryAction({ name, parentId: parentId || undefined, slug });
     }
 
-    // Server-side recursive tree renderer using modern HTML5 <details> for JS-less toggling
+    // Server-side recursive tree renderer using modern HTML5 <details>
     const renderNode = (node: any, level: number = 0) => {
         const hasChildren = node.children && node.children.length > 0;
         const isRoot = level === 0;
 
         return (
             <details key={node.id} className="group" open={isRoot}>
-                <summary className="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/[0.02] list-none select-none">
+                <summary className="flex items-center justify-between p-3 rounded-[14px] cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-white/10 list-none select-none">
                     <div className="flex items-center gap-3">
-                        <div className={`w-6 h-6 flex items-center justify-center rounded-md flex-shrink-0 transition-colors ${
+                        <div className={`w-6 h-6 flex items-center justify-center rounded-lg flex-shrink-0 transition-colors ${
                             isRoot 
-                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500' 
+                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' 
                                 : hasChildren 
-                                    ? 'bg-gray-100 dark:bg-white/[0.05] text-gray-500 dark:text-gray-400'
-                                    : 'text-gray-300 dark:text-gray-600'
+                                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                    : 'text-slate-300 dark:text-slate-600'
                         }`}>
                             {hasChildren ? (
                                 <ChevronRight className="w-4 h-4 transition-transform duration-200 group-open:rotate-90" />
@@ -55,24 +55,23 @@ export default async function AdminCategoriesPage() {
                                 <div className="w-1.5 h-1.5 rounded-full bg-current" />
                             )}
                         </div>
-                        <span className={`text-sm ${isRoot ? 'font-semibold text-gray-900 dark:text-white' : 'font-medium text-gray-700 dark:text-gray-300'}`}>
+                        <span className={`text-sm ${isRoot ? 'font-black tracking-tight text-slate-900 dark:text-white' : 'font-bold text-slate-700 dark:text-slate-300'}`}>
                             {node.name}
                         </span>
                         {hasChildren && (
-                            <span className="text-[10px] items-center flex px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-white/[0.05] text-gray-500 dark:text-gray-400 font-medium">
+                            <span className="text-[10px] items-center flex px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold border border-slate-200 dark:border-white/5">
                                 {node.children.length}
                             </span>
                         )}
                     </div>
                     
-                    {/* Slug badge hiding on extra small screens */}
-                    <div className="hidden sm:flex items-center px-2 py-1 rounded border border-gray-200 dark:border-white/[0.05] bg-white dark:bg-[#0B0D10] text-[10px] font-mono text-gray-400 truncate max-w-[200px]">
+                    <div className="hidden sm:flex items-center px-2 py-1 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 truncate max-w-[200px] shadow-sm">
                         {node.slug}
                     </div>
                 </summary>
 
                 {hasChildren && (
-                    <div className="mt-1 ml-3 pl-3 border-l border-gray-200 dark:border-white/[0.05] space-y-0.5 flex flex-col">
+                    <div className="mt-1 ml-3 pl-3 border-l tracking-widest border-slate-200 dark:border-white/5 space-y-1 flex flex-col pt-1 pb-2">
                         {node.children.sort((a: any, b: any) => a.name.localeCompare(b.name)).map((child: any) => renderNode(child, level + 1))}
                     </div>
                 )}
@@ -81,108 +80,88 @@ export default async function AdminCategoriesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0D10] font-sans">
-            {/* Header Section */}
-            <div className="bg-white dark:bg-[#111317] border-b border-gray-100 dark:border-white/[0.04]">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <div className="flex items-center gap-2 text-indigo-500 mb-2">
-                                <Network className="w-5 h-5" />
-                                <span className="text-xs font-bold tracking-wider uppercase">Global Taxonomy</span>
-                            </div>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-                                Universal Catalog Categories
-                            </h1>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-2xl">
-                                Manage the deeply nested network hierarchy for B2B trade endpoints. Defines accurate ML routing across Hub instances.
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/[0.04] text-sm font-medium text-gray-600 dark:text-gray-300">
-                                {categories.length} Root Nodes
-                            </div>
-                            <div className="px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                                <Layers className="w-4 h-4" />
-                                4 Levels Deep
-                            </div>
-                        </div>
-                    </div>
+        <EnterprisePageShell
+            title="Universal Catalog Categories"
+            description="Manage the deeply nested network hierarchy for B2B trade endpoints. Defines accurate ML routing across Hub instances."
+        >
+            <div className="flex items-center gap-3 mb-6">
+                <div className="px-4 py-2 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 shadow-sm flex items-center justify-center">
+                    {categories.length} Root Nodes
+                </div>
+                <div className="px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-[11px] font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-400 flex items-center gap-2 shadow-sm">
+                    <Layers className="w-4 h-4" />
+                    4 Levels Deep
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 space-y-8">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    
-                    {/* Tree View Panel (Takes 3 columns) */}
-                    <div className="lg:col-span-3">
-                        <div className="bg-white dark:bg-[#111317] rounded-2xl shadow-sm border border-gray-100 dark:border-white/[0.04] overflow-hidden">
-                            <div className="px-6 py-5 border-b border-gray-100 dark:border-white/[0.04] flex items-center gap-3">
-                                <FolderTree className="w-5 h-5 text-gray-400" />
-                                <h2 className="text-base font-semibold text-gray-900 dark:text-white">Active Hierarchy Network</h2>
-                            </div>
-                            
-                            <div className="p-4 bg-gray-50/50 dark:bg-transparent max-h-[70vh] overflow-y-auto">
-                                {categories.length === 0 ? (
-                                    <div className="py-20 flex flex-col items-center justify-center text-gray-400">
-                                        <Network className="w-12 h-12 mb-4 opacity-20" />
-                                        <p>No taxonomy definitions found.</p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-1">
-                                        {categories.map(root => renderNode(root, 0))}
-                                    </div>
-                                )}
-                            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-3">
+                    <EnterpriseCard noPadding>
+                        <EnterpriseSectionHeader 
+                            title="Active Hierarchy Network" 
+                            icon={<FolderTree className="h-5 w-5" />}
+                            className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20"
+                        />
+                        
+                        <div className="p-4 bg-transparent max-h-[70vh] overflow-y-auto custom-scrollbar">
+                            {categories.length === 0 ? (
+                                <div className="py-20 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
+                                    <Network className="w-12 h-12 mb-4 opacity-20" />
+                                    <p className="text-sm font-black tracking-widest uppercase">No taxonomy definitions found</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-1">
+                                    {categories.map(root => renderNode(root, 0))}
+                                </div>
+                            )}
                         </div>
-                    </div>
+                    </EnterpriseCard>
+                </div>
 
-                    {/* Form Panel (Takes 1 column) */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white dark:bg-[#111317] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-white/[0.04] sticky top-8">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-500">
-                                    <Tag className="w-4 h-4" />
-                                </div>
-                                <h2 className="text-base font-semibold text-gray-900 dark:text-white">Append Node</h2>
+                <div className="lg:col-span-1">
+                    <EnterpriseCard className="sticky top-8">
+                        <EnterpriseSectionHeader title="Append Node" icon={<Tag className="h-4 w-4" />} />
+                        
+                        <form action={handleAdd} className="space-y-5 mt-4">
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 px-1">
+                                    Node Name
+                                </label>
+                                <input 
+                                    name="name" 
+                                    type="text" 
+                                    className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-sm" 
+                                    placeholder="e.g. Engine Components" 
+                                    required 
+                                />
                             </div>
-                            
-                            <form action={handleAdd} className="space-y-5">
-                                <div className="space-y-1.5">
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                        Node Name
-                                    </label>
-                                    <input 
-                                        name="name" 
-                                        type="text" 
-                                        className="w-full bg-gray-50 dark:bg-[#0B0D10] border border-gray-200 dark:border-white/[0.06] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all placeholder:text-gray-400" 
-                                        placeholder="e.g. Engine Components" 
-                                        required 
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                        Parent Mapping
-                                    </label>
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 px-1">
+                                    Parent Mapping
+                                </label>
+                                <div className="relative">
                                     <select 
                                         name="parentId" 
-                                        className="w-full bg-gray-50 dark:bg-[#0B0D10] border border-gray-200 dark:border-white/[0.06] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all appearance-none"
+                                        className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 rounded-xl pl-4 pr-10 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all appearance-none shadow-sm"
                                     >
                                         <option value="">None (Creates Root Node)</option>
                                         {categories?.map(c => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
                                     </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                    </div>
                                 </div>
-                                <button className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors shadow-sm mt-4 active:scale-[0.98]">
-                                    Provision Category
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
+                            </div>
+                            
+                            <EnterpriseButton variant="primary" type="submit" className="w-full mt-6 flex justify-center uppercase tracking-widest text-[10px] px-0 h-12">
+                                <FolderTree className="w-4 h-4 mr-2" /> Provision Category
+                            </EnterpriseButton>
+                        </form>
+                    </EnterpriseCard>
                 </div>
             </div>
-        </div>
+        </EnterprisePageShell>
     );
 }

@@ -1,4 +1,5 @@
-import { EnterprisePageShell, EnterpriseCard, EnterpriseButton } from '@/components/ui/enterprise';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseButton, EnterpriseInput, EnterpriseSelect, EnterpriseSectionHeader } from '@/components/ui/enterprise';
+import { Save, ShieldCheck } from 'lucide-react';
 
 export default async function PoliciesPage() {
     return (
@@ -7,36 +8,44 @@ export default async function PoliciesPage() {
             description="Tenant bazlı genel kurallar. M-FA Zorunluluğu, Token Yaşam Süresi (TTL)."
             actions={
                 <EnterpriseButton variant="primary">
-                    Politikaları Kaydet
+                    <Save className="w-4 h-4" /> Politikaları Kaydet
                 </EnterpriseButton>
             }
         >
-            <EnterpriseCard>
-                <div className="border-b pb-4 mb-4 dark:border-slate-800">
-                    <h3 className="text-lg font-medium">Aktif Politika Matrisi</h3>
-                    <p className="text-sm text-slate-500">Bu ayarlar tüm yeni oluşturulan zarflara (envelope) snapshot olarak kopyalanacaktır.</p>
-                </div>
-                <div className="space-y-4 max-w-lg mt-4">
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm font-medium">Varsayılan Public Token TTL (Saat)</label>
-                        <input type="number" defaultValue={72} className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 dark:bg-slate-800 dark:text-white dark:ring-slate-700" />
-                    </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <EnterpriseCard>
+                    <EnterpriseSectionHeader 
+                        title="Aktif Politika Matrisi" 
+                        subtitle="Bu ayarlar tüm yeni oluşturulan zarflara (envelope) snapshot olarak kopyalanacaktır." 
+                        icon={<ShieldCheck className="w-5 h-5" />}
+                    />
+                    
+                    <div className="space-y-5">
+                        <EnterpriseInput 
+                            label="Varsayılan Public Token TTL (Saat)" 
+                            type="number" 
+                            defaultValue={72} 
+                            hint="Zarf bağlantılarının otomatik iptal edilmeden önce geçerli olacağı süre."
+                        />
 
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm font-medium">Zorunlu İmza Yöntemi</label>
-                        <select className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 dark:bg-slate-800 dark:text-white dark:ring-slate-700">
+                        <EnterpriseSelect 
+                            label="Zorunlu İmza Yöntemi" 
+                            hint="Tüm dış katılımcıların doğrulanma şartı."
+                        >
                             <option value="NONE">Belirtilmedi (Sadece Email Linki - Serbest Mod)</option>
                             <option value="EMAIL_OTP">Email OTP (Varsayılan)</option>
                             <option value="SMS_OTP">SMS OTP (Kredi Gerektirir)</option>
-                        </select>
-                    </div>
+                        </EnterpriseSelect>
 
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm font-medium">Max OTP Deneme Hakkı</label>
-                        <input type="number" defaultValue={5} className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 dark:bg-slate-800 dark:text-white dark:ring-slate-700" />
+                        <EnterpriseInput 
+                            label="Max OTP Deneme Hakkı" 
+                            type="number" 
+                            defaultValue={5} 
+                            hint="Güvenlik nedeniyle 5 üzerinde olması tavsiye edilmez."
+                        />
                     </div>
-                </div>
-            </EnterpriseCard>
+                </EnterpriseCard>
+            </div>
         </EnterprisePageShell>
     );
 }

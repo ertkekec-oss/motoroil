@@ -1,7 +1,6 @@
 import React from 'react';
 
 // ─── EnterpriseCard ────────────────────────────────────────────────────────────
-// Token: border only, shadow-sm max, no glow, rounded-xl
 export const EnterpriseCard = ({
     children,
     className = '',
@@ -18,10 +17,14 @@ export const EnterpriseCard = ({
     return (
         <div
             onClick={onClick}
-            className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm ${noPadding ? '' : 'p-6'} ${className}`}
+            className={`bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm relative overflow-hidden group ${noPadding ? '' : 'p-6 md:p-8'} ${className}`}
             style={borderLeftColor ? { borderLeft: `4px solid ${borderLeftColor}` } : {}}
         >
-            {children}
+            {/* Ambient Background Glow Effect (Subtle) */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none transition-all duration-500"></div>
+            <div className="relative z-10 w-full">
+                {children}
+            </div>
         </div>
     );
 };
@@ -39,18 +42,20 @@ export const EnterpriseSectionHeader = ({
     rightElement?: React.ReactNode;
 }) => {
     return (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-6">
-            {icon && (
-                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg border border-slate-200 dark:border-slate-700 shrink-0">
-                    {icon}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6 mb-8 relative z-10">
+            <div className="flex items-start gap-4 flex-1">
+                {icon && (
+                    <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center text-indigo-500 dark:text-indigo-400 border border-slate-100 dark:border-white/5 shrink-0 shadow-sm">
+                        {icon}
+                    </div>
+                )}
+                <div>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">{title}</h3>
+                    {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">{subtitle}</p>}
                 </div>
-            )}
-            <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">{title}</h3>
-                {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
             </div>
             {rightElement && (
-                <div className="sm:ml-auto shrink-0">
+                <div className="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
                     {rightElement}
                 </div>
             )}
@@ -73,15 +78,15 @@ export const EnterpriseField = ({
     className?: string;
 }) => {
     return (
-        <div className={`space-y-1.5 ${className}`}>
+        <div className={`space-y-2 relative z-10 ${className}`}>
             {label && (
-                <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1 flex justify-between items-center">
                     {label}
                 </label>
             )}
             {children}
-            {hint && !error && <p className="text-xs text-slate-400 dark:text-slate-500">{hint}</p>}
-            {error && <p className="text-xs text-rose-500">{error}</p>}
+            {hint && !error && <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium px-1">{hint}</p>}
+            {error && <p className="text-[11px] font-bold text-rose-500 dark:text-rose-400 px-1">{error}</p>}
         </div>
     );
 };
@@ -92,7 +97,7 @@ export const EnterpriseInput = React.forwardRef<HTMLInputElement, React.InputHTM
         const inputEl = (
             <input
                 ref={ref}
-                className={`w-full h-10 px-3.5 bg-white dark:bg-slate-950 border ${error ? 'border-rose-400 focus:ring-rose-400/30' : 'border-slate-200 dark:border-slate-800 focus:ring-slate-400/20'} rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:border-slate-400 dark:focus:border-slate-600 transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-slate-400 dark:placeholder:text-slate-600 read-only:bg-slate-50 dark:read-only:bg-slate-900 ${className}`}
+                className={`w-full h-11 px-4 bg-white dark:bg-[#0f172a] border ${error ? 'border-rose-400 dark:border-rose-500/50 focus:ring-rose-500/30' : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500/50'} rounded-xl text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:border-indigo-500 transition-all shadow-sm read-only:bg-slate-50 dark:read-only:bg-slate-900/50 disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
                 {...props}
             />
         );
@@ -108,13 +113,18 @@ EnterpriseInput.displayName = 'EnterpriseInput';
 export const EnterpriseSelect = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement> & { label?: string; hint?: string; error?: string }>(
     ({ className = '', label, hint, error, children, ...props }, ref) => {
         const selectEl = (
-            <select
-                ref={ref}
-                className={`w-full h-10 px-3.5 bg-white dark:bg-slate-950 border ${error ? 'border-rose-400 focus:ring-rose-400/30' : 'border-slate-200 dark:border-slate-800 focus:ring-slate-400/20'} rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:border-slate-400 dark:focus:border-slate-600 transition-all outline-none appearance-none cursor-pointer disabled:opacity-50 ${className}`}
-                {...props}
-            >
-                {children}
-            </select>
+            <div className="relative">
+                <select
+                    ref={ref}
+                    className={`w-full h-11 pl-4 pr-10 bg-white dark:bg-[#0f172a] border ${error ? 'border-rose-400 dark:border-rose-500/50 focus:ring-rose-500/30' : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500/50'} rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:border-indigo-500 transition-all shadow-sm appearance-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+                    {...props}
+                >
+                    {children}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+            </div>
         );
         if (label || hint || error) {
             return <EnterpriseField label={label} hint={hint} error={error}>{selectEl}</EnterpriseField>;
@@ -130,7 +140,7 @@ export const EnterpriseTextarea = React.forwardRef<HTMLTextAreaElement, React.Te
         const textareaEl = (
             <textarea
                 ref={ref}
-                className={`w-full p-3.5 min-h-[100px] bg-white dark:bg-slate-950 border ${error ? 'border-rose-400 focus:ring-rose-400/30' : 'border-slate-200 dark:border-slate-800 focus:ring-slate-400/20'} rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:border-slate-400 dark:focus:border-slate-600 transition-all outline-none resize-y disabled:opacity-50 placeholder:text-slate-400 dark:placeholder:text-slate-600 ${className}`}
+                className={`w-full p-4 min-h-[120px] bg-white dark:bg-[#0f172a] border ${error ? 'border-rose-400 dark:border-rose-500/50 focus:ring-rose-500/30' : 'border-slate-200 dark:border-slate-700 focus:ring-indigo-500/50'} rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:border-indigo-500 transition-all shadow-sm resize-y disabled:opacity-60 placeholder:text-slate-400 dark:placeholder:text-slate-600 ${className}`}
                 {...props}
             />
         );
@@ -143,7 +153,6 @@ export const EnterpriseTextarea = React.forwardRef<HTMLTextAreaElement, React.Te
 EnterpriseTextarea.displayName = 'EnterpriseTextarea';
 
 // ─── EnterpriseButton ──────────────────────────────────────────────────────────
-// rounded-lg (not full), slate-900 primary, no glow/gradient
 export const EnterpriseButton = ({
     children,
     variant = 'primary',
@@ -154,12 +163,12 @@ export const EnterpriseButton = ({
     variant?: 'primary' | 'secondary' | 'danger';
     className?: string;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
-    const baseStyles = "h-10 px-4 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer outline-none whitespace-nowrap";
+    const baseStyles = "h-11 px-6 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed outline-none whitespace-nowrap shadow-sm";
 
     const variants: Record<string, string> = {
-        primary: "bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white dark:bg-white dark:hover:bg-slate-100 dark:active:bg-slate-200 dark:text-slate-900",
-        secondary: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600",
-        danger: "bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white border border-rose-700"
+        primary: "bg-slate-900 dark:bg-emerald-600 text-white hover:bg-slate-800 dark:hover:bg-emerald-500 border border-transparent shadow-[0_4px_14px_0_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_rgba(16,185,129,0.3)]",
+        secondary: "bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800",
+        danger: "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/20"
     };
 
     return (
@@ -187,15 +196,15 @@ export const EnterpriseSwitch = ({
     className?: string;
 }) => {
     return (
-        <label className={`flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer transition-all select-none ${className}`}>
-            <div className={`w-10 rounded-full relative transition-all duration-200 shrink-0 ${checked ? 'bg-slate-900 dark:bg-white' : 'bg-slate-200 dark:bg-slate-700'}`}
-                style={{ height: '22px' }}>
-                <div className={`absolute top-[3px] w-4 h-4 rounded-full transition-all duration-200 ${checked ? 'left-[22px] bg-white dark:bg-slate-900' : 'left-[3px] bg-white dark:bg-slate-400'}`} />
+        <label className={`flex items-center gap-4 p-4 bg-white dark:bg-[#1e293b] hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none shadow-sm relative z-10 ${className}`}>
+            <div className={`w-12 rounded-full relative transition-all duration-300 shrink-0 border ${checked ? 'bg-indigo-500 dark:bg-emerald-500 border-indigo-600 dark:border-emerald-400' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-700'}`}
+                style={{ height: '26px' }}>
+                <div className={`absolute top-[2px] w-[20px] h-[20px] rounded-full transition-all duration-300 shadow-sm ${checked ? 'left-[26px] bg-white' : 'left-[2px] bg-white dark:bg-slate-400'}`} />
             </div>
             <input type="checkbox" className="hidden" checked={checked} onChange={onChange} />
             <div className="flex-1">
-                {label && <div className="text-sm font-medium text-slate-900 dark:text-white leading-tight">{label}</div>}
-                {description && <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</div>}
+                {label && <div className="text-sm font-black text-slate-900 dark:text-white leading-tight">{label}</div>}
+                {description && <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">{description}</div>}
             </div>
         </label>
     );
@@ -212,18 +221,18 @@ export const EnterpriseTable = ({
     className?: string;
 }) => {
     return (
-        <div className={`w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 ${className}`}>
+        <div className={`w-full overflow-x-auto rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-[#1e293b] shadow-sm relative z-10 ${className}`}>
             <table className="w-full text-left border-collapse">
-                <thead className="bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+                <thead className="bg-slate-50/80 dark:bg-slate-900/50 sticky top-0 z-10 border-b border-slate-200 dark:border-white/5">
                     <tr>
                         {headers?.map((h, i: number) => (
-                            <th key={i} className={`h-10 px-4 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap ${typeof h === 'object' && h.alignRight ? 'text-right' : ''}`}>
+                            <th key={i} className={`h-11 px-6 text-[10px] font-bold text-slate-500 dark:text-slate-400/80 uppercase tracking-widest whitespace-nowrap ${typeof h === 'object' && h.alignRight ? 'text-right' : ''}`}>
                                 {typeof h === 'object' ? h.label : h}
                             </th>
                         ))}
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                     {children}
                 </tbody>
             </table>
@@ -232,7 +241,6 @@ export const EnterpriseTable = ({
 };
 
 // ─── EnterprisePageShell ───────────────────────────────────────────────────────
-// Root container — full width, no max-w lock (parent controls width)
 export const EnterprisePageShell = ({
     title,
     description,
@@ -247,24 +255,26 @@ export const EnterprisePageShell = ({
     className?: string;
 }) => {
     return (
-        <div className={`w-full px-8 py-10 max-w-[1280px] mx-auto ${className}`}>
-            {(title || actions) && (
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
-                    <div>
-                        {title && (
-                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                                {title}
-                            </h1>
-                        )}
-                        {description && (
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{description}</p>
-                        )}
+        <div className={`bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16 ${className}`}>
+            <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300 space-y-8">
+                {(title || actions) && (
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 border-b border-slate-200 dark:border-white/10 pb-6">
+                        <div>
+                            {title && (
+                                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                                    {title}
+                                </h1>
+                            )}
+                            {description && (
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-2xl">{description}</p>
+                            )}
+                        </div>
+                        {actions && <div className="shrink-0">{actions}</div>}
                     </div>
-                    {actions && <div className="shrink-0">{actions}</div>}
+                )}
+                <div className="space-y-6">
+                    {children}
                 </div>
-            )}
-            <div className="space-y-6">
-                {children}
             </div>
         </div>
     );
@@ -277,23 +287,23 @@ export const EnterpriseTabs = ({
     onTabChange,
     className = ''
 }: {
-    tabs: Array<{ id: string; label: string; icon?: string }>;
+    tabs: Array<{ id: string; label: string; icon?: React.ReactNode }>;
     activeTab: string;
     onTabChange: (id: string) => void;
     className?: string;
 }) => {
     return (
-        <div className={`flex flex-wrap gap-1 p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 w-fit mb-6 shadow-sm ${className}`}>
+        <div className={`flex flex-wrap gap-2 p-1.5 bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 w-fit mb-8 shadow-sm relative z-10 ${className}`}>
             {tabs?.map((tab) => (
                 <button
                     key={tab.id}
                     onClick={() => onTabChange(tab.id)}
-                    className={`px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2 ${activeTab === tab.id
-                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    className={`px-5 py-2.5 rounded-xl text-[11px] font-bold tracking-widest uppercase transition-all flex items-center gap-2 ${activeTab === tab.id
+                        ? 'bg-slate-900 dark:bg-slate-800 text-white dark:text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                         }`}
                 >
-                    {tab.icon && <span>{tab.icon}</span>}
+                    {tab.icon && <span className="w-4 h-4">{tab.icon}</span>}
                     <span>{tab.label}</span>
                 </button>
             ))}
@@ -302,7 +312,6 @@ export const EnterpriseTabs = ({
 };
 
 // ─── EnterpriseEmptyState ──────────────────────────────────────────────────────
-// Corporate: muted icon, no glow, no color
 export const EnterpriseEmptyState = ({
     icon,
     title,
@@ -317,17 +326,19 @@ export const EnterpriseEmptyState = ({
     className?: string;
 }) => {
     return (
-        <div className={`flex flex-col items-center justify-center py-16 px-6 text-center text-slate-500 ${className}`}>
+        <div className={`flex flex-col items-center justify-center p-16 text-center w-full rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-[#1e293b] shadow-sm relative z-10 ${className}`}>
             {icon && (
-                <div className="text-3xl text-slate-300 dark:text-slate-600 mb-4">
-                    {icon}
+                <div className="text-slate-400 dark:text-slate-500 mb-6 opacity-50 relative">
+                    {/* Ambient glow behind icon */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-indigo-500/10 dark:bg-emerald-500/10 rounded-full blur-[20px] pointer-events-none"></div>
+                    <div className="relative z-10">{icon}</div>
                 </div>
             )}
-            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{title}</h3>
+            <h3 className="text-sm font-black text-slate-800 dark:text-slate-200 tracking-widest uppercase mb-2">{title}</h3>
             {description && (
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-xs">{description}</p>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">{description}</p>
             )}
-            {action && <div className="mt-5">{action}</div>}
+            {action && <div className="mt-8">{action}</div>}
         </div>
     );
 };

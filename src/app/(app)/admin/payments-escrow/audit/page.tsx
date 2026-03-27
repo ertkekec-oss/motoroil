@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { ShieldCheck, Filter, AlertCircle, FileText, Calendar, Database } from "lucide-react";
 
 export default function AuditPage() {
     const [logs, setLogs] = useState<any[]>([]);
@@ -25,70 +26,106 @@ export default function AuditPage() {
     };
 
     return (
-        <div className="space-y-6 max-w-7xl">
-            <div className="border-b pb-4 flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Governance Denetim İzi (Audit Trail)</h1>
-                    <p className="text-sm text-slate-500 mt-2">Platform seviyesindeki politikaların (Komisyon / Escrow) izlenebilirliği.</p>
+        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16">
+            <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+                            <ShieldCheck className="w-6 h-6 text-indigo-500" />
+                            Governance Denetim İzi (Audit Trail)
+                        </h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                            Platform seviyesindeki finansal politikaların (Komisyon / Escrow) kim tarafından ve ne sebeple değiştirildiğinin izlenebilirliği.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <Filter className="w-4 h-4 text-slate-400 ml-2" />
+                        <select value={actionFilter} onChange={e => setActionFilter(e.target.value)} className="bg-transparent border-none text-sm font-bold text-slate-900 dark:text-white cursor-pointer outline-none focus:ring-0">
+                            <option value="">Tümü (Global Görünüm)</option>
+                            <option value="ESCROW_POLICY_UPDATE">Escrow Değişimi</option>
+                            <option value="COMMISSION_PLAN_CREATE">Komisyon Planı (Yeni)</option>
+                            <option value="COMMISSION_PLAN_UPDATE">Komisyon Planı (Güncelleme)</option>
+                            <option value="COMMISSION_PLAN_ARCHIVE">Komisyon Planı (Arşiv)</option>
+                            <option value="PROVIDER_RECONCILE_TRIGGER">Manuel Mutabakat</option>
+                            <option value="KILL_SWITCH_TOGGLE">Acil Durumu (Kill Switch)</option>
+                        </select>
+                    </div>
                 </div>
 
-                <select value={actionFilter} onChange={e => setActionFilter(e.target.value)} className="p-2 border rounded-md shadow-sm text-sm font-medium focus:ring">
-                    <option value="">Tüm İşlemler</option>
-                    <option value="ESCROW_POLICY_UPDATE">Escrow Seçenekleri Değişimi</option>
-                    <option value="COMMISSION_PLAN_CREATE">Yeni Plan Oluşturma</option>
-                    <option value="COMMISSION_PLAN_UPDATE">Plan Güncellemesi</option>
-                    <option value="COMMISSION_PLAN_ARCHIVE">Plan Arşivleme</option>
-                    <option value="PROVIDER_RECONCILE_TRIGGER">Mutabakat Tetiklemesi</option>
-                    <option value="KILL_SWITCH_TOGGLE">Kill Switch / Acil Durdurma</option>
-                </select>
-            </div>
-
-            {loading ? (
-                <div className="p-8 text-center text-slate-500">Kayıtlar aranıyor...</div>
-            ) : (
-                <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <table className="w-full text-left font-inter table-auto">
-                        <thead className="bg-slate-50 border-b text-xs uppercase text-slate-500 font-bold sticky top-0">
-                            <tr>
-                                <th className="p-4">Tarih</th>
-                                <th className="p-4">Aksiyon</th>
-                                <th className="p-4">Nesne (Entity)</th>
-                                <th className="p-4">Firma (Tenant)</th>
-                                <th className="p-4 w-1/3">Sebep / Payload Özeti</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y text-sm">
-                            {logs?.map(log => (
-                                <tr key={log.id} className="hover:bg-slate-50">
-                                    <td className="p-4 font-medium text-slate-600 space-y-1">
-                                        <div>{new Date(log.createdAt).toLocaleDateString()}</div>
-                                        <div className="text-xs text-slate-400">{new Date(log.createdAt).toLocaleTimeString()}</div>
-                                    </td>
-                                    <td className="p-4">
-                                        <span className={`px-2 py-1 flex max-w-min rounded font-bold text-xs ring-1 ring-inset ${log.action.includes('KILL_SWITCH') ? 'bg-red-50 text-red-700 ring-red-200' :
-                                                log.action.includes('UPDATE') ? 'bg-amber-50 text-amber-700 ring-amber-200' :
-                                                    log.action.includes('ARCHIVE') ? 'bg-slate-100 text-slate-600 ring-slate-200' :
-                                                        log.action.includes('RECONCILE') ? 'bg-blue-50 text-blue-700 ring-blue-200' :
-                                                            'bg-emerald-50 text-emerald-700 ring-emerald-200'
-                                            }`}>
-                                            {log.action}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-slate-600 font-mono text-xs">{log.entityType} <br /> <span className="text-slate-400">{log.entityId}</span></td>
-                                    <td className="p-4 font-semibold text-slate-800">{log.tenantId}</td>
-                                    <td className="p-4">
-                                        <div className="font-semibold text-slate-800 text-sm">{log.payloadJson?.reason || 'Sebep Yok'}</div>
-                                        <pre className="mt-2 p-2 bg-slate-100 rounded text-xs text-slate-600 max-h-32 overflow-y-auto whitespace-pre-wrap">
-                                            {JSON.stringify(log.payloadJson, null, 2)}
-                                        </pre>
-                                    </td>
+                <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-white/5 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left font-sans table-auto">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-white/5 text-[11px] uppercase text-slate-500 dark:text-slate-400 font-bold sticky top-0 z-10">
+                                <tr>
+                                    <th className="py-4 px-6 border-none whitespace-nowrap">Tarih / Zaman</th>
+                                    <th className="py-4 px-6 border-none">Aksiyon Tipi</th>
+                                    <th className="py-4 px-6 border-none">Hedef (Entity)</th>
+                                    <th className="py-4 px-6 border-none">Firma / Acenta (Tenant)</th>
+                                    <th className="py-4 px-6 border-none w-1/3">Sebep ve Veri (Payload)</th>
                                 </tr>
-                            ))}
-                            {logs.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-slate-500">Seçili kriterde denetim kaydı bulunamadı.</td></tr>}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-sm">
+                                {loading ? (
+                                    <tr><td colSpan={5} className="py-12 px-6 text-center text-slate-400 dark:text-slate-500 font-medium">Güvenlik kayıtları analize ediliyor...</td></tr>
+                                ) : logs.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} className="py-12 px-6 text-center text-slate-400 dark:text-slate-500 font-medium flex-col items-center">
+                                            <AlertCircle className="w-8 h-8 mx-auto mb-3 opacity-20" /> Seçi̇li̇ kri̇terde deneti̇m kaydi bulunamadi.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    logs?.map((log, index) => (
+                                        <tr key={log.id || index} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                            <td className="py-4 px-6 align-top">
+                                                <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+                                                    <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                                                    {new Date(log.createdAt).toLocaleDateString('tr-TR')}
+                                                </div>
+                                                <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 uppercase pl-6">{new Date(log.createdAt).toLocaleTimeString('tr-TR')}</div>
+                                            </td>
+                                            <td className="py-4 px-6 align-top">
+                                                <span className={`px-2.5 py-1 flex max-w-min rounded-md uppercase font-bold text-[10px] tracking-wider border ${
+                                                    log.action.includes('KILL_SWITCH') ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-900/30 dark:border-rose-500/30 dark:text-rose-400' :
+                                                    log.action.includes('UPDATE') ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-500/30 dark:text-amber-400' :
+                                                    log.action.includes('ARCHIVE') ? 'bg-slate-100 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400' :
+                                                    log.action.includes('RECONCILE') ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500/30 dark:text-blue-400' :
+                                                    'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-500/30 dark:text-emerald-400'
+                                                }`}>
+                                                    {log.action}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-6 text-slate-600 dark:text-slate-300 font-mono text-xs align-top">
+                                                <div className="flex items-center gap-1.5 font-bold mb-1">
+                                                    <Database className="w-3.5 h-3.5 text-slate-400" />
+                                                    {log.entityType}
+                                                </div>
+                                                <div className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800/50 p-1 px-1.5 rounded w-max border border-slate-200 dark:border-white/5 truncate max-w-[150px]" title={log.entityId}>{log.entityId}</div>
+                                            </td>
+                                            <td className="py-4 px-6 font-bold text-slate-800 dark:text-slate-300 font-mono text-xs align-top">
+                                                {log.tenantId ? log.tenantId : <span className="text-slate-400 italic font-sans text-sm">Sistem</span>}
+                                            </td>
+                                            <td className="py-4 px-6 align-top">
+                                                {log.payloadJson?.reason && (
+                                                    <div className="font-bold text-slate-800 dark:text-white text-sm mb-2 flex gap-2">
+                                                        <FileText className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                                                        {log.payloadJson.reason}
+                                                    </div>
+                                                )}
+                                                <div className="bg-slate-50 dark:bg-[#111c30] border border-slate-200 dark:border-white/5 rounded-lg p-3">
+                                                    <pre className="text-[10px] text-slate-600 dark:text-slate-400 font-mono overflow-x-auto whitespace-pre-wrap max-h-32 hidden-scrollbar">
+                                                        {JSON.stringify(log.payloadJson, null, 2)}
+                                                    </pre>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

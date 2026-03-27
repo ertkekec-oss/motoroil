@@ -3,8 +3,8 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader, EnterpriseInput, EnterpriseButton } from '@/components/ui/enterprise';
-import { Plus, Trash2, GripVertical, Check, X } from 'lucide-react';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader, EnterpriseInput, EnterpriseButton, EnterpriseEmptyState } from '@/components/ui/enterprise';
+import { Plus, Trash2, GripVertical, Check, X, ShieldCheck, ListChecks, Hash, Link as LinkIcon, Settings } from 'lucide-react';
 
 export const metadata = {
     title: 'Onboarding Akışı Yönetimi - Periodya Admin'
@@ -61,95 +61,133 @@ export default async function OnboardingAdminPage() {
 
     return (
         <EnterprisePageShell
-            title="Onboarding / Ürün Keşfi Widget Yönetimi"
-            description="Müşteri Paneli 'Periodya'yı Keşfedin' widget adımlarını ve API aksiyonlarını buradan yönetebilirsiniz."
+            title="Onboarding / Keşif Widget Yönetimi"
+            description="Müşteri Paneli 'Periodya'yı Keşfedin' widget adımlarını ve evrensel API aksiyonlarını yöneteceğiniz kontrol paneli."
         >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {/* Sol Taraf: Mevcut Adımlar */}
+                {/* Left Side: Existing Steps */}
                 <div className="lg:col-span-2 space-y-6">
-                    <EnterpriseSectionHeader title="Aktif Widget Adımları" subtitle="Bütün müşterilerde sıralı olarak görünecek olan keşif görevleri." />
+                    <EnterpriseCard noPadding>
+                        <EnterpriseSectionHeader 
+                            title="Aktif Navigasyon Adımları" 
+                            subtitle="Bütün müşterilerde sıralı olarak görünecek olan keşif görevleri." 
+                            icon={<ListChecks className="w-5 h-5" />}
+                            className="p-6 md:p-8 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20"
+                        />
+                        
+                        <div className="p-6 md:p-8">
+                            {steps.length === 0 ? (
+                                <EnterpriseEmptyState 
+                                    icon={<ListChecks className="w-10 h-10" />}
+                                    title="Kayıt Bulunamadı"
+                                    description="Sistem üzerinde aktif bir onboarding adımı yoktur."
+                                />
+                            ) : (
+                                <div className="space-y-4">
+                                    {steps.map((step, index) => (
+                                        <div key={step.id} className={`p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl border transition-all gap-4 ${step.isActive ? 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/5 shadow-sm' : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-white/5 opacity-60'}`}>
+                                            <div className="flex items-start gap-4">
+                                                <div className="mt-2.5 cursor-grab text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400 transition-colors hidden sm:block">
+                                                    <GripVertical className="w-5 h-5" />
+                                                </div>
+                                                <div className="mt-1 w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center font-black text-indigo-600 dark:text-indigo-400 text-sm border border-indigo-100 dark:border-indigo-500/20 shrink-0 shadow-sm">
+                                                    {index + 1}
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                                        {step.title}
+                                                        {!step.isActive && <span className="text-[9px] bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded tracking-widest uppercase font-black">Pasif</span>}
+                                                    </h4>
+                                                    <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1 max-w-sm line-clamp-1">{step.description || 'Açıklama girilmemiş'}</p>
+                                                    
+                                                    <div className="flex flex-wrap items-center gap-3 mt-3">
+                                                        <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-1 rounded-md border border-slate-200 dark:border-white/5 truncate max-w-[200px]">
+                                                            <LinkIcon className="w-3 h-3 text-slate-400" /> {step.href}
+                                                        </span>
+                                                        <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-200 dark:border-indigo-500/20">
+                                                            <Hash className="w-3 h-3 text-indigo-400" /> {step.actionKey}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                    {steps.length === 0 ? (
-                        <EnterpriseCard className="p-8 text-center text-slate-500 border-dashed">
-                            Henüz ekli bir onboarding adımı yok. Lütfen sağ panelden bir görev ekleyin.
-                        </EnterpriseCard>
-                    ) : (
-                        <div className="space-y-3">
-                            {steps.map((step, index) => (
-                                <EnterpriseCard key={step.id} className={`p-4 flex items-center justify-between transition-colors ${!step.isActive ? 'opacity-50' : ''}`}>
-                                    <div className="flex items-center gap-4">
-                                        <div className="cursor-grab text-slate-400 hover:text-slate-600">
-                                            <GripVertical className="w-5 h-5" />
+                                            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto w-full sm:w-auto mt-2 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-slate-100 dark:border-white/5">
+                                                <form action={toggleStep.bind(null, step.id, step.isActive)} className="flex-1 sm:flex-none">
+                                                    <EnterpriseButton type="submit" variant="secondary" className="w-full sm:w-auto h-10 px-4 flex justify-center text-slate-600 dark:text-slate-400">
+                                                        {step.isActive ? <X className="w-4 h-4 mr-1.5" /> : <Check className="w-4 h-4 mr-1.5 text-emerald-500" />}
+                                                        {step.isActive ? "Pasife Al" : "Aktif Et"}
+                                                    </EnterpriseButton>
+                                                </form>
+                                                <form action={deleteStep.bind(null, step.id)} className="flex-none">
+                                                    <EnterpriseButton type="submit" variant="secondary" className="h-10 px-4 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </EnterpriseButton>
+                                                </form>
+                                            </div>
                                         </div>
-                                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-500 text-xs">
-                                            {index + 1}
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-slate-900 dark:text-slate-100">{step.title}</h4>
-                                            <p className="text-xs text-slate-500">{step.description} • Yol: {step.href}</p>
-                                            <p className="text-[10px] font-mono mt-1 text-blue-500 bg-blue-50 px-2 py-0.5 rounded w-max">Aksiyon: {step.actionKey}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <form action={toggleStep.bind(null, step.id, step.isActive)}>
-                                            <button type="submit" className={`p-2 rounded-md ${step.isActive ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`} title={step.isActive ? "Pasife Al" : "Aktif Et"}>
-                                                {step.isActive ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
-                                            </button>
-                                        </form>
-                                        <form action={deleteStep.bind(null, step.id)}>
-                                            <button type="submit" className="p-2 rounded-md bg-rose-100 text-rose-700 hover:bg-rose-200" title="Sil">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </form>
-                                    </div>
-                                </EnterpriseCard>
-                            ))}
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </EnterpriseCard>
                 </div>
 
-                {/* Sağ Taraf: Yeni Adım Ekleme */}
-                <div>
-                    <EnterpriseCard className="p-6 sticky top-24">
-                        <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-slate-100">Yeni Adım Ekle</h3>
-                        <form action={addStep} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-500 mb-1">Görünür Başlık</label>
-                                <EnterpriseInput name="title" required placeholder="Örn: İlk Ürünü Ekle" />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-500 mb-1">Kısa Açıklama (Opsiyonel)</label>
-                                <EnterpriseInput name="description" placeholder="Örn: Kataloga yeni ürün ekleyin" />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-500 mb-1">Yönlendirilecek URL</label>
-                                <EnterpriseInput name="href" required placeholder="Örn: /products/new" />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-500 mb-1">Tetikleyici Anahtar (Action Key)</label>
-                                <EnterpriseInput name="actionKey" required placeholder="Örn: PRODUCT_ADDED" />
-                                <p className="text-[10px] text-slate-400 mt-1 leading-tight">Bu anahtar, müşteri başarılı aksiyonu aldığında sistem tarafından `ProductOnboardingProgress` üzerine eklenecektir. Daha önceden tanımlanmış keyler kullanılabilir.</p>
-                            </div>
+                {/* Right Side: Add New Step */}
+                <div className="lg:col-span-1 space-y-6">
+                    <EnterpriseCard className="sticky top-8 lg:order-2">
+                        <EnterpriseSectionHeader title="Yeni Adım Ekle" icon={<Plus className="w-4 h-4" />} />
+                        
+                        <form action={addStep} className="space-y-4 mt-6 pt-6 border-t border-slate-100 dark:border-white/5">
+                            <EnterpriseInput 
+                                label="Görünür Başlık"
+                                name="title" 
+                                required 
+                                placeholder="Örn: İlk Ürünü Ekle" 
+                            />
+                            
+                            <EnterpriseInput 
+                                label="Kısa Açıklama (Opsiyonel)"
+                                name="description" 
+                                placeholder="Örn: Kataloga yeni ürün ekleyin" 
+                            />
+                            
+                            <EnterpriseInput 
+                                label="Yönlendirilecek URL"
+                                name="href" 
+                                required 
+                                placeholder="Örn: /products/new" 
+                            />
+                            
+                            <EnterpriseInput 
+                                label="Tetikleyici Anahtar (Action Key)"
+                                hint="OnboardingProgress modeli için benzersiz takip anahtarı."
+                                name="actionKey" 
+                                required 
+                                placeholder="Örn: PRODUCT_ADDED" 
+                            />
 
-                            <EnterpriseButton type="submit" className="w-full mt-4 flex items-center justify-center gap-2" variant="primary">
-                                <Plus className="w-4 h-4" /> Sisteme Kaydet
+                            <EnterpriseButton type="submit" variant="primary" className="w-full mt-4 h-12 flex justify-center text-[10px] uppercase tracking-widest px-0">
+                                <ShieldCheck className="w-4 h-4 mr-2" /> Sisteme Kaydet
                             </EnterpriseButton>
                         </form>
                     </EnterpriseCard>
 
-                    <EnterpriseCard className="mt-6 p-5 bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-900/30">
-                        <h4 className="font-bold text-sm text-blue-900 dark:text-blue-300 mb-2">Varsayılan Anahtarlar (Action Keys)</h4>
-                        <ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1.5 list-disc pl-4">
-                            <li><code>firstInvoice</code> : Fatura oluşturunca otomatik tetiklenir.</li>
-                            <li><code>firstCustomer</code> : Cari ekleyince otomatik tetiklenir.</li>
-                            <li><code>inventoryViewed</code> : Stok sayfasına girince otomatik tetiklenir.</li>
-                            <li><code>salesXViewed</code> : Saha satışa girince otomatik tetiklenir.</li>
-                            <li><code>b2bHubViewed</code> : B2B paneline girince otomatik tetiklenir.</li>
+                    <EnterpriseCard className="bg-indigo-50/50 dark:bg-indigo-500/5 border-indigo-100 dark:border-indigo-500/20 lg:order-3">
+                        <h4 className="text-[11px] font-black text-indigo-900 dark:text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <Hash className="w-4 h-4" />
+                            Varsayılan Anahtarlar
+                        </h4>
+                        <ul className="text-[11px] font-bold text-slate-600 dark:text-slate-400 space-y-3">
+                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">firstInvoice</code> <span>Fatura oluşturunca.</span></li>
+                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">firstCustomer</code> <span>Cari ekleyince.</span></li>
+                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">inventoryViewed</code> <span>Stok sayfasına girince.</span></li>
+                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">salesXViewed</code> <span>Saha satışa girince.</span></li>
+                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">b2bHubViewed</code> <span>B2B paneline girince.</span></li>
                         </ul>
                     </EnterpriseCard>
                 </div>
+
             </div>
         </EnterprisePageShell>
     );

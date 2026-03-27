@@ -10,56 +10,61 @@ export default async function AdminCompaniesPage() {
     });
 
     return (
-        <div className="p-6 bg-[#F6F7F9] min-h-screen text-slate-800 font-sans">
-            <div className="max-w-6xl mx-auto space-y-6">
-                <div className="flex justify-between items-center bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
+            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
+                <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#1F3A5F]">Company Management</h1>
-                        <p className="text-sm text-slate-500">Govern platform actors, roles, and access states.</p>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
+                            <span className="p-2 bg-indigo-100 dark:bg-blue-500/10 rounded-lg">🏢</span>
+                            Firma Yönetimi
+                        </h1>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2 ml-14">Platform aktörlerini, rollerini ve erişim durumlarını yönetin.</p>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                    <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-50 border-b">
-                            <tr>
-                                <th className="p-4 font-bold text-slate-500 uppercase text-xs">Company</th>
-                                <th className="p-4 font-bold text-slate-500 uppercase text-xs">VKN / Tax</th>
-                                <th className="p-4 font-bold text-slate-500 uppercase text-xs">Role / Type</th>
-                                <th className="p-4 font-bold text-slate-500 uppercase text-xs text-center">Status</th>
-                                <th className="p-4 font-bold text-slate-500 uppercase text-xs text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {companies?.map(comp => (
-                                <tr key={comp.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="p-4">
-                                        <div className="font-bold text-[#1F3A5F]">{comp.name}</div>
-                                        <div className="text-[10px] text-slate-400 font-mono">{comp.id}</div>
-                                    </td>
-                                    <td className="p-4 text-slate-600 font-mono text-xs">
-                                        {comp.vkn || "N/A"}
-                                    </td>
-                                    <td className="p-4">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${comp.type === CompanyType.BUYER ? "bg-blue-50 text-blue-700 border-blue-100" :
-                                                comp.type === CompanyType.SELLER ? "bg-amber-50 text-amber-700 border-amber-100" :
-                                                    "bg-indigo-50 text-indigo-700 border-indigo-100"
-                                            }`}>
-                                            {comp.type}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-center">
-                                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${comp.status === CompanyStatus.ACTIVE ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
-                                            {comp.status}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-right">
-                                        <CompanyAdminClient companyId={comp.id} currentStatus={comp.status} currentType={comp.type} />
-                                    </td>
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden flex flex-col shadow-sm">
+                    <div className="overflow-auto flex-1 relative">
+                        <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
+                            <thead className="bg-[#F6F7F9] dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 sticky top-0 z-10 border-b border-slate-300 dark:border-slate-700 shadow-sm backdrop-blur-sm">
+                                <tr>
+                                    <th className="px-5 py-3.5 font-black uppercase tracking-widest text-[10px] border-r border-slate-200 dark:border-white/5 w-64">Firma</th>
+                                    <th className="px-5 py-3.5 font-black uppercase tracking-widest text-[10px] border-r border-slate-200 dark:border-white/5 w-40">VKN / Vergi</th>
+                                    <th className="px-5 py-3.5 font-black uppercase tracking-widest text-[10px] border-r border-slate-200 dark:border-white/5 w-48">Rol / Tip</th>
+                                    <th className="px-5 py-3.5 font-black uppercase tracking-widest text-[10px] border-r border-slate-200 dark:border-white/5 text-center w-36">Durum</th>
+                                    <th className="px-5 py-3.5 font-black uppercase tracking-widest text-[10px] text-center w-40 text-slate-500 dark:text-slate-400">İşlemler</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                {companies?.map(comp => (
+                                    <tr key={comp.id} className="hover:bg-slate-50 border-b border-transparent hover:border-slate-200 dark:hover:bg-white/5 transition-colors group">
+                                        <td className="px-5 py-4 border-r border-slate-100 dark:border-white/5">
+                                            <div className="font-bold text-slate-900 dark:text-white truncate max-w-[250px]">{comp.name}</div>
+                                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-1 font-bold">#{comp.id.slice(-8).toUpperCase()}</div>
+                                        </td>
+                                        <td className="px-5 py-4 border-r border-slate-100 dark:border-white/5 text-slate-600 dark:text-slate-400 font-mono font-bold text-[13px]">
+                                            {comp.vkn || "BİLİNMİYOR"}
+                                        </td>
+                                        <td className="px-5 py-4 border-r border-slate-100 dark:border-white/5">
+                                            <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded shadow-sm border ${comp.type === CompanyType.BUYER ? "bg-blue-50 border-blue-200 text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-400" :
+                                                    comp.type === CompanyType.SELLER ? "bg-amber-50 border-amber-200 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400" :
+                                                        "bg-indigo-50 border-indigo-200 text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-400"
+                                                }`}>
+                                                {comp.type}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-4 border-r border-slate-100 dark:border-white/5 text-center">
+                                            <span className={`text-[9px] font-black tracking-widest uppercase px-2.5 py-1 rounded border shadow-sm ${comp.status === CompanyStatus.ACTIVE ? "bg-emerald-50 border-emerald-300 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-rose-50 border-rose-300 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400"}`}>
+                                                {comp.status === CompanyStatus.ACTIVE ? "AKTİF" : comp.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-4 text-center">
+                                            <CompanyAdminClient companyId={comp.id} currentStatus={comp.status} currentType={comp.type} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

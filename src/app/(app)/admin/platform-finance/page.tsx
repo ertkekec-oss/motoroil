@@ -17,27 +17,45 @@ export default async function PlatformFinancePage() {
   });
   const userCount = await prisma.user.count({ where: { deletedAt: null } });
 
-  // Total Escrow Locked / Processed approximations (MOCKED until Prisma migration for escrow is applied)
-  const activeEscrows = 142; // MOCK
-  const completedTrades = 8524; // MOCK
+  // Live Escrow & Trade queries
+  const activeEscrows = await prisma.escrowCase.count({
+      where: {
+          status: {
+              in: ['FUNDS_HELD', 'RELEASE_REQUESTED', 'SETTLEMENT_EXECUTING', 'DISPUTED']
+          }
+      }
+  });
 
-  // Let's also fetch recent ledger entries (MOCKED)
-  const recentLedgers = [
-    {
-      id: "ldg_881923412",
-      proposalId: "B2B_ORD_991",
-      status: "CLEARED",
-      recordedAt: new Date().toISOString(),
-      metaJson: { type: "B2B Escrow Mahsuplaşma" }
-    },
-    {
-      id: "ldg_881923400",
-      proposalId: "B2B_ORD_814",
-      status: "LOCKED_ESCROW",
-      recordedAt: new Date(Date.now() - 3600000).toISOString(),
-      metaJson: { type: "Iyzico SubMerchant FonBlokesi" }
-    }
-  ];
+  const completedTrades = await prisma.tradeLedgerEntry.count({
+      where: {
+          eventType: 'TRADE_COMPLETED'
+      }
+  });
+
+  const recentLedgersQuery = await prisma.tradeLedgerEntry.findMany({
+      orderBy: { occurredAt: 'desc' },
+      take: 5
+  });
+
+  const recentLedgers = recentLedgersQuery.map(l => ({
+      id: l.id,
+      proposalId: l.proposalId || "N/A",
+      status: l.eventStatus || l.eventType,
+      recordedAt: l.occurredAt.toISOString(),
+      metaJson: l.metadataJson || { type: "B2B Ağ İşlemi" }
+  }));
+
+  const salesInvoices = await prisma.salesInvoice.findMany({
+      take: 5,
+      orderBy: { invoiceDate: 'desc' },
+      include: { customer: true, company: true }
+  });
+
+  const purchaseInvoices = await prisma.purchaseInvoice.findMany({
+      take: 5,
+      orderBy: { invoiceDate: 'desc' },
+      include: { supplier: true, company: true }
+  });
 
   return (
     <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
@@ -167,66 +185,36 @@ export default async function PlatformFinancePage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-slate-700 dark:text-slate-300">
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        Bugün, 09:12
-                      </td>
-                      <td className="py-4 px-4 font-mono">PER2026000104</td>
-                      <td className="py-4 px-4 font-bold text-indigo-600">
-                        Motoroil Yedek Parça
-                      </td>
-                      <td className="py-4 px-4 font-medium">
-                        B2B Komisyon %10 + 5.000 SMS Paketi
-                      </td>
-                      <td className="py-4 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">
-                        6.250,00 ₺
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-emerald-600 font-bold text-[10px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded">
-                          E-FATURA KESİLDİ
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        Bugün, 08:30
-                      </td>
-                      <td className="py-4 px-4 font-mono">-</td>
-                      <td className="py-4 px-4 font-bold text-indigo-600">
-                        Teknik Lojistik A.Ş.
-                      </td>
-                      <td className="py-4 px-4 font-medium">
-                        SaaS Abonelik (Pro) Aylık Yenileme
-                      </td>
-                      <td className="py-4 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">
-                        2.500,00 ₺
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-amber-600 font-bold text-[10px] bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded">
-                          TASLAK (BEKLİYOR)
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        Dün, 16:45
-                      </td>
-                      <td className="py-4 px-4 font-mono">PER2026000103</td>
-                      <td className="py-4 px-4 font-bold text-indigo-600">
-                        Bosch Merkez
-                      </td>
-                      <td className="py-4 px-4 font-medium">
-                        Lojistik Org. Bedeli (Sendeo) Mutabakatı
-                      </td>
-                      <td className="py-4 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">
-                        12.400,00 ₺
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-emerald-600 font-bold text-[10px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded">
-                          E-FATURA KESİLDİ
-                        </span>
-                      </td>
-                    </tr>
+                    {salesInvoices.length === 0 ? (
+                      <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td colSpan={6} className="py-8 px-4 text-center text-[11px] font-black uppercase tracking-widest text-slate-500">
+                           Henüz Giden Fatura Yok
+                        </td>
+                      </tr>
+                    ) : (
+                      salesInvoices.map((inv) => (
+                        <tr key={inv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            {new Intl.DateTimeFormat("tr-TR", { dateStyle: "short" }).format(new Date(inv.invoiceDate))}
+                          </td>
+                          <td className="py-4 px-4 font-mono">{inv.invoiceNo || "-"}</td>
+                          <td className="py-4 px-4 font-bold text-indigo-600 dark:text-indigo-400">
+                            {inv.customer?.name || "Bilinmiyor"}
+                          </td>
+                          <td className="py-4 px-4 font-medium turncate max-w-[200px]">
+                            {inv.description || "Hizmet Bedeli"}
+                          </td>
+                          <td className="py-4 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">
+                            {Number(inv.totalAmount).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+                          </td>
+                          <td className="py-4 px-4 text-center">
+                            <span className="text-emerald-600 font-bold text-[10px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded uppercase">
+                              {inv.status || "KESİLDİ"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -251,72 +239,33 @@ export default async function PlatformFinancePage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-slate-700 dark:text-slate-300">
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        25.03.2026
-                      </td>
-                      <td className="py-4 px-4 font-mono">SND20260099</td>
-                      <td className="py-4 px-4 font-bold">
-                        Kolay Gelsin (Sendeo)
-                      </td>
-                      <td className="py-4 px-4 text-right font-mono font-bold text-rose-600">
-                        -11.250,50 ₺
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-rose-600 font-bold text-[10px] bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded">
-                          ÖDENDİ
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        24.03.2026
-                      </td>
-                      <td className="py-4 px-4 font-mono">AWS88192344</td>
-                      <td className="py-4 px-4 font-bold">Vercel / AWS</td>
-                      <td className="py-4 px-4 text-right font-mono font-bold text-rose-600">
-                        -2.340,00 ₺
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-amber-600 font-bold text-[10px] bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded border border-amber-200">
-                          VADE BEKLİYOR
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        20.03.2026
-                      </td>
-                      <td className="py-4 px-4 font-mono">NLV88129331</td>
-                      <td className="py-4 px-4 font-bold">
-                        Nilvera E-Fatura A.Ş.
-                      </td>
-                      <td className="py-4 px-4 text-right font-mono font-bold text-rose-600">
-                        -1.800,00 ₺
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-rose-600 font-bold text-[10px] bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded">
-                          ÖDENDİ
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        15.03.2026
-                      </td>
-                      <td className="py-4 px-4 font-mono">PTR11002344</td>
-                      <td className="py-4 px-4 font-bold">
-                        PayTR Ödeme Hizmetleri
-                      </td>
-                      <td className="py-4 px-4 text-right font-mono font-bold text-rose-600">
-                        -4.120,00 ₺
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-rose-600 font-bold text-[10px] bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded">
-                          MAHSUP EDİLDİ
-                        </span>
-                      </td>
-                    </tr>
+                     {purchaseInvoices.length === 0 ? (
+                      <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td colSpan={5} className="py-8 px-4 text-center text-[11px] font-black uppercase tracking-widest text-slate-500">
+                           Henüz Gelen Fatura Yok
+                        </td>
+                      </tr>
+                     ) : (
+                       purchaseInvoices.map((inv) => (
+                         <tr key={inv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                           <td className="py-4 px-4 whitespace-nowrap">
+                             {new Intl.DateTimeFormat("tr-TR", { dateStyle: "short" }).format(new Date(inv.invoiceDate))}
+                           </td>
+                           <td className="py-4 px-4 font-mono">{inv.invoiceNo || "-"}</td>
+                           <td className="py-4 px-4 font-bold">
+                             {inv.supplier?.name || "Bilinmiyor"}
+                           </td>
+                           <td className="py-4 px-4 text-right font-mono font-bold text-rose-600 dark:text-rose-400">
+                             -{Number(inv.totalAmount).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+                           </td>
+                           <td className="py-4 px-4 text-center">
+                             <span className="text-rose-600 font-bold text-[10px] bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded uppercase">
+                               {inv.status || "ÖDENDİ"}
+                             </span>
+                           </td>
+                         </tr>
+                       ))
+                     )}
                   </tbody>
                 </table>
               </div>

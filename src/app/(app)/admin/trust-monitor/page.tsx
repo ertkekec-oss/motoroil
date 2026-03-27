@@ -26,63 +26,78 @@ export default async function TrustMonitorPage() {
     companies.forEach(c => companyMap.set(c.tenantId, c.name));
 
     return (
-        <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
-                <div className="flex justify-between items-center mb-8">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
+            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
+                {/* Header Section */}
+                <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">🧠 Trust Monitor (Güven Monitörü)</h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Platformdaki tüm firmaların Network İtibar skorları ve algoritmik değerlendirmeleri.</p>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
+                            <span className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">🧠</span>
+                            Güven Monitörü (Trust Monitor)
+                        </h1>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2 ml-14">
+                            Platformdaki tüm firmaların Network İtibar skorları ve algoritmik değerlendirmeleri.
+                        </p>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden mb-8">
-                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]/50">
-                        <h3 className="text-base font-semibold text-slate-900 dark:text-white">Global Firma Trust Skorları</h3>
+                <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden mb-8">
+                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Global Firma Trust Skorları</h2>
+                            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Ağdaki firma güven profillerinin risk analizi dağılımları.</p>
+                        </div>
                     </div>
 
                     <div className="p-0">
                         {trustProfiles.length === 0 ? (
                             <div className="p-16 text-center">
-                                <span className="text-4xl text-slate-400">🔍</span>
-                                <h3 className="font-semibold text-slate-900 dark:text-white mt-4">Henüz Analiz Yok</h3>
-                                <p className="text-slate-500 text-sm mt-2">Sistemde oluşan yeterli trust verisi (TrustProfile) bulunamadı.</p>
+                                <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 dark:border-white/5 shadow-sm">
+                                    🔍
+                                </div>
+                                <p className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">Henüz Analiz Yok</p>
+                                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 max-w-sm mx-auto uppercase tracking-widest">Sistemde oluşan yeterli trust verisi (TrustProfile) bulunamadı.</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400">
-                                    <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200 dark:border-white/5">
-                                        <tr>
-                                            <th className="px-6 py-4">Firma / Üye Müşteri</th>
-                                            <th className="px-6 py-4 text-center">Trust Level</th>
-                                            <th className="px-6 py-4 text-center">Overall Score</th>
-                                            <th className="px-6 py-4 text-center">Identity</th>
-                                            <th className="px-6 py-4 text-center">Trade</th>
-                                            <th className="px-6 py-4 text-center">Shipping</th>
-                                            <th className="px-6 py-4 text-center">Dispute</th>
-                                            <th className="px-6 py-4 text-right">Son Hesaplama</th>
+                                <table className="w-full text-left border-collapse whitespace-nowrap">
+                                    <thead>
+                                        <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-white/5">
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Firma / Üye Müşteri</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Güven Seviyesi (Tier)</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Genel Skor</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Kimlik & Finans</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Ticaret İtibarı</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">Lojistik Bağlılığı</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-center">İtiraz & Uyuşmazlık</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 text-right">Son Değerlendirme</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                         {trustProfiles.map(p => (
-                                            <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
+                                            <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors group">
+                                                <td className="px-6 py-4 font-black text-[12px] text-slate-900 dark:text-white uppercase tracking-wider">
                                                     {companyMap.get(p.tenantId) || p.tenantId}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${p.trustLevel === 'A' ? 'bg-emerald-100 text-emerald-800' :
-                                                            p.trustLevel === 'B' ? 'bg-blue-100 text-blue-800' :
-                                                                p.trustLevel === 'C' ? 'bg-amber-100 text-amber-800' :
-                                                                    'bg-red-100 text-red-800'
+                                                    <span className={`inline-flex px-3 py-1 rounded-lg text-[11px] font-black uppercase tracking-widest border ${p.trustLevel === 'A' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30' :
+                                                            p.trustLevel === 'B' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-500/30' :
+                                                                p.trustLevel === 'C' ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border-amber-200 dark:border-amber-500/30' :
+                                                                    'bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-500/30'
                                                         }`}>
-                                                        {p.trustLevel}
+                                                        Tier {p.trustLevel}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-center font-bold text-slate-800">{p.overallScore}</td>
-                                                <td className="px-6 py-4 text-center">{p.identityScore}</td>
-                                                <td className="px-6 py-4 text-center">{p.tradeScore}</td>
-                                                <td className="px-6 py-4 text-center">{p.shippingScore}</td>
-                                                <td className="px-6 py-4 text-center">{p.disputeScore}</td>
-                                                <td className="px-6 py-4 text-right">
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className="inline-flex items-center justify-center bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg font-mono text-[13px] font-black text-slate-900 dark:text-white border border-slate-200 dark:border-white/10">
+                                                        {p.overallScore}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center font-mono text-[12px] font-bold text-slate-600 dark:text-slate-400">{p.identityScore}</td>
+                                                <td className="px-6 py-4 text-center font-mono text-[12px] font-bold text-slate-600 dark:text-slate-400">{p.tradeScore}</td>
+                                                <td className="px-6 py-4 text-center font-mono text-[12px] font-bold text-slate-600 dark:text-slate-400">{p.shippingScore}</td>
+                                                <td className="px-6 py-4 text-center font-mono text-[12px] font-bold text-slate-600 dark:text-slate-400">{p.disputeScore}</td>
+                                                <td className="px-6 py-4 text-right text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest">
                                                     {p.lastCalculatedAt ? new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short' }).format(new Date(p.lastCalculatedAt)) : '-'}
                                                 </td>
                                             </tr>

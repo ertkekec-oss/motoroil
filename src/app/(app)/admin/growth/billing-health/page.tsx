@@ -1,7 +1,7 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
+import { Activity, Camera, Shield, FileText, Lock, AlertTriangle, AlertCircle, RefreshCw, Layers, ShieldCheck } from "lucide-react";
+import { EnterprisePageShell, EnterpriseCard } from "@/components/ui/enterprise";
 
 export default function AdminGrowthBillingHealth() {
     const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
@@ -65,114 +65,193 @@ export default function AdminGrowthBillingHealth() {
         }
     };
 
-    if (loading && !data) return <div className="p-8">Yükleniyor...</div>;
+    const actions = (
+        <div className="flex gap-3">
+            <button 
+                disabled={saving} 
+                onClick={() => handleAction('snapshot')} 
+                className="h-10 px-5 bg-white dark:bg-[#1e293b] hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+            >
+                <Camera className="w-4 h-4 text-indigo-500" /> Snapshot Al
+            </button>
+            <button 
+                disabled={saving} 
+                onClick={() => handleAction('run-collection-guard')} 
+                className="h-10 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+            >
+                <Shield className="w-4 h-4" /> Guard Motorunu Çalıştır
+            </button>
+        </div>
+    );
 
     return (
-        <div className="space-y-6 max-w-7xl pb-10">
-            <div className="flex justify-between items-center border-b pb-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Mali AR & Billing Health</h1>
-                    <p className="text-sm text-slate-500 mt-2">Boost Hub ve Ekstra Servis faturalandırmalarının finansal durumu (Alacaklar/Tahsilat)</p>
+        <EnterprisePageShell
+            title="Mali AR & Billing Health"
+            description="Boost Hub aboneliklerinin pürüzsüz finansal akışı (Alacaklar / Tahsilat / Gecikme / Koleksiyon Riski)."
+            actions={actions}
+            className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
+            titleIcon={<Activity className="w-6 h-6 text-emerald-600 dark:text-emerald-500" />}
+        >
+            {loading && !data ? (
+                <div className="p-16 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/5 rounded-2xl bg-white dark:bg-[#1e293b] shadow-sm">
+                    <RefreshCw className="w-8 h-8 animate-spin text-emerald-500 mb-4" />
+                    <span className="text-[11px] font-black tracking-widest uppercase">Finansal Veriler Çekiliyor...</span>
                 </div>
-                <div className="flex gap-2">
-                    <button disabled={saving} onClick={() => handleAction('snapshot')} className="px-3 py-1.5 text-xs font-bold bg-white text-slate-700 border rounded shadow-sm hover:bg-slate-50 disabled:opacity-50">
-                        📸 Snapshot Al
-                    </button>
-                    <button disabled={saving} onClick={() => handleAction('run-collection-guard')} className="px-3 py-1.5 text-xs font-bold bg-slate-900 text-white rounded shadow hover:bg-black disabled:opacity-50">
-                        🛡 Guard Motorunu Çalıştır
-                    </button>
-                </div>
-            </div>
-
-            {data && (
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div className="bg-white p-4 items-center justify-between border rounded shadow-sm flex flex-col items-start bg-slate-900 text-white">
-                        <div className="text-[10px] font-bold text-slate-400 capitalize w-full">Askıdaki Tahsilat Toplamı (AR)</div>
-                        <div className="text-2xl font-bold mt-1 max-w-full text-emerald-400 self-start">
-                            {Number(data.kpis.outstandingArTotal).toLocaleString('tr-TR')} TRY
+            ) : data ? (
+                <>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                        <div className="bg-slate-900 dark:bg-black/40 border border-slate-800 dark:border-white/5 rounded-2xl p-6 shadow-sm flex flex-col justify-between group overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+                            <div className="text-[11px] font-black text-slate-400 uppercase tracking-widest relative z-10 w-full mb-4 flex items-center justify-between">
+                                <span>Askıdaki Tahsilat Toplamı (AR)</span>
+                                <Layers className="w-5 h-5 text-emerald-500" />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="text-[32px] font-black text-emerald-400 tracking-tighter self-start flex items-baseline gap-1">
+                                    <span className="text-[20px] text-emerald-500/50 font-medium tracking-normal">₺</span>
+                                    {Number(data.kpis.outstandingArTotal).toLocaleString('tr-TR')}
+                                </div>
+                                <div className="text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded inline-flex mt-2 uppercase tracking-widest shadow-sm">Tahsil edilmeyi bekliyor</div>
+                            </div>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm flex flex-col justify-between group overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-blue-500/20 transition-all duration-500"></div>
+                            <div className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-between relative z-10">
+                                <span>Açık Fatura</span>
+                                <FileText className="w-5 h-5 text-blue-500" />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="text-[32px] font-black text-slate-900 dark:text-white tracking-tighter">{data.kpis.currentCount}</div>
+                                <div className="text-[10px] font-black text-emerald-500 mt-2 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-1 rounded shadow-sm inline-flex">Normal Akış</div>
+                            </div>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm flex flex-col justify-between group overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 dark:bg-amber-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-amber-500/20 transition-all duration-500"></div>
+                            <div className="text-[11px] font-black text-amber-500 dark:text-amber-500 uppercase tracking-widest mb-4 flex items-center justify-between relative z-10">
+                                <span>Ekstra Tolere (Grace)</span>
+                                <AlertCircle className="w-5 h-5 text-amber-500" />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="text-[32px] font-black text-amber-600 dark:text-amber-500 tracking-tighter">{data.kpis.graceCount}</div>
+                                <div className="text-[10px] font-black text-amber-700 dark:text-amber-400 mt-2 uppercase tracking-widest bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2 py-1 rounded shadow-sm inline-flex">Güven süresi</div>
+                            </div>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-[#1e293b] border border-rose-200 dark:border-rose-900/40 rounded-2xl p-6 shadow-sm flex flex-col justify-between group overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 dark:bg-rose-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-rose-500/20 transition-all duration-500"></div>
+                            <div className="text-[11px] font-black text-rose-600 dark:text-rose-500 uppercase tracking-widest mb-4 flex items-center justify-between relative z-10">
+                                <span>Gecikmiş (Overdue)</span>
+                                <AlertTriangle className="w-5 h-5 text-rose-500" />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="text-[32px] font-black text-rose-600 dark:text-rose-400 tracking-tighter">{data.kpis.overdueCount}</div>
+                                <div className="text-[10px] font-black text-rose-700 dark:text-rose-400 mt-2 uppercase tracking-widest bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-2 py-1 rounded shadow-sm inline-flex">Tahsilat Riski Yüksek</div>
+                            </div>
+                        </div>
+                        
+                        <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between group overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/10 dark:bg-rose-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-rose-500/20 transition-all duration-500"></div>
+                            <div className="text-[11px] font-black text-rose-800 dark:text-rose-400 uppercase tracking-widest mb-4 flex items-center justify-between relative z-10">
+                                <span>Blokeli Abonelikler</span>
+                                <Lock className="w-5 h-5 text-rose-600 dark:text-rose-500" />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="text-[32px] font-black text-rose-800 dark:text-rose-300 tracking-tighter">{data.kpis.blockedSubscriptionsCount}</div>
+                                <div className="text-[10px] font-black text-rose-700 dark:text-rose-400 mt-2 uppercase tracking-widest bg-rose-100 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 px-2 py-1 rounded shadow-sm inline-flex">Suspended Status</div>
+                            </div>
                         </div>
                     </div>
-                    <div className="bg-white p-4 border rounded shadow-sm">
-                        <div className="text-[10px] font-bold text-slate-400 uppercase">Açık Fatura</div>
-                        <div className="text-2xl font-bold text-slate-800 mt-1">{data.kpis.currentCount} Adet</div>
-                    </div>
-                    <div className="bg-white p-4 border rounded shadow-sm">
-                        <div className="text-[10px] font-bold text-amber-500 uppercase">Ekstra Tolere (Grace)</div>
-                        <div className="text-2xl font-bold text-amber-600 mt-1">{data.kpis.graceCount} Adet</div>
-                    </div>
-                    <div className="bg-white p-4 border rounded shadow-sm ring-1 ring-red-500">
-                        <div className="text-[10px] font-bold text-red-500 uppercase flex items-center gap-1">Gecikmiş (Overdue)</div>
-                        <div className="text-2xl font-bold text-red-600 mt-1">{data.kpis.overdueCount} Adet</div>
-                    </div>
-                    <div className="bg-white p-4 border rounded shadow-sm bg-red-50">
-                        <div className="text-[10px] font-bold text-red-800 uppercase">Blokeli (Suspended) Abonelikler</div>
-                        <div className="text-2xl font-bold text-red-800 mt-1">{data.kpis.blockedSubscriptionsCount} Adet</div>
-                    </div>
-                </div>
-            )}
 
-            <div className="flex gap-2">
-                {[
-                    { label: 'Tümü', val: 'all' },
-                    { label: 'Güncel (Current)', val: 'current' },
-                    { label: 'Tolerans (Grace)', val: 'grace' },
-                    { label: 'Gecikmiş (Overdue)', val: 'overdue' },
-                    { label: 'Açılmayı Bekleyen (Blocked)', val: 'blocked' }
-                ]?.map(f => (
-                    <button key={f.val} onClick={() => setFilter(f.val)} className={`px-4 py-2 text-xs font-bold rounded shadow-sm border ${filter === f.val ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
-                        {f.label}
-                    </button>
-                ))}
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table className="w-full text-left font-inter table-auto">
-                    <thead className="bg-slate-50 border-b text-xs uppercase text-slate-500 font-bold">
-                        <tr>
-                            <th className="p-4">Tenant / Fatura ID</th>
-                            <th className="p-4 text-right">Fatura Tutarı</th>
-                            <th className="p-4">Durum (Collection)</th>
-                            <th className="p-4">Son Ödeme Zamanı</th>
-                            <th className="p-4">Bloke Riski</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y text-sm">
-                        {data?.tenants?.map((t: any) => (
-                            <tr key={t.invoiceId} className="hover:bg-slate-50">
-                                <td className="p-4">
-                                    <div className="font-bold text-slate-800 font-mono text-xs">{t.tenantId}</div>
-                                    <div className="font-mono text-[10px] text-slate-400 mt-1">Inv: {t.invoiceId.substring(0, 8)}...</div>
-                                </td>
-                                <td className="p-4 font-bold text-slate-700 text-right">
-                                    {Number(t.amount).toLocaleString('tr-TR')} TRY
-                                </td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded text-[10px] font-bold ${t.status === 'COLLECTION_BLOCKED' ? 'bg-slate-800 text-white' :
-                                            t.status === 'OVERDUE' ? 'bg-red-100 text-red-800' :
-                                                t.status === 'GRACE' ? 'bg-amber-100 text-amber-800' :
-                                                    'bg-emerald-100 text-emerald-800'
-                                        }`}>
-                                        {t.status}
-                                    </span>
-                                </td>
-                                <td className="p-4 text-xs font-mono text-slate-500">
-                                    {t.overdueSince ? new Date(t.overdueSince).toLocaleString() : 'Belirsiz'}
-                                </td>
-                                <td className="p-4 text-xs font-bold">
-                                    {t.billingBlocked ? (
-                                        <span className="text-red-600 flex items-center gap-1">🔒 Sistem Zaten Bloke Edilmiş</span>
-                                    ) : (
-                                        <span className={t.status === 'OVERDUE' ? 'text-amber-600' : 'text-slate-400'}>
-                                            {t.status === 'OVERDUE' ? 'Bloke edilebilir (SLA > 15G)' : 'Güvende'}
-                                        </span>
-                                    )}
-                                </td>
-                            </tr>
+                    <div className="flex gap-2 my-6 overflow-x-auto pb-2">
+                        {[
+                            { label: 'TÜMÜ', val: 'all' },
+                            { label: 'GÜNCEL (CURRENT)', val: 'current' },
+                            { label: 'TOLERANS (GRACE)', val: 'grace' },
+                            { label: 'GECİKMİŞ (OVERDUE)', val: 'overdue' },
+                            { label: 'AÇILMAYI BEKLEYEN (BLOCKED)', val: 'blocked' }
+                        ]?.map(f => (
+                            <button key={f.val} onClick={() => setFilter(f.val)} 
+                                className={`px-5 h-10 text-[10px] uppercase tracking-widest font-black rounded-xl shadow-sm border transition-all whitespace-nowrap inline-flex items-center justify-center
+                                    ${filter === f.val ? 'bg-slate-900 dark:bg-emerald-600 text-white dark:text-white border-slate-900 dark:border-emerald-600' : 
+                                    'bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 border-slate-200 dark:border-white/5'}`}>
+                                {f.label}
+                            </button>
                         ))}
-                        {data?.tenants.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-slate-500">Bu filtrelere uygun fatura bulunmuyor.</td></tr>}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    </div>
+
+                    <EnterpriseCard padding="none">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left font-sans table-auto border-collapse whitespace-nowrap">
+                                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-white/5 text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-black">
+                                    <tr>
+                                        <th className="px-6 py-4">Tenant & Fatura ID</th>
+                                        <th className="px-6 py-4 text-right">Fatura Tutarı</th>
+                                        <th className="px-6 py-4">Durum (Collection)</th>
+                                        <th className="px-6 py-4">Son Ödeme Zamanı</th>
+                                        <th className="px-6 py-4 pr-6">Bloke Riski & Uyarı</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                    {data?.tenants?.map((t: any) => (
+                                        <tr key={t.invoiceId} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors group">
+                                            <td className="px-6 py-4 align-middle">
+                                                <div className="font-black text-[11px] uppercase tracking-wide text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">{t.tenantId}</div>
+                                                <div className="font-mono text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest flex items-center gap-1.5">
+                                                    <FileText className="w-3 h-3 opacity-50" />
+                                                    INV-{t.invoiceId.substring(0, 8).toUpperCase()}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 align-middle font-black tracking-wide text-[12px] text-slate-900 dark:text-white text-right">
+                                                {Number(t.amount).toLocaleString('tr-TR')} TRY
+                                            </td>
+                                            <td className="px-6 py-4 align-middle">
+                                                <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
+                                                        ${t.status === 'COLLECTION_BLOCKED' ? 'bg-slate-800 text-white dark:bg-slate-600 border border-slate-900 dark:border-slate-500' :
+                                                            t.status === 'OVERDUE' ? 'bg-rose-100/50 text-rose-800 dark:bg-rose-500/20 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30' :
+                                                                t.status === 'GRACE' ? 'bg-amber-100/50 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30' :
+                                                                    'bg-emerald-100/50 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30'
+                                                        }`}>
+                                                    {t.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 align-middle text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300">
+                                                {t.overdueSince ? new Date(t.overdueSince).toLocaleString('tr-TR') : <span className="text-emerald-500 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4" /> Belirsiz</span>}
+                                            </td>
+                                            <td className="px-6 py-4 align-middle text-[10px] font-black uppercase tracking-widest pr-6">
+                                                {t.billingBlocked ? (
+                                                    <span className="text-rose-600 dark:text-rose-400 flex items-center gap-1.5 bg-rose-50 dark:bg-rose-500/10 px-2.5 py-1 rounded-lg w-max border border-rose-200 dark:border-rose-500/20">
+                                                        <Lock className="w-3.5 h-3.5" /> TAHAKKUK BLOKELİ
+                                                    </span>
+                                                ) : (
+                                                    <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg w-max border ${t.status === 'OVERDUE' ? 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20' : 'text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-white/5'}`}>
+                                                        {t.status === 'OVERDUE' ? <><AlertTriangle className="w-3.5 h-3.5" /> Otonom Risk (SLA {'>'} 15G)</> : <><ShieldCheck className="w-3.5 h-3.5 opacity-50" /> Güvende</>}
+                                                    </span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {data?.tenants?.length === 0 && (
+                                        <tr>
+                                            <td colSpan={5} className="p-16 text-center">
+                                                <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 space-y-3">
+                                                    <AlertCircle className="w-10 h-10 opacity-20" />
+                                                    <p className="text-[11px] font-black tracking-widest uppercase">Kayıtlı Fatura Bekleniyor</p>
+                                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">Uygulanan filtrelere uygun finansal/faturalı bir açık kayıt bulunmuyor.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="px-6 py-4 border-t border-slate-200 dark:border-white/5 text-[10px] text-slate-500 uppercase font-black tracking-widest flex justify-between bg-slate-50/50 dark:bg-slate-800/10">
+                            <span>Toplam Kayıt: {data?.tenants?.length || 0}</span>
+                        </div>
+                    </EnterpriseCard>
+                </>
+            ) : null}
+        </EnterprisePageShell>
     );
 }

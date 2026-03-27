@@ -1,4 +1,6 @@
 import { CarrierAdapter } from './carrierAdapter';
+import './hepsijetAdapter';
+import './sendeoAdapter';
 
 const adapters: Record<string, CarrierAdapter> = {};
 

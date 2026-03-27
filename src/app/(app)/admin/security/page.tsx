@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { ShieldAlert, Mic, Plus, Trash2, Info, AlertTriangle, Loader2 } from 'lucide-react';
 
 export default function SecuritySettingsPage() {
     const [words, setWords] = useState<string[]>([]);
@@ -81,82 +82,107 @@ export default function SecuritySettingsPage() {
         handleSave(updated);
     };
 
-    if (isLoading) return <div className="p-8 text-slate-500">Yükleniyor...</div>;
+    if (isLoading) return (
+        <div className="flex flex-col items-center justify-center p-32 text-slate-500 dark:text-slate-400">
+            <Loader2 className="w-10 h-10 animate-spin text-indigo-500 mb-4" />
+            <span className="text-sm font-bold tracking-widest uppercase">Güvenlik Motoru Yükleniyor...</span>
+        </div>
+    );
 
     return (
-        <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 font-outfit">Operasyonel Güvenlik</h1>
-                    <p className="text-slate-500">Kaçak satış tespiti için şüpheli kelime yönetimi</p>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-                <h2 className="text-lg font-bold mb-6 text-slate-800 flex items-center gap-2">
-                    <span className="p-2 bg-red-50 text-red-600 rounded-lg">🎤</span>
-                    Şüpheli Kelimeler Listesi
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="col-span-full bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-300">
-                        <div className="flex gap-4">
-                            <input
-                                type="text"
-                                value={newWord}
-                                onChange={(e) => setNewWord(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && addWord()}
-                                placeholder="Yeni şüpheli kelime veya cümle ekleyin..."
-                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                            />
-                            <button
-                                onClick={addWord}
-                                disabled={isSaving}
-                                className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50"
-                            >
-                                {isSaving ? 'Kaydediliyor...' : 'Ekle'}
-                            </button>
-                        </div>
-                        <p className="mt-3 text-xs text-slate-400">
-                            * Sistem bu kelimeleri gerçek zamanlı olarak dinler. Satış kaydı yoksa alarm üretir.
+        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16">
+            <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300 space-y-8">
+                
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
+                            <ShieldAlert className="w-7 h-7 text-indigo-600 dark:text-indigo-500" />
+                            Operasyonel Güvenlik
+                        </h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                            Kaçak satış ve anomali tespiti için akustik dinleme ve şüpheli kelime motoru yönetimi.
                         </p>
                     </div>
-
-                    {words?.map((word) => (
-                        <div
-                            key={word}
-                            className="flex justify-between items-center p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-red-200 group transition-all"
-                        >
-                            <span className="font-medium text-slate-700">{word}</span>
-                            <button
-                                onClick={() => removeWord(word)}
-                                className="p-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                            </button>
-                        </div>
-                    ))}
-
-                    {words.length === 0 && (
-                        <div className="col-span-full py-12 text-center text-slate-400">
-                            Henüz şüpheli kelime eklenmemiş.
-                        </div>
-                    )}
                 </div>
-            </div>
 
-            <div className="bg-amber-50 rounded-3xl p-8 border border-amber-100">
-                <h3 className="text-amber-800 font-bold mb-2 flex items-center gap-2">
-                    <span>💡</span> Kaçak Satış Tespiti Nasıl Çalışır?
-                </h3>
-                <ul className="text-amber-700 text-sm space-y-2 list-disc ml-5">
-                    <li>Sistem sadece <b>Chrome veya Edge</b> tarayıcılarında çalışır.</li>
-                    <li>Mikrofon izni gereklidir ve admin panelindeki yüzen mikrofon ikonuna basılarak başlatılır.</li>
-                    <li>Eğer personel yukarıdaki kelimelerden birini söylerse ve <b>son 5 dakikada</b> gerçekleşmiş bir satış bulamazsa &quot;Şüpheli İşlem&quot; alarmı tetiklenir.</li>
-                    <li>Alarmlar hem bildirim olarak düşer hem de &quot;Güvenlik &gt; Şüpheli Olaylar&quot; sayfasında saklanır.</li>
-                </ul>
+                <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/80 dark:bg-[#111827]/50">
+                        <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 uppercase tracking-widest">
+                            <Mic className="w-4 h-4 text-rose-500" />
+                            Akustik Tehdit İmzaları (Şüpheli Kelimeler)
+                        </h2>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        {/* Add Input Area */}
+                        <div className="bg-slate-50 dark:bg-[#0f172a] p-5 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="relative flex-1">
+                                    <AlertTriangle className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type="text"
+                                        value={newWord}
+                                        onChange={(e) => setNewWord(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addWord()}
+                                        placeholder="Yeni şüpheli kelime veya gramer ekleyin..."
+                                        className="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm text-slate-900 dark:text-white dark:placeholder-slate-500 transition-all font-medium"
+                                    />
+                                </div>
+                                <button
+                                    onClick={addWord}
+                                    disabled={isSaving || !newWord.trim()}
+                                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 text-white font-bold rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm whitespace-nowrap"
+                                >
+                                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                    İmza Ekle
+                                </button>
+                            </div>
+                            <p className="mt-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <Info className="w-3.5 h-3.5" />
+                                Sistem bu kelimeleri gerçek zamanlı olarak dinler. Satış kaydı yoksa alarm üretir.
+                            </p>
+                        </div>
+
+                        {/* Words Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {words?.map((word) => (
+                                <div
+                                    key={word}
+                                    className="flex justify-between items-center p-3.5 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/80 rounded-xl shadow-sm hover:border-rose-300 dark:hover:border-rose-500/50 group transition-all"
+                                >
+                                    <span className="font-bold text-sm text-slate-700 dark:text-slate-300 truncate font-mono" title={word}>{word}</span>
+                                    <button
+                                        onClick={() => removeWord(word)}
+                                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg opacity-0 group-hover:opacity-100 transition-all focus:opacity-100 outline-none"
+                                        title="Kaldır"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))}
+
+                            {words.length === 0 && (
+                                <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                                    <Mic className="w-8 h-8 mb-3 opacity-20" />
+                                    <span className="font-bold tracking-widest uppercase text-[11px]">Akustik İmza Bulunamadı</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-amber-50/50 dark:bg-amber-500/5 rounded-2xl p-6 border border-amber-200/50 dark:border-amber-500/20">
+                    <h3 className="text-amber-800 dark:text-amber-400 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-widest">
+                        <Info className="w-4 h-4" /> Kaçak Satış Tespiti Nasıl Çalışır?
+                    </h3>
+                    <ul className="text-amber-700/80 dark:text-amber-300/80 text-xs font-medium space-y-2.5 list-disc ml-5 marker:text-amber-400/50">
+                        <li>Sistem akustiği işleyebilmek için sadece <b>Chrome veya Edge (Blink tabanlı)</b> tarayıcılarında çalışır.</li>
+                        <li>Platform admin panelindeki yüzen mikrofon ikonuna basılarak başlatılır ve aktif dinleme modu devreye girer.</li>
+                        <li>Eğer personel yukarıdaki imzalardan birini sesli telaffuz ederse ve <b>son 5 dakikada (300 saniye)</b> POS/Fatura üzerinde gerçekleşmiş bir satış kaydı bulamazsa <b>"Şüpheli İşlem / Kaçak Alarmı"</b> tetiklenir.</li>
+                        <li>Alarmlar anlık bildirim olarak (Push) düşer ve "Güvenlik &gt; Şüpheli Olaylar" denetim günlüğünde immutable olarak saklanır.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     );

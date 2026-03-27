@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Save, Settings } from 'lucide-react';
+import { Plus, Trash2, Save, Settings, FileBox } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 import {
   EnterprisePageShell,
@@ -9,7 +9,7 @@ import {
   EnterpriseSectionHeader,
   EnterpriseInput,
   EnterpriseButton,
-  EnterpriseField
+  EnterpriseEmptyState
 } from '@/components/ui/enterprise';
 
 type TaxTier = {
@@ -119,68 +119,76 @@ export default function PayrollSettingsPage() {
   return (
     <EnterprisePageShell
       title="Bordro Parametreleri"
-      description="Sistem genelinde kullanılacak resmi SGK ve vergi oranlarını yönetin."
+      description="Sistem genelinde kullanılacak resmi SGK ve vergi oranlarını yönetin. Değişiklikler anında yürürlüğe girer."
       actions={
-        <EnterpriseButton onClick={handleSave} disabled={isLoading || isFetching}>
+        <EnterpriseButton onClick={handleSave} disabled={isLoading || isFetching} variant="primary">
           {isLoading ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          Ayarları Kaydet
+          Konfigürasyonu Kaydet
         </EnterpriseButton>
       }
     >
       {isFetching ? (
-        <div className="flex justify-center p-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 dark:border-white"></div>
-        </div>
+        <EnterpriseCard className="min-h-[400px] flex items-center justify-center">
+            <EnterpriseEmptyState 
+                icon={<Settings className="w-12 h-12 text-slate-400 dark:text-slate-500 animate-spin" />}
+                title="Sistem Parametreleri Okunuyor"
+                description="Bordro motoruna ait resmi çarpan değerleri ve vergi dilimleri veritabanından çekiliyor."
+            />
+        </EnterpriseCard>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <EnterpriseCard>
             <EnterpriseSectionHeader 
               title="SGK Tavan & Taban" 
               subtitle="Yıllık belirlenen yasal parametreler"
-              icon={<Settings />}
+              icon={<FileBox className="w-5 h-5 text-indigo-500" />}
             />
             
-            <div className="space-y-4">
-              <div className="flex gap-2 isolate">
-                <EnterpriseInput
-                  label="Yıl"
-                  type="number"
-                  value={params.periodYear}
-                  onChange={e => setParams({...params, periodYear: parseInt(e.target.value) || new Date().getFullYear()})}
-                  className="flex-1"
-                />
-                <div className="flex items-end pb-0.5">
-                  <EnterpriseButton variant="secondary" onClick={() => fetchParams(params.periodYear)}>
-                    Getir
-                  </EnterpriseButton>
+            <div className="space-y-5 mt-6 border-t border-slate-100 dark:border-white/5 pt-6">
+              <div className="flex gap-4 items-end bg-slate-50 dark:bg-slate-900/40 p-4 rounded-xl border border-slate-200 dark:border-white/5">
+                <div className="flex-1">
+                    <EnterpriseInput
+                    label="Parametre Yılı"
+                    type="number"
+                    value={params.periodYear}
+                    onChange={e => setParams({...params, periodYear: parseInt(e.target.value) || new Date().getFullYear()})}
+                    />
                 </div>
+                <EnterpriseButton variant="secondary" onClick={() => fetchParams(params.periodYear)} className="mb-0 h-[46px]">
+                  Verileri Çek
+                </EnterpriseButton>
               </div>
 
-              <EnterpriseInput
-                label="Brüt Asgari Ücret (Taban) (₺)"
-                type="number"
-                value={params.sgkFloor}
-                onChange={e => setParams({...params, sgkFloor: parseFloat(e.target.value) || 0})}
-              />
+              <div className="grid gap-5">
+                <EnterpriseInput
+                    label="Brüt Asgari Ücret (Taban) (₺)"
+                    type="number"
+                    value={params.sgkFloor}
+                    onChange={e => setParams({...params, sgkFloor: parseFloat(e.target.value) || 0})}
+                    hint="SGK taban matrahını belirler."
+                />
 
-              <EnterpriseInput
-                label="SGK Tavan Ücreti (₺)"
-                type="number"
-                value={params.sgkCeiling}
-                onChange={e => setParams({...params, sgkCeiling: parseFloat(e.target.value) || 0})}
-              />
+                <EnterpriseInput
+                    label="SGK Tavan Ücreti (₺)"
+                    type="number"
+                    value={params.sgkCeiling}
+                    onChange={e => setParams({...params, sgkCeiling: parseFloat(e.target.value) || 0})}
+                    hint="SGK kesintisi için üst limiti belirler."
+                />
 
-              <EnterpriseInput
-                label="Damga Vergisi Oranı"
-                type="number"
-                step="0.00001"
-                value={params.stampTaxRate}
-                onChange={e => setParams({...params, stampTaxRate: parseFloat(e.target.value) || 0})}
-              />
+                <EnterpriseInput
+                    label="Damga Vergisi Oranı"
+                    type="number"
+                    step="0.00001"
+                    value={params.stampTaxRate}
+                    onChange={e => setParams({...params, stampTaxRate: parseFloat(e.target.value) || 0})}
+                    hint="Örn: 0.00759 (Binde 7.59)"
+                />
+              </div>
             </div>
           </EnterpriseCard>
 
@@ -188,18 +196,18 @@ export default function PayrollSettingsPage() {
             <EnterpriseSectionHeader 
               title="Gelir Vergisi Dilimleri" 
               subtitle="Kümülatif vergi matrahına göre uygulanacak dilimler"
-              icon={<Settings />}
+              icon={<Settings className="w-5 h-5 text-emerald-500" />}
               rightElement={
                 <EnterpriseButton variant="secondary" onClick={addTier}>
-                  <Plus className="w-4 h-4 mr-1.5" /> Ekle
+                  <Plus className="w-4 h-4 mr-1.5" /> Dilim Ekle
                 </EnterpriseButton>
               }
             />
 
-            <div className="space-y-3">
+            <div className="space-y-4 mt-6 border-t border-slate-100 dark:border-white/5 pt-6">
               {params.incomeTaxBrackets.map((tier, index) => (
-                <div key={index} className="flex gap-3 items-end p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                  <div className="flex-1">
+                <div key={index} className="flex flex-col sm:flex-row gap-4 items-end p-4 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900/40 shadow-sm transition-all hover:border-slate-300 dark:hover:border-white/10 group">
+                  <div className="flex-1 w-full">
                     <EnterpriseInput
                       label="Limit (₺) (Sınırsız için boş)"
                       type="number"
@@ -208,7 +216,7 @@ export default function PayrollSettingsPage() {
                       placeholder="Sınırsız"
                     />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 w-full">
                     <EnterpriseInput
                       label="Vergi Oranı (örn: 0.15)"
                       type="number"
@@ -217,7 +225,11 @@ export default function PayrollSettingsPage() {
                       onChange={e => updateTier(index, 'rate', parseFloat(e.target.value) || 0)}
                     />
                   </div>
-                  <EnterpriseButton variant="danger" onClick={() => removeTier(index)} className="px-3 shrink-0">
+                  <EnterpriseButton 
+                    variant="secondary" 
+                    onClick={() => removeTier(index)} 
+                    className="px-4 h-[46px] w-full sm:w-auto text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </EnterpriseButton>
                 </div>

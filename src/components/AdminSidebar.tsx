@@ -184,7 +184,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
               label="Onboarding Akışı"
             />
             <NavItem
-              href="/admin/support/doctor"
+              href="/admin/system/doctor"
               icon={Activity}
               label="Platform Doctor"
             />

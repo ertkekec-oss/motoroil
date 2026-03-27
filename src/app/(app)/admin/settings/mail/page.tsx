@@ -2,49 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-
-// Common UI wrappers for Enterprise style
-function ERPInput(props: any) {
-    return (
-        <input
-            {...props}
-            className={`w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 ${props.className || ''}`}
-        />
-    );
-}
-
-function ERPField({ label, hint, children }: { label: string, hint?: string, children: React.ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1.5 focus-within:text-slate-900">
-            <div className="flex items-center justify-between">
-                <label className="text-[12px] font-medium text-slate-500 uppercase tracking-widest transition-colors">{label}</label>
-                {hint && <span className="text-[11px] text-slate-400 font-medium">{hint}</span>}
-            </div>
-            {children}
-        </div>
-    );
-}
-
-function ERPBlock({ title, description, badge, children }: { title?: string, description?: string, badge?: React.ReactNode, children: React.ReactNode }) {
-    return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] mb-6">
-            {(title || description || badge) && (
-                <div className="flex items-start justify-between mb-6 pb-5 border-b border-slate-100">
-                    <div>
-                        {title && <h3 className="text-[16px] font-semibold text-slate-900">{title}</h3>}
-                        {description && <p className="text-[14px] text-slate-500 mt-1">{description}</p>}
-                    </div>
-                    {badge && <div>{badge}</div>}
-                </div>
-            )}
-            {children}
-        </div>
-    );
-}
+import { Save, CheckCircle2, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseInput, EnterpriseButton, EnterpriseSectionHeader } from '@/components/ui/enterprise';
 
 export default function AdminMailSettingsPage() {
     const [smtpSettings, setSmtpSettings] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(true);
+    const [isTesting, setIsTesting] = useState(false);
 
     useEffect(() => {
         fetch('/api/admin/settings/mail')
@@ -83,7 +47,7 @@ export default function AdminMailSettingsPage() {
     };
 
     const testConnection = async () => {
-        setIsLoading(true);
+        setIsTesting(true);
         try {
             const res = await fetch('/api/admin/settings/mail/test', {
                 method: 'POST',
@@ -98,97 +62,120 @@ export default function AdminMailSettingsPage() {
                 toast.error(data.error || 'Bağlantı hatası: Bilgilerinizi kontrol edin.');
             }
         } catch (e) {
-            toast.error('Sunucuya bağlanılamadı.');
+            toast.error('Sunucu test edilemedi. Ağa ulaşılamıyor olabilir.');
         } finally {
-            setIsLoading(false);
+            setIsTesting(false);
         }
     };
 
     const isConfigured = !!smtpSettings?.email;
 
     return (
-        <div className="max-w-5xl mx-auto w-full animate-in fade-in duration-300">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h2 className="text-[24px] font-semibold text-slate-900 tracking-tight">Mail Motoru Sunucu Ayarları</h2>
-                    <p className="text-[14px] text-slate-500 mt-1">Uygulamanın varsayılan mail altyapısı sayfası. Kiracılar kendi ayarlarından farklı bir mail şablonu atamazlarsa sistem bu maili kullanır.</p>
+        <EnterprisePageShell
+            title="Mail Motoru Sunucu Ayarları"
+            description="Uygulamanın varsayılan mail altyapısı konfigürasyonu. Kiracılar kendi ayarlarını devre dışı bırakırsa sistem bu SMTP Gateway'i kullanır."
+            actions={
+                <EnterpriseButton onClick={saveSmtpSettings} disabled={isLoading} variant="primary">
+                    {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Konfigürasyonu Kaydet
+                </EnterpriseButton>
+            }
+        >
+            {isLoading && !smtpSettings.email && !smtpSettings.password ? (
+                <div className="p-16 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 w-full rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-[#1e293b] shadow-sm">
+                    <RefreshCw className="w-8 h-8 animate-spin text-indigo-500 mb-4" />
+                    <span className="text-sm font-bold tracking-widest uppercase mb-1">Cihaz Anahtarları Okunuyor...</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">SMTP Ağ geçidi konfigürasyonu kontrol ediliyor</span>
                 </div>
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    {/* Main Form Area */}
+                    <div className="lg:col-span-2 space-y-6">
+                        <EnterpriseCard className="relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none transition-all duration-500"></div>
+                            
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 dark:border-white/5 pb-6">
+                                <EnterpriseSectionHeader 
+                                    title="SMTP Gateway (Simple Mail Transfer Protocol)" 
+                                    subtitle="Google Workspace, Microsoft Outlook veya yetkili SMTP port geçidi." 
+                                />
+                                <div>
+                                    {isConfigured ? (
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[10px] font-black uppercase tracking-widest flex-shrink-0">
+                                            <CheckCircle2 className="w-3.5 h-3.5" /> SUNUCU AKTİF
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-md text-[10px] font-black uppercase tracking-widest flex-shrink-0">
+                                            <Activity className="w-3.5 h-3.5" /> AYAR YOK
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                <div className="shrink-0 flex items-center gap-3">
-                    <button
-                        onClick={saveSmtpSettings}
-                        disabled={isLoading}
-                        className="h-10 px-6 bg-slate-900 border border-slate-900 rounded-lg text-white text-[14px] font-medium hover:bg-slate-800 transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 flex items-center gap-2 disabled:opacity-50"
-                    >
-                        <span>💾</span> Konfigürasyonu Kaydet
-                    </button>
-                </div>
-            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                                <EnterpriseInput
+                                    label="Gönderici Ana E-Posta Kimliği"
+                                    hint="Varsayılan uygulamanın SMTP yetkili şirket hesabı."
+                                    required
+                                    type="email"
+                                    placeholder="ornek@sirketiniz.com"
+                                    value={smtpSettings?.email || ''}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSmtpSettings({ ...smtpSettings, email: e.target.value })}
+                                    disabled={isLoading}
+                                />
 
-            {/* Block */}
-            <ERPBlock
-                title="SMTP (Simple Mail Transfer Protocol) Ayarları"
-                description="Google, Outlook veya SMTP erişimli kurumsal sunucunuzun uygulamaya özel port geçidi yetkileri."
-                badge={
-                    <span className={`inline-flex px-3 py-1 text-[11px] font-semibold uppercase tracking-widest rounded border ${isConfigured ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-500 border-slate-200'}`}>
-                        {isConfigured ? '✓ SUNUCU AKTİF' : 'AYAR YAPILMADI'}
-                    </span>
-                }
-            >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <ERPField
-                        label="GÖNDERİCİ ANA E-POSTA KİMLİĞİ"
-                        hint="Varsayılan uygulamanın SMTP yetkili hesap adresi"
-                    >
-                        <ERPInput
-                            type="email"
-                            placeholder="ornek@sirketiniz.com"
-                            value={smtpSettings?.email || ''}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                setSmtpSettings({ ...smtpSettings, email: e.target.value })
-                            }
-                            disabled={isLoading}
-                        />
-                    </ERPField>
-                    <div className="flex flex-col gap-2 relative">
-                        <ERPField
-                            label="UYGULAMA API ŞİFRESİ"
-                            hint="Google Security -> App Passwords"
-                        >
-                            <ERPInput
-                                type="password"
-                                placeholder="•••• •••• •••• ••••"
-                                value={smtpSettings?.password || ''}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                    setSmtpSettings({ ...smtpSettings, password: e.target.value })
-                                }
-                                disabled={isLoading}
-                            />
-                        </ERPField>
-                        {!isConfigured && (
-                            <p className="absolute -bottom-6 right-0 text-[11px] text-slate-400 font-medium">Bu şifre 16 karakterli API app kodudur.</p>
-                        )}
-                    </div>
-                </div>
-
-                <div className="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between">
-                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg max-w-lg">
-                        <strong className="text-[12px] font-semibold text-slate-800 uppercase tracking-widest block mb-1">Kurumsal Uyum Uyarısı</strong>
-                        <p className="text-[12px] text-slate-600 leading-relaxed">
-                            Güvenlik nedeniyle kişisel ("Gmail" giriş şifrenizi) kullanmayınız. Lütfen hizmet sağlayıcınızın kontrol panelinden oluşturulmuş <strong>Uygulama İzin Kodunu</strong> temin edip giriniz.
-                        </p>
+                                <EnterpriseInput
+                                    label="Uygulama API Şifresi"
+                                    hint="Güvenlik sekmesinden oluşturulan 16 haneli erişim kodu."
+                                    required
+                                    type="password"
+                                    placeholder="•••• •••• •••• ••••"
+                                    value={smtpSettings?.password || ''}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSmtpSettings({ ...smtpSettings, password: e.target.value })}
+                                    disabled={isLoading}
+                                />
+                            </div>
+                        </EnterpriseCard>
                     </div>
 
-                    <button
-                        onClick={testConnection}
-                        className="h-10 px-4 bg-white border border-slate-300 text-slate-700 rounded-lg text-[13px] font-medium hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
-                        disabled={!smtpSettings?.email || !smtpSettings?.password || isLoading}
-                    >
-                        📬 Bağlantıyı Sınama Testi
-                    </button>
+                    {/* Sidebar / Helpers */}
+                    <div className="lg:col-span-1 space-y-6">
+                        <EnterpriseCard className="text-center overflow-hidden flex flex-col items-center">
+                            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl flex items-center justify-center mb-4 text-indigo-500 dark:text-indigo-400 shadow-sm z-10">
+                                <ShieldCheck className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest z-10 mb-2">Kurumsal Uyum Uyarısı</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed z-10 text-balance">
+                                Güvenlik nedeniyle kişisel giriş şifrenizi kullanmayınız. Lütfen hizmet sağlayıcınızın kontrol panelinden oluşturulmuş <strong className="text-slate-700 dark:text-slate-300">Uygulama İzin Kodunu</strong> temin edip giriniz.
+                            </p>
+                        </EnterpriseCard>
+
+                        <EnterpriseCard className="bg-indigo-500/5 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20">
+                            <h3 className="text-[11px] font-black text-indigo-900 dark:text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <Activity className="w-4 h-4" /> Çıkış Sınaması
+                            </h3>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed mb-5">
+                                Ayarları kaydettikten sonra sistemin kendi içerisinden mail çıkışı yapıp yapamadığını test edin.
+                            </p>
+                            
+                            <EnterpriseButton 
+                                variant="secondary" 
+                                className="w-full justify-center"
+                                onClick={testConnection} 
+                                disabled={!smtpSettings?.email || !smtpSettings?.password || isTesting}
+                            >
+                                {isTesting ? (
+                                    <><RefreshCw className="w-4 h-4 animate-spin" /> Sınanıyor...</>
+                                ) : (
+                                    <>Bağlantıyı Test Et</>
+                                )}
+                            </EnterpriseButton>
+                        </EnterpriseCard>
+                    </div>
+
                 </div>
-            </ERPBlock>
-        </div>
+            )}
+        </EnterprisePageShell>
     );
 }

@@ -121,77 +121,91 @@ export default function AdminB2BPoliciesPage() {
             title="Sistem Güvenlik & OTP Politikaları (Governance)"
             description="Tenant bazlı Dealer Portal giriş politikalarını (OTP, Şifre vb.) görüntüleyin ve platform çapında yönetin."
             actions={actions}
+            className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
         >
-            <div className="bg-sky-50 dark:bg-sky-900/10 border border-sky-200 dark:border-sky-800 rounded-xl p-4 flex gap-3 text-sm text-sky-800 dark:text-sky-300 shadow-sm align-start mb-6">
-                <Info className="w-5 h-5 shrink-0 mt-0.5" />
+            <div className="bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/20 rounded-xl p-4 flex gap-3 text-sky-800 dark:text-sky-300 shadow-sm align-start mb-6 items-start">
+                <Info className="w-5 h-5 shrink-0" />
                 <div>
-                    <span className="font-bold block mb-1">Katı Politika İlkesi:</span>
-                    Platform adminleri (Süper/Platform Admin), B2B sisteminde güvenliği ihlal eden tenantların portal giriş şeklini zorunlu olarak "SADECE OTP" moduna zorlayabilir. OTP moduna geçen bayiler SMS kodu ile portal erişimi sağlayacaktır.
+                    <span className="text-[11px] font-black uppercase tracking-widest block mb-1 text-sky-900 dark:text-sky-400">Katı Politika İlkesi:</span>
+                    <span className="text-[12px] font-medium leading-relaxed opacity-90">Platform adminleri (Süper/Platform Admin), B2B sisteminde güvenliği ihlal eden tenantların portal giriş şeklini zorunlu olarak "SADECE OTP" moduna zorlayabilir. OTP moduna geçen bayiler SMS kodu ile portal erişimi sağlayacaktır.</span>
                 </div>
             </div>
 
-            <EnterpriseCard noPadding>
-                <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center bg-slate-50 dark:bg-slate-900 rounded-t-xl">
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Tenant İzinli Politikaları</h3>
+            <EnterpriseCard noPadding className="border-slate-200 dark:border-white/5 bg-white dark:bg-[#1e293b] shadow-sm">
+                <div className="px-6 py-5 border-b border-slate-200 dark:border-white/5 flex items-center bg-slate-50 dark:bg-slate-800/30 rounded-t-xl">
+                    <h3 className="text-[13px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Tenant İzinli Politikaları</h3>
                 </div>
 
-                <EnterpriseTable headers={headers}>
-                    {loading ? (
-                        <tr>
-                            <td colSpan={5} className="p-8 text-center text-sm text-slate-500 font-medium">Yükleniyor...</td>
-                        </tr>
-                    ) : policies.length === 0 ? (
-                        <tr>
-                            <td colSpan={5} className="p-8 text-center text-sm text-slate-500 font-medium">Görüntülenecek politika kaydı bulunamadı.</td>
-                        </tr>
-                    ) : (
-                        policies?.map((policy) => (
-                            <tr key={policy.tenantId} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td className="p-4 align-middle">
-                                    <div className="font-semibold text-slate-900 dark:text-white text-sm">{policy.tenantName}</div>
-                                    <div className="text-[10px] text-slate-400 font-mono mt-0.5">{policy.tenantId}</div>
-                                </td>
-                                <td className="p-4 align-middle">
-                                    <div className="font-medium text-slate-700 dark:text-slate-200 text-sm font-mono">{policy.vkn}</div>
-                                </td>
-                                <td className="p-4 align-middle">
-                                    {editingPolicy === policy.tenantId ? (
-                                        <div className="w-48">
-                                            <EnterpriseSelect
-                                                value={selectedMode}
-                                                onChange={(e) => setSelectedMode(e.target.value)}
-                                            >
-                                                <option value="PASSWORD_ONLY">Sadece Şifre (Varsayılan)</option>
-                                                <option value="OTP_ONLY">Zorunlu OTP (Sadece SMS)</option>
-                                                <option value="OTP_OR_PASSWORD">Hybrid (OTP veya Şifre)</option>
-                                            </EnterpriseSelect>
-                                        </div>
-                                    ) : (
-                                        <AuthModeBadge mode={policy.dealerAuthMode} />
-                                    )}
-                                </td>
-                                <td className="p-4 align-middle text-sm text-slate-600 dark:text-slate-300">
-                                    {format(new Date(policy.updatedAt), "dd MMM yyyy HH:mm")}
-                                </td>
-                                <td className="p-4 align-middle text-right w-[200px]">
-                                    {editingPolicy === policy.tenantId ? (
-                                        <div className="flex items-center justify-end gap-2">
-                                            <EnterpriseButton variant="secondary" onClick={handleCancelEdit} disabled={saving}>İptal</EnterpriseButton>
-                                            <EnterpriseButton onClick={() => handleSave(policy.tenantId)} disabled={saving}>{saving ? '...' : 'Kaydet'}</EnterpriseButton>
-                                        </div>
-                                    ) : (
-                                        <EnterpriseButton variant="secondary" onClick={() => handleEditStart(policy.tenantId, policy.dealerAuthMode)}>
-                                            <Edit2 className="w-4 h-4" />
-                                            Politika Düzenle
-                                        </EnterpriseButton>
-                                    )}
-                                </td>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr className="bg-slate-50 dark:bg-slate-800/50 border-y border-slate-200 dark:border-white/5">
+                                {headers.map((h: any, i) => (
+                                    <th key={i} className={`px-4 py-3 text-[10px] uppercase tracking-widest font-black text-slate-500 dark:text-slate-400 ${h.alignRight ? 'text-right' : ''}`}>
+                                        {typeof h === 'string' ? h : h.label}
+                                    </th>
+                                ))}
                             </tr>
-                        ))
-                    )}
-                </EnterpriseTable>
-                <div className="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 tracking-wide font-medium flex justify-between">
-                    <span>Mevcut Aktif Politika: {totalVisible} kayıt</span>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={5} className="p-8 text-center text-[11px] font-black uppercase tracking-widest text-slate-500">Yükleniyor...</td>
+                                </tr>
+                            ) : policies.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="p-12 text-center text-[11px] font-black uppercase tracking-widest text-slate-500">Görüntülenecek politika kaydı bulunamadı.</td>
+                                </tr>
+                            ) : (
+                                policies?.map((policy) => (
+                                    <tr key={policy.tenantId} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors group">
+                                        <td className="p-4 align-middle">
+                                            <div className="font-black text-[11px] uppercase tracking-wide text-slate-900 dark:text-white">{policy.tenantName}</div>
+                                            <div className="text-[10px] text-slate-400 font-mono mt-1 font-bold">{policy.tenantId}</div>
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            <div className="font-black text-[11px] tracking-widest text-slate-700 dark:text-slate-200 font-mono">{policy.vkn || 'N/A'}</div>
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            {editingPolicy === policy.tenantId ? (
+                                                <div className="w-56">
+                                                    <EnterpriseSelect
+                                                        value={selectedMode}
+                                                        onChange={(e) => setSelectedMode(e.target.value)}
+                                                    >
+                                                        <option value="PASSWORD_ONLY">Sadece Şifre (Varsayılan)</option>
+                                                        <option value="OTP_ONLY">Zorunlu OTP (Sadece SMS)</option>
+                                                        <option value="OTP_OR_PASSWORD">Hybrid (OTP veya Şifre)</option>
+                                                    </EnterpriseSelect>
+                                                </div>
+                                            ) : (
+                                                <AuthModeBadge mode={policy.dealerAuthMode} />
+                                            )}
+                                        </td>
+                                        <td className="p-4 align-middle text-[11px] font-black tracking-widest uppercase text-slate-600 dark:text-slate-300">
+                                            {format(new Date(policy.updatedAt), "dd MMM yyyy HH:mm")}
+                                        </td>
+                                        <td className="p-4 align-middle text-right">
+                                            {editingPolicy === policy.tenantId ? (
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <EnterpriseButton variant="secondary" onClick={handleCancelEdit} disabled={saving}>İptal</EnterpriseButton>
+                                                    <EnterpriseButton onClick={() => handleSave(policy.tenantId)} disabled={saving}>{saving ? '...' : 'Kaydet'}</EnterpriseButton>
+                                                </div>
+                                            ) : (
+                                                <EnterpriseButton variant="secondary" onClick={() => handleEditStart(policy.tenantId, policy.dealerAuthMode)} className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Edit2 className="w-4 h-4 mr-1.5" />
+                                                    Politika Düzenle
+                                                </EnterpriseButton>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="p-4 border-t border-slate-200 dark:border-white/5 text-[10px] text-slate-500 uppercase font-black tracking-widest flex justify-between bg-slate-50/50 dark:bg-slate-800/10 rounded-b-xl">
+                    <span>Mevcut Aktif Politika: {totalVisible} KAYIT</span>
                 </div>
             </EnterpriseCard>
 
