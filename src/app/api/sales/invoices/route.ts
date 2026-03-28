@@ -360,9 +360,9 @@ export async function POST(request: Request) {
 
                     const lineNet = Number((qty * price).toFixed(2));
                     let lineOtv = 0;
-                    if (otvType === 'maktu Ö.T.V') {
+                    if (otvType === 'Birim Başına') {
                         lineOtv = Number((qty * otvRate).toFixed(2));
-                    } else if (otvType === 'yüzdesel Ö.T.V') {
+                    } else if (otvType === 'Yüzdesel') {
                         lineOtv = Number((lineNet * (otvRate / 100)).toFixed(2));
                     }
 

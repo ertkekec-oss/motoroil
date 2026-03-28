@@ -496,9 +496,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                     // Net Price calculation (Gross -> Net)
                     let netPrice = grossPrice;
-                    if (otvType === 'yüzdesel Ö.T.V') {
+                    if (otvType === 'Yüzdesel') {
                         netPrice = grossPrice / ((1 + otvRate / 100) * (1 + vatRate / 100));
-                    } else if (otvType === 'maktu Ö.T.V') {
+                    } else if (otvType === 'Birim Başına') {
                         netPrice = (grossPrice / (1 + vatRate / 100)) - otvRate;
                     } else {
                         netPrice = grossPrice / (1 + vatRate / 100);
@@ -637,9 +637,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             const lineQty = Number(it.qty || 1);
             const lineNet = lineQty * Number(it.price || 0);
             let lineOtv = 0;
-            if (it.otvType === 'yüzdesel Ö.T.V') {
+            if (it.otvType === 'Yüzdesel') {
                 lineOtv = lineNet * (Number(it.otv || 0) / 100);
-            } else if (it.otvType === 'maktu Ö.T.V') {
+            } else if (it.otvType === 'Birim Başına') {
                 lineOtv = Number(it.otv || 0) * lineQty;
             }
             const matrah = lineNet + lineOtv;
@@ -2258,9 +2258,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             const lineNetTotal = lineNetBase - discountAmount;
 
                                             let otvAmount = 0;
-                                            if (it.otvType === 'yüzdesel Ö.T.V') {
+                                            if (it.otvType === 'Yüzdesel') {
                                                 otvAmount = lineNetTotal * (otvRate / 100);
-                                            } else if (it.otvType === 'maktu Ö.T.V') {
+                                            } else if (it.otvType === 'Birim Başına') {
                                                 otvAmount = otvRate * qty;
                                             }
                                             const vatMatrah = lineNetTotal + otvAmount;
@@ -2281,9 +2281,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 if (factor <= 0) return; // avoid division by zero or negative discount inversions
                                                 
                                                 let calculatedNet = 0;
-                                                if (it.otvType === 'yüzdesel Ö.T.V') {
+                                                if (it.otvType === 'Yüzdesel') {
                                                     calculatedNet = newGross / (qty * factor * (1 + otvRate / 100) * (1 + (vatRate + oivR) / 100));
-                                                } else if (it.otvType === 'maktu Ö.T.V') {
+                                                } else if (it.otvType === 'Birim Başına') {
                                                     calculatedNet = ((newGross / (1 + (vatRate + oivR) / 100)) - (otvRate * qty)) / (qty * factor);
                                                 } else {
                                                     calculatedNet = newGross / (qty * factor * (1 + (vatRate + oivR) / 100));
@@ -2310,9 +2310,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         const effectiveVatOiv = (1 + (vatRate + oivRate) / 100);
                                                                         
                                                                         let netPrice = 0;
-                                                                        if (otvType === 'yüzdesel Ö.T.V') {
+                                                                        if (otvType === 'Yüzdesel') {
                                                                             netPrice = rawPrice / ((1 + otvRate / 100) * effectiveVatOiv);
-                                                                        } else if (otvType === 'maktu Ö.T.V') {
+                                                                        } else if (otvType === 'Birim Başına') {
                                                                             netPrice = (rawPrice / effectiveVatOiv) - otvRate;
                                                                         } else {
                                                                             netPrice = rawPrice / effectiveVatOiv;
@@ -2353,7 +2353,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 </span>
                                                                 {(it.otvType && it.otvType !== 'Ö.T.V yok') && (
                                                                     <span className="text-[10px] font-bold px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-500 shadow-sm border border-amber-200 dark:border-amber-500/20">
-                                                                        {it.otvType === 'yüzdesel Ö.T.V' ? `ÖTV %${it.otv}` : `ÖTV ${it.otv} ₺`}
+                                                                        {it.otvType === 'Yüzdesel' ? `ÖTV %${it.otv}` : `ÖTV ${it.otv} ₺`}
                                                                     </span>
                                                                 )}
                                                                 {(Number(it.oiv || 0) > 0) && (
@@ -2475,9 +2475,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 const lineNet = lineNetBase - lineDiscount;
                                                 
                                                 let lineOtv = 0;
-                                                if (it.otvType === 'yüzdesel Ö.T.V') {
+                                                if (it.otvType === 'Yüzdesel') {
                                                     lineOtv = lineNet * (Number(it.otv || 0) / 100);
-                                                } else if (it.otvType === 'maktu Ö.T.V') {
+                                                } else if (it.otvType === 'Birim Başına') {
                                                     lineOtv = Number(it.otv || 0) * lineQty;
                                                 }
                                                 const matrah = lineNet + lineOtv;
@@ -2863,8 +2863,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     }}
                                 >
                                     <option value="Ö.T.V yok">🟢 Uygulanmasın (Yok)</option>
-                                    <option value="yüzdesel Ö.T.V">🔵 Yüzde Oranlı (%)</option>
-                                    <option value="maktu Ö.T.V">🟠 Sabit Tutarlı (₺)</option>
+                                    <option value="Yüzdesel">🔵 Yüzde Oranlı (%)</option>
+                                    <option value="Birim Başına">🟠 Sabit Tutarlı (₺)</option>
                                 </EnterpriseSelect>
 
                                 {invoiceItems[taxEditIndex].otvType !== 'Ö.T.V yok' && (
@@ -2888,7 +2888,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         </EnterpriseSelect>
 
                                         <EnterpriseInput
-                                            label={`BELİRLENEN Ö.T.V ${invoiceItems[taxEditIndex].otvType === 'yüzdesel Ö.T.V' ? 'ORANI (%)' : 'TUTARI (₺)'}`}
+                                            label={`BELİRLENEN Ö.T.V ${invoiceItems[taxEditIndex].otvType === 'Yüzdesel' ? 'ORANI (%)' : 'TUTARI (₺)'}`}
                                             type="number"
                                             value={invoiceItems[taxEditIndex].otv || 0}
                                             onChange={(e) => {
@@ -3090,9 +3090,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         const effectiveVatOiv = (1 + (vatRate + oivRate) / 100);
 
                                         let netPrice = 0;
-                                        if (otvType === 'yüzdesel Ö.T.V') {
+                                        if (otvType === 'Yüzdesel') {
                                             netPrice = grossPrice / ((1 + otvRate / 100) * effectiveVatOiv);
-                                        } else if (otvType === 'maktu Ö.T.V') {
+                                        } else if (otvType === 'Birim Başına') {
                                             netPrice = (grossPrice / effectiveVatOiv) - otvRate;
                                         } else {
                                             netPrice = grossPrice / effectiveVatOiv;

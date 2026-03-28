@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
                 taxInfoList.push(`%${vatRate} KDV`);
                 
                 if (item.otvType && item.otvType !== 'Ö.T.V yok' && item.otv > 0) {
-                    taxInfoList.push(`ÖTV: ${item.otvType === 'yüzdesel Ö.T.V' ? '%' + item.otv : item.otv + ' ₺'} (Kod: ${item.otvCode || '0071'})`);
+                    taxInfoList.push(`ÖTV: ${item.otvType === 'Yüzdesel' ? '%' + item.otv : item.otv + ' ₺'} (Kod: ${item.otvCode || '0071'})`);
                 }
                 
                 itemDescription += `(${taxInfoList.join(' | ')})`;

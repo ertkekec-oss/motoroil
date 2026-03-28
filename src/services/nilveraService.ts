@@ -272,7 +272,7 @@ export class NilveraInvoiceService {
             let otvAmount = 0;
 
             if (line.OtvRate && line.OtvRate > 0) {
-                if (line.OtvType === 'maktu Ö.T.V') {
+                if (line.OtvType === 'Birim Başına') {
                     otvAmount = Number((line.OtvRate * line.Quantity).toFixed(2));
                     taxes.push({ TaxCode: line.OtvCode || "0071", Total: otvAmount, Percent: 0 });
                 } else {
