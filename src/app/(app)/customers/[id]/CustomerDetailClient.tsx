@@ -2137,86 +2137,99 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         </div>
                                     </EnterpriseCard>
 
-                                    {/* Section: Ekstra Seçenekler */}
-                                    <EnterpriseCard borderLeftColor="#10b981" className="space-y-4 lg:col-span-1 !p-4">
-                                        <h3 className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">AYARLAR & VADE</h3>
-                                        <div className="flex flex-col gap-3">
-                                            <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 cursor-pointer hover:border-emerald-500/50 transition-colors">
-                                                <input
-                                                    type="checkbox"
-                                                    id="inv_create_wayslip"
-                                                    className="w-4 h-4 rounded text-emerald-500 accent-emerald-500"
-                                                />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Giden Sevk İrsaliyesi</span>
-                                                    <span className="text-[10px] text-slate-500">İrsaliye ref nosu faturaya yazılır</span>
-                                                </div>
-                                            </label>
-
+                                    {/* Section: Finansal Özet */}
+                                    <EnterpriseCard borderLeftColor="#10b981" className="space-y-4 lg:col-span-1 !p-4 bg-emerald-50/10 dark:bg-emerald-900/5 flex flex-col">
+                                        <h3 className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">FİNANSAL ÖZET</h3>
+                                        <div className="flex-1 flex flex-col justify-end">
                                         {(() => {
-                                            const pmRaw = selectedOrder?.rawData ? (typeof selectedOrder.rawData === 'string' ? JSON.parse(selectedOrder.rawData)?.paymentMode : selectedOrder.rawData.paymentMode) : null;
-                                            const isVeresiye = !pmRaw || ['account', 'veresiye'].includes(pmRaw);
-                                            
-                                            // VADELENDİRME SADECE VERESİYE SATIŞLARDA GÖZÜKMELİ
-                                            if (!isVeresiye) return null;
+                                            const subtotal = invoiceItems.reduce((acc, it) => acc + (Number(it.qty) * Number(it.price)), 0);
 
-                                            const invoiceIdsForOrder = (customer?.invoices || [])
-                                                .filter((inv: any) => inv.orderId === selectedOrder?.id)
-                                                .map((inv: any) => inv.id);
+                                            let totalOtv = 0;
+                                            let totalOiv = 0;
+                                            let totalVat = 0;
 
-                                            const isAlreadyVadelendi = selectedOrder && (
-                                                vadelenenIds.includes(selectedOrder.id) || 
-                                                invoiceIdsForOrder.some((id: string) => vadelenenIds.includes(id)) ||
-                                                customer?.paymentPlans?.some((p: any) => 
-                                                    (
-                                                        p.description === selectedOrder.id || 
-                                                        (lastInvoice && p.description === lastInvoice.id) || 
-                                                        (lastInvoice && p.description === lastInvoice.orderId) ||
-                                                        invoiceIdsForOrder.includes(p.description)
-                                                    ) && 
-                                                    p.status !== 'İptal' && p.status !== 'Cancelled'
-                                                )
-                                            );
+                                            invoiceItems.forEach(it => {
+                                                const lineQty = Number(it.qty || 1);
+                                                const lineNetBase = lineQty * Number(it.price || 0);
+                                                const lineDiscount = lineNetBase * (Number(it.discountRate || 0) / 100);
+                                                const lineNet = lineNetBase - lineDiscount;
+                                                
+                                                let lineOtv = 0;
+                                                if (it.otvType === 'Yüzdesel') {
+                                                    lineOtv = lineNet * (Number(it.otv || 0) / 100);
+                                                } else if (it.otvType === 'Birim Başına') {
+                                                    lineOtv = Number(it.otv || 0) * lineQty;
+                                                }
+                                                const matrah = lineNet + lineOtv;
+                                                totalOtv += lineOtv;
+                                                totalOiv += matrah * (Number(it.oiv || 0) / 100);
+                                                totalVat += matrah * (Number(it.vat || 20) / 100);
+                                            });
+
+                                            let discAmount = 0;
+                                            if (discountType === 'percent') {
+                                                discAmount = subtotal * (discountValue / 100);
+                                            } else {
+                                                discAmount = discountValue;
+                                            }
+
+                                            const finalTotal = subtotal + totalOtv + totalOiv + totalVat - discAmount;
 
                                             return (
-                                                <div className="flex flex-col gap-2 pt-3 mt-3 border-t border-slate-200 dark:border-slate-800">
-                                                    <label className={`flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer transition-colors ${isAlreadyVadelendi ? 'bg-slate-100 dark:bg-slate-900/10 opacity-60 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500/50'}`}>
-                                                        <input
-                                                            type="checkbox"
-                                                            disabled={isAlreadyVadelendi}
-                                                            checked={isAlreadyVadelendi ? false : isInstallmentInvoice}
-                                                            onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
-                                                            className="w-4 h-4 rounded text-emerald-500 accent-emerald-500 disabled:opacity-50"
-                                                        />
-                                                        <div className="flex flex-col">
-                                                            <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
-                                                                Vade & Ödeme Planı (Sadece Veresiye)
-                                                                {isAlreadyVadelendi && (
-                                                                    <span className="ml-2 text-[10px] bg-amber-500/20 text-amber-500 px-1 py-0.5 rounded uppercase">Zaten Vadelendi</span>
-                                                                )}
-                                                            </span>
-                                                            <span className="text-[10px] text-slate-500">Plan ödeme notu faturaya yazılır</span>
-                                                        </div>
-                                                    </label>
+                                                <div className="flex flex-col gap-3 py-1">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-xs font-semibold text-slate-500">Ara Toplam (Net)</span>
+                                                        <span className="font-mono font-bold text-[14px]">{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                    </div>
 
-                                                    {isInstallmentInvoice && (
-                                                        <div className="p-3 bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-200 dark:border-emerald-500/20 rounded-xl flex items-end gap-3 animate-in fade-in zoom-in-95 duration-200">
-                                                            <div className="flex-1">
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">TÜR</label>
-                                                                <select id="inv_installment_type" defaultValue="Açık Hesap" className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white">
-                                                                    <option value="Açık Hesap">Açık Hesap</option>
-                                                                    <option value="Çek">Çek Alınacak</option>
-                                                                    <option value="Senet">Senet (Periodya İmza)</option>
-                                                                </select>
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">VADE</label>
-                                                                <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full px-2 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-bold text-slate-900 dark:text-white">
-                                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
-                                                                </select>
-                                                            </div>
+                                                    {totalOtv > 0 && (
+                                                        <div className="flex justify-between items-center">
+                                                            <span className="text-xs font-semibold text-slate-500">ÖTV Toplam</span>
+                                                            <span className="font-mono font-bold text-[14px] text-amber-500">{totalOtv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                         </div>
                                                     )}
+
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs font-semibold text-slate-500">İskonto</span>
+                                                            <select
+                                                                value={discountType}
+                                                                onChange={(e: any) => setDiscountType(e.target.value)}
+                                                                className="px-1 py-0.5 text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded outline-none"
+                                                            >
+                                                                <option value="percent">%</option>
+                                                                <option value="amount">₺</option>
+                                                            </select>
+                                                            <input
+                                                                type="number"
+                                                                value={discountValue}
+                                                                onChange={(e) => setDiscountValue(Number(e.target.value))}
+                                                                className="w-14 px-1 py-0.5 text-center text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded outline-none"
+                                                            />
+                                                        </div>
+                                                        <span className="font-mono font-bold text-[14px] text-red-500">- {discAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                    </div>
+
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs font-semibold text-slate-500">KDV Katkısı</span>
+                                                            {invoiceItems.length > 0 && invoiceItems.every((it: any) => it.vat === invoiceItems[0].vat) && (
+                                                                <span className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[9px] font-bold text-slate-500 border border-slate-200 dark:border-slate-700">
+                                                                    %{invoiceItems[0].vat || 20}
+                                                                </span>
+                                                            )}
+                                                        </div>                                                        
+                                                        <span className="font-mono font-bold text-[14px]">{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                    </div>
+
+                                                    <div className="h-px bg-slate-200 dark:bg-slate-700 my-1"></div>
+
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-sm font-bold tracking-widest text-slate-900 dark:text-white">GENEL TOPLAM</span>
+                                                        <span className="text-2xl font-mono font-black text-blue-600 dark:text-blue-500 tracking-tight">
+                                                            {finalTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm opacity-80">₺</span>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             );
                                         })()}
@@ -2459,102 +2472,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </EnterpriseCard>
 
                                 {/* Section: Totals Summary */}
-                                <div className="flex justify-end">
-                                    <EnterpriseCard className="w-[480px] bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/50">
-                                        {(() => {
-                                            const subtotal = invoiceItems.reduce((acc, it) => acc + (Number(it.qty) * Number(it.price)), 0);
-
-                                            let totalOtv = 0;
-                                            let totalOiv = 0;
-                                            let totalVat = 0;
-
-                                            invoiceItems.forEach(it => {
-                                                const lineQty = Number(it.qty || 1);
-                                                const lineNetBase = lineQty * Number(it.price || 0);
-                                                const lineDiscount = lineNetBase * (Number(it.discountRate || 0) / 100);
-                                                const lineNet = lineNetBase - lineDiscount;
-                                                
-                                                let lineOtv = 0;
-                                                if (it.otvType === 'Yüzdesel') {
-                                                    lineOtv = lineNet * (Number(it.otv || 0) / 100);
-                                                } else if (it.otvType === 'Birim Başına') {
-                                                    lineOtv = Number(it.otv || 0) * lineQty;
-                                                }
-                                                const matrah = lineNet + lineOtv;
-                                                totalOtv += lineOtv;
-                                                totalOiv += matrah * (Number(it.oiv || 0) / 100);
-                                                totalVat += matrah * (Number(it.vat || 20) / 100);
-                                            });
-
-                                            let discAmount = 0;
-                                            if (discountType === 'percent') {
-                                                discAmount = subtotal * (discountValue / 100);
-                                            } else {
-                                                discAmount = discountValue;
-                                            }
-
-                                            const finalTotal = subtotal + totalOtv + totalOiv + totalVat - discAmount;
-
-                                            return (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-semibold text-slate-500">Ara Toplam (Net)</span>
-                                                        <span className="font-mono font-bold text-[15px]">{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
-                                                    </div>
-
-                                                    {totalOtv > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-sm font-semibold text-slate-500">ÖTV Toplam</span>
-                                                            <span className="font-mono font-bold text-[15px] text-amber-500">{totalOtv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
-                                                        </div>
-                                                    )}
-
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-sm font-semibold text-slate-500">İskonto</span>
-                                                            <select
-                                                                value={discountType}
-                                                                onChange={(e: any) => setDiscountType(e.target.value)}
-                                                                className="px-2 py-1 text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md outline-none"
-                                                            >
-                                                                <option value="percent">% (Yüzde)</option>
-                                                                <option value="amount">₺ Tutar</option>
-                                                            </select>
-                                                            <input
-                                                                type="number"
-                                                                value={discountValue}
-                                                                onChange={(e) => setDiscountValue(Number(e.target.value))}
-                                                                className="w-20 px-2 py-1 text-center text-sm font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md outline-none focus:ring-1 focus:ring-slate-300"
-                                                            />
-                                                        </div>
-                                                        <span className="font-mono font-bold text-[15px] text-red-500">- {discAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
-                                                    </div>
-
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-sm font-semibold text-slate-500">KDV Toplam Katkısı</span>
-                                                            {invoiceItems.length > 0 && invoiceItems.every((it: any) => it.vat === invoiceItems[0].vat) && (
-                                                                <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500 border border-slate-200 dark:border-slate-700">
-                                                                    %{invoiceItems[0].vat || 20}
-                                                                </span>
-                                                            )}
-                                                        </div>                                                        
-                                                        <span className="font-mono font-bold text-[15px]">{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
-                                                    </div>
-
-                                                    <div className="h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
-
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-base font-bold tracking-widest text-slate-900 dark:text-white">GENEL TOPLAM</span>
-                                                        <span className="text-3xl font-mono font-black text-blue-600 dark:text-blue-500 tracking-tight">
-                                                            {finalTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl text-blue-400 opacity-80">₺</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
-                                    </EnterpriseCard>
-                                </div>
+                                {/* Finansal Özet sağ üst alana taşındı */}
 
                             </div>
 
