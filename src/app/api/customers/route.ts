@@ -55,8 +55,8 @@ export async function GET(request: Request) {
                     const catCondition = {
                         OR: [
                             { categoryId: categoryIdParam },
-                            { customerClass: { equals: cat.name, mode: 'insensitive' } },
-                            { supplierClass: { equals: cat.name, mode: 'insensitive' } }
+                            { customerClass: { contains: cat.name, mode: 'insensitive' } },
+                            { supplierClass: { contains: cat.name, mode: 'insensitive' } }
                         ]
                     };
                     if (where.AND) {
@@ -141,7 +141,7 @@ export async function GET(request: Request) {
             phone: c.phone || '',
             branch: c.branch || 'Merkez',
             balance: Number(c.balance || 0),
-            category: c.category?.name || 'Genel',
+            category: c.category?.name || c.customerClass || 'Genel',
             priceListId: c.category?.priceListId || null,
             email: c.email || '',
             address: c.address || '',

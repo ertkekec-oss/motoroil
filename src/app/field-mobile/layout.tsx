@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useSyncMasterData } from '@/hooks/useSyncMasterData';
 import { useSyncUplink } from '@/hooks/useSyncUplink';
 
-import { Map, Zap, Users, LayoutDashboard, User } from 'lucide-react';
+import { Route, TrendingUp, Building2, LayoutGrid, UserCircle2 } from 'lucide-react';
 
 export default function FieldMobileLayout({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading, user } = useAuth();
@@ -25,11 +25,11 @@ export default function FieldMobileLayout({ children }: { children: React.ReactN
     if (isLoading) return <div className="h-screen bg-[#0f111a] flex items-center justify-center text-white">Yükleniyor...</div>;
 
     const navItems = [
-        { href: '/field-mobile/routes', icon: <Map className="w-[22px] h-[22px]" />, label: 'Rotalarım' },
-        { href: '/field-mobile/intelligence', icon: <Zap className="w-[22px] h-[22px]" />, label: 'SalesX' },
-        { href: '/field-mobile/customers', icon: <Users className="w-[22px] h-[22px]" />, label: 'Müşteriler' },
-        { href: '/staff/me', icon: <LayoutDashboard className="w-[22px] h-[22px]" />, label: 'Dashboard' },
-        { href: '/field-mobile/profile', icon: <User className="w-[22px] h-[22px]" />, label: 'Profil' },
+        { href: '/field-mobile/routes', icon: <Route className="w-[22px] h-[22px]" strokeWidth={2} />, label: 'Rotalarım' },
+        { href: '/field-mobile/intelligence', icon: <TrendingUp className="w-[22px] h-[22px]" strokeWidth={2} />, label: 'SalesX' },
+        { href: '/field-mobile/customers', icon: <Building2 className="w-[22px] h-[22px]" strokeWidth={2} />, label: 'Müşteriler' },
+        { href: '/staff/me', icon: <LayoutGrid className="w-[22px] h-[22px]" strokeWidth={2} />, label: 'Dashboard' },
+        { href: '/field-mobile/profile', icon: <UserCircle2 className="w-[22px] h-[22px]" strokeWidth={2} />, label: 'Profil' },
     ];
 
     return (

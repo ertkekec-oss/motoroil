@@ -49,7 +49,15 @@ export default function SupplierInvoiceUploadModal({ isOpen, onClose, supplierId
                 method: 'POST',
                 body: formData
             });
-            const data = await res.json();
+
+            let data;
+            try {
+                data = await res.json();
+            } catch (jsonErr) {
+                console.error("Non-JSON response from server:", await res.text().catch(() => ""));
+                showError('Hata', 'Sunucu yanıtı okunamadı (Sunucu hatası). Lütfen daha küçültülmüş bir PDF ile tekrar deneyin.');
+                return;
+            }
 
             if (data.success && data.parsedData) {
                 setInvoiceData(data.parsedData);
@@ -58,6 +66,7 @@ export default function SupplierInvoiceUploadModal({ isOpen, onClose, supplierId
                 showError('Hata', data.error || 'Fatura okunamadı.');
             }
         } catch (e: any) {
+            console.error(e);
             showError('Hata', 'Fatura işlenirken bir sorun oluştu.');
         } finally {
             setIsParsing(false);

@@ -730,6 +730,7 @@ export default function AdminRoutesPage() {
                                                 {customerCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                             </select>
                                             <button 
+                                                type="button"
                                                 onClick={() => {
                                                     const selectEl = document.getElementById('category-add-select') as HTMLSelectElement;
                                                     if(selectEl && selectEl.value) {

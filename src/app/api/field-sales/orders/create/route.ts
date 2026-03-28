@@ -34,16 +34,46 @@ export async function POST(req: NextRequest) {
         });
         if (!visit) return NextResponse.json({ error: 'Visit not found' }, { status: 404 });
 
-        // Create SalesOrder and related entities in a transaction
+        const customer = await (prisma as any).customer.findUnique({ where: { id: customerId } });
+        if (!customer) return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
+
         const result = await prisma.$transaction(async (tx) => {
-            const order = await (tx as any).salesOrder.create({
+            // 1. Create Order (for the beautiful Invoicing screen on Desktop 'Satış Yap (POS)' equivalent)
+            const unifiedOrderIdStr = `SAHA-${Date.now().toString().slice(-6)}`;
+            const order = await tx.order.create({
                 data: {
+                    companyId: company.id,
+                    marketplaceId: `SA-${Date.now()}`,
+                    orderNumber: unifiedOrderIdStr,
+                    marketplace: 'Saha Satış',
+                    customerName: customer.name,
+                    customerEmail: customer.email,
+                    totalAmount: total,
+                    status: 'Teslim Edildi',
+                    orderDate: new Date(),
+                    items: items.map((item: any) => ({
+                        productId: item.productId,
+                        name: item.name || 'Unknown',
+                        qty: item.qty,
+                        price: item.price,
+                        category: item.category || 'Genel'
+                    })),
+                    staffId: visit.staffId,
+                    salesChannel: 'POS',
+                    rawData: { source: 'FieldMobile', notes, visitId }
+                } as any
+            });
+
+            // 2. Create SalesOrder (legacy structure used by field-sales modules natively)
+            await (tx as any).salesOrder.create({
+                data: {
+                    id: order.id, // match IDs closely or keep separate, let's just let it auto-gen
                     companyId: company.id,
                     customerId,
                     staffId: visit.staffId,
                     visitId,
                     totalAmount: total,
-                    status: 'COMPLETED', // default to completed as per user flow
+                    status: 'COMPLETED',
                     items: {
                         create: items.map((item: any) => ({
                             productId: item.productId,
@@ -57,13 +87,14 @@ export async function POST(req: NextRequest) {
                 }
             });
 
-            // Update Customer Balance
+            // 3. Update Customer Balance
             await tx.customer.update({
                 where: { id: customerId },
                 data: { balance: { increment: total } }
             });
 
-            // Create Transaction Record for Cari Visibility
+            // 4. Create Transaction Record for Cari Visibility
+            // CRITICAL: We include `| REF: ${order.id}` so CustomerDetailClient.tsx can link it to the Order!
             await (tx as any).transaction.create({
                 data: {
                     companyId: company.id,
@@ -71,13 +102,13 @@ export async function POST(req: NextRequest) {
                     visitId,
                     type: 'SATIŞ',
                     amount: total,
-                    description: `Saha Satışı - Sipariş No: ${order.id.substring(order.id.length - 6).toUpperCase()}`,
+                    description: `Saha Satışı - Sipariş No: ${unifiedOrderIdStr} | REF: ${order.id}`,
                     date: new Date(),
                     branch: visit.branch || 'Merkez'
                 }
             });
 
-            // Update Stocks
+            // 5. Update Stocks
             for (const item of items) {
                 if (item.productId) {
                     await (tx as any).stock.upsert({
@@ -95,7 +126,6 @@ export async function POST(req: NextRequest) {
                         }
                     });
 
-                    // Update Legacy Stock field
                     if (!visit.branch || visit.branch === 'Merkez') {
                         await tx.product.update({
                             where: { id: item.productId },

@@ -7,8 +7,14 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const mod = require('pdf-parse');
-        const pdf = typeof mod === 'function' ? mod : (mod.PDFParse || mod.default);
+        let pdf: any;
+        try {
+            const pdfParseModule = await import('pdf-parse');
+            pdf = pdfParseModule.default || pdfParseModule;
+        } catch (loaderErr) {
+            console.error("Failed to load pdf-parse:", loaderErr);
+            return NextResponse.json({ success: false, error: 'Sunucuda PDF okuyucu eklentisi bulunamadı.' }, { status: 500 });
+        }
         
         const session: any = await getSession();
         if (!session) return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });

@@ -120,9 +120,9 @@ export default function MobileCreateCollectionPage() {
 
                 {/* Kasa Selection */}
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">ÖDEME KANALI / KASA</label>
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">ÖDEME KANALI</label>
                     <div className="grid grid-cols-1 gap-2">
-                        {kasalar.map(k => (
+                        {[...kasalar, { id: 'NEW_CHECK', name: 'Müşteri Çeki Al', type: 'Çek' }, { id: 'NEW_SENET', name: 'Müşteri Senedi Al', type: 'Senet' }].map(k => (
                             <button
                                 key={k.id}
                                 onClick={() => setSelectedKasa(k.id)}
@@ -132,7 +132,9 @@ export default function MobileCreateCollectionPage() {
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <span className="text-xl">{k.type === 'Banka' ? '🏦' : '💵'}</span>
+                                    <span className="text-xl">
+                                        {k.type === 'Banka' ? '🏦' : k.type === 'Çek' ? '📄' : k.type === 'Senet' ? '📜' : '💵'}
+                                    </span>
                                     <div className="text-left leading-tight">
                                         <div className="font-bold text-sm">{k.name}</div>
                                         <div className="text-[10px] opacity-50 uppercase">{k.type}</div>
@@ -143,6 +145,28 @@ export default function MobileCreateCollectionPage() {
                         ))}
                     </div>
                 </div>
+
+                {(selectedKasa === 'NEW_CHECK' || selectedKasa === 'NEW_SENET') && (
+                     <div className="space-y-4 pt-4 border-t border-white/10 mt-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">BELGE NUMARASI</label>
+                            <input
+                                type="text"
+                                id="docNumberInput"
+                                placeholder={`Örn. ${selectedKasa === 'NEW_CHECK' ? 'C' : 'S'}100234`}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">VADE TARİHİ</label>
+                            <input
+                                type="date"
+                                id="dueDateInput"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                     </div>
+                )}
 
                 {/* Description */}
                 <div className="space-y-2">
@@ -158,7 +182,44 @@ export default function MobileCreateCollectionPage() {
             {/* Bottom Bar */}
             <div className="p-4 bg-[#161b22] border-t border-white/10 safe-area-bottom">
                 <button
-                    onClick={handleSave}
+                    onClick={async () => {
+                        if (selectedKasa === 'NEW_CHECK' || selectedKasa === 'NEW_SENET') {
+                            const docNum = (document.getElementById('docNumberInput') as HTMLInputElement)?.value;
+                            const dueDate = (document.getElementById('dueDateInput') as HTMLInputElement)?.value;
+                            if (!docNum || !dueDate) {
+                                showError("Uyarı", "Belge Numarası ve Vade Tarihi girmelisiniz.");
+                                return;
+                            }
+                            setSaving(true);
+                            try {
+                                const res = await fetch('/api/financials/checks', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        type: selectedKasa === 'NEW_CHECK' ? 'Alınan Çek' : 'Alınan Senet',
+                                        number: docNum,
+                                        bank: selectedKasa === 'NEW_CHECK' ? 'Saha' : 'Saha Senedi',
+                                        dueDate: dueDate,
+                                        amount: Number(amount),
+                                        customerId,
+                                        description: description || `Saha ${selectedKasa === 'NEW_CHECK' ? 'Çek' : 'Senet'} Tahsilatı`
+                                    })
+                                });
+                                if (res.ok) {
+                                    showSuccess("Bİlgi", `${selectedKasa === 'NEW_CHECK' ? 'Çek' : 'Senet'} başarıyla sisteme işlendi.`);
+                                    router.back();
+                                } else {
+                                    showError("Hata", "Kaydedilemedi!");
+                                }
+                            } catch (e) {
+                                showError("Hata", "Sisteme erişilemiyor.");
+                            } finally {
+                                setSaving(false);
+                            }
+                        } else {
+                            handleSave();
+                        }
+                    }}
                     disabled={saving || !amount}
                     className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl shadow-sm shadow-green-900/20 transition-all text-sm tracking-widest"
                 >
