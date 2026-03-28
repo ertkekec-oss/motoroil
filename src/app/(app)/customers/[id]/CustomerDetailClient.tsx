@@ -1025,37 +1025,84 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </Link>
                 </div>
 
-                {/* GROUPED NAVIGATION & FILTERS - CENTERED TABS (SUPPLIER STYLE) */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-center gap-4 mt-2">
-                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
-                                {[
-                                    { id: 'all', label: 'Hareketler' },
-                                    { id: 'sales', label: 'Faturalar' },
-                                    { id: 'payments', label: 'İşlemler' },
-                                    { id: 'offers', label: 'Teklifler' },
-                                    { id: 'documents', label: 'Dosyalar' },
-                                    { id: 'warranties', label: 'Garantiler' },
-                                    { id: 'services', label: 'Servis' },
-                                    { id: 'checks', label: 'Vadeler' }
-                                ].map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => {
-                                            setActiveTab(tab.id as any);
-                                            if (tab.id === 'documents') fetchDocuments();
-                                            if (tab.id === 'services') fetchServices();
-                                        }}
-                                        className={activeTab === tab.id
-                                            ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px] transition-all"
-                                            : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
+                {/* GROUPED NAVIGATION & FILTERS - OLD STYLE V2 */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-center gap-4 mt-4 mb-2">
+                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-3 px-1 custom-scroll select-none pb-2">
+                        
+                        {/* Group 1 */}
+                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
+                            {[
+                                { id: 'all', label: 'Tüm Hareketler' },
+                                { id: 'sales', label: 'Satışlar & Faturalar' },
+                                { id: 'payments', label: 'Finansal İşlemler' },
+                                { id: 'offers', label: 'Teklifler' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={activeTab === tab.id
+                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
+                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
                         </div>
+
+                        <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0"></div>
+
+                        {/* Group 2 */}
+                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
+                            {[
+                                { id: 'documents', label: 'Dosyalar & Evraklar' },
+                                { id: 'warranties', label: 'Garantiler' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => { setActiveTab(tab.id as any); if (tab.id === 'documents') fetchDocuments(); }}
+                                    className={activeTab === tab.id
+                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
+                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0"></div>
+
+                        {/* Group 3 */}
+                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
+                            <button
+                                onClick={() => { setActiveTab('services' as any); fetchServices(); }}
+                                className={activeTab === 'services'
+                                    ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
+                                    : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
+                            >
+                                Servis
+                            </button>
+                        </div>
+
+                        <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0"></div>
+
+                        {/* Group 4 */}
+                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
+                            {[
+                                { id: 'checks', label: 'Evraklar & Vadeler' },
+                                { id: 'reconciliation', label: 'Mutabakatlar' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={activeTab === tab.id
+                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
+                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
                     </div>
                 </div>
 
@@ -1266,6 +1313,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     </table>
                                 </div>
                             )}
+                        </div>
+                    ) : activeTab === 'reconciliation' ? (
+                        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
+                            <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🤝</div>
+                            <h4 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Mutabakatlar</h4>
+                            <p style={{ maxWidth: '400px', margin: '0 auto', fontSize: '13px' }}>
+                                Cari hesap mutabakat işlemleri bu alandan yönetilecektir. Yeni e-mutabakat sistemi yakında eklenecektir.
+                            </p>
                         </div>
                     ) : activeTab === 'documents' ? (
                         <div style={{ padding: '32px' }}>
@@ -2379,7 +2434,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     <td className="px-4 py-2">
                                                         <div className="flex flex-col gap-2 min-w-[250px]">
                                                             <select
-                                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-medium focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 outline-none"
+                                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-medium focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 outline-none"
                                                                 value={it.productId || ''}
                                                                 onChange={(e) => {
                                                                     const selectedProduct = products.find(p => String(p.id) === e.target.value);
@@ -2463,7 +2518,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         placeholder="Malzeme / Hizmet Açıklaması (Örn: ŞASE NO: XYZ, Motor NO: 123...)"
                                                                         value={it.description || ''}
                                                                         onChange={(e) => updateItem('description', e.target.value)}
-                                                                        className="w-full min-h-[60px] p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:ring-1 focus:ring-blue-500/30 resize-y"
+                                                                        className="w-full min-h-[60px] p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md outline-none focus:ring-1 focus:ring-blue-500/30 resize-y"
                                                                     />
                                                                 </div>
                                                             )}
@@ -2474,7 +2529,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             type="number"
                                                             value={it.qty}
                                                             onChange={(e) => updateItem('qty', Number(e.target.value))}
-                                                            className="w-[70px] h-9 px-2 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300 ml-auto"
+                                                            className="w-[70px] h-9 px-2 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300 ml-auto"
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 text-right">
@@ -2485,7 +2540,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 value={netPrice > 0 ? Number(netPrice.toFixed(4)) : ''}
                                                                 placeholder="0.00"
                                                                 onChange={(e) => updateItem('price', Number(e.target.value))}
-                                                                className="w-[100px] h-9 px-2 text-right bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-mono font-semibold outline-none focus:ring-1 focus:ring-slate-300"
+                                                                className="w-[100px] h-9 px-2 text-right bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-mono font-semibold outline-none focus:ring-1 focus:ring-slate-300"
                                                             />
                                                             <span className="text-xs font-semibold text-slate-500">₺ + KDV</span>
                                                         </div>
@@ -2496,7 +2551,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 type="number"
                                                                 value={it.discountRate || 0}
                                                                 onChange={(e) => updateItem('discountRate', Number(e.target.value))}
-                                                                className="w-full h-9 pl-2 pr-6 text-center bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/50 rounded-lg text-sm text-rose-600 dark:text-rose-400 font-semibold outline-none focus:ring-1 focus:ring-rose-300"
+                                                                className="w-full h-9 pl-2 pr-6 text-center bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/50 rounded-md text-sm text-rose-600 dark:text-rose-400 font-semibold outline-none focus:ring-1 focus:ring-rose-300"
                                                             />
                                                             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-rose-400 pointer-events-none">%</span>
                                                         </div>
@@ -2510,7 +2565,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 type="number"
                                                                 value={it.vat}
                                                                 onChange={(e) => updateItem('vat', Number(e.target.value))}
-                                                                className="w-full h-9 pl-2 pr-6 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300"
+                                                                className="w-full h-9 pl-2 pr-6 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300"
                                                             />
                                                             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">%</span>
                                                         </div>
@@ -2523,13 +2578,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             type="number"
                                                             value={lineGrossTotal.toFixed(2)}
                                                             onChange={(e) => handleGrossChange(Number(e.target.value))}
-                                                            className="w-[110px] h-9 px-2 text-right bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg text-sm font-mono font-bold outline-none ml-auto"
+                                                            className="w-[110px] h-9 px-2 text-right bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-md text-sm font-mono font-bold outline-none ml-auto"
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 text-center">
                                                         <button
                                                             onClick={() => setInvoiceItems(invoiceItems.filter((_, idx) => idx !== i))}
-                                                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-500 transition-colors mx-auto"
+                                                            className="w-8 h-8 flex items-center justify-center rounded-md bg-red-50 text-red-500 hover:bg-red-500 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-500 transition-colors mx-auto"
                                                         >
                                                             🗑️
                                                         </button>
