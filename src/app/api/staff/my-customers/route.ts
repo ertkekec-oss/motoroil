@@ -14,9 +14,8 @@ export async function GET(req: NextRequest) {
         const conditions = [];
         if (session.email) conditions.push({ email: session.email });
         if (session.username) conditions.push({ username: session.username });
-        if (session.id) conditions.push({ userId: session.id });
         
-        // Resolve Staff or Admin record
+        // Resolve Staff record
         let staffUser = null;
         if (conditions.length > 0) {
             staffUser = await (prisma as any).staff.findFirst({

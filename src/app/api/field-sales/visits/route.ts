@@ -10,11 +10,10 @@ export async function GET(req: NextRequest) {
         const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        // Build valid conditions from the session object properties (which are flattened)
+        // Build valid conditions from the session object properties
         const conditions = [];
         if (session.email) conditions.push({ email: session.email });
         if (session.username) conditions.push({ username: session.username });
-        if (session.id) conditions.push({ userId: session.id }); // If staff table links by userId
         
         // Find Staff linked to this user
         let staff = null;
@@ -67,7 +66,6 @@ export async function PUT(req: NextRequest) {
         const conditions = [];
         if (session.email) conditions.push({ email: session.email });
         if (session.username) conditions.push({ username: session.username });
-        if (session.id) conditions.push({ userId: session.id });
         
         let staff = null;
         if (conditions.length > 0) {
