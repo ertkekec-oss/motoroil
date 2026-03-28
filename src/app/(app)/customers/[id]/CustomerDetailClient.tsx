@@ -2112,9 +2112,78 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         <p className="text-xs font-semibold text-slate-500 tracking-wide">E-ARŞİV / E-FATURA TASLAĞI</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setInvoiceModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors">
-                                    &times;
-                                </button>
+                                <div className="flex items-center gap-2 md:gap-4">
+                                    <label className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            id="inv_create_wayslip"
+                                            className="w-3.5 h-3.5 rounded text-emerald-500 accent-emerald-500"
+                                        />
+                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-200">İrsaliye Ekle</span>
+                                    </label>
+
+                                    {(() => {
+                                        const pmRaw = selectedOrder?.rawData ? (typeof selectedOrder.rawData === 'string' ? JSON.parse(selectedOrder.rawData)?.paymentMode : selectedOrder.rawData.paymentMode) : null;
+                                        const isVeresiye = !pmRaw || ['account', 'veresiye'].includes(pmRaw);
+                                        if (!isVeresiye) return null;
+
+                                        const invoiceIdsForOrder = (customer?.invoices || [])
+                                            .filter((inv: any) => inv.orderId === selectedOrder?.id)
+                                            .map((inv: any) => inv.id);
+
+                                        const isAlreadyVadelendi = selectedOrder && (
+                                            vadelenenIds.includes(selectedOrder.id) || 
+                                            invoiceIdsForOrder.some((id: string) => vadelenenIds.includes(id)) ||
+                                            customer?.paymentPlans?.some((p: any) => 
+                                                (
+                                                    p.description === selectedOrder.id || 
+                                                    (lastInvoice && p.description === lastInvoice.id) || 
+                                                    (lastInvoice && p.description === lastInvoice.orderId) ||
+                                                    invoiceIdsForOrder.includes(p.description)
+                                                ) && 
+                                                p.status !== 'İptal' && p.status !== 'Cancelled'
+                                            )
+                                        );
+
+                                        return (
+                                            <div className="relative group/vadewrap">
+                                                <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer transition-colors ${isAlreadyVadelendi ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-500/50'}`}>
+                                                    <input
+                                                        type="checkbox"
+                                                        disabled={isAlreadyVadelendi}
+                                                        checked={isAlreadyVadelendi ? false : isInstallmentInvoice}
+                                                        onChange={(e) => setIsInstallmentInvoice(e.target.checked)}
+                                                        className="w-3.5 h-3.5 rounded text-blue-500 accent-blue-500 disabled:opacity-50"
+                                                    />
+                                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Vadelendir (Plan)</span>
+                                                </label>
+                                                
+                                                {isInstallmentInvoice && !isAlreadyVadelendi && (
+                                                    <div className="absolute right-0 top-[120%] z-50 w-72 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl animate-in fade-in zoom-in-95 duration-200 flex flex-col gap-3">
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <label className="text-[10px] uppercase font-bold text-slate-500">Taksit Türü</label>
+                                                            <select id="inv_installment_type" defaultValue="Açık Hesap" className="p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold outline-none focus:ring-1 focus:ring-blue-500">
+                                                                <option value="Açık Hesap">Açık Hesap / Cari</option>
+                                                                <option value="Çek">Çek Alınacak</option>
+                                                                <option value="Senet">Senet / Promissory Note</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <label className="text-[10px] uppercase font-bold text-slate-500">Ödeme Vadesi (Düzen)</label>
+                                                            <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full text-xs p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg outline-none font-bold">
+                                                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+
+                                    <button onClick={() => setInvoiceModalOpen(false)} className="ml-2 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-slate-500 transition-colors">
+                                        &times;
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-950/30">
