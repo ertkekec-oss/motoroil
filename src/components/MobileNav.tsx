@@ -7,9 +7,11 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useIsMobile } from '@/hooks/useResponsive';
+import { Route, TrendingUp, Building2, LayoutGrid, UserCircle2, Receipt, History } from 'lucide-react';
+import Link from 'next/link';
 
 interface NavItem {
-    icon: string;
+    icon: any;
     label: string;
     path: string;
     badge?: number;
@@ -23,11 +25,13 @@ export function MobileNav() {
     if (!isMobile) return null;
 
     const navItems: NavItem[] = [
-        { icon: '🏠', label: 'Ana Sayfa', path: '/' },
-        { icon: '📦', label: 'Stok', path: '/inventory' },
-        { icon: '💰', label: 'Satış', path: '/pos' },
-        { icon: '👥', label: 'Müşteri', path: '/customers' },
-        { icon: '📊', label: 'Rapor', path: '/reports' },
+        { path: '/field-mobile/routes', icon: <Route className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Rotalarım' },
+        { path: '/field-mobile/intelligence', icon: <TrendingUp className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'SalesX' },
+        { path: '/field-mobile/customers', icon: <Building2 className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Müşteriler' },
+        { path: '/field-mobile/visits', icon: <History className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Ziyaretler' },
+        { path: '/field-mobile/expenses', icon: <Receipt className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Masraflar' },
+        { path: '/staff/me', icon: <LayoutGrid className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Portal' },
+        { path: '/field-mobile/profile', icon: <UserCircle2 className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Profil' },
     ];
 
     return (
@@ -37,17 +41,18 @@ export function MobileNav() {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                background: 'var(--bg-card)',
-                borderTop: '1px solid var(--border-light)',
-                display: 'grid',
-                gridTemplateColumns: `repeat(${navItems.length}, 1fr)`,
-                padding: '8px 0',
+                background: '#0b0f19', // More corporate, serious dark theme matching Enterprise Profile
+                borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+                display: 'flex',
+                justifyContent: 'space-evenly',
+                paddingBottom: 'env(safe-area-inset-bottom)',
                 zIndex: 1000,
-                boxShadow: '0 -4px 12px rgba(0,0,0,0.3)',
+                height: '64px',
+                boxShadow: '0 -8px 24px rgba(0,0,0,0.5)',
             }}
         >
-            {navItems?.map((item) => {
-                const isActive = pathname === item.path;
+            {navItems.map((item) => {
+                const isActive = pathname === item.path || (item.path !== '/staff/me' && pathname.startsWith(item.path));
                 return (
                     <button
                         key={item.path}
@@ -56,18 +61,26 @@ export function MobileNav() {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            gap: '4px',
-                            padding: '8px 4px',
+                            justifyContent: 'center',
+                            flex: 1,
                             background: 'transparent',
                             border: 'none',
-                            color: isActive ? 'var(--primary)' : 'var(--text-muted)',
+                            color: isActive ? '#3b82f6' : '#64748b',
                             cursor: 'pointer',
-                            transition: 'all 0.2s',
                             position: 'relative',
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            opacity: isActive ? 1 : 0.7,
+                            transform: isActive ? 'scale(1.05)' : 'scale(1)',
                         }}
                     >
-                        <span style={{ fontSize: '20px' }}>{item.icon}</span>
-                        <span style={{ fontSize: '10px', fontWeight: isActive ? '700' : '500' }}>
+                        {item.icon}
+                        <span style={{ 
+                            fontSize: '9px', 
+                            fontWeight: '900', 
+                            letterSpacing: '0.5px',
+                            textTransform: 'uppercase',
+                            marginTop: '2px'
+                        }}>
                             {item.label}
                         </span>
                         {item.badge && (
@@ -75,11 +88,11 @@ export function MobileNav() {
                                 style={{
                                     position: 'absolute',
                                     top: '4px',
-                                    right: '8px',
-                                    background: 'var(--danger)',
+                                    right: '10px',
+                                    background: '#ef4444',
                                     color: 'white',
                                     fontSize: '9px',
-                                    fontWeight: 'bold',
+                                    fontWeight: '900',
                                     padding: '2px 5px',
                                     borderRadius: '10px',
                                     minWidth: '16px',
