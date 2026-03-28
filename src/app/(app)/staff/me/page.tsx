@@ -90,10 +90,10 @@ const DashboardView = ({
     const displayBonus = targets?.length > 0 ? `₺${totalEstBonus.toLocaleString('tr-TR')}` : (statsData?.stats?.bonus || '₺0,00');
 
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 h-[calc(100vh-280px)] min-h-[600px]">
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-full gap-6">
             <ProfileHeader user={user} title="Aktif Görev" dataCount={activeTasksCount} dataLabel="Adet" />
             
-            <div className="flex flex-col space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
+            <div className="flex flex-col space-y-6 flex-1 w-full">
                 {/* Top Summaries */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 shrink-0">
                     <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#3b82f6">
@@ -134,8 +134,8 @@ const DashboardView = ({
                 </div>
 
                 {/* PDKS & Vardiya */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-[300px]">
-                    <EnterpriseCard className="h-full flex flex-col">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 h-auto">
+                    <EnterpriseCard className="h-full flex flex-col min-h-[300px]">
                         <EnterpriseSectionHeader title="PDKS Geçiş İşlemleri" icon="⚡" />
                         <div className="p-6 space-y-6 flex-1 flex flex-col justify-center">
                             <div className="grid grid-cols-2 gap-4">
@@ -143,29 +143,40 @@ const DashboardView = ({
                                     <>
                                         <button onClick={handleQrCheckin} className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group">
                                             <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">📱</span></div>
-                                            <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
+                                            <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center mt-2">Ofis Girişi<br/>(QR)</span>
                                         </button>
                                         <button onClick={handleGpsCheckin} className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group">
                                             <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">📍</span></div>
-                                            <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
+                                            <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center mt-2">Saha Girişi<br/>(GPS)</span>
                                         </button>
                                     </>
                                 ) : (
-                                    <button onClick={handleCheckout} className="col-span-2 flex flex-col items-center justify-center gap-3 p-8 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group h-full">
-                                        <div className="w-16 h-16 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform"><span className="text-3xl">🏁</span></div>
-                                        <span className="text-[13px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest text-center mt-2">MESAİYİ BİTİR (ÇIKIŞ YAP)</span>
-                                    </button>
+                                    <div className="col-span-2 flex flex-col items-center gap-4 bg-[#080b11] border border-white/5 rounded-2xl h-full justify-center p-6 shadow-inner">
+                                        <div className="text-center w-full bg-emerald-500/10 border border-emerald-500/20 p-5 rounded-xl">
+                                            <p className="text-emerald-400 font-bold uppercase tracking-widest text-[10px] mb-2">Mevcut Oturum Verisi</p>
+                                            <div className="text-3xl font-black text-white tracking-widest">
+                                                {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '...'}
+                                            </div>
+                                            <p className="text-emerald-300/60 font-black text-[10px] mt-2 uppercase tracking-widest">
+                                                {pdksStatus.activeSession?.locationIn?.mode === 'FIELD_GPS' ? '📍 SAHA / GPS' : '📱 ŞÜBE / QR'}
+                                            </p>
+                                        </div>
+                                        <button onClick={handleCheckout} className="w-full py-5 bg-rose-500 hover:bg-rose-600 rounded-xl transition-all shadow-lg active:scale-95 border-b-4 border-rose-700 active:border-b-0 border border-t border-rose-400 flex items-center justify-center gap-3">
+                                            <span className="text-lg">🏁</span>
+                                            <span className="text-[13px] font-black text-white uppercase tracking-widest">MESAİYİ BİTİR</span>
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                             <div className="flex items-center justify-center pt-2">
                                 <span className="text-[10px] uppercase font-bold text-slate-400">📲 Konum ve cihaz parmak izi güvenli şekilde doğrulanır.</span>
                             </div>
                         </div>
-                </EnterpriseCard>
+                    </EnterpriseCard>
 
-                <EnterpriseCard>
-                    <EnterpriseSectionHeader title="Sıradaki Vardiya Özetim" icon="⏰" />
-                    <div className="p-6 flex flex-col justify-center h-[calc(100%-60px)] space-y-4">
+                    <EnterpriseCard className="h-full flex flex-col min-h-[300px]">
+                        <EnterpriseSectionHeader title="Sıradaki Vardiya Özetim" icon="⏰" />
+                        <div className="p-6 flex flex-col justify-center flex-1 space-y-4">
                         {shifts.length > 0 ? (
                             <div className="flex items-center gap-4 p-5 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
                                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl flex flex-col items-center justify-center font-black">

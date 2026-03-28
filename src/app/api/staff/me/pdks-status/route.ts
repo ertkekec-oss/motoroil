@@ -12,13 +12,16 @@ export async function GET(req: NextRequest) {
         const user = auth.user;
         const userId = user.id;
 
+        const orConditions = [
+            user.username ? { username: user.username } : null,
+            user.email ? { username: user.email } : null,
+            user.email ? { email: user.email } : null,
+            user.userId ? { userId: user.userId } : null
+        ].filter(Boolean);
+
         const staffRecord = await (prisma as any).staff.findFirst({
             where: {
-                OR: [
-                    user.username ? { username: user.username } : null,
-                    user.email ? { username: user.email } : null,
-                    user.email ? { email: user.email } : null
-                ].filter(Boolean),
+                ...(orConditions.length > 0 ? { OR: orConditions } : { id: user.id }),
                 deletedAt: null
             },
             select: {
