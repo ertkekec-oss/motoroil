@@ -62,6 +62,17 @@ export async function GET(req: NextRequest) {
             where.OR = [];
             if (hasCategoryAssignments) {
                 where.OR.push({ categoryId: { in: staffUser.assignedCategoryIds } });
+                
+                // Fallback for customers using the legacy "customerClass" string instead of relational categoryId
+                const assignedCategories = await (prisma as any).customerCategory.findMany({
+                    where: { id: { in: staffUser.assignedCategoryIds } },
+                    select: { name: true }
+                });
+                const categoryNames = assignedCategories.map((c: any) => c.name);
+                
+                if (categoryNames.length > 0) {
+                    where.OR.push({ customerClass: { in: categoryNames } });
+                }
             }
             if (hasAssignedCustomers) {
                 where.OR.push({ assignedStaffId: staffUser.id });
