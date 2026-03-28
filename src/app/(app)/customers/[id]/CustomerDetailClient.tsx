@@ -354,13 +354,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
         startDate: new Date().toISOString().split('T')[0]
     });
 
-    // Use real invoices from history for warranty selection
+    // Use real invoices and sales records from history for warranty selection
     const customerInvoices = useMemo(() => {
         return historyList
-            .filter(item => item.type === 'Fatura')
-            .map(inv => ({
-                id: inv.id,
-                number: (inv.desc || '').split(' - ')[0] || 'Fatura',
+            .filter((item: any) => (item.type === 'Fatura' || item.type === 'Satış' || item.type === 'İrsaliye') && item.items && item.items.length > 0)
+            .map((inv: any) => ({
+                id: inv.formalInvoiceId || inv.id, // Prefer the real invoice ID if merged, else fallback to the order/transaction ID
+                number: (inv.desc || '').split(' - ')[0] || inv.type,
                 date: (inv.date || '').split(' ')[0] || 'Bilinmiyor',
                 total: inv.amount,
                 items: inv.items || []
