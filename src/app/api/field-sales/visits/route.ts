@@ -7,7 +7,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+        
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Build valid conditions from the session object properties
@@ -54,7 +56,9 @@ export async function GET(req: NextRequest) {
 // PUT - ziyaret notlarını güncelle
 export async function PUT(req: NextRequest) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+        
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await req.json();
