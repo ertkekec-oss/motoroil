@@ -826,37 +826,48 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 </div>
             )}
 
-                        {/* EXECUTIVE HEADER STRIP (ENTERPRISE STANDARD) */}
-            <div className="sticky top-0 z-40 bg-[#080a0f]/95 backdrop-blur-xl border-b border-white/5 pt-4 pb-6 px-4 md:px-8 shadow-2xl">
-                <div className="max-w-7xl mx-auto flex flex-col gap-6">
-                    
+                                    {/* EXECUTIVE HEADER STRIP */}
+            <div style={{
+                background: 'var(--bg-panel, rgba(15, 23, 42, 0.6))',
+                borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
+                padding: '24px 40px',
+                position: 'sticky',
+                top: 0,
+                zIndex: 40
+            }}>
+                <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
                     {/* Top Row: Back link & Title */}
                     <div className="flex justify-between items-center">
-                        <Link href="/customers" className="text-slate-400 hover:text-blue-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors">
-                            <span className="text-base leading-none">←</span> Müşteri Merkezi
+                        <Link href="/customers" style={{ color: 'var(--text-muted, #888)', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', transition: 'color 0.2s' }} className="hover:text-blue-500">
+                            <span style={{ fontSize: '16px' }}>←</span> Müşteri Merkezi
                         </Link>
-                        <div className="flex items-center gap-2">
+                        <div style={{ display: 'flex', gap: '8px' }}>
                             <button
                                 onClick={() => setReconWizardOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg text-[11px] font-black tracking-wide uppercase transition-colors"
+                                className="btn"
+                                style={{ background: '#10b981', border: '1px solid rgba(16, 185, 129, 0.4)', color: 'white', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '800', display: 'flex', gap: '8px', alignItems: 'center', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}
                             >
                                 🤝 Mutabakat
                             </button>
                             <button
                                 onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-lg text-[11px] font-black tracking-wide uppercase transition-colors"
+                                className="btn"
+                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
                             >
                                 📄 Özet Ekstre
                             </button>
                             <button
                                 onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-lg text-[11px] font-black tracking-wide uppercase transition-colors"
+                                className="btn"
+                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
                             >
                                 📑 Detaylı Ekstre
                             </button>
                             <button
                                 onClick={() => router.push(`/customers?edit=${customer.id}`)}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 rounded-lg text-[11px] font-black tracking-wide uppercase transition-colors"
+                                className="btn"
+                                style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: '#3b82f6', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
                             >
                                 ✏️ Düzenle
                             </button>
@@ -864,22 +875,28 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </div>
 
                     {/* Business/Profile Row */}
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                         {/* Left: Avatar + Details */}
-                        <div className="flex items-center gap-6">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-2xl font-black text-white shadow-xl shadow-black/50 shrink-0">
+                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                            <div style={{
+                                width: '72px', height: '72px', borderRadius: '18px',
+                                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '28px', fontWeight: '800', color: 'white',
+                                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.25)',
+                                border: '1px solid rgba(255,255,255,0.1)'
+                            }}>
                                 {val(customer.name, '?').charAt(0).toUpperCase()}
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <h1 className="text-[26px] font-black text-white tracking-tight m-0 leading-tight">
+                            <div>
+                                <h1 style={{ fontSize: '26px', fontWeight: '800', margin: '0 0 6px 0', color: 'var(--text-main, #fff)', letterSpacing: '-0.5px' }}>
                                     {val(customer.name)}
                                 </h1>
-                                <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-400 mt-1">
-                                    <span className="flex items-center gap-1.5"><span className="text-slate-500 opacity-60">🏷️</span> {val(customer.category?.name, 'Genel Müşteri')}</span>
-                                    <span className="flex items-center gap-1.5"><span className="text-slate-500 opacity-60">📱</span> <span className="text-slate-300">{val(customer.phone, 'Telefon Yok')}</span></span>
-                                    <span className="flex items-center gap-1.5"><span className="text-slate-500 opacity-60">📧</span> <span className="text-slate-300">{val(customer.email, 'E-posta Yok')}</span></span>
-                                    <span className="flex items-center gap-1.5"><span className="text-slate-500 opacity-60">📍</span>
-                                        <span className="text-slate-300">
+                                <div style={{ display: 'flex', gap: '16px', color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '500', flexWrap: 'wrap' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷️</span> {val(customer.category?.name, 'Genel Müşteri')}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📱</span> {val(customer.phone, 'Telefon Yok')}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📧</span> {val(customer.email, 'E-posta Yok')}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📍</span>
                                         {(() => {
                                             let addr = customer.address;
                                             if (customer.city || customer.district) {
@@ -893,16 +910,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             } catch (e) { }
                                             return 'Adres Yok';
                                         })()}
-                                        </span>
                                     </span>
                                 </div>
                                 {services.length > 0 && services[0].plate && (
-                                    <div className="flex items-center gap-2 mt-2">
+                                    <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
                                         <button
                                             onClick={() => setQrPlate(services[0].plate)}
-                                            className="text-[10px] font-black px-3 py-1.5 rounded bg-slate-800 border border-white/5 text-slate-300 hover:text-white uppercase transition-colors flex items-center gap-1.5"
+                                            style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: '600' }}
                                         >
-                                            <span className="text-sm">📱</span> Dijital Karne
+                                            📱 Dijital Karne Müşteri Linki (QR)
                                         </button>
                                         <button
                                             onClick={() => {
@@ -910,9 +926,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
                                                 window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                             }}
-                                            className="text-[10px] font-black px-3 py-1.5 rounded bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] hover:bg-[#25D366]/20 uppercase transition-colors flex items-center gap-1.5"
+                                            style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(37, 211, 102, 0.1)', border: '1px solid rgba(37, 211, 102, 0.3)', color: '#25D366', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: '600' }}
                                         >
-                                            <span className="text-sm">💬</span> WhatsApp
+                                            💬 WhatsApp'tan Karne Gönder
                                         </button>
                                     </div>
                                 )}
@@ -920,40 +936,49 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         </div>
 
                         {/* Right: Balance & Financial Health */}
-                        <div className="flex flex-col items-end justify-center">
-                            <div className="text-[10px] font-black text-slate-500 tracking-widest uppercase mb-1">
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+                            <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '8px' }}>
                                 FİNANSAL DURUM (NET BAKİYE)
                             </div>
-                            <div className="flex items-baseline gap-3">
-                                <div className={`text-3xl font-black tracking-tighter ${balance > 0 ? 'text-red-500' : balance < 0 ? 'text-emerald-500' : 'text-slate-300'}`}>
-                                    {Math.abs(balance).toLocaleString('tr-TR')} <span className="text-2xl opacity-70">₺</span>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                                <div style={{ fontSize: '36px', fontWeight: '900', color: balanceColor, lineHeight: '1', letterSpacing: '-1px' }}>
+                                    {Math.abs(balance).toLocaleString()} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span>
                                 </div>
-                                <div className={`px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest ${balance > 0 ? 'bg-red-500/10 text-red-500 border border-red-500/20' : balance < 0 ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 border border-white/5'}`}>
-                                    {balance > 0 ? 'BORÇLU (RİSK)' : balance < 0 ? 'ALACAKLI' : 'DENGELİ'}
+                                <div style={{
+                                    padding: '4px 10px',
+                                    borderRadius: '8px',
+                                    fontSize: '11px',
+                                    fontWeight: '800',
+                                    background: balance > 0 ? 'rgba(239, 68, 68, 0.1)' : balance < 0 ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))',
+                                    color: balanceColor,
+                                    border: `1px solid ${balance > 0 ? 'rgba(239, 68, 68, 0.3)' : balance < 0 ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-color, rgba(255,255,255,0.1))'}`,
+                                    textTransform: 'uppercase'
+                                }}>
+                                    {balance > 0 ? 'Borçlu (Risk)' : balance < 0 ? 'Alacaklı' : 'Kapalı (Dengeli)'}
                                 </div>
                             </div>
 
                             {/* DUE INSTALLMENTS SUMMARY */}
                             {(overdueInstallments.length > 0 || upcomingInstallments.length > 0) && (
-                                <div className="mt-3 flex gap-2 items-center">
+                                <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
                                     {overdueInstallments.length > 0 && (
-                                        <div className="flex items-center gap-2 bg-red-500/5 px-2 py-1 rounded border border-red-500/20">
-                                            <span className="text-[9px] font-black text-red-500/80 uppercase tracking-widest">Gecikti</span>
-                                            <span className="text-xs font-black text-red-500 tabular-nums">{overdueAmount.toLocaleString('tr-TR')} ₺</span>
+                                        <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', padding: '8px 12px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                            <span style={{ fontSize: '10px', color: '#ef4444', fontWeight: '800', textTransform: 'uppercase' }}>VADESİ GEÇEN</span>
+                                            <span style={{ fontSize: '14px', color: '#ef4444', fontWeight: '900', fontFamily: 'monospace' }}>{overdueAmount.toLocaleString('tr-TR')} ₺</span>
                                         </div>
                                     )}
                                     {upcomingInstallments.length > 0 && (
-                                        <div className="flex items-center gap-2 bg-blue-500/5 px-2 py-1 rounded border border-blue-500/20">
-                                            <span className="text-[9px] font-black text-blue-500/80 uppercase tracking-widest">30 Gün (Vade)</span>
-                                            <span className="text-xs font-black text-blue-500 tabular-nums">{upcomingAmount.toLocaleString('tr-TR')} ₺</span>
+                                        <div style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', padding: '8px 12px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                            <span style={{ fontSize: '10px', color: '#3b82f6', fontWeight: '800', textTransform: 'uppercase' }}>YAKLAŞAN VADE (30 GÜN)</span>
+                                            <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: '900', fontFamily: 'monospace' }}>{upcomingAmount.toLocaleString('tr-TR')} ₺</span>
                                         </div>
                                     )}
                                 </div>
                             )}
 
                             {portfolioChecks > 0 && (
-                                <div className="text-[10px] font-bold text-amber-500/80 mt-2 flex items-center gap-1.5">
-                                    <span>⚠️</span> Portföyde {portfolioChecks.toLocaleString('tr-TR')} ₺ aktif çek/senet
+                                <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '600', marginTop: '12px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <span>⚠️</span> Portföyde {portfolioChecks.toLocaleString()} ₺ değerinde aktif çek/senet var.
                                 </div>
                             )}
                         </div>
@@ -962,81 +987,81 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             </div>
 
             {/* MAIN CONTENT AREA */}
-            <div className="max-w-7xl mx-auto w-full px-4 md:px-8 py-8 flex flex-col gap-6">
+            <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
                 {/* PREMIUM ACTION BAR */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
                     <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
-                        className="group flex flex-col items-center justify-center p-6 bg-[#080a0f] border border-white/5 hover:border-emerald-500/30 rounded-2xl shadow-lg transition-all"
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(16, 185, 129, 0.05)', color: '#10b981', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+                        className="hover:-translate-y-1 hover:bg-emerald-500/10 hover:border-emerald-500/40"
                     >
-                        <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/5 group-hover:border-emerald-500/20 group-hover:bg-emerald-500/10 flex items-center justify-center text-2xl transition-colors mb-3">
-                            <span className="group-hover:scale-110 transition-transform">💰</span>
-                        </div>
-                        <div className="text-center">
-                            <div className="font-extrabold text-[13px] text-white tracking-widest uppercase mb-1 group-hover:text-emerald-400 transition-colors">TAHSİLAT AL</div>
-                            <div className="text-[11px] text-slate-500 font-semibold px-4">Cari hesaptan ödeme al (Nakit, K.K, Kasa)</div>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💰</div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>TAHSİLAT AL</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Cari hesaptan nakit / kk ile ödeme al</div>
                         </div>
                     </Link>
 
                     <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
-                        className="group flex flex-col items-center justify-center p-6 bg-[#080a0f] border border-white/5 hover:border-red-500/30 rounded-2xl shadow-lg transition-all"
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+                        className="hover:-translate-y-1 hover:bg-red-500/10 hover:border-red-500/40"
                     >
-                        <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/5 group-hover:border-red-500/20 group-hover:bg-red-500/10 flex items-center justify-center text-2xl transition-colors mb-3">
-                            <span className="group-hover:scale-110 transition-transform">💸</span>
-                        </div>
-                        <div className="text-center">
-                            <div className="font-extrabold text-[13px] text-white tracking-widest uppercase mb-1 group-hover:text-red-400 transition-colors">ÖDEME YAP</div>
-                            <div className="text-[11px] text-slate-500 font-semibold px-4">Firmadan Müşteriye nakit çıkışı yap</div>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💸</div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>ÖDEME YAP</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Firmadan nakit / kk ile ödeme çıkışı yap</div>
                         </div>
                     </Link>
 
                     <Link href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
-                        className="group flex flex-col items-center justify-center p-6 bg-[#080a0f] border border-white/5 hover:border-blue-500/30 rounded-2xl shadow-lg transition-all"
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(59, 130, 246, 0.05)', color: '#3b82f6', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(59, 130, 246, 0.2)' }}
+                        className="hover:-translate-y-1 hover:bg-blue-500/10 hover:border-blue-500/40"
                     >
-                        <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/5 group-hover:border-blue-500/20 group-hover:bg-blue-500/10 flex items-center justify-center text-2xl transition-colors mb-3">
-                            <span className="group-hover:scale-110 transition-transform">🛒</span>
-                        </div>
-                        <div className="text-center">
-                            <div className="font-extrabold text-[13px] text-white tracking-widest uppercase mb-1 group-hover:text-blue-400 transition-colors">SATIŞ YAP (POS)</div>
-                            <div className="text-[11px] text-slate-500 font-semibold px-4">Terminalde cariyi seç ve işlem başlat</div>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--bg-panel, rgba(59, 130, 246, 0.1))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛒</div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>SATIŞ YAP (POS)</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Bu müşteriye terminalde yeni satış başlat</div>
                         </div>
                     </Link>
                 </div>
 
-                {/* GROUPED NAVIGATION & FILTERS (HR MODULE STYLE) */}
-                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mt-2">
-                    <div className="flex w-full xl:w-max overflow-x-auto items-center gap-1.5 p-1.5 bg-[#080a0f] border border-white/5 rounded-xl scrollbar-hide select-none shadow-md">
-                        {[
-                            { id: 'all', label: 'Tüm Hareketler', icon: '📋' },
-                            { id: 'sales', label: 'Satışlar & Faturalar', icon: '🛒' },
-                            { id: 'payments', label: 'Finansal İşlemler', icon: '💵' },
-                            { id: 'offers', label: 'Teklifler', icon: '📝' },
-                            { id: 'documents', label: 'Dosyalar & Evraklar', icon: '📁' },
-                            { id: 'warranties', label: 'Garantiler', icon: '🛡️' },
-                            { id: 'services', label: 'Servis', icon: '🛠️' },
-                            { id: 'checks', label: 'Vadeler', icon: '📅' },
-                            { id: 'reconciliations', label: 'Mutabakat', icon: '🤝' },
-                        ].map(tab => (
-                            <button
-                                key={tab.id}
-                                onClick={() => {
-                                    setActiveTab(tab.id as any);
-                                    if (tab.id === 'documents') fetchDocuments();
-                                    if (tab.id === 'services') fetchServices();
-                                }}
-                                className={activeTab === tab.id
-                                    ? "px-4 py-2.5 text-[12px] font-black tracking-wide text-white bg-slate-800 shadow-md border border-white/10 rounded-lg transition-all flex items-center gap-2 whitespace-nowrap uppercase"
-                                    : "px-4 py-2.5 text-[12px] font-bold tracking-wide text-slate-500 hover:text-white hover:bg-slate-800/40 transition-all rounded-lg flex items-center gap-2 whitespace-nowrap uppercase"}
-                            >
-                                <span className={activeTab === tab.id ? "" : "opacity-60 grayscale"}>{tab.icon}</span> {tab.label}
-                            </button>
-                        ))}
+                {/* GROUPED NAVIGATION & FILTERS - CENTERED TABS (SUPPLIER STYLE) */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-center gap-4 mt-2">
+                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                {[
+                                    { id: 'all', label: 'Hareketler' },
+                                    { id: 'sales', label: 'Faturalar' },
+                                    { id: 'payments', label: 'İşlemler' },
+                                    { id: 'offers', label: 'Teklifler' },
+                                    { id: 'documents', label: 'Dosyalar' },
+                                    { id: 'warranties', label: 'Garantiler' },
+                                    { id: 'services', label: 'Servis' },
+                                    { id: 'checks', label: 'Vadeler' }
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => {
+                                            setActiveTab(tab.id as any);
+                                            if (tab.id === 'documents') fetchDocuments();
+                                            if (tab.id === 'services') fetchServices();
+                                        }}
+                                        className={activeTab === tab.id
+                                            ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px] transition-all"
+                                            : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* CONTENT AREA */}
                 <div style={{
-                    background: 'rgba(8,10,15, 0.4)',
+                    background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))',
                     borderRadius: '20px',
                     border: '1px solid rgba(255,255,255,0.05)',
                     overflow: 'hidden',
@@ -1111,7 +1136,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     Servis verileri getiriliyor...
                                 </div>
                             ) : services.length === 0 ? (
-                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
                                     <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🔧</div>
                                     <div style={{ marginBottom: '24px', color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Bu müşteriye ait servis kaydı yok.</div>
                                     <button
@@ -1258,7 +1283,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     Dosyalar getiriliyor...
                                 </div>
                             ) : documents.length === 0 ? (
-                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
                                     <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📁</div>
                                     <div style={{ color: 'var(--text-muted, #888)', fontSize: '15px', fontWeight: '500' }}>Henüz dosyası yüklenmemiş. (Maks 5MB PDF, PNG, JPEG)</div>
                                 </div>
@@ -1301,7 +1326,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
 
                             {warranties.length === 0 ? (
-                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
                                     <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🛡️</div>
                                     <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Henüz kayıtlı garanti karnesi bulunmuyor.</div>
                                 </div>
@@ -1386,12 +1411,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         <span style={{ fontSize: '20px' }}>📥</span> Çek & Senet Portföyü
                                     </h4>
                                     {!customer.checks || customer.checks.length === 0 ? (
-                                        <div style={{ padding: '40px 20px', textAlign: 'center', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                        <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
                                             <div style={{ fontSize: '36px', marginBottom: '12px', opacity: 0.5 }}>📑</div>
                                             <div style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '600' }}>Kayıtlı evrak bulunmuyor.</div>
                                         </div>
                                     ) : (
-                                        <div style={{ overflowX: 'auto', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <div style={{ overflowX: 'auto', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
                                                 <thead>
                                                     <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
@@ -1474,12 +1499,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         <span style={{ fontSize: '20px' }}>📅</span> Taksit & Vadelendirme Planları
                                     </h4>
                                     {!customer.paymentPlans || customer.paymentPlans.length === 0 ? (
-                                        <div style={{ padding: '40px 20px', textAlign: 'center', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                        <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
                                             <div style={{ fontSize: '36px', marginBottom: '12px', opacity: 0.5 }}>📅</div>
                                             <div style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '600' }}>Aktif vadelendirme planı bulunmuyor.</div>
                                         </div>
                                     ) : (
-                                        <div style={{ overflowX: 'auto', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <div style={{ overflowX: 'auto', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
                                                 <thead>
                                                     <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
@@ -1568,7 +1593,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
 
                             {(!customer.reconciliations || customer.reconciliations.length === 0) ? (
-                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'rgba(8,10,15, 0.4)', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
                                     <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🤝</div>
                                     <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Bu cariyle henüz mutabakat yapılmamış.</div>
                                     <button
@@ -1610,7 +1635,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
                                 <thead>
-                                    <tr style={{ background: 'rgba(8,10,15, 0.4)', color: 'var(--text-muted, #888)', fontSize: '11px', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' }}>
+                                    <tr style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', color: 'var(--text-muted, #888)', fontSize: '11px', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' }}>
                                         <th style={{ padding: '24px' }}>Tarih</th>
                                         <th style={{ padding: '24px' }}>Hareket Türü</th>
                                         <th style={{ padding: '24px' }}>Açıklama</th>
@@ -1909,7 +1934,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
                                                                 {/* Sol Taraf: Kalemler (Order Summary) ve Ödeme Planı */}
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                                                                    <div style={{ background: 'rgba(8,10,15, 0.4)', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                    <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', paddingBottom: '16px' }}>
                                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                                             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
@@ -1952,7 +1977,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
                                                                     if (!attachedPlan) return null;
                                                                     return (
-                                                                        <div style={{ background: 'rgba(8,10,15, 0.4)', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                        <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                                                                                 <h4 style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#f59e0b', letterSpacing: '1px' }}>ÖDEME PLANI DETAYI</h4>
                                                                                 <span style={{ fontSize: '11px', fontWeight: '800', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', padding: '4px 8px', borderRadius: '8px' }}>{attachedPlan.installments?.length || attachedPlan.installmentCount} Taksit</span>
@@ -1976,7 +2001,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 {/* Sağ Taraf: Payment Breakdown & Timeline */}
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-                                                                    <div style={{ background: 'rgba(8,10,15, 0.4)', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                    <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                                         <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>FİNANSAL ÖZET</h4>
                                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                                                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
@@ -1999,7 +2024,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
 
 
-                                                                    <div style={{ background: 'rgba(8,10,15, 0.4)', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                    <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                                         <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>ZAMAN ÇİZELGESİ</h4>
                                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative' }}>
                                                                             <div style={{ position: 'absolute', left: '7px', top: '10px', bottom: '10px', width: '2px', background: 'var(--border-color, rgba(255,255,255,0.05))' }}></div>
