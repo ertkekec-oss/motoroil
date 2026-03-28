@@ -31,7 +31,6 @@ export default function FieldMobileLayout({ children }: { children: React.ReactN
         { href: '/field-mobile/visits', icon: <History className="w-[20px] h-[20px]" strokeWidth={2} />, label: 'Ziyaretler' },
         { href: '/field-mobile/expenses', icon: <Receipt className="w-[20px] h-[20px]" strokeWidth={2} />, label: 'Masraflarım' },
         { href: '/staff/me', icon: <LayoutGrid className="w-[20px] h-[20px]" strokeWidth={2} />, label: 'Dashboard' },
-        { href: '/field-mobile/profile', icon: <UserCircle2 className="w-[20px] h-[20px]" strokeWidth={2} />, label: 'Profil' },
     ];
 
     return (

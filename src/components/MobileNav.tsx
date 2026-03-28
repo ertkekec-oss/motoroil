@@ -31,7 +31,6 @@ export function MobileNav() {
         { path: '/field-mobile/visits', icon: <History className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Ziyaretler' },
         { path: '/field-mobile/expenses', icon: <Receipt className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Masraflar' },
         { path: '/staff/me', icon: <LayoutGrid className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Portal' },
-        { path: '/field-mobile/profile', icon: <UserCircle2 className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Profil' },
     ];
 
     return (

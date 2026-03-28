@@ -10,18 +10,25 @@ export async function GET(req: NextRequest) {
         const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+        // Build valid conditions from the session object properties (which are flattened)
+        const conditions = [];
+        if (session.email) conditions.push({ email: session.email });
+        if (session.username) conditions.push({ username: session.username });
+        if (session.id) conditions.push({ userId: session.id }); // If staff table links by userId
+        
         // Find Staff linked to this user
-        const staff = await (prisma as any).staff.findFirst({
-            where: {
-                OR: [
-                    { email: session.user?.email },
-                    { username: session.user?.username || session.user?.email }
-                ]
-            }
-        });
+        let staff = null;
+        if (conditions.length > 0) {
+            staff = await (prisma as any).staff.findFirst({
+                where: { OR: conditions }
+            });
+        }
 
         if (!staff) {
-            return NextResponse.json({ visits: [] });
+            staff = await (prisma as any).staff.findUnique({
+                where: { id: session.id }
+            });
+            if (!staff) return NextResponse.json({ visits: [] });
         }
 
         const visits = await (prisma as any).salesVisit.findMany({
@@ -57,14 +64,22 @@ export async function PUT(req: NextRequest) {
         if (!id) return NextResponse.json({ error: 'ID gerekli' }, { status: 400 });
 
         // Staff kontrolü - sadece kendi ziyaretini düzenleyebilsin
-        const staff = await (prisma as any).staff.findFirst({
-            where: {
-                OR: [
-                    { email: session.user?.email },
-                    { username: session.user?.username || session.user?.email }
-                ]
-            }
-        });
+        const conditions = [];
+        if (session.email) conditions.push({ email: session.email });
+        if (session.username) conditions.push({ username: session.username });
+        if (session.id) conditions.push({ userId: session.id });
+        
+        let staff = null;
+        if (conditions.length > 0) {
+            staff = await (prisma as any).staff.findFirst({
+                where: { OR: conditions }
+            });
+        }
+        if (!staff) {
+            staff = await (prisma as any).staff.findUnique({
+                where: { id: session.id }
+            });
+        }
 
         const visit = await (prisma as any).salesVisit.findFirst({
             where: { id }
