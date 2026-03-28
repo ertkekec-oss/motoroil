@@ -26,6 +26,9 @@ export async function GET(request: Request) {
             include: {
                 customer: {
                     select: { name: true }
+                },
+                technician: {
+                    select: { name: true }
                 }
             }
         });
@@ -56,6 +59,7 @@ export async function POST(request: Request) {
             data: {
                 customerId,
                 companyId,
+                branch: auth.user.branch || 'Merkez',
                 plate,
                 vehicleBrand,
                 vehicleSerial,

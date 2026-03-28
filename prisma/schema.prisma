@@ -856,6 +856,7 @@ model ServiceRecord {
   technician       Staff?    @relation("TechnicianRecords", fields: [technicianId], references: [id])
   photos           Json?
   customerApproved Boolean   @default(false)
+  branch           String?   @default("Merkez")
   deletedAt        DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt

@@ -19,9 +19,10 @@ export default function ServiceDashboard() {
         }
     }, [hasFeature, currentUser, router]);
 
-    const isSystemAdmin = currentUser?.role === 'Admin';
+    const isSystemAdmin = currentUser?.role?.toUpperCase() === 'ADMIN' || currentUser?.role?.toUpperCase() === 'SUPER_ADMIN' || currentUser?.role?.toUpperCase() === 'PLATFORM_ADMIN';
 
     const [activeServiceTab, setActiveServiceTab] = useState<'jobs' | 'calendar' | 'performance'>('jobs');
+    const [activeBranchName, setActiveBranchName] = useState<string>('Merkez');
     const [selectedService, setSelectedService] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -37,7 +38,8 @@ export default function ServiceDashboard() {
             const data = await res.json();
             if (data.success) {
                 const all = data.services || [];
-                setActiveJobs(all.filter((j: any) => j.status !== 'Beklemede'));
+                // Filtering happens in the component for dynamic branch switching
+                setActiveJobs(all.filter((j: any) => j.status !== 'Beklemede' && j.status !== 'İptal Edildi'));
                 setAppointments(all.filter((j: any) => j.status === 'Beklemede'));
             }
         } catch (error) { console.error("Service fetch error", error); }
@@ -55,6 +57,18 @@ export default function ServiceDashboard() {
             console.error(e);
         }
     };
+
+    useEffect(() => {
+        if (currentUser?.branch) setActiveBranchName(currentUser.branch);
+    }, [currentUser]);
+
+    const filteredJobs = isSystemAdmin
+        ? activeJobs
+        : activeJobs.filter((j: any) => (j.branch || 'Merkez') === (activeBranchName || 'Merkez'));
+
+    const filteredAppointments = isSystemAdmin
+        ? appointments
+        : appointments.filter((a: any) => (a.branch || 'Merkez') === (activeBranchName || 'Merkez'));
 
     useEffect(() => {
         fetchServices();
@@ -98,11 +112,11 @@ export default function ServiceDashboard() {
 
     const filteredJobs = !hasPermission('branch_isolation') || isSystemAdmin
         ? activeJobs
-        : activeJobs.filter((j: any) => j.branch === currentUser?.branch);
+        : activeJobs.filter((j: any) => (j.branch || 'Merkez') === (currentUser?.branch || 'Merkez'));
 
     const filteredAppointments = !hasPermission('branch_isolation') || isSystemAdmin
         ? appointments
-        : appointments.filter((a: any) => a.branch === currentUser?.branch);
+        : appointments.filter((a: any) => (a.branch || 'Merkez') === (currentUser?.branch || 'Merkez'));
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -277,9 +291,9 @@ export default function ServiceDashboard() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
                                                         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isLight ? 'bg-slate-200 text-slate-600' : 'bg-slate-800 text-slate-400'}`}>
-                                                            {(job.technician || 'Personel').split(' ').map((n: string) => n[0]).join('')}
+                                                            {((job.technician?.name || job.technician) || 'Personel').split(' ').map((n: string) => n[0]).join('')}
                                                         </div>
-                                                        <span className={`text-[13px] font-medium ${textMain}`}>{job.technician || 'Atanmadı'}</span>
+                                                        <span className={`text-[13px] font-medium ${textMain}`}>{job.technician?.name || job.technician || 'Atanmadı'}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">

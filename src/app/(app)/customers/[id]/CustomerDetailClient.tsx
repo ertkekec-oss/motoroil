@@ -1198,13 +1198,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <div style={{ overflowX: 'auto' }}>
                                     <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
                                         <thead>
-                                            <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                                <th style={{ padding: '16px 20px' }}>TARİH / RANDEVU</th>
-                                                <th style={{ padding: '16px 20px' }}>MARKA / MODEL</th>
-                                                <th style={{ padding: '16px 20px' }}>PLAKA</th>
-                                                <th style={{ padding: '16px 20px' }}>DURUM</th>
-                                                <th style={{ padding: '16px 20px' }}>YAPILAN İŞLEMLER</th>
-                                                <th style={{ padding: '16px 20px', textAlign: 'right' }}>TUTAR</th>
+                                            <tr style={{ background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Tarih / Randevu</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Marka / Model</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Plaka</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Durum</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Teknisyen</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>İşlemler</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800', textAlign: 'right' }}>Tutar</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1220,7 +1221,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 const displayDate = svc.date ? svc.date : svc.createdAt;
 
                                                 return (
-                                                    <tr key={svc.id || i} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', cursor: 'pointer', transition: 'background 0.2s' }} onClick={() => router.push(`/service/${svc.id}`)} className="hover:bg-white/5">
+                                                    <tr key={svc.id || i} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
                                                         <td style={{ padding: '20px' }}>
                                                             <div style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{displayDate ? new Date(displayDate).toLocaleDateString('tr-TR') : '-'}</div>
                                                             {svc.status === 'Beklemede' && svc.appointmentDate && (
@@ -1237,10 +1238,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         </td>
                                                         <td style={{ padding: '20px' }}>
                                                             <span style={{
-                                                                padding: '4px 10px',
+                                                                padding: '6px 10px',
                                                                 borderRadius: '8px',
                                                                 fontSize: '11px',
                                                                 fontWeight: 'bold',
+                                                                textTransform: 'uppercase',
                                                                 background: svc.status === 'Tamamlandı' ? 'rgba(16, 185, 129, 0.1)' : svc.status === 'İşlemde' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(245, 158, 11, 0.1)',
                                                                 color: svc.status === 'Tamamlandı' ? '#10b981' : svc.status === 'İşlemde' ? '#3b82f6' : '#f59e0b',
                                                                 border: `1px solid ${svc.status === 'Tamamlandı' ? 'rgba(16, 185, 129, 0.2)' : svc.status === 'İşlemde' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`
@@ -1248,12 +1250,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 {svc.status}
                                                             </span>
                                                         </td>
-                                                        <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>
-                                                            {itemsStr ? (
-                                                                <span title={itemsStr} style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{itemsStr}</span>
-                                                            ) : (
-                                                                <span style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.description || svc.notes || '-'}</span>
-                                                            )}
+                                                        <td style={{ padding: '20px', color: 'var(--text-main, #fff)', fontWeight: '600' }}>
+                                                            {svc.technician?.name || svc.technician || 'Atanmadı'}
+                                                        </td>
+                                                        <td style={{ padding: '20px' }}>
+                                                            <Link href={`/service/${svc.id}`} style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '11px', fontWeight: '800', textDecoration: 'none' }}>
+                                                                Servis Kokpiti ↗
+                                                            </Link>
                                                         </td>
                                                         <td style={{ padding: '20px', textAlign: 'right', fontWeight: '800', color: '#3b82f6', fontSize: '14px' }}>
                                                             {Number(svc.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
