@@ -9,10 +9,24 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     const [service, setService] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [technicians, setTechnicians] = useState<any[]>([]);
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    useEffect(() => {
+    const fetchTechnicians = async () => {
+        try {
+            const res = await fetch('/api/staff');
+            const data = await res.json();
+            if (data.success) {
+                setTechnicians(data.staff.filter((s: any) => s.type === 'service' || !s.type));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const fetchService = () => {
         if (!id) return;
-
+        setLoading(true);
         fetch(`/api/services/${id}`)
             .then(res => res.json())
             .then(data => {
@@ -24,6 +38,11 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchService();
+        fetchTechnicians();
     }, [id]);
 
     const formatDate = (dateString: string | null) => {
@@ -65,9 +84,39 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
     const items = service.items || [];
     const partsTotal = items.reduce((acc: number, item: any) => acc + (item.isWarranty ? 0 : item.price * item.quantity), 0);
-    const totalAmount = parseFloat(service.totalAmount);
-    // If labor is not in items, we can try to show it as the remainder if it makes sense
-    // But usually it's better to just show "Parts" and "Total"
+    const handleUpdate = async (payload: any) => {
+        setIsUpdating(true);
+        try {
+            const res = await fetch(`/api/services/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                setService(data.service);
+            } else {
+                alert("Güncelleme hatası: " + data.error);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result as string;
+            const currentPhotos = service.photos || [];
+            handleUpdate({ photos: [...currentPhotos, base64] });
+        };
+        reader.readAsDataURL(file);
+    };
 
     const [isActionsOpen, setIsActionsOpen] = useState(false);
 
@@ -111,6 +160,19 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                             <>
                                 <div className="fixed inset-0 z-40" onClick={() => setIsActionsOpen(false)}></div>
                                 <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl shadow-lg z-50 overflow-hidden py-1">
+                                    <button 
+                                        onClick={() => handleUpdate({ status: 'İşlemde', startTime: new Date().toISOString() })}
+                                        className="w-full text-left px-4 py-2.5 text-[13px] font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+                                    >
+                                        İşlemi Başlat
+                                    </button>
+                                    <button 
+                                        onClick={() => handleUpdate({ status: 'Tamamlandı', endTime: new Date().toISOString() })}
+                                        className="w-full text-left px-4 py-2.5 text-[13px] font-semibold text-emerald-600 hover:bg-emerald-50 transition-colors"
+                                    >
+                                        Tamamlandı Olarak İşaretle
+                                    </button>
+                                    <div className="h-px bg-slate-100 dark:bg-white/5 my-1"></div>
                                     <button 
                                         className="w-full text-left px-4 py-2.5 text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                                     >
@@ -179,15 +241,63 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                                         <div className="text-sm font-bold text-white/80 line-clamp-1">{service.vehicleBrand || '-'}</div>
                                     </div>
                                     <div>
-                                        <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Mevcut Kilometre</div>
+                                        <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">KM</div>
                                         <div className="text-sm font-bold text-secondary">{service.km ? `${service.km.toLocaleString()} KM` : '-'}</div>
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Şasi / Seri No</div>
-                                        <div className="text-sm font-mono font-bold text-white/40 character-variant">{service.vehicleSerial || '-'}</div>
+                                        <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Sorumlu Teknisyen</div>
+                                        <select
+                                            value={service.technicianId || ''}
+                                            onChange={(e) => handleUpdate({ technicianId: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-primary/50 transition-all"
+                                        >
+                                            <option value="" className="bg-[#1a1c2e]">Personel Seçiniz</option>
+                                            {technicians.map((t: any) => (
+                                                <option key={t.id} value={t.id} className="bg-[#1a1c2e]">{t.name}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* DIGITAL INTAKE GALLERY */}
+                    <div className="bg-white/5 border border-white/10 rounded-[40px] p-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-sm font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
+                                <span className="w-8 h-[2px] bg-primary"></span>
+                                Dijital Kabul ve Fotoğraflar
+                            </h3>
+                            <label className="cursor-pointer px-4 py-2 rounded-xl bg-primary/20 text-primary border border-primary/30 text-[10px] font-black uppercase tracking-widest hover:bg-primary/30 transition-all">
+                                📷 FOTOĞRAF EKLE
+                                <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} />
+                            </label>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            {(service.photos || []).map((photo: string, idx: number) => (
+                                <div key={idx} className="aspect-square rounded-2xl bg-black/20 border border-white/5 overflow-hidden group relative">
+                                    <img src={photo} alt="Service" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <button 
+                                            onClick={() => {
+                                                const newPhotos = [...service.photos];
+                                                newPhotos.splice(idx, 1);
+                                                handleUpdate({ photos: newPhotos });
+                                            }}
+                                            className="text-white text-xs font-black uppercase tracking-tighter bg-danger/80 px-3 py-1.5 rounded-lg"
+                                        >
+                                            SİL
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            {(!service.photos || service.photos.length === 0) && (
+                                <div className="col-span-full py-12 flex flex-col items-center justify-center bg-white/[0.02] rounded-3xl border border-dashed border-white/10">
+                                    <span className="text-4xl mb-3 opacity-20">📸</span>
+                                    <p className="text-[11px] font-black text-white/20 uppercase tracking-widest">Henüz fotoğraf eklenmemiş</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -333,18 +443,26 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                             <div className="absolute left-[7px] top-2 bottom-2 w-[2px] bg-white/5"></div>
 
                             <div className="flex gap-4 items-start relative z-10">
-                                <div className="w-4 h-4 rounded-full bg-success border-4 border-[#080911] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                                <div className={`w-4 h-4 rounded-full border-4 border-[#080911] ${service.startTime ? 'bg-success shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-white/10'}`}></div>
                                 <div>
-                                    <div className="text-xs font-black text-white">Bakım Tamamlandı</div>
-                                    <div className="text-[10px] font-bold text-white/20 uppercase mt-0.5">{formatDate(service.createdAt)}</div>
+                                    <div className={`text-xs font-black ${service.startTime ? 'text-white' : 'text-white/20'}`}>İşleme Başlandı</div>
+                                    <div className="text-[10px] font-bold text-white/20 uppercase mt-0.5">{service.startTime ? new Date(service.startTime).toLocaleString('tr-TR') : '-'}</div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 items-start relative z-10">
+                                <div className={`w-4 h-4 rounded-full border-4 border-[#080911] ${service.status === 'Tamamlandı' ? 'bg-success shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-white/10'}`}></div>
+                                <div>
+                                    <div className={`text-xs font-black ${service.status === 'Tamamlandı' ? 'text-white' : 'text-white/20'}`}>Bakım Tamamlandı</div>
+                                    <div className="text-[10px] font-bold text-white/20 uppercase mt-0.5">{service.endTime ? new Date(service.endTime).toLocaleString('tr-TR') : '-'}</div>
                                 </div>
                             </div>
 
                             <div className="flex gap-4 items-start relative z-10">
                                 <div className="w-4 h-4 rounded-full bg-white/10 border-4 border-[#080911]"></div>
                                 <div>
-                                    <div className="text-xs font-black text-white/30 italic">Teslim Edildi</div>
-                                    <div className="text-[10px] font-bold text-white/10 uppercase mt-0.5">-</div>
+                                    <div className="text-xs font-black text-white/10 italic">Teslim Edildi</div>
+                                    <div className="text-[10px] font-bold text-white/5 uppercase mt-0.5">-</div>
                                 </div>
                             </div>
                         </div>

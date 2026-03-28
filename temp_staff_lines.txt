@@ -1,0 +1,75 @@
+﻿Line 141: staff                 Staff[]
+Line 142: staffTargets          StaffTarget[]
+Line 186: employee   Staff    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+Line 318: staffId               String?
+Line 329: staff                 Staff?            @relation("StaffStoreOrders", fields: [staffId], references: [id])
+Line 621: assignedStaffId     String?
+Line 628: assignedStaff       Staff?                       @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
+Line 1104: model Staff {
+Line 1151: assignedCustomers      Customer[]                @relation("StaffCustomers")
+Line 1154: expenses               Expense[]                 @relation("StaffExpenses")
+Line 1159: storeOrders            Order[]                   @relation("StaffStoreOrders")
+Line 1170: documents              StaffDocument[]
+Line 1171: targets                StaffTarget[]
+Line 1173: tasks                  StaffTask[]
+Line 1187: receiver   Staff?   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+Line 1188: sender     Staff    @relation("SentMessages", fields: [senderId], references: [id])
+Line 1194: model StaffTask {
+Line 1196: staffId     String
+Line 1208: staff     Staff               @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 1209: feedbacks StaffTaskFeedback[]
+Line 1211: @@index([staffId])
+Line 1216: model StaffTaskFeedback {
+Line 1224: isFromStaff Boolean  @default(true) // true: personelin yorumu/cevab─▒, false: y├Âneticinin yorumu/cevab─▒
+Line 1227: task StaffTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+Line 1234: model StaffDocument {
+Line 1236: staffId    String
+Line 1242: staff      Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 1244: @@index([staffId])
+Line 1249: staffId   String
+Line 1257: staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 1259: @@index([staffId])
+Line 1265: staffId    String
+Line 1275: staff      Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 1277: @@index([staffId])
+Line 1283: staffId      String
+Line 1296: staff        Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 1298: @@index([staffId])
+Line 1304: staffId      String
+Line 1321: staff        Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 1323: @@unique([staffId, period])
+Line 1446: staff             String?
+Line 1875: staffId   String
+Line 1882: staff     Staff       @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 1886: @@index([staffId])
+Line 1910: staffId          String
+Line 1925: staff            Staff         @relation(fields: [staffId], references: [id])
+Line 1929: @@index([staffId])
+Line 1939: staffId     String
+Line 1947: staff       Staff            @relation(fields: [staffId], references: [id])
+Line 1970: model StaffTarget {
+Line 1972: staffId        String
+Line 1989: staff          Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 2446: staffId     String
+Line 2451: staff       Staff    @relation("StaffExpenses", fields: [staffId], references: [id])
+Line 2453: @@index([staffId])
+Line 2531: staffId      String
+Line 2541: staff        Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 6807: staffId        String
+Line 6816: staff          Staff         @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 6844: staffId     String
+Line 6848: staff       Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 6855: staffId    String
+Line 6861: staff      Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 6909: staffId          String
+Line 6917: staff            Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 6958: targetStaffId String?
+Line 6963: staff         Staff?   @relation(fields: [targetStaffId], references: [id])
+Line 6992: assignedStaffId String?
+Line 6995: staff           Staff?   @relation(fields: [assignedStaffId], references: [id])
+Line 7004: staffId        String
+Line 7012: staff          Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 8009: DEALER_STAFF
+Line 9190: staffId     String
+Line 9198: staff       Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+Line 9200: @@index([staffId])

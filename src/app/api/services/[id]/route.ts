@@ -46,7 +46,11 @@ export async function PUT(
 
         const { id } = await params;
         const body = await request.json();
-        const { plate, km, nextKm, nextDate, vehicleBrand, vehicleSerial, notes, status, totalAmount, items } = body;
+        const { 
+            plate, km, nextKm, nextDate, vehicleBrand, vehicleSerial, 
+            notes, status, totalAmount, subTotal, taxTotal, 
+            items, technicianId, startTime, endTime, photos, customerApproved 
+        } = body;
 
         const existing = await prisma.serviceRecord.findFirst({
             where: { id, companyId }
@@ -56,20 +60,33 @@ export async function PUT(
             return NextResponse.json({ success: false, error: 'Service record not found or access denied.' }, { status: 404 });
         }
 
+        const data: any = {
+            plate,
+            km: km !== undefined ? parseInt(km.toString()) : undefined,
+            nextKm: nextKm !== undefined ? parseInt(nextKm.toString()) : undefined,
+            nextDate: nextDate ? new Date(nextDate) : undefined,
+            vehicleBrand,
+            vehicleSerial,
+            notes,
+            status,
+            totalAmount,
+            subTotal,
+            taxTotal,
+            items,
+            technicianId,
+            customerApproved: customerApproved !== undefined ? !!customerApproved : undefined,
+            photos: photos || undefined
+        };
+
+        if (startTime) data.startTime = new Date(startTime);
+        if (endTime) data.endTime = new Date(endTime);
+
+        // Filter undefined
+        Object.keys(data).forEach(key => data[key] === undefined && delete data[key]);
+
         const updatedService = await prisma.serviceRecord.update({
             where: { id },
-            data: {
-                plate,
-                km: km ? parseInt(km.toString()) : undefined,
-                nextKm: nextKm ? parseInt(nextKm.toString()) : undefined,
-                nextDate: nextDate ? new Date(nextDate) : undefined,
-                vehicleBrand,
-                vehicleSerial,
-                notes,
-                status,
-                totalAmount,
-                items
-            }
+            data
         });
 
         return NextResponse.json({ success: true, service: updatedService });

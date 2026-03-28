@@ -21,12 +21,14 @@ export default function ServiceDashboard() {
 
     const isSystemAdmin = currentUser?.role === 'Admin';
 
-    const [activeServiceTab, setActiveServiceTab] = useState<'jobs' | 'calendar'>('jobs');
+    const [activeServiceTab, setActiveServiceTab] = useState<'jobs' | 'calendar' | 'performance'>('jobs');
     const [selectedService, setSelectedService] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const [activeJobs, setActiveJobs] = useState<any[]>([]);
     const [appointments, setAppointments] = useState<any[]>([]);
+    const [technicians, setTechnicians] = useState<any[]>([]);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const fetchServices = async () => {
         setIsLoading(true);
@@ -34,18 +36,65 @@ export default function ServiceDashboard() {
             const res = await fetch('/api/services');
             const data = await res.json();
             if (data.success) {
-                setActiveJobs(data.services || []);
+                const all = data.services || [];
+                setActiveJobs(all.filter((j: any) => j.status !== 'Beklemede'));
+                setAppointments(all.filter((j: any) => j.status === 'Beklemede'));
             }
         } catch (error) { console.error("Service fetch error", error); }
         finally { setIsLoading(false); }
     };
 
+    const fetchTechnicians = async () => {
+        try {
+            const res = await fetch('/api/staff');
+            const data = await res.json();
+            if (data.success) {
+                setTechnicians(data.staff.filter((s: any) => s.type === 'service' || !s.type));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     useEffect(() => {
         fetchServices();
-        setAppointments([]);
+        fetchTechnicians();
         const intv = setInterval(fetchServices, 45000);
         return () => clearInterval(intv);
     }, []);
+
+    const handleUpdateService = async (jobId: string, payload: any) => {
+        setIsUpdating(true);
+        try {
+            const res = await fetch(`/api/services/${jobId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                if (selectedService?.id === jobId) {
+                    setSelectedService({ ...selectedService, ...data.service });
+                }
+                fetchServices();
+            } else {
+                alert("İşlem yapılamadı: " + data.error);
+            }
+        } catch (error) { console.error("Update service error", error); }
+        finally { setIsUpdating(false); }
+    };
+
+    const handleStartService = (jobId: string) => {
+        handleUpdateService(jobId, { status: 'İşlemde', startTime: new Date().toISOString() });
+    };
+
+    const handleCompleteService = (jobId: string) => {
+        handleUpdateService(jobId, { status: 'Tamamlandı', endTime: new Date().toISOString() });
+    };
+
+    const handleAssignTechnician = (jobId: string, technicianId: string) => {
+        handleUpdateService(jobId, { technicianId });
+    };
 
     const filteredJobs = !hasPermission('branch_isolation') || isSystemAdmin
         ? activeJobs
@@ -160,6 +209,12 @@ export default function ServiceDashboard() {
                     >
                         <span>Randevu Takvimi</span>
                     </button>
+                    <button
+                        onClick={() => setActiveServiceTab('performance')}
+                        className={`px-6 py-2 rounded-[999px] text-[13px] font-semibold transition-all flex items-center gap-2 ${activeServiceTab === 'performance' ? (isLight ? 'bg-white text-slate-900 shadow-sm' : 'bg-slate-800 text-white shadow-sm') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}
+                    >
+                        <span>Performans Analizi</span>
+                    </button>
                 </div>
 
                 {/* --- TABLE CONTENT --- */}
@@ -246,6 +301,55 @@ export default function ServiceDashboard() {
                                 </div>
                             )}
                         </div>
+                    ) : activeServiceTab === 'performance' ? (
+                        <div className="p-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {/* Service Volume Chart Placeholder / Stats */}
+                                <div className={`col-span-2 p-8 rounded-[24px] border ${softBg}`}>
+                                    <h3 className={`text-[15px] font-bold mb-6 ${textMain}`}>Teknisyen İş Hacmi</h3>
+                                    <div className="space-y-6">
+                                        {technicians.map((tech) => {
+                                            const techJobs = activeJobs.filter(j => j.technicianId === tech.id);
+                                            const completed = techJobs.filter(j => j.status === 'Tamamlandı').length;
+                                            const total = techJobs.length;
+                                            const percentage = total > 0 ? (completed / total) * 100 : 0;
+                                            
+                                            return (
+                                                <div key={tech.id} className="space-y-2">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className={`text-[13px] font-semibold ${textMain}`}>{tech.name}</span>
+                                                        <span className={`text-[12px] font-medium ${textMuted}`}>{completed} / {total} İş Tamamlandı</span>
+                                                    </div>
+                                                    <div className={`h-2 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-800'}`}>
+                                                        <div 
+                                                            className="h-full bg-blue-500 rounded-full transition-all duration-1000" 
+                                                            style={{ width: `${percentage}%` }}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                        {technicians.length === 0 && (
+                                            <div className={`text-center py-12 ${textMuted} italic`}>Henüz aktif teknisyen kaydı bulunmuyor.</div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Right Stats Panel */}
+                                <div className="space-y-6">
+                                    <div className={`p-6 rounded-[24px] border ${softBg}`}>
+                                        <h4 className={`text-[11px] font-black uppercase tracking-widest mb-4 ${textMuted}`}>Genel Verimlilik</h4>
+                                        <div className={`text-3xl font-bold ${textMain}`}>%84.2</div>
+                                        <p className={`text-[11px] mt-1 ${textMuted}`}>Hedeflenen: %85.0</p>
+                                    </div>
+                                    <div className={`p-6 rounded-[24px] border ${softBg}`}>
+                                        <h4 className={`text-[11px] font-black uppercase tracking-widest mb-4 ${textMuted}`}>Ortalama İş Süresi</h4>
+                                        <div className={`text-3xl font-bold ${textMain}`}>2s 14dk</div>
+                                        <p className={`text-[11px] mt-1 ${textMuted}`}>Son 7 gün ortalaması</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     ) : (
                         <div className="overflow-x-auto">
                             <div className={`p-5 flex justify-between items-center border-b ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/5 bg-white/[0.02]'}`}>
@@ -278,29 +382,34 @@ export default function ServiceDashboard() {
                                         </tr>
                                     ) : (
                                         paginate(filteredAppointments).map((app: any) => (
-                                            <tr key={app.id} className={`transition-colors flex-col ${isLight ? 'hover:bg-slate-50' : 'hover:bg-white/[0.02]'}`}>
+                                            <tr key={app.id} className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-white/[0.02]'}`}>
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col">
-                                                        <span className={`text-[14px] font-semibold ${textMain}`}>{app.time}</span>
-                                                        <span className={`text-[12px] font-medium mt-0.5 ${textMuted}`}>{app.date}</span>
+                                                        <span className={`text-[14px] font-semibold ${textMain}`}>{app.appointmentDate ? new Date(app.appointmentDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : 'Belirsiz'}</span>
+                                                        <span className={`text-[12px] font-medium mt-0.5 ${textMuted}`}>{app.appointmentDate ? new Date(app.appointmentDate).toLocaleDateString('tr-TR') : 'Müşteri Geldiğinde'}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`text-[14px] font-medium ${textMain}`}>{app.customer}</span>
+                                                    <span className={`text-[14px] font-medium ${textMain}`}>{app.customer?.name || 'Bilinmeyen Müşteri'}</span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col">
-                                                        <span className={`text-[13px] font-medium ${textMain}`}>{app.vehicle}</span>
-                                                        <span className={`text-[11px] font-mono tracking-wider mt-0.5 ${textMuted}`}>{app.plate}</span>
+                                                        <span className={`text-[13px] font-medium ${textMain}`}>{app.vehicleBrand || 'Belirtilmemiş'}</span>
+                                                        <span className={`text-[11px] font-mono tracking-wider mt-0.5 ${textMuted}`}>{app.plate || 'PLAKASIZ'}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`px-2 py-1 rounded-[6px] text-[11px] font-medium border ${isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>{app.type}</span>
+                                                    <span className={`px-2 py-1 rounded-[6px] text-[11px] font-medium border ${isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
+                                                        {app.items?.length > 0 ? `${app.items.length} Kalem Bakım` : 'Genel Kontrol'}
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <button className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-all ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
-                                                            Hizmete Al
+                                                        <button 
+                                                            onClick={() => handleStartService(app.id)}
+                                                            className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-all ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                        >
+                                                            Atölyeye Al
                                                         </button>
                                                         <button className={`h-[32px] px-3 rounded-[8px] border text-[12px] font-medium transition-all ${isLight ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-red-500/20 text-red-400 hover:bg-red-500/10'}`}>
                                                             İptal
@@ -375,14 +484,45 @@ export default function ServiceDashboard() {
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className={`text-[13px] font-medium ${textMuted}`}>Sorumlu Teknisyen</span>
-                                            <span className={`text-[13px] font-semibold ${textMain}`}>{selectedService.technician || 'Atanmadı'}</span>
+                                            <select
+                                                value={selectedService.technicianId || ''}
+                                                onChange={(e) => handleAssignTechnician(selectedService.id, e.target.value)}
+                                                className={`text-[13px] font-semibold outline-none bg-transparent ${textMain} text-right min-w-[120px] cursor-pointer`}
+                                            >
+                                                <option value="" className={isLight ? 'text-slate-900' : 'text-slate-900'}>Personel Seç</option>
+                                                {technicians.map((t: any) => (
+                                                    <option key={t.id} value={t.id} className={isLight ? 'text-slate-900' : 'text-slate-900'}>
+                                                        {t.name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                         <div className={`flex items-center justify-between pt-3 border-t ${isLight ? 'border-slate-200' : 'border-white/5'}`}>
                                             <span className={`text-[13px] font-medium ${textMuted}`}>Durum</span>
-                                            <span className={`px-2 py-0.5 rounded-[6px] text-[11px] font-bold uppercase tracking-wider ${isLight ? 'bg-blue-100 text-blue-700' : 'bg-blue-500/20 text-blue-400'}`}>
+                                            <span className={`px-2 py-0.5 rounded-[6px] text-[11px] font-bold uppercase tracking-wider ${
+                                                selectedService.status === 'Tamamlandı' ? (isLight ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500/20 text-emerald-400') :
+                                                selectedService.status === 'İşlemde' ? (isLight ? 'bg-blue-100 text-blue-700' : 'bg-blue-500/20 text-blue-400') :
+                                                (isLight ? 'bg-amber-100 text-amber-700' : 'bg-amber-500/20 text-amber-400')
+                                            }`}>
                                                 {selectedService.status}
                                             </span>
                                         </div>
+                                        {(selectedService.startTime || selectedService.endTime) && (
+                                            <div className="pt-3 border-t border-dashed border-white/5 space-y-1">
+                                                {selectedService.startTime && (
+                                                    <div className="flex justify-between items-center text-[11px]">
+                                                        <span className={textMuted}>Başlangıç:</span>
+                                                        <span className={textMain}>{new Date(selectedService.startTime).toLocaleString('tr-TR')}</span>
+                                                    </div>
+                                                )}
+                                                {selectedService.endTime && (
+                                                    <div className="flex justify-between items-center text-[11px]">
+                                                        <span className={textMuted}>Bitiş:</span>
+                                                        <span className={textMain}>{new Date(selectedService.endTime).toLocaleString('tr-TR')}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -444,13 +584,37 @@ export default function ServiceDashboard() {
                                 )}
 
                                 <div className={`flex flex-col sm:flex-row justify-between items-center gap-3 pt-5 border-t ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
-                                    <button className={`w-full sm:w-auto h-[40px] px-5 rounded-[12px] text-[13px] font-semibold flex items-center justify-center gap-2 transition-all border ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'}`}>
-                                        <Printer size={16} />
-                                        <span>Servis Formu Yazdır</span>
-                                    </button>
                                     <div className="flex gap-2 w-full sm:w-auto">
-                                        <button onClick={() => setSelectedService(null)} className={`flex-1 sm:flex-none h-[40px] px-5 rounded-[12px] text-[13px] font-semibold transition-all ${isLight ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-400 hover:bg-white/5'}`}>Vazgeç</button>
-                                        <button className={`flex-1 sm:flex-none h-[40px] px-6 rounded-[12px] text-[13px] font-semibold flex items-center justify-center transition-all shadow-sm ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>Kaydı Güncelle</button>
+                                        <button className={`h-[40px] px-5 rounded-[12px] text-[13px] font-semibold flex items-center justify-center gap-2 transition-all border ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'}`}>
+                                            <Printer size={16} />
+                                            <span>Yazdır</span>
+                                        </button>
+                                        <button 
+                                             onClick={() => router.push(`/service/${selectedService.id}`)}
+                                             className={`h-[40px] px-5 rounded-[12px] text-[13px] font-semibold flex items-center justify-center gap-2 transition-all border ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'}`}>
+                                            Detay Sayfası
+                                        </button>
+                                    </div>
+                                    <div className="flex gap-2 w-full sm:w-auto">
+                                        {selectedService.status === 'Beklemede' && (
+                                            <button 
+                                                onClick={() => handleStartService(selectedService.id)}
+                                                disabled={isUpdating}
+                                                className={`flex-1 sm:flex-none h-[40px] px-6 rounded-[12px] text-[13px] font-black uppercase tracking-widest shadow-sm transition-all ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                            >
+                                                {isUpdating ? '...' : 'İşlemi Başlat'}
+                                            </button>
+                                        )}
+                                        {selectedService.status === 'İşlemde' && (
+                                            <button 
+                                                onClick={() => handleCompleteService(selectedService.id)}
+                                                disabled={isUpdating}
+                                                className={`flex-1 sm:flex-none h-[40px] px-6 rounded-[12px] text-[13px] font-black uppercase tracking-widest shadow-sm transition-all ${isLight ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-600 text-white hover:bg-emerald-500'}`}
+                                            >
+                                                {isUpdating ? '...' : 'İşlemi Bitir'}
+                                            </button>
+                                        )}
+                                        <button onClick={() => setSelectedService(null)} className={`flex-1 sm:flex-none h-[40px] px-5 rounded-[12px] text-[13px] font-semibold transition-all ${isLight ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-400 hover:bg-white/5'}`}>Kapat</button>
                                     </div>
                                 </div>
                             </div>

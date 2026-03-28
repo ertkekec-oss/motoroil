@@ -1199,10 +1199,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
                                         <thead>
                                             <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                                <th style={{ padding: '16px 20px' }}>TARİH</th>
+                                                <th style={{ padding: '16px 20px' }}>TARİH / RANDEVU</th>
                                                 <th style={{ padding: '16px 20px' }}>MARKA / MODEL</th>
                                                 <th style={{ padding: '16px 20px' }}>PLAKA</th>
-                                                <th style={{ padding: '16px 20px' }}>KİLOMETRE</th>
+                                                <th style={{ padding: '16px 20px' }}>DURUM</th>
                                                 <th style={{ padding: '16px 20px' }}>YAPILAN İŞLEMLER</th>
                                                 <th style={{ padding: '16px 20px', textAlign: 'right' }}>TUTAR</th>
                                             </tr>
@@ -1221,14 +1221,33 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                                                 return (
                                                     <tr key={svc.id || i} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', cursor: 'pointer', transition: 'background 0.2s' }} onClick={() => router.push(`/service/${svc.id}`)} className="hover:bg-white/5">
-                                                        <td style={{ padding: '20px', color: 'var(--text-main, #e2e8f0)', fontWeight: '500' }}>{displayDate ? new Date(displayDate).toLocaleDateString('tr-TR') : '-'}</td>
+                                                        <td style={{ padding: '20px' }}>
+                                                            <div style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{displayDate ? new Date(displayDate).toLocaleDateString('tr-TR') : '-'}</div>
+                                                            {svc.status === 'Beklemede' && svc.appointmentDate && (
+                                                                <div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: '700', marginTop: '4px' }}>
+                                                                    🕒 Randevu: {new Date(svc.appointmentDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                                                </div>
+                                                            )}
+                                                        </td>
                                                         <td style={{ padding: '20px' }}><span style={{ fontWeight: '600', color: 'var(--text-main, #fff)' }}>{svc.vehicleBrand || '-'}</span></td>
                                                         <td style={{ padding: '20px' }}>
                                                             <span style={{ padding: '4px 10px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontWeight: '800', color: '#3b82f6', letterSpacing: '1px' }}>
                                                                 {svc.plate || '-'}
                                                             </span>
                                                         </td>
-                                                        <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>{svc.km ? svc.km.toLocaleString() : '-'} km</td>
+                                                        <td style={{ padding: '20px' }}>
+                                                            <span style={{
+                                                                padding: '4px 10px',
+                                                                borderRadius: '8px',
+                                                                fontSize: '11px',
+                                                                fontWeight: 'bold',
+                                                                background: svc.status === 'Tamamlandı' ? 'rgba(16, 185, 129, 0.1)' : svc.status === 'İşlemde' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                                color: svc.status === 'Tamamlandı' ? '#10b981' : svc.status === 'İşlemde' ? '#3b82f6' : '#f59e0b',
+                                                                border: `1px solid ${svc.status === 'Tamamlandı' ? 'rgba(16, 185, 129, 0.2)' : svc.status === 'İşlemde' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`
+                                                            }}>
+                                                                {svc.status}
+                                                            </span>
+                                                        </td>
                                                         <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>
                                                             {itemsStr ? (
                                                                 <span title={itemsStr} style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{itemsStr}</span>

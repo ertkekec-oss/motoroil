@@ -63,7 +63,8 @@ function ServiceAcceptanceContent() {
         phone: '',
         notes: '',
         brand: '',
-        serialNumber: ''
+        serialNumber: '',
+        appointmentDate: ''
     });
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -203,7 +204,7 @@ function ServiceAcceptanceContent() {
     const activeLaborCost = isLaborWarranty ? 0 : laborCost;
     const totalCost = (totalParts + activeLaborCost) * 1.2;
 
-    const handleSave = async () => {
+    const handleSave = async (status: 'Beklemede' | 'İşlemde' | 'Tamamlandı') => {
         if (!formData.customerName) {
             showError('Hata', 'Lütfen müşteri adını giriniz.');
             return;
@@ -230,6 +231,9 @@ function ServiceAcceptanceContent() {
                 }
             }
 
+            const subTotal = totalParts + activeLaborCost;
+            const taxTotal = subTotal * 0.20;
+
             const sRes = await fetch('/api/services', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -244,17 +248,26 @@ function ServiceAcceptanceContent() {
                     nextDate: formData.nextDate,
                     notes: formData.notes,
                     items: selectedParts.map(p => ({ ...p, type: 'Part' })),
-                    totalAmount: totalCost
+                    totalAmount: totalCost,
+                    subTotal: subTotal,
+                    taxTotal: taxTotal,
+                    status: status,
+                    appointmentDate: formData.appointmentDate || null
                 })
             });
             const sData = await sRes.json();
 
             if (sData.success) {
-                showSuccess('İş Emri Açıldı', 'Servis kaydı başarıyla oluşturuldu. Ödeme sayfasına yönlendiriliyorsunuz...');
-                setTimeout(() => {
-                    const desc = `${formData.plate ? formData.plate + ' - ' : ''}Servis Hizmeti`;
-                    router.push(`/payment?amount=${totalCost.toFixed(0)}&title=${encodeURIComponent(desc)}&ref=SRV-${sData.service.id}&customerId=${finalCustomerId}`);
-                }, 1500);
+                if (status === 'Tamamlandı') {
+                    showSuccess('İş Emri Açıldı', 'Servis kaydı başarıyla oluşturuldu. Ödeme sayfasına yönlendiriliyorsunuz...');
+                    setTimeout(() => {
+                        const desc = `${formData.plate ? formData.plate + ' - ' : ''}Servis Hizmeti`;
+                        router.push(`/payment?amount=${totalCost.toFixed(0)}&title=${encodeURIComponent(desc)}&ref=SRV-${sData.service.id}&customerId=${finalCustomerId}`);
+                    }, 1500);
+                } else {
+                    showSuccess('Kayıt Başarılı', status === 'Beklemede' ? 'Randevu başarıyla oluşturuldu.' : 'Servis iş emri atölyeye alındı.');
+                    setTimeout(() => router.push('/service'), 1000);
+                }
             } else {
                 showError('Hata', 'Servis kaydı oluşturulamadı: ' + sData.error);
             }
@@ -448,6 +461,14 @@ function ServiceAcceptanceContent() {
                                         </div>
                                     </>
                                 )}
+
+                                <div className="space-y-1.5 col-span-full">
+                                    <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>Randevu Tarihi (Opsiyonel)</label>
+                                    <input type="datetime-local" value={formData.appointmentDate} onChange={e => setFormData({ ...formData, appointmentDate: e.target.value })}
+                                        className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${isLight ? 'bg-amber-50/50 border-amber-200 focus:border-amber-500 text-slate-900 focus:bg-white' : 'bg-amber-500/5 border-amber-500/20 focus:border-amber-500/50 text-white'}`}
+                                    />
+                                    <p className={`text-[10px] font-medium mt-1 ml-1 ${textMuted}`}>Eğer aracı hemen servise almayacaksanız randevu tarihi girerek ajandaya kaydedebilirsiniz.</p>
+                                </div>
                             </div>
                         </section>
 
@@ -594,12 +615,15 @@ function ServiceAcceptanceContent() {
                             </div>
 
                             <div className="mt-8 space-y-3">
-                                <button onClick={handleSave} className={`w-full h-[48px] rounded-[12px] text-[13px] font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isLight ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}>
+                                <button onClick={() => handleSave('Tamamlandı')} className={`w-full h-[48px] rounded-[12px] text-[13px] font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isLight ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}>
                                     <Check size={16} strokeWidth={3} />
-                                    {isNewCustomer ? 'Kaydet ve Ödeme Al' : 'Oluştur ve Ödeme Al'}
+                                    Hemen Servise Al ve Bitir
                                 </button>
-                                <button onClick={() => router.back()} className={`w-full h-[44px] rounded-[12px] border text-[12px] font-bold uppercase tracking-wide transition-all ${isLight ? 'border-slate-200 text-slate-500 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>
-                                    İşlemi İptal Et
+                                <button onClick={() => handleSave('İşlemde')} className={`w-full h-[44px] rounded-[12px] border text-[12px] font-bold uppercase tracking-wide transition-all ${isLight ? 'border-blue-200 text-blue-600 hover:bg-blue-50' : 'border-blue-500/20 text-blue-400 hover:bg-blue-500/10'}`}>
+                                    Atölyeye Al (İşlemi Başlat)
+                                </button>
+                                <button onClick={() => handleSave('Beklemede')} className={`w-full h-[44px] rounded-[12px] border text-[12px] font-bold uppercase tracking-wide transition-all ${isLight ? 'border-amber-200 text-amber-600 hover:bg-amber-50' : 'border-amber-500/20 text-amber-400 hover:bg-amber-500/10'}`}>
+                                    Randevu Olarak Kaydet
                                 </button>
                             </div>
                         </div>

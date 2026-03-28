@@ -1,0 +1,16 @@
+Categories: [
+  {
+    "id": "cmmz9ted90003108yak7tzhym",
+    "name": "B2B"
+  },
+  {
+    "id": "cmmz9xefb0001m20mr1bki8if",
+    "name": "A Sınıfı"
+  },
+  {
+    "id": "cmmzg0ma800011dau1cehvrrg",
+    "name": "B Sınıfı"
+  }
+]
+Customer Count: 5
+Customer categories: ["NULL"]

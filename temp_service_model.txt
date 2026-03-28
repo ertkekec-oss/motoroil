@@ -1,0 +1,26 @@
+model ServiceRecord {
+  id            String    @id @default(cuid())
+  customerId    String
+  plate         String?
+  km            Int?
+  nextKm        Int?
+  nextDate      DateTime?
+  vehicleBrand  String?
+  vehicleSerial String?
+  notes         String?
+  status        String    @default("TamamlandÄ±")
+  totalAmount   Decimal   @db.Decimal(10, 2)
+  items         Json
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  companyId     String?
+  company       Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer      Customer  @relation(fields: [customerId], references: [id])
+
+  @@index([customerId])
+  @@index([plate])
+  @@index([nextDate])
+  @@index([status])
+  @@index([companyId])
+}
