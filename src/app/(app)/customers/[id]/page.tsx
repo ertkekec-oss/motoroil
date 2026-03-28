@@ -120,12 +120,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         const fetchedOrderIds = new Set(marketplaceOrders.map((o: any) => o.id));
 
         // Prepare history data on server to keep client component clean and fast
-        const txs = (customer.transactions || [])
+            const txs = (customer.transactions || [])
             .map((t: any) => {
                 const isCollection = (t.type === 'income' || t.type === 'Collection' || t.type === 'Senet' || t.type === 'Check');
                 const typeLabel = isCollection ? 'Tahsilat' :
                     t.type === 'Payment' ? 'Ödeme' :
-                        t.type === 'Sales' ? 'Satış' :
+                        (t.type === 'Sales' || t.type?.toUpperCase() === 'SATIŞ') ? 'Satış' :
                             t.type === 'Expense' ? 'Gider' : t.type;
 
                 // Extract Order REF and clean description
@@ -144,7 +144,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     type: typeLabel,
                     desc: displayDesc,
                     amount: isCollection ? -Number(t.amount || 0) : Number(t.amount || 0),
-                    color: isCollection ? '#10b981' : (t.type === 'Payment' ? '#3b82f6' : (t.type === 'Sales' ? '#10b981' : '#ef4444')),
+                    color: isCollection ? '#10b981' : (t.type === 'Payment' ? '#3b82f6' : ((t.type === 'Sales' || t.type?.toUpperCase() === 'SATIŞ') ? '#10b981' : '#ef4444')),
                     items: null,
                     orderId: orderId,
                     // If an orderId exists and ANY invoice was created for it, mark as invoiced
@@ -155,7 +155,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             })
             .filter((t: any) => {
                 // Remove duplicate 'Sales' transactions if we also have the Order row
-                if (t.type === 'Satış' && t.orderId && fetchedOrderIds.has(t.orderId)) {
+                if ((t.type === 'Satış' || t.type?.toUpperCase() === 'SATIŞ') && t.orderId && fetchedOrderIds.has(t.orderId)) {
                     return false;
                 }
                 return true;

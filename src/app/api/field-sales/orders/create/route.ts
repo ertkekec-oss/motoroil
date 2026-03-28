@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
                     customerName: customer.name,
                     customerEmail: customer.email,
                     totalAmount: total,
-                    status: 'Teslim Edildi',
+                    status: 'Sipariş Alındı',
                     orderDate: new Date(),
                     items: items.map((item: any) => ({
                         productId: item.productId,
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
                     staffId: visit.staffId,
                     visitId,
                     totalAmount: total,
-                    status: 'COMPLETED',
+                    status: 'PENDING',
                     items: {
                         create: items.map((item: any) => ({
                             productId: item.productId,
@@ -87,53 +87,8 @@ export async function POST(req: NextRequest) {
                 }
             });
 
-            // 3. Update Customer Balance
-            await tx.customer.update({
-                where: { id: customerId },
-                data: { balance: { increment: total } }
-            });
-
-            // 4. Create Transaction Record for Cari Visibility
-            // CRITICAL: We include `| REF: ${order.id}` so CustomerDetailClient.tsx can link it to the Order!
-            await (tx as any).transaction.create({
-                data: {
-                    companyId: company.id,
-                    customerId,
-                    visitId,
-                    type: 'SATIŞ',
-                    amount: total,
-                    description: `Saha Satışı - Sipariş No: ${unifiedOrderIdStr} | REF: ${order.id}`,
-                    date: new Date(),
-                    branch: visit.branch || 'Merkez'
-                }
-            });
-
-            // 5. Update Stocks
-            for (const item of items) {
-                if (item.productId) {
-                    await (tx as any).stock.upsert({
-                        where: {
-                            productId_branch: {
-                                productId: item.productId,
-                                branch: visit.branch || 'Merkez'
-                            }
-                        },
-                        update: { quantity: { decrement: item.qty } },
-                        create: {
-                            productId: item.productId,
-                            branch: visit.branch || 'Merkez',
-                            quantity: -item.qty
-                        }
-                    });
-
-                    if (!visit.branch || visit.branch === 'Merkez') {
-                        await tx.product.update({
-                            where: { id: item.productId },
-                            data: { stock: { decrement: item.qty } }
-                        });
-                    }
-                }
-            }
+            // Action completes here. Balance/Stock/Transaction will be triggered by explicit actions 
+            // (e.g. Conversion to Invoice, or Finalize as direct Sales).
 
             return order;
         });

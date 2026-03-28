@@ -11,17 +11,26 @@ export async function GET(req: NextRequest) {
         const session = sessionResult?.user || sessionResult;
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        // Resolve Staff record
-        const staffUser = await (prisma as any).staff.findFirst({
-            where: {
-                OR: [
-                    { email: session.email },
-                    { username: session.username || session.email }
-                ]
-            }
+        // Resolve Staff or Admin record
+        const staffUser = await (prisma as any).staff.findUnique({
+            where: { id: session.id }
         });
 
+        // If not a staff, they might be an Admin trying to view the mobile app
         if (!staffUser) {
+            const adminUser = await (prisma as any).user.findUnique({
+                where: { id: session.id }
+            });
+            
+            if (adminUser) {
+                // Return all customers for the admin's company / tenant
+                const allCustomers = await (prisma as any).customer.findMany({
+                    where: { deletedAt: null },
+                    include: { category: true },
+                    orderBy: { name: 'asc' }
+                });
+                return NextResponse.json({ success: true, customers: allCustomers });
+            }
             return NextResponse.json({ customers: [] });
         }
 

@@ -280,9 +280,9 @@ export default function MobileCreateOrderPage() {
                         <button
                             onClick={handleSaveOrder}
                             disabled={cart.length === 0 || saving}
-                            className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all"
+                            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all"
                         >
-                            {saving ? 'KAYDEDİLİYOR...' : 'SİPARİŞİ ONAYLA VE GÖNDER'}
+                            {saving ? 'KAYDEDİLİYOR...' : 'SİPARİŞİ KAYDET'}
                         </button>
                     </div>
                 </div>
@@ -290,33 +290,32 @@ export default function MobileCreateOrderPage() {
             
             {/* Order Success Modal */}
             {orderSuccess.isOpen && (
-                <div className="fixed inset-0 bg-[#0f111a]/90 backdrop-blur-md z-[200] flex flex-col items-center justify-center p-6 text-center animate-in zoom-in duration-300">
-                    <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center text-4xl mb-6 shadow-[0_0_80px_rgba(16,185,129,0.5)] border-4 border-emerald-400">✓</div>
-                    <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Sipariş Tamamlandı!</h2>
+                <div className="fixed inset-0 bg-[#0f111a]/95 backdrop-blur-md z-[200] flex flex-col items-center justify-center p-6 text-center animate-in zoom-in duration-300">
+                    <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center text-5xl mb-6 border-2 border-blue-400">📝</div>
+                    <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Sipariş Kaydedildi!</h2>
                     <p className="text-gray-400 text-[11px] font-bold mb-10 uppercase tracking-widest max-w-xs leading-relaxed">
-                        ₺{orderSuccess.total?.toLocaleString()} tutarındaki işlem carinin hesabına borç olarak işlendi. Lütfen sıradaki işlemi seçin.
+                        ₺{orderSuccess.total?.toLocaleString()} tutarındaki sipariş taslağı oluşturuldu. Henüz cari hesaba yansımadı. Lütfen sıradaki işlemi seçin.
                     </p>
                     
                     <div className="w-full max-w-sm flex flex-col gap-4">
                         <button 
                              onClick={handleFormalizeInvoice}
                              disabled={saving}
-                             className="w-full bg-purple-600 hover:bg-purple-500 text-white font-black py-5 rounded-2xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-fuchsia-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                             className="w-full bg-purple-600 hover:bg-purple-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase relative overflow-hidden group">
                             <span className="relative z-10 flex items-center gap-3">🧾 E-FATURA KES {saving && <span className="animate-spin text-sm">↻</span>}</span>
                         </button>
                         
                         <button 
                              onClick={() => router.push(`/field-mobile/collection/create?visitId=${visitId}&customerId=${customerId}&customerName=${encodeURIComponent(customerName || '')}&orderId=${orderSuccess.orderId}&amount=${orderSuccess.total}`)}
                              disabled={saving}
-                             className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-5 rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase">
+                             className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase">
                             <span>💳</span> TAHSİLAT AL
                         </button>
                         
                         <button 
                              onClick={() => router.push(`/field-mobile/routes/${visitId}`)}
                              disabled={saving}
-                             className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-black py-4 rounded-xl border border-white/5 shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-xs tracking-widest uppercase mt-4">
+                             className="w-full bg-[#161b22] hover:bg-[#1c2128] text-slate-300 font-black py-4 rounded-xl border border-white/10 shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-xs tracking-widest uppercase mt-2">
                             <span>🔙</span> SİPARİŞ OLARAK BIRAK (KAPAT)
                         </button>
                     </div>
