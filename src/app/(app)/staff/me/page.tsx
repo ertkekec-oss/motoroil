@@ -91,55 +91,64 @@ const DashboardView = ({
             
             <div className="flex flex-col space-y-4 w-full flex-1">
                 {/* Top Summaries */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-slate-100 flex items-center gap-4">
-                        <div className="flex-1">
-                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Günlük Cirom</div>
-                            <IconActivity className="w-3.5 h-3.5 text-primary opacity-50" />
+                <div className="flex flex-wrap items-center gap-3 shrink-0 mb-6 w-full">
+                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-blue-500 shadow-sm border-none">
+                            <IconActivity className="w-5 h-5"/>
                         </div>
-                        <p className="text-xl font-black font-mono text-text-primary tracking-tight">₺{(turnover || 0).toLocaleString()}</p>
+                        <div className="flex flex-col justify-center">
+                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Günlük Cirom</span>
+                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">₺{(turnover || 0).toLocaleString()}</span>
+                        </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-slate-100 flex items-center gap-4">
-                        <div className="flex-1">
-                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Hedef (Ay)</div>
-                            <IconTrendingUp className="w-3.5 h-3.5 text-state-info-text opacity-50" />
+                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-emerald-500 shadow-sm border-none">
+                            <IconTrendingUp className="w-5 h-5"/>
                         </div>
-                        <p className="text-xl font-black font-mono text-text-primary tracking-tight">{displayAchievement}</p>
+                        <div className="flex flex-col justify-center">
+                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Hedef (Ay)</span>
+                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayAchievement}</span>
+                        </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-slate-100 flex items-center gap-4">
-                        <div className="flex-1">
-                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Bekleyen Görev</div>
-                            <IconClock className="w-3.5 h-3.5 text-state-warning-text opacity-50" />
+                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-orange-500 shadow-sm border-none">
+                            <IconClock className="w-5 h-5"/>
                         </div>
-                        <p className="text-xl font-black font-mono text-text-primary tracking-tight">{activeTasksCount}</p>
+                        <div className="flex flex-col justify-center">
+                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Bekleyen Görev</span>
+                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{activeTasksCount}</span>
+                        </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-emerald-100 flex items-center gap-4">
-                        <div className="flex-1">
-                            <div className="text-[10px] font-bold text-state-success-text uppercase tracking-widest">Kazanılan Prim</div>
+                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-purple-500 shadow-sm border-none">
+                            <DollarSign className="w-5 h-5"/>
                         </div>
-                        <p className="text-xl font-black font-mono text-state-success-text tracking-tight">{displayBonus}</p>
+                        <div className="flex flex-col justify-center">
+                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Kazanılan Prim</span>
+                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayBonus}</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* PDKS & Vardiya */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-                    <div className="bg-white dark:bg-[#1e293b] rounded-[24px] ring-1 ring-slate-100 dark:ring-white/5 shadow-sm overflow-hidden flex flex-col">
-                        <div className="bg-slate-50 dark:bg-[#0f172a] px-5 py-4 border-none text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center justify-between">
-                            <h3 className="flex items-center gap-2"><IconZap className="w-3.5 h-3.5 text-text-muted" /> PDKS DOĞRULAMASI</h3>
+                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none overflow-hidden flex flex-col">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400"><IconZap className="w-3.5 h-3.5 text-text-muted" /> PDKS DOĞRULAMASI</h3>
                             {!pdksStatus?.isWorking && <span className="text-[9px] text-text-muted font-bold">KAPALI</span>}
                             {pdksStatus?.isWorking && <span className="w-1.5 h-1.5 rounded-full bg-state-success-text animate-pulse"></span>}
                         </div>
                         <div className="p-4 flex-1 flex flex-col justify-center">
                             {!pdksStatus?.isWorking ? (
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button onClick={handleQrCheckin} className="flex flex-col items-center justify-center gap-2 h-20 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-md outline-none transition-colors group">
+                                    <button onClick={handleQrCheckin} className="flex items-center justify-center gap-3 h-16 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-[24px] outline-none transition-colors group border-none ring-0">
                                         <Printer className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
                                         <span className="text-[10px] font-black text-text-primary uppercase tracking-widest">Ofis QR (Lokal)</span>
                                     </button>
-                                    <button onClick={handleGpsCheckin} className="flex flex-col items-center justify-center gap-2 h-20 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-md outline-none transition-colors group">
+                                    <button onClick={handleGpsCheckin} className="flex items-center justify-center gap-3 h-16 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-[24px] outline-none transition-colors group border-none ring-0">
                                         <Flag className="w-5 h-5 text-state-success-text group-hover:scale-110 transition-transform" />
                                         <span className="text-[10px] font-black text-text-primary uppercase tracking-widest">Saha GPS (Dış)</span>
                                     </button>
@@ -155,7 +164,7 @@ const DashboardView = ({
                                             {pdksStatus.activeSession?.locationIn?.mode === 'FIELD_GPS' ? 'PROTOKOL: GPS DOĞRULAMALI / SAHA' : 'PROTOKOL: QR DOĞRULAMALI / ŞUBE'}
                                         </p>
                                     </div>
-                                    <button onClick={handleCheckout} className="h-10 px-6 bg-state-alert-text hover:bg-rose-700 text-white rounded-md font-black text-[10px] uppercase tracking-widest shadow-sm outline-none transition-colors border border-transparent">
+                                    <button onClick={handleCheckout} className="h-10 px-6 bg-state-alert-text hover:bg-rose-700 text-white rounded-md font-black text-[10px] uppercase tracking-widest shadow-none outline-none transition-colors border border-transparent">
                                         PASİFE AL
                                     </button>
                                 </div>
@@ -163,8 +172,8 @@ const DashboardView = ({
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1e293b] rounded-[24px] ring-1 ring-slate-100 dark:ring-white/5 shadow-sm overflow-hidden flex flex-col">
-                        <div className="bg-slate-50 dark:bg-[#0f172a] px-5 py-4 border-none text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center gap-2">
+                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none overflow-hidden flex flex-col">
+                        <div className="flex items-center gap-2 mb-6">
                            <IconClock className="w-3.5 h-3.5 text-text-muted" /> SIRADAKİ VARDİYA
                         </div>
                         <div className="p-4 flex flex-col justify-center flex-1">
@@ -211,28 +220,28 @@ const TargetsView = ({ targets, statsData, user }: any) => {
             {/* COLUMNS 2-4: The Content */}
             <div className="flex-1 overflow-y-auto flex flex-col space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-slate-100 flex items-center gap-4">
+                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
                         <div className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> İlerleme Başarısı</div>
                         <div className="text-xl font-black font-mono text-text-primary dark:text-white">%{overallProgress}</div>
                         <div className="w-full h-1.5 bg-surface-secondary dark:bg-slate-800 rounded-full mt-3 overflow-hidden border border-default">
                             <div className="h-full bg-state-success-text rounded-full transition-all duration-1000" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
                         </div>
                     </div>
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-slate-100 flex items-center gap-4">
+                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
                         <div className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-state-success-text" /> Ulaşılan Hedefler</div>
                         <div className="text-xl font-black font-mono text-text-primary dark:text-white">{completedTargetsCount}</div>
                     </div>
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-slate-100 flex items-center gap-4">
+                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
                         <div className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><IconActivity className="w-3.5 h-3.5 text-state-warning-text" /> Aktif Hedefler</div>
                         <div className="text-xl font-black font-mono text-text-primary dark:text-white">{activeTargetsCount}</div>
                     </div>
-                    <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-emerald-100 flex items-center gap-4">
+                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
                         <div className="text-[10px] font-bold tracking-widest text-state-success-text dark:text-emerald-400 uppercase mb-2 flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5" /> Prim Hakedişi</div>
                         <div className="text-xl font-black font-mono text-state-success-text dark:text-emerald-400">₺{totalEstBonus.toLocaleString()}</div>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-transparent min-h-[300px]">
+                <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-[#1e293b]/50 rounded-2xl shadow-none border border-transparent min-h-[300px]">
                     <EnterpriseSectionHeader title="Dönemsel Performans Tablosu" icon="🎯" />
                     {targets?.length === 0 ? (
                         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-surface-bg/30 dark:bg-transparent">
@@ -369,7 +378,7 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
                     <div className="p-3 border-b border-divider bg-surface-secondary/50 dark:bg-slate-800/10 shrink-0">
                         <div className="flex bg-surface-tertiary dark:bg-slate-800 p-1 rounded-sm border border-default">
                             {['Devam Edenler', 'Tamamlandı', 'Tümü'].map((status) => (
-                                <button key={status} onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }} className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm transition-all ${filterStatus === status ? 'bg-surface dark:bg-slate-700 text-primary dark:text-blue-400 shadow-sm border border-default' : 'text-text-secondary hover:text-text-primary dark:hover:text-slate-300 border border-transparent'}`}>
+                                <button key={status} onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }} className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm transition-all ${filterStatus === status ? 'bg-surface dark:bg-slate-700 text-primary dark:text-blue-400 shadow-none border border-default' : 'text-text-secondary hover:text-text-primary dark:hover:text-slate-300 border border-transparent'}`}>
                                     {status}
                                 </button>
                             ))}
@@ -415,7 +424,7 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
                             </div>
                             <div className="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col">
                                 {selectedTask.description && (
-                                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent shrink-0">
+                                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-none border border-transparent shrink-0">
                                         <div className="text-[9px] uppercase font-black text-text-muted mb-2 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5"/> Görev Detayı / Açıklama</div>
                                         <div className="text-[12px] text-text-secondary leading-relaxed whitespace-pre-wrap">{selectedTask.description}</div>
                                     </div>
@@ -444,10 +453,10 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-3">
-                                        <textarea className="w-full h-16 bg-surface-secondary dark:bg-slate-800 rounded-sm p-3 text-[12px] border border-default focus:border-primary focus:ring-1 focus:ring-primary/20 resize-none outline-none custom-scrollbar transition-all" placeholder="Görevle ilgili raporunuzu veya yorumunuzu buraya yazın..." value={feedback} onChange={e => setFeedback(e.target.value)} />
+                                        <textarea className="w-full h-16 bg-surface-secondary dark:bg-slate-800 rounded-sm p-3 text-[12px] border border-default focus:border-primary focus:ring-0 focus:ring-0 resize-none outline-none custom-scrollbar transition-all" placeholder="Görevle ilgili raporunuzu veya yorumunuzu buraya yazın..." value={feedback} onChange={e => setFeedback(e.target.value)} />
                                         <div className="flex items-center gap-3">
                                             <button onClick={() => handleSendFeedback()} disabled={isUpdating || !feedback.trim()} className="flex-1 bg-surface-tertiary hover:bg-surface-secondary py-2.5 rounded-sm text-[10px] font-black uppercase disabled:opacity-50 text-text-primary border border-default transition-all">Sadece Yorum Bırak</button>
-                                            <button onClick={() => handleSendFeedback('Tamamlandı')} disabled={isUpdating} className="flex-1 bg-state-success-text hover:bg-emerald-600 focus:bg-emerald-700 disabled:opacity-50 text-white py-2.5 rounded-sm text-[10px] font-black uppercase flex items-center justify-center gap-2 shadow-sm transition-all border border-transparent">
+                                            <button onClick={() => handleSendFeedback('Tamamlandı')} disabled={isUpdating} className="flex-1 bg-state-success-text hover:bg-emerald-600 focus:bg-emerald-700 disabled:opacity-50 text-white py-2.5 rounded-sm text-[10px] font-black uppercase flex items-center justify-center gap-2 shadow-none transition-all border border-transparent">
                                                 <CheckCircle2 className="w-3.5 h-3.5"/> GÖREVİ TAMAMLA
                                             </button>
                                         </div>
@@ -563,7 +572,7 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
                         <EnterpriseSectionHeader title="İzin Sicilim" icon="🕒" />
                         <div className="flex-1 overflow-y-auto custom-scroll outline-none">
                             <table className="w-full text-left border-collapse min-w-[600px]">
-                                <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-sm">
+                                <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-none">
                                     <tr>
                                         <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Belge & Tür</th>
                                         <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Tarih Aralığı / Süre</th>
@@ -666,7 +675,7 @@ const PayrollView = ({ payrolls, user }: any) => {
                     <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <table className="w-full text-left border-collapse min-w-[600px]">
-                            <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-sm">
+                            <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-none">
                                 <tr>
                                     <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Dönem & Referans</th>
                                     <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Net Hakediş (TRY)</th>
@@ -727,7 +736,7 @@ const ShiftsView = ({ shifts, user }: any) => {
                                 {shifts.map((s: any) => {
                                     const isPermit = s.type === 'İzinli';
                                     return (
-                                        <div key={s.id} className={`p-4 rounded-2xl flex flex-col justify-between border border-transparent shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] h-[100px] relative overflow-hidden transition-all hover:shadow-sm ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
+                                        <div key={s.id} className={`p-4 rounded-2xl flex flex-col justify-between border border-transparent shadow-none h-[100px] relative overflow-hidden transition-all hover:shadow-none ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
                                             <div className="flex justify-between items-start z-10 w-full mb-3">
                                                 <div>
                                                     <div className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${isPermit ? 'text-state-warning-text' : 'text-text-secondary'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
@@ -763,7 +772,7 @@ const ProfileSettingsView = ({ user }: any) => {
                     <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
                     <div className="p-6 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
                         <div className="flex items-center gap-5 mb-6 border-b pb-6 border-default">
-                            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 border border-transparent flex items-center justify-center text-xl font-black text-text-primary relative shadow-sm">
+                            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 border border-transparent flex items-center justify-center text-xl font-black text-text-primary relative shadow-none">
                                 {user?.name?.[0]?.toUpperCase() || 'P'}
                             </div>
                             <div className="flex flex-col justify-center">
@@ -845,7 +854,7 @@ const ReportsView = ({ user }: any) => {
                             </div>
                         ) : report?.summary ? (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-blue-100 flex items-center gap-4">
+                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
                                     <div className="flex justify-between items-center mb-3 text-blue-500 dark:text-blue-400">
                                         <TrendingUp className="w-5 h-5"/>
                                         <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Ciro / Toplam Satış</div>
@@ -854,7 +863,7 @@ const ReportsView = ({ user }: any) => {
                                     <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.salesCount} Başarılı İşlem</div>
                                 </div>
                                 
-                                <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-emerald-100 flex items-center gap-4">
+                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
                                     <div className="flex justify-between items-center mb-3 text-emerald-500 dark:text-emerald-400">
                                         <CheckCircle2 className="w-5 h-5"/>
                                         <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Nakit / Tahsilat</div>
@@ -863,7 +872,7 @@ const ReportsView = ({ user }: any) => {
                                     <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.collectionsCount} Tamamlanan Tahsilat</div>
                                 </div>
                                 
-                                <div className="bg-white dark:bg-[#1e293b] px-5 py-3 rounded-[100px] shadow-sm ring-1 ring-slate-100 flex items-center gap-4">
+                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
                                     <div className="flex justify-between items-center mb-3 text-text-secondary">
                                         <MapPin className="w-5 h-5"/>
                                         <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Aksiyon / Saha Ziyareti</div>
@@ -1013,9 +1022,9 @@ export default function PersonelPanel() {
     ].map(tab => (
         <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
             className={activeTab === tab.id
-                ? "px-5 py-2.5 text-[12px] font-bold text-slate-800 dark:text-white bg-white dark:bg-slate-800 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 rounded-[16px] transition-all"
-                : "px-5 py-2.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[16px] border border-transparent"
-            }
+                                ? "px-5 py-2 text-[12px] font-bold text-slate-800 dark:text-white bg-white dark:bg-white/5 rounded-lg transition-all border-none ring-0 shadow-none"
+                                : "px-5 py-2 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all rounded-lg border-none ring-0 shadow-none"
+                            }
         >
             {tab.label}
         </button>
