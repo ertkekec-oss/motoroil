@@ -87,14 +87,14 @@ const TopPills = ({ pills }: any) => (
 );
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#1e293b]/50 rounded-[32px] p-6 lg:p-8 flex flex-col ${className} ring-0 border-none shadow-none`}>
+    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden flex flex-col ${className}`}>
         {title && (
-            <div className="flex items-center gap-2 mb-6 text-[12px] font-black uppercase tracking-widest text-slate-500">
-                <span className="text-slate-400">{icon}</span>
-                <h3>{title}</h3>
+            <div className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-6 py-3 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2">
+                {icon && <span className="opacity-70">{icon}</span>}
+                {title}
             </div>
         )}
-        <div className="flex-1">
+        <div className="flex-1 overflow-auto custom-scroll w-full relative">
             {children}
         </div>
     </div>
@@ -252,39 +252,46 @@ const TargetsView = ({ targets, statsData, user }: any) => {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[700px]">
-                            <thead>
+                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
                                 <tr>
-                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800/50">HEDEF TÜRÜ</th>
-                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800/50">DURUM</th>
-                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right border-b border-slate-100 dark:border-slate-800/50">KOTA / GERÇEKLEŞEN</th>
-                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest w-48 border-b border-slate-100 dark:border-slate-800/50 pr-4 text-right">PERFORMANS BARI</th>
+                                    <th className="px-4 py-3 pl-6 font-bold border-b border-slate-200 dark:border-white/5">HEDEF TÜRÜ</th>
+                                    <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">DURUM</th>
+                                    <th className="px-4 py-3 text-right font-bold border-b border-slate-200 dark:border-white/5">KOTA / GERÇEKLEŞEN</th>
+                                    <th className="px-4 py-3 pr-6 text-right font-bold w-48 border-b border-slate-200 dark:border-white/5">PERFORMANS BARI</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {targets.map((t: any) => {
                                     const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
                                     const isCompleted = progress >= 100;
                                     return (
-                                        <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
-                                            <td className="py-4 align-middle">
+                                        <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[64px] group">
+                                            <td className="px-4 py-3 pl-6 align-middle">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 border border-slate-200 dark:border-white/5">
                                                         {t.type === 'TURNOVER' ? <DollarSign className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
                                                     </div>
                                                     <div>
-                                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{t.title || 'Hedef'}</div>
-                                                        <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase">DÖNEM: {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}</div>
+                                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none">{t.title || 'Hedef'}</div>
+                                                        <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">DÖNEM: {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="py-4 align-middle">
-                                                {isCompleted ? <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">BAŞARILI</span> : <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">DEVAM EDİYOR</span>}
+                                            <td className="px-4 py-3 align-middle">
+                                                <div className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${isCompleted ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-blue-50 text-blue-600 border border-blue-200'}`}>
+                                                    <div className={`w-1 h-1 rounded-full mr-1.5 ${isCompleted ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>
+                                                    {isCompleted ? 'BAŞARILI' : 'DEVAM EDİYOR'}
+                                                </div>
                                             </td>
-                                            <td className="py-4 align-middle text-right">
-                                                <div className="text-[13px] font-black text-slate-800 dark:text-white">{t.type === 'TURNOVER' ? `₺${Number(t.currentValue).toLocaleString()}` : t.currentValue}</div>
-                                                <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">/ {t.type === 'TURNOVER' ? `₺${Number(t.targetValue).toLocaleString()}` : t.targetValue}</div>
+                                            <td className="px-4 py-3 align-middle text-right">
+                                                <div className="text-[13px] font-black text-slate-800 dark:text-white">
+                                                    {t.type === 'TURNOVER' ? `₺${Number(t.currentValue).toLocaleString()}` : t.currentValue}
+                                                </div>
+                                                <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
+                                                    / {t.type === 'TURNOVER' ? `₺${Number(t.targetValue).toLocaleString()}` : t.targetValue}
+                                                </div>
                                             </td>
-                                            <td className="py-4 align-middle pr-4">
+                                            <td className="px-4 py-3 align-middle pr-6">
                                                 <ProgressBar label="" value={t.currentValue} max={t.targetValue} color={isCompleted ? "#10b981" : "#3b82f6"} />
                                             </td>
                                         </tr>
@@ -321,10 +328,10 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
             ]} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                <SoftContainer title="Bana Atanan Görevler" icon={<Briefcase className="w-5 h-5"/>} className="min-h-[400px]">
-                    <div className="flex gap-2 mb-6">
-                        <button onClick={() => setSubTab('pending')} className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors border-none ring-0 shadow-none ${subTab==='pending' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-50 dark:bg-slate-800/40 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/60'}`}>Devam Edenler</button>
-                        <button onClick={() => setSubTab('completed')} className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors border-none ring-0 shadow-none ${subTab==='completed' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-50 dark:bg-slate-800/40 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/60'}`}>Tamamlandı</button>
+                <SoftContainer title="Bana Atanan Görevler" icon={<Briefcase className="w-4 h-4"/>} className="min-h-[400px]">
+                    <div className="px-6 py-3 border-b border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] flex gap-2 shrink-0">
+                        <button onClick={() => setSubTab('pending')} className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-colors ${subTab==='pending' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-100 dark:bg-slate-800/40 text-slate-600 hover:bg-slate-200'}`}>Devam Edenler</button>
+                        <button onClick={() => setSubTab('completed')} className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-colors ${subTab==='completed' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-100 dark:bg-slate-800/40 text-slate-600 hover:bg-slate-200'}`}>Tamamlandı</button>
                     </div>
                     {displayTasks.length === 0 ? (
                         <div className="py-20 text-center flex flex-col items-center">
@@ -332,21 +339,33 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
                             <h4 className="text-[12px] font-black text-slate-500 uppercase tracking-widest leading-none">GÖREV BULUNMUYOR</h4>
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-3">
-                            {displayTasks.map((t: any) => (
-                                <div key={t.id} className="bg-slate-50 dark:bg-slate-800/30 rounded-3xl p-5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors border-none ring-0">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest leading-snug pr-4">{t.title}</div>
-                                        {t.priority === 'HIGH' && <span className="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 dark:bg-red-500/10 px-3 py-1 rounded-full shrink-0">YÜKSEK</span>}
-                                    </div>
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.status}</div>
-                                </div>
-                            ))}
-                        </div>
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
+                                <tr>
+                                    <th className="px-4 py-3 pl-6 font-bold border-b border-slate-200 dark:border-white/5">GÖREV BİLGİSİ</th>
+                                    <th className="px-4 py-3 pr-6 font-bold border-b border-slate-200 dark:border-white/5 text-right">ÖNCELİK & DURUM</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                {displayTasks.map((t: any) => (
+                                    <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[54px] group cursor-pointer">
+                                        <td className="px-4 py-3 pl-6 align-middle">
+                                            <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest leading-snug">{t.title}</div>
+                                        </td>
+                                        <td className="px-4 py-3 pr-6 align-middle text-right flex justify-end">
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t.status}</span>
+                                                {t.priority === 'HIGH' && <span className="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 dark:bg-red-500/10 px-2 py-0.5 rounded border border-red-100 dark:border-red-500/20">YÜKSEK</span>}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     )}
                 </SoftContainer>
 
-                <SoftContainer title="Görev Rapor Merkezi" icon={<FileText className="w-5 h-5"/>} className="min-h-[400px]">
+                <SoftContainer title="Görev Rapor Merkezi" icon={<FileText className="w-4 h-4"/>} className="min-h-[400px]">
                     <div className="flex-1 flex items-center justify-center flex-col text-slate-400 gap-3 text-center py-20">
                         <MessageSquare className="w-10 h-10 opacity-30 mb-2" />
                         <h4 className="text-[12px] font-black uppercase tracking-widest mt-2 block leading-none">LİSTEDEN BİR GÖREV SEÇEREK RAPOR EKRANINI AÇIN</h4>
@@ -542,55 +561,55 @@ const ReportsView = ({ user }: any) => {
             <ProfileHeader user={user} title="Performans ve Aksiyon" dataCount="AKTİF" dataLabel="Analiz" />
             
             <div className="flex-1 flex flex-col ">
-                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
-                    <EnterpriseSectionHeader title="Dönemsel Operasyon Raporu & KPI" icon="📊" />
+                <SoftContainer title="Dönemsel Operasyon Raporu & KPI" icon={<TrendingUp className="w-4 h-4" />} className="h-full flex flex-col min-h-[400px]">
                     
-                    <div className="p-4 border-none bg-surface-secondary/50 shrink-0 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    
+                    <div className="border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/10 shrink-0 flex flex-col sm:flex-row gap-4 justify-between items-center p-6">
                         <div className="flex gap-3 w-full sm:w-auto">
                             <EnterpriseInput label="Operasyon Başlangıcı" type="date" value={dateRange.startDate} onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })} />
                             <EnterpriseInput label="Operasyon Bitişi" type="date" value={dateRange.endDate} onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })} />
                         </div>
                     </div>
 
-                    <div className="p-5 flex-1   bg-surface dark:bg-[#0f172a]">
+                    <div className="p-6 flex-1 bg-white dark:bg-[#0f172a]">
                         {loading ? (
-                            <div className="py-12 text-center text-[10px] font-black uppercase tracking-widest text-text-muted">Aksiyon verileri işleniyor...</div>
+                            <div className="py-12 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">Aksiyon verileri işleniyor...</div>
                         ) : report?.error ? (
-                            <div className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-state-alert-text bg-state-alert-bg/30 rounded-sm border-none">
+                            <div className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 dark:bg-red-500/10 rounded-xl">
                                 {report.error === 'Staff not found' ? 'Personel hesabı ile eşleştirilemedi.' : report.error}
                             </div>
                         ) : report?.summary ? (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-slate-50 dark:bg-[#1e293b]/50 p-6 rounded-[24px] border border-slate-100 dark:border-white/5 flex flex-col gap-2">
                                     <div className="flex justify-between items-center mb-3 text-blue-500 dark:text-blue-400">
                                         <TrendingUp className="w-5 h-5"/>
-                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Ciro / Toplam Satış</div>
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ciro / Toplam Satış</div>
                                     </div>
-                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">₺{report.summary.totalSales.toLocaleString('tr-TR')}</div>
-                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.salesCount} Başarılı İşlem</div>
+                                    <div className="text-[20px] font-black text-slate-800 dark:text-white mt-2">₺{report.summary.totalSales.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{report.summary.salesCount} Başarılı İşlem</div>
                                 </div>
                                 
-                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
+                                <div className="bg-slate-50 dark:bg-[#1e293b]/50 p-6 rounded-[24px] border border-slate-100 dark:border-white/5 flex flex-col gap-2">
                                     <div className="flex justify-between items-center mb-3 text-emerald-500 dark:text-emerald-400">
                                         <CheckCircle2 className="w-5 h-5"/>
-                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Nakit / Tahsilat</div>
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nakit / Tahsilat</div>
                                     </div>
-                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">₺{report.summary.totalCollections.toLocaleString('tr-TR')}</div>
-                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.collectionsCount} Tamamlanan Tahsilat</div>
+                                    <div className="text-[20px] font-black text-slate-800 dark:text-white mt-2">₺{report.summary.totalCollections.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{report.summary.collectionsCount} Tamamlanan Tahsilat</div>
                                 </div>
                                 
-                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
+                                <div className="bg-slate-50 dark:bg-[#1e293b]/50 p-6 rounded-[24px] border border-slate-100 dark:border-white/5 flex flex-col gap-2">
                                     <div className="flex justify-between items-center mb-3 text-text-secondary">
                                         <MapPin className="w-5 h-5"/>
-                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Aksiyon / Saha Ziyareti</div>
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Aksiyon / Saha Ziyareti</div>
                                     </div>
-                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">{report.summary.totalVisits} Müşteri Ziyareti</div>
-                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Saha Temas Raporu</div>
+                                    <div className="text-[20px] font-black text-slate-800 dark:text-white mt-2">{report.summary.totalVisits} Müşteri Ziyareti</div>
+                                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Saha Temas Raporu</div>
                                 </div>
                             </div>
                         ) : null}
                     </div>
-                </EnterpriseCard>
+                </SoftContainer>
             </div>
         </div>
     );
@@ -619,7 +638,7 @@ const PayrollView = ({ payrolls, user }: any) => {
                             </div>
                             <div className="text-right">
                                 <h3 className="font-bold text-lg">{user?.name}</h3>
-                                <p className="text-sm">Personel ID: {user?.id.slice(0, 8)}</p>
+                                <p className="text-sm">Personel ID: {user?.id?.slice(0, 8)}</p>
                             </div>
                         </div>
 
@@ -643,35 +662,34 @@ const PayrollView = ({ payrolls, user }: any) => {
                 )}
             </div>
 
-            <EnterpriseCard className="no-print border-none ring-0 shadow-sm rounded-[32px]">
-                <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
-                <div className="p-6 overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-[#f8fafc] dark:bg-[#0f111a] border-y border-slate-100 dark:border-slate-800">
-                            <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                                <th className="px-4 py-3">Dönem</th>
-                                <th className="px-4 py-3">Net Hakediş (TRL)</th>
-                                <th className="px-4 py-3">Brüt + Prim / Kesinti</th>
-                                <th className="px-4 py-3">Durum & İşlem Z.</th>
-                                <th className="px-4 py-3 text-right">Eylem</th>
+            <SoftContainer className="min-h-[400px]" title="Geçmiş Bordro ve Hakedişlerim" icon={<DollarSign className="w-4 h-4" />}>
+                <div className="overflow-x-auto w-full">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
+                            <tr>
+                                <th className="px-4 py-3 pl-6 font-bold border-b border-slate-200 dark:border-white/5">DÖNEM</th>
+                                <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">NET HAKEDİŞ (TRL)</th>
+                                <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">BRÜT + PRİM / KESİNTİ</th>
+                                <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">DURUM & İŞLEM Z.</th>
+                                <th className="px-4 py-3 pr-6 font-bold text-right border-b border-slate-200 dark:border-white/5">EYLEM</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-[11px] font-bold text-slate-400 uppercase tracking-widest">Aktif bordro kaydı bulunmamaktadır.</td></tr> :
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                            {payrolls.length === 0 ? <tr><td colSpan={5} className="py-16 text-center text-[11px] font-bold text-slate-400 uppercase tracking-widest">Aktif bordro kaydı bulunmamaktadır.</td></tr> :
                                 payrolls.map((pr: any) => (
-                                    <tr key={pr.id} className="border-b transition hover:bg-slate-50 dark:hover:bg-slate-800/10 dark:border-slate-800">
-                                        <td className="px-4 py-4 text-[14px] font-black">{pr.period}</td>
-                                        <td className="px-4 py-4 text-[16px] font-black text-emerald-600">₺{Number(pr.netPay).toLocaleString()}</td>
-                                        <td className="px-4 py-4 text-[11px] font-semibold text-slate-500 space-y-1">
+                                    <tr key={pr.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[64px] group">
+                                        <td className="px-4 py-3 pl-6 align-middle text-[12px] font-black tracking-widest uppercase text-slate-800 dark:text-white">{pr.period}</td>
+                                        <td className="px-4 py-3 align-middle text-[14px] font-black text-emerald-600">₺{Number(pr.netPay).toLocaleString()}</td>
+                                        <td className="px-4 py-3 align-middle text-[10px] font-bold text-slate-500 uppercase tracking-widest space-y-1">
                                             <div>Brüt: ₺{Number(pr.basePay).toLocaleString()}</div>
-                                            <div className="text-blue-500 font-bold uppercase tracking-widest">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
+                                            <div className="text-blue-500">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
                                         </td>
-                                        <td className="px-4 py-4">
-                                             <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded ${pr.status === 'Ödendi' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{pr.status || 'Bekliyor'}</span>
+                                        <td className="px-4 py-3 align-middle">
+                                             <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded border ${pr.status === 'Ödendi' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400 dark:border-white/5'}`}>{pr.status || 'BEKLİYOR'}</span>
                                         </td>
-                                        <td className="px-4 py-4 text-right">
-                                            <button onClick={() => handlePrint(pr)} className="px-4 py-2 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-widest inline-flex items-center gap-2">
-                                                <Printer className="w-3.5 h-3.5"/> Pusula Yazdır
+                                        <td className="px-4 py-3 pr-6 align-middle text-right flex justify-end">
+                                            <button onClick={() => handlePrint(pr)} className="px-4 py-1.5 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-bold uppercase tracking-widest inline-flex items-center gap-2 transition-colors border border-blue-100 dark:border-blue-500/20">
+                                                <Printer className="w-3.5 h-3.5"/> PUSULA YAZDIR
                                             </button>
                                         </td>
                                     </tr>
@@ -680,7 +698,7 @@ const PayrollView = ({ payrolls, user }: any) => {
                         </tbody>
                     </table>
                 </div>
-            </EnterpriseCard>
+            </SoftContainer>
         </div>
     );
 };
@@ -689,28 +707,28 @@ const PayrollView = ({ payrolls, user }: any) => {
 const ShiftsView = ({ shifts }: any) => {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
-            <EnterpriseCard className="border-none ring-0 shadow-sm rounded-[32px]">
-                <EnterpriseSectionHeader title="Haftalık Vardiya Planım" icon="📆" />
-                <div className="p-8">
+            <SoftContainer className="min-h-[400px]" title="Haftalık Vardiya Planım" icon={<Calendar className="w-4 h-4" />}>
+                <div className="p-6">
                     {shifts.length === 0 ? (
-                        <div className="py-12 text-center text-[11px] uppercase tracking-widest font-black text-slate-400 border border-dashed border-slate-200 dark:border-slate-700 rounded-[24px]">
-                            İlgili hafta için planlanmış vardiya yok.
+                        <div className="py-16 text-center flex flex-col items-center">
+                            <Clock className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                            <h4 className="text-[12px] font-black text-slate-500 uppercase tracking-widest leading-none">PLANLANMIŞ VARDİYA YOK</h4>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {shifts.map((s: any) => {
                                 const isPermit = s.type === 'İzinli';
                                 return (
-                                    <div key={s.id} className={`p-5 rounded-[24px] border flex flex-col justify-between h-[140px] relative overflow-hidden ${isPermit ? 'bg-[#ffedd5]/50 border-amber-200' : 'bg-slate-50 border-slate-100 dark:bg-slate-800/30 dark:border-slate-700/50'}`}>
-                                        <div className="flex justify-between items-start z-10 w-full">
+                                    <div key={s.id} className={`p-5 rounded-[20px] border flex flex-col justify-between h-[120px] relative overflow-hidden transition-colors ${isPermit ? 'bg-amber-50/50 border-amber-200/50' : 'bg-slate-50/50 border-slate-200 dark:bg-slate-800/30 dark:border-white/5'}`}>
+                                        <div className="flex justify-between items-start z-10 w-full mb-3">
                                             <div>
-                                                <div className={`text-[10px] font-black uppercase tracking-widest ${isPermit ? 'text-amber-600' : 'text-slate-400'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
-                                                <div className={`text-[16px] font-black ${isPermit ? 'text-amber-900' : 'text-slate-800 dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: '2-digit' })}</div>
+                                                <div className={`text-[10px] font-bold uppercase tracking-widest ${isPermit ? 'text-amber-600' : 'text-slate-400'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
+                                                <div className={`text-[14px] font-black tracking-widest uppercase mt-0.5 ${isPermit ? 'text-amber-900' : 'text-slate-800 dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: '2-digit' })}</div>
                                             </div>
-                                            {isPermit ? <span className="text-xl">🏖️</span> : <span className="text-xl">🏢</span>}
                                         </div>
-                                        <div className="z-10 mt-auto bg-white/60 dark:bg-black/20 p-2.5 rounded-xl text-center backdrop-blur-md">
-                                            <span className={`text-[12px] font-black tracking-widest uppercase ${isPermit ? 'text-amber-700' : 'text-blue-600 dark:text-blue-400'}`}>
+                                        <div className="z-10 mt-auto items-center flex gap-2">
+                                            {isPermit ? <span className="text-[14px]">🏖️</span> : <span className="text-[14px]">🏢</span>}
+                                            <span className={`text-[11px] font-black tracking-widest uppercase ${isPermit ? 'text-amber-700' : 'text-blue-600 dark:text-blue-400'}`}>
                                                 {isPermit ? "TAM GÜN İZİNLİ" : `${new Date(s.start).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} - ${new Date(s.end).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`}
                                             </span>
                                         </div>
@@ -720,7 +738,7 @@ const ShiftsView = ({ shifts }: any) => {
                         </div>
                     )}
                 </div>
-            </EnterpriseCard>
+            </SoftContainer>
         </div>
     );
 };
@@ -729,17 +747,17 @@ const ShiftsView = ({ shifts }: any) => {
 const ProfileSettingsView = ({ user }: any) => {
     return (
         <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
-            <EnterpriseCard className="border-none ring-0 shadow-sm rounded-[32px]">
-                <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
+            <SoftContainer title="Profil & Güvenlik Ayarları" icon={<Lock className="w-4 h-4"/>} className="border-none ring-0 shadow-sm min-h-[400px]">
+                
                 <div className="p-8">
                     <div className="flex items-center gap-6 mb-8 border-b pb-8 border-slate-100 dark:border-slate-800">
-                        <div className="w-20 h-20 rounded-[24px] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white relative shadow-md">
+                        <div className="w-20 h-20 rounded-[20px] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white relative shadow-md">
                             {user?.name?.[0]?.toUpperCase() || 'P'}
                         </div>
                         <div>
                             <h4 className="text-[20px] font-black text-slate-800 dark:text-white mb-2">{user?.name}</h4>
                             <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest rounded-md">{user?.role || 'Personel'}</span>
-                            <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">ŞİRKET ID NO: #{user?.id?.slice(0,6).toUpperCase()}</div>
+                            <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">ŞİRKET ID NO: #{user?.id?.slice(0,6)?.toUpperCase()}</div>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -758,7 +776,7 @@ const ProfileSettingsView = ({ user }: any) => {
                         </div>
                     </div>
                 </div>
-            </EnterpriseCard>
+            </SoftContainer>
         </div>
     );
 };

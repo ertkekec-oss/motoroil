@@ -1,7 +1,24 @@
-﻿src/app/(app)/admin/b2b/policies/page.tsx(105,47): error TS1005: ',' expected.
-src/app/(app)/admin/b2b/policies/page.tsx(105,53): error TS1005: ':' expected.
-src/app/(app)/admin/b2b/policies/page.tsx(114,6): error TS1005: ',' expected.
-src/app/(app)/admin/b2b/policies/page.tsx(115,21): error TS1138: Parameter declaration expected.
-src/app/(app)/admin/b2b/policies/page.tsx(115,26): error TS1005: ',' expected.
-src/app/(app)/admin/b2b/policies/page.tsx(116,5): error TS1109: Expression expected.
-src/app/(app)/admin/products/page.tsx(104,1): error TS1128: Declaration or statement expected.
+﻿old_page.tsx(362,13): error TS2339: Property 'fetchPersonelData' does not exist on type 'AppContextType'.
+old_page.tsx(741,46): error TS2304: Cannot find name 'PayrollView'.
+old_page.tsx(742,45): error TS2304: Cannot find name 'ShiftsView'.
+old_page.tsx(743,46): error TS2304: Cannot find name 'ProfileSettingsView'.
+old_page_utf8.tsx(362,13): error TS2339: Property 'fetchPersonelData' does not exist on type 'AppContextType'.
+old_page_utf8.tsx(741,46): error TS2304: Cannot find name 'PayrollView'.
+old_page_utf8.tsx(742,45): error TS2304: Cannot find name 'ShiftsView'.
+old_page_utf8.tsx(743,46): error TS2304: Cannot find name 'ProfileSettingsView'.
+src/app/(app)/admin/b2b/settings/page.tsx(14,163): error TS2322: Type '{ children: Element[]; className: string; padding: string; }' is not assignable to type 'IntrinsicAttributes & { children?: ReactNode; className?: string; noPadding?: boolean; borderLeftColor?: string; onClick?: MouseEventHandler<HTMLDivElement>; }'.
+  Property 'padding' does not exist on type 'IntrinsicAttributes & { children?: ReactNode; className?: string; noPadding?: boolean; borderLeftColor?: string; onClick?: MouseEventHandler<HTMLDivElement>; }'. Did you mean 'noPadding'?
+src/app/(app)/admin/growth/audit/page.tsx(62,13): error TS2322: Type '{ children: Element; title: string; description: string; actions: Element; className: string; titleIcon: Element; }' is not assignable to type 'IntrinsicAttributes & { title?: string; description?: string; actions?: ReactNode; children?: ReactNode; className?: string; }'.
+  Property 'titleIcon' does not exist on type 'IntrinsicAttributes & { title?: string; description?: string; actions?: ReactNode; children?: ReactNode; className?: string; }'.
+src/app/(app)/admin/growth/audit/page.tsx(64,29): error TS2322: Type '{ children: Element[]; padding: string; }' is not assignable to type 'IntrinsicAttributes & { children?: ReactNode; className?: string; noPadding?: boolean; borderLeftColor?: string; onClick?: MouseEventHandler<HTMLDivElement>; }'.
+  Property 'padding' does not exist on type 'IntrinsicAttributes & { children?: ReactNode; className?: string; noPadding?: boolean; borderLeftColor?: string; onClick?: MouseEventHandler<HTMLDivElement>; }'. Did you mean 'noPadding'?
+src/app/(app)/admin/settings/categories/page.tsx(103,29): error TS2322: Type '{ title: string; icon: Element; className: string; }' is not assignable to type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+src/app/(app)/admin/settings/onboarding/page.tsx(76,29): error TS2322: Type '{ title: string; subtitle: string; icon: Element; className: string; }' is not assignable to type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & { title: string; subtitle?: string; icon?: ReactNode; rightElement?: ReactNode; }'.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(1344,25): error TS2367: This comparison appears to be unintentional because the types '"checks" | "documents" | "reconciliations" | "warranties" | "payments" | "all" | "sales"' and '"reconciliation"' have no overlap.
+src/app/(app)/inventory/components/AutonomousInventory.tsx(206,30): error TS2304: Cannot find name 'finalAnomalies'.
+src/app/(app)/inventory/components/AutonomousInventory.tsx(213,30): error TS2304: Cannot find name 'finalAnomalies'.
+src/app/(app)/inventory/page.tsx(1504,76): error TS2322: Type '{ products: Product[]; onRunAiMap: () => Promise<void>; }' is not assignable to type 'IntrinsicAttributes & { products: any[]; }'.
+  Property 'onRunAiMap' does not exist on type 'IntrinsicAttributes & { products: any[]; }'.
+src/app/api/suppliers/[id]/invoice/parse/route.ts(13,34): error TS2339: Property 'default' does not exist on type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/node_modules/pdf-parse/dist/pdf-parse/esm/index")'.
