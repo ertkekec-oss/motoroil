@@ -32,7 +32,7 @@ const ProgressBar = ({ label, value, max, color = "#3b82f6" }: any) => {
                 <span className="text-slate-500">{label}</span>
                 <span style={{ color }}>%{percentage.toFixed(0)}</span>
             </div>
-            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800/80 rounded-full ">
                 <div className="h-full transition-all duration-1000 ease-out rounded-full" style={{ width: `${percentage}%`, background: color }} />
             </div>
             <div className="flex justify-end text-[9px] text-slate-400 mt-1 font-bold">
@@ -166,7 +166,7 @@ const DashboardView = ({
 
                 {/* PDKS & Vardiya */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none overflow-hidden flex flex-col">
+                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none  flex flex-col">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400"><IconZap className="w-3.5 h-3.5 text-text-muted" /> PDKS DOĞRULAMASI</h3>
                             {!pdksStatus?.isWorking && <span className="text-[9px] text-text-muted font-bold">KAPALI</span>}
@@ -203,7 +203,7 @@ const DashboardView = ({
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none overflow-hidden flex flex-col">
+                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none  flex flex-col">
                         <div className="flex items-center gap-2 mb-6">
                            <IconClock className="w-3.5 h-3.5 text-text-muted" /> SIRADAKİ VARDİYA
                         </div>
@@ -402,12 +402,12 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
     };
 
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+        <div className="flex flex-col animate-in fade-in duration-500  ">
             <style>{printStyles}</style>
             
             <ProfileHeader user={user} title="Onay Bekleyen Talep" dataCount={leaves.filter((l: any) => l.status === 'Bekliyor').length} dataLabel="Adet" />
             
-            <div className="flex-1 flex gap-4 overflow-hidden">
+            <div className="flex-1 flex gap-4 ">
                 {/* INVISIBLE PRINT CONTAINER */}
                 <div id="printable-area" className="hidden">
                     {printableLeave && (
@@ -437,9 +437,9 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
 
                 {/* FORM COLUMN */}
                 <div className="w-[350px] shrink-0 no-print flex flex-col h-full">
-                    <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
-                        <EnterpriseSectionHeader title="Yeni Talep Oluştur" icon="📝" />
-                        <div className="p-4 flex-1 overflow-y-auto space-y-4 custom-scrollbar">
+                    <SoftContainer title="Yeni Talep Oluştur" icon={<Calendar className="w-5 h-5"/>} className="w-full border-none ring-0">
+                        
+                        <div className="p-4 flex-1  space-y-4 ">
                             <EnterpriseSelect label="İzin Türü" value={type} onChange={(e) => setType(e.target.value)}>
                                 <option value="Yıllık İzin">Yıllık Ücretli İzin</option>
                                 <option value="Mazeret İzni">Mazeret İzni</option>
@@ -457,16 +457,16 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
                                 {isSubmitting ? "GÖNDERİLİYOR..." : "DİLEKÇEYİ ONAYA SUN"}
                             </EnterpriseButton>
                         </div>
-                    </EnterpriseCard>
+                    </SoftContainer>
                 </div>
                 
                 {/* TABLE COLUMN */}
                 <div className="flex-1 min-w-0 no-print flex flex-col h-full">
-                    <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+                    <SoftContainer title="Yeni Talep Oluştur" icon={<Calendar className="w-5 h-5"/>} className="w-full border-none ring-0">
                         <EnterpriseSectionHeader title="İzin Sicilim" icon="🕒" />
-                        <div className="flex-1 overflow-y-auto custom-scroll outline-none">
+                        <div className="flex-1  custom-scroll outline-none">
                             <table className="w-full text-left border-collapse min-w-[600px]">
-                                <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-none">
+                                <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-slate-100 dark:border-white/5 shadow-none">
                                     <tr>
                                         <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Belge & Tür</th>
                                         <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Tarih Aralığı / Süre</th>
@@ -507,7 +507,7 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
                                 </tbody>
                             </table>
                         </div>
-                    </EnterpriseCard>
+                    </SoftContainer>
                 </div>
             </div>
         </div>
@@ -524,7 +524,7 @@ const PayrollView = ({ payrolls, user }: any) => {
     };
 
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+        <div className="flex flex-col animate-in fade-in duration-500  ">
             <style>{printStyles}</style>
 
             <ProfileHeader user={user} title="Toplam Bordro Kaydı" dataCount={payrolls.length} dataLabel="Ay" />
@@ -564,10 +564,10 @@ const PayrollView = ({ payrolls, user }: any) => {
                 )}
             </div>
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col ">
                 <EnterpriseCard className="no-print h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
-                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="flex-1  ">
                         <table className="w-full text-left border-collapse min-w-[600px]">
                             <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-none">
                                 <tr>
@@ -614,13 +614,13 @@ const PayrollView = ({ payrolls, user }: any) => {
 // ─── SHIFTS VIEW ─────────────────────────────────────────────────────
 const ShiftsView = ({ shifts, user }: any) => {
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+        <div className="flex flex-col animate-in fade-in duration-500  ">
             <ProfileHeader user={user} title="Haftalık Planlanmış" dataCount={shifts.length} dataLabel="Vardiya" />
             
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col ">
                 <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Haftalık Vardiya Planım" icon="📅" />
-                    <div className="p-5 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
+                    <div className="p-5 flex-1   bg-surface dark:bg-[#0f172a]">
                         {shifts.length === 0 ? (
                             <div className="py-12 text-center text-[11px] font-black uppercase tracking-widest text-text-muted border border-dashed border-default rounded-sm bg-surface-bg/30">
                                 İlgili dönem içi planlanmış vardiya planı bulunmuyor.
@@ -630,7 +630,7 @@ const ShiftsView = ({ shifts, user }: any) => {
                                 {shifts.map((s: any) => {
                                     const isPermit = s.type === 'İzinli';
                                     return (
-                                        <div key={s.id} className={`p-4 rounded-2xl flex flex-col justify-between border border-transparent shadow-none h-[100px] relative overflow-hidden transition-all hover:shadow-none ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
+                                        <div key={s.id} className={`p-4 rounded-2xl flex flex-col justify-between border border-transparent shadow-none h-[100px] relative  transition-all hover:shadow-none ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
                                             <div className="flex justify-between items-start z-10 w-full mb-3">
                                                 <div>
                                                     <div className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${isPermit ? 'text-state-warning-text' : 'text-text-secondary'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
@@ -658,13 +658,13 @@ const ShiftsView = ({ shifts, user }: any) => {
 // ─── PROFILE VIEW ────────────────────────────────────────────────────
 const ProfileSettingsView = ({ user }: any) => {
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+        <div className="flex flex-col animate-in fade-in duration-500  ">
             <ProfileHeader user={user} title="Hesap Durumu" dataCount={"ONAYLI"} dataLabel="Kullanıcı" />
             
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col ">
                 <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
-                    <div className="p-6 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
+                    <div className="p-6 flex-1   bg-surface dark:bg-[#0f172a]">
                         <div className="flex items-center gap-5 mb-6 border-b pb-6 border-default">
                             <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 border border-transparent flex items-center justify-center text-xl font-black text-text-primary relative shadow-none">
                                 {user?.name?.[0]?.toUpperCase() || 'P'}
@@ -725,25 +725,25 @@ const ReportsView = ({ user }: any) => {
     useEffect(() => { fetchReport(); }, [dateRange]);
 
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
+        <div className="flex flex-col animate-in fade-in duration-500  ">
             <ProfileHeader user={user} title="Performans ve Aksiyon" dataCount="AKTİF" dataLabel="Analiz" />
             
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col ">
                 <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Dönemsel Operasyon Raporu & KPI" icon="📊" />
                     
-                    <div className="p-4 border-b border-default bg-surface-secondary/50 shrink-0 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <div className="p-4 border-none bg-surface-secondary/50 shrink-0 flex flex-col sm:flex-row gap-4 justify-between items-center">
                         <div className="flex gap-3 w-full sm:w-auto">
                             <EnterpriseInput label="Operasyon Başlangıcı" type="date" value={dateRange.startDate} onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })} />
                             <EnterpriseInput label="Operasyon Bitişi" type="date" value={dateRange.endDate} onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })} />
                         </div>
                     </div>
 
-                    <div className="p-5 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
+                    <div className="p-5 flex-1   bg-surface dark:bg-[#0f172a]">
                         {loading ? (
                             <div className="py-12 text-center text-[10px] font-black uppercase tracking-widest text-text-muted">Aksiyon verileri işleniyor...</div>
                         ) : report?.error ? (
-                            <div className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-state-alert-text bg-state-alert-bg/30 rounded-sm border border-state-alert-border">
+                            <div className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-state-alert-text bg-state-alert-bg/30 rounded-sm border-none">
                                 {report.error === 'Staff not found' ? 'Personel hesabı ile eşleştirilemedi.' : report.error}
                             </div>
                         ) : report?.summary ? (
@@ -916,8 +916,8 @@ export default function PersonelPanel() {
     ].map(tab => (
         <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
             className={activeTab === tab.id
-                                ? "px-5 py-2 text-[12px] font-bold text-slate-800 dark:text-white bg-white dark:bg-white/5 rounded-lg transition-all border-none ring-0 shadow-none"
-                                : "px-5 py-2 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all rounded-lg border-none ring-0 shadow-none"
+                                ? "px-5 py-2.5 text-[12px] font-bold text-slate-800 dark:text-white bg-white dark:bg-slate-700 shadow-sm rounded-full transition-all border-none ring-0"
+                                : "px-5 py-2.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all rounded-full border-none ring-0 shadow-none"
                             }
         >
             {tab.label}
