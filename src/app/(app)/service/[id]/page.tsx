@@ -11,6 +11,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     const [error, setError] = useState<string | null>(null);
     const [technicians, setTechnicians] = useState<any[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [elapsedTime, setElapsedTime] = useState<string>('00:00:00');
+    const [isActionsOpen, setIsActionsOpen] = useState(false);
 
     const fetchTechnicians = async () => {
         try {
@@ -44,6 +46,62 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         fetchService();
         fetchTechnicians();
     }, [id]);
+
+    useEffect(() => {
+        if (!service || service.status !== 'İşlemde' || !service.startTime) {
+            setElapsedTime('00:00:00');
+            return;
+        }
+
+        const interval = setInterval(() => {
+            const start = new Date(service.startTime).getTime();
+            const now = new Date().getTime();
+            const diff = now - start;
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            setElapsedTime(
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+            );
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [service?.status, service?.startTime]);
+
+    const handleUpdate = async (payload: any) => {
+        setIsUpdating(true);
+        try {
+            const res = await fetch(`/api/services/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                setService(data.service);
+            } else {
+                alert("Güncelleme hatası: " + data.error);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result as string;
+            const currentPhotos = service?.photos || [];
+            handleUpdate({ photos: [...currentPhotos, base64] });
+        };
+        reader.readAsDataURL(file);
+    };
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return '-';
@@ -83,68 +141,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     }
 
     const items = service.items || [];
-    const partsTotal = items.reduce((acc: number, item: any) => acc + (item.isWarranty ? 0 : Number(item.price) * Number(item.quantity)), 0);
+    const partsTotal = items.reduce((acc: number, item: any) => acc + (item.isWarranty ? 0 : (Number(item.price) || 0) * (Number(item.quantity) || 0)), 0);
     const totalAmount = partsTotal;
-
-    const [elapsedTime, setElapsedTime] = useState<string>('00:00:00');
-
-    useEffect(() => {
-        if (service.status !== 'İşlemde' || !service.startTime) {
-            setElapsedTime('00:00:00');
-            return;
-        }
-
-        const interval = setInterval(() => {
-            const start = new Date(service.startTime).getTime();
-            const now = new Date().getTime();
-            const diff = now - start;
-
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff / (1000 * 60)) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-
-            setElapsedTime(
-                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-            );
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [service.status, service.startTime]);
-
-    const handleUpdate = async (payload: any) => {
-        setIsUpdating(true);
-        try {
-            const res = await fetch(`/api/services/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.success) {
-                setService(data.service);
-            } else {
-                alert("Güncelleme hatası: " + data.error);
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setIsUpdating(false);
-        }
-    };
-
-    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64 = reader.result as string;
-            const currentPhotos = service.photos || [];
-            handleUpdate({ photos: [...currentPhotos, base64] });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const [isActionsOpen, setIsActionsOpen] = useState(false);
 
     return (
         <div className="container p-8 max-w-[1400px] mx-auto min-h-screen bg-[#080911]">
