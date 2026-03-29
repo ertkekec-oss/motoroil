@@ -1,4 +1,6 @@
-"use client";
+const fs = require('fs');
+
+const code = `"use client";
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -7,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, Info, Plus, Trash2, UploadCloud, Users, Send } from 'lucide-react';
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -88,7 +90,7 @@ export default function NewSignaturePage() {
             const data = await res.json();
             if (data.success) {
                 toast.success('Zarf başarıyla oluşturuldu ve hazırlandı!');
-                router.push(`/signatures/envelopes/${data.envelope.id}`);
+                router.push(\`/signatures/envelopes/\${data.envelope.id}\`);
             } else {
                 toast.error(data.error || 'Zarf oluşturulamadı.');
             }
@@ -178,7 +180,7 @@ export default function NewSignaturePage() {
                                             {i + 1}
                                         </div>
                                         
-                                        <div className={`flex-1 grid ${otpRequired ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'} gap-4`}>
+                                        <div className={\`flex-1 grid \${otpRequired ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'} gap-4\`}>
                                             <div className="flex flex-col">
                                                 <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">İmzacı Adı Soyadı</label>
                                                 <input required value={r.name} onChange={e => handleChangeRecipient(i, 'name', e.target.value)} type="text" placeholder="Ahmet Yılmaz" className="w-full px-4 py-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl text-slate-800 dark:text-white text-[13px] font-medium outline-none focus:border-blue-500 transition-shadow" />
@@ -225,3 +227,7 @@ export default function NewSignaturePage() {
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/signatures/new/page.tsx', code);
+console.log('done rewriting signatures/new/page.tsx');

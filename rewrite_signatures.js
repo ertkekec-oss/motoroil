@@ -1,4 +1,6 @@
-import { getSession } from "@/lib/auth";
+const fs = require('fs');
+
+const code = `import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -9,7 +11,7 @@ const TopPills = ({ pills }: any) => (
     <div className="flex flex-wrap items-center gap-4 shrink-0 mb-8 w-full">
         {pills.map((p: any, i: number) => (
             <Link href={p.route} key={i} className="flex flex-1 min-w-[240px] bg-white dark:bg-[#0f172a] rounded-[24px] pl-4 pr-6 py-4 items-center gap-5 transition-transform hover:-translate-y-1 hover:shadow-md border border-slate-200 dark:border-white/5 shadow-sm group">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${p.bg} ${p.color} transition-colors`}>
+                <div className={\`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 \${p.bg} \${p.color} transition-colors\`}>
                     {p.icon}
                 </div>
                 <div className="flex flex-col justify-center">
@@ -22,7 +24,7 @@ const TopPills = ({ pills }: any) => (
 );
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -126,7 +128,7 @@ export default async function SignaturesDashboardPage() {
                                         <tr key={a.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[68px] group">
                                             <td className="px-6 py-3 align-middle">
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${props.bg} ${props.color} shrink-0`}>
+                                                    <div className={\`w-8 h-8 rounded-full flex items-center justify-center border \${props.bg} \${props.color} shrink-0\`}>
                                                         {props.icon}
                                                     </div>
                                                     <div className="flex flex-col">
@@ -136,7 +138,7 @@ export default async function SignaturesDashboardPage() {
                                             </td>
                                             <td className="px-6 py-3 align-middle">
                                                 <div className="flex flex-col gap-1 max-w-[400px]">
-                                                    <Link href={`/signatures/envelopes/${a.envelopeId}`} className="text-[12px] font-bold text-blue-600 dark:text-blue-400 hover:underline truncate">
+                                                    <Link href={\`/signatures/envelopes/\${a.envelopeId}\`} className="text-[12px] font-bold text-blue-600 dark:text-blue-400 hover:underline truncate">
                                                         {a.envelope.title}
                                                     </Link>
                                                     <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-mono truncate">
@@ -161,3 +163,7 @@ export default async function SignaturesDashboardPage() {
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/signatures/page.tsx', code);
+console.log('done rewriting signatures/page.tsx');

@@ -1,11 +1,13 @@
-import { getSession } from "@/lib/auth";
+const fs = require('fs');
+
+const code = `import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ChevronLeft, Filter, FileSignature, LayoutDashboard } from "lucide-react";
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -118,15 +120,15 @@ export default async function SignatureEnvelopesPage({ searchParams }: { searchP
                                         </span>
                                     </td>
                                     <td className="px-6 py-3 align-middle">
-                                        <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                                        <span className={\`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest \${
                                             env.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400' :
                                             env.status === 'REJECTED' || env.status === 'FAILED' ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400' :
                                             'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400'
-                                        }`}>
-                                            <div className={`w-1 h-1 rounded-full mr-1.5 ${
+                                        }\`}>
+                                            <div className={\`w-1 h-1 rounded-full mr-1.5 \${
                                                 env.status === 'COMPLETED' ? 'bg-emerald-500' :
                                                 env.status === 'REJECTED' || env.status === 'FAILED' ? 'bg-red-500' : 'bg-blue-500'
-                                            }`}></div>
+                                            }\`}></div>
                                             {env.status}
                                         </span>
                                     </td>
@@ -135,7 +137,7 @@ export default async function SignatureEnvelopesPage({ searchParams }: { searchP
                                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kişi</div>
                                     </td>
                                     <td className="px-6 py-3 pr-8 align-middle text-right">
-                                        <Link href={`/signatures/envelopes/${env.id}`} className="px-4 py-2 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+                                        <Link href={\`/signatures/envelopes/\${env.id}\`} className="px-4 py-2 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
                                             Detay Gör
                                         </Link>
                                     </td>
@@ -148,3 +150,7 @@ export default async function SignatureEnvelopesPage({ searchParams }: { searchP
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/signatures/envelopes/page.tsx', code);
+console.log('done rewriting signatures/envelopes/page.tsx');
