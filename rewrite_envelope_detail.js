@@ -1,4 +1,46 @@
-"use client";
+const fs = require('fs');
+
+const pageCode = `import { getSession } from "@/lib/auth";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import EnvelopeDetailClient from "./EnvelopeDetailClient";
+
+export default async function EnvelopeDetailPage({ params }: { params: { id: string } }) {
+    const session = await getSession();
+    if (!session) return notFound();
+
+    const tenantId = session.companyId || (session as any).tenantId;
+    const { id } = await params;
+
+    const envelope = await prisma.signatureEnvelope.findUnique({
+        where: { id },
+        include: {
+            recipients: {
+                orderBy: { orderIndex: 'asc' }
+            },
+            auditEvents: {
+                orderBy: { createdAt: 'desc' }
+            }
+        }
+    });
+
+    if (!envelope || envelope.tenantId !== tenantId) {
+        return notFound();
+    }
+
+    return (
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-white pb-24">
+            <div className="max-w-[1600px] mx-auto p-6 md:p-8 animate-in fade-in duration-500">
+                <EnvelopeDetailClient envelope={envelope} currentUserEmail={session.user?.email || ''} />
+            </div>
+        </div>
+    );
+}
+`;
+
+fs.writeFileSync('src/app/(app)/signatures/envelopes/[id]/page.tsx', pageCode);
+
+const clientCode = `"use client";
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -6,7 +48,7 @@ import { useModal } from "@/contexts/ModalContext";
 import { ChevronLeft, FileText, CheckCircle2, History, AlertCircle, Users, Download, Eye, XCircle, PenTool, Activity, ShieldAlert, Navigation } from "lucide-react";
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2 relative">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -34,7 +76,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
             async () => {
                 setSigning(true);
                 try {
-                    const res = await fetch(`/api/signatures/envelopes/${envelope.id}/sign`, { method: 'POST' });
+                    const res = await fetch(\`/api/signatures/envelopes/\${envelope.id}/sign\`, { method: 'POST' });
                     const data = await res.json();
                     if (data.success) {
                         showSuccess("Bilgi", 'Belge başarıyla imzalandı!');
@@ -55,7 +97,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
         if (docUrl) return;
         setLoadingDoc(true);
         try {
-            const res = await fetch(`/api/signatures/envelopes/${envelope.id}/document`);
+            const res = await fetch(\`/api/signatures/envelopes/\${envelope.id}/document\`);
             const data = await res.json();
             if (data.success && data.url) {
                 setDocUrl(data.url);
@@ -72,7 +114,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
     const handleViewFinalDocument = async () => {
         setLoadingDoc(true);
         try {
-            const res = await fetch(`/api/signatures/envelopes/${envelope.id}/document?final=true`);
+            const res = await fetch(\`/api/signatures/envelopes/\${envelope.id}/document?final=true\`);
             const data = await res.json();
             if (data.success && data.url) {
                 window.open(data.url, '_blank');
@@ -92,7 +134,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
             "Bu zarfı iptal etmek (geri çekmek) istediğinize emin misiniz? İmzacıların onayı da iptal edilecektir.",
             async () => {
                 try {
-                    const res = await fetch(`/api/signatures/envelopes/${envelope.id}/cancel`, { method: 'POST' });
+                    const res = await fetch(\`/api/signatures/envelopes/\${envelope.id}/cancel\`, { method: 'POST' });
                     const data = await res.json();
                     if (data.success) {
                         showSuccess("Bilgi", 'Zarf başarıyla iptal edildi.');
@@ -135,7 +177,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 justify-end w-full md:w-auto mt-4 md:mt-0">
-                    <div className={`flex items-center gap-3 px-5 py-2.5 rounded-xl border border-dashed shadow-sm ${currentStatus.bg} ${currentStatus.color} ${currentStatus.bg.replace('bg-','border-').replace('/10','/30')}`}>
+                    <div className={\`flex items-center gap-3 px-5 py-2.5 rounded-xl border border-dashed shadow-sm \${currentStatus.bg} \${currentStatus.color} \${currentStatus.bg.replace('bg-','border-').replace('/10','/30')}\`}>
                        {currentStatus.icon}
                        <span className="text-[11px] font-black tracking-widest leading-none">{currentStatus.label}</span>
                     </div>
@@ -153,7 +195,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                     {envelope.status === 'REVISION_REQUESTED' && (
                         <button disabled={signing} onClick={async () => {
                             setSigning(true);
-                            await fetch(`/api/signatures/envelopes/${envelope.id}/reject-revision`, { method: 'POST' });
+                            await fetch(\`/api/signatures/envelopes/\${envelope.id}/reject-revision\`, { method: 'POST' });
                             window.location.reload();
                         }} className="px-5 py-3 h-[42px] flex items-center gap-2 bg-orange-50 dark:bg-orange-500/10 hover:bg-orange-100 dark:hover:bg-orange-500/20 text-orange-600 border border-orange-200 dark:border-orange-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                             <ShieldAlert className="w-4 h-4"/> REVİZEYİ REDDET & ZORLA
@@ -205,17 +247,17 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                                         </div>
                                     </div>
                                     <div className="mt-4 sm:mt-0 flex flex-col sm:items-end gap-1.5 ml-14 sm:ml-0">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                                        <span className={\`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest \${
                                             r.status === 'SIGNED' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400' :
                                             r.status === 'REJECTED' ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400' :
                                             r.status === 'REVISION_REQUESTED' ? 'bg-orange-50 text-orange-600 border border-orange-200 dark:bg-orange-500/10 dark:border-orange-500/20 dark:text-orange-400' :
                                             'bg-white dark:bg-[#0f172a] text-slate-500 border border-slate-200 dark:border-slate-700'
-                                        }`}>
-                                            <div className={`w-1 h-1 rounded-full mr-2 ${
+                                        }\`}>
+                                            <div className={\`w-1 h-1 rounded-full mr-2 \${
                                                 r.status === 'SIGNED' ? 'bg-emerald-500' :
                                                 r.status === 'REJECTED' ? 'bg-red-500' : 
                                                 r.status === 'REVISION_REQUESTED' ? 'bg-orange-500' : 'bg-slate-400'
-                                            }`}></div>
+                                            }\`}></div>
                                             {r.status}
                                         </span>
                                         {r.signedAt && <div className="text-[9px] font-bold text-emerald-600/60 dark:text-emerald-400/60 font-mono tracking-widest uppercase items-center flex gap-1"><CheckCircle2 className="w-3 h-3"/> {new Date(r.signedAt).toLocaleString()}</div>}
@@ -247,7 +289,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                            )}
                            {docUrl && (
                                <div className="rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-inner">
-                                   <iframe src={`${docUrl}#toolbar=0`} className="w-full h-[600px] bg-white border-none" />
+                                   <iframe src={\`\${docUrl}#toolbar=0\`} className="w-full h-[600px] bg-white border-none" />
                                    <div className="p-2 text-center text-[10px] text-slate-500 dark:text-slate-400 bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10">
                                        <a href={docUrl} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 hover:underline">Orijinalini görüntülemek ve yerel kaydetmek için buraya tıklayın.</a>
                                    </div>
@@ -275,12 +317,12 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
                                         const isBad = a.action.includes('REJECTED') || a.action.includes('FAILED');
                                         return (
                                             <div key={a.id} className="flex gap-4">
-                                                <div className={`w-8 h-8 rounded-full border-2 border-white dark:border-[#0f172a] flex items-center justify-center shrink-0 shadow-sm ${
+                                                <div className={\`w-8 h-8 rounded-full border-2 border-white dark:border-[#0f172a] flex items-center justify-center shrink-0 shadow-sm \${
                                                     isGood ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-500' :
                                                     isBad ? 'bg-red-100 dark:bg-red-500/20 text-red-500' :
                                                     isSystem ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-500' :
                                                     'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                                                }`}>
+                                                }\`}>
                                                     {a.action.includes('VIEWED') ? <Eye className="w-3.5 h-3.5" /> : 
                                                      a.action.includes('SIGNED') ? <PenTool className="w-3.5 h-3.5" /> : 
                                                      a.action.includes('REJECTED') ? <XCircle className="w-3.5 h-3.5" /> : 
@@ -313,3 +355,7 @@ export default function EnvelopeDetailClient({ envelope, currentUserEmail }: { e
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/signatures/envelopes/[id]/EnvelopeDetailClient.tsx', clientCode);
+console.log('done rewriting envelope detail');

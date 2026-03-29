@@ -1,11 +1,13 @@
-import { getSession } from "@/lib/auth";
+const fs = require('fs');
+
+const code = `import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from 'next/link';
 import { ChevronLeft, Filter, AlertTriangle, ShieldAlert, CheckCircle2 } from "lucide-react";
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2 relative">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -114,15 +116,15 @@ export default async function ReconciliationDisputesPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 align-top whitespace-nowrap">
-                                                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                                                <div className={\`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest \${
                                                     isOpen ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400' : 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400'
-                                                }`}>
+                                                }\`}>
                                                     {isOpen ? <AlertTriangle className="w-3 h-3"/> : <CheckCircle2 className="w-3 h-3"/>}
                                                     {d.status}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 pr-8 align-top text-right">
-                                                <Link href={`/reconciliation/${d.reconciliationId}`} className="px-4 py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+                                                <Link href={\`/reconciliation/\${d.reconciliationId}\`} className="px-4 py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
                                                     İncele
                                                 </Link>
                                             </td>
@@ -137,3 +139,7 @@ export default async function ReconciliationDisputesPage() {
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/reconciliation/disputes/page.tsx', code);
+console.log('done rewriting recon disputes');

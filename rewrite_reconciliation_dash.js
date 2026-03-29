@@ -1,4 +1,6 @@
-import { getSession } from "@/lib/auth";
+const fs = require('fs');
+
+const code = `import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from 'next/link';
@@ -8,7 +10,7 @@ const TopPills = ({ pills }: any) => (
     <div className="flex flex-wrap items-center gap-4 shrink-0 mb-8 w-full">
         {pills.map((p: any, i: number) => (
             <Link href={p.route} key={i} className="flex flex-1 min-w-[200px] bg-white dark:bg-[#0f172a] rounded-[24px] pl-4 pr-6 py-4 items-center gap-5 transition-transform hover:-translate-y-1 hover:shadow-md border border-slate-200 dark:border-white/5 shadow-sm group">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${p.bg} ${p.color} transition-colors`}>
+                <div className={\`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 \${p.bg} \${p.color} transition-colors\`}>
                     {p.icon}
                 </div>
                 <div className="flex flex-col justify-center">
@@ -21,7 +23,7 @@ const TopPills = ({ pills }: any) => (
 );
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2 relative">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -125,11 +127,11 @@ export default async function ReconciliationDashboardPage() {
                                             const isBad = a.action.includes('REJECTED') || a.action.includes('DISPUTED');
                                             return (
                                                 <div key={a.id} className="flex gap-4">
-                                                    <div className={`w-8 h-8 rounded-full border-2 border-white dark:border-[#0f172a] flex items-center justify-center shrink-0 shadow-sm ${
+                                                    <div className={\`w-8 h-8 rounded-full border-2 border-white dark:border-[#0f172a] flex items-center justify-center shrink-0 shadow-sm \${
                                                         isGood ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-500' :
                                                         isBad ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-500' :
                                                         'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                                                    }`}>
+                                                    }\`}>
                                                         {isGood ? <CheckCircle2 className="w-3.5 h-3.5" /> : 
                                                          isBad ? <AlertTriangle className="w-3.5 h-3.5" /> : 
                                                          <Activity className="w-3.5 h-3.5" />}
@@ -159,3 +161,7 @@ export default async function ReconciliationDashboardPage() {
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/reconciliation/page.tsx', code);
+console.log('done rewriting reconciliation/page.tsx');
