@@ -47,7 +47,7 @@ export async function PUT(
         const { id } = await params;
         const body = await request.json();
         const { 
-            plate, km, nextKm, nextDate, vehicleBrand, vehicleSerial, 
+            plate, km, nextKm, nextDate, vehicleBrand, vehicleSerial, vehicleType, checklist,
             notes, status, totalAmount, subTotal, taxTotal, 
             items, technicianId, startTime, endTime, photos, customerApproved 
         } = body;
@@ -67,6 +67,8 @@ export async function PUT(
             nextDate: nextDate ? new Date(nextDate) : undefined,
             vehicleBrand,
             vehicleSerial,
+            vehicleType,
+            checklist,
             notes,
             status,
             totalAmount,

@@ -104,14 +104,18 @@ export default function Sidebar() {
         isSeller,
         suspiciousEventsCount
     }: any) => {
-        const permMap: Record<string, { perm?: string, feature?: string, platformOnly?: boolean }> = {
+        const permMap: Record<string, { perm?: string, feature?: string, platformOnly?: boolean, customCheck?: () => boolean }> = {
             '/': { perm: 'pos_access', feature: 'pos' },
             '/terminal': { perm: 'pos_access', feature: 'pos' },
             '/accounting': { perm: 'finance_view', feature: 'financials' },
             '/customers': { perm: 'customer_view', feature: 'current_accounts' },
             '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
             '/inventory': { perm: 'inventory_view', feature: 'inventory' },
-            '/service': { perm: 'service_view', feature: 'service_desk' },
+            '/service': { 
+                perm: 'service_view', 
+                feature: 'service_desk',
+                customCheck: () => isSystemAdmin || currentUser?.type === 'service'
+            },
             '/sales': { perm: 'sales_archive', feature: 'sales' },
             '/sales/revenue-intelligence': { perm: 'sales_archive', feature: 'sales' },
             '/campaigns': { perm: 'settings_manage', feature: 'sales' },
@@ -353,6 +357,7 @@ export default function Sidebar() {
                 }
                 if (config?.platformOnly && !isPlatformAdmin) return false;
                 if (config?.feature && !checkFeature(config.feature)) return false;
+                if (config?.customCheck && !config.customCheck()) return false;
                 if (isSystemAdmin && !config?.platformOnly) return true;
                 if (config?.perm) return checkPerm(config.perm);
                 return true;
@@ -365,6 +370,7 @@ export default function Sidebar() {
                             if (!subConfig) return true;
                             if (subConfig.platformOnly && !isPlatformAdmin) return false;
                             if (subConfig.feature && !checkFeature(subConfig.feature)) return false;
+                            if (subConfig.customCheck && !subConfig.customCheck()) return false;
                             if (isSystemAdmin && !subConfig.platformOnly) return true;
                             if (subConfig.perm) return checkPerm(subConfig.perm);
                             return true;

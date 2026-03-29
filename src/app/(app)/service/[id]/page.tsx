@@ -144,6 +144,23 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     const partsTotal = items.reduce((acc: number, item: any) => acc + (item.isWarranty ? 0 : (Number(item.price) || 0) * (Number(item.quantity) || 0)), 0);
     const totalAmount = partsTotal;
 
+    const defaultChecklists: Record<string, string[]> = {
+        'Motosiklet': ["Fren Hidroliği", "Zincir Gerginliği & Yağlama", "Lastik Basınçları", "Yağ Seviyesi", "Soğutma Suyu", "Aydınlatma Grubu"],
+        'Bisiklet': ["Fren Papuçları / Balatalar", "Zincir Yağlama", "Vites Ayarları", "Lastik Basınçları", "Jant Akordu", "Gidon Sıkılığı"],
+    };
+
+    const currentChecklistItems = defaultChecklists[service.vehicleType || 'Motosiklet'] || ["Genel Kontrol", "Temizlik", "Fonksiyon Testi"];
+
+    const toggleChecklistItem = (item: string) => {
+        const currentChecklist = service.checklist || {};
+        handleUpdate({
+            checklist: {
+                ...currentChecklist,
+                [item]: !currentChecklist[item]
+            }
+        });
+    };
+
     return (
         <div className="container p-8 max-w-[1400px] mx-auto min-h-screen bg-[#080911]">
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
@@ -230,6 +247,29 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-10">
+                        <h3 className="text-sm font-black text-white uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><span className="w-10 h-[2px] bg-emerald-500"></span> Teknik Kontrol Listesi</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {currentChecklistItems.map((item, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => toggleChecklistItem(item)}
+                                    className={`p-5 rounded-[24px] border flex items-center gap-4 transition-all text-left group ${service.checklist?.[item]
+                                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                                            : 'bg-white/[0.02] border-white/5 text-white/40 hover:bg-white/5'
+                                        }`}
+                                >
+                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${service.checklist?.[item]
+                                            ? 'bg-emerald-500 border-emerald-500 text-black'
+                                            : 'border-white/10 group-hover:border-white/20'
+                                        }`}>
+                                        {service.checklist?.[item] && <span className="font-black">✓</span>}
+                                    </div>
+                                    <span className="text-[13px] font-black tracking-tight">{item}</span>
+                                </button>
+                            ))}
                         </div>
                     </div>
                     <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-10">

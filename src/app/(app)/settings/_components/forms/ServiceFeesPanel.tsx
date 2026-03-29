@@ -19,22 +19,25 @@ export default function ServiceFeesPanel(props: any) {
         localServiceSettings,
         setLocalServiceSettings,
         handleSaveServiceSettings,
+        vehicleTypes
     } = props;
 
-    const services = [
-        {
-            icon: '🏍️',
-            label: 'Motosiklet Periyodik Bakım',
-            field: 'motoMaintenancePrice',
-            price: localServiceSettings?.motoMaintenancePrice ?? 0,
-        },
-        {
-            icon: '🚲',
-            label: 'Bisiklet Periyodik Bakım',
-            field: 'bikeMaintenancePrice',
-            price: localServiceSettings?.bikeMaintenancePrice ?? 0,
-        },
-    ];
+    const getIcon = (type: string) => {
+        const lower = type.toLowerCase();
+        if (lower.includes('moto')) return '🏍️';
+        if (lower.includes('bisiklet')) return '🚲';
+        if (lower.includes('otomobil') || lower.includes('araba')) return '🚗';
+        if (lower.includes('kamyon')) return '🚚';
+        if (lower.includes('elektrikli')) return '⚡';
+        return '🔧';
+    };
+
+    const services = (vehicleTypes || []).map((type: string) => ({
+        icon: getIcon(type),
+        label: `${type} Periyodik Bakım`,
+        field: type,
+        price: localServiceSettings?.[type] ?? 0,
+    }));
 
     return (
         <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">

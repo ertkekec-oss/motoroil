@@ -843,6 +843,8 @@ model ServiceRecord {
   nextDate         DateTime?
   vehicleBrand     String?
   vehicleSerial    String?
+  vehicleType      String?   @default("Motosiklet")
+  checklist        Json?
   notes            String?
   status           String    @default("Beklemede")
   totalAmount      Decimal   @db.Decimal(10, 2)

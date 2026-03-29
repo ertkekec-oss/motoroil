@@ -1200,7 +1200,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         <thead>
                                             <tr style={{ background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>
                                                 <th style={{ padding: '16px 20px', fontWeight: '800' }}>Tarih / Randevu</th>
-                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Marka / Model</th>
+                                                <th style={{ padding: '16px 20px', fontWeight: '800' }}>Kategori / Marka</th>
                                                 <th style={{ padding: '16px 20px', fontWeight: '800' }}>Plaka</th>
                                                 <th style={{ padding: '16px 20px', fontWeight: '800' }}>Durum</th>
                                                 <th style={{ padding: '16px 20px', fontWeight: '800' }}>Teknisyen</th>
@@ -1230,7 +1230,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 </div>
                                                             )}
                                                         </td>
-                                                        <td style={{ padding: '20px' }}><span style={{ fontWeight: '600', color: 'var(--text-main, #fff)' }}>{svc.vehicleBrand || '-'}</span></td>
+                                                        <td style={{ padding: '20px' }}>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                                <span style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', color: '#3b82f6' }}>{svc.vehicleType || 'Motor'}</span>
+                                                                <span style={{ fontWeight: '700', color: 'var(--text-main, #fff)' }}>{svc.vehicleBrand || '-'}</span>
+                                                            </div>
+                                                        </td>
                                                         <td style={{ padding: '20px' }}>
                                                             <span style={{ padding: '4px 10px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontWeight: '800', color: '#3b82f6', letterSpacing: '1px' }}>
                                                                 {svc.plate || '-'}

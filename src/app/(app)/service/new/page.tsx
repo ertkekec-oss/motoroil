@@ -64,8 +64,26 @@ function ServiceAcceptanceContent() {
         notes: '',
         brand: '',
         serialNumber: '',
-        appointmentDate: ''
+        appointmentDate: '',
+        checklist: {} as Record<string, boolean>
     });
+
+    const defaultChecklists: Record<string, string[]> = {
+        'Motosiklet': ["Fren Hidroliği", "Zincir Gerginliği & Yağlama", "Lastik Basınçları", "Yağ Seviyesi", "Soğutma Suyu", "Aydınlatma Grubu"],
+        'Bisiklet': ["Fren Papuçları / Balatalar", "Zincir Yağlama", "Vites Ayarları", "Lastik Basınçları", "Jant Akordu", "Gidon Sıkılığı"],
+    };
+
+    const currentChecklistItems = defaultChecklists[vehicleType] || ["Genel Kontrol", "Temizlik", "Fonksiyon Testi"];
+
+    const toggleChecklistItem = (item: string) => {
+        setFormData(prev => ({
+            ...prev,
+            checklist: {
+                ...prev.checklist,
+                [item]: !prev.checklist[item]
+            }
+        }));
+    };
 
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -200,7 +218,7 @@ function ServiceAcceptanceContent() {
     };
 
     const totalParts = selectedParts.reduce((acc, curr) => acc + (curr.isWarranty ? 0 : curr.price * curr.quantity), 0);
-    const laborCost = isMotorized(vehicleType) ? (serviceSettings?.motoMaintenancePrice || 750) : (serviceSettings?.bikeMaintenancePrice || 350);
+    const laborCost = serviceSettings?.[vehicleType] || (isMotorized(vehicleType) ? 750 : 350);
     const activeLaborCost = isLaborWarranty ? 0 : laborCost;
     const totalCost = (totalParts + activeLaborCost) * 1.2;
 
@@ -243,6 +261,7 @@ function ServiceAcceptanceContent() {
                     vehicleBrand: formData.brand,
                     vehicleSerial: formData.serialNumber,
                     vehicleType,
+                    checklist: formData.checklist,
                     km: formData.km,
                     nextKm: formData.nextKm,
                     nextDate: formData.nextDate,
@@ -469,6 +488,36 @@ function ServiceAcceptanceContent() {
                                     />
                                     <p className={`text-[10px] font-medium mt-1 ml-1 ${textMuted}`}>Eğer aracı hemen servise almayacaksanız randevu tarihi girerek ajandaya kaydedebilirsiniz.</p>
                                 </div>
+                            </div>
+                        </section>
+
+                        {/* SECTION 1.5: CHECKLIST */}
+                        <section className={`rounded-[20px] border shadow-sm p-6 sm:p-8 relative overflow-hidden ${cardBg}`}>
+                            <div className={`absolute top-0 right-0 p-6 text-[100px] font-black italic opacity-[0.03] leading-none pointer-events-none ${isLight ? 'text-slate-900' : 'text-white'}`}>CL</div>
+                            <h2 className={`text-[13px] font-bold uppercase tracking-wide mb-6 flex items-center gap-3 ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>
+                                <span className={`w-6 h-1 rounded-full ${isLight ? 'bg-emerald-600' : 'bg-emerald-500'}`}></span>
+                                {vehicleType} Kontrol Listesi
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {currentChecklistItems.map((item, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => toggleChecklistItem(item)}
+                                        className={`p-4 rounded-xl border flex items-center gap-3 transition-all text-left ${formData.checklist[item]
+                                                ? (isLight ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-emerald-500/10 border-emerald-500 text-emerald-400')
+                                                : (isLight ? 'bg-white border-slate-200 text-slate-600 hover:border-slate-300' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10')
+                                            }`}
+                                    >
+                                        <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${formData.checklist[item]
+                                                ? (isLight ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-emerald-500 border-emerald-500 text-white')
+                                                : (isLight ? 'border-slate-300' : 'border-white/20')
+                                            }`}>
+                                            {formData.checklist[item] && <Check size={12} strokeWidth={4} />}
+                                        </div>
+                                        <span className="text-[13px] font-bold tracking-tight">{item}</span>
+                                    </button>
+                                ))}
                             </div>
                         </section>
 

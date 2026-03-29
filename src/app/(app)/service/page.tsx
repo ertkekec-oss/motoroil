@@ -17,6 +17,9 @@ export default function ServiceDashboard() {
         if (!hasFeature('service_desk') && currentUser !== null) {
             router.push('/billing?upsell=service_desk');
         }
+        if (currentUser && currentUser.role?.toUpperCase() !== 'SUPER_ADMIN' && currentUser.role?.toUpperCase() !== 'ADMIN' && currentUser.type !== 'service') {
+            router.push('/');
+        }
     }, [hasFeature, currentUser, router]);
 
     const isSystemAdmin = currentUser?.role?.toUpperCase() === 'ADMIN' || currentUser?.role?.toUpperCase() === 'SUPER_ADMIN' || currentUser?.role?.toUpperCase() === 'PLATFORM_ADMIN';
@@ -50,7 +53,7 @@ export default function ServiceDashboard() {
             const res = await fetch('/api/staff');
             const data = await res.json();
             if (data.success) {
-                setTechnicians(data.staff.filter((s: any) => s.type === 'service' || !s.type));
+                setTechnicians(data.staff.filter((s: any) => s.type === 'service'));
             }
         } catch (e) {
             console.error(e);
@@ -212,103 +215,83 @@ export default function ServiceDashboard() {
                 {/* --- TABLE CONTENT --- */}
                 <div className={`rounded-[32px] border shadow-2xl overflow-hidden ${cardBg} backdrop-blur-xl`}>
                     {activeServiceTab === 'jobs' ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse min-w-[1200px]">
-                                <thead>
-                                    <tr className={`border-b ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/5 bg-white/[0.02]'}`}>
-                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>İş Emri</th>
-                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>Araç Detay</th>
-                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>Personel</th>
-                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>Durum</th>
-                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase text-right ${textMuted}`}>Eylem</th>
-                                    </tr>
-                                </thead>
-                                <tbody className={`divide-y ${isLight ? 'divide-slate-200' : 'divide-white/5'}`}>
-                                    {filteredJobs.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={5} className="p-24 text-center">
-                                                <div className="flex flex-col items-center justify-center gap-4">
-                                                    <div className="text-5xl opacity-20">🔧</div>
-                                                    <div className={`text-[13px] font-black uppercase tracking-[0.3em] ${textMuted}`}>Atölyede aktif iş emri bulunamadı.</div>
-                                                    <button onClick={() => router.push('/service/new')} className="mt-2 text-blue-500 text-xs font-bold hover:underline tracking-widest uppercase">Yeni İş Emri Oluştur →</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        paginate(filteredJobs).map((job) => (
-                                            <tr key={job.id} className={`transition-all ${isLight ? 'hover:bg-slate-50' : 'hover:bg-blue-500/5'}`}>
-                                                <td className="px-8 py-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${isLight ? 'bg-white border-slate-200 text-slate-400' : 'bg-white/5 border-white/10 text-white/40'}`}>
-                                                            #{job.id.slice(-4).toUpperCase()}
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className={`text-[15px] font-black ${textMain}`}>İş Emri</span>
-                                                            <span className={`text-[10px] font-bold text-blue-500 uppercase mt-0.5 tracking-widest`}>SRV-{job.id.slice(0,6).toUpperCase()}</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <div className="flex flex-col">
-                                                        <span className={`text-[14px] font-bold ${textMain}`}>{job.vehicleBrand || 'Marka Belirtilmemiş'} {job.vehicleSerial || ''}</span>
-                                                        <div className="mt-1.5 flex items-center gap-2">
-                                                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black tracking-widest border border-emerald-500/20 bg-emerald-500/10 text-emerald-400`}>
-                                                                {job.plate || 'PLAKASIZ'}
-                                                            </span>
-                                                            <span className={`text-[10px] font-bold opacity-40 ${textMuted}`}>{job.km ? `${job.km.toLocaleString()} KM` : 'KM Girilmedi'}</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-[10px] font-black ${isLight ? 'bg-slate-200 text-slate-600' : 'bg-blue-600 text-white'}`}>
-                                                            {(typeof (job.technician?.name || job.technician) === 'string' ? (job.technician?.name || job.technician) : 'P').split(' ').map((n: string) => n[0]).join('')}
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className={`text-[13px] font-bold ${textMain}`}>{job.technician?.name || (typeof job.technician === 'string' ? job.technician : '') || 'Atanmadı'}</span>
-                                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${textMuted}`}>Sorumlu Personel</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`w-2 h-2 rounded-full ${job.status === 'İşlemde' ? 'bg-blue-500 animate-pulse' : 'bg-emerald-500'}`} />
-                                                            <span className={`text-[11px] font-black uppercase tracking-widest ${job.status === 'İşlemde' ? 'text-blue-500' : 'text-emerald-500'}`}>
-                                                                {job.status}
-                                                            </span>
-                                                        </div>
-                                                        <div className={`text-[10px] font-bold opacity-40 ${textMuted}`}>Giriş: {new Date(job.createdAt).toLocaleDateString('tr-TR')}</div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6 text-right">
-                                                    <div className="flex justify-end gap-3">
-                                                        {job.status === 'Beklemede' && (
-                                                            <button 
-                                                                onClick={() => handleStartService(job.id)}
-                                                                className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20`}
-                                                            >
-                                                                Atölyeye Al
-                                                            </button>
-                                                        )}
-                                                        <button onClick={() => router.push(`/service/${job.id}`)} className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all bg-white/5 border border-white/10 text-white/40 hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-xl`}>
-                                                            🚀 KOKPİT
-                                                        </button>
-                                                        <button onClick={() => setSelectedService(job)} className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white`}>
-                                                            Detay
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                            {totalPages > 1 && (
-                                <div className={`p-4 border-t ${isLight ? 'border-slate-200' : 'border-white/5'}`}>
-                                    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                        <div className="p-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* -- PENDING COLUMN -- */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between px-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+                                            <h3 className={`text-[12px] font-black uppercase tracking-[0.2em] ${textMain}`}>Beklemede</h3>
+                                        </div>
+                                        <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black ${isLight ? 'bg-slate-200 text-slate-500' : 'bg-white/5 text-white/30'}`}>
+                                            {activeJobs.filter(j => j.status === 'Beklemede').length}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {activeJobs.filter(j => j.status === 'Beklemede').length === 0 ? (
+                                            <div className={`p-12 text-center rounded-[24px] border-2 border-dashed ${isLight ? 'border-slate-200 text-slate-400' : 'border-white/5 text-white/10'}`}>
+                                                <div className="text-3xl mb-3">⏳</div>
+                                                <div className="text-[10px] font-bold uppercase tracking-widest">Bekleyen İş Yok</div>
+                                            </div>
+                                        ) : (
+                                            activeJobs.filter(j => j.status === 'Beklemede').map((job) => (
+                                                <KanbanCard key={job.id} job={job} isLight={isLight} textMain={textMain} textMuted={textMuted} cardBg={cardBg} router={router} onStart={() => handleStartService(job.id)} />
+                                            ))
+                                        )}
+                                    </div>
                                 </div>
-                            )}
+
+                                {/* -- IN PROGRESS COLUMN -- */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between px-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] animate-pulse"></div>
+                                            <h3 className={`text-[12px] font-black uppercase tracking-[0.2em] ${textMain}`}>İşlemde</h3>
+                                        </div>
+                                        <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black ${isLight ? 'bg-blue-50 text-blue-500' : 'bg-blue-500/10 text-blue-400'}`}>
+                                            {activeJobs.filter(j => j.status === 'İşlemde').length}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {activeJobs.filter(j => j.status === 'İşlemde').length === 0 ? (
+                                            <div className={`p-12 text-center rounded-[24px] border-2 border-dashed ${isLight ? 'border-blue-100 text-blue-200' : 'border-blue-500/5 text-blue-500/10'}`}>
+                                                <div className="text-3xl mb-3">🛠️</div>
+                                                <div className="text-[10px] font-bold uppercase tracking-widest">Aktif İşlem Yok</div>
+                                            </div>
+                                        ) : (
+                                            activeJobs.filter(j => j.status === 'İşlemde').map((job) => (
+                                                <KanbanCard key={job.id} job={job} isLight={isLight} textMain={textMain} textMuted={textMuted} cardBg={cardBg} router={router} isActive />
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* -- COMPLETED COLUMN -- */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between px-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                                            <h3 className={`text-[12px] font-black uppercase tracking-[0.2em] ${textMain}`}>Tamamlandı</h3>
+                                        </div>
+                                        <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black ${isLight ? 'bg-emerald-50 text-emerald-500' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                            {activeJobs.filter(j => j.status === 'Tamamlandı').length}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {activeJobs.filter(j => j.status === 'Tamamlandı').length === 0 ? (
+                                            <div className={`p-12 text-center rounded-[24px] border-2 border-dashed ${isLight ? 'border-emerald-100 text-emerald-200' : 'border-emerald-500/5 text-emerald-500/10'}`}>
+                                                <div className="text-3xl mb-3">✅</div>
+                                                <div className="text-[10px] font-bold uppercase tracking-widest">Biten İş Yok</div>
+                                            </div>
+                                        ) : (
+                                            activeJobs.filter(j => j.status === 'Tamamlandı').slice(0, 10).map((job) => (
+                                                <KanbanCard key={job.id} job={job} isLight={isLight} textMain={textMain} textMuted={textMuted} cardBg={cardBg} router={router} isDone />
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     ) : activeServiceTab === 'performance' ? (
                         <div className="p-8">
@@ -631,6 +614,51 @@ export default function ServiceDashboard() {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+function KanbanCard({ job, isLight, textMain, textMuted, cardBg, router, onStart, isActive, isDone }: any) {
+    const textBlue = isLight ? 'text-blue-600' : 'text-blue-400';
+    
+    return (
+        <div className={`p-5 rounded-[24px] border shadow-sm space-y-4 group transition-all hover:shadow-xl hover:border-blue-500/50 ${cardBg} ${isActive ? (isLight ? 'border-blue-100 bg-blue-50/10' : 'border-blue-500/20 bg-blue-500/5') : ''}`}>
+            <div className="flex justify-between items-start">
+                <div className="flex flex-col">
+                    <span className={`text-[14px] font-black tracking-tight ${textMain}`}>{job.vehicleBrand || 'Marka Belirtilmemiş'}</span>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${textBlue} mt-0.5`}>SRV-{job.id.slice(-6).toUpperCase()}</span>
+                </div>
+                <div className={`px-2 py-1 rounded-lg text-[10px] font-black tracking-widest border uppercase ${isDone ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'bg-white/5 border-white/10 text-white/40'}`}>
+                    {job.plate || 'PLAKASIZ'}
+                </div>
+            </div>
+            
+            <div className="flex items-center gap-3 py-1">
+                <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-[10px] font-black ${isLight ? 'bg-slate-100 text-slate-500' : 'bg-blue-600 text-white'}`}>
+                    {(job.technician?.name || 'P').split(' ').map((n: string) => n[0]).join('')}
+                </div>
+                <div className="flex flex-col">
+                    <span className={`text-[12px] font-bold ${textMain}`}>{job.technician?.name || 'Atanmadı'}</span>
+                    <span className={`text-[9px] font-bold uppercase tracking-widest ${textMuted}`}>Sorumlu Personel</span>
+                </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-2">
+                <div className="flex flex-col">
+                    <span className={`text-[10px] font-bold uppercase tracking-widest ${textMuted}`}>{isActive ? 'İşlemler' : isDone ? 'Tamamlanma' : 'Geliş'}</span>
+                    <span className={`text-[11px] font-black ${textMain}`}>{isActive ? (job.items?.length || 0) + ' Kalem' : new Date(job.createdAt).toLocaleDateString('tr-TR')}</span>
+                </div>
+                <div className="flex gap-2">
+                    {onStart && (
+                        <button onClick={onStart} className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/20 hover:scale-110 active:scale-95 transition-all">
+                            <Wrench size={14} />
+                        </button>
+                    )}
+                    <button onClick={() => router.push(`/service/${job.id}`)} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/40 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all">
+                        <ChevronRight size={14} />
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

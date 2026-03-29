@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
 
         const body = await request.json();
-        const { customerId, plate, vehicleBrand, vehicleSerial, km, nextKm, nextDate, notes, items, totalAmount, subTotal, taxTotal, status, appointmentDate } = body;
+        const { customerId, plate, vehicleBrand, vehicleSerial, vehicleType, checklist, km, nextKm, nextDate, notes, items, totalAmount, subTotal, taxTotal, status, appointmentDate } = body;
 
         if (customerId) {
             const customer = await prisma.customer.findFirst({ where: { id: customerId, companyId } });
@@ -63,6 +63,8 @@ export async function POST(request: Request) {
                 plate,
                 vehicleBrand,
                 vehicleSerial,
+                vehicleType,
+                checklist,
                 km: km ? parseInt(km) : null,
                 nextKm: nextKm ? parseInt(nextKm) : null,
                 nextDate: nextDate ? new Date(nextDate) : null,

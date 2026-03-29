@@ -40,6 +40,7 @@ export interface Staff {
     salary?: number | string;
     earnings?: number;
     performance?: number;
+    type?: string;
 }
 
 export interface SuspiciousEvent {
