@@ -30,7 +30,7 @@ export default async function ReconciliationDisputesPage() {
         take: 50,
         include: {
             reconciliation: {
-                include: { account: true, customer: true }
+                include: { account: true }
             }
         }
     });
@@ -95,7 +95,7 @@ export default async function ReconciliationDisputesPage() {
                                         <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors group">
                                             <td className="px-6 py-4 align-top">
                                                 <div className="text-[13px] font-black text-slate-800 dark:text-white max-w-[250px] leading-tight mb-1">
-                                                    {d.reconciliation.account?.name || d.reconciliation.customer?.name || 'Bilinmiyor'}
+                                                    {d.reconciliation.account?.name || 'Bilinmiyor'}
                                                 </div>
                                                 <div className="text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400 tracking-wider">
                                                     ZARF: {d.reconciliationId.substring(0, 8).toUpperCase()}
