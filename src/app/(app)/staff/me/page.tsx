@@ -92,7 +92,7 @@ const DashboardView = ({
             <div className="flex flex-col space-y-4 w-full flex-1">
                 {/* Top Summaries */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
-                    <div className="bg-surface border border-default p-4 flex flex-col justify-between rounded-md shadow-sm">
+                    <div className="bg-white dark:bg-[#1e293b] p-5 flex flex-col justify-between rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent">
                         <div className="flex justify-between items-start mb-2">
                             <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Günlük Cirom</h4>
                             <IconActivity className="w-3.5 h-3.5 text-primary opacity-50" />
@@ -100,7 +100,7 @@ const DashboardView = ({
                         <p className="text-xl font-black font-mono text-text-primary tracking-tight">₺{(turnover || 0).toLocaleString()}</p>
                     </div>
 
-                    <div className="bg-surface border border-default p-4 flex flex-col justify-between rounded-md shadow-sm">
+                    <div className="bg-white dark:bg-[#1e293b] p-5 flex flex-col justify-between rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent">
                         <div className="flex justify-between items-start mb-2">
                             <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Hedef (Ay)</h4>
                             <IconTrendingUp className="w-3.5 h-3.5 text-state-info-text opacity-50" />
@@ -108,7 +108,7 @@ const DashboardView = ({
                         <p className="text-xl font-black font-mono text-text-primary tracking-tight">{displayAchievement}</p>
                     </div>
 
-                    <div className="bg-surface border border-default p-4 flex flex-col justify-between rounded-md shadow-sm">
+                    <div className="bg-white dark:bg-[#1e293b] p-5 flex flex-col justify-between rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent">
                         <div className="flex justify-between items-start mb-2">
                             <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Bekleyen Görev</h4>
                             <IconClock className="w-3.5 h-3.5 text-state-warning-text opacity-50" />
@@ -116,7 +116,7 @@ const DashboardView = ({
                         <p className="text-xl font-black font-mono text-text-primary tracking-tight">{activeTasksCount}</p>
                     </div>
 
-                    <div className="bg-surface dark:bg-emerald-900/10 border border-state-success-border p-4 flex flex-col justify-between rounded-md shadow-sm">
+                    <div className="bg-emerald-50 dark:bg-emerald-900/10 p-5 flex flex-col justify-between rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent">
                         <div className="flex justify-between items-start mb-2">
                             <h4 className="text-[10px] font-bold text-state-success-text uppercase tracking-widest">Kazanılan Prim</h4>
                         </div>
@@ -126,8 +126,8 @@ const DashboardView = ({
 
                 {/* PDKS & Vardiya */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-                    <div className="bg-surface border border-default overflow-hidden flex flex-col rounded-md shadow-sm">
-                        <div className="bg-surface-secondary px-4 py-3 border-b border-default text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center justify-between">
+                    <div className="bg-white dark:bg-[#1e293b] overflow-hidden flex flex-col rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent">
+                        <div className="bg-slate-50 dark:bg-[#0f172a] px-5 py-4 border-none text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center justify-between">
                             <h3 className="flex items-center gap-2"><IconZap className="w-3.5 h-3.5 text-text-muted" /> PDKS DOĞRULAMASI</h3>
                             {!pdksStatus?.isWorking && <span className="text-[9px] text-text-muted font-bold">KAPALI</span>}
                             {pdksStatus?.isWorking && <span className="w-1.5 h-1.5 rounded-full bg-state-success-text animate-pulse"></span>}
@@ -163,8 +163,8 @@ const DashboardView = ({
                         </div>
                     </div>
 
-                    <div className="bg-surface border border-default overflow-hidden flex flex-col rounded-md shadow-sm">
-                        <div className="bg-surface-secondary px-4 py-3 border-b border-default text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center gap-2">
+                    <div className="bg-white dark:bg-[#1e293b] overflow-hidden flex flex-col rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent">
+                        <div className="bg-slate-50 dark:bg-[#0f172a] px-5 py-4 border-none text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center gap-2">
                            <IconClock className="w-3.5 h-3.5 text-text-muted" /> SIRADAKİ VARDİYA
                         </div>
                         <div className="p-4 flex flex-col justify-center flex-1">
@@ -211,28 +211,28 @@ const TargetsView = ({ targets, statsData, user }: any) => {
             {/* COLUMNS 2-4: The Content */}
             <div className="flex-1 overflow-y-auto flex flex-col space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
-                    <div className="bg-surface dark:bg-[#0f172a] border border-default rounded-md shadow-sm p-4 flex flex-col justify-between">
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] p-5 flex flex-col justify-between border border-transparent">
                         <h4 className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> İlerleme Başarısı</h4>
                         <div className="text-xl font-black font-mono text-text-primary dark:text-white">%{overallProgress}</div>
                         <div className="w-full h-1.5 bg-surface-secondary dark:bg-slate-800 rounded-full mt-3 overflow-hidden border border-default">
                             <div className="h-full bg-state-success-text rounded-full transition-all duration-1000" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
                         </div>
                     </div>
-                    <div className="bg-surface dark:bg-[#0f172a] border border-default rounded-md shadow-sm p-4 flex flex-col justify-between">
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] p-5 flex flex-col justify-between border border-transparent">
                         <h4 className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-state-success-text" /> Ulaşılan Hedefler</h4>
                         <div className="text-xl font-black font-mono text-text-primary dark:text-white">{completedTargetsCount}</div>
                     </div>
-                    <div className="bg-surface dark:bg-[#0f172a] border border-default rounded-md shadow-sm p-4 flex flex-col justify-between">
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] p-5 flex flex-col justify-between border border-transparent">
                         <h4 className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><IconActivity className="w-3.5 h-3.5 text-state-warning-text" /> Aktif Hedefler</h4>
                         <div className="text-xl font-black font-mono text-text-primary dark:text-white">{activeTargetsCount}</div>
                     </div>
-                    <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-state-success-border rounded-md shadow-sm p-4 flex flex-col justify-between">
+                    <div className="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] p-5 flex flex-col justify-between border border-transparent">
                         <h4 className="text-[10px] font-bold tracking-widest text-state-success-text dark:text-emerald-400 uppercase mb-2 flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5" /> Prim Hakedişi</h4>
                         <div className="text-xl font-black font-mono text-state-success-text dark:text-emerald-400">₺{totalEstBonus.toLocaleString()}</div>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col bg-surface border border-default rounded-md shadow-sm min-h-[300px]">
+                <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-transparent min-h-[300px]">
                     <EnterpriseSectionHeader title="Dönemsel Performans Tablosu" icon="🎯" />
                     {targets?.length === 0 ? (
                         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-surface-bg/30 dark:bg-transparent">
@@ -415,7 +415,7 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
                             </div>
                             <div className="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col">
                                 {selectedTask.description && (
-                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-sm border border-default shadow-sm shrink-0">
+                                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent shrink-0">
                                         <h4 className="text-[9px] uppercase font-black text-text-muted mb-2 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5"/> Görev Detayı / Açıklama</h4>
                                         <div className="text-[12px] text-text-secondary leading-relaxed whitespace-pre-wrap">{selectedTask.description}</div>
                                     </div>
@@ -727,7 +727,7 @@ const ShiftsView = ({ shifts, user }: any) => {
                                 {shifts.map((s: any) => {
                                     const isPermit = s.type === 'İzinli';
                                     return (
-                                        <div key={s.id} className={`p-4 rounded-sm border flex flex-col justify-between h-[100px] relative overflow-hidden transition-all hover:shadow-sm ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
+                                        <div key={s.id} className={`p-4 rounded-2xl flex flex-col justify-between border border-transparent shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] h-[100px] relative overflow-hidden transition-all hover:shadow-sm ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
                                             <div className="flex justify-between items-start z-10 w-full mb-3">
                                                 <div>
                                                     <div className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${isPermit ? 'text-state-warning-text' : 'text-text-secondary'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
@@ -763,7 +763,7 @@ const ProfileSettingsView = ({ user }: any) => {
                     <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
                     <div className="p-6 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
                         <div className="flex items-center gap-5 mb-6 border-b pb-6 border-default">
-                            <div className="w-16 h-16 rounded-sm bg-surface-tertiary border border-default flex items-center justify-center text-xl font-black text-text-primary relative shadow-sm">
+                            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 border border-transparent flex items-center justify-center text-xl font-black text-text-primary relative shadow-sm">
                                 {user?.name?.[0]?.toUpperCase() || 'P'}
                             </div>
                             <div className="flex flex-col justify-center">
@@ -845,7 +845,7 @@ const ReportsView = ({ user }: any) => {
                             </div>
                         ) : report?.summary ? (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="p-5 rounded-sm border bg-surface-bg/30 dark:bg-slate-800/40 border-default border-t-2 border-t-blue-500">
+                                <div className="p-6 rounded-2xl bg-white dark:bg-[#1e293b] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent border-t-2 border-t-blue-500">
                                     <div className="flex justify-between items-center mb-3 text-blue-500 dark:text-blue-400">
                                         <TrendingUp className="w-5 h-5"/>
                                         <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Ciro / Toplam Satış</div>
@@ -854,7 +854,7 @@ const ReportsView = ({ user }: any) => {
                                     <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.salesCount} Başarılı İşlem</div>
                                 </div>
                                 
-                                <div className="p-5 rounded-sm border bg-surface-bg/30 dark:bg-slate-800/40 border-default border-t-2 border-t-emerald-500">
+                                <div className="p-6 rounded-2xl bg-white dark:bg-[#1e293b] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent border-t-2 border-t-emerald-500">
                                     <div className="flex justify-between items-center mb-3 text-emerald-500 dark:text-emerald-400">
                                         <CheckCircle2 className="w-5 h-5"/>
                                         <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Nakit / Tahsilat</div>
@@ -863,7 +863,7 @@ const ReportsView = ({ user }: any) => {
                                     <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.collectionsCount} Tamamlanan Tahsilat</div>
                                 </div>
                                 
-                                <div className="p-5 rounded-sm border bg-surface-bg/30 dark:bg-slate-800/40 border-default border-t-2 border-t-slate-500">
+                                <div className="p-6 rounded-2xl bg-white dark:bg-[#1e293b] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent border-t-2 border-t-slate-500">
                                     <div className="flex justify-between items-center mb-3 text-text-secondary">
                                         <MapPin className="w-5 h-5"/>
                                         <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Aksiyon / Saha Ziyareti</div>
@@ -1028,14 +1028,14 @@ export default function PersonelPanel() {
                         ].map((grp, i) => (
                             <div key={grp.group} className="flex items-center gap-3">
                                 {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
-                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-[#1e293b] p-1.5 rounded-[16px] shadow-none border border-transparent">
                                     {grp.items.map(tab => (
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id as any)}
                                             className={activeTab === tab.id
-                                                ? "px-4 py-2 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
-                                                : "px-4 py-2 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
+                                                ? "px-6 py-2.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-transparent rounded-[12px]"
+                                                : "px-6 py-2.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[12px] border border-transparent"
                                             }
                                         >
                                             {tab.label}

@@ -17,11 +17,11 @@ export const EnterpriseCard = ({
     return (
         <div
             onClick={onClick}
-            className={`bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm relative overflow-hidden group ${noPadding ? '' : 'p-6 md:p-8'} ${className}`}
-            style={borderLeftColor ? { borderLeft: `4px solid ${borderLeftColor}` } : {}}
+            className={`bg-white dark:bg-[#1e293b] !border-none rounded-2xl shadow-sm md:shadow-md relative overflow-hidden group transition-all duration-300 ${noPadding ? '' : 'p-6 md:p-8'} ${className}`}
+            style={borderLeftColor ? { borderLeft: `5px solid ${borderLeftColor}` } : {}}
         >
             {/* Ambient Background Glow Effect (Subtle) */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none transition-all duration-500"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 dark:bg-teal-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none transition-all duration-500"></div>
             <div className="relative z-10 w-full">
                 {children}
             </div>
