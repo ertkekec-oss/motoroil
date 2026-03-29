@@ -274,7 +274,7 @@ export default function Sidebar() {
                         ]
                     },
                     { name: 'Teklifler', href: '/offers', icon: FileText },
-                    { name: 'TechoPs', href: '/service', icon: Wrench },
+                    { name: 'TechOPs', href: '/service', icon: Wrench },
                     {
                         name: 'SalesX',
                         icon: Map,

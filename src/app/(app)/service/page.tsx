@@ -153,21 +153,26 @@ export default function ServiceDashboard() {
                             <Wrench size={24} strokeWidth={2} />
                         </div>
                         <div>
-                            <h1 className={`text-[28px] font-bold tracking-tight ${textMain}`}>Servis Masası</h1>
-                            <p className={`text-[13px] font-medium leading-none mt-1 ${textMuted}`}>Atölye Durumu ve Randevu Planlama</p>
+                            <h1 className={`text-[28px] font-bold tracking-tight ${textMain}`}>TechOPs Servis Masası</h1>
+                            <p className={`text-[13px] font-medium leading-none mt-1 ${textMuted}`}>Operasyonel İzleme ve Atölye Yönetimi</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className={`flex items-center gap-3 px-4 py-2 rounded-[999px] border shadow-sm ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
-                            <span className={`text-[11px] font-semibold uppercase tracking-wide ${textMuted}`}>Atölye Doluluk</span>
-                            <div className={`w-20 h-1.5 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-800'}`}>
-                                <div className="h-full bg-amber-500 rounded-full" style={{ width: '65%' }}></div>
+                        {isSystemAdmin && (
+                            <div className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-400 text-[10px] font-black uppercase tracking-widest`}>
+                                <MapPin size={10} /> {activeBranchName} Şubesi
                             </div>
-                            <span className="text-[12px] font-bold text-amber-500">%65</span>
+                        )}
+                        <div className={`flex items-center gap-3 px-4 py-2 rounded-[999px] border shadow-sm ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
+                            <span className={`text-[11px] font-semibold uppercase tracking-wide ${textMuted}`}>Kapasite Kullanımı</span>
+                            <div className={`w-20 h-1.5 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-800'}`}>
+                                <div className="h-full bg-blue-600 rounded-full" style={{ width: '65%' }}></div>
+                            </div>
+                            <span className="text-[12px] font-bold text-blue-500">%65</span>
                         </div>
-                        <button onClick={() => router.push('/service/new')} className={`px-5 py-2.5 rounded-[12px] text-[13px] font-semibold flex items-center gap-2 transition-all shadow-sm ${isLight ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}>
-                            <span>Yeni Servis Kaydı</span>
+                        <button onClick={() => router.push('/service/new')} className={`px-5 py-2.5 rounded-[12px] text-[13px] font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95 ${isLight ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}>
+                            <Wrench size={14} /> <span>Yeni Kayıt</span>
                         </button>
                     </div>
                 </header>
@@ -175,126 +180,125 @@ export default function ServiceDashboard() {
                 {/* --- KPI CARDS --- */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
                     {[
-                        { label: 'Açık İş Emri', value: filteredJobs.length, unit: 'Araç', icon: <FileText size={18} />, color: isLight ? 'text-blue-600' : 'text-blue-400' },
-                        { label: 'Bugün Tamamlanan', value: activeJobs.filter(j => j.status === 'Tamamlandı').length, unit: 'Araç', icon: <CheckCircle2 size={18} />, color: isLight ? 'text-emerald-600' : 'text-emerald-400' },
-                        { label: 'Bekleyen Randevu', value: appointments.length, unit: 'Randevu', icon: <Calendar size={18} />, color: isLight ? 'text-amber-500' : 'text-amber-400' },
-                        { label: 'Ortalama Teslimat', value: 3.2, unit: 'Saat', icon: <Clock size={18} />, color: isLight ? 'text-slate-600' : 'text-slate-300' },
+                        { label: 'Açık İş Emri', value: filteredJobs.length, unit: 'Araç', icon: <FileText size={18} />, color: 'blue' },
+                        { label: 'Bugün Tamamlanan', value: activeJobs.filter(j => j.status === 'Tamamlandı').length, unit: 'Araç', icon: <CheckCircle2 size={18} />, color: 'emerald' },
+                        { label: 'Bekleyen Randevu', value: appointments.length, unit: 'Randevu', icon: <Calendar size={18} />, color: 'amber' },
+                        { label: 'Tahmini Teslimat', value: '2s 15d', unit: '', icon: <Clock size={18} />, color: 'slate' },
                     ].map((stat, i) => (
-                        <div key={i} className={`p-5 rounded-[18px] border shadow-sm flex flex-col justify-between relative overflow-hidden group transition-all hover:border-blue-500/30 ${cardBg}`}>
-                            <div className="flex justify-between items-start mb-4">
+                        <div key={i} className={`p-6 rounded-[24px] border shadow-sm flex flex-col justify-between relative overflow-hidden group transition-all hover:-translate-y-1 ${cardBg}`}>
+                            <div className={`absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 transition-opacity transform group-hover:scale-150 duration-700`}>{stat.icon}</div>
+                            <div className="flex justify-between items-start mb-4 relative z-10">
                                 <div className={`flex items-center gap-2 ${textMuted}`}>
                                     {stat.icon}
-                                    <span className="text-[11px] font-semibold uppercase tracking-wide">{stat.label}</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em]">{stat.label}</span>
                                 </div>
-                                {stat.value > 0 && <span className={`w-2 h-2 rounded-full ${stat.color === (isLight ? 'text-emerald-600' : 'text-emerald-400') ? 'bg-emerald-500' : 'bg-blue-500'}`} />}
                             </div>
-                            <div className="flex items-baseline gap-2">
-                                <span className={`text-[32px] font-bold leading-none tracking-tight ${textMain}`}>{stat.value}</span>
-                                <span className={`text-[13px] font-medium ${textMuted}`}>{stat.unit}</span>
+                            <div className="flex items-baseline gap-2 relative z-10">
+                                <span className={`text-[34px] font-[900] leading-none tracking-tighter ${textMain}`}>{stat.value}</span>
+                                <span className={`text-[12px] font-bold uppercase opacity-40 ${textMuted}`}>{stat.unit}</span>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                {/* --- TABS / SEGMENTED CONTROL --- */}
-                <div className={`inline-flex p-1 rounded-[999px] border shadow-sm ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
-                    <button
-                        onClick={() => setActiveServiceTab('jobs')}
-                        className={`px-6 py-2 rounded-[999px] text-[13px] font-semibold transition-all flex items-center gap-2 ${activeServiceTab === 'jobs' ? (isLight ? 'bg-white text-slate-900 shadow-sm' : 'bg-slate-800 text-white shadow-sm') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}
-                    >
-                        <span>Atölye (Aktif İşler)</span>
-                        {filteredJobs.length > 0 && (
-                            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${activeServiceTab === 'jobs' ? (isLight ? 'bg-blue-100 text-blue-700' : 'bg-blue-500/20 text-blue-400') : (isLight ? 'bg-slate-200 text-slate-500' : 'bg-slate-800 text-slate-400')}`}>
-                                {filteredJobs.length}
-                            </span>
-                        )}
+                {/* --- TABS --- */}
+                <div className={`inline-flex p-1 rounded-2xl border ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
+                    <button onClick={() => setActiveServiceTab('jobs')} className={`px-6 py-2 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${activeServiceTab === 'jobs' ? (isLight ? 'bg-white text-blue-600 shadow-md' : 'bg-blue-600 text-white shadow-lg shadow-blue-600/20') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}>
+                        Atölye (Aktif) {filteredJobs.length > 0 && <span className={`px-2 py-0.5 rounded-md text-[10px] ${activeServiceTab === 'jobs' ? 'bg-white text-blue-600' : 'bg-slate-800 text-slate-400'}`}>{filteredJobs.length}</span>}
                     </button>
-                    <button
-                        onClick={() => setActiveServiceTab('calendar')}
-                        className={`px-6 py-2 rounded-[999px] text-[13px] font-semibold transition-all flex items-center gap-2 ${activeServiceTab === 'calendar' ? (isLight ? 'bg-white text-slate-900 shadow-sm' : 'bg-slate-800 text-white shadow-sm') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}
-                    >
-                        <span>Randevu Takvimi</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveServiceTab('performance')}
-                        className={`px-6 py-2 rounded-[999px] text-[13px] font-semibold transition-all flex items-center gap-2 ${activeServiceTab === 'performance' ? (isLight ? 'bg-white text-slate-900 shadow-sm' : 'bg-slate-800 text-white shadow-sm') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}
-                    >
-                        <span>Performans Analizi</span>
-                    </button>
+                    <button onClick={() => setActiveServiceTab('calendar')} className={`px-6 py-2 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all ${activeServiceTab === 'calendar' ? (isLight ? 'bg-white text-blue-600 shadow-md' : 'bg-blue-600 text-white shadow-lg shadow-blue-600/20') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}>Randevular</button>
+                    <button onClick={() => setActiveServiceTab('performance')} className={`px-6 py-2 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all ${activeServiceTab === 'performance' ? (isLight ? 'bg-white text-blue-600 shadow-md' : 'bg-blue-600 text-white shadow-lg shadow-blue-600/20') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}>Analitik</button>
                 </div>
 
                 {/* --- TABLE CONTENT --- */}
-                <div className={`rounded-[20px] border shadow-sm overflow-hidden ${cardBg}`}>
+                <div className={`rounded-[32px] border shadow-2xl overflow-hidden ${cardBg} backdrop-blur-xl`}>
                     {activeServiceTab === 'jobs' ? (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse min-w-[1000px]">
+                            <table className="w-full text-left border-collapse min-w-[1200px]">
                                 <thead>
                                     <tr className={`border-b ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/5 bg-white/[0.02]'}`}>
-                                        <th className={`h-[40px] px-6 text-[11px] font-medium tracking-wide uppercase ${textMuted}`}>İş Kaydı</th>
-                                        <th className={`h-[40px] px-6 text-[11px] font-medium tracking-wide uppercase ${textMuted}`}>Araç / Plaka</th>
-                                        <th className={`h-[40px] px-6 text-[11px] font-medium tracking-wide uppercase ${textMuted}`}>Giriş Saati</th>
-                                        <th className={`h-[40px] px-6 text-[11px] font-medium tracking-wide uppercase ${textMuted}`}>Durum</th>
-                                        <th className={`h-[40px] px-6 text-[11px] font-medium tracking-wide uppercase ${textMuted}`}>Teknisyen</th>
-                                        <th className={`h-[40px] px-6 text-[11px] font-medium tracking-wide uppercase text-right ${textMuted}`}>İşlem</th>
+                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>İş Emri</th>
+                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>Araç Detay</th>
+                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>Personel</th>
+                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase ${textMuted}`}>Durum</th>
+                                        <th className={`h-[56px] px-8 text-[10px] font-black tracking-[0.2em] uppercase text-right ${textMuted}`}>Eylem</th>
                                     </tr>
                                 </thead>
                                 <tbody className={`divide-y ${isLight ? 'divide-slate-200' : 'divide-white/5'}`}>
                                     {filteredJobs.length === 0 ? (
                                         <tr>
-                                            <td colSpan={6} className="p-16 text-center">
-                                                <div className="flex flex-col items-center justify-center gap-3">
-                                                    <div className={`w-12 h-12 flex items-center justify-center rounded-full ${isLight ? 'bg-slate-100 text-slate-400' : 'bg-slate-800 text-slate-500'}`}>
-                                                        <Wrench size={24} />
-                                                    </div>
-                                                    <div className={`text-[14px] font-medium ${textMuted}`}>Atölyede aktif iş bulunmuyor.</div>
+                                            <td colSpan={5} className="p-24 text-center">
+                                                <div className="flex flex-col items-center justify-center gap-4">
+                                                    <div className="text-5xl opacity-20">🔧</div>
+                                                    <div className={`text-[13px] font-black uppercase tracking-[0.3em] ${textMuted}`}>Atölyede aktif iş emri bulunamadı.</div>
+                                                    <button onClick={() => router.push('/service/new')} className="mt-2 text-blue-500 text-xs font-bold hover:underline tracking-widest uppercase">Yeni İş Emri Oluştur →</button>
                                                 </div>
                                             </td>
                                         </tr>
                                     ) : (
                                         paginate(filteredJobs).map((job) => (
-                                            <tr key={job.id} className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-white/[0.02]'}`}>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col">
-                                                        <span className={`text-[14px] font-semibold ${textMain}`}>#{job.id.slice(-6).toUpperCase()}</span>
-                                                        <span className={`text-[11px] font-medium tracking-wide uppercase mt-0.5 ${textMuted}`}>Servis Kaydı</span>
+                                            <tr key={job.id} className={`transition-all ${isLight ? 'hover:bg-slate-50' : 'hover:bg-blue-500/5'}`}>
+                                                <td className="px-8 py-6">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${isLight ? 'bg-white border-slate-200 text-slate-400' : 'bg-white/5 border-white/10 text-white/40'}`}>
+                                                            #{job.id.slice(-4).toUpperCase()}
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className={`text-[15px] font-black ${textMain}`}>İş Emri</span>
+                                                            <span className={`text-[10px] font-bold text-blue-500 uppercase mt-0.5 tracking-widest`}>SRV-{job.id.slice(0,6).toUpperCase()}</span>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-8 py-6">
                                                     <div className="flex flex-col">
-                                                        <span className={`text-[14px] font-medium ${textMain}`}>{job.vehicle || (job.vehicleBrand ? `${job.vehicleBrand} ${job.vehicleSerial || ''}` : 'Belirtilmemiş')}</span>
-                                                        <div className="mt-1">
-                                                            <span className={`px-2 py-0.5 rounded-[6px] text-[11px] font-semibold tracking-wider font-mono border ${isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
+                                                        <span className={`text-[14px] font-bold ${textMain}`}>{job.vehicleBrand || 'Marka Belirtilmemiş'} {job.vehicleSerial || ''}</span>
+                                                        <div className="mt-1.5 flex items-center gap-2">
+                                                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black tracking-widest border border-emerald-500/20 bg-emerald-500/10 text-emerald-400`}>
                                                                 {job.plate || 'PLAKASIZ'}
                                                             </span>
+                                                            <span className={`text-[10px] font-bold opacity-40 ${textMuted}`}>{job.km ? `${job.km.toLocaleString()} KM` : 'KM Girilmedi'}</span>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`text-[13px] font-medium ${textMuted}`}>{job.entry || new Date(job.createdAt).toLocaleDateString('tr-TR')}</span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-semibold uppercase tracking-wide border ${job.status === 'İşlemde' ? (isLight ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-500/10 text-blue-400 border-blue-500/20') :
-                                                        job.status === 'Tamamlandı' ? (isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20') :
-                                                            (isLight ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-800 text-slate-400 border-slate-700')
-                                                        }`}>
-                                                        {job.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isLight ? 'bg-slate-200 text-slate-600' : 'bg-slate-800 text-slate-400'}`}>
-                                                            {((job.technician?.name || job.technician) || 'Personel').split(' ').map((n: string) => n[0]).join('')}
+                                                <td className="px-8 py-6">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-[10px] font-black ${isLight ? 'bg-slate-200 text-slate-600' : 'bg-blue-600 text-white'}`}>
+                                                            {((job.technician?.name || job.technician) || 'P').split(' ').map((n: string) => n[0]).join('')}
                                                         </div>
-                                                        <span className={`text-[13px] font-medium ${textMain}`}>{job.technician?.name || job.technician || 'Atanmadı'}</span>
+                                                        <div className="flex flex-col">
+                                                            <span className={`text-[13px] font-bold ${textMain}`}>{job.technician?.name || job.technician || 'Atanmadı'}</span>
+                                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${textMuted}`}>Sorumlu Personel</span>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <button
-                                                        onClick={() => setSelectedService(job)}
-                                                        className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-all shadow-sm border ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'}`}
-                                                    >
-                                                        Detay
-                                                    </button>
+                                                <td className="px-8 py-6">
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`w-2 h-2 rounded-full ${job.status === 'İşlemde' ? 'bg-blue-500 animate-pulse' : 'bg-emerald-500'}`} />
+                                                            <span className={`text-[11px] font-black uppercase tracking-widest ${job.status === 'İşlemde' ? 'text-blue-500' : 'text-emerald-500'}`}>
+                                                                {job.status}
+                                                            </span>
+                                                        </div>
+                                                        <div className={`text-[10px] font-bold opacity-40 ${textMuted}`}>Giriş: {new Date(job.createdAt).toLocaleDateString('tr-TR')}</div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <div className="flex justify-end gap-3">
+                                                        {job.status === 'Beklemede' && (
+                                                            <button 
+                                                                onClick={() => handleStartService(job.id)}
+                                                                className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20`}
+                                                            >
+                                                                Atölyeye Al
+                                                            </button>
+                                                        )}
+                                                        <button onClick={() => router.push(`/service/${job.id}`)} className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all bg-white/5 border border-white/10 text-white/40 hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-xl`}>
+                                                            🚀 KOKPİT
+                                                        </button>
+                                                        <button onClick={() => setSelectedService(job)} className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white`}>
+                                                            Detay
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
