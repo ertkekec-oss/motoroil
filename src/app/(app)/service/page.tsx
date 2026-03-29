@@ -38,8 +38,7 @@ export default function ServiceDashboard() {
             const data = await res.json();
             if (data.success) {
                 const all = data.services || [];
-                // Filtering happens in the component for dynamic branch switching
-                setActiveJobs(all.filter((j: any) => j.status !== 'Beklemede' && j.status !== 'İptal Edildi'));
+                setActiveJobs(all.filter((j: any) => j.status !== 'Tamamlandı' && j.status !== 'Teslim Edildi' && j.status !== 'İptal Edildi'));
                 setAppointments(all.filter((j: any) => j.status === 'Beklemede'));
             }
         } catch (error) { console.error("Service fetch error", error); }
