@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle, ChevronRight, Printer, Target, TrendingUp, DollarSign } from 'lucide-react';
+import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle, ChevronRight, Printer, Target, TrendingUp, DollarSign, Clock, Lock, MapPin } from 'lucide-react';
 import { IconActivity, IconTrendingUp, IconClock, IconCheck, IconAlert, IconZap, IconShield, IconRefresh, IconTrash } from '@/components/icons/PremiumIcons';
 import { useApp } from '@/contexts/AppContext';
 import dynamic from 'next/dynamic';
@@ -45,28 +45,24 @@ const ProgressBar = ({ label, value, max, color = "#3b82f6" }: any) => {
 // ─── PROFILE HEADER (COMMON TOP ROW) ──────────────────────────
 const ProfileHeader = ({ user, title = "ÖZET", dataCount = 0, dataLabel = "Kayıt" }: any) => {
     return (
-        <div className="w-full flex justify-between items-center h-auto bg-surface dark:bg-[#0f172a] border border-default dark:border-white/5 shadow-enterprise rounded-[16px] p-6 mb-6">
-            <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-full bg-state-success-bg dark:bg-emerald-500/20 text-state-success-text dark:text-emerald-400 flex items-center justify-center text-3xl font-black shadow-inner shrink-0">
+        <div className="w-full flex justify-between items-center bg-surface dark:bg-[#0f172a] border-b border-default dark:border-white/5 pb-4 mb-4">
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded bg-state-success-bg dark:bg-emerald-500/20 text-state-success-text dark:text-emerald-400 flex items-center justify-center text-sm font-black border border-state-success-border">
                     {user?.name?.substring(0, 2).toUpperCase()}
                 </div>
                 <div>
-                    <h3 className="text-xl font-black text-text-primary dark:text-white">{user?.name}</h3>
-                    <p className="text-xs font-bold uppercase text-text-secondary mt-1 tracking-widest">{user?.role || 'Personel'}</p>
+                    <h3 className="text-sm font-black text-text-primary dark:text-white uppercase tracking-widest">{user?.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-state-success-text"></span>
+                        <p className="text-[10px] font-bold text-text-secondary tracking-widest uppercase">{user?.role || 'Personel'} — AKTİF ÇALIŞAN</p>
+                    </div>
                 </div>
             </div>
             
-            <div className="flex items-center gap-8">
-                <div className="text-right hidden sm:block">
-                    <div className="text-[10px] font-bold tracking-widest text-text-muted uppercase">Durum Göstergesi</div>
-                    <div className="text-[13px] font-bold text-text-secondary dark:text-slate-300 flex items-center justify-end gap-2 mt-1">
-                        <span className="w-2 h-2 rounded-full bg-state-success-text"></span> Aktif Çalışan
-                    </div>
-                </div>
-                <div className="h-10 w-px bg-border-divider dark:bg-white/5 hidden sm:block"></div>
+            <div className="flex items-center gap-6">
                 <div className="text-right">
-                    <div className="text-[10px] font-bold tracking-widest text-text-muted uppercase">{title}</div>
-                    <div className="text-[16px] font-black text-state-success-text dark:text-emerald-400 mt-1">{dataCount} <span className="text-sm font-bold text-text-muted">{dataLabel}</span></div>
+                    <div className="text-[9px] font-bold tracking-widest text-text-muted uppercase">{title}</div>
+                    <div className="text-[14px] font-mono font-black text-state-success-text dark:text-emerald-400 mt-0.5">{dataCount} <span className="text-[10px] font-bold text-text-muted uppercase">{dataLabel}</span></div>
                 </div>
             </div>
         </div>
@@ -93,111 +89,105 @@ const DashboardView = ({
         <div className="flex flex-col animate-in fade-in duration-500 min-h-full gap-6 bg-app">
             <ProfileHeader user={user} title="Aktif Görev" dataCount={activeTasksCount} dataLabel="Adet" />
             
-            <div className="flex flex-col space-y-6 flex-1 w-full">
+            <div className="flex flex-col space-y-4 w-full flex-1">
                 {/* Top Summaries */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 shrink-0">
-                    <EnterpriseCard className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                            <h4 className="text-[11px] font-bold text-text-secondary uppercase tracking-widest">Günlük Cirom</h4>
-                            <IconActivity className="w-5 h-5 text-primary" />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
+                    <div className="bg-surface border border-default p-4 flex flex-col justify-between rounded-md shadow-sm">
+                        <div className="flex justify-between items-start mb-2">
+                            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Günlük Cirom</h4>
+                            <IconActivity className="w-3.5 h-3.5 text-primary opacity-50" />
                         </div>
-                        <p className="text-3xl font-black text-text-primary dark:text-white tracking-tight">₺{(turnover || 0).toLocaleString()}</p>
-                        <p className="text-[11px] font-semibold text-text-muted mt-2">Bugünkü satış totali</p>
-                    </EnterpriseCard>
+                        <p className="text-xl font-black font-mono text-text-primary tracking-tight">₺{(turnover || 0).toLocaleString()}</p>
+                    </div>
 
-                    <EnterpriseCard className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                            <h4 className="text-[11px] font-bold text-text-secondary uppercase tracking-widest">Hedef Gerçekleşme</h4>
-                            <IconTrendingUp className="w-5 h-5 text-state-info-text" />
+                    <div className="bg-surface border border-default p-4 flex flex-col justify-between rounded-md shadow-sm">
+                        <div className="flex justify-between items-start mb-2">
+                            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Hedef (Ay)</h4>
+                            <IconTrendingUp className="w-3.5 h-3.5 text-state-info-text opacity-50" />
                         </div>
-                        <p className="text-3xl font-black text-text-primary dark:text-white tracking-tight">{displayAchievement}</p>
-                        <p className="text-[11px] font-semibold text-text-muted mt-2">Bu ayki hedef durumu</p>
-                    </EnterpriseCard>
+                        <p className="text-xl font-black font-mono text-text-primary tracking-tight">{displayAchievement}</p>
+                    </div>
 
-                    <EnterpriseCard className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                            <h4 className="text-[11px] font-bold text-text-secondary uppercase tracking-widest">Bekleyen Görev</h4>
-                            <IconClock className="w-5 h-5 text-state-warning-text" />
+                    <div className="bg-surface border border-default p-4 flex flex-col justify-between rounded-md shadow-sm">
+                        <div className="flex justify-between items-start mb-2">
+                            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Bekleyen Görev</h4>
+                            <IconClock className="w-3.5 h-3.5 text-state-warning-text opacity-50" />
                         </div>
-                        <p className="text-3xl font-black text-text-primary dark:text-white tracking-tight">{activeTasksCount}</p>
-                        <p className="text-[11px] font-semibold text-text-muted mt-2">Size atanmış aktif görev</p>
-                    </EnterpriseCard>
+                        <p className="text-xl font-black font-mono text-text-primary tracking-tight">{activeTasksCount}</p>
+                    </div>
 
-                    <EnterpriseCard className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                            <h4 className="text-[11px] font-bold text-text-secondary uppercase tracking-widest">Kazanılan Prim</h4>
-                            <IconZap className="w-5 h-5 text-state-success-text" />
+                    <div className="bg-surface dark:bg-emerald-900/10 border border-state-success-border p-4 flex flex-col justify-between rounded-md shadow-sm">
+                        <div className="flex justify-between items-start mb-2">
+                            <h4 className="text-[10px] font-bold text-state-success-text uppercase tracking-widest">Kazanılan Prim</h4>
                         </div>
-                        <p className="text-3xl font-black text-text-primary dark:text-white tracking-tight">{displayBonus}</p>
-                        <p className="text-[11px] font-semibold text-text-muted mt-2">Dönem biriken tutar</p>
-                    </EnterpriseCard>
+                        <p className="text-xl font-black font-mono text-state-success-text tracking-tight">{displayBonus}</p>
+                    </div>
                 </div>
 
                 {/* PDKS & Vardiya */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 h-auto">
-                    <EnterpriseCard className="h-full flex flex-col min-h-[300px]">
-                        <EnterpriseSectionHeader title="PDKS Geçiş İşlemleri" icon="⚡" />
-                        <div className="p-6 space-y-6 flex-1 flex flex-col justify-center">
-                            <div className="grid grid-cols-2 gap-4">
-                                {!pdksStatus?.isWorking ? (
-                                    <>
-                                        <button onClick={handleQrCheckin} className="flex flex-col items-center gap-3 p-6 bg-surface-secondary dark:bg-indigo-500/10 hover:bg-surface-tertiary dark:hover:bg-indigo-500/20 border border-default dark:border-indigo-500/20 rounded-xl transition-all group">
-                                            <div className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center shadow-premium group-hover:scale-110 transition-transform"><span className="text-2xl">📱</span></div>
-                                            <span className="text-[11px] font-black text-text-primary dark:text-indigo-400 uppercase tracking-widest text-center mt-2">Ofis Girişi<br/>(QR)</span>
-                                        </button>
-                                        <button onClick={handleGpsCheckin} className="flex flex-col items-center gap-3 p-6 bg-surface-secondary dark:bg-emerald-500/10 hover:bg-surface-tertiary dark:hover:bg-emerald-500/20 border border-default dark:border-emerald-500/20 rounded-xl transition-all group">
-                                            <div className="w-12 h-12 bg-state-success-text text-white rounded-xl flex items-center justify-center shadow-premium group-hover:scale-110 transition-transform"><span className="text-2xl">📍</span></div>
-                                            <span className="text-[11px] font-black text-text-primary dark:text-emerald-400 uppercase tracking-widest text-center mt-2">Saha Girişi<br/>(GPS)</span>
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className="col-span-2 flex flex-col items-center gap-4 bg-surface-tertiary border border-default rounded-2xl h-full justify-center p-6 shadow-enterprise">
-                                        <div className="text-center w-full bg-state-success-bg border border-state-success-border p-5 rounded-xl">
-                                            <p className="text-state-success-text font-bold uppercase tracking-widest text-[10px] mb-2">Mevcut Oturum Verisi</p>
-                                            <div className="text-3xl font-black text-text-primary tracking-widest">
-                                                {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '...'}
-                                            </div>
-                                            <p className="text-text-secondary font-black text-[10px] mt-2 uppercase tracking-widest">
-                                                {pdksStatus.activeSession?.locationIn?.mode === 'FIELD_GPS' ? '📍 SAHA / GPS' : '📱 ŞÜBE / QR'}
-                                            </p>
-                                        </div>
-                                        <button onClick={handleCheckout} className="w-full py-5 bg-state-alert-text hover:bg-rose-700 rounded-xl transition-all shadow-lg active:scale-95 border-b-4 border-rose-900 active:border-b-0 border border-t border-rose-400 flex items-center justify-center gap-3">
-                                            <span className="text-lg">🏁</span>
-                                            <span className="text-[13px] font-black text-white uppercase tracking-widest">MESAİYİ BİTİR</span>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex items-center justify-center pt-2">
-                                <span className="text-[10px] uppercase font-bold text-text-muted">📲 Konum ve cihaz parmak izi güvenli şekilde doğrulanır.</span>
-                            </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
+                    <div className="bg-surface border border-default overflow-hidden flex flex-col rounded-md shadow-sm">
+                        <div className="bg-surface-secondary px-4 py-3 border-b border-default text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center justify-between">
+                            <h3 className="flex items-center gap-2"><IconZap className="w-3.5 h-3.5 text-text-muted" /> PDKS DOĞRULAMASI</h3>
+                            {!pdksStatus?.isWorking && <span className="text-[9px] text-text-muted font-bold">KAPALI</span>}
+                            {pdksStatus?.isWorking && <span className="w-1.5 h-1.5 rounded-full bg-state-success-text animate-pulse"></span>}
                         </div>
-                    </EnterpriseCard>
+                        <div className="p-4 flex-1 flex flex-col justify-center">
+                            {!pdksStatus?.isWorking ? (
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button onClick={handleQrCheckin} className="flex flex-col items-center justify-center gap-2 h-20 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-md outline-none transition-colors group">
+                                        <Printer className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                                        <span className="text-[10px] font-black text-text-primary uppercase tracking-widest">Ofis QR (Lokal)</span>
+                                    </button>
+                                    <button onClick={handleGpsCheckin} className="flex flex-col items-center justify-center gap-2 h-20 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-md outline-none transition-colors group">
+                                        <Flag className="w-5 h-5 text-state-success-text group-hover:scale-110 transition-transform" />
+                                        <span className="text-[10px] font-black text-text-primary uppercase tracking-widest">Saha GPS (Dış)</span>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-4 bg-surface-tertiary border border-default p-4 rounded-md">
+                                    <div className="flex-1">
+                                        <p className="text-state-success-text font-black uppercase tracking-widest text-[9px] mb-1 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> VERİ DOĞRULANDI</p>
+                                        <div className="text-xl font-mono font-black text-text-primary">
+                                            {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '--:--'}
+                                        </div>
+                                        <p className="text-text-secondary font-bold text-[9px] uppercase tracking-widest mt-1">
+                                            {pdksStatus.activeSession?.locationIn?.mode === 'FIELD_GPS' ? 'PROTOKOL: GPS DOĞRULAMALI / SAHA' : 'PROTOKOL: QR DOĞRULAMALI / ŞUBE'}
+                                        </p>
+                                    </div>
+                                    <button onClick={handleCheckout} className="h-10 px-6 bg-state-alert-text hover:bg-rose-700 text-white rounded-md font-black text-[10px] uppercase tracking-widest shadow-sm outline-none transition-colors border border-transparent">
+                                        PASİFE AL
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                    <EnterpriseCard className="h-full flex flex-col min-h-[300px]">
-                        <EnterpriseSectionHeader title="Sıradaki Vardiya Özetim" icon="⏰" />
-                        <div className="p-6 flex flex-col justify-center flex-1 space-y-4">
+                    <div className="bg-surface border border-default overflow-hidden flex flex-col rounded-md shadow-sm">
+                        <div className="bg-surface-secondary px-4 py-3 border-b border-default text-[10px] font-black uppercase tracking-widest text-text-primary flex items-center gap-2">
+                           <IconClock className="w-3.5 h-3.5 text-text-muted" /> SIRADAKİ VARDİYA
+                        </div>
+                        <div className="p-4 flex flex-col justify-center flex-1">
                         {shifts.length > 0 ? (
-                            <div className="flex items-center gap-4 p-5 bg-surface-secondary dark:bg-blue-500/10 border border-default dark:border-blue-500/20 rounded-xl">
-                                <div className="w-16 h-16 bg-surface dark:bg-blue-500/20 text-primary dark:text-blue-400 rounded-xl flex flex-col items-center justify-center font-black">
-                                    <span className="text-xs">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}</span>
-                                    <span className="text-lg">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { weekday: 'short' })}</span>
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-surface-secondary border border-default rounded-md flex flex-col items-center justify-center font-black">
+                                    <span className="text-[10px] uppercase font-mono">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })}</span>
                                 </div>
                                 <div>
-                                    <h4 className="text-[14px] font-black text-text-primary dark:text-white uppercase tracking-widest">{shifts[0]?.type} Vardiyası</h4>
-                                    <p className="text-[12px] font-bold text-primary dark:text-blue-400 mt-1">
+                                    <h4 className="text-[12px] font-black text-text-primary uppercase tracking-widest">{shifts[0]?.type} Vardiyası</h4>
+                                    <p className="text-[11px] font-mono font-bold text-text-secondary mt-1">
                                         {shifts[0]?.type === 'İzinli' ? 'Tam Gün İzinli' : `${new Date(shifts[0]?.start).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})} - ${new Date(shifts[0]?.end).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}`}
                                     </p>
                                 </div>
                             </div>
                         ) : (
-                            <div className="text-center text-sm font-semibold text-slate-400 py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
-                                Size atanmış yaklaşan vardiya bulunmuyor.
+                            <div className="text-center text-[10px] font-bold text-text-muted uppercase tracking-widest py-4 bg-surface-secondary border border-dashed border-default rounded-md">
+                                PLANLI VARDİYA BULUNMUYOR
                             </div>
                         )}
+                        </div>
                     </div>
-                </EnterpriseCard>
-            </div>
+                </div>
             </div>
             <BarcodeScanner isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={onQrScan} />
         </div>
@@ -219,110 +209,98 @@ const TargetsView = ({ targets, statsData, user }: any) => {
             <ProfileHeader user={user} title="Aktif Dönem Hedefleri" dataCount={targets?.length || 0} dataLabel="Adet Hedef" />
 
             {/* COLUMNS 2-4: The Content */}
-            <div className="flex-1 overflow-y-auto flex flex-col bg-surface dark:bg-[#0f172a] shadow-enterprise rounded-[16px] border border-default dark:border-white/5 p-6 space-y-6">
-                <div className="flex items-center justify-between bg-surface-secondary dark:bg-[#1e293b]/60 p-5 rounded-[12px] border border-default dark:border-white/5 shrink-0">
-                    <div>
-                        <h2 className="text-[18px] font-black text-text-primary dark:text-white flex items-center gap-2">
-                            <Target className="w-5 h-5 text-state-success-text" />
-                            Kişisel Hedef ve Performansım
-                        </h2>
-                        <p className="text-[12px] text-text-secondary dark:text-slate-400 mt-1">Bu dönemki hedeflerinizi ve komisyon hakedişlerinizi anlık takip edebilirsiniz.</p>
-                    </div>
-                </div>
-
+            <div className="flex-1 overflow-y-auto flex flex-col space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
-                    <div className="bg-surface dark:bg-[#0f172a] border border-default dark:border-white/5 rounded-[12px] p-5 shadow-enterprise">
-                        <h4 className="text-[11px] font-bold tracking-widest text-text-secondary uppercase mb-3 flex items-center gap-1.5"><TrendingUp className="w-3 h-3" /> İlerleme Başarısı</h4>
-                        <div className="text-3xl font-black text-text-primary dark:text-white">%{overallProgress}</div>
-                        <div className="w-full h-1.5 bg-surface-secondary dark:bg-slate-800 rounded-full mt-3 overflow-hidden">
+                    <div className="bg-surface dark:bg-[#0f172a] border border-default rounded-md shadow-sm p-4 flex flex-col justify-between">
+                        <h4 className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> İlerleme Başarısı</h4>
+                        <div className="text-xl font-black font-mono text-text-primary dark:text-white">%{overallProgress}</div>
+                        <div className="w-full h-1.5 bg-surface-secondary dark:bg-slate-800 rounded-full mt-3 overflow-hidden border border-default">
                             <div className="h-full bg-state-success-text rounded-full transition-all duration-1000" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
                         </div>
                     </div>
-                    <div className="bg-surface dark:bg-[#0f172a] border border-default dark:border-white/5 rounded-[12px] p-5 shadow-enterprise">
-                        <h4 className="text-[11px] font-bold tracking-widest text-text-secondary uppercase mb-3 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> Ulaşılan Hedefler</h4>
-                        <div className="text-3xl font-black text-text-primary dark:text-white">{completedTargetsCount}</div>
+                    <div className="bg-surface dark:bg-[#0f172a] border border-default rounded-md shadow-sm p-4 flex flex-col justify-between">
+                        <h4 className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-state-success-text" /> Ulaşılan Hedefler</h4>
+                        <div className="text-xl font-black font-mono text-text-primary dark:text-white">{completedTargetsCount}</div>
                     </div>
-                    <div className="bg-surface dark:bg-[#0f172a] border border-default dark:border-white/5 rounded-[12px] p-5 shadow-enterprise">
-                        <h4 className="text-[11px] font-bold tracking-widest text-text-secondary uppercase mb-3 flex items-center gap-1.5">🔥 Aktif Hedefler</h4>
-                        <div className="text-3xl font-black text-text-primary dark:text-white">{activeTargetsCount}</div>
+                    <div className="bg-surface dark:bg-[#0f172a] border border-default rounded-md shadow-sm p-4 flex flex-col justify-between">
+                        <h4 className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><IconActivity className="w-3.5 h-3.5 text-state-warning-text" /> Aktif Hedefler</h4>
+                        <div className="text-xl font-black font-mono text-text-primary dark:text-white">{activeTargetsCount}</div>
                     </div>
-                    <div className="bg-surface dark:bg-[#0f172a] border border-default dark:border-white/5 rounded-[12px] p-5 shadow-enterprise bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-900/10 dark:to-[#0f172a]">
-                        <h4 className="text-[11px] font-bold tracking-widest text-state-success-text dark:text-emerald-400 uppercase mb-3 flex items-center gap-1.5"><DollarSign className="w-3 h-3" /> Prim (Tahmini)</h4>
-                        <div className="text-3xl font-black text-state-success-text dark:text-emerald-400">₺{totalEstBonus.toLocaleString()}</div>
+                    <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-state-success-border rounded-md shadow-sm p-4 flex flex-col justify-between">
+                        <h4 className="text-[10px] font-bold tracking-widest text-state-success-text dark:text-emerald-400 uppercase mb-2 flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5" /> Prim Hakedişi</h4>
+                        <div className="text-xl font-black font-mono text-state-success-text dark:text-emerald-400">₺{totalEstBonus.toLocaleString()}</div>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col bg-surface dark:bg-[#0f172a] border border-default rounded-xl">
-                    <div className="p-4 border-b border-divider dark:border-white/5 bg-surface-secondary dark:bg-[#1e293b] shrink-0">
-                        <h3 className="text-[13px] font-bold text-text-primary dark:text-slate-300">Detaylı Hedef Tablosu</h3>
-                    </div>
+                <div className="flex-1 overflow-hidden flex flex-col bg-surface border border-default rounded-md shadow-sm min-h-[300px]">
+                    <EnterpriseSectionHeader title="Dönemsel Performans Tablosu" icon="🎯" />
                     {targets?.length === 0 ? (
                         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-surface-bg/30 dark:bg-transparent">
-                            <Target className="w-10 h-10 text-text-muted dark:text-slate-600 mb-3 opacity-50" />
-                            <h3 className="text-[14px] font-bold text-text-secondary dark:text-slate-300 mb-1">Hedef Ataması Bulunmuyor</h3>
-                            <p className="text-[12px] text-text-muted">Bu dönem için henüz sizin adınıza planlanmış bir performans hedefi yok.</p>
+                            <Target className="w-8 h-8 text-text-muted mb-3 opacity-50" />
+                            <h3 className="text-[12px] font-bold text-text-secondary dark:text-slate-300 mb-1 uppercase tracking-widest">Hedef Ataması Bulunmuyor</h3>
+                            <p className="text-[11px] text-text-muted font-semibold">Bu dönem için henüz sizin adınıza planlanmış bir performans hedefi yok.</p>
                         </div>
                     ) : (
                         <div className="flex-1 overflow-y-auto custom-scroll outline-none">
                             <table className="w-full text-left border-collapse min-w-[700px]">
                                 <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default dark:border-white/5 shadow-enterprise">
                                     <tr>
-                                        <th className="p-3 pl-4 text-[11px] font-bold text-text-muted uppercase tracking-widest backdrop-blur bg-surface-secondary/90 dark:bg-[#1e293b]/90">Hedef Türü</th>
-                                        <th className="p-3 text-[11px] font-bold text-text-muted uppercase tracking-widest backdrop-blur bg-surface-secondary/90 dark:bg-[#1e293b]/90">Durum</th>
-                                        <th className="p-3 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right backdrop-blur bg-surface-secondary/90 dark:bg-[#1e293b]/90">KOTA</th>
-                                        <th className="p-3 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right backdrop-blur bg-surface-secondary/90 dark:bg-[#1e293b]/90">Cari Gerçekleşen</th>
-                                        <th className="p-3 text-[11px] font-bold text-text-muted uppercase tracking-widest pr-4 w-48 backdrop-blur bg-surface-secondary/90 dark:bg-[#1e293b]/90">Performans</th>
+                                        <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Hedef Türü</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Durum</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right">KOTA (HEDEF)</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right">Cari Gerçekleşen</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest pr-4 w-48">Performans</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50 bg-white dark:bg-[#0f172a]">
+                                <tbody className="divide-y divide-default bg-white dark:bg-[#0f172a]">
                                     {targets.map((t: any) => {
                                         const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
                                         const isCompleted = progress >= 100;
 
                                         return (
-                                            <tr key={t.id} className="hover:bg-surface-secondary dark:hover:bg-slate-800/20 transition-colors border-b border-divider">
+                                            <tr key={t.id} className="hover:bg-surface-secondary/50 dark:hover:bg-slate-800/20 transition-colors">
                                                 <td className="p-3 pl-4 align-middle">
                                                     <div className="flex items-center gap-3">
-                                                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${t.type === 'TURNOVER' ? 'bg-state-info-bg dark:bg-blue-500/20 text-state-info-text dark:text-blue-400' : 'bg-state-warning-bg dark:bg-orange-500/20 text-state-warning-text dark:text-orange-400'}`}>
-                                                            {t.type === 'TURNOVER' ? <DollarSign className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
+                                                        <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center ${t.type === 'TURNOVER' ? 'bg-state-info-bg border border-state-info-border text-state-info-text' : 'bg-state-warning-bg border border-state-warning-border text-state-warning-text'}`}>
+                                                            {t.type === 'TURNOVER' ? <DollarSign className="w-3.5 h-3.5" /> : <TrendingUp className="w-3.5 h-3.5" />}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <div className="text-[13px] font-bold text-text-primary dark:text-slate-200 truncate">
-                                                                {t.type === 'TURNOVER' ? 'Ciro Hedefi' : 'Aksiyon Hedefi'} ({t.period})
+                                                            <div className="text-[12px] font-black text-text-primary dark:text-white uppercase tracking-widest truncate">
+                                                                {t.title || (t.type === 'TURNOVER' ? 'Ciro Hedefi' : 'Aksiyon Hedefi')}
                                                             </div>
-                                                            <div className="text-[10px] uppercase font-bold text-text-muted truncate mt-0.5 tracking-widest">
-                                                                {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}
+                                                            <div className="text-[10px] font-bold text-text-secondary truncate mt-0.5 tracking-widest">
+                                                                DÖNEM: {new Date(t.startDate).toLocaleDateString('tr-TR', {month:'2-digit', year:'2-digit'})} / {new Date(t.endDate).toLocaleDateString('tr-TR', {month:'2-digit', year:'2-digit'})}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="p-3 align-middle whitespace-nowrap">
                                                     {isCompleted ? (
-                                                        <span className="inline-flex items-center justify-center px-2 py-1 bg-state-success-bg dark:bg-emerald-500/20 text-state-success-text dark:text-emerald-400 font-bold text-[10px] uppercase tracking-widest rounded border border-state-success-border dark:border-emerald-500/30">
+                                                        <span className="inline-flex items-center justify-center px-2 py-0.5 bg-state-success-bg text-state-success-text font-black text-[9px] uppercase tracking-widest rounded border border-state-success-border">
                                                             BAŞARILI
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center justify-center px-2 py-1 bg-state-info-bg dark:bg-blue-500/20 text-state-info-text dark:text-blue-400 font-bold text-[10px] uppercase tracking-widest rounded border border-state-info-border dark:border-blue-500/30">
+                                                        <span className="inline-flex items-center justify-center px-2 py-0.5 bg-state-info-bg text-state-info-text font-black text-[9px] uppercase tracking-widest rounded border border-state-info-border">
                                                             DEVAM EDİYOR
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="p-3 align-middle text-[13px] font-bold text-slate-600 dark:text-slate-300 text-right whitespace-nowrap">
+                                                <td className="p-3 align-middle text-[12px] font-black font-mono text-text-secondary dark:text-slate-300 text-right whitespace-nowrap">
                                                     {t.type === 'TURNOVER' ? `₺${Number(t.targetValue).toLocaleString()}` : `${t.targetValue}`}
                                                 </td>
-                                                <td className="p-3 align-middle text-[13px] font-black text-emerald-600 dark:text-emerald-400 text-right whitespace-nowrap">
+                                                <td className="p-3 align-middle text-[13px] font-black font-mono text-state-success-text text-right whitespace-nowrap">
                                                     {t.type === 'TURNOVER' ? `₺${Number(t.currentValue).toLocaleString()}` : `${t.currentValue}`}
                                                 </td>
                                                 <td className="p-3 align-middle pr-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                            <div className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${Math.min(progress, 100)}%` }} />
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex-1 h-1.5 bg-surface-secondary dark:bg-slate-800 rounded-full overflow-hidden border border-default">
+                                                            <div className={`h-full transition-all duration-500 rounded-full ${isCompleted ? 'bg-state-success-text' : 'bg-state-info-text'}`} style={{ width: `${Math.min(progress, 100)}%` }} />
                                                         </div>
-                                                        <span className={`text-[11px] font-black w-9 text-right shrink-0 ${isCompleted ? 'text-state-success-text' : 'text-text-muted'}`}>%{progress}</span>
+                                                        <span className={`text-[10px] font-black font-mono w-8 text-right shrink-0 ${isCompleted ? 'text-state-success-text' : 'text-text-muted'}`}>%{progress}</span>
                                                     </div>
                                                     {t.estimatedBonus > 0 && (
-                                                        <div className="mt-1 flex justify-end">
-                                                            <span className="text-[9px] uppercase font-bold text-state-success-text dark:text-emerald-400 tracking-widest bg-state-success-bg dark:bg-emerald-500/10 px-1.5 py-0.5 rounded">Hakediş: ₺{Number(t.estimatedBonus).toLocaleString()}</span>
+                                                        <div className="mt-1.5 flex justify-end">
+                                                            <span className="text-[9px] font-black text-state-success-text uppercase tracking-widest max-w-max border-b border-dashed border-state-success-text">HAKEDİŞ: ₺{Number(t.estimatedBonus).toLocaleString()}</span>
                                                         </div>
                                                     )}
                                                 </td>
@@ -384,86 +362,94 @@ const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
         <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
             <ProfileHeader user={user} title="Atanmış Aktif Görevler" dataCount={tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length} dataLabel="Görev" />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
-                <div className="lg:col-span-1 border border-transparent">
-                <EnterpriseCard className="h-full flex flex-col">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 h-auto">
+                <div className="lg:col-span-1 h-full flex flex-col">
+                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Atanan Görevlerim" icon="📋" />
-                    <div className="p-4 border-b border-divider bg-surface-secondary/50 dark:bg-slate-800/10">
-                        <div className="flex bg-surface-tertiary dark:bg-slate-800 p-1 rounded-lg">
+                    <div className="p-3 border-b border-divider bg-surface-secondary/50 dark:bg-slate-800/10 shrink-0">
+                        <div className="flex bg-surface-tertiary dark:bg-slate-800 p-1 rounded-sm border border-default">
                             {['Devam Edenler', 'Tamamlandı', 'Tümü'].map((status) => (
-                                <button key={status} onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }} className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${filterStatus === status ? 'bg-surface dark:bg-slate-700 text-primary dark:text-blue-400 shadow-enterprise' : 'text-text-secondary hover:text-text-primary dark:hover:text-slate-300'}`}>
+                                <button key={status} onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }} className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm transition-all ${filterStatus === status ? 'bg-surface dark:bg-slate-700 text-primary dark:text-blue-400 shadow-sm border border-default' : 'text-text-secondary hover:text-text-primary dark:hover:text-slate-300 border border-transparent'}`}>
                                     {status}
                                 </button>
                             ))}
                         </div>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                        {loading ? <p className="text-center text-sm text-text-muted">Yükleniyor...</p> : 
-                            paginatedTasks.length === 0 ? <p className="text-center text-sm font-semibold text-text-muted p-8">Belirtilen duruma uygun görev yok.</p> :
-                            paginatedTasks.map((task: any) => (
-                                <button key={task.id} onClick={() => setSelectedTask(task)} className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTask?.id === task.id ? 'bg-surface-secondary border-primary dark:bg-blue-500/10' : 'bg-surface dark:bg-slate-800 border-default dark:border-slate-700 hover:border-primary'}`}>
-                                    <h4 className="text-[13px] font-black text-text-primary dark:text-white mb-2 line-clamp-1">{task.title}</h4>
-                                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-                                        <span className={task.status === 'Tamamlandı' ? 'text-state-success-text' : task.status === 'İptal' ? 'text-text-muted' : 'text-state-warning-text'}>{task.status}</span>
-                                        <span className="flex items-center gap-1 text-text-muted"><Flag className="w-3 h-3"/> {task.priority}</span>
-                                    </div>
-                                </button>
-                            ))
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                        {loading ? <p className="text-center text-xs text-text-muted p-8">Yükleniyor...</p> : 
+                            paginatedTasks.length === 0 ? <p className="text-center text-xs font-semibold text-text-muted p-8">Belirtilen duruma uygun görev yok.</p> :
+                            <div className="divide-y divide-default">
+                                {paginatedTasks.map((task: any) => (
+                                    <button key={task.id} onClick={() => setSelectedTask(task)} className={`w-full text-left p-4 transition-all block ${selectedTask?.id === task.id ? 'bg-primary/5 dark:bg-blue-500/10' : 'bg-surface hover:bg-surface-secondary dark:bg-slate-800 dark:hover:bg-slate-800/80'}`}>
+                                        <h4 className={`text-[12px] font-black mb-1.5 line-clamp-1 ${selectedTask?.id === task.id ? 'text-primary dark:text-blue-400' : 'text-text-primary dark:text-white'}`}>{task.title}</h4>
+                                        <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest">
+                                            <span className={task.status === 'Tamamlandı' ? 'text-state-success-text' : task.status === 'İptal' ? 'text-text-muted' : 'text-state-warning-text'}>{task.status}</span>
+                                            <span className="flex items-center gap-1 text-text-muted"><Flag className="w-3 h-3"/> {task.priority}</span>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
                         }
                     </div>
                     {totalPages > 1 && (
-                        <div className="p-3 border-t border-divider flex justify-between text-[11px] font-bold text-text-secondary bg-surface-secondary/50 dark:bg-slate-800/20">
-                            <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="px-3 py-1.5 bg-surface dark:bg-slate-700 border border-default rounded">GERİ</button>
-                            <span>Sayfa {currentPage} / {totalPages}</span>
-                            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="px-3 py-1.5 bg-surface dark:bg-slate-700 border border-default rounded">İLERİ</button>
+                        <div className="p-3 border-t border-divider flex justify-between text-[10px] items-center font-bold text-text-secondary bg-surface-secondary/50 shrink-0">
+                            <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="px-3 py-1 bg-surface dark:bg-slate-700 border border-default rounded-sm hover:bg-surface-secondary disabled:opacity-50 transition-colors">GERİ</button>
+                            <span className="font-mono tracking-widest text-[9px]">SAYFA {currentPage} / {totalPages}</span>
+                            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="px-3 py-1 bg-surface dark:bg-slate-700 border border-default rounded-sm hover:bg-surface-secondary disabled:opacity-50 transition-colors">İLERİ</button>
                         </div>
                     )}
                 </EnterpriseCard>
             </div>
-            <div className="lg:col-span-2">
-                <EnterpriseCard className="h-full flex flex-col">
-                    <EnterpriseSectionHeader title="Görev Detayı & Rapor" icon="📝" />
+            <div className="lg:col-span-2 h-full flex flex-col">
+                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+                    <EnterpriseSectionHeader title="Görev Rapor Merkezi" icon="📝" />
                     {!selectedTask ? (
-                        <div className="flex-1 flex flex-col items-center justify-center p-8 opacity-50 text-slate-500 text-[13px] font-bold uppercase tracking-widest text-center">
-                            ← LİSTEDEN BİR GÖREV SEÇEREK DETAYLARI VE BİLDİRİM EKRANINI AÇIN
+                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-text-muted text-[11px] font-black uppercase tracking-widest text-center border-t border-default bg-surface-bg/30">
+                            ← LİSTEDEN BİR GÖREV SEÇEREK RAPOR EKRANINI AÇIN
                         </div>
                     ) : (
-                        <div className="flex-1 flex flex-col overflow-hidden">
-                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
-                                <h2 className="text-[18px] font-black text-text-primary">{selectedTask.title}</h2>
-                                {selectedTask.dueDate && <span className="flex items-center gap-1.5 mt-2 text-[11px] font-bold uppercase text-state-alert-text bg-state-alert-bg px-3 py-1.5 w-max rounded-lg border border-state-alert-border"><Calendar className="w-4 h-4"/> Son Teslim: {new Date(selectedTask.dueDate).toLocaleDateString()}</span>}
+                        <div className="flex-1 flex flex-col overflow-hidden bg-surface dark:bg-[#0f172a] shadow-inner">
+                            <div className="p-5 border-b border-default bg-surface-secondary/40 shrink-0">
+                                <h2 className="text-[14px] font-black text-text-primary">{selectedTask.title}</h2>
+                                {selectedTask.dueDate && <span className="flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase text-state-alert-text bg-state-alert-bg/50 px-2 py-1 w-max rounded-sm border border-state-alert-border"><Calendar className="w-3.5 h-3.5"/> Son Teslim: {new Date(selectedTask.dueDate).toLocaleDateString()}</span>}
                             </div>
-                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            <div className="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col">
                                 {selectedTask.description && (
-                                    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border shadow-sm">
-                                        <h4 className="text-[10px] uppercase font-black text-slate-500 mb-3 flex items-center gap-2"><FileText className="w-4 h-4"/> Açıklama</h4>
-                                        <p className="text-[13px] text-slate-700 dark:text-slate-300">{selectedTask.description}</p>
+                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-sm border border-default shadow-sm shrink-0">
+                                        <h4 className="text-[9px] uppercase font-black text-text-muted mb-2 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5"/> Görev Detayı / Açıklama</h4>
+                                        <div className="text-[12px] text-text-secondary leading-relaxed whitespace-pre-wrap">{selectedTask.description}</div>
                                     </div>
                                 )}
-                                <div className="space-y-4">
-                                    <h4 className="text-[10px] uppercase font-black text-slate-500 flex items-center gap-2"><MessageSquare className="w-4 h-4"/> Rapor & Yorum Geçmişi</h4>
-                                    {selectedTask.feedbacks?.length === 0 ? <p className="text-[11px] text-text-muted italic">Henüz rapor girilmedi.</p> : 
-                                        selectedTask.feedbacks?.map((fb: any) => (
-                                            <div key={fb.id} className={`p-4 rounded-xl max-w-[85%] ${fb.isFromStaff ? 'bg-state-warning-bg dark:bg-amber-500/10 ml-auto border-state-warning-border text-right text-state-warning-text' : 'bg-state-info-bg dark:bg-blue-500/10 border-state-info-border text-state-info-text'}`}>
-                                                <div className={`flex justify-between items-center mb-2 text-[9px] font-bold text-text-muted uppercase tracking-widest ${fb.isFromStaff && 'flex-row-reverse'}`}>
-                                                    <span>{fb.isFromStaff ? user?.name : 'Yönetim / İK'}</span>
-                                                    <span>{new Date(fb.createdAt).toLocaleString()}</span>
+                                <div className="space-y-4 flex-1">
+                                    <h4 className="text-[9px] uppercase font-black text-text-muted flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5"/> Rapor & Yorum Akışı</h4>
+                                    {selectedTask.feedbacks?.length === 0 ? <p className="text-[10px] text-text-muted italic border-l-2 border-default pl-3">Henüz geri bildirim ya da rapor eklenmemiş.</p> : 
+                                        <div className="space-y-3">
+                                            {selectedTask.feedbacks?.map((fb: any) => (
+                                                <div key={fb.id} className={`p-4 rounded-sm border max-w-[85%] ${fb.isFromStaff ? 'bg-surface-secondary dark:bg-slate-800/80 ml-auto border-default' : 'bg-primary/5 dark:bg-blue-500/10 border-primary/20'}`}>
+                                                    <div className={`flex justify-between items-center mb-1.5 text-[9px] font-black text-text-muted uppercase tracking-widest ${fb.isFromStaff && 'flex-row-reverse'}`}>
+                                                        <span className={fb.isFromStaff ? 'text-primary dark:text-blue-400' : 'text-text-secondary'}>{fb.isFromStaff ? user?.name : 'Yönetim / İK'}</span>
+                                                        <span>{new Date(fb.createdAt).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'})}</span>
+                                                    </div>
+                                                    <p className="text-[12px] text-text-primary dark:text-slate-200 whitespace-pre-wrap">{fb.content}</p>
                                                 </div>
-                                                <p className="text-[13px] font-medium">{fb.content}</p>
-                                            </div>
-                                        ))
+                                            ))}
+                                        </div>
                                     }
                                 </div>
                             </div>
-                            <div className="p-4 border-t bg-white dark:bg-slate-900">
+                            <div className="p-4 border-t border-default bg-surface shrink-0 z-10 sticky bottom-0">
                                 {selectedTask.status === 'Tamamlandı' ? (
-                                    <div className="bg-emerald-50 text-emerald-600 font-bold p-4 text-center rounded-lg border flex justify-center gap-2"><CheckCircle2 className="w-5 h-5"/> BU GÖREV TAMAMLANDI</div>
+                                    <div className="bg-state-success-bg/30 text-state-success-text font-black text-[11px] uppercase tracking-widest p-4 text-center rounded-sm border border-state-success-border flex items-center justify-center gap-2">
+                                        <CheckCircle2 className="w-4 h-4"/> BU GÖREV BAŞARIYLA TAMAMLANDI
+                                    </div>
                                 ) : (
-                                    <div className="space-y-3">
-                                        <textarea className="w-full h-20 bg-surface-secondary dark:bg-slate-800 rounded-xl p-3 text-[13px] border border-default focus:border-primary resize-none" placeholder="Durum bildirimi/raporu yazın..." value={feedback} onChange={e => setFeedback(e.target.value)} />
-                                        <div className="flex gap-2">
-                                            <button onClick={() => handleSendFeedback()} disabled={isUpdating || !feedback.trim()} className="flex-1 bg-surface-tertiary hover:bg-surface-secondary py-3 rounded-lg text-[11px] font-black uppercase disabled:opacity-50 text-text-primary border border-default">Sadece Yorum Gir</button>
-                                            <button onClick={() => handleSendFeedback('Tamamlandı')} disabled={isUpdating} className="flex-1 bg-state-success-text hover:bg-emerald-600 disabled:opacity-50 text-white py-3 rounded-lg text-[11px] font-black uppercase flex items-center justify-center gap-2 shadow-premium"><CheckCircle2 className="w-4 h-4"/> GÖREVİ TAMAMLADIM</button>
+                                    <div className="flex flex-col gap-3">
+                                        <textarea className="w-full h-16 bg-surface-secondary dark:bg-slate-800 rounded-sm p-3 text-[12px] border border-default focus:border-primary focus:ring-1 focus:ring-primary/20 resize-none outline-none custom-scrollbar transition-all" placeholder="Görevle ilgili raporunuzu veya yorumunuzu buraya yazın..." value={feedback} onChange={e => setFeedback(e.target.value)} />
+                                        <div className="flex items-center gap-3">
+                                            <button onClick={() => handleSendFeedback()} disabled={isUpdating || !feedback.trim()} className="flex-1 bg-surface-tertiary hover:bg-surface-secondary py-2.5 rounded-sm text-[10px] font-black uppercase disabled:opacity-50 text-text-primary border border-default transition-all">Sadece Yorum Bırak</button>
+                                            <button onClick={() => handleSendFeedback('Tamamlandı')} disabled={isUpdating} className="flex-1 bg-state-success-text hover:bg-emerald-600 focus:bg-emerald-700 disabled:opacity-50 text-white py-2.5 rounded-sm text-[10px] font-black uppercase flex items-center justify-center gap-2 shadow-sm transition-all border border-transparent">
+                                                <CheckCircle2 className="w-3.5 h-3.5"/> GÖREVİ TAMAMLA
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -518,101 +504,107 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
             
             <ProfileHeader user={user} title="Onay Bekleyen Talep" dataCount={leaves.filter((l: any) => l.status === 'Bekliyor').length} dataLabel="Adet" />
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+            <div className="flex-1 flex gap-4 overflow-hidden">
                 {/* INVISIBLE PRINT CONTAINER */}
-            <div id="printable-area" className="hidden">
-                {printableLeave && (
-                    <div className="p-10 font-[serif] text-black">
-                        <h2 className="text-center text-xl font-bold uppercase mb-10 border-b-2 border-black pb-4">İzin Talep Formu / Dilekçesi</h2>
-                        <div className="text-right mb-10">Tarih: {new Date(printableLeave.createdAt).toLocaleDateString('tr-TR')}</div>
-                        <p className="text-lg mb-8 leading-relaxed">
-                            Kurumunuzda sicil numaralı personeli <strong>{user?.name}</strong> olarak görev yapmaktayım.<br/><br/>
-                            <strong>{new Date(printableLeave.startDate).toLocaleDateString('tr-TR')}</strong> ile <strong>{new Date(printableLeave.endDate).toLocaleDateString('tr-TR')}</strong> tarihleri arasında 
-                            toplam <strong>{printableLeave.days} gün</strong> süreyle <strong>{printableLeave.type}</strong> kullanmak hususunda gereğini;
-                        </p>
-                        <p className="text-lg mt-6">Bilgilerinize arz ederim.</p>
-                        <div className="mt-16 text-right w-full flex justify-end">
-                            <div className="w-[300px] text-center">
-                                <p className="font-bold underline mb-16">İmza</p>
-                                <p className="font-bold">{user?.name}</p>
+                <div id="printable-area" className="hidden">
+                    {printableLeave && (
+                        <div className="p-10 font-[serif] text-black">
+                            <h2 className="text-center text-xl font-bold uppercase mb-10 border-b-2 border-black pb-4">İzin Talep Formu / Dilekçesi</h2>
+                            <div className="text-right mb-10">Tarih: {new Date(printableLeave.createdAt).toLocaleDateString('tr-TR')}</div>
+                            <p className="text-lg mb-8 leading-relaxed">
+                                Kurumunuzda sicil numaralı personeli <strong>{user?.name}</strong> olarak görev yapmaktayım.<br/><br/>
+                                <strong>{new Date(printableLeave.startDate).toLocaleDateString('tr-TR')}</strong> ile <strong>{new Date(printableLeave.endDate).toLocaleDateString('tr-TR')}</strong> tarihleri arasında 
+                                toplam <strong>{printableLeave.days} gün</strong> süreyle <strong>{printableLeave.type}</strong> kullanmak hususunda gereğini;
+                            </p>
+                            <p className="text-lg mt-6">Bilgilerinize arz ederim.</p>
+                            <div className="mt-16 text-right w-full flex justify-end">
+                                <div className="w-[300px] text-center">
+                                    <p className="font-bold underline mb-16">İmza</p>
+                                    <p className="font-bold">{user?.name}</p>
+                                </div>
+                            </div>
+                            <div className="mt-20 border-t border-dashed border-black pt-4">
+                                <h3 className="font-bold">İK Onayı / Bildirimi</h3>
+                                <p className="mt-2">Sistem Durumu: {printableLeave.status}</p>
+                                <p>Onaylayan: {printableLeave.approvedBy || '______________'}</p>
                             </div>
                         </div>
-                        <div className="mt-20 border-t border-dashed border-black pt-4">
-                            <h3 className="font-bold">İK Onayı / Bildirimi</h3>
-                            <p className="mt-2">Sistem Durumu: {printableLeave.status}</p>
-                            <p>Onaylayan: {printableLeave.approvedBy || '______________'}</p>
-                        </div>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
 
-            <div className="lg:col-span-1 no-print">
-                <EnterpriseCard className="h-full">
-                    <EnterpriseSectionHeader title="Yeni Talep Oluştur" icon="📝" />
-                    <div className="p-6 space-y-5">
-                        <EnterpriseSelect label="İzin Türü" value={type} onChange={(e) => setType(e.target.value)}>
-                            <option value="Yıllık İzin">Yıllık Ücretli İzin</option>
-                            <option value="Mazeret İzni">Mazeret İzni</option>
-                            <option value="Sağlık İzni">Sağlık İzni</option>
-                            <option value="Ücretsiz İzin">Ücretsiz İzin</option>
-                        </EnterpriseSelect>
-                        <div className="grid grid-cols-2 gap-4">
-                            <EnterpriseInput label="Başlangıç Seçimi" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                            <EnterpriseInput label="Bitiş Seçimi" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                {/* FORM COLUMN */}
+                <div className="w-[350px] shrink-0 no-print flex flex-col h-full">
+                    <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+                        <EnterpriseSectionHeader title="Yeni Talep Oluştur" icon="📝" />
+                        <div className="p-4 flex-1 overflow-y-auto space-y-4 custom-scrollbar">
+                            <EnterpriseSelect label="İzin Türü" value={type} onChange={(e) => setType(e.target.value)}>
+                                <option value="Yıllık İzin">Yıllık Ücretli İzin</option>
+                                <option value="Mazeret İzni">Mazeret İzni</option>
+                                <option value="Sağlık İzni">Sağlık İzni</option>
+                                <option value="Ücretsiz İzin">Ücretsiz İzin</option>
+                            </EnterpriseSelect>
+                            <div className="grid grid-cols-2 gap-3">
+                                <EnterpriseInput label="Başlangıç Seçimi" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                                <EnterpriseInput label="Bitiş Seçimi" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                            </div>
+                            <EnterpriseTextarea label="Dilekçe İçeriği / E-Posta Notu" placeholder="Ek açıklama..." rows={6} value={reason} onChange={e => setReason(e.target.value)} />
                         </div>
-                        <EnterpriseTextarea label="Dilekçe İçeriği / E-Posta Notu" placeholder="Ek açıklama..." rows={4} value={reason} onChange={e => setReason(e.target.value)} />
-                        <EnterpriseButton variant="primary" className="w-full mt-2" onClick={handleSubmit} disabled={isSubmitting}>
-                            {isSubmitting ? "GÖNDERİLİYOR..." : "DİLEKÇEYİ ONAYA SUN"}
-                        </EnterpriseButton>
-                    </div>
-                </EnterpriseCard>
-            </div>
-            
-            <div className="lg:col-span-2 no-print">
-                <EnterpriseCard className="h-full">
-                    <EnterpriseSectionHeader title="İzin Sicilim" icon="🕒" />
-                    <div className="p-6 overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-surface-secondary dark:bg-slate-800/50">
-                                <tr className="text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-divider">
-                                    <th className="px-4 py-3">Belge & Tür</th>
-                                    <th className="px-4 py-3">Tarih Aralığı / Süre</th>
-                                    <th className="px-4 py-3">Sistem Durumu</th>
-                                    <th className="px-4 py-3">Aksiyoner</th>
-                                    <th className="px-4 py-3 text-right">Belge</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? <tr><td colSpan={5} className="py-8 text-center text-sm text-slate-400">Yükleniyor...</td></tr> : 
-                                 leaves.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-sm text-slate-400">Arşivde evrak yok.</td></tr> :
-                                 leaves.map((leave: any) => (
-                                     <tr key={leave.id} className="border-b hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-all">
-                                         <td className="px-4 py-4 text-[13px] font-bold">
-                                             {leave.type}
-                                             <div className="text-[10px] text-slate-400 font-medium">{leave.id.slice(0,8).toUpperCase()}</div>
-                                         </td>
-                                         <td className="px-4 py-4 text-[12px] font-medium text-slate-600 dark:text-slate-300">
-                                             {new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}
-                                             <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-indigo-500"><Calendar className="w-3 h-3"/> Toplam: {leave.days} Gün</div>
-                                         </td>
-                                         <td className="px-4 py-4">
-                                             <span className={`px-2 py-1 text-[9px] font-bold uppercase rounded-md border ${
-                                                 leave.status === 'Onaylandı' ? 'bg-state-success-bg text-state-success-text border-state-success-border' :
-                                                 leave.status === 'Reddedildi' ? 'bg-state-alert-bg text-state-alert-text border-state-alert-border' : 'bg-state-warning-bg text-state-warning-text border-state-warning-border'
-                                             }`}>{leave.status}</span>
-                                         </td>
-                                         <td className="px-4 py-4 text-[11px] font-medium text-slate-500">{leave.approvedBy || '-'}</td>
-                                         <td className="px-4 py-4 text-right">
-                                             <button onClick={() => handlePrint(leave)} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center justify-center gap-2 ml-auto">
-                                                 <Printer className="w-3 h-3"/> Dilekçe Çıktı
-                                             </button>
-                                         </td>
-                                     </tr>
-                                 ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </EnterpriseCard>
+                        <div className="p-4 border-t border-default bg-surface shrink-0">
+                            <EnterpriseButton variant="primary" className="w-full text-[10px] tracking-widest font-black" onClick={handleSubmit} disabled={isSubmitting}>
+                                {isSubmitting ? "GÖNDERİLİYOR..." : "DİLEKÇEYİ ONAYA SUN"}
+                            </EnterpriseButton>
+                        </div>
+                    </EnterpriseCard>
+                </div>
+                
+                {/* TABLE COLUMN */}
+                <div className="flex-1 min-w-0 no-print flex flex-col h-full">
+                    <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+                        <EnterpriseSectionHeader title="İzin Sicilim" icon="🕒" />
+                        <div className="flex-1 overflow-y-auto custom-scroll outline-none">
+                            <table className="w-full text-left border-collapse min-w-[600px]">
+                                <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-sm">
+                                    <tr>
+                                        <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Belge & Tür</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Tarih Aralığı / Süre</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Sistem Durumu</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Aksiyoner (İK)</th>
+                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right pr-4">Belge İşlemi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-default bg-white dark:bg-[#0f172a]">
+                                    {loading ? <tr><td colSpan={5} className="py-8 text-center text-xs text-text-muted">Yükleniyor...</td></tr> : 
+                                     leaves.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-xs text-text-muted uppercase tracking-widest">Arşivde evrak yok.</td></tr> :
+                                     leaves.map((leave: any) => (
+                                         <tr key={leave.id} className="hover:bg-surface-secondary/50 dark:hover:bg-slate-800/10 transition-colors">
+                                             <td className="p-3 pl-4 align-middle">
+                                                 <div className="text-[12px] font-black text-text-primary dark:text-white mb-0.5 uppercase tracking-widest">{leave.type}</div>
+                                                 <div className="text-[9px] text-text-muted font-bold font-mono tracking-widest uppercase">DOC: {leave.id.slice(0,8)}</div>
+                                             </td>
+                                             <td className="p-3 align-middle">
+                                                 <div className="text-[11px] font-black text-text-secondary dark:text-slate-300">
+                                                     {new Date(leave.startDate).toLocaleDateString('tr-TR', {month:'2-digit', day:'2-digit', year:'numeric'})} - {new Date(leave.endDate).toLocaleDateString('tr-TR', {month:'2-digit', day:'2-digit', year:'numeric'})}
+                                                 </div>
+                                                 <div className="mt-0.5 flex items-center gap-1 text-[9px] font-black text-primary tracking-widest uppercase"><Calendar className="w-3.5 h-3.5"/> Toplam: {leave.days} Gün</div>
+                                             </td>
+                                             <td className="p-3 align-middle">
+                                                 <span className={`inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest rounded border ${
+                                                     leave.status === 'Onaylandı' ? 'bg-state-success-bg text-state-success-text border-state-success-border' :
+                                                     leave.status === 'Reddedildi' ? 'bg-state-alert-bg text-state-alert-text border-state-alert-border' : 'bg-state-warning-bg text-state-warning-text border-state-warning-border'
+                                                 }`}>{leave.status}</span>
+                                             </td>
+                                             <td className="p-3 align-middle text-[11px] font-bold text-text-secondary uppercase">{leave.approvedBy || '-'}</td>
+                                             <td className="p-3 align-middle pr-4 text-right">
+                                                 <button onClick={() => handlePrint(leave)} className="px-3 py-1.5 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-sm text-[9px] font-black text-text-primary uppercase tracking-widest inline-flex items-center justify-center gap-1.5 transition-colors">
+                                                     <Printer className="w-3.5 h-3.5"/> Dilekçe Çıktı
+                                                 </button>
+                                             </td>
+                                         </tr>
+                                     ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </EnterpriseCard>
                 </div>
             </div>
         </div>
@@ -670,35 +662,38 @@ const PayrollView = ({ payrolls, user }: any) => {
             </div>
 
             <div className="flex-1 flex flex-col overflow-hidden">
-                <EnterpriseCard className="no-print h-full flex flex-col">
+                <EnterpriseCard className="no-print h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
-                    <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-surface-secondary dark:bg-[#0f111a] sticky top-0 z-10">
-                                <tr className="text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-divider">
-                                    <th className="px-4 py-3">Dönem</th>
-                                    <th className="px-4 py-3">Net Hakediş (TRL)</th>
-                                    <th className="px-4 py-3">Brüt + Prim / Kesinti</th>
-                                    <th className="px-4 py-3">Durum & İşlem Z.</th>
-                                    <th className="px-4 py-3 text-right">Eylem</th>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                        <table className="w-full text-left border-collapse min-w-[600px]">
+                            <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-sm">
+                                <tr>
+                                    <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Dönem & Referans</th>
+                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Net Hakediş (TRY)</th>
+                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Brüt & Ek Nitelikler</th>
+                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Sistem & İşlem Durumu</th>
+                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right pr-4">Belge Görüntüleme</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-sm text-slate-400">Aktif bordro kaydı bulunmamaktadır.</td></tr> :
+                            <tbody className="divide-y divide-default bg-white dark:bg-[#0f172a]">
+                                {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-[11px] font-black uppercase text-text-muted tracking-widest">Aktif bordro kaydı bulunmamaktadır.</td></tr> :
                                     payrolls.map((pr: any) => (
-                                        <tr key={pr.id} className="border-b transition hover:bg-slate-50 dark:hover:bg-slate-800/10">
-                                            <td className="px-4 py-4 text-[14px] font-black text-text-primary">{pr.period}</td>
-                                            <td className="px-4 py-4 text-[16px] font-black text-state-success-text">₺{Number(pr.netPay).toLocaleString()}</td>
-                                            <td className="px-4 py-4 text-[11px] font-semibold text-text-secondary space-y-1">
-                                                <div>Brüt: ₺{Number(pr.basePay).toLocaleString()}</div>
-                                                <div className="text-primary">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
+                                        <tr key={pr.id} className="hover:bg-surface-secondary/50 dark:hover:bg-slate-800/10 transition-colors">
+                                            <td className="p-3 pl-4 align-middle">
+                                                <div className="text-[12px] font-black text-text-primary dark:text-white mb-0.5">{pr.period}</div>
+                                                <div className="text-[9px] text-text-muted font-bold font-mono tracking-widest uppercase">REF:{pr.id.slice(0,8)}</div>
                                             </td>
-                                            <td className="px-4 py-4">
-                                                 <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded border ${pr.status === 'Ödendi' ? 'bg-state-success-bg text-state-success-text border-state-success-border' : 'bg-surface-secondary text-text-muted border-default'}`}>{pr.status || 'Bekliyor'}</span>
+                                            <td className="p-3 align-middle text-[12px] font-black text-state-success-text tracking-tight">₺{Number(pr.netPay).toLocaleString('tr-TR')}</td>
+                                            <td className="p-3 align-middle">
+                                                <div className="text-[10px] font-bold text-text-secondary">Brüt: ₺{Number(pr.basePay).toLocaleString('tr-TR')}</div>
+                                                <div className="text-[10px] font-bold text-primary mt-0.5">Aylık Prim: + ₺{Number(pr.bonus).toLocaleString('tr-TR')}</div>
                                             </td>
-                                            <td className="px-4 py-4 text-right">
-                                                <button onClick={() => handlePrint(pr)} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-2">
-                                                    <Printer className="w-3 h-3"/> Pusula Yazdır
+                                            <td className="p-3 align-middle">
+                                                 <span className={`inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest rounded border ${pr.status === 'Ödendi' ? 'bg-state-success-bg text-state-success-text border-state-success-border' : 'bg-surface-secondary text-text-muted border-default'}`}>{pr.status || 'Bekliyor'}</span>
+                                            </td>
+                                            <td className="p-3 align-middle pr-4 text-right">
+                                                <button onClick={() => handlePrint(pr)} className="px-3 py-1.5 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-sm text-[9px] font-black text-text-primary uppercase tracking-widest inline-flex items-center justify-center gap-1.5 transition-colors">
+                                                    <Printer className="w-3.5 h-3.5"/> Pusula Çıktı
                                                 </button>
                                             </td>
                                         </tr>
@@ -720,28 +715,28 @@ const ShiftsView = ({ shifts, user }: any) => {
             <ProfileHeader user={user} title="Haftalık Planlanmış" dataCount={shifts.length} dataLabel="Vardiya" />
             
             <div className="flex-1 flex flex-col overflow-hidden">
-                <EnterpriseCard className="h-full flex flex-col">
+                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Haftalık Vardiya Planım" icon="📅" />
-                    <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="p-5 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
                         {shifts.length === 0 ? (
-                            <div className="py-12 text-center text-[13px] font-bold text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
-                                İlgili dönem içi planlanmış vardiya yok.
+                            <div className="py-12 text-center text-[11px] font-black uppercase tracking-widest text-text-muted border border-dashed border-default rounded-sm bg-surface-bg/30">
+                                İlgili dönem içi planlanmış vardiya planı bulunmuyor.
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {shifts.map((s: any) => {
                                     const isPermit = s.type === 'İzinli';
                                     return (
-                                        <div key={s.id} className={`p-5 rounded-2xl border flex flex-col justify-between h-32 relative overflow-hidden ${isPermit ? 'bg-state-warning-bg border-state-warning-border' : 'bg-surface-secondary border-default dark:bg-slate-800/30 dark:border-slate-700/50'}`}>
-                                            <div className="flex justify-between items-start z-10">
+                                        <div key={s.id} className={`p-4 rounded-sm border flex flex-col justify-between h-[100px] relative overflow-hidden transition-all hover:shadow-sm ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
+                                            <div className="flex justify-between items-start z-10 w-full mb-3">
                                                 <div>
-                                                    <div className={`text-[12px] font-bold uppercase tracking-widest ${isPermit ? 'text-state-warning-text' : 'text-text-secondary'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
-                                                    <div className={`text-[16px] font-black ${isPermit ? 'text-state-warning-text' : 'text-text-primary dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: '2-digit' })}</div>
+                                                    <div className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${isPermit ? 'text-state-warning-text' : 'text-text-secondary'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
+                                                    <div className={`text-[12px] font-black ${isPermit ? 'text-state-warning-text' : 'text-text-primary dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: 'long', year: 'numeric' })}</div>
                                                 </div>
-                                                {isPermit ? <span className="text-xl">🌴</span> : <span className="text-xl">🏢</span>}
+                                                {isPermit ? <Calendar className="w-4 h-4 text-state-warning-text"/> : <Clock className="w-4 h-4 text-text-muted"/>}
                                             </div>
-                                            <div className="z-10 bg-surface/50 dark:bg-black/20 p-2 rounded-lg text-center backdrop-blur-sm">
-                                                <span className={`text-[14px] font-black tracking-tight ${isPermit ? 'text-state-warning-text' : 'text-primary dark:text-blue-400'}`}>
+                                            <div className={`z-10 py-1.5 px-3 border rounded-sm flex items-center justify-center ${isPermit ? 'bg-state-warning-bg border-state-warning-border' : 'bg-surface border-default dark:bg-[#1e293b]'}`}>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest leading-none ${isPermit ? 'text-state-warning-text' : 'text-primary dark:text-blue-400'}`}>
                                                     {isPermit ? "TAM GÜN İZİNLİ" : `${new Date(s.start).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} - ${new Date(s.end).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`}
                                                 </span>
                                             </div>
@@ -764,32 +759,34 @@ const ProfileSettingsView = ({ user }: any) => {
             <ProfileHeader user={user} title="Hesap Durumu" dataCount={"ONAYLI"} dataLabel="Kullanıcı" />
             
             <div className="flex-1 flex flex-col overflow-hidden">
-                <EnterpriseCard className="h-full flex flex-col">
+                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
                     <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
-                    <div className="p-8 flex-1 overflow-y-auto custom-scrollbar">
-                        <div className="flex items-center gap-6 mb-8 border-b pb-8 border-divider">
-                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-3xl font-black text-white relative shadow-enterprise">
+                    <div className="p-6 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
+                        <div className="flex items-center gap-5 mb-6 border-b pb-6 border-default">
+                            <div className="w-16 h-16 rounded-sm bg-surface-tertiary border border-default flex items-center justify-center text-xl font-black text-text-primary relative shadow-sm">
                                 {user?.name?.[0]?.toUpperCase() || 'P'}
                             </div>
-                            <div>
-                                <h4 className="text-2xl font-black text-text-primary">{user?.name}</h4>
-                                <span className="px-3 py-1 bg-surface-secondary dark:bg-blue-500/10 text-primary text-[11px] font-bold uppercase rounded-md">{user?.role || 'Personel'}</span>
-                                <div className="mt-1 text-xs font-bold uppercase text-text-muted">ŞİRKET ID NO: #{user?.id?.slice(0,6).toUpperCase()}</div>
+                            <div className="flex flex-col justify-center">
+                                <h4 className="text-[14px] font-black text-text-primary mb-1.5">{user?.name}</h4>
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2 py-0.5 bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest rounded border border-primary/20">{user?.role || 'Personel'}</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted font-mono">SYS_ID: {user?.id?.slice(0,8).toUpperCase()}</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <EnterpriseInput label="Tam Ad Soyad" defaultValue={user?.name} disabled />
                             <EnterpriseInput label="E-Posta Adresi" type="email" defaultValue={user?.email} disabled />
-                            <EnterpriseInput label="Telefon Numarası" type="tel" placeholder="Ulaşım bilgisi sisteme kapalı" disabled />
+                            <EnterpriseInput label="Telefon Numarası" type="tel" placeholder="Ulaşım bilgisi sisteme kapalı / Güvenli Bölge" disabled />
                         </div>
-                        <div className="pt-8 border-t border-slate-200 dark:border-slate-800">
-                            <h4 className="text-[12px] font-bold text-slate-600 uppercase flex items-center gap-2 mb-6"><span>🔒</span> Parola Güncelle</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <EnterpriseInput label="Mevcut Şifre" type="password" />
-                                <EnterpriseInput label="Yeni Şifre" type="password" />
+                        <div className="pt-6 border-t border-default">
+                            <h4 className="text-[10px] font-black text-text-muted uppercase tracking-widest flex items-center gap-2 mb-4"><Lock className="w-3.5 h-3.5"/> Sistem Parolasını Yenile</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <EnterpriseInput label="Mevcut Güvenlik Anahtarı (Şifre)" type="password" />
+                                <EnterpriseInput label="Yeni Güvenlik Anahtarı (Şifre)" type="password" />
                             </div>
-                            <div className="mt-8 flex justify-end">
-                                <EnterpriseButton variant="primary" className="px-10">BİLGİLERİ GÜNCELLE</EnterpriseButton>
+                            <div className="mt-5 flex justify-end">
+                                <EnterpriseButton variant="primary" className="text-[10px] uppercase font-black tracking-widest px-8">KİMLİK BİLGİLERİNİ GÜNCELLE</EnterpriseButton>
                             </div>
                         </div>
                     </div>
@@ -829,50 +826,50 @@ const ReportsView = ({ user }: any) => {
             <ProfileHeader user={user} title="Performans ve Aksiyon" dataCount="AKTİF" dataLabel="Analiz" />
             
             <div className="flex-1 flex flex-col overflow-hidden">
-                <EnterpriseCard className="h-full flex flex-col">
-                    <EnterpriseSectionHeader title="Dönemsel Operasyon Raporu" icon="📊" />
+                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+                    <EnterpriseSectionHeader title="Dönemsel Operasyon Raporu & KPI" icon="📊" />
                     
-                    <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/30 flex flex-col sm:flex-row gap-4 justify-between items-center">
-                        <div className="flex gap-4 w-full sm:w-auto">
-                            <EnterpriseInput label="Başlangıç" type="date" value={dateRange.startDate} onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })} />
-                            <EnterpriseInput label="Bitiş" type="date" value={dateRange.endDate} onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })} />
+                    <div className="p-4 border-b border-default bg-surface-secondary/50 shrink-0 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                        <div className="flex gap-3 w-full sm:w-auto">
+                            <EnterpriseInput label="Operasyon Başlangıcı" type="date" value={dateRange.startDate} onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })} />
+                            <EnterpriseInput label="Operasyon Bitişi" type="date" value={dateRange.endDate} onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })} />
                         </div>
                     </div>
 
-                    <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="p-5 flex-1 overflow-y-auto custom-scrollbar bg-surface dark:bg-[#0f172a]">
                         {loading ? (
-                            <div className="py-12 text-center text-[13px] font-bold text-slate-400">Rapor hesaplanıyor...</div>
+                            <div className="py-12 text-center text-[10px] font-black uppercase tracking-widest text-text-muted">Aksiyon verileri işleniyor...</div>
                         ) : report?.error ? (
-                            <div className="py-12 text-center text-[13px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 rounded-xl border border-rose-200">
-                                {report.error === 'Staff not found' ? 'Personel hesabınız bulunamadı.' : report.error}
+                            <div className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-state-alert-text bg-state-alert-bg/30 rounded-sm border border-state-alert-border">
+                                {report.error === 'Staff not found' ? 'Personel hesabı ile eşleştirilemedi.' : report.error}
                             </div>
                         ) : report?.summary ? (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-50 to-white dark:from-blue-500/10 dark:to-slate-800/50 border-blue-200 dark:border-blue-500/20">
-                                    <div className="flex justify-between items-center mb-4 text-blue-500">
-                                        <div className="text-3xl">💰</div>
-                                        <div className="text-[11px] font-black uppercase tracking-widest">Toplam Satış</div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="p-5 rounded-sm border bg-surface-bg/30 dark:bg-slate-800/40 border-default border-t-2 border-t-blue-500">
+                                    <div className="flex justify-between items-center mb-3 text-blue-500 dark:text-blue-400">
+                                        <TrendingUp className="w-5 h-5"/>
+                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Ciro / Toplam Satış</div>
                                     </div>
-                                    <div className="text-3xl font-black text-slate-900 dark:text-white">₺{report.summary.totalSales.toLocaleString('tr-TR')}</div>
-                                    <div className="text-[12px] font-bold mt-2 text-slate-500">{report.summary.salesCount} Başarılı Sipariş</div>
+                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">₺{report.summary.totalSales.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.salesCount} Başarılı İşlem</div>
                                 </div>
                                 
-                                <div className="p-6 rounded-2xl border bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-500/10 dark:to-slate-800/50 border-emerald-200 dark:border-emerald-500/20">
-                                    <div className="flex justify-between items-center mb-4 text-emerald-500">
-                                        <div className="text-3xl">💳</div>
-                                        <div className="text-[11px] font-black uppercase tracking-widest">Tahsilatlar</div>
+                                <div className="p-5 rounded-sm border bg-surface-bg/30 dark:bg-slate-800/40 border-default border-t-2 border-t-emerald-500">
+                                    <div className="flex justify-between items-center mb-3 text-emerald-500 dark:text-emerald-400">
+                                        <CheckCircle2 className="w-5 h-5"/>
+                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Nakit / Tahsilat</div>
                                     </div>
-                                    <div className="text-3xl font-black text-slate-900 dark:text-white">₺{report.summary.totalCollections.toLocaleString('tr-TR')}</div>
-                                    <div className="text-[12px] font-bold mt-2 text-slate-500">{report.summary.collectionsCount} Tamamlanan İşlem</div>
+                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">₺{report.summary.totalCollections.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.collectionsCount} Tamamlanan Tahsilat</div>
                                 </div>
                                 
-                                <div className="p-6 rounded-2xl border bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
-                                    <div className="flex justify-between items-center mb-4 text-slate-500">
-                                        <div className="text-3xl">📍</div>
-                                        <div className="text-[11px] font-black uppercase tracking-widest">Saha Ziyareti</div>
+                                <div className="p-5 rounded-sm border bg-surface-bg/30 dark:bg-slate-800/40 border-default border-t-2 border-t-slate-500">
+                                    <div className="flex justify-between items-center mb-3 text-text-secondary">
+                                        <MapPin className="w-5 h-5"/>
+                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Aksiyon / Saha Ziyareti</div>
                                     </div>
-                                    <div className="text-3xl font-black text-slate-900 dark:text-white">{report.summary.totalVisits}</div>
-                                    <div className="text-[12px] font-bold mt-2 text-slate-500">Gerçekleşen Müşteri Görüşmesi</div>
+                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">{report.summary.totalVisits} Müşteri Ziyareti</div>
+                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Saha Temas Raporu</div>
                                 </div>
                             </div>
                         ) : null}
