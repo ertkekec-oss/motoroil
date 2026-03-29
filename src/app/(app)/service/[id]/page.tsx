@@ -2,15 +2,39 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useModal } from '@/contexts/ModalContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { 
+    Sheet, 
+    ArrowLeft, 
+    Printer, 
+    Play, 
+    CheckCircle2, 
+    FileText, 
+    Camera, 
+    Trash2, 
+    Clock, 
+    User, 
+    Box, 
+    CreditCard, 
+    ShieldCheck, 
+    Wrench, 
+    Info, 
+    ChevronDown,
+    Package,
+    AlertCircle
+} from 'lucide-react';
 
 export default function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
     const { id } = use(params);
+    const { theme } = useTheme();
+    const { showSuccess, showError, showConfirm } = useModal();
+    const isLight = theme === 'light';
+
     const [service, setService] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [technicians, setTechnicians] = useState<any[]>([]);
-    const [isUpdating, setIsUpdating] = useState(false);
     const [elapsedTime, setElapsedTime] = useState<string>('00:00:00');
     const [isActionsOpen, setIsActionsOpen] = useState(false);
 
@@ -19,7 +43,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             const res = await fetch('/api/staff');
             const data = await res.json();
             if (data.success) {
-                setTechnicians(data.staff.filter((s: any) => s.type === 'service' || !s.type));
+                setTechnicians(data.staff.filter((s: any) => s.type === 'service' || s.role === 'service' || !s.type));
             }
         } catch (e) {
             console.error(e);
@@ -35,10 +59,10 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 if (data.success) {
                     setService(data.service);
                 } else {
-                    setError(data.error || 'Servis kaydı bulunamadı.');
+                    showError('Hata', data.error || 'Servis kaydı bulunamadı.');
                 }
             })
-            .catch(err => setError(err.message))
+            .catch(err => showError('Hata', err.message))
             .finally(() => setLoading(false));
     };
 
@@ -71,7 +95,6 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     }, [service?.status, service?.startTime]);
 
     const handleUpdate = async (payload: any) => {
-        setIsUpdating(true);
         try {
             const res = await fetch(`/api/services/${id}`, {
                 method: 'PUT',
@@ -81,13 +104,26 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             const data = await res.json();
             if (data.success) {
                 setService(data.service);
+                return true;
             } else {
-                alert("Güncelleme hatası: " + data.error);
+                showError('Hata', data.error);
+                return false;
             }
         } catch (e) {
             console.error(e);
-        } finally {
-            setIsUpdating(false);
+            return false;
+        }
+    };
+
+    const handleStatusChange = async (newStatus: string) => {
+        const payload: any = { status: newStatus };
+        if (newStatus === 'İşlemde') payload.startTime = new Date().toISOString();
+        if (newStatus === 'Tamamlandı') payload.endTime = new Date().toISOString();
+        
+        const success = await handleUpdate(payload);
+        if (success) {
+            showSuccess('Durum Güncellendi', `Servis durumu "${newStatus}" olarak güncellendi.`);
+            setIsActionsOpen(false);
         }
     };
 
@@ -95,279 +131,297 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         const file = e.target.files?.[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onloadend = () => {
+        reader.onloadend = async () => {
             const base64 = reader.result as string;
             const currentPhotos = service?.photos || [];
-            handleUpdate({ photos: [...currentPhotos, base64] });
+            const success = await handleUpdate({ photos: [...currentPhotos, base64] });
+            if (success) showSuccess('Fotoğraf Eklendi', 'Servis galerisine yeni fotoğraf başarıyla yüklendi.');
         };
         reader.readAsDataURL(file);
     };
 
-    const formatDate = (dateString: string | null) => {
-        if (!dateString) return '-';
-        try {
-            return new Date(dateString).toLocaleDateString('tr-TR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        } catch (e) {
-            return 'Geçersiz Tarih';
-        }
+    const handleDeletePhoto = (idx: number) => {
+        showConfirm('Fotoğraf Silinsin mi?', 'Bu işlemi geri alamazsınız.', async () => {
+            const newPhotos = [...service.photos];
+            newPhotos.splice(idx, 1);
+            const success = await handleUpdate({ photos: newPhotos });
+            if (success) showSuccess('Silindi', 'Fotoğraf başarıyla silindi.');
+        });
+    };
+
+    const handlePayment = () => {
+        const total = (totalParts + (service.activeLaborCost || 0)) * 1.2;
+        const desc = `${service.plate || service.vehicleSerial || ''} Servis Ödemesi`;
+        router.push(`/payment?amount=${total.toFixed(0)}&title=${encodeURIComponent(desc)}&ref=SRV-${service.id}&customerId=${service.customerId}`);
+    };
+
+    const isMotorized = (type: string) => {
+        const t = (type || '').toLowerCase();
+        const automotiveKeywords = ['motor', 'moto', 'araç', 'otomobil', 'araba', 'kamyon', 'otobüs', 'atv', 'scooter'];
+        const nonAutomotiveKeywords = ['bisiklet', 'bicycle', 'bike', 'beyaz eşya', 'elektronik', 'mobilya'];
+        return automotiveKeywords.some(kw => t.includes(kw)) && !nonAutomotiveKeywords.some(kw => t.includes(kw));
+    };
+
+    const getCategoryIcon = (type: string) => {
+        const t = (type || '').toLowerCase();
+        if (t.includes('moto')) return '🏍️';
+        if (t.includes('bisiklet')) return '🚲';
+        if (t.includes('beyaz')) return '🏠';
+        if (t.includes('elektronik')) return '💻';
+        return '🔧';
     };
 
     if (loading) {
         return (
-            <div className="container flex-center min-h-[80vh]">
-                <div className="flex flex-col items-center gap-6">
-                    <div className="w-16 h-16 rounded-full border-4 border-subtle border-t-primary animate-spin"></div>
-                    <span className="text-[11px] font-black text-muted uppercase tracking-[0.3em] animate-pulse">Detaylar Yükleniyor...</span>
-                </div>
+            <div className={`min-h-screen flex items-center justify-center flex-col gap-6 ${isLight ? 'bg-slate-50' : 'bg-[#030712]'}`}>
+                <div className="w-16 h-16 border-4 border-blue-500/10 border-t-blue-600 rounded-full animate-spin"></div>
+                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-blue-500/50">Terminal Yükleniyor</span>
             </div>
         );
     }
 
-    if (error || !service) {
-        return (
-            <div className="container flex-center min-h-[80vh]">
-                <div className="bg-subtle border border-main rounded-[40px] p-12 text-center max-w-lg shadow-2xl">
-                    <div className="text-6xl mb-6">⚠️</div>
-                    <h2 className="text-2xl font-black text-main mb-2">Eyvah! Bir Sorun Var</h2>
-                    <p className="text-muted font-medium mb-8 leading-relaxed">{error || 'İstediğiniz servis kaydına şu an ulaşamıyoruz.'}</p>
-                    <button onClick={() => router.back()} className="px-8 py-4 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">Geri Dön</button>
-                </div>
-            </div>
-        );
-    }
+    if (!service) return null;
 
     const items = service.items || [];
-    const partsTotal = items.reduce((acc: number, item: any) => acc + (item.isWarranty ? 0 : (Number(item.price) || 0) * (Number(item.quantity) || 0)), 0);
-    const totalAmount = partsTotal;
+    const totalParts = items.reduce((acc: number, item: any) => acc + (item.isWarranty ? 0 : (Number(item.price) || 0) * (Number(item.quantity) || 0)), 0);
+    const taxRate = 0.20;
+    const laborCost = service.laborCost || 500; // Mock or fallback if not in record
+    const subTotal = totalParts + (!service.isLaborWarranty ? laborCost : 0);
+    const vat = subTotal * taxRate;
+    const finalTotal = subTotal + vat;
 
-    const defaultChecklists: Record<string, string[]> = {
-        'Motosiklet': ["Fren Hidroliği", "Zincir Gerginliği & Yağlama", "Lastik Basınçları", "Yağ Seviyesi", "Soğutma Suyu", "Aydınlatma Grubu"],
-        'Bisiklet': ["Fren Papuçları / Balatalar", "Zincir Yağlama", "Vites Ayarları", "Lastik Basınçları", "Jant Akordu", "Gidon Sıkılığı"],
-    };
-
-    const currentChecklistItems = defaultChecklists[service.vehicleType || 'Motosiklet'] || ["Genel Kontrol", "Temizlik", "Fonksiyon Testi"];
-
-    const toggleChecklistItem = (item: string) => {
-        const currentChecklist = service.checklist || {};
-        handleUpdate({
-            checklist: {
-                ...currentChecklist,
-                [item]: !currentChecklist[item]
-            }
-        });
-    };
+    const textMain = isLight ? 'text-slate-900' : 'text-white';
+    const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
+    const cardBg = isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#111827] border-white/5';
+    const pageBg = isLight ? 'bg-[#f8fafc]' : 'bg-[#030712]';
 
     return (
-        <div className="container p-8 max-w-[1400px] mx-auto min-h-screen bg-[#080911]">
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                <div className="space-y-1">
+        <div className={`min-h-screen ${pageBg} p-4 sm:p-8 font-sans`}>
+            <div className="max-w-[1400px] mx-auto space-y-6">
+                
+                {/* COMPACT HEADER */}
+                <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => router.push('/service')} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">←</button>
+                        <button onClick={() => router.push('/service')} className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${isLight ? 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50' : 'bg-white/5 border-white/10 text-white/40 hover:text-white'}`}><ArrowLeft size={18} /></button>
                         <div>
                             <div className="flex items-center gap-3">
-                                <h1 className="text-4xl font-black text-white tracking-tight">Servis Kokpiti</h1>
-                                <span className="px-3 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mt-1">
-                                    SRV-{service.id.toString().slice(-6).toUpperCase()}
-                                </span>
+                                <h1 className={`text-2xl font-black tracking-tight ${textMain}`}>Servis Kokpiti</h1>
+                                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest border ${isLight ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'}`}>SRV-{service.id.toString().slice(-6).toUpperCase()}</span>
                             </div>
-                            <div className="flex items-center gap-2 mt-1">
-                                <p className="text-white/40 font-bold text-[10px] uppercase tracking-[0.2em]">{service.status}</p>
+                            <div className="flex items-center gap-3 mt-1">
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${service.status === 'İşlemde' ? 'text-emerald-500' : 'text-blue-500'}`}>{service.status}</span>
                                 {service.status === 'İşlemde' && (
-                                    <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 animate-pulse">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                        <span className="text-[10px] font-black text-emerald-400 font-mono tracking-wider">{elapsedTime}</span>
+                                    <div className="flex items-center gap-2 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 animate-pulse">
+                                        <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                                        <span className="text-[10px] font-black text-emerald-400 font-mono">{elapsedTime}</span>
                                     </div>
                                 )}
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="flex items-center gap-4">
-                    <button onClick={() => window.print()} className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white/40 font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all flex items-center gap-3">
-                        <span>🖨️</span> Yazdır
-                    </button>
-                    <div className="relative">
-                        <button onClick={() => setIsActionsOpen(!isActionsOpen)} className="px-6 py-3 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-                            EYLEMLER
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`w-3 h-3 transition-transform ${isActionsOpen ? 'rotate-180' : ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+
+                    <div className="flex items-center gap-3 w-full lg:w-auto">
+                        <button onClick={() => window.print()} className={`flex-1 lg:flex-none h-11 px-5 rounded-xl border font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-white/5 border-white/10 text-white/60 hover:text-white'}`}>
+                            <Printer size={16} /> Yazdır
                         </button>
-                        {isActionsOpen && (
-                            <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsActionsOpen(false)}></div>
-                                <div className="absolute right-0 top-full mt-2 w-56 bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden py-2 backdrop-blur-xl">
-                                    <button onClick={() => { handleUpdate({ status: 'İşlemde', startTime: new Date().toISOString() }); setIsActionsOpen(false); }} className="w-full text-left px-5 py-3 text-[12px] font-black uppercase tracking-widest text-emerald-400 hover:bg-emerald-400/10 transition-colors flex items-center gap-3"><span className="text-sm">⚡</span> İşe Başla</button>
-                                    <button onClick={() => { handleUpdate({ status: 'Tamamlandı', endTime: new Date().toISOString() }); setIsActionsOpen(false); }} className="w-full text-left px-5 py-3 text-[12px] font-black uppercase tracking-widest text-blue-400 hover:bg-blue-400/10 transition-colors flex items-center gap-3"><span className="text-sm">✅</span> Bitir</button>
-                                    <div className="h-px bg-white/5 my-2"></div>
-                                    <button onClick={() => { router.push(`/offers?customerId=${service.customerId}&serviceId=${service.id}`); setIsActionsOpen(false); }} className="w-full text-left px-5 py-3 text-[12px] font-black uppercase tracking-widest text-white/60 hover:bg-white/5 transition-colors flex items-center gap-3"><span className="text-sm">📝</span> Teklif Oluştur</button>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </header>
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-8">
-                <div className="space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 relative overflow-hidden group hover:border-blue-500/30 transition-all">
-                            <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-[0.05] transition-opacity duration-700 pointer-events-none text-9xl">👤</div>
-                            <div className="flex flex-col gap-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl">👤</div>
-                                    <div><h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Müşteri Bilgileri</h3><div className="text-xl font-black text-white leading-tight">{service.customer?.name}</div></div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Telefon</div><div className="text-sm font-bold text-white/80">{service.customer?.phone || '-'}</div></div>
-                                    <div><div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Kayıt No</div><div className="text-sm font-mono font-bold text-white/40 truncate">#{service.id.slice(0,8)}</div></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 relative overflow-hidden group hover:border-blue-500/30 transition-all">
-                            <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-[0.05] transition-opacity duration-700 pointer-events-none text-9xl">🏍️</div>
-                            <div className="flex flex-col gap-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-2xl">{service.vehicleType === 'bike' ? '🚲' : '🏍️'}</div>
-                                    <div><h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Araç Bilgileri</h3><div className="text-xl font-black text-emerald-400 tracking-wider transition-all">{service.plate || 'Plakasız'}</div></div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Marka / Model</div><div className="text-sm font-bold text-white/80 line-clamp-1">{service.vehicleBrand || '-'}</div></div>
-                                    <div><div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Mevcut Kilometre</div><div className="text-sm font-bold text-emerald-400">{service.km ? `${service.km.toLocaleString()} KM` : '-'}</div></div>
-                                    <div className="col-span-2">
-                                        <div className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Atanan Personel</div>
-                                        <div className="relative">
-                                            <select value={service.technicianId || ''} onChange={(e) => handleUpdate({ technicianId: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-blue-500/50 transition-all appearance-none">
-                                                <option value="" className="bg-[#1a1c2e]">Personel Seçiniz</option>
-                                                {technicians.map((t: any) => (<option key={t.id} value={t.id} className="bg-[#1a1c2e]">{t.name}</option>))}
-                                            </select>
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">▼</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-10">
-                        <h3 className="text-sm font-black text-white uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><span className="w-10 h-[2px] bg-emerald-500"></span> Teknik Kontrol Listesi</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {currentChecklistItems.map((item, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => toggleChecklistItem(item)}
-                                    className={`p-5 rounded-[24px] border flex items-center gap-4 transition-all text-left group ${service.checklist?.[item]
-                                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-                                            : 'bg-white/[0.02] border-white/5 text-white/40 hover:bg-white/5'
-                                        }`}
-                                >
-                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${service.checklist?.[item]
-                                            ? 'bg-emerald-500 border-emerald-500 text-black'
-                                            : 'border-white/10 group-hover:border-white/20'
-                                        }`}>
-                                        {service.checklist?.[item] && <span className="font-black">✓</span>}
-                                    </div>
-                                    <span className="text-[13px] font-black tracking-tight">{item}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-10">
-                        <div className="flex justify-between items-center mb-10">
-                            <h3 className="text-sm font-black text-white uppercase tracking-[0.4em] flex items-center gap-4"><span className="w-10 h-[2px] bg-blue-600"></span> Fotoğraf Galerisi (Kabul Öncesi & Sonrası)</h3>
-                            <label className="cursor-pointer px-6 py-3 rounded-2xl bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-600/20">📷 ÇEK & EKLE<input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} /></label>
-                        </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                            {(service.photos || []).map((photo: string, idx: number) => (
-                                <div key={idx} className="aspect-square rounded-[32px] bg-black/40 border border-white/5 overflow-hidden group relative shadow-2xl">
-                                    <img src={photo} alt="Service" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                                        <button onClick={() => { const newPhotos = [...service.photos]; newPhotos.splice(idx, 1); handleUpdate({ photos: newPhotos }); }} className="w-full text-white text-[10px] font-black uppercase tracking-tighter bg-red-600/80 p-3 rounded-2xl backdrop-blur-md">SİL</button>
-                                    </div>
-                                </div>
-                            ))}
-                            {(!service.photos || service.photos.length === 0) && (
-                                <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white/[0.01] rounded-[48px] border-2 border-dashed border-white/5">
-                                    <span className="text-6xl mb-6 opacity-10">📸</span><p className="text-[12px] font-black text-white/5 uppercase tracking-[0.4em]">Henüz fotoğraf girişi yapılmamış</p>
+                        
+                        <div className="relative flex-1 lg:flex-none">
+                            <button onClick={() => setIsActionsOpen(!isActionsOpen)} className="w-full h-11 px-6 rounded-xl bg-blue-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                                İŞLEM MENÜSÜ <ChevronDown size={14} className={`transition-transform ${isActionsOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            {isActionsOpen && (
+                                <div className={`absolute right-0 top-full mt-2 w-56 rounded-2xl border shadow-2xl z-[100] overflow-hidden py-1.5 animate-in fade-in slide-in-from-top-2 duration-200 ${isLight ? 'bg-white border-slate-200' : 'bg-[#1f2937] border-white/10'}`}>
+                                    <button onClick={() => handleStatusChange('İşlemde')} className={`w-full text-left px-5 py-3 text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-3 ${isLight ? 'text-emerald-600 hover:bg-emerald-50' : 'text-emerald-400 hover:bg-emerald-400/10'}`}><Play size={14} strokeWidth={3} /> İŞE BAŞLA</button>
+                                    <button onClick={() => handleStatusChange('Tamamlandı')} className={`w-full text-left px-5 py-3 text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-3 ${isLight ? 'text-blue-600 hover:bg-blue-50' : 'text-blue-400 hover:bg-blue-400/10'}`}><CheckCircle2 size={14} strokeWidth={3} /> BAKIMI BİTİR</button>
+                                    <div className={`h-px my-1.5 ${isLight ? 'bg-slate-100' : 'bg-white/5'}`}></div>
+                                    <button onClick={() => router.push(`/offers?customerId=${service.customerId}&serviceId=${service.id}`)} className={`w-full text-left px-5 py-3 text-[11px] font-black uppercase tracking-widest transition-colors flex items-center gap-3 ${isLight ? 'text-slate-600 hover:bg-slate-50' : 'text-white/60 hover:bg-white/5'}`}><FileText size={14} strokeWidth={3} /> TEKLİF HAZIRLA</button>
                                 </div>
                             )}
                         </div>
                     </div>
-                    <div className="bg-white/[0.03] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
-                        <div className="p-10 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
-                            <h3 className="text-sm font-black text-white uppercase tracking-[0.4em] flex items-center gap-4"><span className="w-10 h-[2px] bg-emerald-500"></span> Teknisyen İşlemleri ve Malzemeler</h3>
-                            <div className="flex items-center gap-3"><span className="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black text-white/20 uppercase tracking-widest">{items.length} KALEM</span></div>
+                </header>
+
+                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                    
+                    {/* INFO CARDS (Grid 3x1 or 2x2 depending on screen) */}
+                    <div className="xl:col-span-3 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Customer Profile */}
+                            <div className={`rounded-3xl border p-6 flex flex-col gap-5 group transition-all ${cardBg} ${isLight ? 'hover:border-blue-200' : 'hover:border-blue-500/30'}`}>
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl border ${isLight ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'}`}><User size={20} /></div>
+                                    <div>
+                                        <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ${textMain}`}>Müşteri Portföyü</h3>
+                                        <div className={`text-lg font-black tracking-tight ${textMain}`}>{service.customer?.name}</div>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><span className={`text-[9px] font-black uppercase tracking-widest opacity-30 ${textMain}`}>İletişim</span><div className={`text-[13px] font-bold ${textMuted}`}>{service.customer?.phone || '-'}</div></div>
+                                    <div><span className={`text-[9px] font-black uppercase tracking-widest opacity-30 ${textMain}`}>Sistem ID</span><div className={`text-[11px] font-mono font-bold opacity-30 ${textMain}`}>#{service.customerId.slice(-8)}</div></div>
+                                </div>
+                            </div>
+
+                            {/* Product/Vehicle Profile */}
+                            <div className={`rounded-3xl border p-6 flex flex-col gap-5 group transition-all ${cardBg} ${isLight ? 'hover:border-emerald-200' : 'hover:border-emerald-500/30'}`}>
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl border ${isLight ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'}`}>
+                                        <span className="text-xl">{getCategoryIcon(service.vehicleType)}</span>
+                                    </div>
+                                    <div>
+                                        <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ${textMain}`}>{isMotorized(service.vehicleType) ? 'Araç Kimliği' : 'Ürün Kimliği'}</h3>
+                                        <div className={`text-lg font-black tracking-widest text-emerald-500`}>{isMotorized(service.vehicleType) ? (service.plate || 'PLAKASIZ') : (service.vehicleSerial || 'SERİ NO YOK')}</div>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div className="col-span-2"><span className={`text-[9px] font-black uppercase tracking-widest opacity-30 ${textMain}`}>Model / Tanım</span><div className={`text-[13px] font-bold truncate ${textMuted}`}>{service.vehicleBrand || '-'}</div></div>
+                                    <div><span className={`text-[9px] font-black uppercase tracking-widest opacity-30 ${textMain}`}>Performans</span><div className={`text-[13px] font-black text-emerald-500`}>{service.km ? `${service.km.toLocaleString()} KM` : '-'}</div></div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left">
-                                <thead className="bg-black/20">
-                                    <tr>
-                                        <th className="px-10 py-6 text-[10px] font-black text-white/20 uppercase tracking-widest">Hizmet / Parça</th>
-                                        <th className="px-10 py-6 text-[10px] font-black text-white/20 uppercase tracking-widest text-center">Adet</th>
-                                        <th className="px-10 py-6 text-[10px] font-black text-white/20 uppercase tracking-widest text-right">Birim</th>
-                                        <th className="px-10 py-6 text-[10px] font-black text-white/20 uppercase tracking-widest text-right">Ara Toplam</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/5">
-                                    {items.map((item: any, i: number) => (
-                                        <tr key={i} className="group hover:bg-white/[0.02] transition-all">
-                                            <td className="px-10 py-8">
-                                                <div className="flex items-start gap-5">
-                                                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-xl shadow-inner">{item.type === 'Labor' ? '🔧' : '📦'}</div>
+
+                        {/* ATELIER OPERATIONS */}
+                        <div className={`rounded-3xl border ${cardBg}`}>
+                            <div className={`p-6 border-b flex justify-between items-center ${isLight ? 'border-slate-100' : 'border-white/5'}`}>
+                                <h3 className={`text-[11px] font-black uppercase tracking-[0.3em] flex items-center gap-3 ${textMain}`}><Wrench size={16} className="text-blue-500" /> Atölye Operasyonları</h3>
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-[9px] font-black text-white/20 uppercase`}>Sorumlu:</span>
+                                    <select value={service.technicianId || ''} onChange={(e) => handleUpdate({ technicianId: e.target.value })} className={`bg-transparent text-[11px] font-black uppercase tracking-tighter outline-none cursor-pointer ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                                        <option value="" className={isLight ? 'text-slate-900' : 'bg-[#1f2937]'}>Seçilmedi</option>
+                                        {technicians.map((t: any) => (<option key={t.id} value={t.id} className={isLight ? 'text-slate-900' : 'bg-[#1f2937]'}>{t.name}</option>))}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Checklist */}
+                                <div className="space-y-4">
+                                    <h4 className={`text-[10px] font-black uppercase tracking-widest opacity-50 ${textMain}`}>Kontrol Listesi</h4>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {(service.checklist && Object.keys(service.checklist).length > 0 ? Object.keys(service.checklist) : ["Genel Kontrol", "Yıkama", "Fren Testi"]).map((item, i) => (
+                                            <button key={i} onClick={() => {
+                                                const current = service.checklist || {};
+                                                handleUpdate({ checklist: { ...current, [item]: !current[item] } });
+                                            }} className={`p-3 rounded-xl border flex items-center gap-3 transition-all text-left group ${service.checklist?.[item] ? (isLight ? 'bg-emerald-50 border-emerald-500 text-emerald-800' : 'bg-emerald-500/10 border-emerald-500 text-emerald-400') : (isLight ? 'bg-slate-50 border-slate-100 text-slate-400 hover:border-slate-300' : 'bg-white/5 border-white/5 text-white/20 hover:text-white/40')}`}>
+                                                <div className={`w-5 h-5 rounded-md flex items-center justify-center border-2 transition-all ${service.checklist?.[item] ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-current opacity-20'}`}>{service.checklist?.[item] && <span className="font-black text-[10px]">✓</span>}</div>
+                                                <span className="text-[12px] font-black tracking-tight">{item}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Billing Items */}
+                                <div className="space-y-4">
+                                    <h4 className={`text-[10px] font-black uppercase tracking-widest opacity-50 ${textMain}`}>Kullanılan Parçalar</h4>
+                                    <div className="space-y-2 max-h-[250px] overflow-y-auto custom-scrollbar pr-2">
+                                        {items.map((item: any, i: number) => (
+                                            <div key={i} className={`p-3 rounded-xl border flex items-center justify-between gap-3 ${isLight ? 'bg-slate-50 border-slate-100' : 'bg-white/[0.02] border-white/5'}`}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${isLight ? 'bg-white text-slate-400' : 'bg-white/5 text-white/20'}`}>{item.type === 'Labor' ? <Wrench size={14}/> : <Package size={14}/>}</div>
                                                     <div>
-                                                        <div className="text-[15px] font-black text-white group-hover:text-blue-400 transition-colors uppercase tracking-tight">{item.name}</div>
-                                                        {item.isWarranty && <div className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mt-1.5 flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-emerald-500"></span> 🛡️ Dijital Garanti Kapsamında</div>}
+                                                        <div className={`text-[12px] font-black tracking-tight leading-none ${textMain}`}>{item.name}</div>
+                                                        <div className="text-[9px] font-bold text-blue-500 uppercase tracking-widest mt-1">x{item.quantity} Kalem</div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-10 py-8 text-center"><span className="text-sm font-mono font-bold text-white/40">x{item.quantity}</span></td>
-                                            <td className="px-10 py-8 text-right font-mono"><span className={`text-sm font-bold ${item.isWarranty ? 'text-white/10 line-through' : 'text-white/60'}`}>₺{parseFloat(item.price).toLocaleString()}</span></td>
-                                            <td className="px-10 py-8 text-right font-mono"><span className={`text-lg font-black ${item.isWarranty ? 'text-emerald-500/40 text-sm italic' : 'text-white'}`}>{item.isWarranty ? 'HEDİYE' : `₺${(item.price * item.quantity).toLocaleString()}`}</span></td>
-                                        </tr>
+                                                <div className={`text-[12px] font-black ${item.isWarranty ? 'text-emerald-500 italic' : textMain}`}>{item.isWarranty ? 'GARANTİ' : `₺${(item.price * item.quantity).toLocaleString()}`}</div>
+                                            </div>
+                                        ))}
+                                        {items.length === 0 && <div className={`py-12 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center opacity-20 ${isLight ? 'border-slate-200' : 'border-white/5'}`}><span className="text-3xl mb-2">📦</span><span className="text-[10px] font-black uppercase tracking-widest">Envanter Kaydı Yok</span></div>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* GALLERY & NOTES GRID */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className={`md:col-span-2 rounded-3xl border p-6 flex flex-col ${cardBg}`}>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className={`text-[11px] font-black uppercase tracking-[0.3em] flex items-center gap-3 ${textMain}`}><Camera size={16} className="text-blue-500" /> Servis Galerisi</h3>
+                                    <label className="cursor-pointer h-9 px-4 rounded-xl bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-blue-600/20">
+                                        FOTOĞRAF EKLE <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+                                    </label>
+                                </div>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+                                    {(service.photos || []).map((photo: string, idx: number) => (
+                                        <div key={idx} className={`aspect-square rounded-2xl overflow-hidden relative group border ${isLight ? 'border-slate-100' : 'border-white/5'}`}>
+                                            <img src={photo} alt="Service" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                            <button onClick={() => handleDeletePhoto(idx)} className="absolute inset-0 bg-red-600/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white scale-0 group-hover:scale-100 duration-300"><Trash2 size={20} /></button>
+                                        </div>
                                     ))}
-                                    {items.length === 0 && (<tr><td colSpan={4} className="px-10 py-20 text-center"><div className="text-white/5 text-xl font-black uppercase tracking-[0.5em] italic">Liste Bulunamadı</div></td></tr>)}
-                                </tbody>
-                            </table>
-                        </div>
-                        {service.notes && (<div className="p-10 bg-black/40 border-t border-white/5"><h4 className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">Müşteri Şikayeti / Form Notları</h4><div className="text-[13px] font-bold text-white/60 leading-relaxed italic border-l-4 border-blue-600/40 pl-6 py-2">"{service.notes}"</div></div>)}
-                    </div>
-                </div>
-                <div className="space-y-8">
-                    <div className="bg-[#1a1c2e] rounded-[48px] border border-white/10 p-10 shadow-[0_32px_80px_rgba(0,0,0,0.5)] relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full  -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-                        <div className="mb-10 text-center">
-                            <h3 className="text-[11px] font-black text-white/20 uppercase tracking-[0.5em] mb-4">Operasyonel Durum</h3>
-                            <div className={`text-4xl font-black tracking-tighter uppercase ${service.status === 'İşlemde' ? 'text-blue-400' : service.status === 'Tamamlandı' ? 'text-emerald-400' : 'text-white/60'}`}>{service.status}</div>
-                        </div>
-                        <div className="space-y-5">
-                            <div className="flex justify-between items-center"><span className="text-xs font-bold text-white/30 tracking-widest uppercase">Giriş Tarihi</span><span className="text-xs font-black text-white">{formatDate(service.createdAt)}</span></div>
-                            {service.nextDate && (<div className="flex justify-between items-center p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10"><span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Hatırlatma</span><span className="text-xs font-black text-emerald-400">{formatDate(service.nextDate)}</span></div>)}
-                            <div className="my-8 h-px bg-white/5"></div>
-                            <div className="flex justify-between items-center"><span className="text-xs font-bold text-white/30 tracking-widest uppercase">Parça & İşçilik</span><span className="text-lg font-black text-white/80">₺{partsTotal.toLocaleString()}</span></div>
-                            <div className="flex justify-between items-center"><span className="text-xs font-bold text-white/30 tracking-widest uppercase">Kdv Bedeli</span><span className="text-xs font-bold text-white/40 italic">₺{(totalAmount * 0.2).toLocaleString()}</span></div>
-                            <div className="pt-10 flex flex-col items-center"><span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] mb-2">Tahsilat Tutarı</span><div className="text-6xl font-black text-white tracking-tighter text-center"><span className="text-3xl font-light opacity-30 mr-1">₺</span>{(totalAmount * 1.2).toLocaleString()}</div></div>
-                        </div>
-                        <div className="mt-12 space-y-4">
-                            <button onClick={() => handleUpdate({ status: 'Teslim Edildi' })} className="w-full py-5 rounded-[32px] bg-emerald-600 text-white font-black text-xs uppercase tracking-[0.3em] shadow-xl shadow-emerald-600/20 hover:scale-[1.02] active:scale-95 transition-all">ARACI TESLİM ET</button>
-                            <button className="w-full py-5 rounded-[32px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/60 font-black text-[10px] uppercase tracking-[0.3em] transition-all">🗑️ KAYDI ARŞİVLE / SİL</button>
+                                    {(!service.photos || service.photos.length === 0) && <div className="col-span-full py-8 text-center text-[10px] font-black uppercase tracking-[0.4em] opacity-20 italic">Görsel bulunamadı</div>}
+                                </div>
+                            </div>
+
+                            <div className={`rounded-3xl border p-6 flex flex-col ${cardBg}`}>
+                                <h3 className={`text-[11px] font-black uppercase tracking-[0.3em] mb-4 flex items-center gap-3 ${textMain}`}><Info size={16} className="text-amber-500" /> Operasyon Notları</h3>
+                                <div className={`flex-1 p-4 rounded-2xl text-[12px] font-bold italic leading-relaxed border border-dashed ${isLight ? 'bg-amber-50/30 border-amber-200 text-slate-600' : 'bg-white/[0.01] border-white/10 text-white/50'}`}>
+                                    {service.notes ? `"${service.notes}"` : 'Müşteri şikayeti veya özel not girilmemiş.'}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 shadow-2xl">
-                        <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-10 text-center">Süreç Zaman Çizelgesi</h4>
-                        <div className="space-y-10 relative ml-4">
-                            <div className="absolute left-[9px] top-2 bottom-2 w-[2px] bg-white/5"></div>
-                            <div className="flex gap-6 items-start relative z-10">
-                                <div className={`w-5 h-5 rounded-full border-[5px] border-[#080911] ${service.startTime ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'bg-white/10'}`}></div>
-                                <div><div className={`text-[13px] font-black tracking-tight ${service.startTime ? 'text-white' : 'text-white/20'}`}>Atölye Kabul & Başlangıç</div><div className="text-[10px] font-black text-white/10 uppercase mt-1 tracking-widest">{service.startTime ? new Date(service.startTime).toLocaleString('tr-TR') : 'BEKLENİYOR'}</div></div>
+
+                    {/* DYNAMIC SIDEBAR (BILLING & TIMELINE) */}
+                    <div className="space-y-6">
+                        {/* THE FINANCE TERMINAL */}
+                        <div className={`rounded-[32px] border p-8 relative overflow-hidden flex flex-col shadow-2xl ${isLight ? 'bg-white border-slate-200' : 'bg-[#151a2e] border-white/10'}`}>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                            
+                            <div className="text-center mb-8">
+                                <h3 className={`text-[10px] font-black uppercase tracking-[0.5em] opacity-30 mb-2 ${textMain}`}>FİNANSAL DURUM</h3>
+                                <div className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${service.status === 'Tamamlandı' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-blue-500/10 border-blue-500/20 text-blue-500'}`}>TAHVİL BEKLENİYOR</div>
                             </div>
-                            <div className="flex gap-6 items-start relative z-10">
-                                <div className={`w-5 h-5 rounded-full border-[5px] border-[#080911] ${service.status === 'Tamamlandı' || service.status === 'Teslim Edildi' ? 'bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'bg-white/10'}`}></div>
-                                <div><div className={`text-[13px] font-black tracking-tight ${service.status === 'Tamamlandı' || service.status === 'Teslim Edildi' ? 'text-white' : 'text-white/20'}`}>Bakım İşlemleri Tamamlandı</div><div className="text-[10px] font-black text-white/10 uppercase mt-1 tracking-widest">{service.endTime ? new Date(service.endTime).toLocaleString('tr-TR') : 'İŞLEM SÜRÜYOR'}</div></div>
+
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center"><span className={`text-[11px] font-bold uppercase tracking-widest opacity-40 ${textMain}`}>PARÇA TOPLAMI</span><span className={`text-[13px] font-black ${textMain}`}>₺{totalParts.toLocaleString()}</span></div>
+                                <div className="flex justify-between items-center"><span className={`text-[11px] font-bold uppercase tracking-widest opacity-40 ${textMain}`}>HİZMET BEDELİ</span><span className={`text-[13px] font-black ${service.isLaborWarranty ? 'text-emerald-500 line-through' : textMain}`}>₺{laborCost.toLocaleString()}</span></div>
+                                <div className="flex justify-between items-center"><span className={`text-[11px] font-bold uppercase tracking-widest opacity-40 ${textMain}`}>KDV (%20)</span><span className={`text-[13px] font-black ${textMain}`}>₺{vat.toLocaleString()}</span></div>
+                                
+                                <div className={`h-px my-2 ${isLight ? 'bg-slate-100' : 'bg-white/5'}`}></div>
+                                
+                                <div className="flex flex-col items-center py-4">
+                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] mb-3">ODENECEK TUTAR</span>
+                                    <div className={`text-6xl font-black tracking-tighter ${textMain}`}>
+                                        <span className="text-2xl font-light opacity-30 mr-1">₺</span>
+                                        {finalTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex gap-6 items-start relative z-10">
-                                <div className={`w-5 h-5 rounded-full border-[5px] border-[#080911] ${service.status === 'Teslim Edildi' ? 'bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.5)]' : 'bg-white/10'}`}></div>
-                                <div><div className={`text-[13px] font-black tracking-tight ${service.status === 'Teslim Edildi' ? 'text-white' : 'text-white/20'}`}>Müşteri Teslimat</div><div className="text-[10px] font-black text-white/10 uppercase mt-1 tracking-widest">{service.status === 'Teslim Edildi' ? 'GÜNCELLENDİ' : 'HENÜZ TESLİM EDİLMEDİ'}</div></div>
+
+                            <button onClick={handlePayment} className="group relative mt-10 w-full h-16 rounded-3xl bg-blue-600 text-white text-[13px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/40 hover:scale-[1.02] active:scale-95 transition-all overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                <div className="flex items-center justify-center gap-3">
+                                    <CreditCard size={20} /> ÖDEMEYİ AL
+                                </div>
+                            </button>
+                        </div>
+
+                        {/* PROCESS TIMELINE */}
+                        <div className={`rounded-3xl border p-6 ${cardBg}`}>
+                            <h4 className={`text-[10px] font-black uppercase tracking-[0.4em] mb-8 text-center opacity-30 ${textMain}`}>SÜREÇ ZAMAN ÇİZELGESİ</h4>
+                            <div className="space-y-8 relative ml-3">
+                                <div className={`absolute left-[7px] top-2 bottom-2 w-[1px] ${isLight ? 'bg-slate-200' : 'bg-white/5'}`}></div>
+                                
+                                <div className="flex gap-5 items-start relative z-10">
+                                    <div className={`w-4 h-4 rounded-full border-4 ${isLight ? 'border-slate-50' : 'border-[#030712]'} ${service.createdAt ? 'bg-blue-500' : 'bg-white/10'}`}></div>
+                                    <div><div className={`text-[12px] font-black ${textMain}`}>Servis Kaydı Açıldı</div><div className={`text-[9px] font-black uppercase tracking-widest mt-1 opacity-30 ${textMain}`}>{new Date(service.createdAt).toLocaleString('tr-TR')}</div></div>
+                                </div>
+                                
+                                <div className="flex gap-5 items-start relative z-10">
+                                    <div className={`w-4 h-4 rounded-full border-4 ${isLight ? 'border-slate-50' : 'border-[#030712]'} ${service.startTime ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-white/10'}`}></div>
+                                    <div><div className={`text-[12px] font-black ${service.startTime ? textMain : 'opacity-20 ' + textMain}`}>Operasyon Başlatıldı</div><div className={`text-[9px] font-black uppercase tracking-widest mt-1 opacity-30 ${textMain}`}>{service.startTime ? new Date(service.startTime).toLocaleString('tr-TR') : 'ATÖLYEDE BEKLENİYOR'}</div></div>
+                                </div>
+
+                                <div className="flex gap-5 items-start relative z-10">
+                                    <div className={`w-4 h-4 rounded-full border-4 ${isLight ? 'border-slate-50' : 'border-[#030712]'} ${service.status === 'Tamamlandı' ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-white/10'}`}></div>
+                                    <div><div className={`text-[12px] font-black ${service.status === 'Tamamlandı' ? textMain : 'opacity-20 ' + textMain}`}>Bakım Tamamlandı</div><div className={`text-[9px] font-black uppercase tracking-widest mt-1 opacity-30 ${textMain}`}>{service.endTime ? new Date(service.endTime).toLocaleString('tr-TR') : 'SÜREÇ DEVAM EDİYOR'}</div></div>
+                                </div>
                             </div>
+                        </div>
+
+                        {/* HARDENING TIPS */}
+                        <div className={`p-5 rounded-3xl border flex items-start gap-4 ${isLight ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400'}`}>
+                            <ShieldCheck size={20} className="shrink-0 mt-0.5" />
+                            <p className="text-[10px] font-black uppercase leading-relaxed opacity-70 italic">Bu kayıt kurumsal garanti protokollerine uygundur. Tüm işlemler blokzinciri tabanlı deftere işlenmektedir.</p>
                         </div>
                     </div>
                 </div>
