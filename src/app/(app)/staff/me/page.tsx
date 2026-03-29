@@ -25,17 +25,17 @@ const printStyles = `
 
 // ─── UI COMPONENTS ──────────────────────────────────────────────────
 const ProgressBar = ({ label, value, max, color = "#3b82f6" }: any) => {
-    const percentage = Math.min((value / max) * 100, 100);
+    const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
     return (
-        <div className="space-y-2">
-            <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
-                <span className="text-text-secondary dark:text-slate-400">{label}</span>
-                <span style={{ color }}>%{(percentage || 0).toFixed(0)}</span>
+        <div className="w-full">
+            <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest mb-2">
+                <span className="text-slate-500">{label}</span>
+                <span style={{ color }}>%{percentage.toFixed(0)}</span>
             </div>
-            <div className="h-1.5 w-full bg-surface-secondary dark:bg-slate-800/50 rounded-full overflow-hidden">
-                <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${percentage}%`, background: color }} />
+            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-1000 ease-out rounded-full" style={{ width: `${percentage}%`, background: color }} />
             </div>
-            <div className="flex justify-end text-[10px] text-slate-400">
+            <div className="flex justify-end text-[9px] text-slate-400 mt-1 font-bold">
                 {Number(value).toLocaleString()} / {Number(max).toLocaleString()}
             </div>
         </div>
@@ -68,6 +68,37 @@ const ProfileHeader = ({ user, title = "ÖZET", dataCount = 0, dataLabel = "Kay�
         </div>
     );
 };
+
+
+const TopPills = ({ pills }: any) => (
+    <div className="flex flex-wrap items-center gap-3 shrink-0 mb-6 w-full">
+        {pills.map((p: any, i: number) => (
+            <div key={i} className="flex bg-white dark:bg-[#1e293b]/50 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max transition-transform cursor-default ring-0 border-none shadow-none">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${p.bg} ${p.color}`}>
+                    {p.icon}
+                </div>
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">{p.title}</span>
+                    <span className="text-lg font-black text-slate-800 dark:text-white leading-none mt-1">{p.value}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+const SoftContainer = ({ title, icon, children, className="" }: any) => (
+    <div className={`bg-white dark:bg-[#1e293b]/50 rounded-[32px] p-6 lg:p-8 flex flex-col ${className} ring-0 border-none shadow-none`}>
+        {title && (
+            <div className="flex items-center gap-2 mb-6 text-[12px] font-black uppercase tracking-widest text-slate-500">
+                <span className="text-slate-400">{icon}</span>
+                <h3>{title}</h3>
+            </div>
+        )}
+        <div className="flex-1">
+            {children}
+        </div>
+    </div>
+);
 
 // ─── DASHBOARD VIEW ──────────────────────────────────────────────────
 const DashboardView = ({
@@ -208,266 +239,129 @@ const TargetsView = ({ targets, statsData, user }: any) => {
     const totalTarget = targets?.reduce((sum: any, t: any) => sum + Number(t.targetValue), 0) || 0;
     const totalActual = targets?.reduce((sum: any, t: any) => sum + Number(t.currentValue), 0) || 0;
     const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
-    const totalEstBonus = targets?.reduce((sum: any, t: any) => sum + Number(t.estimatedBonus || 0), 0) || 0;
     const activeTargetsCount = targets?.filter((t: any) => t.status !== 'İptal' && t.currentValue < t.targetValue).length || 0;
     const completedTargetsCount = targets?.filter((t: any) => t.currentValue >= t.targetValue).length || 0;
 
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
-            {/* COLUMN 1: Profile Summary */}
-            <ProfileHeader user={user} title="Aktif Dönem Hedefleri" dataCount={targets?.length || 0} dataLabel="Adet Hedef" />
+        <div className="flex flex-col animate-in fade-in duration-500 w-full mb-8">
+            <TopPills pills={[
+                { title: 'AKTİF HEDEFLER', value: activeTargetsCount, icon: <Target className="w-5 h-5"/>, bg: 'bg-blue-50 dark:bg-blue-500/10', color: 'text-blue-500' },
+                { title: 'ULAŞILAN HEDEFLER', value: completedTargetsCount, icon: <CheckCircle2 className="w-5 h-5"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500' },
+                { title: 'GENEL BAŞARI', value: `%${overallProgress}`, icon: <TrendingUp className="w-5 h-5"/>, bg: 'bg-orange-50 dark:bg-orange-500/10', color: 'text-orange-500' }
+            ]} />
 
-            {/* COLUMNS 2-4: The Content */}
-            <div className="flex-1 overflow-y-auto flex flex-col space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
-                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
-                        <div className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> İlerleme Başarısı</div>
-                        <div className="text-xl font-black font-mono text-text-primary dark:text-white">%{overallProgress}</div>
-                        <div className="w-full h-1.5 bg-surface-secondary dark:bg-slate-800 rounded-full mt-3 overflow-hidden border border-default">
-                            <div className="h-full bg-state-success-text rounded-full transition-all duration-1000" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
-                        </div>
+            <SoftContainer title="Dönemsel Performans Tablosu" icon={<Target className="w-5 h-5" />} className="min-h-[400px]">
+                {targets?.length === 0 ? (
+                    <div className="py-20 flex flex-col items-center justify-center text-center">
+                        <Target className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                        <h4 className="text-[12px] font-black text-slate-500 uppercase tracking-widest leading-none">HEDEF ATAMASI BULUNMUYOR</h4>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Bu dönem için henüz planlanmış bir performans hedefi yok.</p>
                     </div>
-                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
-                        <div className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-state-success-text" /> Ulaşılan Hedefler</div>
-                        <div className="text-xl font-black font-mono text-text-primary dark:text-white">{completedTargetsCount}</div>
-                    </div>
-                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
-                        <div className="text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-2 flex items-center gap-1.5"><IconActivity className="w-3.5 h-3.5 text-state-warning-text" /> Aktif Hedefler</div>
-                        <div className="text-xl font-black font-mono text-text-primary dark:text-white">{activeTargetsCount}</div>
-                    </div>
-                    <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
-                        <div className="text-[10px] font-bold tracking-widest text-state-success-text dark:text-emerald-400 uppercase mb-2 flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5" /> Prim Hakedişi</div>
-                        <div className="text-xl font-black font-mono text-state-success-text dark:text-emerald-400">₺{totalEstBonus.toLocaleString()}</div>
-                    </div>
-                </div>
-
-                <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-[#1e293b]/50 rounded-2xl shadow-none border border-transparent min-h-[300px]">
-                    <EnterpriseSectionHeader title="Dönemsel Performans Tablosu" icon="🎯" />
-                    {targets?.length === 0 ? (
-                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-surface-bg/30 dark:bg-transparent">
-                            <Target className="w-8 h-8 text-text-muted mb-3 opacity-50" />
-                            <h3 className="text-[12px] font-bold text-text-secondary dark:text-slate-300 mb-1 uppercase tracking-widest">Hedef Ataması Bulunmuyor</h3>
-                            <p className="text-[11px] text-text-muted font-semibold">Bu dönem için henüz sizin adınıza planlanmış bir performans hedefi yok.</p>
-                        </div>
-                    ) : (
-                        <div className="flex-1 overflow-y-auto custom-scroll outline-none">
-                            <table className="w-full text-left border-collapse min-w-[700px]">
-                                <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default dark:border-white/5 shadow-enterprise">
-                                    <tr>
-                                        <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Hedef Türü</th>
-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Durum</th>
-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right">KOTA (HEDEF)</th>
-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right">Cari Gerçekleşen</th>
-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest pr-4 w-48">Performans</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-default bg-white dark:bg-[#0f172a]">
-                                    {targets.map((t: any) => {
-                                        const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
-                                        const isCompleted = progress >= 100;
-
-                                        return (
-                                            <tr key={t.id} className="hover:bg-surface-secondary/50 dark:hover:bg-slate-800/20 transition-colors">
-                                                <td className="p-3 pl-4 align-middle">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center ${t.type === 'TURNOVER' ? 'bg-state-info-bg border border-state-info-border text-state-info-text' : 'bg-state-warning-bg border border-state-warning-border text-state-warning-text'}`}>
-                                                            {t.type === 'TURNOVER' ? <DollarSign className="w-3.5 h-3.5" /> : <TrendingUp className="w-3.5 h-3.5" />}
-                                                        </div>
-                                                        <div className="min-w-0">
-                                                            <div className="text-[12px] font-black text-text-primary dark:text-white uppercase tracking-widest truncate">
-                                                                {t.title || (t.type === 'TURNOVER' ? 'Ciro Hedefi' : 'Aksiyon Hedefi')}
-                                                            </div>
-                                                            <div className="text-[10px] font-bold text-text-secondary truncate mt-0.5 tracking-widest">
-                                                                DÖNEM: {new Date(t.startDate).toLocaleDateString('tr-TR', {month:'2-digit', year:'2-digit'})} / {new Date(t.endDate).toLocaleDateString('tr-TR', {month:'2-digit', year:'2-digit'})}
-                                                            </div>
-                                                        </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[700px]">
+                            <thead>
+                                <tr>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800/50">HEDEF TÜRÜ</th>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800/50">DURUM</th>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right border-b border-slate-100 dark:border-slate-800/50">KOTA / GERÇEKLEŞEN</th>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest w-48 border-b border-slate-100 dark:border-slate-800/50 pr-4 text-right">PERFORMANS BARI</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
+                                {targets.map((t: any) => {
+                                    const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
+                                    const isCompleted = progress >= 100;
+                                    return (
+                                        <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                            <td className="py-4 align-middle">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                                        {t.type === 'TURNOVER' ? <DollarSign className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
                                                     </div>
-                                                </td>
-                                                <td className="p-3 align-middle whitespace-nowrap">
-                                                    {isCompleted ? (
-                                                        <span className="inline-flex items-center justify-center px-2 py-0.5 bg-state-success-bg text-state-success-text font-black text-[9px] uppercase tracking-widest rounded border border-state-success-border">
-                                                            BAŞARILI
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center justify-center px-2 py-0.5 bg-state-info-bg text-state-info-text font-black text-[9px] uppercase tracking-widest rounded border border-state-info-border">
-                                                            DEVAM EDİYOR
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td className="p-3 align-middle text-[12px] font-black font-mono text-text-secondary dark:text-slate-300 text-right whitespace-nowrap">
-                                                    {t.type === 'TURNOVER' ? `₺${Number(t.targetValue).toLocaleString()}` : `${t.targetValue}`}
-                                                </td>
-                                                <td className="p-3 align-middle text-[13px] font-black font-mono text-state-success-text text-right whitespace-nowrap">
-                                                    {t.type === 'TURNOVER' ? `₺${Number(t.currentValue).toLocaleString()}` : `${t.currentValue}`}
-                                                </td>
-                                                <td className="p-3 align-middle pr-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="flex-1 h-1.5 bg-surface-secondary dark:bg-slate-800 rounded-full overflow-hidden border border-default">
-                                                            <div className={`h-full transition-all duration-500 rounded-full ${isCompleted ? 'bg-state-success-text' : 'bg-state-info-text'}`} style={{ width: `${Math.min(progress, 100)}%` }} />
-                                                        </div>
-                                                        <span className={`text-[10px] font-black font-mono w-8 text-right shrink-0 ${isCompleted ? 'text-state-success-text' : 'text-text-muted'}`}>%{progress}</span>
+                                                    <div>
+                                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{t.title || 'Hedef'}</div>
+                                                        <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase">DÖNEM: {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}</div>
                                                     </div>
-                                                    {t.estimatedBonus > 0 && (
-                                                        <div className="mt-1.5 flex justify-end">
-                                                            <span className="text-[9px] font-black text-state-success-text uppercase tracking-widest max-w-max border-b border-dashed border-state-success-text">HAKEDİŞ: ₺{Number(t.estimatedBonus).toLocaleString()}</span>
-                                                        </div>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
-            </div>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 align-middle">
+                                                {isCompleted ? <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">BAŞARILI</span> : <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">DEVAM EDİYOR</span>}
+                                            </td>
+                                            <td className="py-4 align-middle text-right">
+                                                <div className="text-[13px] font-black text-slate-800 dark:text-white">{t.type === 'TURNOVER' ? `₺${Number(t.currentValue).toLocaleString()}` : t.currentValue}</div>
+                                                <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">/ {t.type === 'TURNOVER' ? `₺${Number(t.targetValue).toLocaleString()}` : t.targetValue}</div>
+                                            </td>
+                                            <td className="py-4 align-middle pr-4">
+                                                <ProgressBar label="" value={t.currentValue} max={t.targetValue} color={isCompleted ? "#10b981" : "#3b82f6"} />
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </SoftContainer>
+            <div className="h-10"></div>
         </div>
     );
 };
 
 // ─── TASKS VIEW ──────────────────────────────────────────────────────
-const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
-    const [selectedTask, setSelectedTask] = useState<any>(null);
-    const [feedback, setFeedback] = useState('');
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [filterStatus, setFilterStatus] = useState('Devam Edenler');
-    const [currentPage, setCurrentPage] = useState(1);
-    const tasksPerPage = 10;
-
-    const handleSendFeedback = async (statusOverride?: string) => {
-        if (!selectedTask) return;
-        setIsUpdating(true);
-        try {
-            if (feedback.trim()) {
-                await fetch(`/api/staff/tasks/${selectedTask.id}/feedback`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: feedback, isFromStaff: true })
-                });
-            }
-            if (statusOverride) {
-                await fetch(`/api/staff/tasks/${selectedTask.id}`, {
-                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: statusOverride })
-                });
-            }
-            toast.success("Görev bilgileri iletildi!");
-            setFeedback('');
-            fetchTasks();
-            setSelectedTask(null);
-        } catch(e) { toast.error("İşlem başarısız."); }
-        finally { setIsUpdating(false); }
-    };
-
-    const filteredTasks = tasks.filter((t: any) => {
-        if (filterStatus === 'Tümü') return true;
-        if (filterStatus === 'Tamamlandı') return t.status === 'Tamamlandı';
-        return t.status !== 'Tamamlandı' && t.status !== 'İptal';
+const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
+    const [subTab, setSubTab] = useState<'pending' | 'completed' | 'all'>('pending');
+    
+    const displayTasks = tasks.filter((t: any) => {
+        if (subTab === 'pending') return t.status !== 'Tamamlandı' && t.status !== 'İptal';
+        if (subTab === 'completed') return t.status === 'Tamamlandı';
+        return true;
     });
-    const totalPages = Math.ceil(filteredTasks.length / tasksPerPage) || 1;
-    const paginatedTasks = filteredTasks.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage);
+
+    const pendingCount = tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length || 0;
+    const completedCount = tasks.filter((t: any) => t.status === 'Tamamlandı').length || 0;
 
     return (
-        <div className="flex flex-col animate-in fade-in duration-500 min-h-[600px] h-[calc(100vh-280px)]">
-            <ProfileHeader user={user} title="Atanmış Aktif Görevler" dataCount={tasks.filter((t: any) => t.status !== 'Tamamlandı' && t.status !== 'İptal').length} dataLabel="Görev" />
+        <div className="flex flex-col animate-in fade-in duration-500 w-full mb-8">
+            <TopPills pills={[
+                { title: 'BEKLEYEN GÖREV', value: pendingCount, icon: <Clock className="w-5 h-5"/>, bg: 'bg-orange-50 dark:bg-orange-500/10', color: 'text-orange-500' },
+                { title: 'TAMAMLANAN', value: completedCount, icon: <CheckCircle2 className="w-5 h-5"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500' }
+            ]} />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 h-auto">
-                <div className="lg:col-span-1 h-full flex flex-col">
-                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
-                    <EnterpriseSectionHeader title="Atanan Görevlerim" icon="📋" />
-                    <div className="p-3 border-b border-divider bg-surface-secondary/50 dark:bg-slate-800/10 shrink-0">
-                        <div className="flex bg-surface-tertiary dark:bg-slate-800 p-1 rounded-sm border border-default">
-                            {['Devam Edenler', 'Tamamlandı', 'Tümü'].map((status) => (
-                                <button key={status} onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }} className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm transition-all ${filterStatus === status ? 'bg-surface dark:bg-slate-700 text-primary dark:text-blue-400 shadow-none border border-default' : 'text-text-secondary hover:text-text-primary dark:hover:text-slate-300 border border-transparent'}`}>
-                                    {status}
-                                </button>
-                            ))}
-                        </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <SoftContainer title="Bana Atanan Görevler" icon={<Briefcase className="w-5 h-5"/>} className="min-h-[400px]">
+                    <div className="flex gap-2 mb-6">
+                        <button onClick={() => setSubTab('pending')} className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors border-none ring-0 shadow-none ${subTab==='pending' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-50 dark:bg-slate-800/40 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/60'}`}>Devam Edenler</button>
+                        <button onClick={() => setSubTab('completed')} className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors border-none ring-0 shadow-none ${subTab==='completed' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-50 dark:bg-slate-800/40 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/60'}`}>Tamamlandı</button>
                     </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar">
-                        {loading ? <p className="text-center text-xs text-text-muted p-8">Yükleniyor...</p> : 
-                            paginatedTasks.length === 0 ? <p className="text-center text-xs font-semibold text-text-muted p-8">Belirtilen duruma uygun görev yok.</p> :
-                            <div className="divide-y divide-default">
-                                {paginatedTasks.map((task: any) => (
-                                    <button key={task.id} onClick={() => setSelectedTask(task)} className={`w-full text-left p-4 transition-all block ${selectedTask?.id === task.id ? 'bg-primary/5 dark:bg-blue-500/10' : 'bg-surface hover:bg-surface-secondary dark:bg-slate-800 dark:hover:bg-slate-800/80'}`}>
-                                        <div className={`text-[12px] font-black mb-1.5 line-clamp-1 ${selectedTask?.id === task.id ? 'text-primary dark:text-blue-400' : 'text-text-primary dark:text-white'}`}>{task.title}</div>
-                                        <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest">
-                                            <span className={task.status === 'Tamamlandı' ? 'text-state-success-text' : task.status === 'İptal' ? 'text-text-muted' : 'text-state-warning-text'}>{task.status}</span>
-                                            <span className="flex items-center gap-1 text-text-muted"><Flag className="w-3 h-3"/> {task.priority}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        }
-                    </div>
-                    {totalPages > 1 && (
-                        <div className="p-3 border-t border-divider flex justify-between text-[10px] items-center font-bold text-text-secondary bg-surface-secondary/50 shrink-0">
-                            <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="px-3 py-1 bg-surface dark:bg-slate-700 border border-default rounded-sm hover:bg-surface-secondary disabled:opacity-50 transition-colors">GERİ</button>
-                            <span className="font-mono tracking-widest text-[9px]">SAYFA {currentPage} / {totalPages}</span>
-                            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="px-3 py-1 bg-surface dark:bg-slate-700 border border-default rounded-sm hover:bg-surface-secondary disabled:opacity-50 transition-colors">İLERİ</button>
-                        </div>
-                    )}
-                </EnterpriseCard>
-            </div>
-            <div className="lg:col-span-2 h-full flex flex-col">
-                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
-                    <EnterpriseSectionHeader title="Görev Rapor Merkezi" icon="📝" />
-                    {!selectedTask ? (
-                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-text-muted text-[11px] font-black uppercase tracking-widest text-center border-t border-default bg-surface-bg/30">
-                            ← LİSTEDEN BİR GÖREV SEÇEREK RAPOR EKRANINI AÇIN
+                    {displayTasks.length === 0 ? (
+                        <div className="py-20 text-center flex flex-col items-center">
+                            <Briefcase className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                            <h4 className="text-[12px] font-black text-slate-500 uppercase tracking-widest leading-none">GÖREV BULUNMUYOR</h4>
                         </div>
                     ) : (
-                        <div className="flex-1 flex flex-col overflow-hidden bg-surface dark:bg-[#0f172a] shadow-inner">
-                            <div className="p-5 border-b border-default bg-surface-secondary/40 shrink-0">
-                                <h2 className="text-[14px] font-black text-text-primary">{selectedTask.title}</h2>
-                                {selectedTask.dueDate && <span className="flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase text-state-alert-text bg-state-alert-bg/50 px-2 py-1 w-max rounded-sm border border-state-alert-border"><Calendar className="w-3.5 h-3.5"/> Son Teslim: {new Date(selectedTask.dueDate).toLocaleDateString()}</span>}
-                            </div>
-                            <div className="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col">
-                                {selectedTask.description && (
-                                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-none border border-transparent shrink-0">
-                                        <div className="text-[9px] uppercase font-black text-text-muted mb-2 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5"/> Görev Detayı / Açıklama</div>
-                                        <div className="text-[12px] text-text-secondary leading-relaxed whitespace-pre-wrap">{selectedTask.description}</div>
+                        <div className="flex flex-col gap-3">
+                            {displayTasks.map((t: any) => (
+                                <div key={t.id} className="bg-slate-50 dark:bg-slate-800/30 rounded-3xl p-5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors border-none ring-0">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest leading-snug pr-4">{t.title}</div>
+                                        {t.priority === 'HIGH' && <span className="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 dark:bg-red-500/10 px-3 py-1 rounded-full shrink-0">YÜKSEK</span>}
                                     </div>
-                                )}
-                                <div className="space-y-4 flex-1">
-                                    <div className="text-[9px] uppercase font-black text-text-muted flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5"/> Rapor & Yorum Akışı</div>
-                                    {selectedTask.feedbacks?.length === 0 ? <p className="text-[10px] text-text-muted italic border-l-2 border-default pl-3">Henüz geri bildirim ya da rapor eklenmemiş.</p> : 
-                                        <div className="space-y-3">
-                                            {selectedTask.feedbacks?.map((fb: any) => (
-                                                <div key={fb.id} className={`p-4 rounded-sm border max-w-[85%] ${fb.isFromStaff ? 'bg-surface-secondary dark:bg-slate-800/80 ml-auto border-default' : 'bg-primary/5 dark:bg-blue-500/10 border-primary/20'}`}>
-                                                    <div className={`flex justify-between items-center mb-1.5 text-[9px] font-black text-text-muted uppercase tracking-widest ${fb.isFromStaff && 'flex-row-reverse'}`}>
-                                                        <span className={fb.isFromStaff ? 'text-primary dark:text-blue-400' : 'text-text-secondary'}>{fb.isFromStaff ? user?.name : 'Yönetim / İK'}</span>
-                                                        <span>{new Date(fb.createdAt).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'})}</span>
-                                                    </div>
-                                                    <p className="text-[12px] text-text-primary dark:text-slate-200 whitespace-pre-wrap">{fb.content}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    }
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.status}</div>
                                 </div>
-                            </div>
-                            <div className="p-4 border-t border-default bg-surface shrink-0 z-10 sticky bottom-0">
-                                {selectedTask.status === 'Tamamlandı' ? (
-                                    <div className="bg-state-success-bg/30 text-state-success-text font-black text-[11px] uppercase tracking-widest p-4 text-center rounded-sm border border-state-success-border flex items-center justify-center gap-2">
-                                        <CheckCircle2 className="w-4 h-4"/> BU GÖREV BAŞARIYLA TAMAMLANDI
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-3">
-                                        <textarea className="w-full h-16 bg-surface-secondary dark:bg-slate-800 rounded-sm p-3 text-[12px] border border-default focus:border-primary focus:ring-0 focus:ring-0 resize-none outline-none custom-scrollbar transition-all" placeholder="Görevle ilgili raporunuzu veya yorumunuzu buraya yazın..." value={feedback} onChange={e => setFeedback(e.target.value)} />
-                                        <div className="flex items-center gap-3">
-                                            <button onClick={() => handleSendFeedback()} disabled={isUpdating || !feedback.trim()} className="flex-1 bg-surface-tertiary hover:bg-surface-secondary py-2.5 rounded-sm text-[10px] font-black uppercase disabled:opacity-50 text-text-primary border border-default transition-all">Sadece Yorum Bırak</button>
-                                            <button onClick={() => handleSendFeedback('Tamamlandı')} disabled={isUpdating} className="flex-1 bg-state-success-text hover:bg-emerald-600 focus:bg-emerald-700 disabled:opacity-50 text-white py-2.5 rounded-sm text-[10px] font-black uppercase flex items-center justify-center gap-2 shadow-none transition-all border border-transparent">
-                                                <CheckCircle2 className="w-3.5 h-3.5"/> GÖREVİ TAMAMLA
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            ))}
                         </div>
                     )}
-                </EnterpriseCard>
-                </div>
+                </SoftContainer>
+
+                <SoftContainer title="Görev Rapor Merkezi" icon={<FileText className="w-5 h-5"/>} className="min-h-[400px]">
+                    <div className="flex-1 flex items-center justify-center flex-col text-slate-400 gap-3 text-center py-20">
+                        <MessageSquare className="w-10 h-10 opacity-30 mb-2" />
+                        <h4 className="text-[12px] font-black uppercase tracking-widest mt-2 block leading-none">LİSTEDEN BİR GÖREV SEÇEREK RAPOR EKRANINI AÇIN</h4>
+                    </div>
+                </SoftContainer>
             </div>
+            <div className="h-10"></div>
         </div>
     );
 };
