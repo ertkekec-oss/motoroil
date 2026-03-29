@@ -262,7 +262,7 @@ export default function ServiceDashboard() {
                                                 <td className="px-8 py-6">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-[10px] font-black ${isLight ? 'bg-slate-200 text-slate-600' : 'bg-blue-600 text-white'}`}>
-                                                            {((job.technician?.name || job.technician) || 'P').split(' ').map((n: string) => n[0]).join('')}
+                                                            {(typeof (job.technician?.name || job.technician) === 'string' ? (job.technician?.name || job.technician) : 'P').split(' ').map((n: string) => n[0]).join('')}
                                                         </div>
                                                         <div className="flex flex-col">
                                                             <span className={`text-[13px] font-bold ${textMain}`}>{job.technician?.name || job.technician || 'Atanmadı'}</span>
@@ -455,7 +455,7 @@ export default function ServiceDashboard() {
                                     <div className="flex items-center gap-2 mt-1">
                                         <span className={`text-[13px] font-semibold ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>#{selectedService.id.slice(-6).toUpperCase()}</span>
                                         <div className={`w-1 h-1 rounded-full ${isLight ? 'bg-slate-300' : 'bg-slate-700'}`}></div>
-                                        <span className={`text-[12px] font-medium ${textMuted}`}>{selectedService.entry} Giriş Yapıldı</span>
+                                        <span className={`text-[12px] font-medium ${textMuted}`}>{new Date(selectedService.createdAt).toLocaleDateString('tr-TR')} Giriş Yapıldı</span>
                                     </div>
                                 </div>
                             </div>
@@ -473,13 +473,13 @@ export default function ServiceDashboard() {
                                 {/* Card 1 */}
                                 <div className={`p-5 rounded-[16px] border ${softBg}`}>
                                     <label className={`text-[11px] font-semibold uppercase tracking-wide mb-3 block ${textMuted}`}>Araç & Müşteri</label>
-                                    <div className={`text-[16px] font-bold ${textMain} mb-1`}>{selectedService.vehicle}</div>
-                                    <div className={`text-[13px] font-medium ${isLight ? 'text-blue-600' : 'text-blue-400'} mb-3`}>Plaka: {selectedService.plate}</div>
+                                    <div className={`text-[16px] font-bold ${textMain} mb-1`}>{selectedService.vehicleBrand} {selectedService.vehicleSerial || ''}</div>
+                                    <div className={`text-[13px] font-medium ${isLight ? 'text-blue-600' : 'text-blue-400'} mb-3`}>Plaka: {selectedService.plate || 'PLAKASIZ'}</div>
                                     <div className={`flex items-center gap-2 pt-3 border-t ${isLight ? 'border-slate-200' : 'border-white/5'}`}>
                                         <div className={`p-1.5 rounded-md ${isLight ? 'bg-slate-200 text-slate-600' : 'bg-slate-800 text-slate-300'}`}>
                                             <MapPin size={12} />
                                         </div>
-                                        <span className={`text-[13px] font-medium ${textMain}`}>{selectedService.customer}</span>
+                                        <span className={`text-[13px] font-medium ${textMain}`}>{selectedService.customer?.name || 'Bilinmeyen Müşteri'}</span>
                                     </div>
                                 </div>
 
