@@ -7,7 +7,7 @@ export const PosSearchBar = forwardRef<HTMLInputElement, any>((props: any, ref) 
 
     // Virtual search wrapper with enterprise padding and focus ring
     return (
-        <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2 bg-[#FFFFFF] dark:bg-[#0f172a] border border-[#D6DAE1] dark:border-white/10 p-2 rounded-2xl relative items-center min-w-[300px] overflow-visible shadow-[0_1px_2px_rgba(16,24,40,0.04)] focus-within:ring-2 focus-within:ring-[#2563EB]/50 transition-all">
+        <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2 bg-[#FFFFFF] dark:bg-[#0f172a] border border-[#D0D5DD] dark:border-white/10 p-2 rounded-2xl relative items-center min-w-[300px] overflow-visible shadow-[0_1px_2px_rgba(16,24,40,0.06)] focus-within:ring-4 focus-within:ring-[#2563EB]/15 transition-all">
             <Search size={24} className="ml-4 text-[#9AA3AF] shrink-0" />
             <input
                 ref={ref}
@@ -23,7 +23,7 @@ export const PosSearchBar = forwardRef<HTMLInputElement, any>((props: any, ref) 
                     <VoiceControl onCommand={onVoiceCommand} />
                 )}
                 {process.env.NEXT_PUBLIC_POS_CAMERA_VISION !== 'false' && (
-                    <button type="button" onClick={onCameraClick} className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF8FF] dark:bg-indigo-500/10 text-[#2563EB] dark:text-indigo-400 hover:bg-[#F1F3F6] dark:hover:bg-indigo-500/20 transition-colors">
+                    <button type="button" onClick={onCameraClick} className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F8FAFC] dark:bg-indigo-500/10 text-[#2563EB] dark:text-indigo-400 hover:bg-[#EEF2F7] dark:hover:bg-indigo-500/20 transition-colors border border-[#D0D5DD]">
                         <Camera size={20} />
                     </button>
                 )}
@@ -35,7 +35,7 @@ export const PosSearchBar = forwardRef<HTMLInputElement, any>((props: any, ref) 
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
-                <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-[#FFFFFF] dark:bg-[#0f172a] border border-[#D9DEE5] dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[350px] overflow-y-auto">
+                <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-[#FFFFFF] dark:bg-[#0f172a] border border-[#D0D5DD] dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[350px] overflow-y-auto">
                     {filteredProducts?.map((p: any) => (
                         <div key={p.id} onClick={() => addToCart(p)} className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors group">
                             <div className="flex items-center gap-4">

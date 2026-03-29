@@ -16,7 +16,7 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
         : null;
 
     return (
-        <div className="bg-[#FFFFFF] dark:bg-[#0f172a] border border-[#D9DEE5] dark:border-white/10 rounded-2xl p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)] mb-4 transition-all overflow-hidden duration-300">
+        <div className="bg-[#FFFFFF] dark:bg-[#0f172a] border border-[#D0D5DD] dark:border-white/10 rounded-2xl p-4 shadow-[0_1px_2px_rgba(16,24,40,0.06)] mb-4 transition-all overflow-hidden duration-300">
             <div className="flex items-center justify-between cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)}>
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -32,7 +32,7 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
             {!isCollapsed && (
                 <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2">
                     {suggested && (
-                        <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-white/5 rounded-xl">
+                        <div className="flex items-center justify-between p-3 bg-[#F1F5F9] dark:bg-slate-900/50 border border-[#D0D5DD] dark:border-white/5 rounded-xl">
                             <div className="flex items-center gap-3">
                                 <span className="text-xl">{suggested.icon}</span>
                                 <div>
@@ -42,7 +42,7 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
                             </div>
                             <button
                                 onClick={() => onAddSuggested(suggested)}
-                                className="px-3 py-1.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 hover:bg-indigo-100 hover:text-indigo-700 transition-colors rounded-lg text-xs font-bold"
+                                className="px-3 py-1.5 bg-[#E8F0FF] text-[#2563EB] dark:bg-indigo-500/20 dark:text-indigo-400 hover:bg-[#EEF2F7] hover:text-indigo-700 transition-colors rounded-lg text-xs font-bold border border-[#D0D5DD]/20"
                             >
                                 + EKLE
                             </button>
@@ -50,13 +50,13 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
                     )}
 
                     <div className="grid grid-cols-2 gap-2">
-                        <div className="p-3 bg-[#ECFDF3] dark:bg-emerald-500/10 border border-[#ECFDF3] dark:border-emerald-500/20 rounded-xl">
+                        <div className="p-3 bg-[#ECFDF3] dark:bg-emerald-500/10 border border-[#D0D5DD] dark:border-emerald-500/20 rounded-xl">
                             <div className="flex items-center gap-1.5 text-[#027A48] dark:text-emerald-400 mb-1">
                                 <TrendingUp size={14} /> <span className="text-[10px] font-bold uppercase tracking-widest">Çok Satan</span>
                             </div>
                             <p className="text-xs font-semibold text-[#111827] dark:text-white truncate">Ayçiçek Yağı 5L</p>
                         </div>
-                        <div className="p-3 bg-[#FEF3F2] dark:bg-rose-500/10 border border-[#FEF3F2] dark:border-rose-500/20 rounded-xl">
+                        <div className="p-3 bg-[#FEF3F2] dark:bg-rose-500/10 border border-[#D0D5DD] dark:border-rose-500/20 rounded-xl">
                             <div className="flex items-center gap-1.5 text-[#DC2626] dark:text-rose-400 mb-1">
                                 <AlertTriangle size={14} /> <span className="text-[10px] font-bold uppercase tracking-widest">Kritik Stok</span>
                             </div>

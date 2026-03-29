@@ -9,7 +9,7 @@ export default function CheckoutPanel({
 }: any) {
 
     return (
-        <div className="w-full bg-[#F8FAFC] dark:bg-[#0f172a] border border-[#D9DEE5] dark:border-white/10 rounded-2xl p-4 lg:p-6 flex flex-col shadow-[0_1px_2px_rgba(16,24,40,0.04)] flex-1 min-h-0 overflow-hidden">
+        <div className="w-full bg-[#F8FAFC] dark:bg-[#0f172a] border border-[#D0D5DD] dark:border-white/10 rounded-2xl p-4 lg:p-6 flex flex-col shadow-[0_1px_2px_rgba(16,24,40,0.06)] flex-1 min-h-0 overflow-hidden">
             <h2 className="text-[10px] font-black opacity-40 mb-4 tracking-widest text-center shrink-0 uppercase">SATIŞ ÖZETİ</h2>
 
             <div className="flex-1 overflow-y-auto pr-0 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -18,7 +18,7 @@ export default function CheckoutPanel({
                     <label className="text-[10px] font-bold opacity-50 block mb-2 uppercase tracking-widest">Müşteri / Cari</label>
                     <div
                         onClick={() => setIsCustomerModalOpen(true)}
-                        className="flex justify-between items-center bg-[#FFFFFF] dark:bg-slate-900 p-3 lg:p-4 rounded-xl border border-[#D6DAE1] dark:border-white/5 cursor-pointer hover:border-[#2563EB]/40 dark:hover:border-indigo-500/30 transition-all shadow-[0_1px_2px_rgba(16,24,40,0.04)] group"
+                        className="flex justify-between items-center bg-[#FFFFFF] dark:bg-slate-900 p-3 lg:p-4 rounded-xl border border-[#D0D5DD] dark:border-white/5 cursor-pointer hover:border-[#2563EB]/40 dark:hover:border-indigo-500/30 transition-all shadow-[0_1px_2px_rgba(16,24,40,0.06)] group"
                     >
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
@@ -40,7 +40,7 @@ export default function CheckoutPanel({
                 </div>
 
                 {/* Totals */}
-                <div className="space-y-3 bg-[#FFFFFF] dark:bg-slate-900/50 p-4 rounded-xl border border-[#D9DEE5] dark:border-white/5 shadow-sm">
+                <div className="space-y-3 bg-[#FFFFFF] dark:bg-slate-900/50 p-4 rounded-xl border border-[#D6DAE1] dark:border-white/5 shadow-[0_1px_2px_rgba(16,24,40,0.06)]">
                     <div className="flex justify-between text-xs font-medium text-slate-500">
                         <span>Ara Toplam</span>
                         <span>₺{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
@@ -55,15 +55,15 @@ export default function CheckoutPanel({
                         <span>KDV Hariç Tutar</span>
                         <span>₺{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="flex justify-between items-end pt-3 border-t border-slate-100 dark:border-white/10 mt-2">
-                        <span className="font-bold text-sm text-slate-800 dark:text-slate-200">GENEL TOPLAM</span>
+                    <div className="flex justify-between items-center py-4 px-3 bg-[#FEF2F2] dark:bg-rose-950/20 border-t border-[#D0D5DD] dark:border-white/10 mt-2 rounded-lg">
+                        <span className="font-bold text-sm text-[#111827] dark:text-slate-200">GENEL TOPLAM</span>
                         <span className="text-3xl font-black text-[#DC2626] dark:text-rose-400 tracking-tight">₺{finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                 </div>
 
                 {/* Smart Cashier Assistant (Campaigns Summary) */}
                 {(computedCampaignDiscount > 0 || computedEarnedPoints > 0 || (computedPromoItems && computedPromoItems.length > 0)) && (
-                    <div className="relative overflow-hidden bg-[#F1F3F5] dark:from-indigo-900/40 dark:via-purple-900/20 dark:to-rose-900/30 p-4 rounded-xl border border-[#D6DAE1] dark:border-indigo-400/20 shadow-inner group">
+                    <div className="relative overflow-hidden bg-[#F1F5F9] dark:from-indigo-900/40 dark:via-purple-900/20 dark:to-rose-900/30 p-4 rounded-xl border border-[#D0D5DD] dark:border-indigo-400/20 shadow-inner group">
                         <div className="relative text-[10px] font-black text-[#111827] dark:text-indigo-300 mb-3 uppercase tracking-widest flex items-center gap-1.5">
                             <div className="p-1.5 bg-[#2563EB] text-white rounded-md shadow-sm">
                                 <Gift size={12} className="animate-pulse" />

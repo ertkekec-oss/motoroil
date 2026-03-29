@@ -14,9 +14,9 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
     }
 
     return (
-        <div className="w-full overflow-x-auto overflow-y-auto max-h-[calc(100vh-250px)] relative bg-[#FFFFFF] dark:bg-[#0B1220] rounded-2xl border border-[#D9DEE5] dark:border-white/5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+        <div className="w-full overflow-x-auto overflow-y-auto max-h-[calc(100vh-250px)] relative bg-[#FFFFFF] dark:bg-[#0B1220] rounded-2xl border border-[#D0D5DD] dark:border-white/5 shadow-[0_1px_2px_rgba(16,24,40,0.06)]">
             <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 bg-[#F1F3F5] dark:bg-slate-900 border-b border-[#D6DAE1] dark:border-white/10 z-10">
+                <thead className="sticky top-0 bg-[#F8FAFC] dark:bg-slate-900 border-b border-[#D0D5DD] dark:border-white/10 z-10">
                     <tr>
                         <th className="py-3 px-4 text-xs font-bold text-[#4B5563] dark:text-slate-400 uppercase tracking-widest w-[40%]">Ürün</th>
                         <th className="py-3 px-4 text-xs font-bold text-[#4B5563] dark:text-slate-400 uppercase tracking-widest w-[15%] text-center">Birim Fiyat</th>
@@ -25,9 +25,9 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
                         <th className="py-3 px-4 text-xs font-bold text-[#4B5563] dark:text-slate-400 uppercase tracking-widest w-[10%] text-center">Sil</th>
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-[#ECEFF3] dark:divide-white/5">
+                <tbody className="divide-y divide-[#E5E9F0] dark:divide-white/5">
                     {cart?.map((item, idx) => (
-                        <tr key={idx} className="hover:bg-[#ECEFF3] dark:hover:bg-white/5 transition-colors group">
+                        <tr key={idx} className="hover:bg-[#EEF2F7] dark:hover:bg-white/5 transition-colors group">
                             <td className="py-4 px-4 min-w-[200px]">
                                 <div className="font-bold text-sm text-[#111827] dark:text-white truncate max-w-[300px]">{item.name}</div>
                                 <div className="text-[10px] text-[#9CA3AF] opacity-80 mt-0.5">{item.barcode || item.code}</div>
