@@ -265,7 +265,7 @@ export default function ServiceDashboard() {
                                                             {(typeof (job.technician?.name || job.technician) === 'string' ? (job.technician?.name || job.technician) : 'P').split(' ').map((n: string) => n[0]).join('')}
                                                         </div>
                                                         <div className="flex flex-col">
-                                                            <span className={`text-[13px] font-bold ${textMain}`}>{job.technician?.name || job.technician || 'Atanmadı'}</span>
+                                                            <span className={`text-[13px] font-bold ${textMain}`}>{job.technician?.name || (typeof job.technician === 'string' ? job.technician : '') || 'Atanmadı'}</span>
                                                             <span className={`text-[9px] font-bold uppercase tracking-widest ${textMuted}`}>Sorumlu Personel</span>
                                                         </div>
                                                     </div>
