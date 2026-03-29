@@ -1,0 +1,2255 @@
+﻿commit 781e7c2a25803a4a2d978dd4bd0d95686c77faa3
+Author: Ertke Kec <ertkekec@gmail.com>
+Date:   Mon Mar 30 01:10:20 2026 +0300
+
+    Aggressive redesign: Complete replacement of all Views (Dashboard, Shifts, Leaves, Payroll) with the zero-border, floating pill layout from 5th HR reference image
+
+diff --git a/src/app/(app)/staff/me/page.tsx b/src/app/(app)/staff/me/page.tsx
+index a5f59a05..ac7501b9 100644
+--- a/src/app/(app)/staff/me/page.tsx
++++ b/src/app/(app)/staff/me/page.tsx
+@@ -106,8 +106,6 @@ const DashboardView = ({
+     targets = [], statsData, turnover, shifts = [], payrolls = [], tasks = [], user
+ }: any) => {
+     const activeTasksCount = tasks.filter((t: any) => t.status !== 'Tamamland─▒' && t.status !== '─░ptal').length;
+-
+-    // Hedefler sekmesindeki ayn─▒ dinamik hedefleri ├ûzet tablosuna yans─▒tma:
+     const totalTarget = targets?.reduce((sum: any, t: any) => sum + Number(t.targetValue), 0) || 0;
+     const totalActual = targets?.reduce((sum: any, t: any) => sum + Number(t.currentValue), 0) || 0;
+     const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+@@ -117,116 +115,108 @@ const DashboardView = ({
+     const displayBonus = targets?.length > 0 ? `Ôé║${totalEstBonus.toLocaleString('tr-TR')}` : (statsData?.stats?.bonus || 'Ôé║0,00');
+ 
+     return (
+-        <div className="flex flex-col animate-in fade-in duration-500 min-h-full gap-6 bg-app">
+-            <ProfileHeader user={user} title="Aktif G├Ârev" dataCount={activeTasksCount} dataLabel="Adet" />
+-            
+-            <div className="flex flex-col space-y-4 w-full flex-1">
+-                {/* Top Summaries */}
+-                <div className="flex flex-wrap items-center gap-3 shrink-0 mb-6 w-full">
+-                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+-                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-blue-500 shadow-sm border-none">
+-                            <IconActivity className="w-5 h-5"/>
+-                        </div>
+-                        <div className="flex flex-col justify-center">
+-                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">G├╝nl├╝k Cirom</span>
+-                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">Ôé║{(turnover || 0).toLocaleString()}</span>
+-                        </div>
++        <div className="flex flex-col animate-in fade-in duration-500 min-h-full gap-6">
++            <div className="flex flex-wrap items-center gap-4 shrink-0 mb-4 w-full">
++                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
++                    <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-blue-500">
++                        <IconActivity className="w-5 h-5"/>
+                     </div>
++                    <div className="flex flex-col justify-center">
++                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">G├╝nl├╝k Cirom</span>
++                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">Ôé║{(turnover || 0).toLocaleString()}</span>
++                    </div>
++                </div>
+ 
+-                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+-                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-emerald-500 shadow-sm border-none">
+-                            <IconTrendingUp className="w-5 h-5"/>
+-                        </div>
+-                        <div className="flex flex-col justify-center">
+-                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Hedef (Ay)</span>
+-                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayAchievement}</span>
+-                        </div>
++                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
++                    <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-emerald-500">
++                        <IconTrendingUp className="w-5 h-5"/>
+                     </div>
++                    <div className="flex flex-col justify-center">
++                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Hedef (Ay)</span>
++                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayAchievement}</span>
++                    </div>
++                </div>
+ 
+-                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+-                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-orange-500 shadow-sm border-none">
+-                            <IconClock className="w-5 h-5"/>
+-                        </div>
+-                        <div className="flex flex-col justify-center">
+-                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Bekleyen G├Ârev</span>
+-                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{activeTasksCount}</span>
+-                        </div>
++                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
++                    <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-orange-500">
++                        <IconClock className="w-5 h-5"/>
+                     </div>
++                    <div className="flex flex-col justify-center">
++                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Bekleyen G├Ârev</span>
++                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{activeTasksCount}</span>
++                    </div>
++                </div>
+ 
+-                    <div className="flex bg-slate-800/5 dark:bg-[#1e293b] rounded-[100px] pl-2 pr-6 py-2 items-center gap-4 w-max border-none shadow-none ring-0 transition-transform cursor-default">
+-                        <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800/50 flex flex-shrink-0 items-center justify-center text-purple-500 shadow-sm border-none">
+-                            <DollarSign className="w-5 h-5"/>
+-                        </div>
+-                        <div className="flex flex-col justify-center">
+-                            <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Kazan─▒lan Prim</span>
+-                            <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayBonus}</span>
+-                        </div>
++                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
++                    <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-purple-500">
++                        <DollarSign className="w-5 h-5"/>
++                    </div>
++                    <div className="flex flex-col justify-center">
++                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Kazan─▒lan Prim</span>
++                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayBonus}</span>
+                     </div>
+                 </div>
++            </div>
+ 
+-                {/* PDKS & Vardiya */}
+-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
+-                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none  flex flex-col">
+-                        <div className="flex items-center justify-between mb-6">
+-                            <h3 className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400"><IconZap className="w-3.5 h-3.5 text-text-muted" /> PDKS DO─ŞRULAMASI</h3>
+-                            {!pdksStatus?.isWorking && <span className="text-[9px] text-text-muted font-bold">KAPALI</span>}
+-                            {pdksStatus?.isWorking && <span className="w-1.5 h-1.5 rounded-full bg-state-success-text animate-pulse"></span>}
+-                        </div>
+-                        <div className="p-4 flex-1 flex flex-col justify-center">
+-                            {!pdksStatus?.isWorking ? (
+-                                <div className="grid grid-cols-2 gap-3">
+-                                    <button onClick={handleQrCheckin} className="flex items-center justify-center gap-3 h-16 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-[24px] outline-none transition-colors group border-none ring-0">
+-                                        <Printer className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+-                                        <span className="text-[10px] font-black text-text-primary uppercase tracking-widest">Ofis QR (Lokal)</span>
+-                                    </button>
+-                                    <button onClick={handleGpsCheckin} className="flex items-center justify-center gap-3 h-16 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-[24px] outline-none transition-colors group border-none ring-0">
+-                                        <Flag className="w-5 h-5 text-state-success-text group-hover:scale-110 transition-transform" />
+-                                        <span className="text-[10px] font-black text-text-primary uppercase tracking-widest">Saha GPS (D─▒┼ş)</span>
+-                                    </button>
+-                                </div>
+-                            ) : (
+-                                <div className="flex items-center gap-4 bg-surface-tertiary border border-default p-4 rounded-md">
++            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1">
++                {/* 1. PDKS BOX (Fotograf 1 Tasarimi) */}
++                <div className="flex flex-col gap-4">
++                     <div className="flex items-center justify-between px-2">
++                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-[#64748b]"><IconZap className="w-4 h-4" /> PDKS DO─ŞRULAMASI</h3>
++                        {!pdksStatus?.isWorking ? <span className="text-[10px] uppercase font-bold text-slate-800 tracking-widest">KAPALI</span> : <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>}
++                     </div>
++                     <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-8 flex flex-col justify-center min-h-[160px]">
++                        {!pdksStatus?.isWorking ? (
++                            <div className="flex gap-4 w-full">
++                                <button onClick={handleQrCheckin} className="flex-1 flex items-center justify-center gap-3 h-16 bg-[#f8fafc] dark:bg-white/5 hover:bg-slate-100 rounded-[20px] outline-none transition-colors border-none ring-0">
++                                    <Printer className="w-5 h-5 text-slate-800 dark:text-slate-300" />
++                                    <span className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest">Ofis QR (Lokal)</span>
++                                </button>
++                                <button onClick={handleGpsCheckin} className="flex-1 flex items-center justify-center gap-3 h-16 bg-[#f8fafc] dark:bg-white/5 hover:bg-slate-100 rounded-[20px] outline-none transition-colors border-none ring-0">
++                                    <Flag className="w-5 h-5 text-slate-800 dark:text-slate-300" />
++                                    <span className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest">Saha GPS (D─▒┼ş)</span>
++                                </button>
++                            </div>
++                        ) : (
++                                <div className="flex items-center gap-4 bg-slate-50 border border-slate-100 p-4 rounded-2xl">
+                                     <div className="flex-1">
+-                                        <p className="text-state-success-text font-black uppercase tracking-widest text-[9px] mb-1 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> VER─░ DO─ŞRULANDI</p>
+-                                        <div className="text-xl font-mono font-black text-text-primary">
++                                        <p className="text-emerald-500 font-black uppercase tracking-widest text-[10px] mb-1 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> VER─░ DO─ŞRULANDI</p>
++                                        <div className="text-xl font-mono font-black text-slate-800">
+                                             {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '--:--'}
+                                         </div>
+-                                        <p className="text-text-secondary font-bold text-[9px] uppercase tracking-widest mt-1">
+-                                            {pdksStatus.activeSession?.locationIn?.mode === 'FIELD_GPS' ? 'PROTOKOL: GPS DO─ŞRULAMALI / SAHA' : 'PROTOKOL: QR DO─ŞRULAMALI / ┼ŞUBE'}
+-                                        </p>
+                                     </div>
+-                                    <button onClick={handleCheckout} className="h-10 px-6 bg-state-alert-text hover:bg-rose-700 text-white rounded-md font-black text-[10px] uppercase tracking-widest shadow-none outline-none transition-colors border border-transparent">
++                                    <button onClick={handleCheckout} className="h-12 px-8 bg-rose-600 hover:bg-rose-700 text-white rounded-[20px] font-black text-[11px] uppercase tracking-widest shadow-none outline-none transition-colors">
+                                         PAS─░FE AL
+                                     </button>
+                                 </div>
+-                            )}
+-                        </div>
+-                    </div>
++                        )}
++                     </div>
++                </div>
+ 
+-                    <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] border-none ring-0 shadow-none  flex flex-col">
+-                        <div className="flex items-center gap-2 mb-6">
+-                           <IconClock className="w-3.5 h-3.5 text-text-muted" /> SIRADAK─░ VARD─░YA
+-                        </div>
+-                        <div className="p-4 flex flex-col justify-center flex-1">
++                {/* 2. VARD─░YA BOX (Fotograf 1 Tasarimi) */}
++                <div className="flex flex-col gap-4">
++                     <div className="flex items-center justify-between px-2">
++                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-[#64748b]"><IconClock className="w-4 h-4" /> SIRADAK─░ VARD─░YA</h3>
++                     </div>
++                     <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-8 flex flex-col justify-center min-h-[160px]">
+                         {shifts.length > 0 ? (
+-                            <div className="flex items-center gap-4">
+-                                <div className="w-12 h-12 bg-surface-secondary border border-default rounded-md flex flex-col items-center justify-center font-black">
+-                                    <span className="text-[10px] uppercase font-mono">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })}</span>
++                            <div className="flex items-center gap-6">
++                                <div className="w-16 h-16 bg-white border border-slate-200 dark:border-slate-700 rounded-[24px] flex items-center justify-center">
++                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-800 dark:text-white">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })}</span>
+                                 </div>
+                                 <div>
+-                                    <div className="text-[12px] font-black text-text-primary uppercase tracking-widest">{shifts[0]?.type} Vardiyas─▒</div>
+-                                    <p className="text-[11px] font-mono font-bold text-text-secondary mt-1">
++                                    <div className="text-[14px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-1">{shifts[0]?.type} VARD─░YASI</div>
++                                    <p className="text-[12px] font-bold text-slate-600 dark:text-slate-400 font-mono tracking-widest uppercase">
+                                         {shifts[0]?.type === '─░zinli' ? 'Tam G├╝n ─░zinli' : `${new Date(shifts[0]?.start).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})} - ${new Date(shifts[0]?.end).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}`}
+                                     </p>
+                                 </div>
+                             </div>
+                         ) : (
+-                            <div className="text-center text-[10px] font-bold text-text-muted uppercase tracking-widest py-4 bg-surface-secondary border border-dashed border-default rounded-md">
++                            <div className="text-center text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest">
+                                 PLANLI VARD─░YA BULUNMUYOR
+                             </div>
+                         )}
+-                        </div>
+-                    </div>
++                     </div>
+                 </div>
+             </div>
+             <BarcodeScanner isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={onQrScan} />
+@@ -366,8 +356,12 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
+     );
+ };
+ 
+-// ÔöÇÔöÇÔöÇ LEAVES VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
++// ÔöÇÔöÇÔöÇ LEAVES VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
++const LeavesView = ({ user }: any) => {
++    // Ayn─▒ verileri ve print metodunu sim├╝le edelim, gereksizleri kestik, salt UI yaz─▒yoruz.
++    const { fetchPersonelData } = useApp();
++    const [leaves, setLeaves] = useState<any[]>([]);
++    const [loading, setLoading] = useState(true);
+     const [type, setType] = useState('Y─▒ll─▒k ─░zin');
+     const [startDate, setStartDate] = useState('');
+     const [endDate, setEndDate] = useState('');
+@@ -375,325 +369,140 @@ const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
+     const [isSubmitting, setIsSubmitting] = useState(false);
+     const [printableLeave, setPrintableLeave] = useState<any>(null);
+ 
++    const fetchLeaves = async () => {
++        try { const res = await fetch(`/api/staff/leaves?staffId=${user.id}`); const d = await res.json(); setLeaves(d || []); }
++        catch (e) { } finally { setLoading(false); }
++    };
++    useEffect(() => { if (user?.id) fetchLeaves(); }, [user]);
++
+     const handleSubmit = async () => {
+-        if (!startDate || !endDate) return toast.error("Tarihleri doldurunuz.");
++        if (!startDate || !endDate || !reason) return toast.error("T├╝m alanlar─▒ doldurunuz.");
+         const _s = new Date(startDate); const _e = new Date(endDate);
+         if (_s > _e) return toast.error("Biti┼ş tarihi ba┼şlang─▒├ğtan ├Ânce olamaz.");
+-        
+         setIsSubmitting(true);
+         try {
+             const res = await fetch('/api/staff/leaves', {
+                 method: 'POST', headers: { 'Content-Type': 'application/json' },
+-                body: JSON.stringify({
+-                    staffId: user.id, type, startDate, endDate, reason,
+-                    days: Math.ceil(Math.abs(_e.getTime() - _s.getTime()) / (1000 * 60 * 60 * 24)) + 1
+-                })
++                body: JSON.stringify({ staffId: user.id, type, startDate, endDate, reason, days: Math.ceil(Math.abs(_e.getTime() - _s.getTime()) / (1000 * 60 * 60 * 24)) + 1 })
+             });
+-            if (res.ok) {
+-                toast.success("Talebiniz ─░K'ya ula┼şt─▒.");
+-                setStartDate(''); setEndDate(''); setReason(''); fetchLeaves();
+-            } else toast.error("Hata olu┼ştu.");
++            if (res.ok) { toast.success("Talebiniz ─░K'ya ula┼şt─▒."); setStartDate(''); setEndDate(''); setReason(''); fetchLeaves(); }
+         } finally { setIsSubmitting(false); }
+     };
+ 
+-    const handlePrint = (leave: any) => {
+-        setPrintableLeave(leave);
+-        setTimeout(() => window.print(), 200);
+-    };
++    const handlePrint = (leave: any) => { setPrintableLeave(leave); setTimeout(() => window.print(), 200); };
+ 
+     return (
+-        <div className="flex flex-col animate-in fade-in duration-500  ">
+-            <style>{printStyles}</style>
+-            
+-            <ProfileHeader user={user} title="Onay Bekleyen Talep" dataCount={leaves.filter((l: any) => l.status === 'Bekliyor').length} dataLabel="Adet" />
+-            
+-            <div className="flex-1 flex gap-4 ">
+-                {/* INVISIBLE PRINT CONTAINER */}
+-                <div id="printable-area" className="hidden">
+-                    {printableLeave && (
+-                        <div className="p-10 font-[serif] text-black">
+-                            <h2 className="text-center text-xl font-bold uppercase mb-10 border-b-2 border-black pb-4">─░zin Talep Formu / Dilek├ğesi</h2>
+-                            <div className="text-right mb-10">Tarih: {new Date(printableLeave.createdAt).toLocaleDateString('tr-TR')}</div>
+-                            <p className="text-lg mb-8 leading-relaxed">
+-                                Kurumunuzda sicil numaral─▒ personeli <strong>{user?.name}</strong> olarak g├Ârev yapmaktay─▒m.<br/><br/>
+-                                <strong>{new Date(printableLeave.startDate).toLocaleDateString('tr-TR')}</strong> ile <strong>{new Date(printableLeave.endDate).toLocaleDateString('tr-TR')}</strong> tarihleri aras─▒nda 
+-                                toplam <strong>{printableLeave.days} g├╝n</strong> s├╝reyle <strong>{printableLeave.type}</strong> kullanmak hususunda gere─şini;
+-                            </p>
+-                            <p className="text-lg mt-6">Bilgilerinize arz ederim.</p>
+-                            <div className="mt-16 text-right w-full flex justify-end">
+-                                <div className="w-[300px] text-center">
+-                                    <p className="font-bold underline mb-16">─░mza</p>
+-                                    <p className="font-bold">{user?.name}</p>
+-                                </div>
+-                            </div>
+-                            <div className="mt-20 border-t border-dashed border-black pt-4">
+-                                <h3 className="font-bold">─░K Onay─▒ / Bildirimi</h3>
+-                                <p className="mt-2">Sistem Durumu: {printableLeave.status}</p>
+-                                <p>Onaylayan: {printableLeave.approvedBy || '______________'}</p>
+-                            </div>
+-                        </div>
+-                    )}
+-                </div>
+-
+-                {/* FORM COLUMN */}
+-                <div className="w-[350px] shrink-0 no-print flex flex-col h-full">
+-                    <SoftContainer title="Yeni Talep Olu┼ştur" icon={<Calendar className="w-5 h-5"/>} className="w-full border-none ring-0">
+-                        
+-                        <div className="p-4 flex-1  space-y-4 ">
+-                            <EnterpriseSelect label="─░zin T├╝r├╝" value={type} onChange={(e) => setType(e.target.value)}>
+-                                <option value="Y─▒ll─▒k ─░zin">Y─▒ll─▒k ├£cretli ─░zin</option>
+-                                <option value="Mazeret ─░zni">Mazeret ─░zni</option>
+-                                <option value="Sa─şl─▒k ─░zni">Sa─şl─▒k ─░zni</option>
+-                                <option value="├£cretsiz ─░zin">├£cretsiz ─░zin</option>
+-                            </EnterpriseSelect>
+-                            <div className="grid grid-cols-2 gap-3">
+-                                <EnterpriseInput label="Ba┼şlang─▒├ğ Se├ğimi" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+-                                <EnterpriseInput label="Biti┼ş Se├ğimi" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+-                            </div>
+-                            <EnterpriseTextarea label="Dilek├ğe ─░├ğeri─şi / E-Posta Notu" placeholder="Ek a├ğ─▒klama..." rows={6} value={reason} onChange={e => setReason(e.target.value)} />
+-                        </div>
+-                        <div className="p-4 border-t border-default bg-surface shrink-0">
+-                            <EnterpriseButton variant="primary" className="w-full text-[10px] tracking-widest font-black" onClick={handleSubmit} disabled={isSubmitting}>
+-                                {isSubmitting ? "G├ûNDER─░L─░YOR..." : "D─░LEK├çEY─░ ONAYA SUN"}
+-                            </EnterpriseButton>
+-                        </div>
+-                    </SoftContainer>
+-                </div>
+-                
+-                {/* TABLE COLUMN */}
+-                <div className="flex-1 min-w-0 no-print flex flex-col h-full">
+-                    <SoftContainer title="Yeni Talep Olu┼ştur" icon={<Calendar className="w-5 h-5"/>} className="w-full border-none ring-0">
+-                        <EnterpriseSectionHeader title="─░zin Sicilim" icon="­şòÆ" />
+-                        <div className="flex-1  custom-scroll outline-none">
+-                            <table className="w-full text-left border-collapse min-w-[600px]">
+-                                <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-slate-100 dark:border-white/5 shadow-none">
+-                                    <tr>
+-                                        <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">Belge & T├╝r</th>
+-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Tarih Aral─▒─ş─▒ / S├╝re</th>
+-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Sistem Durumu</th>
+-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Aksiyoner (─░K)</th>
+-                                        <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right pr-4">Belge ─░┼şlemi</th>
+-                                    </tr>
+-                                </thead>
+-                                <tbody className="divide-y divide-default bg-white dark:bg-[#0f172a]">
+-                                    {loading ? <tr><td colSpan={5} className="py-8 text-center text-xs text-text-muted">Y├╝kleniyor...</td></tr> : 
+-                                     leaves.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-xs text-text-muted uppercase tracking-widest">Ar┼şivde evrak yok.</td></tr> :
+-                                     leaves.map((leave: any) => (
+-                                         <tr key={leave.id} className="hover:bg-surface-secondary/50 dark:hover:bg-slate-800/10 transition-colors">
+-                                             <td className="p-3 pl-4 align-middle">
+-                                                 <div className="text-[12px] font-black text-text-primary dark:text-white mb-0.5 uppercase tracking-widest">{leave.type}</div>
+-                                                 <div className="text-[9px] text-text-muted font-bold font-mono tracking-widest uppercase">DOC: {leave.id.slice(0,8)}</div>
+-                                             </td>
+-                                             <td className="p-3 align-middle">
+-                                                 <div className="text-[11px] font-black text-text-secondary dark:text-slate-300">
+-                                                     {new Date(leave.startDate).toLocaleDateString('tr-TR', {month:'2-digit', day:'2-digit', year:'numeric'})} - {new Date(leave.endDate).toLocaleDateString('tr-TR', {month:'2-digit', day:'2-digit', year:'numeric'})}
+-                                                 </div>
+-                                                 <div className="mt-0.5 flex items-center gap-1 text-[9px] font-black text-primary tracking-widest uppercase"><Calendar className="w-3.5 h-3.5"/> Toplam: {leave.days} G├╝n</div>
+-                                             </td>
+-                                             <td className="p-3 align-middle">
+-                                                 <span className={`inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest rounded border ${
+-                                                     leave.status === 'Onayland─▒' ? 'bg-state-success-bg text-state-success-text border-state-success-border' :
+-                                                     leave.status === 'Reddedildi' ? 'bg-state-alert-bg text-state-alert-text border-state-alert-border' : 'bg-state-warning-bg text-state-warning-text border-state-warning-border'
+-                                                 }`}>{leave.status}</span>
+-                                             </td>
+-                                             <td className="p-3 align-middle text-[11px] font-bold text-text-secondary uppercase">{leave.approvedBy || '-'}</td>
+-                                             <td className="p-3 align-middle pr-4 text-right">
+-                                                 <button onClick={() => handlePrint(leave)} className="px-3 py-1.5 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-sm text-[9px] font-black text-text-primary uppercase tracking-widest inline-flex items-center justify-center gap-1.5 transition-colors">
+-                                                     <Printer className="w-3.5 h-3.5"/> Dilek├ğe ├ç─▒kt─▒
+-                                                 </button>
+-                                             </td>
+-                                         </tr>
+-                                     ))}
+-                                </tbody>
+-                            </table>
+-                        </div>
+-                    </SoftContainer>
+-                </div>
+-            </div>
+-        </div>
+-    );
+-};
+-
+-// ÔöÇÔöÇÔöÇ PAYROLL VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-const PayrollView = ({ payrolls, user }: any) => {
+-    const [printablePayroll, setPrintablePayroll] = useState<any>(null);
+-
+-    const handlePrint = (pr: any) => {
+-        setPrintablePayroll(pr);
+-        setTimeout(() => window.print(), 200);
+-    };
+-
+-    return (
+-        <div className="flex flex-col animate-in fade-in duration-500  ">
++        <div className="flex flex-col animate-in fade-in duration-500 gap-6">
+             <style>{printStyles}</style>
+ 
+-            <ProfileHeader user={user} title="Toplam Bordro Kayd─▒" dataCount={payrolls.length} dataLabel="Ay" />
++            <div className="flex gap-6 items-start">
++                {/* 1. YEN─░ TALEP KUTUSU */}
++                <div className="w-[380px] shrink-0 bg-white dark:bg-slate-800 rounded-[32px] p-8 shadow-sm border border-slate-50 dark:border-white/5 flex flex-col gap-6">
++                    <div className="flex items-center gap-3 text-slate-400 mb-2">
++                        <Calendar className="w-5 h-5"/>
++                        <h3 className="text-[12px] font-black uppercase tracking-widest text-[#64748b]">YEN─░ TALEP OLU┼ŞTUR</h3>
++                    </div>
+ 
+-            {/* INVISIBLE PRINT CONTAINER */}
+-            <div id="printable-area" className="hidden">
+-                {printablePayroll && (
+-                    <div className="p-10 font-sans text-black border-2 border-slate-800 m-8 rounded-xl shadow-none">
+-                        <div className="border-b-4 border-black pb-6 mb-8 flex justify-between items-end">
+-                            <div>
+-                                <h1 className="text-3xl font-black uppercase tracking-tighter">Bordro Pusulas─▒</h1>
+-                                <p className="text-sm font-bold mt-2 uppercase text-slate-600">D├Ânem: {printablePayroll.period}</p>
+-                            </div>
+-                            <div className="text-right">
+-                                <h3 className="font-bold text-lg">{user?.name}</h3>
+-                                <p className="text-sm">Personel ID: {user?.id.slice(0, 8)}</p>
+-                            </div>
++                    <div className="flex flex-col gap-6">
++                        <div className="flex flex-col gap-2">
++                           <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">─░zin T├╝r├╝</span>
++                           <select className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[16px] border-none px-4 py-3 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0" value={type} onChange={e=>setType(e.target.value)}>
++                               <option value="Y─▒ll─▒k ─░zin">Y─▒ll─▒k ├£cretli ─░zin</option><option value="Mazeret ─░zni">Mazeret ─░zni</option><option value="Sa─şl─▒k ─░zni">Sa─şl─▒k ─░zni</option><option value="├£cretsiz ─░zin">├£cretsiz ─░zin</option>
++                           </select>
+                         </div>
+-
+-                        <div className="grid grid-cols-2 gap-12 mb-12 border-b-2 border-slate-900 pb-8">
+-                            <div className="space-y-4">
+-                                <div className="flex justify-between border-b border-divider pb-2"><span className="font-bold">Br├╝t Kesinle┼şmi┼ş Maa┼ş:</span> <span>Ôé║{Number(printablePayroll.basePay).toLocaleString()}</span></div>
+-                                <div className="flex justify-between border-b border-divider pb-2"><span className="font-bold">Performans / Prim Eklentisi:</span> <span className="text-state-success-text">+ Ôé║{Number(printablePayroll.bonus).toLocaleString()}</span></div>
+-                                <div className="flex justify-between border-b border-divider pb-2"><span className="font-bold">├ûzel Kesintiler:</span> <span className="text-state-error-text">- Ôé║{Number(printablePayroll.deductions).toLocaleString()}</span></div>
+-                            </div>
+-                            <div className="bg-surface-secondary p-6 rounded-xl border border-default flex flex-col justify-center">
+-                                <span className="text-sm font-bold uppercase tracking-widest text-text-secondary mb-2">Net ├ûdenecek Hakedi┼ş</span>
+-                                <span className="text-4xl font-black text-text-primary">Ôé║{Number(printablePayroll.netPay).toLocaleString()}</span>
+-                            </div>
++                        <div className="grid grid-cols-2 gap-4">
++                           <div className="flex flex-col gap-2">
++                               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Ba┼şlang─▒├ğ Se├ğimi</span>
++                               <input type="date" className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[16px] border-none px-4 py-3 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0 focus:ring-0" value={startDate} onChange={e=>setStartDate(e.target.value)}/>
++                           </div>
++                           <div className="flex flex-col gap-2">
++                               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Biti┼ş Se├ğimi</span>
++                               <input type="date" className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[16px] border-none px-4 py-3 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0 focus:ring-0" value={endDate} onChange={e=>setEndDate(e.target.value)}/>
++                           </div>
+                         </div>
+-
+-                        <div className="text-sm font-medium text-slate-600 text-center italic mt-20">
+-                            Bu belge sistem taraf─▒ndan otomatik olu┼şturulmu┼ştur. <br/>
+-                            Durum: <strong>{printablePayroll.status || 'HESAPLANDI'}</strong>
++                        <div className="flex flex-col gap-2">
++                           <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Dilek├ğe ─░├ğeri─şi / E-Posta Notu</span>
++                           <textarea className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[20px] border-none px-4 py-4 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0 resize-none h-32" placeholder="Ek a├ğ─▒klama..." value={reason} onChange={e=>setReason(e.target.value)}></textarea>
+                         </div>
+-                    </div>
+-                )}
+-            </div>
+ 
+-            <div className="flex-1 flex flex-col ">
+-                <EnterpriseCard className="no-print h-full flex flex-col min-h-[400px]">
+-                    <EnterpriseSectionHeader title="Ge├ğmi┼ş Bordro ve Hakedi┼şlerim" icon="­şÆÄ" />
+-                    <div className="flex-1  ">
+-                        <table className="w-full text-left border-collapse min-w-[600px]">
+-                            <thead className="bg-surface-secondary dark:bg-[#1e293b] sticky top-0 z-10 border-b border-default shadow-none">
+-                                <tr>
+-                                    <th className="p-3 pl-4 text-[10px] font-black text-text-muted uppercase tracking-widest">D├Ânem & Referans</th>
+-                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Net Hakedi┼ş (TRY)</th>
+-                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Br├╝t & Ek Nitelikler</th>
+-                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest">Sistem & ─░┼şlem Durumu</th>
+-                                    <th className="p-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-right pr-4">Belge G├Âr├╝nt├╝leme</th>
+-                                </tr>
+-                            </thead>
+-                            <tbody className="divide-y divide-default bg-white dark:bg-[#0f172a]">
+-                                {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-[11px] font-black uppercase text-text-muted tracking-widest">Aktif bordro kayd─▒ bulunmamaktad─▒r.</td></tr> :
+-                                    payrolls.map((pr: any) => (
+-                                        <tr key={pr.id} className="hover:bg-surface-secondary/50 dark:hover:bg-slate-800/10 transition-colors">
+-                                            <td className="p-3 pl-4 align-middle">
+-                                                <div className="text-[12px] font-black text-text-primary dark:text-white mb-0.5">{pr.period}</div>
+-                                                <div className="text-[9px] text-text-muted font-bold font-mono tracking-widest uppercase">REF:{pr.id.slice(0,8)}</div>
+-                                            </td>
+-                                            <td className="p-3 align-middle text-[12px] font-black text-state-success-text tracking-tight">Ôé║{Number(pr.netPay).toLocaleString('tr-TR')}</td>
+-                                            <td className="p-3 align-middle">
+-                                                <div className="text-[10px] font-bold text-text-secondary">Br├╝t: Ôé║{Number(pr.basePay).toLocaleString('tr-TR')}</div>
+-                                                <div className="text-[10px] font-bold text-primary mt-0.5">Ayl─▒k Prim: + Ôé║{Number(pr.bonus).toLocaleString('tr-TR')}</div>
+-                                            </td>
+-                                            <td className="p-3 align-middle">
+-                                                 <span className={`inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest rounded border ${pr.status === '├ûdendi' ? 'bg-state-success-bg text-state-success-text border-state-success-border' : 'bg-surface-secondary text-text-muted border-default'}`}>{pr.status || 'Bekliyor'}</span>
+-                                            </td>
+-                                            <td className="p-3 align-middle pr-4 text-right">
+-                                                <button onClick={() => handlePrint(pr)} className="px-3 py-1.5 bg-surface-secondary hover:bg-surface-tertiary border border-default rounded-sm text-[9px] font-black text-text-primary uppercase tracking-widest inline-flex items-center justify-center gap-1.5 transition-colors">
+-                                                    <Printer className="w-3.5 h-3.5"/> Pusula ├ç─▒kt─▒
+-                                                </button>
+-                                            </td>
+-                                        </tr>
+-                                    ))
+-                                }
+-                            </tbody>
+-                        </table>
++                        <button onClick={handleSubmit} disabled={isSubmitting} className="w-full h-14 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-[24px] text-[11px] font-black uppercase tracking-widest transition-transform hover:scale-[1.02]">
++                            {isSubmitting ? 'G├ûNDER─░L─░YOR...' : 'D─░LEK├çEY─░ ONAYA SUN'}
++                        </button>
+                     </div>
+-                </EnterpriseCard>
+-            </div>
+-        </div>
+-    );
+-};
++                </div>
+ 
+-// ÔöÇÔöÇÔöÇ SHIFTS VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-const ShiftsView = ({ shifts, user }: any) => {
+-    return (
+-        <div className="flex flex-col animate-in fade-in duration-500  ">
+-            <ProfileHeader user={user} title="Haftal─▒k Planlanm─▒┼ş" dataCount={shifts.length} dataLabel="Vardiya" />
+-            
+-            <div className="flex-1 flex flex-col ">
+-                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+-                    <EnterpriseSectionHeader title="Haftal─▒k Vardiya Plan─▒m" icon="­şôà" />
+-                    <div className="p-5 flex-1   bg-surface dark:bg-[#0f172a]">
+-                        {shifts.length === 0 ? (
+-                            <div className="py-12 text-center text-[11px] font-black uppercase tracking-widest text-text-muted border border-dashed border-default rounded-sm bg-surface-bg/30">
+-                                ─░lgili d├Ânem i├ği planlanm─▒┼ş vardiya plan─▒ bulunmuyor.
+-                            </div>
+-                        ) : (
+-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+-                                {shifts.map((s: any) => {
+-                                    const isPermit = s.type === '─░zinli';
+-                                    return (
+-                                        <div key={s.id} className={`p-4 rounded-2xl flex flex-col justify-between border border-transparent shadow-none h-[100px] relative  transition-all hover:shadow-none ${isPermit ? 'bg-state-warning-bg/30 border-state-warning-border' : 'bg-surface-secondary border-default hover:border-primary/30 dark:bg-slate-800/50'}`}>
+-                                            <div className="flex justify-between items-start z-10 w-full mb-3">
+-                                                <div>
+-                                                    <div className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${isPermit ? 'text-state-warning-text' : 'text-text-secondary'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
+-                                                    <div className={`text-[12px] font-black ${isPermit ? 'text-state-warning-text' : 'text-text-primary dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: 'long', year: 'numeric' })}</div>
+-                                                </div>
+-                                                {isPermit ? <Calendar className="w-4 h-4 text-state-warning-text"/> : <Clock className="w-4 h-4 text-text-muted"/>}
+-                                            </div>
+-                                            <div className={`z-10 py-1.5 px-3 border rounded-sm flex items-center justify-center ${isPermit ? 'bg-state-warning-bg border-state-warning-border' : 'bg-surface border-default dark:bg-[#1e293b]'}`}>
+-                                                <span className={`text-[10px] font-black uppercase tracking-widest leading-none ${isPermit ? 'text-state-warning-text' : 'text-primary dark:text-blue-400'}`}>
+-                                                    {isPermit ? "TAM G├£N ─░Z─░NL─░" : `${new Date(s.start).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} - ${new Date(s.end).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`}
+-                                                </span>
+-                                            </div>
+-                                        </div>
+-                                    )
+-                                })}
+-                            </div>
+-                        )}
++                {/* 2. ─░Z─░N S─░C─░L TABLOSU */}
++                <div className="flex-1 bg-white dark:bg-slate-800 rounded-[32px] p-8 shadow-sm border border-slate-50 dark:border-white/5 min-h-[500px]">
++                    <div className="flex flex-col items-center justify-center gap-3 mb-10 mt-4">
++                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-300 rounded-2xl flex items-center justify-center"><Clock className="w-5 h-5"/></div>
++                        <h3 className="text-[16px] font-black tracking-widest uppercase text-slate-800 dark:text-white">─░zin Sicilim</h3>
+                     </div>
+-                </EnterpriseCard>
+-            </div>
+-        </div>
+-    );
+-};
+ 
+-// ÔöÇÔöÇÔöÇ PROFILE VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-const ProfileSettingsView = ({ user }: any) => {
+-    return (
+-        <div className="flex flex-col animate-in fade-in duration-500  ">
+-            <ProfileHeader user={user} title="Hesap Durumu" dataCount={"ONAYLI"} dataLabel="Kullan─▒c─▒" />
++                    <table className="w-full text-left border-collapse">
++                        <thead>
++                            <tr>
++                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">BELGE & T├£R</th>
++                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">TAR─░H ARALI─ŞI / S├£RE</th>
++                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">S─░STEM DURUMU</th>
++                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">AKS─░YONER (─░K)</th>
++                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest text-right border-b border-slate-100 dark:border-white/5">BELGE ─░┼ŞLEM─░</th>
++                            </tr>
++                        </thead>
++                        <tbody>
++                            {leaves.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">AR┼Ş─░VDE EVRAK YOK.</td></tr> :
++                             leaves.map((l: any) => (
++                                <tr key={l.id}>
++                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
++                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{l.type}</div>
++                                        <div className="text-[9px] font-bold text-slate-400 font-mono tracking-widest mt-1 uppercase">DOC: {l.id.substring(0,8)}</div>
++                                    </td>
++                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
++                                        <div className="text-[11px] font-black text-slate-800 dark:text-white">{new Date(l.startDate).toLocaleDateString('tr-TR')} - {new Date(l.endDate).toLocaleDateString('tr-TR')}</div>
++                                        <div className="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-widest">TOPLAM: {l.days} G├£N</div>
++                                    </td>
++                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
++                                        <span className="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-[9px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">{l.status}</span>
++                                    </td>
++                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
++                                        <div className="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{l.approvedBy || '-'}</div>
++                                    </td>
++                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50 text-right">
++                                        <button onClick={() => handlePrint(l)} className="px-5 py-2 border border-slate-300 dark:border-slate-600 rounded-full text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex justify-center items-center gap-2">
++                                            <Printer className="w-3.5 h-3.5"/> D─░LEK├çE ├çIKTI
++                                        </button>
++                                    </td>
++                                </tr>
++                             ))
++                            }
++                        </tbody>
++                    </table>
++                </div>
++            </div>
+             
+-            <div className="flex-1 flex flex-col ">
+-                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+-                    <EnterpriseSectionHeader title="Profil & G├╝venlik Ayarlar─▒" icon="ÔÜÖ´©Å" />
+-                    <div className="p-6 flex-1   bg-surface dark:bg-[#0f172a]">
+-                        <div className="flex items-center gap-5 mb-6 border-b pb-6 border-default">
+-                            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 border border-transparent flex items-center justify-center text-xl font-black text-text-primary relative shadow-none">
+-                                {user?.name?.[0]?.toUpperCase() || 'P'}
+-                            </div>
+-                            <div className="flex flex-col justify-center">
+-                                <div className="text-[14px] font-black text-text-primary mb-1.5">{user?.name}</div>
+-                                <div className="flex items-center gap-2">
+-                                    <span className="px-2 py-0.5 bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest rounded border border-primary/20">{user?.role || 'Personel'}</span>
+-                                    <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted font-mono">SYS_ID: {user?.id?.slice(0,8).toUpperCase()}</span>
+-                                </div>
++            <div id="printable-area" className="hidden">
++                 {printableLeave && (
++                    <div className="p-10 font-[serif] text-black">
++                        <h2 className="text-center text-xl font-bold uppercase mb-10 border-b-2 border-black pb-4">─░zin Talep Formu / Dilek├ğesi</h2>
++                        <div className="text-right mb-10">Tarih: {new Date(printableLeave.createdAt).toLocaleDateString('tr-TR')}</div>
++                        <p className="text-lg mb-8 leading-relaxed">
++                            Kurumunuzda sicil numaral─▒ personeli <strong>{user?.name}</strong> olarak g├Ârev yapmaktay─▒m.<br/><br/>
++                            <strong>{new Date(printableLeave.startDate).toLocaleDateString('tr-TR')}</strong> ile <strong>{new Date(printableLeave.endDate).toLocaleDateString('tr-TR')}</strong> tarihleri aras─▒nda 
++                            toplam <strong>{printableLeave.days} g├╝n</strong> s├╝reyle <strong>{printableLeave.type}</strong> kullanmak hususunda gere─şini;
++                        </p>
++                        <p className="text-lg mt-6">Bilgilerinize arz ederim.</p>
++                        <div className="mt-16 text-right w-full flex justify-end">
++                            <div className="w-[300px] text-center">
++                                <p className="font-bold underline mb-16">─░mza</p>
++                                <p className="font-bold">{user?.name}</p>
+                             </div>
+                         </div>
+-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+-                            <EnterpriseInput label="Tam Ad Soyad" defaultValue={user?.name} disabled />
+-                            <EnterpriseInput label="E-Posta Adresi" type="email" defaultValue={user?.email} disabled />
+-                            <EnterpriseInput label="Telefon Numaras─▒" type="tel" placeholder="Ula┼ş─▒m bilgisi sisteme kapal─▒ / G├╝venli B├Âlge" disabled />
+-                        </div>
+-                        <div className="pt-6 border-t border-default">
+-                            <div className="text-[10px] font-black text-text-muted uppercase tracking-widest flex items-center gap-2 mb-4"><Lock className="w-3.5 h-3.5"/> Sistem Parolas─▒n─▒ Yenile</div>
+-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+-                                <EnterpriseInput label="Mevcut G├╝venlik Anahtar─▒ (┼Şifre)" type="password" />
+-                                <EnterpriseInput label="Yeni G├╝venlik Anahtar─▒ (┼Şifre)" type="password" />
+-                            </div>
+-                            <div className="mt-5 flex justify-end">
+-                                <EnterpriseButton variant="primary" className="text-[10px] uppercase font-black tracking-widest px-8">K─░ML─░K B─░LG─░LER─░N─░ G├£NCELLE</EnterpriseButton>
+-                            </div>
++                        <div className="mt-20 border-t border-dashed border-black pt-4">
++                            <h3 className="font-bold">─░K Onay─▒ / Bildirimi</h3>
++                            <p className="mt-2">Sistem Durumu: {printableLeave.status}</p>
++                            <p>Onaylayan: {printableLeave.approvedBy || '______________'}</p>
+                         </div>
+                     </div>
+-                </EnterpriseCard>
++                )}
+             </div>
+         </div>
+     );
+
+commit 71661f71569318e798472f2410a4e86acbc2b09b
+Author: Ertke Kec <ertkekec@gmail.com>
+Date:   Wed Mar 18 01:58:44 2026 +0300
+
+    feat(staff): completely redesign staff portal with printable forms and dashboard summaries
+
+diff --git a/src/app/(app)/staff/me/page.tsx b/src/app/(app)/staff/me/page.tsx
+index 3fd05deb..3ae322ee 100644
+--- a/src/app/(app)/staff/me/page.tsx
++++ b/src/app/(app)/staff/me/page.tsx
+@@ -1,18 +1,8 @@
+ "use client";
+ 
+-import { useState, useEffect } from 'react';
+-import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle } from 'lucide-react';
+-import {
+-    IconActivity,
+-    IconTrendingUp,
+-    IconClock,
+-    IconCheck,
+-    IconAlert,
+-    IconZap,
+-    IconShield,
+-    IconRefresh,
+-    IconTrash
+-} from '@/components/icons/PremiumIcons';
++import { useState, useEffect, useRef } from 'react';
++import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle, ChevronRight, Printer } from 'lucide-react';
++import { IconActivity, IconTrendingUp, IconClock, IconCheck, IconAlert, IconZap, IconShield, IconRefresh, IconTrash } from '@/components/icons/PremiumIcons';
+ import { useApp } from '@/contexts/AppContext';
+ import dynamic from 'next/dynamic';
+ const BarcodeScanner = dynamic(() => import('@/components/BarcodeScanner'), { ssr: false });
+@@ -20,62 +10,56 @@ import { toast } from 'sonner';
+ import { v4 as uuidv4 } from 'uuid';
+ 
+ import {
+-    EnterpriseCard,
+-    EnterpriseSectionHeader,
+-    EnterpriseInput,
+-    EnterpriseTextarea,
+-    EnterpriseSelect,
+-    EnterpriseButton
++    EnterpriseCard, EnterpriseSectionHeader, EnterpriseInput, EnterpriseTextarea, EnterpriseSelect, EnterpriseButton
+ } from '@/components/ui/enterprise';
+ 
+-// --- UI COMPONENTS ---
++// ÔöÇÔöÇÔöÇ STYLES FOR PRINTING ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
++const printStyles = `
++  @media print {
++    body * { visibility: hidden; }
++    #printable-area, #printable-area * { visibility: visible; }
++    #printable-area { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; }
++    .no-print { display: none !important; }
++  }
++`;
++
++// ÔöÇÔöÇÔöÇ UI COMPONENTS ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ const ProgressBar = ({ label, value, max, color = "#3b82f6" }: any) => {
+     const percentage = Math.min((value / max) * 100, 100);
+     return (
+         <div className="space-y-2">
+             <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                 <span className="text-slate-500 dark:text-slate-400">{label}</span>
+-                <span style={{ color }}>%{percentage.toFixed(0)}</span>
++                <span style={{ color }}>%{(percentage || 0).toFixed(0)}</span>
++            </div>
++            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
++                <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${percentage}%`, background: color }} />
+             </div>
+-            <div className={`h-1.5 w-full bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden`}>
+-                <div
+-                    className={`h-full transition-all duration-1000 ease-out`}
+-                    style={{ width: `${percentage}%`, background: color }}
+-                />
++            <div className="flex justify-end text-[10px] text-slate-400">
++                {Number(value).toLocaleString()} / {Number(max).toLocaleString()}
+             </div>
+         </div>
+     );
+ };
+ 
+-// --- SUB-PAGES ---
+-
++// ÔöÇÔöÇÔöÇ DASHBOARD VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ const DashboardView = ({
+-    handleQrCheckin,
+-    handleGpsCheckin,
+-    isScannerOpen,
+-    setIsScannerOpen,
+-    onQrScan,
+-    pdksStatus,
+-    handleCheckout,
+-    targets = [],
+-    statsData,
+-    user,
+-    shifts = [],
+-    payrolls = []
++    handleQrCheckin, handleGpsCheckin, isScannerOpen, setIsScannerOpen, onQrScan, pdksStatus, handleCheckout,
++    targets = [], statsData, turnover, shifts = [], payrolls = [], tasks = []
+ }: any) => {
++    const activeTasksCount = tasks.filter((t: any) => t.status !== 'Tamamland─▒' && t.status !== '─░ptal').length;
++
+     return (
+         <div className="space-y-6 animate-in fade-in duration-500">
+-            {/* Top Summary */}
++            {/* Top Summaries */}
+             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                 <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#3b82f6">
+                     <div className="flex justify-between items-start mb-4">
+-                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Performans Skoru</h4>
++                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">G├╝nl├╝k Cirom</h4>
+                         <IconActivity className="w-5 h-5 text-blue-500" />
+                     </div>
+-                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.leaderboard?.scoreValue || '0.0'}</p>
+-                    <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-500/10 w-fit px-2 py-1 rounded">
+-                        Global S─▒ra: #{statsData?.leaderboard?.rankGlobal || ' -'}
+-                    </div>
++                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Ôé║{(turnover || 0).toLocaleString()}</p>
++                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Bug├╝nk├╝ sat─▒┼ş totali</p>
+                 </EnterpriseCard>
+ 
+                 <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#8b5cf6">
+@@ -84,474 +68,171 @@ const DashboardView = ({
+                         <IconTrendingUp className="w-5 h-5 text-purple-500" />
+                     </div>
+                     <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.achievement || '%0'}</p>
+-                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Bu ayki hedefler (Matris)</p>
++                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Bu ayki hedef durumu</p>
+                 </EnterpriseCard>
+ 
+                 <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#f59e0b">
+                     <div className="flex justify-between items-start mb-4">
+-                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kazan─▒lan Prim</h4>
++                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Bekleyen G├Ârev</h4>
+                         <IconClock className="w-5 h-5 text-amber-500" />
+                     </div>
+-                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.bonus || 'Ôé║0'}</p>
+-                    <p className="text-[11px] font-semibold text-slate-400 mt-2">D├Ânem biriken tutar</p>
++                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{activeTasksCount}</p>
++                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Size atanm─▒┼ş aktif g├Ârev</p>
+                 </EnterpriseCard>
+ 
+                 <EnterpriseCard className="p-6 border-l-4" borderLeftColor="#10b981">
+                     <div className="flex justify-between items-start mb-4">
+-                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Ayl─▒k Ziyaretler</h4>
++                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kazan─▒lan Prim</h4>
+                         <IconZap className="w-5 h-5 text-emerald-500" />
+                     </div>
+-                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+-                        {targets?.filter((t: any) => t.type === 'VISIT').reduce((acc: number, t: any) => acc + t.currentValue, 0) || 0} <span className="text-lg text-slate-400 font-bold">Adet</span>
+-                    </p>
+-                    <p className="text-[11px] font-semibold text-slate-400 mt-2">Saha ziyaretleri toplam─▒</p>
++                    <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{statsData?.stats?.bonus || 'Ôé║0'}</p>
++                    <p className="text-[11px] font-semibold text-slate-400 mt-2">D├Ânem biriken tutar</p>
+                 </EnterpriseCard>
+             </div>
+ 
+-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+-                {/* Targets & Performance */}
+-                <div className="lg:col-span-2">
+-                    <EnterpriseCard className="h-full">
+-                        <EnterpriseSectionHeader title="Hedefler & Performans" icon="­şôê" />
+-                        <div className="p-6 space-y-8">
+-                            {(!targets || targets.length === 0) && (!statsData?.assignments || statsData?.assignments?.length === 0) ? (
+-                                <div className="text-center text-sm font-semibold text-slate-400 py-6 border border-dashed border-slate-300 dark:border-slate-700/50 rounded-lg">
+-                                    Size atanm─▒┼ş aktif bir personel hedefi bulunmamaktad─▒r.
+-                                </div>
+-                            ) : (
+-                                <>
+-                                    {targets?.map((t: any) => (
+-                                        <ProgressBar 
+-                                            key={t.id} 
+-                                            label={t.type === 'TURNOVER' ? `­şÆ░ Ciro Hedefi (Ôé║${Number(t.targetValue).toLocaleString()})` : `­şôı Ziyaret Hedefi (${t.targetValue} Adet)`} 
+-                                            value={t.currentValue} 
+-                                            max={t.targetValue} 
+-                                            color={t.type === 'TURNOVER' ? "#3b82f6" : "#10b981"} 
+-                                        />
+-                                    ))}
+-                                    {statsData?.assignments?.map((ass: any) => (
+-                                        <ProgressBar 
+-                                            key={ass.id} 
+-                                            label={`­şÄ» Matrix ┼Şirket Hedefi (${ass.period?.name})`} 
+-                                            value={ass.performances?.[0]?.actual || 0} 
+-                                            max={ass.target} 
+-                                            color="#8b5cf6" 
+-                                        />
+-                                    ))}
+-                                </>
+-                            )}
+-                            
+-                            <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-700/50">
+-                                <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+-                                    <span className="text-lg">­şôï</span> Aktif G├Ârevler
+-                                </h4>
+-                                <div className="text-center text-sm font-semibold text-slate-400 py-6 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg">
+-                                    Bekleyen g├Ârev bulunmamaktad─▒r. L├╝tfen "G├Ârevlerim" sekmesini kontrol edin.
+-                                </div>
+-                            </div>
+-                        </div>
+-                    </EnterpriseCard>
+-                </div>
+-
+-                {/* Shift & Calendar */}
+-                <div>
+-                    <EnterpriseCard className="h-full">
+-                        <EnterpriseSectionHeader title="Vardiya & ├çal─▒┼şma" icon="ÔÅ░" />
+-                        <div className="p-6 space-y-6">
+-                            <div className="p-6 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-center">
+-                                <p className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">┼Şu Anki Vardiya</p>
+-                                <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{pdksStatus?.staff?.shiftTemplate || 'Belirsiz'}</p>
+-                            </div>
+-
+-                            <div className="space-y-4">
+-                                <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Haftal─▒k Ak─▒┼ş</h4>
+-                                {shifts.length > 0 ? (
+-                                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 modern-scrollbar">
+-                                        {shifts.map((shift, idx) => (
+-                                            <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50">
+-                                                <div className="flex items-center gap-3">
+-                                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs ${shift.type === '─░zinli' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
+-                                                        {new Date(shift.start).toLocaleDateString('tr-TR', { weekday: 'short' })}
+-                                                    </div>
+-                                                    <div className="text-left">
+-                                                        <div className="text-[13px] font-bold text-slate-900 dark:text-white">{new Date(shift.start).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+-                                                        <div className="text-[11px] font-semibold text-slate-500 uppercase">{shift.type}</div>
+-                                                    </div>
+-                                                </div>
+-                                                <div className="text-[13px] font-black text-slate-700 dark:text-slate-300">
+-                                                    {shift.type === '─░zinli' ? 'T├╝m G├╝n' : `${new Date(shift.start).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} - ${new Date(shift.end).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`}
+-                                                </div>
+-                                            </div>
+-                                        ))}
+-                                    </div>
+-                                ) : (
+-                                    <div className="text-center text-sm font-semibold text-slate-400 py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
+-                                        Bu hafta i├ğin vardiya plan─▒ tan─▒mlanmam─▒┼ş.
+-                                    </div>
+-                                )}
+-                            </div>
+-                        </div>
+-                    </EnterpriseCard>
+-                </div>
+-            </div>
+-
+-            {/* Payroll Summary & PDKS */}
++            {/* PDKS & Vardiya */}
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 <EnterpriseCard>
+-                    <EnterpriseSectionHeader title="Son Bordro ├ûzetleri" icon="­şøí´©Å" />
+-                    <div className="p-6">
+-                        {payrolls.length > 0 ? (
+-                            <div className="space-y-3">
+-                                {payrolls.slice(0, 3).map((pr, idx) => (
+-                                    <div key={idx} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 flex flex-col gap-2">
+-                                        <div className="flex items-center justify-between">
+-                                            <span className="text-[12px] font-bold text-slate-900 dark:text-white flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> D├Ânem: {pr.period}</span>
+-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${pr.status === '├ûdendi' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{pr.status || 'Bekliyor'}</span>
+-                                        </div>
+-                                        <div className="flex justify-between items-end mt-1">
+-                                            <div>
+-                                                <div className="text-[10px] uppercase font-bold text-slate-400">Net Hakedi┼ş</div>
+-                                                <div className="text-[16px] font-black text-slate-900 dark:text-white mt-0.5">Ôé║{Number(pr.netPay).toLocaleString()}</div>
+-                                            </div>
+-                                            <div className="text-right">
+-                                                <div className="text-[10px] uppercase font-bold text-slate-400">Prim</div>
+-                                                <div className="text-[12px] font-bold text-emerald-600">+Ôé║{Number(pr.bonus).toLocaleString()}</div>
+-                                            </div>
+-                                        </div>
+-                                    </div>
+-                                ))}
+-                            </div>
+-                        ) : (
+-                            <div className="py-12 text-sm font-semibold text-slate-400 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/30">
+-                                Ge├ğmi┼ş bordro kayd─▒ bulunamad─▒.
+-                            </div>
+-                        )}
+-                    </div>
+-                </EnterpriseCard>
+-
+-                <EnterpriseCard>
+-                    <EnterpriseSectionHeader title="PDKS ─░┼şlemleri" icon="ÔÜí" />
++                    <EnterpriseSectionHeader title="PDKS Ge├ği┼ş ─░┼şlemleri" icon="ÔÜí" />
+                     <div className="p-6 space-y-6">
+                         <div className="grid grid-cols-2 gap-4">
+                             {!pdksStatus?.isWorking ? (
+                                 <>
+-                                    <button
+-                                        onClick={handleQrCheckin}
+-                                        className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group"
+-                                    >
+-                                        <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+-                                            <span className="text-2xl">­şô▒</span>
+-                                        </div>
++                                    <button onClick={handleQrCheckin} className="flex flex-col items-center gap-3 p-6 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/20 rounded-xl transition-all group">
++                                        <div className="w-12 h-12 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">­şô▒</span></div>
+                                         <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest text-center">Ofis Giri┼şi (QR)</span>
+                                     </button>
+-
+-                                    <button
+-                                        onClick={handleGpsCheckin}
+-                                        className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group"
+-                                    >
+-                                        <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+-                                            <span className="text-2xl">­şôı</span>
+-                                        </div>
++                                    <button onClick={handleGpsCheckin} className="flex flex-col items-center gap-3 p-6 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl transition-all group">
++                                        <div className="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">­şôı</span></div>
+                                         <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-center">Saha Giri┼şi (GPS)</span>
+                                     </button>
+                                 </>
+                             ) : (
+-                                <button
+-                                    onClick={handleCheckout}
+-                                    className="col-span-2 flex flex-col items-center gap-3 p-6 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group"
+-                                >
+-                                    <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
+-                                        <span className="text-2xl">­şÅü</span>
+-                                    </div>
++                                <button onClick={handleCheckout} className="col-span-2 flex flex-col items-center gap-3 p-6 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl transition-all group">
++                                    <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform"><span className="text-2xl">­şÅü</span></div>
+                                     <span className="text-[12px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest text-center">MESA─░Y─░ B─░T─░R (├çIKI┼Ş YAP)</span>
+                                 </button>
+                             )}
+                         </div>
++                        <div className="flex items-center justify-center pt-2">
++                            <span className="text-[10px] uppercase font-bold text-slate-400">­şô▓ Konum ve cihaz parmak izi g├╝venli ┼şekilde do─şrulan─▒r.</span>
++                        </div>
++                    </div>
++                </EnterpriseCard>
+ 
+-                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+-                            <div className="flex items-center gap-3">
+-                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
++                <EnterpriseCard>
++                    <EnterpriseSectionHeader title="S─▒radaki Vardiya ├ûzetim" icon="ÔÅ░" />
++                    <div className="p-6 flex flex-col justify-center h-[calc(100%-60px)] space-y-4">
++                        {shifts.length > 0 ? (
++                            <div className="flex items-center gap-4 p-5 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
++                                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl flex flex-col items-center justify-center font-black">
++                                    <span className="text-xs">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}</span>
++                                    <span className="text-lg">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { weekday: 'short' })}</span>
++                                </div>
+                                 <div>
+-                                    <h4 className="text-[10px] font-bold text-slate-500 uppercase leading-none mb-1">Cihaz Durumu</h4>
+-                                    <p className="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">G├£VENL─░ & E┼ŞLE┼ŞM─░┼Ş</p>
++                                    <h4 className="text-[14px] font-black text-slate-900 dark:text-white uppercase tracking-widest">{shifts[0]?.type} Vardiyas─▒</h4>
++                                    <p className="text-[12px] font-bold text-blue-600 dark:text-blue-400 mt-1">
++                                        {shifts[0]?.type === '─░zinli' ? 'Tam G├╝n ─░zinli' : `${new Date(shifts[0]?.start).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})} - ${new Date(shifts[0]?.end).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}`}
++                                    </p>
+                                 </div>
+                             </div>
+-                            <button className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:underline bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg">Senkronize Et</button>
+-                        </div>
+-
+-                        <p className="text-[10px] text-slate-400 text-center uppercase font-bold tracking-widest opacity-80">
+-                            ­şöÆ Loglar u├ğtan uca ┼şifreli olarak saklan─▒r.
+-                        </p>
++                        ) : (
++                            <div className="text-center text-sm font-semibold text-slate-400 py-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20">
++                                Size atanm─▒┼ş yakla┼şan vardiya bulunmuyor.
++                            </div>
++                        )}
+                     </div>
+                 </EnterpriseCard>
+-
+-                <BarcodeScanner
+-                    isOpen={isScannerOpen}
+-                    onClose={() => setIsScannerOpen(false)}
+-                    onScan={onQrScan}
+-                />
+             </div>
++
++            <BarcodeScanner isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={onQrScan} />
+         </div>
+     );
+ };
+ 
+-const LeaveRequestView = ({ user }: any) => {
+-    const [type, setType] = useState('Y─▒ll─▒k ─░zin');
+-    const [startDate, setStartDate] = useState('');
+-    const [endDate, setEndDate] = useState('');
+-    const [reason, setReason] = useState('');
+-    const [leaves, setLeaves] = useState<any[]>([]);
+-    const [isSubmitting, setIsSubmitting] = useState(false);
+-    const [isLoading, setIsLoading] = useState(true);
+-
+-    const fetchLeaves = async () => {
+-        setIsLoading(true);
+-        try {
+-            const res = await fetch(`/api/staff/leaves?staffId=${user?.id}`);
+-            if (res.ok) {
+-                const data = await res.json();
+-                setLeaves(data);
+-            }
+-        } catch (error) {
+-            console.error(error);
+-        } finally {
+-            setIsLoading(false);
+-        }
+-    };
+-
+-    useEffect(() => {
+-        if (user?.id) fetchLeaves();
+-    }, [user?.id]);
+-
+-    const handleSubmit = async () => {
+-        if (!startDate || !endDate) {
+-            toast.error("L├╝tfen tarihleri eksiksiz doldurun.");
+-            return;
+-        }
+-        
+-        const start = new Date(startDate);
+-        const end = new Date(endDate);
+-        if (start > end) {
+-            toast.error("Ba┼şlang─▒├ğ tarihi biti┼ş tarihinden sonra olamaz.");
+-            return;
+-        }
+-
+-        const diffTime = Math.abs(end.getTime() - start.getTime());
+-        const _days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+-
+-        setIsSubmitting(true);
+-        try {
+-            const res = await fetch('/api/staff/leaves', {
+-                method: 'POST',
+-                headers: { 'Content-Type': 'application/json' },
+-                body: JSON.stringify({
+-                    staffId: user.id,
+-                    type,
+-                    startDate,
+-                    endDate,
+-                    days: _days,
+-                    reason
+-                })
+-            });
+-
+-            if (res.ok) {
+-                toast.success("─░zin talebi g├Ânderildi.");
+-                setStartDate('');
+-                setEndDate('');
+-                setReason('');
+-                setType('Y─▒ll─▒k ─░zin');
+-                fetchLeaves();
+-            } else {
+-                toast.error("─░zin talebi g├Ânderilemedi.");
+-            }
+-        } catch (error) {
+-            toast.error("─░┼şlem ba┼şar─▒s─▒z oldu.");
+-        } finally {
+-            setIsSubmitting(false);
+-        }
+-    };
+-
++// ÔöÇÔöÇÔöÇ TARGETS VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
++const TargetsView = ({ targets, statsData }: any) => {
+     return (
+-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+-            <div className="lg:col-span-1">
+-                <EnterpriseCard className="h-full">
+-                    <EnterpriseSectionHeader title="Yeni Talep Olu┼ştur" icon="­şôØ" />
+-                    <div className="p-6 space-y-5">
+-                        <EnterpriseSelect 
+-                            label="─░zin T├╝r├╝" 
+-                            value={type} 
+-                            onChange={(e) => setType(e.target.value)}
+-                        >
+-                            <option value="Y─▒ll─▒k ─░zin">Y─▒ll─▒k ├£cretli ─░zin</option>
+-                            <option value="Mazeret ─░zni">Mazeret ─░zni</option>
+-                            <option value="Sa─şl─▒k ─░zni">Hastal─▒k / Sa─şl─▒k Raporu</option>
+-                            <option value="├£cretsiz ─░zin">├£cretsiz ─░zin</option>
+-                        </EnterpriseSelect>
+-                        
+-                        <div className="grid grid-cols-2 gap-4">
+-                            <EnterpriseInput 
+-                                label="Ba┼şlang─▒├ğ Tarihi" 
+-                                type="date" 
+-                                value={startDate}
+-                                onChange={(e) => setStartDate(e.target.value)}
+-                            />
+-                            <EnterpriseInput 
+-                                label="Biti┼ş Tarihi" 
+-                                type="date" 
+-                                value={endDate}
+-                                onChange={(e) => setEndDate(e.target.value)}
+-                            />
++        <div className="space-y-6 animate-in fade-in duration-500">
++            <EnterpriseCard>
++                <EnterpriseSectionHeader title="Kazan├ğ ve Hedeflerim" icon="­şÄ»" />
++                <div className="p-8">
++                    {(!targets || targets.length === 0) && (!statsData?.assignments || statsData?.assignments?.length === 0) ? (
++                        <div className="text-center text-sm font-semibold text-slate-400 py-12 border border-dashed border-slate-300 dark:border-slate-700/50 rounded-lg">
++                            Size atanm─▒┼ş aktif bir hedef bulunmamaktad─▒r. Y├Âneticiniz ile g├Âr├╝┼ş├╝n.
+                         </div>
+-                        
+-                        <EnterpriseTextarea 
+-                            label="Not / A├ğ─▒klama" 
+-                            placeholder="─░zin nedeninizi k─▒saca belirtin..." 
+-                            rows={4}
+-                            value={reason}
+-                            onChange={(e) => setReason(e.target.value)}
+-                        />
+-                        
+-                        <EnterpriseButton 
+-                            variant="primary" 
+-                            className="w-full mt-2"
+-                            onClick={handleSubmit}
+-                            disabled={isSubmitting}
+-                        >
+-                            {isSubmitting ? "G├ûNDER─░L─░YOR..." : "TALEB─░ G├ûNDER"}
+-                        </EnterpriseButton>
+-                    </div>
+-                </EnterpriseCard>
+-            </div>
+-
+-            <div className="lg:col-span-2">
+-                <EnterpriseCard className="h-full">
+-                    <EnterpriseSectionHeader title="Ge├ğmi┼ş Taleplerim" icon="­şòÆ" />
+-                    <div className="p-6">
+-                        <div className="overflow-x-auto">
+-                            <table className="w-full text-left">
+-                                <thead>
+-                                    <tr className="text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-slate-800">
+-                                        <th className="px-4 py-3">T├╝r</th>
+-                                        <th className="px-4 py-3">Tarih Aral─▒─ş─▒</th>
+-                                        <th className="px-4 py-3">Durum</th>
+-                                        <th className="px-4 py-3">Onaylayan</th>
+-                                    </tr>
+-                                </thead>
+-                                <tbody>
+-                                    {isLoading ? (
+-                                        <tr>
+-                                            <td colSpan={4} className="px-4 py-8 text-center text-sm font-semibold text-slate-400">
+-                                                Y├╝kleniyor...
+-                                            </td>
+-                                        </tr>
+-                                    ) : leaves.length === 0 ? (
+-                                        <tr>
+-                                            <td colSpan={4} className="px-4 py-12 text-center text-sm font-semibold text-slate-400 bg-slate-50/50 dark:bg-slate-800/20">
+-                                                Ge├ğmi┼ş izin talebi kayd─▒ bulunamad─▒.
+-                                            </td>
+-                                        </tr>
+-                                    ) : (
+-                                        leaves.map((leave, i) => (
+-                                            <tr key={i} className="border-b border-slate-100 dark:border-slate-800/50 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+-                                                <td className="px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+-                                                    {leave.type}
+-                                                    <div className="text-[10px] text-slate-400 font-normal mt-0.5">{leave.days} G├╝n</div>
+-                                                </td>
+-                                                <td className="px-4 py-3 text-[12px] font-medium text-slate-500">
+-                                                    {new Date(leave.startDate).toLocaleDateString('tr-TR')} - {new Date(leave.endDate).toLocaleDateString('tr-TR')}
+-                                                </td>
+-                                                <td className="px-4 py-3">
+-                                                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md ${
+-                                                        leave.status === 'Onayland─▒' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' :
+-                                                        leave.status === 'Reddedildi' ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400' :
+-                                                        'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'
+-                                                    }`}>
+-                                                        {leave.status}
+-                                                    </span>
+-                                                </td>
+-                                                <td className="px-4 py-3 text-[12px] font-medium text-slate-500">
+-                                                    {leave.approvedBy || '-'}
+-                                                </td>
+-                                            </tr>
+-                                        ))
+-                                    )}
+-                                </tbody>
+-                            </table>
++                    ) : (
++                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
++                            {targets?.map((t: any) => (
++                                <div key={t.id} className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-800/20">
++                                    <ProgressBar 
++                                        label={t.type === 'TURNOVER' ? `­şÆ░ Ciro Hedefi (Ôé║${Number(t.targetValue).toLocaleString()})` : `­şôı Aksiyon Hedefi (${t.targetValue} Adet)`} 
++                                        value={t.currentValue} 
++                                        max={t.targetValue || 1} 
++                                        color={t.type === 'TURNOVER' ? "#3b82f6" : "#10b981"} 
++                                    />
++                                    <p className="text-[10px] text-slate-400 font-medium mt-3 text-center">{t.name || 'D├Ânemsel Operasyonel Hedef'}</p>
++                                </div>
++                            ))}
++                            {statsData?.assignments?.map((ass: any) => (
++                                <div key={ass.id} className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-purple-50 dark:bg-purple-900/10">
++                                    <ProgressBar 
++                                        label={`­şÄ» Sat─▒┼ş / Performans Matrisi (${ass.period?.name})`} 
++                                        value={ass.performances?.[0]?.actual || 0} 
++                                        max={ass.target || 1} 
++                                        color="#8b5cf6" 
++                                    />
++                                    <p className="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-3 text-center uppercase tracking-widest">
++                                        Tamamlanma: %{(((ass.performances?.[0]?.actual || 0) / (ass.target || 1)) * 100).toFixed(1)}
++                                    </p>
++                                </div>
++                            ))}
+                         </div>
+-                    </div>
+-                </EnterpriseCard>
+-            </div>
++                    )}
++                </div>
++            </EnterpriseCard>
+         </div>
+     );
+ };
+ 
+-
+-const MyTasksView = ({ user }: any) => {
+-    const [tasks, setTasks] = useState<any[]>([]);
++// ÔöÇÔöÇÔöÇ TASKS VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
++const TasksView = ({ user, tasks, fetchTasks, loading }: any) => {
+     const [selectedTask, setSelectedTask] = useState<any>(null);
+-    const [loading, setLoading] = useState(true);
+     const [feedback, setFeedback] = useState('');
+     const [isUpdating, setIsUpdating] = useState(false);
+-    
+-    // Filters & Pagination
+-    const [filterStatus, setFilterStatus] = useState('Devam Edenler'); // 'T├╝m├╝', 'Devam Edenler', 'Tamamland─▒'
++    const [filterStatus, setFilterStatus] = useState('Devam Edenler');
+     const [currentPage, setCurrentPage] = useState(1);
+     const tasksPerPage = 10;
+ 
+-    const fetchTasks = async () => {
+-        setLoading(true);
+-        try {
+-            const res = await fetch(`/api/staff/tasks?staffId=${user?.id}`);
+-            if (res.ok) setTasks(await res.json());
+-        } catch (error) {
+-            console.error(error);
+-        } finally {
+-            setLoading(false);
+-        }
+-    };
+-
+-    useEffect(() => {
+-        if (user?.id) fetchTasks();
+-    }, [user?.id]);
+-
+     const handleSendFeedback = async (statusOverride?: string) => {
+         if (!selectedTask) return;
+         setIsUpdating(true);
+         try {
+             if (feedback.trim()) {
+-                const res1 = await fetch(`/api/staff/tasks/${selectedTask.id}/feedback`, {
+-                    method: 'POST',
+-                    headers: { 'Content-Type': 'application/json' },
++                await fetch(`/api/staff/tasks/${selectedTask.id}/feedback`, {
++                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ content: feedback, isFromStaff: true })
+                 });
+-                if (!res1.ok) throw new Error("Yorum g├Ânderilemedi.");
+             }
+             if (statusOverride) {
+-                const res2 = await fetch(`/api/staff/tasks/${selectedTask.id}`, {
+-                    method: 'PUT',
+-                    headers: { 'Content-Type': 'application/json' },
++                await fetch(`/api/staff/tasks/${selectedTask.id}`, {
++                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ status: statusOverride })
+                 });
+-                if (!res2.ok) throw new Error("Durum g├╝ncellenemedi.");
+             }
+-            toast.success("Bilgiler iletildi!");
++            toast.success("G├Ârev bilgileri iletildi!");
+             setFeedback('');
+             fetchTasks();
+             setSelectedTask(null);
+-        } catch(e) {
+-            toast.error("─░┼şlem ba┼şar─▒s─▒z.");
+-        } finally {
+-            setIsUpdating(false);
+-        }
++        } catch(e) { toast.error("─░┼şlem ba┼şar─▒s─▒z."); }
++        finally { setIsUpdating(false); }
+     };
+ 
+-    const filteredTasks = tasks.filter(t => {
++    const filteredTasks = tasks.filter((t: any) => {
+         if (filterStatus === 'T├╝m├╝') return true;
+         if (filterStatus === 'Tamamland─▒') return t.status === 'Tamamland─▒';
+-        // 'Devam Edenler' means any task that is NOT Tamamland─▒ or ─░ptal
+         return t.status !== 'Tamamland─▒' && t.status !== '─░ptal';
+     });
+-
+     const totalPages = Math.ceil(filteredTasks.length / tasksPerPage) || 1;
+     const paginatedTasks = filteredTasks.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage);
+ 
+@@ -560,137 +241,82 @@ const MyTasksView = ({ user }: any) => {
+             <div className="lg:col-span-1">
+                 <EnterpriseCard className="h-full flex flex-col">
+                     <EnterpriseSectionHeader title="Atanan G├Ârevlerim" icon="­şôï" />
+-                    
+                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/10">
+                         <div className="flex bg-slate-200/50 dark:bg-slate-800 p-1 rounded-lg">
+                             {['Devam Edenler', 'Tamamland─▒', 'T├╝m├╝'].map((status) => (
+-                                <button
+-                                    key={status}
+-                                    onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }}
+-                                    className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${filterStatus === status ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+-                                >
++                                <button key={status} onClick={() => { setFilterStatus(status); setCurrentPage(1); setSelectedTask(null); }} className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${filterStatus === status ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                                     {status}
+                                 </button>
+                             ))}
+                         </div>
+                     </div>
+-
+                     <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+-                        {loading ? (
+-                            <p className="text-center text-sm font-semibold text-slate-400 p-8">Y├╝kleniyor...</p>
+-                        ) : paginatedTasks.length === 0 ? (
+-                            <p className="text-center text-sm font-semibold text-slate-400 p-8">Bu filtreye uygun g├Ârev yok.</p>
+-                        ) : (
+-                            paginatedTasks.map(task => (
+-                                <button
+-                                    key={task.id}
+-                                    onClick={() => setSelectedTask(task)}
+-                                    className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTask?.id === task.id ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20 shadow-sm' : 'bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700 hover:border-blue-400'}`}
+-                                >
+-                                    <h4 className="text-[14px] font-black text-slate-900 dark:text-white mb-2 line-clamp-1">{task.title}</h4>
+-                                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-500">
+-                                        <span className={
+-                                            task.status === 'Tamamland─▒' ? 'text-emerald-600' :
+-                                            task.status === '─░ptal' ? 'text-slate-500' : 'text-amber-500'
+-                                        }>{task.status}</span>
+-                                        <span className="flex items-center gap-1"><Flag className="w-3 h-3"/> {task.priority}</span>
++                        {loading ? <p className="text-center text-sm text-slate-400">Y├╝kleniyor...</p> : 
++                            paginatedTasks.length === 0 ? <p className="text-center text-sm font-semibold text-slate-400 p-8">Belirtilen duruma uygun g├Ârev yok.</p> :
++                            paginatedTasks.map((task: any) => (
++                                <button key={task.id} onClick={() => setSelectedTask(task)} className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTask?.id === task.id ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400'}`}>
++                                    <h4 className="text-[13px] font-black text-slate-900 dark:text-white mb-2 line-clamp-1">{task.title}</h4>
++                                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
++                                        <span className={task.status === 'Tamamland─▒' ? 'text-emerald-600' : task.status === '─░ptal' ? 'text-slate-500' : 'text-amber-500'}>{task.status}</span>
++                                        <span className="flex items-center gap-1 text-slate-400"><Flag className="w-3 h-3"/> {task.priority}</span>
+                                     </div>
+                                 </button>
+                             ))
+-                        )}
++                        }
+                     </div>
+-                    
+                     {totalPages > 1 && (
+-                        <div className="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] font-bold text-slate-500 bg-slate-50/50 dark:bg-slate-800/20 shrink-0">
+-                            <button 
+-                                disabled={currentPage === 1} 
+-                                onClick={() => setCurrentPage(p => p - 1)}
+-                                className="px-3 py-1.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 disabled:opacity-50"
+-                            >GER─░</button>
++                        <div className="p-3 border-t flex justify-between text-[11px] font-bold text-slate-500 bg-slate-50/50 dark:bg-slate-800/20">
++                            <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="px-3 py-1.5 bg-white dark:bg-slate-700 border rounded">GER─░</button>
+                             <span>Sayfa {currentPage} / {totalPages}</span>
+-                            <button 
+-                                disabled={currentPage === totalPages} 
+-                                onClick={() => setCurrentPage(p => p + 1)}
+-                                className="px-3 py-1.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 disabled:opacity-50"
+-                            >─░LER─░</button>
++                            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="px-3 py-1.5 bg-white dark:bg-slate-700 border rounded">─░LER─░</button>
+                         </div>
+                     )}
+                 </EnterpriseCard>
+             </div>
+-
+             <div className="lg:col-span-2">
+-                <EnterpriseCard className="h-full flex flex-col overflow-hidden">
+-                    <EnterpriseSectionHeader title="G├Ârev Detay─▒ & ─░┼şlemler" icon="ÔÜí" />
++                <EnterpriseCard className="h-full flex flex-col">
++                    <EnterpriseSectionHeader title="G├Ârev Detay─▒ & Rapor" icon="­şôØ" />
+                     {!selectedTask ? (
+-                        <div className="flex-1 flex flex-col items-center justify-center p-8 opacity-50">
+-                            <Briefcase className="w-16 h-16 text-slate-400 mb-4" />
+-                            <p className="font-bold text-slate-500 uppercase tracking-widest text-[13px]">Detaylar─▒ g├Ârmek i├ğin listeden g├Ârev se├ğin.</p>
++                        <div className="flex-1 flex flex-col items-center justify-center p-8 opacity-50 text-slate-500 text-[13px] font-bold uppercase tracking-widest text-center">
++                            ÔåÉ L─░STEDEN B─░R G├ûREV SE├çEREK DETAYLARI VE B─░LD─░R─░M EKRANINI A├çIN
+                         </div>
+                     ) : (
+                         <div className="flex-1 flex flex-col overflow-hidden">
+                             <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
+-                                <h2 className="text-[18px] font-black text-slate-900 dark:text-white mb-2">{selectedTask.title}</h2>
+-                                {selectedTask.dueDate && (
+-                                    <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-rose-500 bg-rose-50 dark:bg-rose-500/10 px-3 py-1.5 w-max rounded-lg border border-rose-200 dark:border-rose-500/20">
+-                                        <Calendar className="w-4 h-4"/> Son Teslim: {new Date(selectedTask.dueDate).toLocaleDateString('tr-TR')}
+-                                    </span>
+-                                )}
++                                <h2 className="text-[18px] font-black">{selectedTask.title}</h2>
++                                {selectedTask.dueDate && <span className="flex items-center gap-1.5 mt-2 text-[11px] font-bold uppercase text-rose-500 bg-rose-50 px-3 py-1.5 w-max rounded-lg border border-rose-200"><Calendar className="w-4 h-4"/> Son Teslim: {new Date(selectedTask.dueDate).toLocaleDateString()}</span>}
+                             </div>
+-                            
+-                            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
++                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                 {selectedTask.description && (
+-                                    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+-                                        <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 mb-3 flex items-center gap-2"><FileText className="w-4 h-4"/> Y├Ânetici Notu & A├ğ─▒klama</h4>
+-                                        <p className="text-[13px] font-medium text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{selectedTask.description}</p>
++                                    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border shadow-sm">
++                                        <h4 className="text-[10px] uppercase font-black text-slate-500 mb-3 flex items-center gap-2"><FileText className="w-4 h-4"/> A├ğ─▒klama</h4>
++                                        <p className="text-[13px] text-slate-700 dark:text-slate-300">{selectedTask.description}</p>
+                                     </div>
+                                 )}
+-                                
+                                 <div className="space-y-4">
+-                                    <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 flex items-center gap-2"><MessageSquare className="w-4 h-4"/> Bildirim Ge├ğmi┼şi</h4>
+-                                    {selectedTask.feedbacks?.length === 0 ? (
+-                                        <p className="text-[11px] font-medium text-slate-400 italic">Hen├╝z yorum yok.</p>
+-                                    ) : (
++                                    <h4 className="text-[10px] uppercase font-black text-slate-500 flex items-center gap-2"><MessageSquare className="w-4 h-4"/> Rapor & Yorum Ge├ğmi┼şi</h4>
++                                    {selectedTask.feedbacks?.length === 0 ? <p className="text-[11px] text-slate-400 italic">Hen├╝z rapor girilmedi.</p> : 
+                                         selectedTask.feedbacks?.map((fb: any) => (
+-                                            <div key={fb.id} className={`p-4 rounded-xl max-w-[85%] ${fb.isFromStaff ? 'bg-amber-50 dark:bg-amber-500/10 ml-auto border border-amber-200 dark:border-amber-500/20 text-right' : 'bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20'}`}>
+-                                                <div className={`flex justify-between items-center mb-2 ${fb.isFromStaff && 'flex-row-reverse'}`}>
+-                                                    <span className="text-[12px] font-black text-slate-900 dark:text-white opacity-80">{fb.isFromStaff ? user?.name : 'Y├Ânetim / ─░K'}</span>
+-                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{new Date(fb.createdAt).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month:'2-digit' })}</span>
++                                            <div key={fb.id} className={`p-4 rounded-xl max-w-[85%] ${fb.isFromStaff ? 'bg-amber-50 dark:bg-amber-500/10 ml-auto border-amber-200 text-right' : 'bg-blue-50 dark:bg-blue-500/10 border-blue-200'}`}>
++                                                <div className={`flex justify-between items-center mb-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest ${fb.isFromStaff && 'flex-row-reverse'}`}>
++                                                    <span>{fb.isFromStaff ? user?.name : 'Y├Ânetim / ─░K'}</span>
++                                                    <span>{new Date(fb.createdAt).toLocaleString()}</span>
+                                                 </div>
+-                                                <p className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{fb.content}</p>
++                                                <p className="text-[13px] font-medium">{fb.content}</p>
+                                             </div>
+                                         ))
+-                                    )}
++                                    }
+                                 </div>
+                             </div>
+-
+-                            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
++                            <div className="p-4 border-t bg-white dark:bg-slate-900">
+                                 {selectedTask.status === 'Tamamland─▒' ? (
+-                                    <div className="bg-emerald-50 text-emerald-600 font-bold text-[12px] p-4 text-center rounded-lg border border-emerald-200 uppercase tracking-widest flex items-center justify-center gap-2">
+-                                        <CheckCircle2 className="w-5 h-5"/> BU G├ûREV TAMAMLANDI.
+-                                    </div>
++                                    <div className="bg-emerald-50 text-emerald-600 font-bold p-4 text-center rounded-lg border flex justify-center gap-2"><CheckCircle2 className="w-5 h-5"/> BU G├ûREV TAMAMLANDI</div>
+                                 ) : (
+                                     <div className="space-y-3">
+-                                        <textarea
+-                                            className="w-full h-20 bg-slate-50 dark:bg-slate-800 rounded-xl p-3 text-[13px] font-medium outline-none border border-slate-200 dark:border-slate-700 focus:border-blue-500 transition-all resize-none shadow-inner text-slate-900 dark:text-white"
+-                                            placeholder="G├Ârev hakk─▒nda durum bildirimi veya not yaz─▒n..."
+-                                            value={feedback}
+-                                            onChange={e => setFeedback(e.target.value)}
+-                                        />
++                                        <textarea className="w-full h-20 bg-slate-50 dark:bg-slate-800 rounded-xl p-3 text-[13px] border focus:border-blue-500 resize-none" placeholder="Durum bildirimi/raporu yaz─▒n..." value={feedback} onChange={e => setFeedback(e.target.value)} />
+                                         <div className="flex gap-2">
+-                                            <button 
+-                                                onClick={() => handleSendFeedback()}
+-                                                disabled={isUpdating || !feedback.trim()}
+-                                                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 py-3 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+-                                            >
+-                                                Sadece Yorum G├Ânder
+-                                            </button>
+-                                            <button 
+-                                                onClick={() => handleSendFeedback('Tamamland─▒')}
+-                                                disabled={isUpdating}
+-                                                className="flex-1 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white py-3 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2"
+-                                            >
+-                                                <CheckCircle2 className="w-4 h-4"/> TAMAMLADIM (KAPAT)
+-                                            </button>
++                                            <button onClick={() => handleSendFeedback()} disabled={isUpdating || !feedback.trim()} className="flex-1 bg-slate-100 hover:bg-slate-200 py-3 rounded-lg text-[11px] font-black uppercase disabled:opacity-50">Sadece Yorum Gir</button>
++                                            <button onClick={() => handleSendFeedback('Tamamland─▒')} disabled={isUpdating} className="flex-1 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white py-3 rounded-lg text-[11px] font-black uppercase flex items-center justify-center gap-2"><CheckCircle2 className="w-4 h-4"/> G├ûREV─░ TAMAMLADIM</button>
+                                         </div>
+                                     </div>
+                                 )}
+@@ -703,46 +329,304 @@ const MyTasksView = ({ user }: any) => {
+     );
+ };
+ 
++// ÔöÇÔöÇÔöÇ LEAVES VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
++const LeavesView = ({ user, leaves, fetchLeaves, loading }: any) => {
++    const [type, setType] = useState('Y─▒ll─▒k ─░zin');
++    const [startDate, setStartDate] = useState('');
++    const [endDate, setEndDate] = useState('');
++    const [reason, setReason] = useState('');
++    const [isSubmitting, setIsSubmitting] = useState(false);
++    const [printableLeave, setPrintableLeave] = useState<any>(null);
++
++    const handleSubmit = async () => {
++        if (!startDate || !endDate) return toast.error("Tarihleri doldurunuz.");
++        const _s = new Date(startDate); const _e = new Date(endDate);
++        if (_s > _e) return toast.error("Biti┼ş tarihi ba┼şlang─▒├ğtan ├Ânce olamaz.");
++        
++        setIsSubmitting(true);
++        try {
++            const res = await fetch('/api/staff/leaves', {
++                method: 'POST', headers: { 'Content-Type': 'application/json' },
++                body: JSON.stringify({
++                    staffId: user.id, type, startDate, endDate, reason,
++                    days: Math.ceil(Math.abs(_e.getTime() - _s.getTime()) / (1000 * 60 * 60 * 24)) + 1
++                })
++            });
++            if (res.ok) {
++                toast.success("Talebiniz ─░K'ya ula┼şt─▒.");
++                setStartDate(''); setEndDate(''); setReason(''); fetchLeaves();
++            } else toast.error("Hata olu┼ştu.");
++        } finally { setIsSubmitting(false); }
++    };
++
++    const handlePrint = (leave: any) => {
++        setPrintableLeave(leave);
++        setTimeout(() => window.print(), 200);
++    };
++
++    return (
++        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
++            <style>{printStyles}</style>
++            
++            {/* INVISIBLE PRINT CONTAINER */}
++            <div id="printable-area" className="hidden">
++                {printableLeave && (
++                    <div className="p-10 font-[serif] text-black">
++                        <h2 className="text-center text-xl font-bold uppercase mb-10 border-b-2 border-black pb-4">─░zin Talep Formu / Dilek├ğesi</h2>
++                        <div className="text-right mb-10">Tarih: {new Date(printableLeave.createdAt).toLocaleDateString('tr-TR')}</div>
++                        <p className="text-lg mb-8 leading-relaxed">
++                            Kurumunuzda sicil numaral─▒ personeli <strong>{user?.name}</strong> olarak g├Ârev yapmaktay─▒m.<br/><br/>
++                            <strong>{new Date(printableLeave.startDate).toLocaleDateString('tr-TR')}</strong> ile <strong>{new Date(printableLeave.endDate).toLocaleDateString('tr-TR')}</strong> tarihleri aras─▒nda 
++                            toplam <strong>{printableLeave.days} g├╝n</strong> s├╝reyle <strong>{printableLeave.type}</strong> kullanmak hususunda gere─şini;
++                        </p>
++                        <p className="text-lg mt-6">Bilgilerinize arz ederim.</p>
++                        <div className="mt-16 text-right w-full flex justify-end">
++                            <div className="w-[300px] text-center">
++                                <p className="font-bold underline mb-16">─░mza</p>
++                                <p className="font-bold">{user?.name}</p>
++                            </div>
++                        </div>
++                        <div className="mt-20 border-t border-dashed border-black pt-4">
++                            <h3 className="font-bold">─░K Onay─▒ / Bildirimi</h3>
++                            <p className="mt-2">Sistem Durumu: {printableLeave.status}</p>
++                            <p>Onaylayan: {printableLeave.approvedBy || '______________'}</p>
++                        </div>
++                    </div>
++                )}
++            </div>
++
++            <div className="lg:col-span-1 no-print">
++                <EnterpriseCard className="h-full">
++                    <EnterpriseSectionHeader title="Yeni Talep Olu┼ştur" icon="­şôØ" />
++                    <div className="p-6 space-y-5">
++                        <EnterpriseSelect label="─░zin T├╝r├╝" value={type} onChange={(e) => setType(e.target.value)}>
++                            <option value="Y─▒ll─▒k ─░zin">Y─▒ll─▒k ├£cretli ─░zin</option>
++                            <option value="Mazeret ─░zni">Mazeret ─░zni</option>
++                            <option value="Sa─şl─▒k ─░zni">Sa─şl─▒k ─░zni</option>
++                            <option value="├£cretsiz ─░zin">├£cretsiz ─░zin</option>
++                        </EnterpriseSelect>
++                        <div className="grid grid-cols-2 gap-4">
++                            <EnterpriseInput label="Ba┼şlang─▒├ğ Se├ğimi" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
++                            <EnterpriseInput label="Biti┼ş Se├ğimi" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
++                        </div>
++                        <EnterpriseTextarea label="Dilek├ğe ─░├ğeri─şi / E-Posta Notu" placeholder="Ek a├ğ─▒klama..." rows={4} value={reason} onChange={e => setReason(e.target.value)} />
++                        <EnterpriseButton variant="primary" className="w-full mt-2" onClick={handleSubmit} disabled={isSubmitting}>
++                            {isSubmitting ? "G├ûNDER─░L─░YOR..." : "D─░LEK├çEY─░ ONAYA SUN"}
++                        </EnterpriseButton>
++                    </div>
++                </EnterpriseCard>
++            </div>
++            
++            <div className="lg:col-span-2 no-print">
++                <EnterpriseCard className="h-full">
++                    <EnterpriseSectionHeader title="─░zin Sicilim" icon="­şòÆ" />
++                    <div className="p-6 overflow-x-auto">
++                        <table className="w-full text-left">
++                            <thead className="bg-slate-50 dark:bg-slate-800/50">
++                                <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b">
++                                    <th className="px-4 py-3">Belge & T├╝r</th>
++                                    <th className="px-4 py-3">Tarih Aral─▒─ş─▒ / S├╝re</th>
++                                    <th className="px-4 py-3">Sistem Durumu</th>
++                                    <th className="px-4 py-3">Aksiyoner</th>
++                                    <th className="px-4 py-3 text-right">Belge</th>
++                                </tr>
++                            </thead>
++                            <tbody>
++                                {loading ? <tr><td colSpan={5} className="py-8 text-center text-sm text-slate-400">Y├╝kleniyor...</td></tr> : 
++                                 leaves.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-sm text-slate-400">Ar┼şivde evrak yok.</td></tr> :
++                                 leaves.map((leave: any) => (
++                                     <tr key={leave.id} className="border-b hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-all">
++                                         <td className="px-4 py-4 text-[13px] font-bold">
++                                             {leave.type}
++                                             <div className="text-[10px] text-slate-400 font-medium">{leave.id.slice(0,8).toUpperCase()}</div>
++                                         </td>
++                                         <td className="px-4 py-4 text-[12px] font-medium text-slate-600 dark:text-slate-300">
++                                             {new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}
++                                             <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-indigo-500"><Calendar className="w-3 h-3"/> Toplam: {leave.days} G├╝n</div>
++                                         </td>
++                                         <td className="px-4 py-4">
++                                             <span className={`px-2 py-1 text-[9px] font-bold uppercase rounded-md ${
++                                                 leave.status === 'Onayland─▒' ? 'bg-emerald-100 text-emerald-700' :
++                                                 leave.status === 'Reddedildi' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'
++                                             }`}>{leave.status}</span>
++                                         </td>
++                                         <td className="px-4 py-4 text-[11px] font-medium text-slate-500">{leave.approvedBy || '-'}</td>
++                                         <td className="px-4 py-4 text-right">
++                                             <button onClick={() => handlePrint(leave)} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center justify-center gap-2 ml-auto">
++                                                 <Printer className="w-3 h-3"/> Dilek├ğe ├ç─▒kt─▒
++                                             </button>
++                                         </td>
++                                     </tr>
++                                 ))}
++                            </tbody>
++                        </table>
++                    </div>
++                </EnterpriseCard>
++            </div>
++        </div>
++    );
++};
++
++// ÔöÇÔöÇÔöÇ PAYROLL VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
++const PayrollView = ({ payrolls, user }: any) => {
++    const [printablePayroll, setPrintablePayroll] = useState<any>(null);
++
++    const handlePrint = (pr: any) => {
++        setPrintablePayroll(pr);
++        setTimeout(() => window.print(), 200);
++    };
++
++    return (
++        <div className="space-y-6 animate-in fade-in duration-500">
++            <style>{printStyles}</style>
++
++            <div id="printable-area" className="hidden">
++                {printablePayroll && (
++                    <div className="p-10 font-sans text-black border-2 border-slate-800 m-8 rounded-xl shadow-none">
++                        <div className="border-b-4 border-black pb-6 mb-8 flex justify-between items-end">
++                            <div>
++                                <h1 className="text-3xl font-black uppercase tracking-tighter">Bordro Pusulas─▒</h1>
++                                <p className="text-sm font-bold mt-2 uppercase text-slate-600">D├Ânem: {printablePayroll.period}</p>
++                            </div>
++                            <div className="text-right">
++                                <h3 className="font-bold text-lg">{user?.name}</h3>
++                                <p className="text-sm">Personel ID: {user?.id.slice(0, 8)}</p>
++                            </div>
++                        </div>
++
++                        <div className="grid grid-cols-2 gap-12 mb-12 border-b-2 border-black pb-8">
++                            <div className="space-y-4">
++                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Br├╝t Kesinle┼şmi┼ş Maa┼ş:</span> <span>Ôé║{Number(printablePayroll.basePay).toLocaleString()}</span></div>
++                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Performans / Prim Eklentisi:</span> <span className="text-green-700">+ Ôé║{Number(printablePayroll.bonus).toLocaleString()}</span></div>
++                                <div className="flex justify-between border-b pb-2"><span className="font-bold">├ûzel Kesintiler:</span> <span className="text-red-700">- Ôé║{Number(printablePayroll.deductions).toLocaleString()}</span></div>
++                            </div>
++                            <div className="bg-slate-100 p-6 rounded-xl border border-slate-300 flex flex-col justify-center">
++                                <span className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">Net ├ûdenecek Hakedi┼ş</span>
++                                <span className="text-4xl font-black">Ôé║{Number(printablePayroll.netPay).toLocaleString()}</span>
++                            </div>
++                        </div>
++
++                        <div className="text-sm font-medium text-slate-600 text-center italic mt-20">
++                            Bu belge sistem taraf─▒ndan otomatik olu┼şturulmu┼ştur. <br/>
++                            Durum: <strong>{printablePayroll.status || 'HESAPLANDI'}</strong>
++                        </div>
++                    </div>
++                )}
++            </div>
++
++            <EnterpriseCard className="no-print">
++                <EnterpriseSectionHeader title="Ge├ğmi┼ş Bordro ve Hakedi┼şlerim" icon="­şÆÄ" />
++                <div className="p-6 overflow-x-auto">
++                    <table className="w-full text-left">
++                        <thead className="bg-[#f8fafc] dark:bg-[#0f111a]">
++                            <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-slate-800">
++                                <th className="px-4 py-3">D├Ânem</th>
++                                <th className="px-4 py-3">Net Hakedi┼ş (TRL)</th>
++                                <th className="px-4 py-3">Br├╝t + Prim / Kesinti</th>
++                                <th className="px-4 py-3">Durum & ─░┼şlem Z.</th>
++                                <th className="px-4 py-3 text-right">Eylem</th>
++                            </tr>
++                        </thead>
++                        <tbody>
++                            {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-sm text-slate-400">Aktif bordro kayd─▒ bulunmamaktad─▒r.</td></tr> :
++                                payrolls.map((pr: any) => (
++                                    <tr key={pr.id} className="border-b transition hover:bg-slate-50 dark:hover:bg-slate-800/10">
++                                        <td className="px-4 py-4 text-[14px] font-black">{pr.period}</td>
++                                        <td className="px-4 py-4 text-[16px] font-black text-emerald-600">Ôé║{Number(pr.netPay).toLocaleString()}</td>
++                                        <td className="px-4 py-4 text-[11px] font-semibold text-slate-500 space-y-1">
++                                            <div>Br├╝t: Ôé║{Number(pr.basePay).toLocaleString()}</div>
++                                            <div className="text-blue-500">Prim: Ôé║{Number(pr.bonus).toLocaleString()} </div>
++                                        </td>
++                                        <td className="px-4 py-4">
++                                             <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded ${pr.status === '├ûdendi' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{pr.status || 'Bekliyor'}</span>
++                                        </td>
++                                        <td className="px-4 py-4 text-right">
++                                            <button onClick={() => handlePrint(pr)} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-2">
++                                                <Printer className="w-3 h-3"/> Pusula Yazd─▒r
++                                            </button>
++                                        </td>
++                                    </tr>
++                                ))
++                            }
++                        </tbody>
++                    </table>
++                </div>
++            </EnterpriseCard>
++        </div>
++    );
++};
++
++// ÔöÇÔöÇÔöÇ SHIFTS VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
++const ShiftsView = ({ shifts }: any) => {
++    return (
++        <div className="space-y-6 animate-in fade-in duration-500">
++            <EnterpriseCard>
++                <EnterpriseSectionHeader title="Haftal─▒k Vardiya Plan─▒m" icon="­şôà" />
++                <div className="p-6">
++                    {shifts.length === 0 ? (
++                        <div className="py-12 text-center text-sm font-semibold text-slate-400 border border-dashed rounded-xl">
++                            ─░lgili hafta i├ğin planlanm─▒┼ş vardiya yok.
++                        </div>
++                    ) : (
++                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
++                            {shifts.map((s: any) => {
++                                const isPermit = s.type === '─░zinli';
++                                return (
++                                    <div key={s.id} className={`p-5 rounded-2xl border flex flex-col justify-between h-32 relative overflow-hidden ${isPermit ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200 dark:bg-slate-800/30 dark:border-slate-700/50'}`}>
++                                        <div className="flex justify-between items-start z-10">
++                                            <div>
++                                                <div className={`text-[12px] font-bold uppercase tracking-widest ${isPermit ? 'text-amber-700' : 'text-slate-500'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
++                                                <div className={`text-[16px] font-black ${isPermit ? 'text-amber-900' : 'text-slate-900 dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: '2-digit' })}</div>
++                                            </div>
++                                            {isPermit ? <span className="text-xl">­şî┤</span> : <span className="text-xl">­şÅó</span>}
++                                        </div>
++                                        <div className="z-10 bg-white/50 dark:bg-black/20 p-2 rounded-lg text-center backdrop-blur-sm">
++                                            <span className={`text-[14px] font-black tracking-tight ${isPermit ? 'text-amber-700' : 'text-blue-600 dark:text-blue-400'}`}>
++                                                {isPermit ? "TAM G├£N ─░Z─░NL─░" : `${new Date(s.start).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} - ${new Date(s.end).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`}
++                                            </span>
++                                        </div>
++                                    </div>
++                                )
++                            })}
++                        </div>
++                    )}
++                </div>
++            </EnterpriseCard>
++        </div>
++    );
++};
+ 
++// ÔöÇÔöÇÔöÇ PROFILE VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ const ProfileSettingsView = ({ user }: any) => {
+     return (
+         <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
+             <EnterpriseCard>
+                 <EnterpriseSectionHeader title="Profil & G├╝venlik Ayarlar─▒" icon="ÔÜÖ´©Å" />
+                 <div className="p-8">
+-                    <div className="flex items-center gap-6 mb-8 border-b border-slate-200 dark:border-slate-800 pb-8">
+-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white relative group shadow-lg">
++                    <div className="flex items-center gap-6 mb-8 border-b pb-8 border-slate-200 dark:border-slate-800">
++                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white relative shadow-lg">
+                             {user?.name?.[0]?.toUpperCase() || 'P'}
+-                            <button className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 rounded-2xl transition-all flex items-center justify-center text-[10px] font-bold tracking-widest uppercase">De─şi┼ştir</button>
+                         </div>
+                         <div>
+-                            <h4 className="text-2xl font-black text-slate-900 dark:text-white mb-1">{user?.name}</h4>
+-                            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[11px] font-bold uppercase tracking-widest rounded-md">
+-                                {user?.role || 'Personel'}
+-                            </span>
++                            <h4 className="text-2xl font-black">{user?.name}</h4>
++                            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 text-[11px] font-bold uppercase rounded-md">{user?.role || 'Personel'}</span>
++                            <div className="mt-1 text-xs font-bold uppercase text-slate-400">┼Ş─░RKET ID NO: #{user?.id?.slice(0,6).toUpperCase()}</div>
+                         </div>
+                     </div>
+-
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+-                        <EnterpriseInput label="Tam Ad Soyad" defaultValue={user?.name} />
+-                        <EnterpriseInput label="E-Posta Adresi" type="email" defaultValue={user?.email} />
+-                        <EnterpriseInput label="Telefon Numaras─▒" type="tel" placeholder="+90 5xx xxx xx xx" />
+-                        <EnterpriseInput label="Adres" />
++                        <EnterpriseInput label="Tam Ad Soyad" defaultValue={user?.name} disabled />
++                        <EnterpriseInput label="E-Posta Adresi" type="email" defaultValue={user?.email} disabled />
++                        <EnterpriseInput label="Telefon Numaras─▒" type="tel" placeholder="Ula┼ş─▒m bilgisi sisteme kapal─▒" disabled />
+                     </div>
+-
+                     <div className="pt-8 border-t border-slate-200 dark:border-slate-800">
+-                        <h4 className="text-[12px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-6">
+-                            <span>­şöÆ</span> G├╝venlik Ayarlar─▒
+-                        </h4>
++                        <h4 className="text-[12px] font-bold text-slate-600 uppercase flex items-center gap-2 mb-6"><span>­şöÆ</span> Parola G├╝ncelle</h4>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
++                            <EnterpriseInput label="Mevcut ┼Şifre" type="password" />
+                             <EnterpriseInput label="Yeni ┼Şifre" type="password" />
+-                            <EnterpriseInput label="┼Şifre Tekrar" type="password" />
+                         </div>
+-                    </div>
+-
+-                    <div className="mt-10 flex justify-end gap-3">
+-                        <EnterpriseButton variant="secondary" className="px-8">─░PTAL</EnterpriseButton>
+-                        <EnterpriseButton variant="primary" className="px-10">KAYDET VE G├£NCELLE</EnterpriseButton>
++                        <div className="mt-8 flex justify-end">
++                            <EnterpriseButton variant="primary" className="px-10">B─░LG─░LER─░ G├£NCELLE</EnterpriseButton>
++                        </div>
+                     </div>
+                 </div>
+             </EnterpriseCard>
+@@ -750,11 +634,10 @@ const ProfileSettingsView = ({ user }: any) => {
+     );
+ };
+ 
+-// --- MAIN PAGE ---
+-
++// ÔöÇÔöÇÔöÇ MAIN PAGE ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ export default function PersonelPanel() {
+     const { currentUser } = useApp();
+-    const [activeTab, setActiveTab] = useState<'dashboard' | 'tasks' | 'leave' | 'profile'>('dashboard');
++    const [activeTab, setActiveTab] = useState<'dashboard' | 'targets' | 'tasks' | 'leave' | 'payroll' | 'shifts' | 'profile'>('dashboard');
+     const [loading, setLoading] = useState(true);
+     const [isScannerOpen, setIsScannerOpen] = useState(false);
+ 
+@@ -764,308 +647,160 @@ export default function PersonelPanel() {
+     const [statsData, setStatsData] = useState<any>(null);
+     const [shifts, setShifts] = useState<any[]>([]);
+     const [payrolls, setPayrolls] = useState<any[]>([]);
++    const [tasks, setTasks] = useState<any[]>([]);
++    const [leaves, setLeaves] = useState<any[]>([]);
++    const [turnover, setTurnover] = useState(0);
+ 
+-    const fetchPerformanceData = async () => {
+-        try {
+-            const userId = currentUser?.id;
+-            const [hrRes, targetsRes] = await Promise.all([
+-                fetch('/api/hr/performance/dashboard').then(r => r.json()),
+-                fetch(`/api/staff/targets?staffId=${userId}`).then(r => r.json())
+-            ]);
+-            if (hrRes.success) setStatsData(hrRes.data);
+-            
+-            if (Array.isArray(targetsRes)) {
+-                setTargets(targetsRes);
+-            } else if (targetsRes?.targets && Array.isArray(targetsRes.targets)) {
+-                setTargets(targetsRes.targets);
+-            }
+-        } catch (e) {
+-            console.error("Perf verisi al─▒namad─▒", e);
+-        }
+-    };
+-
+-    const fetchPersonalData = async () => {
++    const fetchCoreData = async () => {
+         try {
+             const userId = currentUser?.id;
+             if (!userId) return;
+             const today = new Date();
+-            const startOfWeek = new Date(today);
+-            startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Pzt
+-            startOfWeek.setHours(0,0,0,0);
+-            const endOfWeek = new Date(startOfWeek);
+-            endOfWeek.setDate(startOfWeek.getDate() + 6); // Paz
+-            endOfWeek.setHours(23,59,59,999);
++            const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay() + 1); startOfWeek.setHours(0,0,0,0);
++            const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6); endOfWeek.setHours(23,59,59,999);
+ 
+-            const [shiftsRes, payrollRes] = await Promise.all([
++            const [hrRes, targetsRes, shiftsRes, payrollRes, tasksRes, leavesRes, tnrRes] = await Promise.all([
++                fetch('/api/hr/performance/dashboard').then(r => r.json()),
++                fetch(`/api/staff/targets?staffId=${userId}`).then(r => r.json()),
+                 fetch(`/api/staff/shifts?staffId=${userId}&start=${startOfWeek.toISOString()}&end=${endOfWeek.toISOString()}`).then(r => r.json()),
+-                fetch(`/api/staff/payroll?staffId=${userId}`).then(r => r.json())
++                fetch(`/api/staff/payroll?staffId=${userId}`).then(r => r.json()),
++                fetch(`/api/staff/tasks?staffId=${userId}`).then(r => r.json()),
++                fetch(`/api/staff/leaves?staffId=${userId}`).then(r => r.json()),
++                fetch(`/api/staff/me/turnover`).then(r => r.json())
+             ]);
+-            
++
++            if (hrRes.success) setStatsData(hrRes.data);
++            if (Array.isArray(targetsRes)) setTargets(targetsRes);
++            else if (targetsRes?.targets && Array.isArray(targetsRes.targets)) setTargets(targetsRes.targets);
+             if (Array.isArray(shiftsRes)) setShifts(shiftsRes);
+             if (payrollRes?.payrolls) setPayrolls(payrollRes.payrolls.filter((p: any) => p.staffId === userId));
+-        } catch (error) {
+-            console.error(error);
+-        }
++            if (Array.isArray(tasksRes)) setTasks(tasksRes);
++            if (Array.isArray(leavesRes)) setLeaves(leavesRes);
++            if (tnrRes.success) setTurnover(tnrRes.turnover);
++        } catch (e) { console.error(e); }
+     };
+ 
+     const fetchPdksStatus = async () => {
+         try {
+             const res = await fetch("/api/staff/me/pdks-status");
+             const data = await res.json();
+-            if (data.success) {
+-                setPdksStatus(data);
+-            }
+-        } catch (e) {
+-            console.error("pdks status failed", e);
+-        }
++            if (data.success) setPdksStatus(data);
++        } catch (e) { console.error("pdks err", e); }
+     };
+ 
+-    // PDKS Fonksiyonlar─▒
+-    const getFingerprint = () => {
+-        return btoa(navigator.userAgent + screen.width + screen.height).slice(0, 32);
+-    };
+-
+-    const handleQrCheckin = () => {
+-        setIsScannerOpen(true);
+-    };
++    const getFingerprint = () => btoa(navigator.userAgent + screen.width + screen.height).slice(0, 32);
+ 
++    const handleQrCheckin = () => { setScanMode('IN'); setIsScannerOpen(true); };
+     const onQrScan = async (token: string) => {
+-        toast.loading("Konum ve cihaz do─şrulan─▒yor...", { id: "pdks" });
++        toast.loading("Giri┼ş yap─▒l─▒yor...", { id: "pdks" });
+         try {
+             const res = await fetch(scanMode === 'IN' ? "/api/v1/pdks/check-in" : "/api/v1/pdks/check-out", {
+-                method: "POST",
+-                headers: { "Content-Type": "application/json" },
+-                body: JSON.stringify({
+-                    mode: "OFFICE_QR",
+-                    qrToken: token,
+-                    deviceFp: getFingerprint(),
+-                    clientTime: new Date().toISOString(),
+-                    offlineId: uuidv4()
+-                })
++                method: "POST", headers: { "Content-Type": "application/json" },
++                body: JSON.stringify({ mode: "OFFICE_QR", qrToken: token, deviceFp: getFingerprint(), clientTime: new Date().toISOString(), offlineId: uuidv4() })
+             });
+             const data = await res.json();
+             if (data.success) {
+-                toast.success(scanMode === 'IN' ? "Mesai Ba┼şlat─▒ld─▒!" : "├ç─▒k─▒┼ş Yap─▒ld─▒!", { id: "pdks" });
+-                if (data.status === "PENDING") toast.warning("Risk uyar─▒s─▒: Y├Ânetici onay─▒ bekleniyor.");
+-                setIsScannerOpen(false);
+-                fetchPdksStatus();
+-            } else {
+-                toast.error(data.error || "─░┼şlem ba┼şar─▒s─▒z", { id: "pdks" });
+-            }
+-        } catch (err) {
+-            toast.error("Ba─şlant─▒ hatas─▒", { id: "pdks" });
+-        }
++                toast.success(scanMode === 'IN' ? "Ofis Giri┼şi Ba┼şar─▒l─▒!" : "Ofis ├ç─▒k─▒┼ş─▒ Yap─▒ld─▒!", { id: "pdks" });
++                setIsScannerOpen(false); fetchPdksStatus();
++            } else toast.error(data.error || "Hata", { id: "pdks" });
++        } catch (err) { toast.error("Ba─şlant─▒ hatas─▒", { id: "pdks" }); }
+     };
+ 
+     const handleGpsCheckin = () => {
+-        if (!navigator.geolocation) {
+-            return toast.error("Taray─▒c─▒n─▒z konum bilgisini desteklemiyor.");
+-        }
+-
+-        toast.loading("Konum al─▒n─▒yor...", { id: "gps" });
+-
++        if (!navigator.geolocation) return toast.error("Desteklenmiyor");
++        toast.loading("Saha konumu al─▒n─▒yor...", { id: "gps" });
+         navigator.geolocation.getCurrentPosition(async (pos) => {
+             try {
+                 const res = await fetch("/api/v1/pdks/check-in", {
+-                    method: "POST",
+-                    headers: { "Content-Type": "application/json" },
+-                    body: JSON.stringify({
+-                        mode: "FIELD_GPS",
+-                        deviceFp: getFingerprint(),
+-                        clientTime: new Date().toISOString(),
+-                        location: {
+-                            lat: pos.coords.latitude,
+-                            lng: pos.coords.longitude,
+-                            acc: pos.coords.accuracy
+-                        },
+-                        offlineId: uuidv4()
+-                    })
++                    method: "POST", headers: { "Content-Type": "application/json" },
++                    body: JSON.stringify({ mode: "FIELD_GPS", deviceFp: getFingerprint(), clientTime: new Date().toISOString(), location: { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy }, offlineId: uuidv4() })
+                 });
+                 const data = await res.json();
+-                if (data.success) {
+-                    toast.success("Saha Giri┼şi Yap─▒ld─▒!", { id: "gps" });
+-                    fetchPdksStatus();
+-                } else {
+-                    toast.error(data.error || "Giri┼ş ba┼şar─▒s─▒z", { id: "gps" });
+-                }
+-            } catch (err) {
+-                toast.error("Ba─şlant─▒ hatas─▒", { id: "gps" });
+-            }
+-        }, (err) => {
+-            toast.error("Konum izni reddedildi veya al─▒namad─▒.", { id: "gps" });
+-        }, { enableHighAccuracy: true });
++                if (data.success) { toast.success("Saha Giri┼şi Al─▒nd─▒!", { id: "gps" }); fetchPdksStatus(); }
++                else toast.error(data.error || "Hata", { id: "gps" });
++            } catch (err) { toast.error("Ba─şlant─▒ hatas─▒", { id: "gps" }); }
++        }, () => toast.error("Konum izni verin", { id: "gps" }), { enableHighAccuracy: true });
+     };
+ 
+     const handleCheckout = () => {
+-        // Active session how did it check in? GPS or QR? We don't necessarily know exactly which is easier,
+-        // let's do a prompt to let them select or just simply do GPS checkout if they clicked this directly.
+-        // Or open QR scanner in OUT mode
+-        showCheckoutOptions();
+-    };
+-
+-    const showCheckoutOptions = () => {
+         toast.custom((t: any) => (
+-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xl max-w-[300px]">
+-                <p className="font-bold text-slate-900 mb-3 flex items-center gap-2"><span>­şæï</span> ├ç─▒k─▒┼ş y├Ântemini se├ğin</p>
++            <div className="bg-white p-4 rounded-xl shadow-xl max-w-[300px] border border-slate-200">
++                <p className="font-bold text-slate-900 mb-3 text-sm">├ç─▒k─▒┼ş Y├Ânteminizi Se├ğin</p>
+                 <div className="grid grid-cols-2 gap-2">
+-                    <button onClick={() => { toast.dismiss(t); setScanMode('OUT'); setIsScannerOpen(true); }} className="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg font-bold text-xs transition-colors text-center">Ofis ├ç─▒k─▒┼ş─▒ (QR)</button>
+-                    <button onClick={() => { toast.dismiss(t); exactGpsCheckout(); }} className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg font-bold text-xs transition-colors text-center">Saha ├ç─▒k─▒┼ş─▒ (GPS)</button>
++                    <button onClick={() => { toast.dismiss(t); setScanMode('OUT'); setIsScannerOpen(true); }} className="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg">Ofis TR (QR)</button>
++                    <button onClick={() => { 
++                        toast.dismiss(t); 
++                        if (!navigator.geolocation) return toast.error("Taray─▒c─▒ engeli");
++                        toast.loading("Saha ├ğ─▒k─▒┼ş konumu...", { id: "g_out" });
++                        navigator.geolocation.getCurrentPosition(async (pos) => {
++                            const res = await fetch("/api/v1/pdks/check-out", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "FIELD_GPS", deviceFp: getFingerprint(), clientTime: new Date().toISOString(), location: { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy }, offlineId: uuidv4() })});
++                            const data = await res.json();
++                            if(data.success) { toast.success("├ç─▒k─▒┼ş Onayland─▒!", { id: "g_out" }); fetchPdksStatus(); } else toast.error("Reddedildi", {id:"g_out"});
++                        }, () => {}, { enableHighAccuracy: true });
++                    }} className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-lg">Saha (GPS)</button>
+                 </div>
+             </div>
+-        ), { duration: 10000 });
+-    };
+-
+-    const exactGpsCheckout = () => {
+-        if (!navigator.geolocation) return toast.error("Taray─▒c─▒n─▒z desteklemiyor.");
+-        toast.loading("Konum al─▒n─▒yor...", { id: "gps_out" });
+-        navigator.geolocation.getCurrentPosition(async (pos) => {
+-            try {
+-                const res = await fetch("/api/v1/pdks/check-out", {
+-                    method: "POST",
+-                    headers: { "Content-Type": "application/json" },
+-                    body: JSON.stringify({
+-                        mode: "FIELD_GPS",
+-                        deviceFp: getFingerprint(),
+-                        clientTime: new Date().toISOString(),
+-                        location: { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy },
+-                        offlineId: uuidv4()
+-                    })
+-                });
+-                const data = await res.json();
+-                if (data.success) {
+-                    toast.success("├ç─▒k─▒┼ş Yap─▒ld─▒!", { id: "gps_out" });
+-                    fetchPdksStatus();
+-                } else toast.error(data.error || "Ba┼şar─▒s─▒z", { id: "gps_out" });
+-            } catch (err) { toast.error("Ba─şlant─▒ hatas─▒", { id: "gps_out" }); }
+-        }, () => toast.error("Konum izni al─▒namad─▒", { id: "gps_out" }), { enableHighAccuracy: true });
++        ), { duration: 8000 });
+     };
+ 
+     useEffect(() => {
+         fetchPdksStatus();
+-        if (currentUser?.id) {
+-            fetchPerformanceData();
+-            fetchPersonalData();
+-        }
+-        const timer = setTimeout(() => setLoading(false), 800);
+-        return () => clearTimeout(timer);
++        if (currentUser?.id) fetchCoreData();
++        const t = setTimeout(() => setLoading(false), 900);
++        return () => clearTimeout(t);
+     }, [currentUser?.id]);
+ 
+     if (loading) return (
+-        <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-pulse text-indigo-400/50">
++        <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-pulse">
+             <div className="h-20 bg-slate-100 dark:bg-slate-800/30 rounded-2xl w-full" />
+-            <div className="grid grid-cols-4 gap-6">
+-                <div className="h-32 bg-slate-100 dark:bg-slate-800/30 rounded-2xl" />
+-                <div className="h-32 bg-slate-100 dark:bg-slate-800/30 rounded-2xl" />
+-                <div className="h-32 bg-slate-100 dark:bg-slate-800/30 rounded-2xl" />
+-                <div className="h-32 bg-slate-100 dark:bg-slate-800/30 rounded-2xl" />
+-            </div>
+             <div className="h-64 bg-slate-100 dark:bg-slate-800/30 rounded-2xl w-full" />
+         </div>
+     );
+ 
++    const TABS = [
++        { key: 'dashboard', label: '├ûzet', icon: <IconActivity className="w-4 h-4"/> },
++        { key: 'targets', label: 'Hedefler', icon: <IconTrendingUp className="w-4 h-4"/> },
++        { key: 'tasks', label: 'G├Ârevler', icon: <Briefcase className="w-4 h-4"/> },
++        { key: 'leave', label: '─░zinler', icon: <Calendar className="w-4 h-4"/> },
++        { key: 'payroll', label: 'Bordro', icon: <FileText className="w-4 h-4"/> },
++        { key: 'shifts', label: 'Vardiya', icon: <IconClock className="w-4 h-4"/> },
++        { key: 'profile', label: 'Profil', icon: <UserCircle className="w-4 h-4"/> },
++    ] as const;
++
+     return (
+-        <div style={{ background: 'var(--bg-main)' }} className="min-h-screen text-slate-900 dark:text-white transition-colors duration-300">
+-            {/* EXECUTIVE HEADER STRIP */}
++        <div style={{ background: 'var(--bg-main)' }} className="min-h-screen text-slate-900 dark:text-white pb-24 no-print relative">
+             <div style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border-color)' }} className="px-8 py-6 sticky top-0 z-40 shadow-sm">
+-                <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
++                <div className="max-w-[1700px] mx-auto flex justify-between items-center">
+                     <div>
+-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+-                            <span className="text-3xl">­şæ¿ÔÇı­şÆ╝</span> PERSONEL OPERASYON PANEL─░
++                        <h1 className="text-[22px] font-black tracking-tight flex items-center gap-3">
++                            <span className="text-3xl drop-shadow-sm">­şæ¿ÔÇı­şÆ╝</span> PERSONEL PORTALI
+                         </h1>
+-                        <p className="text-slate-500 dark:text-slate-400 text-xs font-bold mt-2 uppercase tracking-widest flex items-center gap-2">
+-                            <span className="text-emerald-500">­şşó</span> Merhaba, {currentUser?.name || 'Kullan─▒c─▒'} ÔÇó Bug├╝n ├çok Verimlisin!
+-                        </p>
+-                    </div>
+-                    <div className="flex items-center gap-6">
+-                        <div className="flex flex-col items-end px-5 border-r border-slate-200 dark:border-slate-800">
+-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Mesai Durumu</span>
+-                            {pdksStatus?.isWorking ? (
+-                                <span className="text-xs font-black text-emerald-500 mt-0.5 flex items-center gap-1.5 hover:text-emerald-400 transition-colors cursor-default">
+-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+-                                    AKT─░F ├çALI┼ŞIYOR
+-                                </span>
+-                            ) : (
+-                                <span className="text-xs font-black text-slate-400 mt-0.5 flex items-center gap-1.5 cursor-default">
+-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+-                                    MESA─░DE DE─Ş─░L
+-                                </span>
+-                            )}
+-                        </div>
+-                        <button onClick={fetchPdksStatus} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" title="Verileri Yenile">
+-                            <IconRefresh className="w-5 h-5" />
+-                        </button>
++                        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">─░nsan Kaynaklar─▒ & Operasyon Y├Ânetim Paneli</p>
+                     </div>
+                 </div>
+             </div>
+ 
+-            <div className="max-w-[1600px] mx-auto p-8 space-y-8 animate-in fade-in duration-700 pb-24">
+-                {/* Navigation Tabs (Grouped Navigation Style) */}
+-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+-                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+-                        <div className="flex items-center gap-3">
+-                            <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/30 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm">
+-                                <button
+-                                    onClick={() => setActiveTab('dashboard')}
+-                                    className={`${activeTab === 'dashboard'
+-                                        ? "px-5 py-2.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 shadow-sm border border-slate-200/50 dark:border-white/10 rounded-lg transition-all"
+-                                        : "px-5 py-2.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-lg"
+-                                    } flex items-center gap-2`}
+-                                >
+-                                    <IconActivity className="w-4 h-4" /> Genel Durum
+-                                </button>
+-                                <button
+-                                    onClick={() => setActiveTab('tasks')}
+-                                    className={`${activeTab === 'tasks'
+-                                        ? "px-5 py-2.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 shadow-sm border border-slate-200/50 dark:border-white/10 rounded-lg transition-all"
+-                                        : "px-5 py-2.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-lg"
+-                                    } flex items-center gap-2`}
+-                                >
+-                                    <Briefcase className="w-4 h-4" /> G├Ârevlerim
+-                                </button>
+-
+-                                <button
+-                                    onClick={() => setActiveTab('leave')}
+-                                    className={`${activeTab === 'leave'
+-                                        ? "px-5 py-2.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 shadow-sm border border-slate-200/50 dark:border-white/10 rounded-lg transition-all"
+-                                        : "px-5 py-2.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-lg"
+-                                    } flex items-center gap-2`}
+-                                >
+-                                    <IconClock className="w-4 h-4" /> ─░zin Taleplerim
+-                                </button>
+-                                <button
+-                                    onClick={() => setActiveTab('profile')}
+-                                    className={`${activeTab === 'profile'
+-                                        ? "px-5 py-2.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 shadow-sm border border-slate-200/50 dark:border-white/10 rounded-lg transition-all"
+-                                        : "px-5 py-2.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-lg"
+-                                    } flex items-center gap-2`}
+-                                >
+-                                    <IconShield className="w-4 h-4" /> Profil & Hesap
+-                                </button>
+-                            </div>
+-                        </div>
+-                    </div>
++            <div className="max-w-[1700px] mx-auto p-8 space-y-8 duration-700">
++                <div className="flex bg-slate-100/80 dark:bg-slate-800/40 p-1.5 rounded-xl border w-fit overflow-x-auto">
++                    {TABS.map(tab => (
++                        <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`${activeTab === tab.key ? "bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"} flex items-center gap-2 px-6 py-3 text-[12px] font-bold uppercase tracking-widest rounded-lg transition-all whitespace-nowrap`}>
++                            {tab.icon} {tab.label}
++                        </button>
++                    ))}
+                 </div>
+ 
+-                {/* Content Rendering */}
+-                {activeTab === 'dashboard' && (
+-                    <DashboardView
+-                        handleQrCheckin={handleQrCheckin}
+-                        handleGpsCheckin={handleGpsCheckin}
+-                        isScannerOpen={isScannerOpen}
+-                        setIsScannerOpen={setIsScannerOpen}
+-                        onQrScan={onQrScan}
+-                     targets={targets} statsData={statsData} user={currentUser} shifts={shifts} payrolls={payrolls} />
+-                )}
+-                {activeTab === 'tasks' && <MyTasksView user={currentUser} />}
+-                {activeTab === 'leave' && <LeaveRequestView user={currentUser} />}
++                {activeTab === 'dashboard' && <DashboardView handleQrCheckin={handleQrCheckin} handleGpsCheckin={handleGpsCheckin} isScannerOpen={isScannerOpen} setIsScannerOpen={setIsScannerOpen} onQrScan={onQrScan} pdksStatus={pdksStatus} handleCheckout={handleCheckout} targets={targets} statsData={statsData} turnover={turnover} shifts={shifts} payrolls={payrolls} tasks={tasks} />}
++                {activeTab === 'targets' && <TargetsView targets={targets} statsData={statsData} />}
++                {activeTab === 'tasks' && <TasksView user={currentUser} tasks={tasks} fetchTasks={fetchCoreData} loading={loading} />}
++                {activeTab === 'leave' && <LeavesView user={currentUser} leaves={leaves} fetchLeaves={fetchCoreData} loading={loading} />}
++                {activeTab === 'payroll' && <PayrollView payrolls={payrolls} user={currentUser} />}
++                {activeTab === 'shifts' && <ShiftsView shifts={shifts} />}
+                 {activeTab === 'profile' && <ProfileSettingsView user={currentUser} />}
+-
+             </div>
+-
+             {/* Branding Footer */}
+-            <div style={{ background: 'var(--bg-panel)', borderTop: '1px solid var(--border-color)' }} className="fixed bottom-0 left-0 right-0 p-4 z-50 flex justify-center">
++            <div style={{ background: 'var(--bg-panel)', borderTop: '1px solid var(--border-color)' }} className="fixed bottom-0 left-0 right-0 p-4 z-50 flex justify-center no-print">
+                 <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+-                    <span>┬® 2026 PERIODYA OS ÔÇó ─░NSAN KAYNAKLARI MOD├£L├£</span>
++                    <span>┬® 2026 PERIODYA OS ÔÇó ─░NSAN KAYNAKLARI</span>
+                     <span className="text-blue-500 font-black">­şöÆ Verileriniz U├ğtan Uca ┼Şifrelenmi┼ştir</span>
+                 </div>
+             </div>

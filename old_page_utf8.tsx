@@ -1,0 +1,754 @@
+﻿"use client";
+
+import { useState, useEffect, useRef } from 'react';
+import { Calendar, MessageSquare, Briefcase, FileText, CheckCircle2, UserCircle, Flag, XCircle, ChevronRight, Printer, Target, TrendingUp, DollarSign, Clock, Lock, MapPin } from 'lucide-react';
+import { IconActivity, IconTrendingUp, IconClock, IconCheck, IconAlert, IconZap, IconShield, IconRefresh, IconTrash } from '@/components/icons/PremiumIcons';
+import { useApp } from '@/contexts/AppContext';
+import dynamic from 'next/dynamic';
+const BarcodeScanner = dynamic(() => import('@/components/BarcodeScanner'), { ssr: false });
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
+
+import {
+    EnterpriseCard, EnterpriseSectionHeader, EnterpriseInput, EnterpriseTextarea, EnterpriseSelect, EnterpriseButton
+} from '@/components/ui/enterprise';
+
+// ÔöÇÔöÇÔöÇ STYLES FOR PRINTING ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const printStyles = `
+  @media print {
+    body * { visibility: hidden; }
+    #printable-area, #printable-area * { visibility: visible; }
+    #printable-area { position: absolute; left: 0; top: 0; width: 100%; padding: 40px; }
+    .no-print { display: none !important; }
+  }
+`;
+
+// ÔöÇÔöÇÔöÇ UI COMPONENTS ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const ProgressBar = ({ label, value, max, color = "#3b82f6" }: any) => {
+    const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+    return (
+        <div className="w-full">
+            <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest mb-2">
+                <span className="text-slate-500">{label}</span>
+                <span style={{ color }}>%{percentage.toFixed(0)}</span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800/80 rounded-full ">
+                <div className="h-full transition-all duration-1000 ease-out rounded-full" style={{ width: `${percentage}%`, background: color }} />
+            </div>
+            <div className="flex justify-end text-[9px] text-slate-400 mt-1 font-bold">
+                {Number(value).toLocaleString()} / {Number(max).toLocaleString()}
+            </div>
+        </div>
+    );
+};
+
+// ÔöÇÔöÇÔöÇ PROFILE HEADER (COMMON TOP ROW) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const ProfileHeader = ({ user, title = "├ûZET", dataCount = 0, dataLabel = "Kay─▒t" }: any) => {
+    return (
+        <div className="w-full flex justify-between items-center bg-surface dark:bg-[#0f172a] border-b border-default dark:border-white/5 pb-4 mb-4">
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded bg-state-success-bg dark:bg-emerald-500/20 text-state-success-text dark:text-emerald-400 flex items-center justify-center text-sm font-black border border-state-success-border">
+                    {user?.name?.substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                    <h3 className="text-sm font-black text-text-primary dark:text-white uppercase tracking-widest">{user?.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-state-success-text"></span>
+                        <p className="text-[10px] font-bold text-text-secondary tracking-widest uppercase">{user?.role || 'Personel'} ÔÇö AKT─░F ├çALI┼ŞAN</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div className="flex items-center gap-6">
+                <div className="text-right">
+                    <div className="text-[9px] font-bold tracking-widest text-text-muted uppercase">{title}</div>
+                    <div className="text-[14px] font-mono font-black text-state-success-text dark:text-emerald-400 mt-0.5">{dataCount} <span className="text-[10px] font-bold text-text-muted uppercase">{dataLabel}</span></div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+const TopPills = ({ pills }: any) => (
+    <div className="flex flex-wrap items-center gap-3 shrink-0 mb-6 w-full">
+        {pills.map((p: any, i: number) => (
+            <div key={i} className="flex bg-white dark:bg-[#1e293b]/50 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max transition-transform cursor-default ring-0 border-none shadow-none">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${p.bg} ${p.color}`}>
+                    {p.icon}
+                </div>
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">{p.title}</span>
+                    <span className="text-lg font-black text-slate-800 dark:text-white leading-none mt-1">{p.value}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+const SoftContainer = ({ title, icon, children, className="" }: any) => (
+    <div className={`bg-white dark:bg-[#1e293b]/50 rounded-[32px] p-6 lg:p-8 flex flex-col ${className} ring-0 border-none shadow-none`}>
+        {title && (
+            <div className="flex items-center gap-2 mb-6 text-[12px] font-black uppercase tracking-widest text-slate-500">
+                <span className="text-slate-400">{icon}</span>
+                <h3>{title}</h3>
+            </div>
+        )}
+        <div className="flex-1">
+            {children}
+        </div>
+    </div>
+);
+
+// ÔöÇÔöÇÔöÇ DASHBOARD VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const DashboardView = ({
+    handleQrCheckin, handleGpsCheckin, isScannerOpen, setIsScannerOpen, onQrScan, pdksStatus, handleCheckout,
+    targets = [], statsData, turnover, shifts = [], payrolls = [], tasks = [], user
+}: any) => {
+    const activeTasksCount = tasks.filter((t: any) => t.status !== 'Tamamland─▒' && t.status !== '─░ptal').length;
+    const totalTarget = targets?.reduce((sum: any, t: any) => sum + Number(t.targetValue), 0) || 0;
+    const totalActual = targets?.reduce((sum: any, t: any) => sum + Number(t.currentValue), 0) || 0;
+    const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+    const totalEstBonus = targets?.reduce((sum: any, t: any) => sum + Number(t.estimatedBonus || 0), 0) || 0;
+
+    const displayAchievement = targets?.length > 0 ? `%${overallProgress}` : (statsData?.stats?.achievement || '%0.0');
+    const displayBonus = targets?.length > 0 ? `Ôé║${totalEstBonus.toLocaleString('tr-TR')}` : (statsData?.stats?.bonus || 'Ôé║0,00');
+
+    return (
+        <div className="flex flex-col animate-in fade-in duration-500 min-h-full gap-6">
+            <div className="flex flex-wrap items-center gap-4 shrink-0 mb-4 w-full">
+                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-blue-500">
+                        <IconActivity className="w-5 h-5"/>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">G├╝nl├╝k Cirom</span>
+                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">Ôé║{(turnover || 0).toLocaleString()}</span>
+                    </div>
+                </div>
+
+                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-emerald-500">
+                        <IconTrendingUp className="w-5 h-5"/>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Hedef (Ay)</span>
+                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayAchievement}</span>
+                    </div>
+                </div>
+
+                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-orange-500">
+                        <IconClock className="w-5 h-5"/>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Bekleyen G├Ârev</span>
+                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{activeTasksCount}</span>
+                    </div>
+                </div>
+
+                <div className="flex bg-white dark:bg-slate-800 rounded-[100px] pl-3 pr-6 py-2.5 items-center gap-4 w-max shadow-sm transition-transform cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-slate-700/50 flex flex-shrink-0 items-center justify-center text-purple-500">
+                        <DollarSign className="w-5 h-5"/>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Kazan─▒lan Prim</span>
+                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayBonus}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1">
+                {/* 1. PDKS BOX (Fotograf 1 Tasarimi) */}
+                <div className="flex flex-col gap-4">
+                     <div className="flex items-center justify-between px-2">
+                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-[#64748b]"><IconZap className="w-4 h-4" /> PDKS DO─ŞRULAMASI</h3>
+                        {!pdksStatus?.isWorking ? <span className="text-[10px] uppercase font-bold text-slate-800 tracking-widest">KAPALI</span> : <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>}
+                     </div>
+                     <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-8 flex flex-col justify-center min-h-[160px]">
+                        {!pdksStatus?.isWorking ? (
+                            <div className="flex gap-4 w-full">
+                                <button onClick={handleQrCheckin} className="flex-1 flex items-center justify-center gap-3 h-16 bg-[#f8fafc] dark:bg-white/5 hover:bg-slate-100 rounded-[20px] outline-none transition-colors border-none ring-0">
+                                    <Printer className="w-5 h-5 text-slate-800 dark:text-slate-300" />
+                                    <span className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest">Ofis QR (Lokal)</span>
+                                </button>
+                                <button onClick={handleGpsCheckin} className="flex-1 flex items-center justify-center gap-3 h-16 bg-[#f8fafc] dark:bg-white/5 hover:bg-slate-100 rounded-[20px] outline-none transition-colors border-none ring-0">
+                                    <Flag className="w-5 h-5 text-slate-800 dark:text-slate-300" />
+                                    <span className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest">Saha GPS (D─▒┼ş)</span>
+                                </button>
+                            </div>
+                        ) : (
+                                <div className="flex items-center gap-4 bg-slate-50 border border-slate-100 p-4 rounded-2xl">
+                                    <div className="flex-1">
+                                        <p className="text-emerald-500 font-black uppercase tracking-widest text-[10px] mb-1 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> VER─░ DO─ŞRULANDI</p>
+                                        <div className="text-xl font-mono font-black text-slate-800">
+                                            {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '--:--'}
+                                        </div>
+                                    </div>
+                                    <button onClick={handleCheckout} className="h-12 px-8 bg-rose-600 hover:bg-rose-700 text-white rounded-[20px] font-black text-[11px] uppercase tracking-widest shadow-none outline-none transition-colors">
+                                        PAS─░FE AL
+                                    </button>
+                                </div>
+                        )}
+                     </div>
+                </div>
+
+                {/* 2. VARD─░YA BOX (Fotograf 1 Tasarimi) */}
+                <div className="flex flex-col gap-4">
+                     <div className="flex items-center justify-between px-2">
+                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-[#64748b]"><IconClock className="w-4 h-4" /> SIRADAK─░ VARD─░YA</h3>
+                     </div>
+                     <div className="bg-white dark:bg-[#1e293b]/50 rounded-[32px] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-8 flex flex-col justify-center min-h-[160px]">
+                        {shifts.length > 0 ? (
+                            <div className="flex items-center gap-6">
+                                <div className="w-16 h-16 bg-white border border-slate-200 dark:border-slate-700 rounded-[24px] flex items-center justify-center">
+                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-800 dark:text-white">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })}</span>
+                                </div>
+                                <div>
+                                    <div className="text-[14px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-1">{shifts[0]?.type} VARD─░YASI</div>
+                                    <p className="text-[12px] font-bold text-slate-600 dark:text-slate-400 font-mono tracking-widest uppercase">
+                                        {shifts[0]?.type === '─░zinli' ? 'Tam G├╝n ─░zinli' : `${new Date(shifts[0]?.start).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})} - ${new Date(shifts[0]?.end).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}`}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest">
+                                PLANLI VARD─░YA BULUNMUYOR
+                            </div>
+                        )}
+                     </div>
+                </div>
+            </div>
+            <BarcodeScanner isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={onQrScan} />
+        </div>
+    );
+};
+
+// ÔöÇÔöÇÔöÇ TARGETS VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const TargetsView = ({ targets, statsData, user }: any) => {
+    const totalTarget = targets?.reduce((sum: any, t: any) => sum + Number(t.targetValue), 0) || 0;
+    const totalActual = targets?.reduce((sum: any, t: any) => sum + Number(t.currentValue), 0) || 0;
+    const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+    const activeTargetsCount = targets?.filter((t: any) => t.status !== '─░ptal' && t.currentValue < t.targetValue).length || 0;
+    const completedTargetsCount = targets?.filter((t: any) => t.currentValue >= t.targetValue).length || 0;
+
+    return (
+        <div className="flex flex-col animate-in fade-in duration-500 w-full mb-8">
+            <TopPills pills={[
+                { title: 'AKT─░F HEDEFLER', value: activeTargetsCount, icon: <Target className="w-5 h-5"/>, bg: 'bg-blue-50 dark:bg-blue-500/10', color: 'text-blue-500' },
+                { title: 'ULA┼ŞILAN HEDEFLER', value: completedTargetsCount, icon: <CheckCircle2 className="w-5 h-5"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500' },
+                { title: 'GENEL BA┼ŞARI', value: `%${overallProgress}`, icon: <TrendingUp className="w-5 h-5"/>, bg: 'bg-orange-50 dark:bg-orange-500/10', color: 'text-orange-500' }
+            ]} />
+
+            <SoftContainer title="D├Ânemsel Performans Tablosu" icon={<Target className="w-5 h-5" />} className="min-h-[400px]">
+                {targets?.length === 0 ? (
+                    <div className="py-20 flex flex-col items-center justify-center text-center">
+                        <Target className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                        <h4 className="text-[12px] font-black text-slate-500 uppercase tracking-widest leading-none">HEDEF ATAMASI BULUNMUYOR</h4>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Bu d├Ânem i├ğin hen├╝z planlanm─▒┼ş bir performans hedefi yok.</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[700px]">
+                            <thead>
+                                <tr>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800/50">HEDEF T├£R├£</th>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800/50">DURUM</th>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right border-b border-slate-100 dark:border-slate-800/50">KOTA / GER├çEKLE┼ŞEN</th>
+                                    <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest w-48 border-b border-slate-100 dark:border-slate-800/50 pr-4 text-right">PERFORMANS BARI</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
+                                {targets.map((t: any) => {
+                                    const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
+                                    const isCompleted = progress >= 100;
+                                    return (
+                                        <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
+                                            <td className="py-4 align-middle">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                                        {t.type === 'TURNOVER' ? <DollarSign className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{t.title || 'Hedef'}</div>
+                                                        <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase">D├ûNEM: {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 align-middle">
+                                                {isCompleted ? <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">BA┼ŞARILI</span> : <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">DEVAM ED─░YOR</span>}
+                                            </td>
+                                            <td className="py-4 align-middle text-right">
+                                                <div className="text-[13px] font-black text-slate-800 dark:text-white">{t.type === 'TURNOVER' ? `Ôé║${Number(t.currentValue).toLocaleString()}` : t.currentValue}</div>
+                                                <div className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">/ {t.type === 'TURNOVER' ? `Ôé║${Number(t.targetValue).toLocaleString()}` : t.targetValue}</div>
+                                            </td>
+                                            <td className="py-4 align-middle pr-4">
+                                                <ProgressBar label="" value={t.currentValue} max={t.targetValue} color={isCompleted ? "#10b981" : "#3b82f6"} />
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </SoftContainer>
+            <div className="h-10"></div>
+        </div>
+    );
+};
+
+// ÔöÇÔöÇÔöÇ TASKS VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
+    const [subTab, setSubTab] = useState<'pending' | 'completed' | 'all'>('pending');
+    
+    const displayTasks = tasks.filter((t: any) => {
+        if (subTab === 'pending') return t.status !== 'Tamamland─▒' && t.status !== '─░ptal';
+        if (subTab === 'completed') return t.status === 'Tamamland─▒';
+        return true;
+    });
+
+    const pendingCount = tasks.filter((t: any) => t.status !== 'Tamamland─▒' && t.status !== '─░ptal').length || 0;
+    const completedCount = tasks.filter((t: any) => t.status === 'Tamamland─▒').length || 0;
+
+    return (
+        <div className="flex flex-col animate-in fade-in duration-500 w-full mb-8">
+            <TopPills pills={[
+                { title: 'BEKLEYEN G├ûREV', value: pendingCount, icon: <Clock className="w-5 h-5"/>, bg: 'bg-orange-50 dark:bg-orange-500/10', color: 'text-orange-500' },
+                { title: 'TAMAMLANAN', value: completedCount, icon: <CheckCircle2 className="w-5 h-5"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500' }
+            ]} />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <SoftContainer title="Bana Atanan G├Ârevler" icon={<Briefcase className="w-5 h-5"/>} className="min-h-[400px]">
+                    <div className="flex gap-2 mb-6">
+                        <button onClick={() => setSubTab('pending')} className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors border-none ring-0 shadow-none ${subTab==='pending' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-50 dark:bg-slate-800/40 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/60'}`}>Devam Edenler</button>
+                        <button onClick={() => setSubTab('completed')} className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors border-none ring-0 shadow-none ${subTab==='completed' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-50 dark:bg-slate-800/40 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/60'}`}>Tamamland─▒</button>
+                    </div>
+                    {displayTasks.length === 0 ? (
+                        <div className="py-20 text-center flex flex-col items-center">
+                            <Briefcase className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                            <h4 className="text-[12px] font-black text-slate-500 uppercase tracking-widest leading-none">G├ûREV BULUNMUYOR</h4>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {displayTasks.map((t: any) => (
+                                <div key={t.id} className="bg-slate-50 dark:bg-slate-800/30 rounded-3xl p-5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors border-none ring-0">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest leading-snug pr-4">{t.title}</div>
+                                        {t.priority === 'HIGH' && <span className="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 dark:bg-red-500/10 px-3 py-1 rounded-full shrink-0">Y├£KSEK</span>}
+                                    </div>
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.status}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </SoftContainer>
+
+                <SoftContainer title="G├Ârev Rapor Merkezi" icon={<FileText className="w-5 h-5"/>} className="min-h-[400px]">
+                    <div className="flex-1 flex items-center justify-center flex-col text-slate-400 gap-3 text-center py-20">
+                        <MessageSquare className="w-10 h-10 opacity-30 mb-2" />
+                        <h4 className="text-[12px] font-black uppercase tracking-widest mt-2 block leading-none">L─░STEDEN B─░R G├ûREV SE├çEREK RAPOR EKRANINI A├çIN</h4>
+                    </div>
+                </SoftContainer>
+            </div>
+            <div className="h-10"></div>
+        </div>
+    );
+};
+
+// ÔöÇÔöÇÔöÇ LEAVES VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const LeavesView = ({ user }: any) => {
+    // Ayn─▒ verileri ve print metodunu sim├╝le edelim, gereksizleri kestik, salt UI yaz─▒yoruz.
+    const { fetchPersonelData } = useApp();
+    const [leaves, setLeaves] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [type, setType] = useState('Y─▒ll─▒k ─░zin');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [reason, setReason] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [printableLeave, setPrintableLeave] = useState<any>(null);
+
+    const fetchLeaves = async () => {
+        try { const res = await fetch(`/api/staff/leaves?staffId=${user.id}`); const d = await res.json(); setLeaves(d || []); }
+        catch (e) { } finally { setLoading(false); }
+    };
+    useEffect(() => { if (user?.id) fetchLeaves(); }, [user]);
+
+    const handleSubmit = async () => {
+        if (!startDate || !endDate || !reason) return toast.error("T├╝m alanlar─▒ doldurunuz.");
+        const _s = new Date(startDate); const _e = new Date(endDate);
+        if (_s > _e) return toast.error("Biti┼ş tarihi ba┼şlang─▒├ğtan ├Ânce olamaz.");
+        setIsSubmitting(true);
+        try {
+            const res = await fetch('/api/staff/leaves', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ staffId: user.id, type, startDate, endDate, reason, days: Math.ceil(Math.abs(_e.getTime() - _s.getTime()) / (1000 * 60 * 60 * 24)) + 1 })
+            });
+            if (res.ok) { toast.success("Talebiniz ─░K'ya ula┼şt─▒."); setStartDate(''); setEndDate(''); setReason(''); fetchLeaves(); }
+        } finally { setIsSubmitting(false); }
+    };
+
+    const handlePrint = (leave: any) => { setPrintableLeave(leave); setTimeout(() => window.print(), 200); };
+
+    return (
+        <div className="flex flex-col animate-in fade-in duration-500 gap-6">
+            <style>{printStyles}</style>
+
+            <div className="flex gap-6 items-start">
+                {/* 1. YEN─░ TALEP KUTUSU */}
+                <div className="w-[380px] shrink-0 bg-white dark:bg-slate-800 rounded-[32px] p-8 shadow-sm border border-slate-50 dark:border-white/5 flex flex-col gap-6">
+                    <div className="flex items-center gap-3 text-slate-400 mb-2">
+                        <Calendar className="w-5 h-5"/>
+                        <h3 className="text-[12px] font-black uppercase tracking-widest text-[#64748b]">YEN─░ TALEP OLU┼ŞTUR</h3>
+                    </div>
+
+                    <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                           <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">─░zin T├╝r├╝</span>
+                           <select className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[16px] border-none px-4 py-3 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0" value={type} onChange={e=>setType(e.target.value)}>
+                               <option value="Y─▒ll─▒k ─░zin">Y─▒ll─▒k ├£cretli ─░zin</option><option value="Mazeret ─░zni">Mazeret ─░zni</option><option value="Sa─şl─▒k ─░zni">Sa─şl─▒k ─░zni</option><option value="├£cretsiz ─░zin">├£cretsiz ─░zin</option>
+                           </select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                           <div className="flex flex-col gap-2">
+                               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Ba┼şlang─▒├ğ Se├ğimi</span>
+                               <input type="date" className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[16px] border-none px-4 py-3 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0 focus:ring-0" value={startDate} onChange={e=>setStartDate(e.target.value)}/>
+                           </div>
+                           <div className="flex flex-col gap-2">
+                               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Biti┼ş Se├ğimi</span>
+                               <input type="date" className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[16px] border-none px-4 py-3 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0 focus:ring-0" value={endDate} onChange={e=>setEndDate(e.target.value)}/>
+                           </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                           <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Dilek├ğe ─░├ğeri─şi / E-Posta Notu</span>
+                           <textarea className="w-full bg-[#f8fafc] dark:bg-slate-700/50 rounded-[20px] border-none px-4 py-4 text-[12px] font-bold text-slate-800 dark:text-white outline-none ring-0 resize-none h-32" placeholder="Ek a├ğ─▒klama..." value={reason} onChange={e=>setReason(e.target.value)}></textarea>
+                        </div>
+
+                        <button onClick={handleSubmit} disabled={isSubmitting} className="w-full h-14 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-[24px] text-[11px] font-black uppercase tracking-widest transition-transform hover:scale-[1.02]">
+                            {isSubmitting ? 'G├ûNDER─░L─░YOR...' : 'D─░LEK├çEY─░ ONAYA SUN'}
+                        </button>
+                    </div>
+                </div>
+
+                {/* 2. ─░Z─░N S─░C─░L TABLOSU */}
+                <div className="flex-1 bg-white dark:bg-slate-800 rounded-[32px] p-8 shadow-sm border border-slate-50 dark:border-white/5 min-h-[500px]">
+                    <div className="flex flex-col items-center justify-center gap-3 mb-10 mt-4">
+                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-300 rounded-2xl flex items-center justify-center"><Clock className="w-5 h-5"/></div>
+                        <h3 className="text-[16px] font-black tracking-widest uppercase text-slate-800 dark:text-white">─░zin Sicilim</h3>
+                    </div>
+
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr>
+                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">BELGE & T├£R</th>
+                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">TAR─░H ARALI─ŞI / S├£RE</th>
+                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">S─░STEM DURUMU</th>
+                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-100 dark:border-white/5">AKS─░YONER (─░K)</th>
+                                <th className="pb-4 text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest text-right border-b border-slate-100 dark:border-white/5">BELGE ─░┼ŞLEM─░</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {leaves.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">AR┼Ş─░VDE EVRAK YOK.</td></tr> :
+                             leaves.map((l: any) => (
+                                <tr key={l.id}>
+                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
+                                        <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{l.type}</div>
+                                        <div className="text-[9px] font-bold text-slate-400 font-mono tracking-widest mt-1 uppercase">DOC: {l.id.substring(0,8)}</div>
+                                    </td>
+                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
+                                        <div className="text-[11px] font-black text-slate-800 dark:text-white">{new Date(l.startDate).toLocaleDateString('tr-TR')} - {new Date(l.endDate).toLocaleDateString('tr-TR')}</div>
+                                        <div className="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-widest">TOPLAM: {l.days} G├£N</div>
+                                    </td>
+                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
+                                        <span className="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-[9px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">{l.status}</span>
+                                    </td>
+                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50">
+                                        <div className="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{l.approvedBy || '-'}</div>
+                                    </td>
+                                    <td className="py-5 border-b border-slate-50 dark:border-slate-700/50 text-right">
+                                        <button onClick={() => handlePrint(l)} className="px-5 py-2 border border-slate-300 dark:border-slate-600 rounded-full text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex justify-center items-center gap-2">
+                                            <Printer className="w-3.5 h-3.5"/> D─░LEK├çE ├çIKTI
+                                        </button>
+                                    </td>
+                                </tr>
+                             ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="printable-area" className="hidden">
+                 {printableLeave && (
+                    <div className="p-10 font-[serif] text-black">
+                        <h2 className="text-center text-xl font-bold uppercase mb-10 border-b-2 border-black pb-4">─░zin Talep Formu / Dilek├ğesi</h2>
+                        <div className="text-right mb-10">Tarih: {new Date(printableLeave.createdAt).toLocaleDateString('tr-TR')}</div>
+                        <p className="text-lg mb-8 leading-relaxed">
+                            Kurumunuzda sicil numaral─▒ personeli <strong>{user?.name}</strong> olarak g├Ârev yapmaktay─▒m.<br/><br/>
+                            <strong>{new Date(printableLeave.startDate).toLocaleDateString('tr-TR')}</strong> ile <strong>{new Date(printableLeave.endDate).toLocaleDateString('tr-TR')}</strong> tarihleri aras─▒nda 
+                            toplam <strong>{printableLeave.days} g├╝n</strong> s├╝reyle <strong>{printableLeave.type}</strong> kullanmak hususunda gere─şini;
+                        </p>
+                        <p className="text-lg mt-6">Bilgilerinize arz ederim.</p>
+                        <div className="mt-16 text-right w-full flex justify-end">
+                            <div className="w-[300px] text-center">
+                                <p className="font-bold underline mb-16">─░mza</p>
+                                <p className="font-bold">{user?.name}</p>
+                            </div>
+                        </div>
+                        <div className="mt-20 border-t border-dashed border-black pt-4">
+                            <h3 className="font-bold">─░K Onay─▒ / Bildirimi</h3>
+                            <p className="mt-2">Sistem Durumu: {printableLeave.status}</p>
+                            <p>Onaylayan: {printableLeave.approvedBy || '______________'}</p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// ÔöÇÔöÇÔöÇ REPORTS VIEW ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+const ReportsView = ({ user }: any) => {
+    const [report, setReport] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [dateRange, setDateRange] = useState({
+        startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
+    });
+
+    const fetchReport = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/staff/reports?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`);
+            const data = await res.json();
+            if (res.ok) setReport(data);
+            else setReport({ error: data.error || 'Bilinmeyen bir hata olu┼ştu.' });
+        } catch (err: any) {
+            setReport({ error: err.message || 'Ba─şlant─▒ hatas─▒' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchReport(); }, [dateRange]);
+
+    return (
+        <div className="flex flex-col animate-in fade-in duration-500  ">
+            <ProfileHeader user={user} title="Performans ve Aksiyon" dataCount="AKT─░F" dataLabel="Analiz" />
+            
+            <div className="flex-1 flex flex-col ">
+                <EnterpriseCard className="h-full flex flex-col min-h-[400px]">
+                    <EnterpriseSectionHeader title="D├Ânemsel Operasyon Raporu & KPI" icon="­şôè" />
+                    
+                    <div className="p-4 border-none bg-surface-secondary/50 shrink-0 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                        <div className="flex gap-3 w-full sm:w-auto">
+                            <EnterpriseInput label="Operasyon Ba┼şlang─▒c─▒" type="date" value={dateRange.startDate} onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })} />
+                            <EnterpriseInput label="Operasyon Biti┼şi" type="date" value={dateRange.endDate} onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })} />
+                        </div>
+                    </div>
+
+                    <div className="p-5 flex-1   bg-surface dark:bg-[#0f172a]">
+                        {loading ? (
+                            <div className="py-12 text-center text-[10px] font-black uppercase tracking-widest text-text-muted">Aksiyon verileri i┼şleniyor...</div>
+                        ) : report?.error ? (
+                            <div className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-state-alert-text bg-state-alert-bg/30 rounded-sm border-none">
+                                {report.error === 'Staff not found' ? 'Personel hesab─▒ ile e┼şle┼ştirilemedi.' : report.error}
+                            </div>
+                        ) : report?.summary ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
+                                    <div className="flex justify-between items-center mb-3 text-blue-500 dark:text-blue-400">
+                                        <TrendingUp className="w-5 h-5"/>
+                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Ciro / Toplam Sat─▒┼ş</div>
+                                    </div>
+                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">Ôé║{report.summary.totalSales.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.salesCount} Ba┼şar─▒l─▒ ─░┼şlem</div>
+                                </div>
+                                
+                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none ring-0 ring-0-100 flex items-center gap-4">
+                                    <div className="flex justify-between items-center mb-3 text-emerald-500 dark:text-emerald-400">
+                                        <CheckCircle2 className="w-5 h-5"/>
+                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Nakit / Tahsilat</div>
+                                    </div>
+                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">Ôé║{report.summary.totalCollections.toLocaleString('tr-TR')}</div>
+                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{report.summary.collectionsCount} Tamamlanan Tahsilat</div>
+                                </div>
+                                
+                                <div className="bg-white dark:bg-[#1e293b]/50 px-5 py-3 rounded-[100px] shadow-none border-none ring-0 flex items-center gap-4">
+                                    <div className="flex justify-between items-center mb-3 text-text-secondary">
+                                        <MapPin className="w-5 h-5"/>
+                                        <div className="text-[9px] font-black uppercase tracking-widest text-text-muted">Aksiyon / Saha Ziyareti</div>
+                                    </div>
+                                    <div className="text-[18px] font-black text-text-primary dark:text-white mb-1">{report.summary.totalVisits} M├╝┼şteri Ziyareti</div>
+                                    <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Saha Temas Raporu</div>
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                </EnterpriseCard>
+            </div>
+        </div>
+    );
+};
+
+// ÔöÇÔöÇÔöÇ MAIN PAGE ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+export default function PersonelPanel() {
+    const { currentUser } = useApp();
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'targets' | 'tasks' | 'reports' | 'leave' | 'payroll' | 'shifts' | 'profile'>('dashboard');
+    const [loading, setLoading] = useState(true);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+    const [pdksStatus, setPdksStatus] = useState<any>(null);
+    const [scanMode, setScanMode] = useState<'IN' | 'OUT'>('IN');
+    const [targets, setTargets] = useState<any[]>([]);
+    const [statsData, setStatsData] = useState<any>(null);
+    const [shifts, setShifts] = useState<any[]>([]);
+    const [payrolls, setPayrolls] = useState<any[]>([]);
+    const [tasks, setTasks] = useState<any[]>([]);
+    const [leaves, setLeaves] = useState<any[]>([]);
+    const [turnover, setTurnover] = useState(0);
+
+    const fetchCoreData = async () => {
+        try {
+            const userId = currentUser?.id;
+            if (!userId) return;
+            const today = new Date();
+            const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay() + 1); startOfWeek.setHours(0,0,0,0);
+            const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6); endOfWeek.setHours(23,59,59,999);
+
+            const [hrRes, targetsRes, shiftsRes, payrollRes, tasksRes, leavesRes, tnrRes] = await Promise.all([
+                fetch('/api/hr/performance/dashboard').then(r => r.json()),
+                fetch(`/api/staff/targets?mine=true`).then(r => r.json()),
+                fetch(`/api/staff/shifts?mine=true&start=${startOfWeek.toISOString()}&end=${endOfWeek.toISOString()}`).then(r => r.json()),
+                fetch(`/api/staff/payroll?mine=true`).then(r => r.json()),
+                fetch(`/api/staff/tasks?mine=true`).then(r => r.json()),
+                fetch(`/api/staff/leaves?mine=true`).then(r => r.json()),
+                fetch(`/api/staff/me/turnover`).then(r => r.json())
+            ]);
+
+            if (hrRes.success) setStatsData(hrRes.data);
+            if (Array.isArray(targetsRes)) setTargets(targetsRes);
+            else if (targetsRes?.targets && Array.isArray(targetsRes.targets)) setTargets(targetsRes.targets);
+            if (Array.isArray(shiftsRes)) setShifts(shiftsRes);
+            if (payrollRes?.payrolls) setPayrolls(payrollRes.payrolls);
+            if (Array.isArray(tasksRes)) setTasks(tasksRes);
+            if (Array.isArray(leavesRes)) setLeaves(leavesRes);
+            if (tnrRes.success) setTurnover(tnrRes.turnover);
+        } catch (e) { console.error(e); }
+    };
+
+    const fetchPdksStatus = async () => {
+        try {
+            const res = await fetch("/api/staff/me/pdks-status");
+            const data = await res.json();
+            if (data.success) setPdksStatus(data);
+        } catch (e) { console.error("pdks err", e); }
+    };
+
+    const getFingerprint = () => btoa(navigator.userAgent + screen.width + screen.height).slice(0, 32);
+
+    const handleQrCheckin = () => { setScanMode('IN'); setIsScannerOpen(true); };
+    const onQrScan = async (token: string) => {
+        toast.loading("Giri┼ş yap─▒l─▒yor...", { id: "pdks" });
+        try {
+            const res = await fetch(scanMode === 'IN' ? "/api/v1/pdks/check-in" : "/api/v1/pdks/check-out", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mode: "OFFICE_QR", qrToken: token, deviceFp: getFingerprint(), clientTime: new Date().toISOString(), offlineId: uuidv4() })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success(scanMode === 'IN' ? "Ofis Giri┼şi Ba┼şar─▒l─▒!" : "Ofis ├ç─▒k─▒┼ş─▒ Yap─▒ld─▒!", { id: "pdks" });
+                setIsScannerOpen(false); fetchPdksStatus();
+            } else toast.error(data.error || "Hata", { id: "pdks" });
+        } catch (err) { toast.error("Ba─şlant─▒ hatas─▒", { id: "pdks" }); }
+    };
+
+    const handleGpsCheckin = () => {
+        if (!navigator.geolocation) return toast.error("Desteklenmiyor");
+        toast.loading("Saha konumu al─▒n─▒yor...", { id: "gps" });
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const res = await fetch("/api/v1/pdks/check-in", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mode: "FIELD_GPS", deviceFp: getFingerprint(), clientTime: new Date().toISOString(), location: { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy }, offlineId: uuidv4() })
+                });
+                const data = await res.json();
+                if (data.success) { toast.success("Saha Giri┼şi Al─▒nd─▒!", { id: "gps" }); fetchPdksStatus(); }
+                else toast.error(data.error || "Hata", { id: "gps" });
+            } catch (err) { toast.error("Ba─şlant─▒ hatas─▒", { id: "gps" }); }
+        }, () => toast.error("Konum izni verin", { id: "gps" }), { enableHighAccuracy: true });
+    };
+
+    const handleCheckout = () => {
+        toast.custom((t: any) => (
+            <div className="bg-white p-4 rounded-xl shadow-xl max-w-[300px] border border-slate-200">
+                <p className="font-bold text-slate-900 mb-3 text-sm">├ç─▒k─▒┼ş Y├Ânteminizi Se├ğin</p>
+                <div className="grid grid-cols-2 gap-2">
+                    <button onClick={() => { toast.dismiss(t); setScanMode('OUT'); setIsScannerOpen(true); }} className="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg">Ofis TR (QR)</button>
+                    <button onClick={() => { 
+                        toast.dismiss(t); 
+                        if (!navigator.geolocation) return toast.error("Taray─▒c─▒ engeli");
+                        toast.loading("Saha ├ğ─▒k─▒┼ş konumu...", { id: "g_out" });
+                        navigator.geolocation.getCurrentPosition(async (pos) => {
+                            const res = await fetch("/api/v1/pdks/check-out", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "FIELD_GPS", deviceFp: getFingerprint(), clientTime: new Date().toISOString(), location: { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy }, offlineId: uuidv4() })});
+                            const data = await res.json();
+                            if(data.success) { toast.success("├ç─▒k─▒┼ş Onayland─▒!", { id: "g_out" }); fetchPdksStatus(); } else toast.error("Reddedildi", {id:"g_out"});
+                        }, () => {}, { enableHighAccuracy: true });
+                    }} className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-lg">Saha (GPS)</button>
+                </div>
+            </div>
+        ), { duration: 8000 });
+    };
+
+    useEffect(() => {
+        fetchPdksStatus();
+        if (currentUser?.id) fetchCoreData();
+        const t = setTimeout(() => setLoading(false), 900);
+        return () => clearTimeout(t);
+    }, [currentUser?.id]);
+
+    if (loading) return (
+        <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-pulse">
+            <div className="h-20 bg-slate-100 dark:bg-slate-800/30 rounded-2xl w-full" />
+            <div className="h-64 bg-slate-100 dark:bg-slate-800/30 rounded-2xl w-full" />
+        </div>
+    );
+
+    return (
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-white pb-24 no-print relative">
+    <div className="max-w-[1700px] mx-auto p-6 md:p-8 space-y-8 duration-700">
+                <div className="flex flex-wrap items-center justify-center gap-2 mb-8 bg-transparent">
+    {[
+        { id: 'dashboard', label: '├ûzet / PDKS' }, { id: 'tasks', label: 'G├Ârevler' }, { id: 'targets', label: 'Hedefler' }, { id: 'reports', label: 'Raporlar' },
+        { id: 'shifts', label: 'Vardiya' }, { id: 'leave', label: '─░zinler' }, { id: 'payroll', label: 'Bordro' }, { id: 'profile', label: 'Profil' }
+    ].map(tab => (
+        <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
+            className={activeTab === tab.id
+                                ? "px-5 py-2.5 text-[12px] font-bold text-slate-800 dark:text-white bg-white dark:bg-slate-700 shadow-sm rounded-full transition-all border-none ring-0"
+                                : "px-5 py-2.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all rounded-full border-none ring-0 shadow-none"
+                            }
+        >
+            {tab.label}
+        </button>
+    ))}
+</div>
+{activeTab === 'dashboard' && <DashboardView handleQrCheckin={handleQrCheckin} handleGpsCheckin={handleGpsCheckin} isScannerOpen={isScannerOpen} setIsScannerOpen={setIsScannerOpen} onQrScan={onQrScan} pdksStatus={pdksStatus} handleCheckout={handleCheckout} targets={targets} statsData={statsData} turnover={turnover} shifts={shifts} payrolls={payrolls} tasks={tasks} user={currentUser} />}
+                {activeTab === 'targets' && <TargetsView targets={targets} statsData={statsData} user={currentUser} />}
+                {activeTab === 'tasks' && <TasksView user={currentUser} tasks={tasks} fetchTasks={fetchCoreData} loading={loading} />}
+                {activeTab === 'reports' && <ReportsView user={currentUser} />}
+                {activeTab === 'leave' && <LeavesView user={currentUser} leaves={leaves} fetchLeaves={fetchCoreData} loading={loading} />}
+                {activeTab === 'payroll' && <PayrollView payrolls={payrolls} user={currentUser} />}
+                {activeTab === 'shifts' && <ShiftsView shifts={shifts} user={currentUser} />}
+                {activeTab === 'profile' && <ProfileSettingsView user={currentUser} />}
+            </div>
+            {/* Branding Footer */}
+            <div style={{ background: 'var(--bg-panel)', borderTop: '1px solid var(--border-color)' }} className="fixed bottom-0 left-0 right-0 p-4 z-50 flex justify-center no-print">
+                <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <span>┬® 2026 PERIODYA OS ÔÇó ─░NSAN KAYNAKLARI</span>
+                    <span className="text-blue-500 font-black">­şöÆ Verileriniz U├ğtan Uca ┼Şifrelenmi┼ştir</span>
+                </div>
+            </div>
+        </div>
+    );
+}

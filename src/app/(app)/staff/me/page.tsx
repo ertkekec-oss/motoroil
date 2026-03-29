@@ -360,7 +360,6 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
 
 // ─── LEAVES VIEW ──────────────────────────────────────────────────────
 const LeavesView = ({ user }: any) => {
-    const { fetchPersonelData } = useApp();
     const [leaves, setLeaves] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('Yıllık İzin');
@@ -593,6 +592,173 @@ const ReportsView = ({ user }: any) => {
                     </div>
                 </EnterpriseCard>
             </div>
+        </div>
+    );
+};
+
+// ─── PAYROLL VIEW ──────────────────────────────────────────────────────
+const PayrollView = ({ payrolls, user }: any) => {
+    const [printablePayroll, setPrintablePayroll] = useState<any>(null);
+
+    const handlePrint = (pr: any) => {
+        setPrintablePayroll(pr);
+        setTimeout(() => window.print(), 200);
+    };
+
+    return (
+        <div className="space-y-6 animate-in fade-in duration-500">
+            <style>{printStyles}</style>
+
+            <div id="printable-area" className="hidden">
+                {printablePayroll && (
+                    <div className="p-10 font-sans text-black border-2 border-slate-800 m-8 rounded-xl shadow-none">
+                        <div className="border-b-4 border-black pb-6 mb-8 flex justify-between items-end">
+                            <div>
+                                <h1 className="text-3xl font-black uppercase tracking-tighter">Bordro Pusulası</h1>
+                                <p className="text-sm font-bold mt-2 uppercase text-slate-600">Dönem: {printablePayroll.period}</p>
+                            </div>
+                            <div className="text-right">
+                                <h3 className="font-bold text-lg">{user?.name}</h3>
+                                <p className="text-sm">Personel ID: {user?.id.slice(0, 8)}</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-12 mb-12 border-b-2 border-black pb-8">
+                            <div className="space-y-4">
+                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Brüt Kesinleşmiş Maaş:</span> <span>₺{Number(printablePayroll.basePay).toLocaleString()}</span></div>
+                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Performans / Prim Eklentisi:</span> <span className="text-green-700">+ ₺{Number(printablePayroll.bonus).toLocaleString()}</span></div>
+                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Özel Kesintiler:</span> <span className="text-red-700">- ₺{Number(printablePayroll.deductions).toLocaleString()}</span></div>
+                            </div>
+                            <div className="bg-slate-100 p-6 rounded-xl border border-slate-300 flex flex-col justify-center">
+                                <span className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">Net Ödenecek Hakediş</span>
+                                <span className="text-4xl font-black">₺{Number(printablePayroll.netPay).toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div className="text-sm font-medium text-slate-600 text-center italic mt-20">
+                            Bu belge sistem tarafından otomatik oluşturulmuştur. <br/>
+                            Durum: <strong>{printablePayroll.status || 'HESAPLANDI'}</strong>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <EnterpriseCard className="no-print border-none ring-0 shadow-sm rounded-[32px]">
+                <EnterpriseSectionHeader title="Geçmiş Bordro ve Hakedişlerim" icon="💎" />
+                <div className="p-6 overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-[#f8fafc] dark:bg-[#0f111a] border-y border-slate-100 dark:border-slate-800">
+                            <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                <th className="px-4 py-3">Dönem</th>
+                                <th className="px-4 py-3">Net Hakediş (TRL)</th>
+                                <th className="px-4 py-3">Brüt + Prim / Kesinti</th>
+                                <th className="px-4 py-3">Durum & İşlem Z.</th>
+                                <th className="px-4 py-3 text-right">Eylem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {payrolls.length === 0 ? <tr><td colSpan={5} className="py-12 text-center text-[11px] font-bold text-slate-400 uppercase tracking-widest">Aktif bordro kaydı bulunmamaktadır.</td></tr> :
+                                payrolls.map((pr: any) => (
+                                    <tr key={pr.id} className="border-b transition hover:bg-slate-50 dark:hover:bg-slate-800/10 dark:border-slate-800">
+                                        <td className="px-4 py-4 text-[14px] font-black">{pr.period}</td>
+                                        <td className="px-4 py-4 text-[16px] font-black text-emerald-600">₺{Number(pr.netPay).toLocaleString()}</td>
+                                        <td className="px-4 py-4 text-[11px] font-semibold text-slate-500 space-y-1">
+                                            <div>Brüt: ₺{Number(pr.basePay).toLocaleString()}</div>
+                                            <div className="text-blue-500 font-bold uppercase tracking-widest">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                             <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded ${pr.status === 'Ödendi' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{pr.status || 'Bekliyor'}</span>
+                                        </td>
+                                        <td className="px-4 py-4 text-right">
+                                            <button onClick={() => handlePrint(pr)} className="px-4 py-2 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-widest inline-flex items-center gap-2">
+                                                <Printer className="w-3.5 h-3.5"/> Pusula Yazdır
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </EnterpriseCard>
+        </div>
+    );
+};
+
+// ─── SHIFTS VIEW ───────────────────────────────────────────────────────
+const ShiftsView = ({ shifts }: any) => {
+    return (
+        <div className="space-y-6 animate-in fade-in duration-500">
+            <EnterpriseCard className="border-none ring-0 shadow-sm rounded-[32px]">
+                <EnterpriseSectionHeader title="Haftalık Vardiya Planım" icon="📆" />
+                <div className="p-8">
+                    {shifts.length === 0 ? (
+                        <div className="py-12 text-center text-[11px] uppercase tracking-widest font-black text-slate-400 border border-dashed border-slate-200 dark:border-slate-700 rounded-[24px]">
+                            İlgili hafta için planlanmış vardiya yok.
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {shifts.map((s: any) => {
+                                const isPermit = s.type === 'İzinli';
+                                return (
+                                    <div key={s.id} className={`p-5 rounded-[24px] border flex flex-col justify-between h-[140px] relative overflow-hidden ${isPermit ? 'bg-[#ffedd5]/50 border-amber-200' : 'bg-slate-50 border-slate-100 dark:bg-slate-800/30 dark:border-slate-700/50'}`}>
+                                        <div className="flex justify-between items-start z-10 w-full">
+                                            <div>
+                                                <div className={`text-[10px] font-black uppercase tracking-widest ${isPermit ? 'text-amber-600' : 'text-slate-400'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { weekday: 'long' })}</div>
+                                                <div className={`text-[16px] font-black ${isPermit ? 'text-amber-900' : 'text-slate-800 dark:text-white'}`}>{new Date(s.start).toLocaleDateString('tr-TR', { day:'2-digit', month: '2-digit' })}</div>
+                                            </div>
+                                            {isPermit ? <span className="text-xl">🏖️</span> : <span className="text-xl">🏢</span>}
+                                        </div>
+                                        <div className="z-10 mt-auto bg-white/60 dark:bg-black/20 p-2.5 rounded-xl text-center backdrop-blur-md">
+                                            <span className={`text-[12px] font-black tracking-widest uppercase ${isPermit ? 'text-amber-700' : 'text-blue-600 dark:text-blue-400'}`}>
+                                                {isPermit ? "TAM GÜN İZİNLİ" : `${new Date(s.start).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} - ${new Date(s.end).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                </div>
+            </EnterpriseCard>
+        </div>
+    );
+};
+
+// ─── PROFILE VIEW ──────────────────────────────────────────────────────
+const ProfileSettingsView = ({ user }: any) => {
+    return (
+        <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
+            <EnterpriseCard className="border-none ring-0 shadow-sm rounded-[32px]">
+                <EnterpriseSectionHeader title="Profil & Güvenlik Ayarları" icon="⚙️" />
+                <div className="p-8">
+                    <div className="flex items-center gap-6 mb-8 border-b pb-8 border-slate-100 dark:border-slate-800">
+                        <div className="w-20 h-20 rounded-[24px] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white relative shadow-md">
+                            {user?.name?.[0]?.toUpperCase() || 'P'}
+                        </div>
+                        <div>
+                            <h4 className="text-[20px] font-black text-slate-800 dark:text-white mb-2">{user?.name}</h4>
+                            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest rounded-md">{user?.role || 'Personel'}</span>
+                            <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">ŞİRKET ID NO: #{user?.id?.slice(0,6).toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <EnterpriseInput label="Tam Ad Soyad" defaultValue={user?.name} disabled />
+                        <EnterpriseInput label="E-Posta Adresi" type="email" defaultValue={user?.email} disabled />
+                        <EnterpriseInput label="Telefon Numarası" type="tel" placeholder="Ulaşım bilgisi sisteme kapalı" disabled />
+                    </div>
+                    <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <h4 className="text-[11px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-6"><Lock className="w-4 h-4"/> Parola Güncelle</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <EnterpriseInput label="Mevcut Şifre" type="password" />
+                            <EnterpriseInput label="Yeni Şifre" type="password" />
+                        </div>
+                        <div className="mt-8 flex justify-end">
+                            <EnterpriseButton variant="primary" className="px-10 text-[11px] font-black tracking-widest uppercase">BİLGİLERİ GÜNCELLE</EnterpriseButton>
+                        </div>
+                    </div>
+                </div>
+            </EnterpriseCard>
         </div>
     );
 };
