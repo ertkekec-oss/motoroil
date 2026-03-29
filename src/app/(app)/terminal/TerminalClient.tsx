@@ -386,7 +386,7 @@ export default function TerminalClient() {
     }, []);
 
     return (
-        <div className="pos-terminal-scope flex flex-col flex-1 h-[calc(100vh-64px)] md:h-screen w-full bg-[#F3F5F7] dark:bg-[#020617] text-[#111827] dark:text-white transition-colors duration-300 overflow-hidden">
+        <div className="pos-terminal-scope flex flex-col flex-1 h-[calc(100vh-64px)] md:h-screen w-full bg-app dark:bg-[#020617] text-primary dark:text-white transition-colors duration-300 overflow-hidden">
             {/* SCOPE CSS (isolated) */}
             <style dangerouslySetInnerHTML={{
                 __html: `
@@ -395,13 +395,13 @@ export default function TerminalClient() {
       `}} />
 
             {/* TOP KPI STRIP (110px max) */}
-            <div className="h-[110px] shrink-0 border-b border-[#D0D5DD] dark:border-white/5 bg-[#FFFFFF] dark:bg-[#0B1220] flex items-center px-6 gap-6 shadow-[0_1px_2px_rgba(16,24,40,0.06)] z-10">
+            <div className="h-[110px] shrink-0 border-b border-default dark:border-white/5 bg-surface dark:bg-[#0B1220] flex items-center px-6 gap-6 shadow-enterprise z-10">
                 <div className="flex flex-col">
-                    <h1 className="text-xl font-black text-[#111827] dark:text-white tracking-tight flex items-center gap-2">
-                        <span className="text-[#2563EB] dark:text-indigo-400 shrink-0">Terminal Workspace</span>
+                    <h1 className="text-xl font-black text-primary dark:text-white tracking-tight flex items-center gap-2">
+                        <span className="text-primary dark:text-indigo-400 shrink-0">Terminal Workspace</span>
                     </h1>
-                    <p className="text-xs font-semibold text-[#4B5563] dark:text-slate-400 mt-1 flex items-center gap-2">
-                        Cari: <span className="text-[#111827] dark:text-slate-300">{selectedCustomer}</span>
+                    <p className="text-xs font-semibold text-secondary dark:text-slate-400 mt-1 flex items-center gap-2">
+                        Cari: <span className="text-primary dark:text-slate-300">{selectedCustomer}</span>
                     </p>
                 </div>
                 <div className="h-10 w-px bg-slate-200 dark:bg-white/10 mx-2 hidden md:block"></div>
@@ -414,29 +414,29 @@ export default function TerminalClient() {
                 </div>
 
                 <div className="ml-auto flex items-center gap-4">
-                    <div className="hidden md:flex items-center gap-2 border-r border-[#E5E9F0] dark:border-white/10 pr-4 mr-2">
+                    <div className="hidden md:flex items-center gap-2 border-r border-divider dark:border-white/10 pr-4 mr-2">
                         {/* Forex Toggle */}
                         <button 
                             onClick={() => updateAppSetting('useForexRate', !useForex)} 
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-colors ${useForex ? 'bg-[#E8F0FF] dark:bg-indigo-500/10 border-[#2563EB]/20 dark:border-indigo-500/20 text-[#2563EB] dark:text-indigo-400 ring-2 ring-[#2563EB]/30' : 'bg-[#F4F6F8] dark:bg-slate-800 border-[#D0D5DD] dark:border-white/5 text-[#4B5563] dark:text-slate-400 hover:bg-[#EEF2F7] dark:hover:bg-slate-700'}`}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-colors ${useForex ? 'bg-sidebar-item-active dark:bg-indigo-500/10 border-primary/20 dark:border-indigo-500/20 text-primary dark:text-indigo-400 ring-2 ring-primary/30' : 'bg-sidebar-bg dark:bg-slate-800 border-default dark:border-white/5 text-secondary dark:text-slate-400 hover:bg-sidebar-item-hover dark:hover:bg-slate-700'}`}
                             title="Aktif olduğunda ürünlerin döviz kurları anlık olarak TL'ye çevrilerek satışı yapılır."
                         >
                             <span className="flex h-2 w-2 relative">
-                                {useForex && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>}
-                                <span className={`relative inline-flex rounded-full h-2 w-2 ${useForex ? 'bg-[#2563EB]' : 'bg-[#D1D5DB]'}`}></span>
+                                {useForex && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/75 opacity-75"></span>}
+                                <span className={`relative inline-flex rounded-full h-2 w-2 ${useForex ? 'bg-primary' : 'bg-text-muted'}`}></span>
                             </span>
                             Canlı Kur {useForex ? 'Açık' : 'Kapalı'}
                         </button>
-                        <div className="h-6 w-px bg-[#E5E9F0] dark:bg-white/10 mx-1"></div>
+                        <div className="h-6 w-px bg-divider dark:bg-white/10 mx-1"></div>
                         
-                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-[#F4F6F8] dark:bg-slate-800 hover:bg-[#EEF2F7] dark:hover:bg-slate-700 text-[#4B5563] dark:text-slate-300 px-3 py-1.5 rounded-xl border border-[#D0D5DD] dark:border-white/5 text-[11px] font-bold transition-colors">
-                            <Tag size={12} /> Kupon {discountCode && <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span>}
+                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-sidebar-bg dark:bg-slate-800 hover:bg-sidebar-item-hover dark:hover:bg-slate-700 text-secondary dark:text-slate-300 px-3 py-1.5 rounded-xl border border-default dark:border-white/5 text-[11px] font-bold transition-colors">
+                            <Tag size={12} /> Kupon {discountCode && <span className="w-1.5 h-1.5 rounded-full bg-state-error-text"></span>}
                         </button>
-                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-[#F4F6F8] dark:bg-slate-800 hover:bg-[#EEF2F7] dark:hover:bg-slate-700 text-[#4B5563] dark:text-slate-300 px-3 py-1.5 rounded-xl border border-[#D0D5DD] dark:border-white/5 text-[11px] font-bold transition-colors">
-                            <Gift size={12} /> Puan {pointsToUse > 0 && <span className="w-1.5 h-1.5 rounded-full bg-[#027A48]"></span>}
+                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-sidebar-bg dark:bg-slate-800 hover:bg-sidebar-item-hover dark:hover:bg-slate-700 text-secondary dark:text-slate-300 px-3 py-1.5 rounded-xl border border-default dark:border-white/5 text-[11px] font-bold transition-colors">
+                            <Gift size={12} /> Puan {pointsToUse > 0 && <span className="w-1.5 h-1.5 rounded-full bg-state-success-text"></span>}
                         </button>
-                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-[#F4F6F8] dark:bg-slate-800 hover:bg-[#EEF2F7] dark:hover:bg-slate-700 text-[#4B5563] dark:text-slate-300 px-3 py-1.5 rounded-xl border border-[#D0D5DD] dark:border-white/5 text-[11px] font-bold transition-colors">
-                            <FileText size={12} /> Ref {referenceNote && <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>}
+                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-sidebar-bg dark:bg-slate-800 hover:bg-sidebar-item-hover dark:hover:bg-slate-700 text-secondary dark:text-slate-300 px-3 py-1.5 rounded-xl border border-default dark:border-white/5 text-[11px] font-bold transition-colors">
+                            <FileText size={12} /> Ref {referenceNote && <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>}
                         </button>
                     </div>
 
@@ -628,7 +628,7 @@ export default function TerminalClient() {
                             </div>
                         </div>
 
-                        <button onClick={() => setShowExtrasModal(false)} className="mt-6 w-full h-12 rounded-xl font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-[0_1px_2px_rgba(16,24,40,0.06)] transition-all focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB]">EKLE VE KAPAT</button>
+                        <button onClick={() => setShowExtrasModal(false)} className="mt-6 w-full h-12 rounded-xl font-bold bg-primary text-white hover:bg-primary-hover shadow-enterprise transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary">EKLE VE KAPAT</button>
                     </div>
                 </div>
             )}

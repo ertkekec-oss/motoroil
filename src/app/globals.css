@@ -1,5 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import "../styles/theme.css";
 @import "tailwindcss";
+
+/**
+ * PERIODYA DESIGN TOKEN SYSTEM
+ * ----------------------------
+ * Avoid using hardcoded hex or tailwind-specific shades (slate-50, gray-200).
+ * Instead use semantic tokens: bg-app, bg-surface, text-primary, border-default.
+ */
 
 @custom-variant dark (&:where(.dark, .dark *));
 
