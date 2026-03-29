@@ -2,7 +2,7 @@ import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from 'next/link';
-import { ChevronLeft, Inbox, Clock, CheckCircle2, AlertTriangle, ArrowRightRight } from "lucide-react";
+import { ChevronLeft, Inbox, Clock, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
     <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
@@ -109,7 +109,7 @@ export default async function ReconciliationInboxPage() {
                                             </td>
                                             <td className="px-6 py-3 pr-8 align-middle text-right">
                                                 <Link href={`/reconciliation/${recon.id}`} className="px-5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2 w-max ml-auto">
-                                                    YANITLA <ArrowRightRight className="w-3 h-3" />
+                                                    YANITLA <ArrowRight className="w-3 h-3" />
                                                 </Link>
                                             </td>
                                         </tr>
