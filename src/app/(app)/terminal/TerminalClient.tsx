@@ -386,7 +386,7 @@ export default function TerminalClient() {
     }, []);
 
     return (
-        <div className="pos-terminal-scope flex flex-col flex-1 h-[calc(100vh-64px)] md:h-screen w-full bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white transition-colors duration-300 overflow-hidden">
+        <div className="pos-terminal-scope flex flex-col flex-1 h-[calc(100vh-64px)] md:h-screen w-full bg-[#F7F8FA] dark:bg-[#020617] text-[#111827] dark:text-white transition-colors duration-300 overflow-hidden">
             {/* SCOPE CSS (isolated) */}
             <style dangerouslySetInnerHTML={{
                 __html: `
@@ -395,21 +395,21 @@ export default function TerminalClient() {
       `}} />
 
             {/* TOP KPI STRIP (110px max) */}
-            <div className="h-[110px] shrink-0 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0B1220] flex items-center px-6 gap-6 shadow-sm z-10">
+            <div className="h-[110px] shrink-0 border-b border-[#E1E5EA] dark:border-white/5 bg-[#FFFFFF] dark:bg-[#0B1220] flex items-center px-6 gap-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] z-10">
                 <div className="flex flex-col">
                     <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <span className="text-indigo-600 dark:text-indigo-400 shrink-0">Terminal Workspace</span>
+                        <span className="text-[#2563EB] dark:text-indigo-400 shrink-0">Terminal Workspace</span>
                     </h1>
-                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
-                        Cari: <span className="text-slate-700 dark:text-slate-300">{selectedCustomer}</span>
+                    <p className="text-xs font-semibold text-[#4B5563] dark:text-slate-400 mt-1 flex items-center gap-2">
+                        Cari: <span className="text-[#111827] dark:text-slate-300">{selectedCustomer}</span>
                     </p>
                 </div>
                 <div className="h-10 w-px bg-slate-200 dark:bg-white/10 mx-2 hidden md:block"></div>
 
                 <div className="flex gap-4">
-                    <div className="px-4 border-l border-slate-100 dark:border-white/5">
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Açık Hesap</span>
-                        <span className="text-sm font-bold">{Number(customer?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL</span>
+                    <div className="px-4 border-l border-[#EEF1F4] dark:border-white/5">
+                        <span className="text-[10px] uppercase font-bold text-[#9CA3AF] block mb-1">Açık Hesap</span>
+                        <span className="text-sm font-bold text-[#111827] dark:text-white">{Number(customer?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL</span>
                     </div>
                 </div>
 
@@ -418,7 +418,7 @@ export default function TerminalClient() {
                         {/* Forex Toggle */}
                         <button 
                             onClick={() => updateAppSetting('useForexRate', !useForex)} 
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-colors ${useForex ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 ring-2 ring-indigo-500/30' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-colors ${useForex ? 'bg-[#E8F0FF] dark:bg-indigo-500/10 border-[#2563EB]/20 dark:border-indigo-500/20 text-[#2563EB] dark:text-indigo-400 ring-2 ring-[#2563EB]/30' : 'bg-[#F4F6F8] dark:bg-slate-800 border-[#E1E5EA] dark:border-white/5 text-[#4B5563] dark:text-slate-400 hover:bg-[#ECEFF3] dark:hover:bg-slate-700'}`}
                             title="Aktif olduğunda ürünlerin döviz kurları anlık olarak TL'ye çevrilerek satışı yapılır."
                         >
                             <span className="flex h-2 w-2 relative">
@@ -506,9 +506,9 @@ export default function TerminalClient() {
             {/* MODALS */}
             {isCustomerModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-                    <div className="w-full max-w-lg bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95">
+                    <div className="w-full max-w-lg bg-[#FFFFFF] dark:bg-[#0f172a] rounded-2xl p-6 border border-[#D9DEE5] dark:border-white/10 shadow-2xl animate-in zoom-in-95">
                         <h3 className="text-lg font-bold mb-4">Müşteri Seçimi (F8)</h3>
-                        <input autoFocus placeholder="Arama..." value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-3 mb-4 focus:ring-2 focus:ring-indigo-500" />
+                        <input autoFocus placeholder="Arama..." value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} className="w-full bg-[#F4F6F8] dark:bg-slate-900 border border-[#D6DAE1] dark:border-white/10 rounded-xl p-3 mb-4 focus:ring-2 focus:ring-[#2563EB] text-[#111827] dark:text-white" />
                         <div className="max-h-[300px] overflow-y-auto space-y-2">
                             <button onClick={() => { setSelectedCustomer('Perakende Müşteri'); setIsCustomerModalOpen(false); }} className="w-full text-left p-3 bg-slate-50 dark:bg-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <span className="font-bold text-indigo-600 dark:text-indigo-400">Perakende Müşteri</span>
@@ -541,7 +541,7 @@ export default function TerminalClient() {
 
             {showResumptionModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-                    <div className="w-full max-w-lg bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95">
+                    <div className="w-full max-w-lg bg-[#FFFFFF] dark:bg-[#0f172a] rounded-2xl p-6 border border-[#D9DEE5] dark:border-white/10 shadow-2xl animate-in zoom-in-95">
                         <h3 className="text-lg font-bold mb-4">Bekleyen Satışlar (F9)</h3>
                         {(!suspendedSales || suspendedSales.length === 0) ? (
                             <div className="text-center opacity-50 py-8">Bekleyen satış yok.</div>

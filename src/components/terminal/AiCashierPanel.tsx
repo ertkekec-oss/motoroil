@@ -16,13 +16,13 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
         : null;
 
     return (
-        <div className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl p-4 shadow-sm mb-4 transition-all overflow-hidden duration-300">
+        <div className="bg-[#FFFFFF] dark:bg-[#0f172a] border border-[#D9DEE5] dark:border-white/10 rounded-2xl p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)] mb-4 transition-all overflow-hidden duration-300">
             <div className="flex items-center justify-between cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)}>
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                         <Sparkles size={18} />
                     </div>
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">Akıllı Kasiyer (AI)</h3>
+                    <h3 className="text-sm font-bold text-[#111827] dark:text-white">Akıllı Kasiyer (AI)</h3>
                 </div>
                 <button className="text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors">
                     {isCollapsed ? 'GÖSTER' : 'GİZLE'}
@@ -36,8 +36,8 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
                             <div className="flex items-center gap-3">
                                 <span className="text-xl">{suggested.icon}</span>
                                 <div>
-                                    <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-0.5">{suggested.category}</p>
-                                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{suggested.name}</p>
+                                    <p className="text-xs font-bold text-[#2563EB] dark:text-indigo-400 mb-0.5">{suggested.category}</p>
+                                    <p className="text-sm font-semibold text-[#111827] dark:text-white">{suggested.name}</p>
                                 </div>
                             </div>
                             <button
@@ -50,17 +50,17 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
                     )}
 
                     <div className="grid grid-cols-2 gap-2">
-                        <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl">
-                            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 mb-1">
+                        <div className="p-3 bg-[#ECFDF3] dark:bg-emerald-500/10 border border-[#ECFDF3] dark:border-emerald-500/20 rounded-xl">
+                            <div className="flex items-center gap-1.5 text-[#027A48] dark:text-emerald-400 mb-1">
                                 <TrendingUp size={14} /> <span className="text-[10px] font-bold uppercase tracking-widest">Çok Satan</span>
                             </div>
-                            <p className="text-xs font-semibold text-slate-800 dark:text-white truncate">Ayçiçek Yağı 5L</p>
+                            <p className="text-xs font-semibold text-[#111827] dark:text-white truncate">Ayçiçek Yağı 5L</p>
                         </div>
-                        <div className="p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-xl">
-                            <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 mb-1">
+                        <div className="p-3 bg-[#FEF3F2] dark:bg-rose-500/10 border border-[#FEF3F2] dark:border-rose-500/20 rounded-xl">
+                            <div className="flex items-center gap-1.5 text-[#DC2626] dark:text-rose-400 mb-1">
                                 <AlertTriangle size={14} /> <span className="text-[10px] font-bold uppercase tracking-widest">Kritik Stok</span>
                             </div>
-                            <p className="text-xs font-semibold text-slate-800 dark:text-white truncate">Un 10Kg</p>
+                            <p className="text-xs font-semibold text-[#111827] dark:text-white truncate">Un 10Kg</p>
                         </div>
                     </div>
                 </div>
