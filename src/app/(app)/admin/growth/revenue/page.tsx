@@ -76,7 +76,7 @@ export default function AdminGrowthRevenue() {
                     </div>
 
                     {/* Grafik Alanı */}
-                    <EnterpriseCard className="overflow-hidden relative" padding="lg">
+                    <EnterpriseCard className="overflow-hidden relative p-8">
                         {/* Background ambient glow */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-indigo-500/5 dark:bg-emerald-500/5 rounded-[100%] blur-[100px] pointer-events-none"></div>
 

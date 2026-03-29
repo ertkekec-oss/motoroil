@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { Activity, Camera, Shield, FileText, Lock, AlertTriangle, AlertCircle, RefreshCw, Layers, ShieldCheck } from "lucide-react";
@@ -91,7 +91,6 @@ export default function AdminGrowthBillingHealth() {
             description="Boost Hub aboneliklerinin pÃ¼rÃ¼zsÃ¼z finansal akÄ±ÅŸÄ± (Alacaklar / Tahsilat / Gecikme / Koleksiyon Riski)."
             actions={actions}
             className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
-            titleIcon={<Activity className="w-6 h-6 text-emerald-600 dark:text-emerald-500" />}
         >
             {loading && !data ? (
                 <div className="p-16 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/5 rounded-2xl bg-white dark:bg-[#1e293b] shadow-sm">
@@ -182,7 +181,7 @@ export default function AdminGrowthBillingHealth() {
                         ))}
                     </div>
 
-                    <EnterpriseCard padding="none">
+                    <EnterpriseCard noPadding>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left font-sans table-auto border-collapse whitespace-nowrap">
                                 <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-white/5 text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-black">

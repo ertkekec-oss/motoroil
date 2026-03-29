@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { Layers, RefreshCw, ShieldAlert, CheckCircle, Lock, Key, AlertTriangle, Activity, CreditCard } from "lucide-react";
@@ -82,7 +82,6 @@ export default function AdminGrowthSubscriptions() {
             description="Hub network Ã¼zerindeki finansal dondurma (billingBlocked) durumlarÄ± ve kota limit tahsislerinin yÃ¶netimi."
             actions={actions}
             className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
-            titleIcon={<Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />}
         >
             <EnterpriseCard>
                 <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b] flex items-center justify-between">

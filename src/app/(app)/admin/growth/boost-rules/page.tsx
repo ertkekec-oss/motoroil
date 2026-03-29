@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { EnterprisePageShell, EnterpriseCard } from "@/components/ui/enterprise";
@@ -110,7 +110,6 @@ export default function AdminBoostRules() {
             description="Kategori, listeleme veya satÄ±cÄ± bazlÄ± suni B2B gÃ¶rÃ¼nÃ¼rlÃ¼k Ã§arpanÄ± ve sponsorluk yÃ¶netimi."
             actions={actions}
             className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
-            titleIcon={<span className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">âš¡</span>}
         >
             {/* Dashboard Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -132,7 +131,7 @@ export default function AdminBoostRules() {
             </div>
 
             {/* Ana Veri Tablosu */}
-            <EnterpriseCard padding="none">
+            <EnterpriseCard noPadding>
                 <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Aktif KonfigÃ¼rasyonlar ve Algoritma Kriterleri</h2>
