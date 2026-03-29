@@ -122,7 +122,7 @@ const DashboardView = ({
                         <IconActivity className="w-5 h-5"/>
                     </div>
                     <div className="flex flex-col justify-center">
-                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Günlük Cirom</span>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Günlük Cirom</span>
                         <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">₺{(turnover || 0).toLocaleString()}</span>
                     </div>
                 </div>
@@ -132,7 +132,7 @@ const DashboardView = ({
                         <IconTrendingUp className="w-5 h-5"/>
                     </div>
                     <div className="flex flex-col justify-center">
-                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Hedef (Ay)</span>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Hedef (Ay)</span>
                         <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayAchievement}</span>
                     </div>
                 </div>
@@ -142,7 +142,7 @@ const DashboardView = ({
                         <IconClock className="w-5 h-5"/>
                     </div>
                     <div className="flex flex-col justify-center">
-                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Bekleyen Görev</span>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Bekleyen Görev</span>
                         <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{activeTasksCount}</span>
                     </div>
                 </div>
@@ -152,7 +152,7 @@ const DashboardView = ({
                         <DollarSign className="w-5 h-5"/>
                     </div>
                     <div className="flex flex-col justify-center">
-                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Kazanılan Prim</span>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Kazanılan Prim</span>
                         <span className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1">{displayBonus}</span>
                     </div>
                 </div>
@@ -162,7 +162,7 @@ const DashboardView = ({
                 {/* 1. PDKS BOX */}
                 <div className="flex flex-col gap-4">
                      <div className="flex items-center justify-between px-2">
-                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-slate-500"><IconZap className="w-4 h-4" /> PDKS DOĞRULAMASI</h3>
+                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300"><IconZap className="w-4 h-4" /> PDKS DOĞRULAMASI</h3>
                         {!pdksStatus?.isWorking ? <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">KAPALI</span> : <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse border border-white"></span>}
                      </div>
                      <div className="bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm p-8 flex flex-col justify-center min-h-[160px]">
@@ -180,14 +180,14 @@ const DashboardView = ({
                         ) : (
                                 <div className="flex justify-between items-center w-full px-2">
                                     <div className="flex flex-col gap-1">
-                                        <p className="text-emerald-600 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 bg-emerald-50 px-2 py-0.5 rounded-md w-max border border-emerald-200">
+                                        <p className="text-emerald-600 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md w-max border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                                             <div className="w-1 h-1 rounded-full bg-emerald-500"></div> DOĞRULANDI
                                         </p>
                                         <div className="text-2xl font-black text-slate-800">
                                             {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '--:--'}
                                         </div>
                                     </div>
-                                    <button onClick={handleCheckout} className="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-sm outline-none transition-colors">
+                                    <button onClick={handleCheckout} className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-white rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-sm outline-none transition-colors">
                                         🏁 Çıkış Yap
                                     </button>
                                 </div>
@@ -198,7 +198,7 @@ const DashboardView = ({
                 {/* 2. VARDİYA BOX */}
                 <div className="flex flex-col gap-4">
                      <div className="flex items-center justify-between px-2">
-                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-slate-500"><IconClock className="w-4 h-4" /> SIRADAKİ VARDİYA</h3>
+                        <h3 className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300"><IconClock className="w-4 h-4" /> SIRADAKİ VARDİYA</h3>
                      </div>
                      <div className="bg-white dark:bg-[#0f172a] rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm p-8 flex flex-col justify-center min-h-[160px]">
                         {(!shifts || shifts.length === 0) ? (
@@ -207,11 +207,11 @@ const DashboardView = ({
                             </div>
                         ) : (
                             <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center">
+                                <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-xl flex items-center justify-center">
                                     <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white">{new Date(shifts[0]?.start).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })}</span>
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <div className="text-[13px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{shifts[0]?.type} Vardiyası</div>
+                                    <div className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{shifts[0]?.type} Vardiyası</div>
                                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-widest uppercase">
                                         {shifts[0]?.type === 'İzinli' ? 'Tam Gün İzinli' : `${new Date(shifts[0]?.start).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})} - ${new Date(shifts[0]?.end).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}`}
                                     </div>
@@ -252,7 +252,7 @@ const TargetsView = ({ targets, statsData, user }: any) => {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[700px]">
-                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
+                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-widest sticky top-0 z-10">
                                 <tr>
                                     <th className="px-4 py-3 pl-6 font-bold border-b border-slate-200 dark:border-white/5">HEDEF TÜRÜ</th>
                                     <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">DURUM</th>
@@ -278,7 +278,7 @@ const TargetsView = ({ targets, statsData, user }: any) => {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 align-middle">
-                                                <div className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${isCompleted ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-blue-50 text-blue-600 border border-blue-200'}`}>
+                                                <div className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${isCompleted ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400' : 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400'}`}>
                                                     <div className={`w-1 h-1 rounded-full mr-1.5 ${isCompleted ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>
                                                     {isCompleted ? 'BAŞARILI' : 'DEVAM EDİYOR'}
                                                 </div>
@@ -330,8 +330,8 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 <SoftContainer title="Bana Atanan Görevler" icon={<Briefcase className="w-4 h-4"/>} className="min-h-[400px]">
                     <div className="px-6 py-3 border-b border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] flex gap-2 shrink-0">
-                        <button onClick={() => setSubTab('pending')} className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-colors ${subTab==='pending' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-100 dark:bg-slate-800/40 text-slate-600 hover:bg-slate-200'}`}>Devam Edenler</button>
-                        <button onClick={() => setSubTab('completed')} className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-colors ${subTab==='completed' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-100 dark:bg-slate-800/40 text-slate-600 hover:bg-slate-200'}`}>Tamamlandı</button>
+                        <button onClick={() => setSubTab('pending')} className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-colors ${subTab==='pending' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-100 dark:bg-slate-800/40 text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-800 dark:text-slate-400'}`}>Devam Edenler</button>
+                        <button onClick={() => setSubTab('completed')} className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-colors ${subTab==='completed' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-800' : 'bg-slate-100 dark:bg-slate-800/40 text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-800 dark:text-slate-400'}`}>Tamamlandı</button>
                     </div>
                     {displayTasks.length === 0 ? (
                         <div className="py-20 text-center flex flex-col items-center">
@@ -340,7 +340,7 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
+                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-widest sticky top-0 z-10">
                                 <tr>
                                     <th className="px-4 py-3 pl-6 font-bold border-b border-slate-200 dark:border-white/5">GÖREV BİLGİSİ</th>
                                     <th className="px-4 py-3 pr-6 font-bold border-b border-slate-200 dark:border-white/5 text-right">ÖNCELİK & DURUM</th>
@@ -419,29 +419,29 @@ const LeavesView = ({ user }: any) => {
                 <div className="w-[380px] shrink-0 bg-white dark:bg-[#0f172a] rounded-[20px] p-8 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col gap-6">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><Calendar className="w-4 h-4"/></div>
-                        <h3 className="text-[12px] font-black uppercase tracking-widest text-slate-800">YENİ TALEP OLUŞTUR</h3>
+                        <h3 className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white">YENİ TALEP OLUŞTUR</h3>
                     </div>
 
                     <div className="flex flex-col gap-5">
                         <div className="flex flex-col gap-1.5">
                            <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">İzin Türü</span>
-                           <select className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-blue-500 shadow-sm" value={type} onChange={e=>setType(e.target.value)}>
+                           <select className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-2 text-[12px] font-semibold text-slate-700 dark:text-white outline-none focus:border-blue-500 shadow-sm" value={type} onChange={e=>setType(e.target.value)}>
                                <option value="Yıllık İzin">Yıllık Ücretli İzin</option><option value="Mazeret İzni">Mazeret İzni</option><option value="Sağlık İzni">Sağlık İzni</option><option value="Ücretsiz İzin">Ücretsiz İzin</option>
                            </select>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                            <div className="flex flex-col gap-1.5">
                                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Başlangıç Seçimi</span>
-                               <input type="date" className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-blue-500 shadow-sm" value={startDate} onChange={e=>setStartDate(e.target.value)}/>
+                               <input type="date" className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-2 text-[12px] font-semibold text-slate-700 dark:text-white outline-none focus:border-blue-500 shadow-sm" value={startDate} onChange={e=>setStartDate(e.target.value)}/>
                            </div>
                            <div className="flex flex-col gap-1.5">
                                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Bitiş Seçimi</span>
-                               <input type="date" className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-2 text-[12px] font-semibold text-slate-700 outline-none focus:border-blue-500 shadow-sm" value={endDate} onChange={e=>setEndDate(e.target.value)}/>
+                               <input type="date" className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-2 text-[12px] font-semibold text-slate-700 dark:text-white outline-none focus:border-blue-500 shadow-sm" value={endDate} onChange={e=>setEndDate(e.target.value)}/>
                            </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
                            <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Dilekçe İçeriği / E-Posta Notu</span>
-                           <textarea className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-3 text-[12px] font-semibold text-slate-700 outline-none focus:border-blue-500 shadow-sm resize-none h-24" placeholder="Ek açıklama..." value={reason} onChange={e=>setReason(e.target.value)}></textarea>
+                           <textarea className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-[8px] border border-slate-200 px-3 py-3 text-[12px] font-semibold text-slate-700 dark:text-white outline-none focus:border-blue-500 shadow-sm resize-none h-24" placeholder="Ek açıklama..." value={reason} onChange={e=>setReason(e.target.value)}></textarea>
                         </div>
 
                         <button onClick={handleSubmit} disabled={isSubmitting} className="w-full h-[36px] bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center transition-colors shadow-sm">
@@ -454,7 +454,7 @@ const LeavesView = ({ user }: any) => {
                 <div className="flex-1 min-w-0 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden flex flex-col min-h-[500px]">
                     <div className="overflow-auto custom-scroll">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-20">
+                            <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-widest sticky top-0 z-20">
                                 <tr>
                                     <th className="px-4 py-3 pl-6 font-bold border-b border-slate-200 dark:border-white/5">BELGE & TÜR</th>
                                     <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">TARİH ARALIĞI / SÜRE</th>
@@ -476,11 +476,11 @@ const LeavesView = ({ user }: any) => {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 align-middle">
-                                                <div className="text-[12px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">{new Date(l.startDate).toLocaleDateString('tr-TR')} - {new Date(l.endDate).toLocaleDateString('tr-TR')}</div>
-                                                <div className="text-[11px] text-slate-500 font-medium">Toplam: {l.days} Gün</div>
+                                                <div className="text-[12px] font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-1">{new Date(l.startDate).toLocaleDateString('tr-TR')} - {new Date(l.endDate).toLocaleDateString('tr-TR')}</div>
+                                                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Toplam: {l.days} Gün</div>
                                             </td>
                                             <td className="px-4 py-3 align-middle">
-                                                <div className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${l.status === 'Onaylandı' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : l.status === 'Reddedildi' ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}>
+                                                <div className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${l.status === 'Onaylandı' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400' : l.status === 'Reddedildi' ? 'bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400' : 'bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}`}>
                                                     <div className={`w-1 h-1 rounded-full mr-1.5 ${l.status === 'Onaylandı' ? 'bg-emerald-500' : l.status === 'Reddedildi' ? 'bg-rose-500' : 'bg-amber-500'}`}></div>
                                                     {l.status}
                                                 </div>
@@ -489,7 +489,7 @@ const LeavesView = ({ user }: any) => {
                                                 <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 uppercase">{l.approvedBy || '-'}</div>
                                             </td>
                                             <td className="px-4 py-3 pr-6 align-middle text-right">
-                                                <button onClick={() => handlePrint(l)} className="px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border whitespace-nowrap bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1e293b] opacity-50 group-hover:opacity-100 flex items-center justify-end gap-1.5 ml-auto">
+                                                <button onClick={() => handlePrint(l)} className="px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border whitespace-nowrap bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1e293b] opacity-75 group-hover:opacity-100 flex items-center justify-end gap-1.5 ml-auto">
                                                     <Printer className="w-3 h-3"/> ÇIKTI
                                                 </button>
                                             </td>
@@ -665,7 +665,7 @@ const PayrollView = ({ payrolls, user }: any) => {
             <SoftContainer className="min-h-[400px]" title="Geçmiş Bordro ve Hakedişlerim" icon={<DollarSign className="w-4 h-4" />}>
                 <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
+                        <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-widest sticky top-0 z-10">
                             <tr>
                                 <th className="px-4 py-3 pl-6 font-bold border-b border-slate-200 dark:border-white/5">DÖNEM</th>
                                 <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">NET HAKEDİŞ (TRL)</th>
