@@ -1,11 +1,13 @@
-import { getSession } from "@/lib/auth";
+const fs = require('fs');
+
+const code = `import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ChevronLeft, Inbox } from "lucide-react";
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -82,20 +84,20 @@ export default async function InboxSignaturesPage() {
                                         <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase font-mono truncate max-w-[400px]">{r.envelope.documentFileName}</div>
                                     </td>
                                     <td className="px-6 py-3 align-middle">
-                                        <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                                        <span className={\`inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest \${
                                             r.status === 'SIGNED' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400' :
                                             r.status === 'REJECTED' || r.status === 'FAILED' ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400' :
                                             'bg-orange-50 text-orange-600 border border-orange-200 dark:bg-orange-500/10 dark:border-orange-500/20 dark:text-orange-400'
-                                        }`}>
-                                            <div className={`w-1 h-1 rounded-full mr-1.5 ${
+                                        }\`}>
+                                            <div className={\`w-1 h-1 rounded-full mr-1.5 \${
                                                 r.status === 'SIGNED' ? 'bg-emerald-500' :
                                                 r.status === 'REJECTED' || r.status === 'FAILED' ? 'bg-red-500' : 'bg-orange-500'
-                                            }`}></div>
+                                            }\`}></div>
                                             {r.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-3 pr-8 align-middle text-right">
-                                        <Link href={`/signatures/envelopes/${r.envelope.id}`} className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+                                        <Link href={\`/signatures/envelopes/\${r.envelope.id}\`} className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
                                             Zarfı Aç
                                         </Link>
                                     </td>
@@ -108,3 +110,7 @@ export default async function InboxSignaturesPage() {
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/signatures/inbox/page.tsx', code);
+console.log('done rewriting inbox');

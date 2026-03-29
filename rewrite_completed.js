@@ -1,11 +1,13 @@
-import { getSession } from "@/lib/auth";
+const fs = require('fs');
+
+const code = `import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ChevronLeft, CheckCircle2 } from "lucide-react";
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center gap-2">
                 {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
@@ -84,7 +86,7 @@ export default async function CompletedSignaturesPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-3 pr-8 align-middle text-right">
-                                        <Link href={`/signatures/envelopes/${env.id}`} className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+                                        <Link href={\`/signatures/envelopes/\${env.id}\`} className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
                                             İmzalı Dosyayı İncele
                                         </Link>
                                     </td>
@@ -97,3 +99,6 @@ export default async function CompletedSignaturesPage() {
         </div>
     );
 }
+`;
+fs.writeFileSync('src/app/(app)/signatures/completed/page.tsx', code);
+console.log('done rewriting completed');
