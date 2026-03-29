@@ -62,14 +62,6 @@ export default function ServiceDashboard() {
         if (currentUser?.branch) setActiveBranchName(currentUser.branch);
     }, [currentUser]);
 
-    const filteredJobs = isSystemAdmin
-        ? activeJobs
-        : activeJobs.filter((j: any) => (j.branch || 'Merkez') === (activeBranchName || 'Merkez'));
-
-    const filteredAppointments = isSystemAdmin
-        ? appointments
-        : appointments.filter((a: any) => (a.branch || 'Merkez') === (activeBranchName || 'Merkez'));
-
     useEffect(() => {
         fetchServices();
         fetchTechnicians();
