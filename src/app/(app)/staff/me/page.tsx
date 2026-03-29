@@ -395,9 +395,9 @@ const LeavesView = ({ user }: any) => {
         <div className="flex flex-col animate-in fade-in duration-500 gap-6">
             <style>{printStyles}</style>
 
-            <div className="flex flex-col lg:flex-row gap-6 items-start">
+            <div className="flex gap-6 items-start">
                 {/* 1. YENİ TALEP KUTUSU */}
-                <div className="w-full lg:w-[380px] shrink-0 bg-white dark:bg-[#0f172a] rounded-[20px] p-6 lg:p-8 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col gap-6">
+                <div className="w-[380px] shrink-0 bg-white dark:bg-[#0f172a] rounded-[20px] p-8 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col gap-6">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><Calendar className="w-4 h-4"/></div>
                         <h3 className="text-[12px] font-black uppercase tracking-widest text-slate-800">YENİ TALEP OLUŞTUR</h3>
@@ -432,7 +432,7 @@ const LeavesView = ({ user }: any) => {
                 </div>
 
                 {/* 2. İZİN SİCİL TABLOSU - HR REFERANS KOPYASI */}
-                <div className="flex-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+                <div className="flex-1 min-w-0 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden flex flex-col min-h-[500px]">
                     <div className="overflow-auto custom-scroll">
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-20">
