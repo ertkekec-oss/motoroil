@@ -109,7 +109,13 @@ const DashboardView = ({
     const totalTarget = targets?.reduce((sum: any, t: any) => sum + Number(t.targetValue), 0) || 0;
     const totalActual = targets?.reduce((sum: any, t: any) => sum + Number(t.currentValue), 0) || 0;
     const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
-    const totalEstBonus = targets?.reduce((sum: any, t: any) => sum + Number(t.estimatedBonus || 0), 0) || 0;
+    const totalEstBonus = targets?.reduce((sum: any, t: any) => {
+        let earned = 0;
+        const progress = t.targetValue > 0 ? (t.currentValue / t.targetValue) : 0;
+        if (progress >= 1) earned += Number(t.bonusAmount || 0);
+        else earned += Number(t.estimatedBonus || 0);
+        return sum + earned;
+    }, 0) || 0;
 
     const displayAchievement = targets?.length > 0 ? `%${overallProgress}` : (statsData?.stats?.achievement || '%0.0');
     const displayBonus = targets?.length > 0 ? `₺${totalEstBonus.toLocaleString('tr-TR')}` : (statsData?.stats?.bonus || '₺0,00');
@@ -233,10 +239,19 @@ const TargetsView = ({ targets, statsData, user }: any) => {
     const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
     const activeTargetsCount = targets?.filter((t: any) => t.status !== 'İptal' && t.currentValue < t.targetValue).length || 0;
     const completedTargetsCount = targets?.filter((t: any) => t.currentValue >= t.targetValue).length || 0;
+    
+    const totalEstBonus = targets?.reduce((sum: any, t: any) => {
+        let earned = 0;
+        const progress = t.targetValue > 0 ? (t.currentValue / t.targetValue) : 0;
+        if (progress >= 1) earned += Number(t.bonusAmount || 0);
+        else earned += Number(t.estimatedBonus || 0);
+        return sum + earned;
+    }, 0) || 0;
 
     return (
         <div className="flex flex-col animate-in fade-in duration-500 w-full mb-8">
             <TopPills pills={[
+                { title: 'PRİM (TAHMİNİ)', value: `₺${totalEstBonus.toLocaleString('tr-TR')}`, icon: <DollarSign className="w-5 h-5"/>, bg: 'bg-purple-50 dark:bg-purple-500/10', color: 'text-purple-500' },
                 { title: 'AKTİF HEDEFLER', value: activeTargetsCount, icon: <Target className="w-5 h-5"/>, bg: 'bg-blue-50 dark:bg-blue-500/10', color: 'text-blue-500' },
                 { title: 'ULAŞILAN HEDEFLER', value: completedTargetsCount, icon: <CheckCircle2 className="w-5 h-5"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500' },
                 { title: 'GENEL BAŞARI', value: `%${overallProgress}`, icon: <TrendingUp className="w-5 h-5"/>, bg: 'bg-orange-50 dark:bg-orange-500/10', color: 'text-orange-500' }
@@ -310,6 +325,15 @@ const TargetsView = ({ targets, statsData, user }: any) => {
 // ─── TASKS VIEW ──────────────────────────────────────────────────────
 const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
     const [subTab, setSubTab] = useState<'pending' | 'completed' | 'all'>('pending');
+    const [selectedTask, setSelectedTask] = useState<any>(null);
+
+    const markAsCompleted = async () => {
+        if(!selectedTask) return;
+        try {
+            const res = await fetch(`/api/staff/tasks/${selectedTask.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ status: 'Tamamlandı' }) });
+            if(res.ok) { fetchTasks(); setSelectedTask({ ...selectedTask, status: 'Tamamlandı' }); }
+        } catch(e) {}
+    };
     
     const displayTasks = tasks.filter((t: any) => {
         if (subTab === 'pending') return t.status !== 'Tamamlandı' && t.status !== 'İptal';
@@ -348,7 +372,7 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {displayTasks.map((t: any) => (
-                                    <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[54px] group cursor-pointer">
+                                    <tr key={t.id} onClick={() => setSelectedTask(t)} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[54px] group cursor-pointer">
                                         <td className="px-4 py-3 pl-6 align-middle">
                                             <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest leading-snug">{t.title}</div>
                                         </td>
@@ -366,10 +390,29 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
                 </SoftContainer>
 
                 <SoftContainer title="Görev Rapor Merkezi" icon={<FileText className="w-4 h-4"/>} className="min-h-[400px]">
-                    <div className="flex-1 flex items-center justify-center flex-col text-slate-400 gap-3 text-center py-20">
+                    {selectedTask ? (
+                        <div className="p-6 flex flex-col h-full animate-in fade-in duration-300">
+                            <h2 className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white mb-2">{selectedTask.title}</h2>
+                            <div className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-6">DURUM: <span className="text-blue-500">{selectedTask.status}</span></div>
+                            
+                            <div className="flex-1 bg-slate-50 dark:bg-slate-800/30 rounded-xl p-4 border border-slate-100 dark:border-white/5 whitespace-pre-wrap text-[13px] font-medium text-slate-700 dark:text-slate-300">
+                                {selectedTask.description || 'Görevin detaylı açıklaması bulunmuyor.'}
+                            </div>
+                            
+                            <div className="mt-6 flex justify-end gap-3 shrink-0">
+                                {selectedTask.status !== 'Tamamlandı' && (
+                                    <button onClick={markAsCompleted} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-[12px] text-[11px] uppercase tracking-widest shadow-sm transition-all focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                                        Tamamlandı Olarak Raporla
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex items-center justify-center flex-col text-slate-400 gap-3 text-center py-20">
                         <MessageSquare className="w-10 h-10 opacity-30 mb-2" />
                         <h4 className="text-[12px] font-black uppercase tracking-widest mt-2 block leading-none">LİSTEDEN BİR GÖREV SEÇEREK RAPOR EKRANINI AÇIN</h4>
                     </div>
+                    )}
                 </SoftContainer>
             </div>
             <div className="h-10"></div>
@@ -502,7 +545,7 @@ const LeavesView = ({ user }: any) => {
                 </div>
             </div>
             
-            <div id="printable-area" className="hidden">
+            <div id="printable-area" className="hidden print:block">
                  {printableLeave && (
                     <div className="p-10 font-[serif] text-black">
                         <h2 className="text-center text-xl font-bold uppercase mb-10 border-b-2 border-black pb-4">İzin Talep Formu / Dilekçesi</h2>
@@ -628,7 +671,7 @@ const PayrollView = ({ payrolls, user }: any) => {
         <div className="space-y-6 animate-in fade-in duration-500">
             <style>{printStyles}</style>
 
-            <div id="printable-area" className="hidden">
+            <div id="printable-area" className="hidden print:block">
                 {printablePayroll && (
                     <div className="p-10 font-sans text-black border-2 border-slate-800 m-8 rounded-xl shadow-none">
                         <div className="border-b-4 border-black pb-6 mb-8 flex justify-between items-end">
@@ -681,7 +724,7 @@ const PayrollView = ({ payrolls, user }: any) => {
                                         <td className="px-4 py-3 pl-6 align-middle text-[12px] font-black tracking-widest uppercase text-slate-800 dark:text-white">{pr.period}</td>
                                         <td className="px-4 py-3 align-middle text-[14px] font-black text-emerald-600">₺{Number(pr.netPay).toLocaleString()}</td>
                                         <td className="px-4 py-3 align-middle text-[10px] font-bold text-slate-500 uppercase tracking-widest space-y-1">
-                                            <div>Brüt: ₺{Number(pr.basePay).toLocaleString()}</div>
+                                            <div>Brüt: ₺{Number(pr.grossSalary).toLocaleString()}</div>
                                             <div className="text-blue-500">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
                                         </td>
                                         <td className="px-4 py-3 align-middle">

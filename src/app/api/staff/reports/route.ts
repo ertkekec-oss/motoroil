@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
@@ -7,9 +6,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     try {
+        const { getStaffIdFromSession } = await import('@/lib/auth');
         const sessionResult: any = await getSession();
         const session = sessionResult?.user || sessionResult;
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const resolvedId = await getStaffIdFromSession(session);
+        if (!resolvedId) return NextResponse.json({ error: 'Staff not found' }, { status: 404 });
 
         const searchParams = req.nextUrl.searchParams;
         const startDateStr = searchParams.get('startDate');
@@ -22,16 +25,7 @@ export async function GET(req: NextRequest) {
         const startDate = new Date(startDateStr);
         const endDate = new Date(endDateStr);
 
-        const staffUser = await (prisma as any).staff.findFirst({
-            where: {
-                OR: [
-                    { email: session.email || 'non_existent_email' },
-                    { username: session.username || session.email || 'non_existent_username' },
-                    { id: session.id }
-                ]
-            }
-        });
-
+        const staffUser = await (prisma as any).staff.findUnique({ where: { id: resolvedId } });
         if (!staffUser) return NextResponse.json({ error: 'Staff not found' }, { status: 404 });
 
         // 1. Sales Report (SalesOrder)
@@ -52,10 +46,10 @@ export async function GET(req: NextRequest) {
             where: {
                 companyId: staffUser.companyId,
                 date: { gte: startDate, lte: endDate },
-                type: 'Tahsilat', // Assuming this is the type name
+                type: 'Tahsilat',
                 OR: [
                     { visit: { staffId: staffUser.id } },
-                    { description: { contains: staffUser.name } } // Fallback
+                    { description: { contains: staffUser.name } }
                 ]
             },
             include: { customer: { select: { name: true } } }
