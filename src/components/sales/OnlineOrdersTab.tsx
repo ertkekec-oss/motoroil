@@ -217,10 +217,134 @@ export function OnlineOrdersTab({
             {/* Bulk Actions Context (Only visible when items selected) */}
             {selectedOrders.length > 0 && (
                 <div className="flex justify-center gap-3 mb-6">
-                    <button disabled={isGeneratingBulk} onClick={/*...existing...*/} className={`h-[36px] px-5 rounded-[12px] font-semibold text-[12px] transition-colors flex items-center justify-center gap-2 shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white ${isGeneratingBulk ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <button 
+                        disabled={isGeneratingBulk} 
+                        onClick={async () => {
+                            const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id)).map(o => ({
+                                marketplace: o.marketplace?.toLowerCase() || '',
+                                id: o.id,
+                                shipmentPackageId: o.shipmentPackageId || (['hepsiburada', 'pazarama', 'n11'].includes(o.marketplace?.toLowerCase() || '') ? o.orderNumber : undefined)
+                            })).filter(o => o.shipmentPackageId);
+                            
+                            if (selectedOrderData.length === 0) {
+                                 showError("Hata", "Seçili siparişlerin etiket numaraları bulunamadı.");
+                                 return;
+                            }
+                            
+                            setIsGeneratingBulk(true);
+                            const newWindow = window.open('', '_blank');
+                            if (!newWindow) {
+                                setIsGeneratingBulk(false);
+                                showError("Tarayıcı Engeli", "Lütfen açılır pencere (popup) engelleyicisini kapatın ve tekrar deneyin.");
+                                return;
+                            }
+                            newWindow.document.write('<body style="background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;margin:0;"><div><h2>Toplu Etiketler Hazırlanıyor...</h2><p style="color:#94a3b8;">Lütfen bekleyin, PDF birleştirme işlemi biraz zaman alabilir.</p></div></body>');
+
+                            try {
+                                const res = await fetch('/api/marketplaces/bulk-label', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ orders: selectedOrderData })
+                                });
+                                if (!res.ok) {
+                                    const err = await res.json().catch(()=>({}));
+                                    throw new Error(err?.error || "Toplu etiket oluşturulamadı");
+                                }
+                                const blob = await res.blob();
+                                const url = URL.createObjectURL(blob);
+                                newWindow.location.href = url;
+                            } catch(e: any) {
+                                if (newWindow) newWindow.close();
+                                showError("İşlem Başarısız", e.message);
+                            } finally {
+                                setIsGeneratingBulk(false);
+                            }
+                        }} 
+                        className={`h-[36px] px-5 rounded-full font-bold uppercase tracking-widest text-[11px] transition-colors flex items-center justify-center gap-2 shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white ${isGeneratingBulk ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
                          {isGeneratingBulk ? 'Etiketler Hazırlanıyor...' : `Toplu Etiket Yazdır (${selectedOrders.length})`}
                     </button>
-                    <button disabled={!!bulkInvoiceStatus} onClick={/*...existing...*/} className={`h-[36px] px-5 rounded-[12px] font-semibold text-[12px] transition-colors flex items-center justify-center gap-2 shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white ${!!bulkInvoiceStatus ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    
+                    <button 
+                        disabled={!!bulkInvoiceStatus} 
+                        onClick={async () => {
+                            const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id));
+                            
+                            if (selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length === 0) {
+                                 modalError("Hata", "Seçili siparişler zaten faturalandırılmış.");
+                                 return;
+                            }
+
+                            showConfirm("Toplu Faturalandırma", `${selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length} adet sipariş otomatik olarak faturalandırılıp resmileştirilecektir (e-Fatura/e-Arşiv gönderimi). Devam etmek istiyor musunuz?`, async () => {
+                                setBulkInvoiceStatus(`Hazırlanıyor...`);
+                                let successCount = 0;
+                                let failCount = 0;
+
+                                try {
+                                    const mappingRes = await fetch('/api/integrations/marketplace/get-mapping');
+                                    const mappingData = await mappingRes.json();
+                                    const rawMappings = mappingData.mappings || [];
+
+                                    for(let i = 0; i < selectedOrderData.length; i++) {
+                                        const o = selectedOrderData[i];
+                                        
+                                        // Zaten faturalıysa atla
+                                        if (['Faturalandırıldı', 'Tamamlandı'].includes(o.status)) {
+                                            continue;
+                                        }
+
+                                        setBulkInvoiceStatus(`Faturalandırılıyor: ${i+1}/${selectedOrderData.length}`);
+                                        
+                                        const saleItems = o.items?.map((item: any) => {
+                                            const code = item.code || item.barcode || item.name;
+                                            const mapMatch = rawMappings.find((m: any) => m.marketplace?.toLowerCase() === o.marketplace?.toLowerCase() && m.marketplaceCode === code);
+                                            return {
+                                                productId: mapMatch ? mapMatch.productId : undefined,
+                                                qty: item.qty || item.quantity || 1,
+                                                name: item.name,
+                                                price: item.price || 0,
+                                                vat: item.vat || 20,
+                                                otv: item.otv || 0
+                                            };
+                                        }) || [];
+
+                                        const convRes = await fetch('/api/sales/invoices/ecommerce-convert', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ orderId: o.id, items: saleItems })
+                                        });
+                                        const convData = await convRes.json();
+                                        
+                                        if (convData.success && convData.invoice) {
+                                            const sendRes = await fetch('/api/sales/invoices', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ action: 'formal-send', invoiceId: convData.invoice.id })
+                                            });
+                                            if (sendRes.ok) successCount++;
+                                            else failCount++;
+                                        } else {
+                                            failCount++;
+                                        }
+                                    }
+
+                                    if (failCount > 0) {
+                                        modalError("Kısmi Başarı / Hata", `${successCount} fatura başarıyla oluşturuldu ve gönderildi. ${failCount} siparişte hata oluştu.`);
+                                    } else {
+                                        modalSuccess("Bilgi", `Başarılı: Tüm faturalar başarıyla oluşturuldu ve gönderildi. (${successCount} adet)`);
+                                    }
+                                    
+                                } catch(e: any) {
+                                    modalError("İşlem Başarısız", e.message || "Bilinmeyen bir hata oluştu.");
+                                } finally {
+                                    setBulkInvoiceStatus(null);
+                                    setSelectedOrders([]);
+                                    fetchOnlineOrders();
+                                }
+                            });
+                        }} 
+                        className={`h-[36px] px-5 rounded-full font-bold uppercase tracking-widest text-[11px] transition-colors flex items-center justify-center gap-2 shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white ${!!bulkInvoiceStatus ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
                          {bulkInvoiceStatus ? bulkInvoiceStatus : `Toplu Fatura (${selectedOrders.length})`}
                     </button>
                 </div>
