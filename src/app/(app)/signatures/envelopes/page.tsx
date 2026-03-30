@@ -71,7 +71,7 @@ export default async function SignatureEnvelopesPage({ searchParams }: { searchP
                         </Link>
                     </div>
                 </div>
-                </div>
+
 
                 <SoftContainer title="Tüm Zarflar" icon={<FileSignature className="w-4 h-4"/>} className="min-h-[400px]">
                     <div className="px-6 py-4 bg-slate-50/50 dark:bg-slate-800/10 border-b border-slate-200 dark:border-white/5 flex flex-col sm:flex-row gap-4 justify-between sm:items-center shrink-0">
