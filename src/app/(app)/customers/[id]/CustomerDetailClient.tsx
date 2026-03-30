@@ -827,77 +827,40 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 </div>
             )}
 
-                                    {/* EXECUTIVE HEADER STRIP */}
-            <div style={{
-                background: 'var(--bg-panel, rgba(15, 23, 42, 0.6))',
-                borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
-                padding: '24px 40px',
-                position: 'sticky',
-                top: 0,
-                zIndex: 40
-            }}>
-                <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-                    {/* Top Row: Back link & Title */}
-                    <div className="flex justify-between items-center">
-                        <Link href="/customers" style={{ color: 'var(--text-muted, #888)', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', transition: 'color 0.2s' }} className="hover:text-blue-500">
-                            <span style={{ fontSize: '16px' }}>←</span> Müşteri Merkezi
+                                    {/* --- CARI COMMAND CENTER (STICKY) --- */}
+            <div className="sticky top-0 z-40 bg-slate-50/95 dark:bg-[#0f172a]/95 backdrop-blur-md pb-4 pt-4 mb-6 border-b border-slate-200 dark:border-white/5 space-y-4 w-full">
+                
+                {/* PROFILE & COMPACT METRICS & ACTIONS */}
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-2 flex flex-col xl:flex-row xl:items-start justify-between gap-6">
+                    
+                    {/* Left: Avatar & Info */}
+                    <div className="flex flex-col gap-4">
+                        <Link href="/customers" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 font-semibold text-[13px] flex items-center gap-2 transition-colors">
+                            <span className="text-[16px]">←</span> Müşteri Merkezi
                         </Link>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                                onClick={() => setReconWizardOpen(true)}
-                                className="btn"
-                                style={{ background: '#10b981', border: '1px solid rgba(16, 185, 129, 0.4)', color: 'white', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '800', display: 'flex', gap: '8px', alignItems: 'center', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}
-                            >
-                                🤝 Mutabakat
-                            </button>
-                            <button
-                                onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
-                                className="btn"
-                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
-                            >
-                                📄 Özet Ekstre
-                            </button>
-                            <button
-                                onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
-                                className="btn"
-                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
-                            >
-                                📑 Detaylı Ekstre
-                            </button>
-                            <button
-                                onClick={() => router.push(`/customers?edit=${customer.id}`)}
-                                className="btn"
-                                style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: '#3b82f6', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
-                            >
-                                ✏️ Düzenle
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Business/Profile Row */}
-                    <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                        {/* Left: Avatar + Details */}
-                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                            <div style={{
-                                width: '72px', height: '72px', borderRadius: '18px',
-                                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '28px', fontWeight: '800', color: 'white',
-                                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.25)',
-                                border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
+                        <div className="flex gap-4 items-center">
+                            <div className="w-14 h-14 rounded-[14px] bg-gradient-to-br from-blue-900 to-blue-500 flex items-center justify-center text-[24px] font-black text-white shadow-sm border border-white/10 shrink-0">
                                 {val(customer.name, '?').charAt(0).toUpperCase()}
                             </div>
                             <div>
-                                <h1 style={{ fontSize: '26px', fontWeight: '800', margin: '0 0 6px 0', color: 'var(--text-main, #fff)', letterSpacing: '-0.5px' }}>
-                                    {val(customer.name)}
-                                </h1>
-                                <div style={{ display: 'flex', gap: '16px', color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '500', flexWrap: 'wrap' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷️</span> {val(customer.category?.name, 'Genel Müşteri')}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📱</span> {val(customer.phone, 'Telefon Yok')}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📧</span> {val(customer.email, 'E-posta Yok')}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📍</span>
+                                <div className="flex items-center gap-3 mb-1">
+                                    <h1 className="text-[20px] font-black m-0 text-slate-900 dark:text-white leading-tight">
+                                        {val(customer.name)}
+                                    </h1>
+                                    {services.length > 0 && services[0].plate && (
+                                        <button
+                                            onClick={() => setQrPlate(services[0].plate)}
+                                            className="px-2.5 py-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-[6px] text-[10px] font-bold shadow-sm hover:border-blue-500 transition-colors flex items-center gap-1.5"
+                                        >
+                                            📱 Karne (QR)
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-[12px] font-semibold text-slate-500 dark:text-slate-400">
+                                    <span className="flex items-center gap-1.5"><span className="opacity-60">🏷️</span> {val(customer.category?.name, 'Genel Müşteri')}</span>
+                                    <span className="flex items-center gap-1.5"><span className="opacity-60">📱</span> {val(customer.phone, 'Telefon Yok')}</span>
+                                    <span className="flex items-center gap-1.5"><span className="opacity-60">📧</span> {val(customer.email, 'E-posta Yok')}</span>
+                                    <span className="flex items-center gap-1.5"><span className="opacity-60">📍</span>
                                         {(() => {
                                             let addr = customer.address;
                                             if (customer.city || customer.district) {
@@ -913,162 +876,135 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         })()}
                                     </span>
                                 </div>
-                                {services.length > 0 && services[0].plate && (
-                                    <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
-                                        <button
-                                            onClick={() => setQrPlate(services[0].plate)}
-                                            style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: '600' }}
-                                        >
-                                            📱 Dijital Karne Müşteri Linki (QR)
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                const plate = services[0].plate;
-                                                const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
-                                                window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
-                                            }}
-                                            style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(37, 211, 102, 0.1)', border: '1px solid rgba(37, 211, 102, 0.3)', color: '#25D366', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: '600' }}
-                                        >
-                                            💬 WhatsApp'tan Karne Gönder
-                                        </button>
-                                    </div>
-                                )}
                             </div>
                         </div>
+                    </div>
 
-                        {/* Right: Balance & Financial Health */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
-                            <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                                FİNANSAL DURUM (NET BAKİYE)
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                                <div style={{ fontSize: '36px', fontWeight: '900', color: balanceColor, lineHeight: '1', letterSpacing: '-1px' }}>
-                                    {Math.abs(balance).toLocaleString()} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span>
-                                </div>
-                                <div style={{
-                                    padding: '4px 10px',
-                                    borderRadius: '8px',
-                                    fontSize: '11px',
-                                    fontWeight: '800',
-                                    background: balance > 0 ? 'rgba(239, 68, 68, 0.1)' : balance < 0 ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))',
-                                    color: balanceColor,
-                                    border: `1px solid ${balance > 0 ? 'rgba(239, 68, 68, 0.3)' : balance < 0 ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-color, rgba(255,255,255,0.1))'}`,
-                                    textTransform: 'uppercase'
-                                }}>
-                                    {balance > 0 ? 'Borçlu (Risk)' : balance < 0 ? 'Alacaklı' : 'Kapalı (Dengeli)'}
+                    {/* Right: Compact Metrics & Actions */}
+                    <div className="flex flex-col items-end gap-3 flex-1">
+                        
+                        {/* Quick Actions */}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
+                                className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                            >
+                                <span>+</span> Tahsilat Al
+                            </Link>
+                            <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
+                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
+                            >
+                                Ödeme Yap
+                            </Link>
+                            <Link href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
+                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden md:flex"
+                            >
+                                Satış Yap (POS)
+                            </Link>
+                            <button
+                                onClick={() => setReconWizardOpen(true)}
+                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                            >
+                                🤝 Mutabakat
+                            </button>
+                            <button
+                                onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
+                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                            >
+                                📄 Özet Ekstre
+                            </button>
+                            <button
+                                onClick={() => router.push(`/customers?edit=${customer.id}`)}
+                                className="w-[36px] h-[36px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-500 rounded-[8px] flex items-center justify-center transition-colors shadow-sm hover:text-blue-600 hover:border-blue-200"
+                                title="Düzenle"
+                            >
+                                ✏️
+                            </button>
+                        </div>
+
+                        {/* Metrics */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[14px] ${balance > 0 ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : balance < 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500' : 'bg-slate-50 dark:bg-slate-700 text-slate-500'}`}>💰</div>
+                                <div>
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{`${balance > 0 ? 'Borç' : balance < 0 ? 'Alacak' : 'Dengeli'}`} Bakiyesi</div>
+                                    <div className={`text-[16px] font-black leading-none mt-0.5 ${balance > 0 ? 'text-red-600 dark:text-red-400' : balance < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>{Math.abs(balance).toLocaleString()} ₺</div>
                                 </div>
                             </div>
 
-                            {/* DUE INSTALLMENTS SUMMARY */}
-                            {(overdueInstallments.length > 0 || upcomingInstallments.length > 0) && (
-                                <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    {overdueInstallments.length > 0 && (
-                                        <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', padding: '8px 12px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                                            <span style={{ fontSize: '10px', color: '#ef4444', fontWeight: '800', textTransform: 'uppercase' }}>VADESİ GEÇEN</span>
-                                            <span style={{ fontSize: '14px', color: '#ef4444', fontWeight: '900', fontFamily: 'monospace' }}>{overdueAmount.toLocaleString('tr-TR')} ₺</span>
-                                        </div>
-                                    )}
-                                    {upcomingInstallments.length > 0 && (
-                                        <div style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', padding: '8px 12px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                                            <span style={{ fontSize: '10px', color: '#3b82f6', fontWeight: '800', textTransform: 'uppercase' }}>YAKLAŞAN VADE (30 GÜN)</span>
-                                            <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: '900', fontFamily: 'monospace' }}>{upcomingAmount.toLocaleString('tr-TR')} ₺</span>
-                                        </div>
-                                    )}
+                            {overdueInstallments.length > 0 && (
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center text-[14px]">⏳</div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vadesi Geçen</div>
+                                        <div className="text-[16px] font-black leading-none text-red-600 dark:text-red-400 mt-0.5">{overdueAmount.toLocaleString()} ₺</div>
+                                    </div>
                                 </div>
                             )}
 
-                            {portfolioChecks > 0 && (
-                                <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '600', marginTop: '12px', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                    <span>⚠️</span> Portföyde {portfolioChecks.toLocaleString()} ₺ değerinde aktif çek/senet var.
+                             {portfolioChecks > 0 && (
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">🧾</div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Açık Çek/Senet</div>
+                                        <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{portfolioChecks.toLocaleString()} ₺</div>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
+
+                {/* GROUPED NAVIGATION & FILTERS */}
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                        {[
+                            { group: 'İŞLEMLER', items: [{ id: 'all', label: 'Tümü' }, { id: 'sales', label: 'Satış/Fatura' }, { id: 'payments', label: 'Finans' }] },
+                            { group: 'RİSK & ONAY', items: [{ id: 'checks', label: 'Vadeler' }, { id: 'reconciliations', label: 'Mutabakat' }, { id: 'offers', label: 'Teklifler' }] },
+                            { group: 'SERVİS', items: [{ id: 'warranties', label: 'Garantiler' }, { id: 'services', label: 'Servis' }, { id: 'documents', label: 'Dosyalar' }] }
+                        ].map((grp, i) => (
+                            <div key={grp.group} className="flex items-center gap-3">
+                                {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
+                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                    {grp.items.map(tab => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => { 
+                                                setActiveTab(tab.id as any); 
+                                                if (tab.id === 'documents') fetchDocuments(); 
+                                                if (tab.id === 'services') fetchServices(); 
+                                            }}
+                                            className={activeTab === tab.id
+                                                ? "px-4 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
+                                                : "px-4 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
+                                            }
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <div className="relative w-full lg:w-[260px]">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                            </span>
+                            <input
+                                type="text"
+                                placeholder="Satır ve işlemlerde ara..."
+                                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-[8px] h-[36px] pl-9 pr-3 text-[12px] font-semibold outline-none focus:border-blue-500 shadow-sm transition-all text-slate-900 dark:text-white"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* MAIN CONTENT AREA */}
-            <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-
-                {/* ENTERPRISE ACTION BAR */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-                    <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
-                        className="group flex flex-col justify-center items-center gap-3 bg-white dark:bg-[#0f172a] p-6 rounded-[24px] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-200 dark:border-white/5 relative overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] dark:opacity-5">
-                            <span className="text-[64px] leading-none select-none">💰</span>
-                        </div>
-                        <div className="w-12 h-12 rounded-[16px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-[24px] shadow-sm z-10 transition-transform group-hover:scale-110">
-                            💰
-                        </div>
-                        <div className="text-center z-10">
-                            <div className="font-black text-[14px] tracking-widest mb-1 text-slate-800 dark:text-white uppercase">Tahsilat Al</div>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Cari hesaptan nakit / kk ile ödeme al</div>
-                        </div>
-                    </Link>
-
-                    <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
-                        className="group flex flex-col justify-center items-center gap-3 bg-white dark:bg-[#0f172a] p-6 rounded-[24px] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-200 dark:border-white/5 relative overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] dark:opacity-5">
-                            <span className="text-[64px] leading-none select-none">💸</span>
-                        </div>
-                        <div className="w-12 h-12 rounded-[16px] bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center text-[24px] shadow-sm z-10 transition-transform group-hover:scale-110">
-                            💸
-                        </div>
-                        <div className="text-center z-10">
-                            <div className="font-black text-[14px] tracking-widest mb-1 text-slate-800 dark:text-white uppercase">Ödeme Yap</div>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Firmadan nakit / kk ile ödeme çıkışı yap</div>
-                        </div>
-                    </Link>
-
-                    <Link href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
-                        className="group flex flex-col justify-center items-center gap-3 bg-white dark:bg-[#0f172a] p-6 rounded-[24px] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-200 dark:border-white/5 relative overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] dark:opacity-5">
-                            <span className="text-[64px] leading-none select-none">🛒</span>
-                        </div>
-                        <div className="w-12 h-12 rounded-[16px] bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-[24px] shadow-sm z-10 transition-transform group-hover:scale-110">
-                            🛒
-                        </div>
-                        <div className="text-center z-10">
-                            <div className="font-black text-[14px] tracking-widest mb-1 text-slate-800 dark:text-white uppercase">Satış Yap (POS)</div>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Bu müşteriye terminalde yeni satış başlat</div>
-                        </div>
-                    </Link>
-                </div>
-
-                {/* FILTERS (ENTERPRISE STANDARD) */}
-                <div className="flex flex-wrap items-center gap-2 mb-6 mt-4 relative z-10 w-full">
-                    {[
-                        { id: 'all', label: 'TÜMÜ' },
-                        { id: 'sales', label: 'SATIŞ/FATURA' },
-                        { id: 'payments', label: 'FİNANS' },
-                        { id: 'offers', label: 'TEKLİFLER' },
-                        { id: 'documents', label: 'DOSYALAR' },
-                        { id: 'warranties', label: 'GARANTİLER' },
-                        { id: 'services', label: 'SERVİS' },
-                        { id: 'checks', label: 'VADELER' },
-                        { id: 'reconciliations', label: 'MUTABAKAT' }
-                    ].map(tab => {
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => { 
-                                    setActiveTab(tab.id as any); 
-                                    if (tab.id === 'documents') fetchDocuments(); 
-                                    if (tab.id === 'services') fetchServices(); 
-                                }}
-                                className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${isActive ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm dark:bg-blue-500/10 dark:border-blue-500/50 dark:text-blue-400' : 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700/50 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:bg-slate-800'}`}
-                            >
-                                {tab.label}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {/* CONTENT AREA */}
+            <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-8 mt-2">
+{/* CONTENT AREA */}
                 <div style={{
                     background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))',
                     borderRadius: '20px',
@@ -1676,51 +1612,42 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             )}
                         </div>
                     ) : (
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
-                                <thead>
-                                    <tr style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', color: 'var(--text-muted, #888)', fontSize: '11px', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' }}>
-                                        <th style={{ padding: '24px' }}>Tarih</th>
-                                        <th style={{ padding: '24px' }}>Hareket Türü</th>
-                                        <th style={{ padding: '24px' }}>Açıklama</th>
-                                        <th style={{ padding: '24px', textAlign: 'right' }}>Tutar</th>
-                                        <th style={{ padding: '24px', textAlign: 'right', width: '220px' }}>Aksiyonlar</th>
-                                        <th style={{ padding: '24px', textAlign: 'center', width: '60px' }}></th>
+                        <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-20">
+                                    <tr>
+                                        <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap">Tarih</th>
+                                        <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap">Hareket Türü</th>
+                                        <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 min-w-[200px]">Açıklama</th>
+                                        <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 text-right whitespace-nowrap">Tutar</th>
+                                        <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 text-right whitespace-nowrap">Aksiyonlar</th>
+                                        <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 text-center w-[40px]"></th>
                                     </tr>
                                 </thead>
 
-                                <tbody>
+                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                     {filteredHistory.length === 0 ? (
-                                        <tr><td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #666)', fontSize: '15px', fontWeight: '500' }}>Bu kategoride kayıt veya işlem bulunamadı.</td></tr>
+                                        <tr><td colSpan={6} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Bu kategoride kayıt veya işlem bulunamadı.</td></tr>
                                     ) : (
                                         paginatedHistory.map((item, idx) => (
                                             <Fragment key={item.id || idx}>
                                                 <tr
                                                     onClick={() => item.items && setExpandedRowId(expandedRowId === item.id ? null : item.id)}
-                                                    style={{
-                                                        borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
-                                                        cursor: item.items ? 'pointer' : 'default',
-                                                        background: expandedRowId === item.id ? 'var(--bg-card, rgba(255,255,255,0.03))' : 'transparent',
-                                                        transition: 'all 0.2s'
-                                                    }}
-                                                    className="hover:bg-white/5"
+                                                    className={`hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group ${expandedRowId === item.id ? "bg-slate-50 dark:bg-white/[0.02]" : ""} ${item.items ? "cursor-pointer" : ""}`}
                                                 >
-                                                    <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-main, #ddd)', fontWeight: '600' }}>{item.date}</td>
-                                                    <td style={{ padding: '24px' }}>
-                                                        <span style={{
-                                                            padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '800',
-                                                            background: item.color + '15', color: item.color, border: '1px solid ' + item.color + '30'
-                                                        }}>
+                                                    <td className="px-5 py-3 align-middle text-[12px] font-bold text-slate-700 dark:text-slate-300">{item.date}</td>
+                                                    <td className="px-5 py-3 align-middle">
+                                                        <span style={{ background: item.color + "15", color: item.color, border: "1px solid " + item.color + "30" }} className="inline-flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest">
                                                             {item.type}
                                                         </span>
                                                     </td>
-                                                    <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-muted, #aaa)', fontWeight: '500' }}>{item.desc}</td>
-                                                    <td style={{ padding: '24px', textAlign: 'right', fontWeight: '800', fontSize: '15px', color: item.amount > 0 ? '#ef4444' : '#10b981', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                                                    <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-500 dark:text-slate-400">{item.desc}</td>
+                                                    <td className={`px-5 py-3 align-middle text-right text-[14px] font-black font-mono whitespace-nowrap ${item.amount > 0 ? "text-red-500" : item.amount < 0 ? "text-emerald-500" : "text-slate-500"}`}>
                                                         {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                     </td>
-                                                    <td style={{ padding: '24px', textAlign: 'right' }}>
+                                                    <td className="px-5 py-3 align-middle text-right pr-6">
                                                         {item.type === 'Satış' && (
-                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                            <div className="flex items-center justify-end gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                                                                 {item.orderId && (
                                                                     (() => {
                                                                         const hasInvoice = item.isFormal || invoicedOrderIds.includes(item.orderId) || formalOrderIds.includes(item.orderId);
@@ -1836,7 +1763,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             </div>
                                                         )}
                                                         {(item.type === 'Fatura' || item.type === 'İrsaliye') && (
-                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                            <div className="flex items-center justify-end gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                                                                 {(() => {
                                                                     const isVadelendi = vadelenenIds.includes(item.id) || customer?.paymentPlans?.some((p: any) => (p.description === item.id || (item.orderId && p.description === item.orderId)) && p.status !== 'İptal' && p.status !== 'Cancelled');
                                                                     if (isVadelendi) {
@@ -1908,7 +1835,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             </div>
                                                         )}
                                                         {(item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider') && (
-                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                            <div className="flex items-center justify-end gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
@@ -1939,7 +1866,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             </div>
                                                         )}
                                                         {item.type === 'Vadelendirme' && (
-                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                            <div className="flex items-center justify-end gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
