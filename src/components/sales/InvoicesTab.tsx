@@ -173,47 +173,55 @@ export function InvoicesTab({
                     {isLoadingInvoices ? (
                         <div className={`text-[14px] py-8 font-medium ${textLabelClass}`}>Yükleniyor...</div>
                     ) : (
-                        <div className={`rounded-[16px] border p-6 overflow-hidden ${cardClass}`}>
+                        <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse min-w-[800px]">
-                                    <thead className="sticky top-0 bg-transparent">
-                                        <tr className={`border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Fatura No</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Cari</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tarih</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tutar</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Durum</th>
-                                            <th className={`h-[48px] px-4 text-center text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İşlem</th>
+                                    <thead className="bg-transparent border-b border-slate-200 dark:border-white/5">
+                                        <tr>
+                                            <th className="h-[48px] px-6 align-middle w-12">
+                                                <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-not-allowed">
+                                                </div>
+                                            </th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Fatura No</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Cari</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Tarih</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Tutar</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Durum</th>
+                                            <th className="h-[48px] px-6 text-center text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">İşlem</th>
                                         </tr>
                                     </thead>
-                                    <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                         {paginatedList.length === 0 ? (
-                                            <tr><td colSpan={6} className={`text-center py-8 font-medium ${textLabelClass}`}>Kayıt bulunamadı.</td></tr>
+                                            <tr><td colSpan={7} className={`text-center py-8 font-medium ${textLabelClass}`}>Kayıt bulunamadı.</td></tr>
                                         ) : paginatedList?.map(inv => {
                                             const isExpanded = expandedOrderId === inv.id;
                                             return (
                                                 <Fragment key={inv.id}>
-                                                    <tr onClick={() => toggleExpand(inv.id)} className={`h-[52px] cursor-pointer transition-colors ${isExpanded ? (isLight ? 'bg-blue-50/30' : 'bg-blue-900/10') : (isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50')}`}>
-                                                        <td className={`px-4 align-middle font-semibold text-[13px] ${textValueClass}`}>{inv.invoiceNo}</td>
-                                                        <td className={`px-4 align-middle font-medium text-[13px] ${textValueClass}`}>{inv.customer?.name}</td>
-                                                        <td className={`px-4 align-middle text-[12px] ${textLabelClass}`}>{new Date(inv.invoiceDate).toLocaleDateString('tr-TR')}</td>
-                                                        <td className={`px-4 align-middle font-semibold text-[13px] ${textValueClass}`}>{inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                                        <td className="px-4 align-middle">
-                                                            <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${inv.isFormal
+                                                    <tr onClick={() => toggleExpand(inv.id)} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group cursor-pointer">
+                                                        <td className="px-6 py-3 align-middle w-12" onClick={e => e.stopPropagation()}>
+                                                            <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap font-black text-[13px] text-slate-800 dark:text-white">{inv.invoiceNo}</td>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap font-bold text-[13px] text-slate-800 dark:text-white">{inv.customer?.name}</td>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap text-[12px] font-medium text-slate-500 dark:text-slate-400">{new Date(inv.invoiceDate).toLocaleDateString('tr-TR')}</td>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap font-black text-[13px] text-slate-800 dark:text-white">{inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                            <span className={`px-2 py-1 text-[10px] font-bold tracking-widest uppercase border rounded-[8px] inline-block ${inv.isFormal
                                                                     ? (isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20')
                                                                     : (isLight ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-500/10 text-amber-400 border-amber-500/20')
                                                                 }`}>
                                                                 {inv.isFormal ? 'Faturalandırıldı' : inv.status}
                                                             </span>
                                                         </td>
-                                                        <td className="px-4 align-middle text-center">
+                                                        <td className="px-6 py-3 align-middle text-center whitespace-nowrap">
                                                             <div className="flex gap-2 items-center justify-center" onClick={e => e.stopPropagation()}>
                                                                 {inv.status !== 'İptal Edildi' && (
                                                                     <>
                                                                         {!inv.isFormal && (
                                                                             <button
                                                                                 onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
-                                                                                className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                                                className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
                                                                                 title="Proformayı veya taslak faturayı GİB'e göndererek resmileştirin"
                                                                             >
                                                                                 Resmileştir
@@ -221,14 +229,14 @@ export function InvoicesTab({
                                                                         )}
                                                                         <button
                                                                             onClick={() => handleViewPDF(inv.id)}
-                                                                            className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                                            className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
                                                                         >
-                                                                            İndir (PDF)
+                                                                            PDF
                                                                         </button>
 
                                                                         <button
                                                                             onClick={() => handleDeleteInvoice(inv.id, inv.isFormal, inv.formalType)}
-                                                                            className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium border transition-colors ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-slate-800 border-red-900/50 text-red-400 hover:bg-red-900/20'}`}
+                                                                            className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase border transition-colors ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-slate-800 border-red-900/50 text-red-400 hover:bg-red-900/20'}`}
                                                                         >
                                                                             İptal Et
                                                                         </button>
@@ -342,49 +350,57 @@ export function InvoicesTab({
                     </div>
 
                     {isLoadingPurchaseInvoices ? <div className={`text-[14px] py-8 ${textLabelClass}`}>Yükleniyor...</div> : (
-                        <div className={`rounded-[16px] border p-6 overflow-hidden ${cardClass}`}>
+                        <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse min-w-[800px]">
-                                    <thead className="sticky top-0 bg-transparent">
-                                        <tr className={`border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Fatura Bilgisi</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tarih</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tutar</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Durum</th>
-                                            <th className={`h-[48px] px-4 text-right text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İşlem</th>
+                                    <thead className="bg-transparent border-b border-slate-200 dark:border-white/5">
+                                        <tr>
+                                            <th className="h-[48px] px-6 align-middle w-12">
+                                                <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-not-allowed">
+                                                </div>
+                                            </th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Fatura Bilgisi</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Tarih</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Tutar</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Durum</th>
+                                            <th className="h-[48px] px-6 text-right text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">İşlem</th>
                                         </tr>
                                     </thead>
-                                    <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                         {paginatedList.length === 0 ? (
-                                            <tr><td colSpan={5} className={`text-center py-8 font-medium ${textLabelClass}`}>Gelen fatura bulunamadı.</td></tr>
+                                            <tr><td colSpan={6} className={`text-center py-8 font-medium ${textLabelClass}`}>Gelen fatura bulunamadı.</td></tr>
                                         ) : paginatedList?.map((inv, idx) => (
-                                            <tr key={idx} className={`h-[52px] transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50'}`}>
-                                                <td className="px-4 align-middle">
-                                                    <div className={`font-semibold text-[13px] ${textValueClass}`}>{inv.supplier}</div>
-                                                    <div className={`text-[11px] font-medium mt-0.5 ${textLabelClass}`}>{inv.id} - {inv.msg}</div>
+                                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12" onClick={e => e.stopPropagation()}>
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+                                                    </div>
                                                 </td>
-                                                <td className={`px-4 align-middle text-[12px] font-medium ${textLabelClass}`}>{inv.date}</td>
-                                                <td className={`px-4 align-middle font-semibold text-[13px] ${textValueClass}`}>{inv.total.toLocaleString()} ₺</td>
-                                                <td className="px-4 align-middle">
-                                                    <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${inv.status === 'Bekliyor'
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="font-black text-[13px] text-slate-800 dark:text-white mb-0.5">{inv.supplier}</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{inv.id} - {inv.msg}</div>
+                                                </td>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap text-[12px] font-medium text-slate-500 dark:text-slate-400">{inv.date}</td>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap font-black text-[13px] text-slate-800 dark:text-white">{inv.total.toLocaleString()} ₺</td>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <span className={`px-2 py-1 text-[10px] font-bold tracking-widest uppercase border rounded-[8px] inline-block ${inv.status === 'Bekliyor'
                                                             ? (isLight ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-500/10 text-amber-400 border-amber-500/20')
                                                             : (isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20')
                                                         }`}>
                                                         {inv.status}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 align-middle text-right flex gap-2 justify-end">
+                                                <td className="px-6 py-3 align-middle text-right flex gap-2 justify-end whitespace-nowrap">
                                                     {inv.status === 'Bekliyor' && (
                                                         <>
                                                             <button
                                                                 onClick={() => handleAcceptPurchaseInvoice(inv.id, inv.documentType || 'INVOICE')}
-                                                                className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-wider transition-colors shadow-sm ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                                className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase transition-colors shadow-sm ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
                                                             >
                                                                 Kabul Et
                                                             </button>
                                                             <button
                                                                 onClick={() => handleRejectPurchaseInvoice(inv.id)}
-                                                                className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-wider transition-colors border shadow-sm ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'}`}
+                                                                className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase transition-colors border shadow-sm ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'}`}
                                                             >
                                                                 Reddet
                                                             </button>
@@ -392,7 +408,7 @@ export function InvoicesTab({
                                                     )}
                                                     <button
                                                         onClick={() => handleViewPDF(inv.id)}
-                                                        className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-wider transition-colors border shadow-sm ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                        className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase transition-colors border shadow-sm ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
                                                     >
                                                         PDF
                                                     </button>
@@ -457,67 +473,75 @@ export function InvoicesTab({
                     </div>
 
                     {isLoadingWayslips ? <div className={`text-[14px] py-8 ${textLabelClass}`}>Yükleniyor...</div> : (
-                        <div className={`rounded-[16px] border p-6 overflow-hidden ${cardClass}`}>
+                        <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse min-w-[800px]">
-                                    <thead className="sticky top-0 bg-transparent">
-                                        <tr className={`border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Belge No</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tip</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Taraf</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tarih</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tutar</th>
-                                            <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Durum</th>
-                                            <th className={`h-[48px] px-4 text-center text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İşlem</th>
+                                    <thead className="bg-transparent border-b border-slate-200 dark:border-white/5">
+                                        <tr>
+                                            <th className="h-[48px] px-6 align-middle w-12">
+                                                <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-not-allowed">
+                                                </div>
+                                            </th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Belge No</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Tip</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Taraf</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Tarih</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Tutar</th>
+                                            <th className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Durum</th>
+                                            <th className="h-[48px] px-6 text-center text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">İşlem</th>
                                         </tr>
                                     </thead>
-                                    <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                         {paginatedList.length === 0 ? (
-                                            <tr><td colSpan={7} className={`text-center py-8 font-medium ${textLabelClass}`}>İrsaliye bulunamadı.</td></tr>
+                                            <tr><td colSpan={8} className={`text-center py-8 font-medium ${textLabelClass}`}>İrsaliye bulunamadı.</td></tr>
                                         ) : paginatedList?.map(irs => {
                                             const isExpanded = expandedOrderId === irs.id;
                                             return (
                                                 <Fragment key={irs.id}>
-                                                    <tr onClick={() => toggleExpand(irs.id)} className={`h-[52px] cursor-pointer transition-colors ${isExpanded ? (isLight ? 'bg-blue-50/30' : 'bg-blue-900/10') : (isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50')}`}>
-                                                        <td className="px-4 align-middle">
-                                                            <div className={`font-semibold text-[13px] ${textValueClass}`}>{irs.formalId || irs.invoiceNo || irs.id}</div>
-                                                            {irs.formalId && <div className="text-[10px] font-semibold text-emerald-500 tracking-wide uppercase mt-0.5">Resmi e-İrsaliye</div>}
+                                                    <tr onClick={() => toggleExpand(irs.id)} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group cursor-pointer">
+                                                        <td className="px-6 py-3 align-middle w-12" onClick={e => e.stopPropagation()}>
+                                                            <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+                                                            </div>
                                                         </td>
-                                                        <td className="px-4 align-middle">
-                                                            <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${irs.type === 'Gelen' ? (isLight ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-500/10 text-blue-400 border-blue-500/20')
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                            <div className="font-black text-[13px] text-slate-800 dark:text-white mb-0.5">{irs.formalId || irs.invoiceNo || irs.id}</div>
+                                                            {irs.formalId && <div className="text-[10px] font-bold text-emerald-500 tracking-widest uppercase mt-0.5">Resmi e-İrsaliye</div>}
+                                                        </td>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                            <span className={`px-2 py-1 text-[10px] font-bold tracking-widest uppercase border rounded-[8px] inline-block ${irs.type === 'Gelen' ? (isLight ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-500/10 text-blue-400 border-blue-500/20')
                                                                     : (isLight ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-purple-500/10 text-purple-400 border-purple-500/20')
                                                                 }`}>
                                                                 {irs.type}
                                                             </span>
                                                         </td>
-                                                        <td className={`px-4 align-middle font-medium text-[13px] ${textValueClass}`}>{irs.customer || irs.supplier}</td>
-                                                        <td className={`px-4 align-middle text-[12px] font-medium ${textLabelClass}`}>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap font-bold text-[13px] text-slate-800 dark:text-white">{irs.customer || irs.supplier}</td>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap text-[12px] font-medium text-slate-500 dark:text-slate-400">
                                                             {typeof irs.date === 'string' && irs.date.includes('.') ? irs.date : new Date(irs.date).toLocaleDateString('tr-TR')}
                                                         </td>
-                                                        <td className={`px-4 align-middle font-semibold text-[13px] ${textValueClass}`}>
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap font-black text-[13px] text-slate-800 dark:text-white">
                                                             {Number(irs.total || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                         </td>
-                                                        <td className="px-4 align-middle">
-                                                            <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${irs.isFormal
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                            <span className={`px-2 py-1 text-[10px] font-bold tracking-widest uppercase border rounded-[8px] inline-block ${irs.isFormal
                                                                     ? (isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20')
                                                                     : (isLight ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-500/10 text-amber-400 border-amber-500/20')
                                                                 }`}>
                                                                 {irs.status}
                                                             </span>
                                                         </td>
-                                                        <td className="px-4 align-middle text-center">
+                                                        <td className="px-6 py-3 align-middle whitespace-nowrap text-center">
                                                             <div className="flex gap-2 items-center justify-center">
                                                                 {irs.type === 'Giden' && !irs.isFormal && (
                                                                     <button
                                                                         onClick={(e) => { e.stopPropagation(); handleSendToELogo(irs.id, 'EIRSALIYE'); }}
-                                                                        className={`h-[32px] px-3 rounded-[8px] text-[11px] font-semibold transition-colors ${isLight ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'}`}
+                                                                        className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase transition-colors ${isLight ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'}`}
                                                                     >
                                                                         Gönder
                                                                     </button>
                                                                 )}
                                                                 <button
                                                                     onClick={(e) => { e.stopPropagation(); toggleExpand(irs.id); }}
-                                                                    className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors border ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                                    className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-widest uppercase transition-colors border ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
                                                                 >
                                                                     {isExpanded ? 'Kapat' : 'Yönet'}
                                                                 </button>

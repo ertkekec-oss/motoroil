@@ -2,6 +2,7 @@
 
 import { useState, Fragment, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
+import { Search, CheckCircle2 } from 'lucide-react';
 
 interface StoreOrdersTabProps {
     storeOrders: any[];
@@ -102,146 +103,104 @@ export function StoreOrdersTab({
 
     return (
         <div className="space-y-8 font-sans">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Mağaza Satış Geçmişi (POS)</h3>
-                
-                <div className="flex flex-wrap items-center gap-2">
-                     <select
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                        className={`h-[36px] px-3 border rounded-[10px] text-[13px] font-medium transition-colors outline-none ${
-                            isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'
-                        }`}
-                    >
-                        <option value="ALL">Tüm Zamanlar</option>
-                        <option value="TODAY">Bugün</option>
-                        <option value="WEEK">Son 1 Hafta</option>
-                        <option value="MONTH">Son 1 Ay</option>
-                        <option value="3MONTHS">Son 3 Ay</option>
-                        <option value="CUSTOM">Özel</option>
-                    </select>
-                    {dateFilter === 'CUSTOM' && (
-                         <div className="flex gap-2 items-center">
-                             <input type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} className={`h-[36px] px-2 rounded-[10px] border text-[12px] ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
-                             <span className={textLabelClass}>-</span>
-                             <input type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} className={`h-[36px] px-2 rounded-[10px] border text-[12px] ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
-                         </div>
-                    )}
-                    <button
-                        onClick={fetchStoreOrders}
-                        className={`h-[36px] px-5 flex items-center justify-center gap-2 rounded-full font-bold tracking-wide text-[13px] border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
-                            }`}
-                    >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                        Yenile
-                    </button>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 mb-6">
+                <div className="relative w-full md:w-[350px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                        type="text" 
+                        placeholder="Kayıt ara..."
+                        className="w-full pl-9 pr-4 h-[44px] bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:bg-[#1e293b] dark:border-white/10 dark:text-white"
+                    />
                 </div>
-            </div>
-
-            {/* Store Stats Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className={`p-5 rounded-[14px] ${cardClass}`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>TOPLAM İŞLEM</div>
-                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-blue-600' : 'text-blue-500'}`}>
-                        {storeOrders.length} <span className={`text-[14px] font-medium ml-1 ${textLabelClass}`}>Adet</span>
-                    </div>
-                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>Tüm zamanlar</div>
-                </div>
-                <div className={`p-5 rounded-[14px] ${cardClass}`}>
-                    <div className="flex justify-between items-center">
-                        <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>{getTurnoverTitle()}</div>
-                        <select
-                            value={turnoverFilter}
-                            onChange={(e) => setTurnoverFilter(e.target.value)}
-                            className={`text-[11px] font-medium border rounded-[6px] px-2 py-1 outline-none ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
-                                }`}
-                        >
-                            <option value="TODAY">Bugün</option>
-                            <option value="WEEK">1 Hafta</option>
-                            <option value="MONTH">Bu Ay</option>
-                            <option value="CUSTOM">Özel</option>
-                        </select>
-                    </div>
-                    {turnoverFilter === 'CUSTOM' && (
-                        <div className="flex gap-2 mt-2 text-[11px]">
-                            <input type="date" value={turnoverCustomStart} onChange={e => setTurnoverCustomStart(e.target.value)} className={`px-2 py-1 rounded-[6px] border ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
-                            <span className={textLabelClass}>–</span>
-                            <input type="date" value={turnoverCustomEnd} onChange={e => setTurnoverCustomEnd(e.target.value)} className={`px-2 py-1 rounded-[6px] border ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
-                        </div>
-                    )}
-
-                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-emerald-600' : 'text-emerald-500'}`}>
-                        ₺ {calculateTurnover(storeOrders).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>Mağaza cirosu</div>
-                </div>
-                <div className={`p-5 rounded-[14px] ${cardClass}`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>ORTALAMA SEPET</div>
-                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${textValueClass}`}>
-                        ₺ {storeOrders.length > 0 ? (storeOrders.reduce((acc, curr) => acc + (parseFloat(curr.totalAmount) || 0), 0) / storeOrders.length).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}
-                    </div>
-                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>İşlem başına</div>
-                </div>
+                <select 
+                    value={dateFilter} 
+                    onChange={e => setDateFilter(e.target.value)}
+                    className="h-[44px] px-4 bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none font-medium text-slate-700 min-w-[140px] appearance-none dark:bg-[#1e293b] dark:border-white/10 dark:text-white cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                >
+                    <option value="ALL">Tüm Satışlar</option>
+                    <option value="TODAY">Bugünki Satışlar</option>
+                    <option value="WEEK">Son 1 Hafta</option>
+                    <option value="MONTH">Son 1 Ay</option>
+                </select>
+                <select 
+                    value={turnoverFilter} 
+                    onChange={e => setTurnoverFilter(e.target.value)}
+                    className="h-[44px] px-4 bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none font-medium text-slate-700 min-w-[140px] appearance-none dark:bg-[#1e293b] dark:border-white/10 dark:text-white cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                >
+                    <option value="TODAY">Tüm Kasalar</option>
+                    <option value="WEEK">Kasa 1 (Ana Kasa)</option>
+                    <option value="MONTH">Kasa 2 (Yedek)</option>
+                </select>
             </div>
 
             {isLoadingStore ? (
-                <div className={`text-[14px] py-8 font-medium ${textLabelClass}`}>Yükleniyor...</div>
+                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="text-[12px] font-black uppercase tracking-widest text-slate-400">Yükleniyor...</div>
+                </div>
             ) : storeOrders.length === 0 ? (
-                <div className={`text-[14px] py-8 text-center font-medium ${textLabelClass}`}>Henüz kayıtlı mağaza satışı bulunmuyor.</div>
+                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="text-[12px] font-black uppercase tracking-widest text-slate-400">Sonuç bulunamadı</div>
+                </div>
             ) : (
-                <div className={`rounded-[16px] border p-6 overflow-hidden ${cardClass}`}>
+                <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[800px]">
-                            <thead className="sticky top-0 bg-transparent">
-                                <tr className={`border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
-                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Sipariş No</th>
-                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tarih</th>
-                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Müşteri</th>
-                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tutar</th>
-                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Ödeme</th>
-                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Durum</th>
-                                    <th className={`h-[48px] px-4 text-center text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İşlem</th>
+                            <thead className="bg-transparent border-b border-slate-200 dark:border-white/5">
+                                <tr>
+                                    <th className="h-[48px] px-6 align-middle w-12">
+                                        <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-not-allowed">
+                                        </div>
+                                    </th>
+                                    {['Sipariş No', 'Müşteri', 'Platform', 'Durum', 'Tutar', 'İşlem']?.map(h => (
+                                        <th key={h} className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">
+                                            {h}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
-                            <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {paginatedOrders?.map(o => {
                                     const isExpanded = expandedStoreOrderId === o.id;
                                     return (
                                         <Fragment key={o.id}>
                                             <tr
                                                 onClick={() => toggleStoreExpand(o.id)}
-                                                className={`h-[52px] cursor-pointer transition-colors ${isExpanded
-                                                        ? (isLight ? 'bg-blue-50/30' : 'bg-blue-900/10')
-                                                        : (isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50')
-                                                    }`}
+                                                className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group cursor-pointer"
                                             >
-                                                <td className={`px-4 align-middle font-medium text-[13px] ${textValueClass}`}>{o.orderNumber || o.id.substring(0, 8)}</td>
-                                                <td className={`px-4 align-middle text-[12px] ${textLabelClass}`}>{new Date(o.orderDate || o.date).toLocaleString('tr-TR')}</td>
-                                                <td className={`px-4 align-middle text-[13px] font-medium ${textValueClass}`}>{o.customerName || 'Davetsiz Müşteri'}</td>
-                                                <td className={`px-4 align-middle text-[13px] font-semibold ${textValueClass}`}>
-                                                    {parseFloat(o.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className={`text-[11px] font-normal ${textLabelClass}`}>{o.currency || 'TL'}</span>
+                                                <td className="px-6 py-3 align-middle w-12" onClick={e => e.stopPropagation()}>
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+                                                    </div>
                                                 </td>
-                                                <td className="px-4 align-middle">
-                                                    <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{o.orderNumber || o.id.substring(0, 8)}</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{new Date(o.orderDate || o.date).toLocaleDateString('tr-TR')}</div>
+                                                </td>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{o.customerName || 'Davetsiz Müşteri'}</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Bireysel Müşteri</div>
+                                                </td>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-bold text-slate-800 dark:text-white mb-0.5 tracking-wide">
                                                         {o.sourceType === 'INVOICE' || o.rawData?.paymentMode === 'account' ? 'Cari / Veresiye' : (o.rawData?.paymentMode === 'cash' ? 'Nakit' : o.rawData?.paymentMode === 'credit_card' ? 'Kredi Kartı' : o.rawData?.paymentMode === 'bank_transfer' ? 'Havale/EFT' : (o.rawData?.paymentMode || 'Nakit').toUpperCase())}
-                                                    </span>
+                                                    </div>
                                                 </td>
-                                                <td className="px-4 align-middle">
-                                                    <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <span className={`px-2 py-1 text-[10px] font-bold tracking-widest uppercase border rounded-[8px] inline-block ${isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
                                                         {o.status || 'Tamamlandı'}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 align-middle text-center">
-                                                    <div className="flex gap-2 items-center justify-center" onClick={e => e.stopPropagation()}>
-                                                        <div className={`p-1.5 cursor-pointer rounded-[6px] ${isLight ? 'text-slate-400 hover:bg-slate-100' : 'text-slate-500 hover:bg-slate-800'}`} onClick={() => toggleStoreExpand(o.id)}>
-                                                            {isExpanded ? '▲' : '▼'}
-                                                        </div>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{parseFloat(o.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {o.currency || 'TL'}</div>
+                                                </td>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="flex gap-2 items-center">
                                                         <button
-                                                            onClick={() => handleDeleteStoreSale(o.id)}
-                                                            className={`px-4 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-colors border ${isLight ? 'border-red-200 text-red-600 bg-red-50 hover:bg-red-100' : 'border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20'
-                                                                }`}
+                                                            onClick={(e) => { e.stopPropagation(); handleDeleteStoreSale(o.id) }}
+                                                            className="px-4 h-[32px] rounded-[12px] text-[11px] font-bold tracking-widest uppercase transition-colors shadow-sm bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/50"
                                                         >
-                                                            Sil
+                                                            İptal Et
                                                         </button>
                                                     </div>
                                                 </td>

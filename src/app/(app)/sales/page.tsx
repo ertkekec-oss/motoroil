@@ -10,7 +10,7 @@ import { useFinancials } from '@/contexts/FinancialContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { apiFetch } from '@/lib/api-client';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, ArrowDownLeft, CheckCircle2, ShoppingBag, Plus } from 'lucide-react';
 
 // New Sub-Components
 import { OnlineOrdersTab } from '@/components/sales/OnlineOrdersTab';
@@ -21,6 +21,22 @@ import { InvoiceMappingModal } from '@/components/sales/InvoiceMappingModal';
 import { NewWayslipModal } from '@/components/sales/NewWayslipModal';
 import { DespatchModal } from '@/components/sales/DespatchModal';
 import { IncomingInvoicePricingModal } from '@/components/sales/IncomingInvoicePricingModal';
+
+const TopPills = ({ pills }: any) => (
+    <div className="flex flex-wrap items-center justify-center gap-4 mb-6 w-full">
+        {pills.map((p: any, i: number) => (
+            <div key={i} className={`flex items-center gap-3 bg-white dark:bg-[#0f172a] rounded-[24px] px-6 py-4 border border-slate-200 dark:border-white/5 shadow-sm min-w-[200px] shrink-0`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${p.bg} ${p.color}`}>
+                    {p.icon}
+                </div>
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase leading-tight mb-0.5">{p.title}</span>
+                    <span className={`text-[18px] font-black truncate ${p.valueColor || 'text-slate-800 dark:text-white'} leading-tight`}>{p.value}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+);
 
 export default function SalesPage() {
     const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
@@ -1029,42 +1045,49 @@ export default function SalesPage() {
     };
 
     return (
-        <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans">
+        <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans text-slate-900 bg-[#f8fafc] dark:bg-slate-950 dark:text-white">
             
+            <TopPills pills={[
+                { title: 'TOPLAM SİPARİŞ', value: onlineOrders.length + storeOrders.length, icon: <ShoppingBag className="w-5 h-5"/>, bg: 'bg-indigo-50 dark:bg-indigo-500/10', color: 'text-indigo-500', valueColor: 'text-indigo-600 dark:text-indigo-400' },
+                { title: 'BEKLEYEN (ONAY)', value: onlineOrders.filter(o => ['Yeni', 'Hazırlanıyor', 'WaitingForApproval', 'Picking'].includes(o.status)).length, icon: <Sun className="w-5 h-5"/>, bg: 'bg-amber-50 dark:bg-amber-500/10', color: 'text-amber-500', valueColor: 'text-amber-600 dark:text-amber-400' },
+                { title: 'TAMAMLANAN', value: onlineOrders.filter(o => ['Delivered', 'Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length, icon: <CheckCircle2 className="w-5 h-5"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500', valueColor: 'text-emerald-600 dark:text-emerald-400' },
+                { title: 'İPTAL / İADE', value: onlineOrders.filter(o => ['Cancelled', 'CANCELLED', 'İptal', 'İptal Edildi', 'Returned'].includes(o.status)).length, icon: <ArrowDownLeft className="w-5 h-5"/>, bg: 'bg-rose-50 dark:bg-rose-500/10', color: 'text-rose-500', valueColor: 'text-rose-600 dark:text-rose-400' }
+            ]} />
 
-            {/* Enterprise Oval Tabs container */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
-                <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
-                    {[
-                        { key: 'all', label: 'Tüm Satışlar', onClick: () => setActiveTab('all') },
-                        { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
-                        { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
-                        { key: 'b2b', label: 'B2B Satışları', onClick: () => setActiveTab('b2b') },
-                        { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
-                        { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
-                        { key: 'revenue', label: 'Revenue Intelligence', onClick: () => router.push('/sales/revenue-intelligence') },
-                    ].map(({ key, label, onClick }) => {
-                        const isActive = activeTab === key || (activeTab === 'invoices' && key === 'invoices' && invoiceSubTab === 'sales') || (activeTab === 'wayslips' && key === 'wayslips' && invoiceSubTab === 'wayslips');
-                        return (
-                            <button
-                                key={key}
-                                onClick={onClick}
-                                className={`flex-1 min-w-[120px] h-11 px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
-                            >
-                                {label}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {/* New Wayslip Add Button */}
+            {/* Centered Actions Row */}
+            <div className="flex items-center justify-center flex-wrap gap-3 mb-6 w-full">
                 {activeTab === 'wayslips' && (
-                    <div className="flex items-center pr-2">
-                        <button onClick={() => setView('new_wayslip')} className="px-6 h-[38px] bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm shadow-emerald-500/20 active:scale-95 flex items-center gap-2 shrink-0">
-                            🚚 YENİ İRSALİYE DÜZENLE
-                        </button>
-                    </div>
+                    <button onClick={() => setView('new_wayslip')} className="h-[40px] px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2">
+                        <Plus className="w-4 h-4"/> Yeni İrsaliye
+                    </button>
                 )}
+                <button className="h-[40px] px-5 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-[12px] font-semibold text-[13px] transition-all flex items-center gap-2">
+                    Dışa Aktar
+                </button>
+            </div>
+
+            {/* Centered Tabs Row */}
+            <div className="flex flex-wrap items-center justify-center gap-1 mb-8 w-full border-b border-slate-200 dark:border-white/5 pb-6">
+                {[
+                    { key: 'all', label: 'Tüm Satışlar', onClick: () => setActiveTab('all') },
+                    { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
+                    { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
+                    { key: 'b2b', label: 'B2B Satışları', onClick: () => setActiveTab('b2b') },
+                    { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
+                    { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
+                    { key: 'revenue', label: 'Revenue Intelligence', onClick: () => router.push('/sales/revenue-intelligence') },
+                ].map(({ key, label, onClick }) => {
+                    const isActive = activeTab === key || (activeTab === 'invoices' && key === 'invoices' && invoiceSubTab === 'sales') || (activeTab === 'wayslips' && key === 'wayslips' && invoiceSubTab === 'wayslips');
+                    return (
+                        <button
+                            key={key}
+                            onClick={onClick}
+                            className={`px-5 py-2 rounded-[16px] text-[13px] transition-all outline-none ${isActive ? 'bg-white font-bold text-slate-800 shadow-sm border border-slate-200 dark:bg-slate-800 dark:text-white dark:border-slate-700' : 'font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#1e293b]'}`}
+                        >
+                            {label}
+                        </button>
+                    );
+                })}
             </div>
 
             <div className="w-full">

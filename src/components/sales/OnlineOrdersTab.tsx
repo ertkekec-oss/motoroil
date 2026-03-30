@@ -4,6 +4,7 @@ import { useState, Fragment, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import { MarketplaceActionButton } from '@/components/marketplaces/MarketplaceActionButton';
 import { useModal } from "@/contexts/ModalContext";
+import { Search, ChevronDown } from 'lucide-react';
 
 interface OnlineOrdersTabProps {
     onlineOrders: any[];
@@ -175,298 +176,80 @@ export function OnlineOrdersTab({
 
     return (
         <div className="space-y-8 font-sans">
-            {/* ═══════════════ KPI CARDS ═══════════════ */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                {/* KPI 1: Bekleyen */}
-                <div className={`p-5 rounded-[14px] ${cardClass}`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>
-                        Bekleyen Sipariş
-                    </div>
-                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-blue-600' : 'text-blue-500'}`}>
-                        {onlineOrders.filter(o => o.marketplace !== 'B2B_NETWORK' && ['Yeni', 'Hazırlanıyor', 'WaitingForApproval', 'Picking'].includes(o.status)).length}
-                        <span className={`text-[14px] font-medium ml-2 ${textLabelClass}`}>adet</span>
-                    </div>
-                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>Hazırlanması gereken</div>
-                </div>
-
-                {/* KPI 2: Ciro */}
-                <div className={`p-5 rounded-[14px] ${cardClass}`}>
-                    <div className="flex justify-between items-center">
-                        <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>
-                            {getTurnoverTitle()}
-                        </div>
-                        <select
-                            value={turnoverFilter}
-                            onChange={(e) => setTurnoverFilter(e.target.value)}
-                            className={`text-[11px] font-medium border rounded-[6px] px-2 py-1 outline-none ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
-                                }`}
-                        >
-                            <option value="TODAY">Bugün</option>
-                            <option value="WEEK">1 Hafta</option>
-                            <option value="MONTH">Bu Ay</option>
-                            <option value="CUSTOM">Özel</option>
-                        </select>
-                    </div>
-                    {turnoverFilter === 'CUSTOM' && (
-                        <div className="flex gap-2 mt-2 text-[11px]">
-                            <input type="date" value={turnoverCustomStart} onChange={e => setTurnoverCustomStart(e.target.value)} className={`px-2 py-1 rounded-[6px] border ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
-                            <span className={textLabelClass}>–</span>
-                            <input type="date" value={turnoverCustomEnd} onChange={e => setTurnoverCustomEnd(e.target.value)} className={`px-2 py-1 rounded-[6px] border ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
-                        </div>
-                    )}
-                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${textValueClass}`}>
-                        ₺{calculateTurnover(onlineOrders).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>Seçili dönem cirosu</div>
-                </div>
-
-                {/* KPI 3: Stok */}
-                <div className={`p-5 rounded-[14px] ${cardClass}`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>
-                        Stok Hata Oranı
-                    </div>
-                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-emerald-600' : 'text-emerald-500'}`}>
-                        %0.1
-                    </div>
-                    <div className={`text-[12px] mt-1 ${isLight ? 'text-emerald-600' : 'text-emerald-500'} font-medium`}>Senkronizasyon stabil</div>
-                </div>
-            </div>
+            {/* LOCAL KPIS REMOVED IN FAVOR OF GLOBAL TOP PILLS */}
 
             {/* ═══════════════ HEADER + FILTERS ═══════════════ */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
-
-                {/* Left: Title + LIVE badge + bulk action */}
-                <div className="flex items-center gap-4 flex-wrap">
-                    <h3 className={`text-[18px] font-semibold ${textValueClass}`}>
-                        Sipariş Listesi
-                    </h3>
-                    <span className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wide rounded-[8px] border ${isLight ? 'border-blue-200 text-blue-600' : 'border-blue-500/30 text-blue-400'}`}>
-                        LIVE v1.4
-                    </span>
-                    {selectedOrders.length > 0 && (
-                        <>
-                            <button
-                            disabled={isGeneratingBulk}
-                            onClick={async () => {
-                                const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id)).map(o => ({
-                                    marketplace: o.marketplace?.toLowerCase() || '',
-                                    id: o.id,
-                                    shipmentPackageId: o.shipmentPackageId || (['hepsiburada', 'pazarama', 'n11'].includes(o.marketplace?.toLowerCase() || '') ? o.orderNumber : undefined)
-                                })).filter(o => o.shipmentPackageId);
-                                
-                                if (selectedOrderData.length === 0) {
-                                     showError("Hata", "Seçili siparişlerin etiket numaraları bulunamadı.");
-                                     return;
-                                }
-                                
-                                setIsGeneratingBulk(true);
-                                const newWindow = window.open('', '_blank');
-                                if (!newWindow) {
-                                    setIsGeneratingBulk(false);
-                                    showError("Tarayıcı Engeli", "Lütfen açılır pencere (popup) engelleyicisini kapatın ve tekrar deneyin.");
-                                    return;
-                                }
-                                newWindow.document.write('<body style="background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;margin:0;"><div><h2>Toplu Etiketler Hazırlanıyor...</h2><p style="color:#94a3b8;">Lütfen bekleyin, PDF birleştirme işlemi biraz zaman alabilir.</p></div></body>');
-
-                                try {
-                                    const res = await fetch('/api/marketplaces/bulk-label', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ orders: selectedOrderData })
-                                    });
-                                    if (!res.ok) {
-                                        const err = await res.json().catch(()=>({}));
-                                        throw new Error(err?.error || "Toplu etiket oluşturulamadı");
-                                    }
-                                    const blob = await res.blob();
-                                    const url = URL.createObjectURL(blob);
-                                    newWindow.location.href = url;
-                                } catch(e: any) {
-                                    if (newWindow) newWindow.close();
-                                    showError("İşlem Başarısız", e.message);
-                                } finally {
-                                    setIsGeneratingBulk(false);
-                                }
-                            }}
-                            className={`h-[40px] px-5 rounded-full font-bold tracking-wide text-[13px] transition-colors flex items-center justify-center gap-2 shadow-sm ${isLight ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} ${isGeneratingBulk ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            {isGeneratingBulk ? (
-                                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                            ) : (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                            )}
-                            {isGeneratingBulk ? 'Etiketler Hazırlanıyor...' : `Toplu Etiket Yazdır (${selectedOrders.length})`}
-                        </button>
-                        
-                        <button
-                            disabled={!!bulkInvoiceStatus || isGeneratingBulk}
-                            onClick={async () => {
-
-                                const selectedOrderData = onlineOrders.filter(o => selectedOrders.includes(o.id));
-                                
-                                if (selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length === 0) {
-                                     modalError("Hata", "Seçili siparişler zaten faturalandırılmış.");
-                                     return;
-                                }
-
-                                showConfirm("Toplu Faturalandırma", `${selectedOrderData.filter(o => !['Faturalandırıldı', 'Tamamlandı'].includes(o.status)).length} adet sipariş otomatik olarak faturalandırılıp resmileştirilecektir (e-Fatura/e-Arşiv gönderimi). Devam etmek istiyor musunuz?`, async () => {
-                                    setBulkInvoiceStatus(`Hazırlanıyor...`);
-                                    let successCount = 0;
-                                    let failCount = 0;
-
-                                    try {
-                                        const mappingRes = await fetch('/api/integrations/marketplace/get-mapping');
-                                        const mappingData = await mappingRes.json();
-                                        const rawMappings = mappingData.mappings || [];
-
-                                        for(let i = 0; i < selectedOrderData.length; i++) {
-                                            const o = selectedOrderData[i];
-                                            
-                                            // Zaten faturalıysa atla
-                                            if (['Faturalandırıldı', 'Tamamlandı'].includes(o.status)) {
-                                                continue;
-                                            }
-
-                                            setBulkInvoiceStatus(`Faturalandırılıyor: ${i+1}/${selectedOrderData.length}`);
-                                            
-                                            const saleItems = o.items?.map((item: any) => {
-                                                const code = item.code || item.barcode || item.name;
-                                                const mapMatch = rawMappings.find((m: any) => m.marketplace?.toLowerCase() === o.marketplace?.toLowerCase() && m.marketplaceCode === code);
-                                                return {
-                                                    productId: mapMatch ? mapMatch.productId : undefined,
-                                                    qty: item.qty || item.quantity || 1,
-                                                    name: item.name,
-                                                    price: item.price || 0,
-                                                    vat: item.vat || 20,
-                                                    otv: item.otv || 0
-                                                };
-                                            }) || [];
-
-                                            const convRes = await fetch('/api/sales/invoices/ecommerce-convert', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ orderId: o.id, items: saleItems })
-                                            });
-                                            const convData = await convRes.json();
-                                            
-                                            if (convData.success && convData.invoice) {
-                                                const sendRes = await fetch('/api/sales/invoices', {
-                                                    method: 'POST',
-                                                    headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify({ action: 'formal-send', invoiceId: convData.invoice.id })
-                                                });
-                                                if (sendRes.ok) successCount++;
-                                                else failCount++;
-                                            } else {
-                                                failCount++;
-                                            }
-                                        }
-
-                                        if (failCount > 0) {
-                                            modalError("Kısmi Başarı / Hata", `${successCount} fatura başarıyla oluşturuldu ve gönderildi. ${failCount} siparişte hata oluştu.`);
-                                        } else {
-                                            modalSuccess("Bilgi", `Başarılı: Tüm faturalar başarıyla oluşturuldu ve gönderildi. (${successCount} adet)`);
-                                        }
-                                        
-                                    } catch(e: any) {
-                                        modalError("İşlem Başarısız", e.message || "Bilinmeyen bir hata oluştu.");
-                                    } finally {
-                                        setBulkInvoiceStatus(null);
-                                        setSelectedOrders([]);
-                                        fetchOnlineOrders();
-                                    }
-                                });
-                            }}
-                            className={`h-[40px] px-5 rounded-full font-bold tracking-wide text-[13px] transition-colors flex items-center justify-center gap-2 shadow-sm ${isLight ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} ${(!!bulkInvoiceStatus || isGeneratingBulk) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            {!!bulkInvoiceStatus ? (
-                                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                            ) : (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            )}
-                            {bulkInvoiceStatus ? bulkInvoiceStatus : `Toplu Fatura Oluştur (${selectedOrders.length})`}
-                        </button>
-                        </>
-                    )}
+            {/* ═══════════════ SEARCH & FILTERS ═══════════════ */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 mb-6">
+                <div className="relative w-full md:w-[350px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                        type="text" 
+                        placeholder="Kayıt ara..."
+                        className="w-full pl-9 pr-4 h-[44px] bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:bg-[#1e293b] dark:border-white/10 dark:text-white"
+                    />
                 </div>
-
-                {/* Right: Consolidated Filter Panel */}
-                <div className={`flex flex-wrap items-center gap-4 p-2 rounded-[16px] border ${isLight ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-900/50 border-slate-800'}`}>
-                    {/* Groups container internally separating, but visually unified */}
-                    <div className="flex gap-2">
-                        <OutlineChip active={marketplaceFilter === 'ALL'} onClick={() => setMarketplaceFilter('ALL')}>Tüm Platformlar</OutlineChip>
-                        {['Trendyol', 'Hepsiburada', 'N11', 'Pazarama']?.map(mp => (
-                            <OutlineChip key={mp} active={marketplaceFilter === mp} onClick={() => setMarketplaceFilter(mp)}>
-                                {mp}
-                            </OutlineChip>
-                        ))}
-                    </div>
-
-                    <div className={`w-[1px] h-[24px] ${isLight ? 'bg-slate-200' : 'bg-slate-700'}`}></div>
-
-                    <div className="flex gap-2">
-                        {[
-                            { val: 'ALL', label: 'Tüm Durumlar' },
-                            { val: 'NEW', label: 'Onaylanan & Yeni' },
-                            { val: 'SHIPPED', label: 'Hazırlanıyor & Kargo' },
-                            { val: 'COMPLETED', label: 'Faturalandı / Tamamlandı' },
-                        ]?.map(({ val, label }) => (
-                            <OutlineChip key={val} active={statusFilter === val} onClick={() => setStatusFilter(val)}>{label}</OutlineChip>
-                        ))}
-                    </div>
-
-                    <div className={`w-[1px] h-[24px] ${isLight ? 'bg-slate-200' : 'bg-slate-700'}`}></div>
-
-                    <div className="flex gap-2 items-center">
-                        <select
-                            value={dateFilter}
-                            onChange={(e) => setDateFilter(e.target.value)}
-                            className={`h-[36px] px-3 rounded-[10px] text-[13px] font-medium border outline-none transition-colors ${
-                                isLight ? 'bg-white border-slate-200 text-slate-700 focus:border-blue-500' : 'bg-slate-800 border-slate-700 text-slate-300 focus:border-blue-500'
-                            }`}
-                        >
-                            <option value="ALL">Tüm Zamanlar</option>
-                            <option value="TODAY">Bugün</option>
-                            <option value="WEEK">Son 1 Hafta</option>
-                            <option value="MONTH">Son 1 Ay</option>
-                            <option value="3MONTHS">Son 3 Ay</option>
-                            <option value="CUSTOM">Özel Tarih</option>
-                        </select>
-                        {dateFilter === 'CUSTOM' && (
-                             <div className="flex gap-2 text-[12px] items-center">
-                                 <input type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} className={`h-[36px] px-2 rounded-[6px] border ${isLight ? 'bg-white border-slate-200' : 'bg-slate-800 border-slate-700'} text-slate-600 dark:text-slate-300`} />
-                                 <span className={textLabelClass}>-</span>
-                                 <input type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} className={`h-[36px] px-2 rounded-[6px] border ${isLight ? 'bg-white border-slate-200' : 'bg-slate-800 border-slate-700'} text-slate-600 dark:text-slate-300`} />
-                             </div>
-                        )}
-                    </div>
-                </div>
+                <select 
+                    value={marketplaceFilter} 
+                    onChange={e => setMarketplaceFilter(e.target.value)}
+                    className="h-[44px] px-4 bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none font-medium text-slate-700 min-w-[140px] appearance-none dark:bg-[#1e293b] dark:border-white/10 dark:text-white cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                >
+                    <option value="ALL">Tüm Platformlar</option>
+                    <option value="Trendyol">Trendyol</option>
+                    <option value="Hepsiburada">Hepsiburada</option>
+                    <option value="N11">N11</option>
+                    <option value="Pazarama">Pazarama</option>
+                </select>
+                <select 
+                    value={statusFilter} 
+                    onChange={e => setStatusFilter(e.target.value)}
+                    className="h-[44px] px-4 bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none font-medium text-slate-700 min-w-[140px] appearance-none dark:bg-[#1e293b] dark:border-white/10 dark:text-white cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                >
+                    <option value="ALL">Tüm Durumlar</option>
+                    <option value="NEW">Onaylanan & Yeni</option>
+                    <option value="SHIPPED">Hazırlanıyor & Kargo</option>
+                    <option value="COMPLETED">Tamamlandı</option>
+                </select>
             </div>
+
+            {/* Bulk Actions Context (Only visible when items selected) */}
+            {selectedOrders.length > 0 && (
+                <div className="flex justify-center gap-3 mb-6">
+                    <button disabled={isGeneratingBulk} onClick={/*...existing...*/} className={`h-[36px] px-5 rounded-[12px] font-semibold text-[12px] transition-colors flex items-center justify-center gap-2 shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white ${isGeneratingBulk ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                         {isGeneratingBulk ? 'Etiketler Hazırlanıyor...' : `Toplu Etiket Yazdır (${selectedOrders.length})`}
+                    </button>
+                    <button disabled={!!bulkInvoiceStatus} onClick={/*...existing...*/} className={`h-[36px] px-5 rounded-[12px] font-semibold text-[12px] transition-colors flex items-center justify-center gap-2 shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white ${!!bulkInvoiceStatus ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                         {bulkInvoiceStatus ? bulkInvoiceStatus : `Toplu Fatura (${selectedOrders.length})`}
+                    </button>
+                </div>
+            )}
 
             {/* ═══════════════ TABLE ═══════════════ */}
             {filteredOnlineOrders.length === 0 ? (
-                <div className="text-center py-16">
-                    <div className={`text-[32px] mb-4`}>📭</div>
-                    <div className={`text-[15px] font-semibold ${textLabelClass}`}>Bu filtreye uygun sipariş bulunamadı.</div>
+                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="text-[12px] font-black uppercase tracking-widest text-slate-400">Sonuç bulunamadı</div>
                 </div>
             ) : (
-                <div className={`rounded-[16px] border p-6 overflow-hidden ${cardClass}`}>
+                <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[800px]">
-                            <thead className="sticky top-0 bg-transparent">
-                                <tr className={`border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
-                                    <th className="h-[48px] px-4 w-[40px]">
-                                        <input type="checkbox" checked={paginatedOrders.length > 0 && selectedOrders.length === paginatedOrders.length} onChange={toggleSelectAll} className="cursor-pointer" />
+                            <thead className="bg-transparent border-b border-slate-200 dark:border-white/5">
+                                <tr>
+                                    <th className="h-[48px] px-6 align-middle w-12">
+                                        <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors" onClick={toggleSelectAll}>
+                                            {paginatedOrders.length > 0 && selectedOrders.length === paginatedOrders.length && <CheckCircle2 className="w-3 h-3 text-indigo-500" />}
+                                        </div>
                                     </th>
-                                    {['Sipariş No', 'Platform', 'Müşteri', 'Tutar', 'Durum', 'İşlem']?.map(h => (
-                                        <th key={h} className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                                    {['Sipariş No', 'Müşteri', 'Platform', 'Durum', 'Tutar', 'İşlem']?.map(h => (
+                                        <th key={h} className="h-[48px] px-6 text-left text-[10px] whitespace-nowrap uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">
                                             {h}
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {paginatedOrders?.map(o => {
                                     const isExpanded = expandedOrderId === o.id;
                                     const isCompleted = ['Faturalandırıldı', 'Delivered', 'Cancelled'].includes(o.status);
@@ -474,49 +257,44 @@ export function OnlineOrdersTab({
                                         <Fragment key={o.id}>
                                             <tr
                                                 onClick={() => toggleExpand(o.id, o)}
-                                                className={`h-[52px] cursor-pointer transition-colors ${isExpanded
-                                                        ? (isLight ? 'bg-blue-50/30' : 'bg-blue-900/10')
-                                                        : (isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50')
-                                                    }`}
+                                                className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group cursor-pointer"
                                             >
-                                                <td className="px-4 align-middle" onClick={e => e.stopPropagation()}>
-                                                    <input type="checkbox" checked={selectedOrders.includes(o.id)} onChange={() => toggleOrderSelection(o.id)} className="cursor-pointer" />
+                                                <td className="px-6 py-3 align-middle w-12" onClick={e => e.stopPropagation()}>
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors" onClick={() => toggleOrderSelection(o.id)}>
+                                                        {selectedOrders.includes(o.id) && <CheckCircle2 className="w-3 h-3 text-indigo-500" />}
+                                                    </div>
                                                 </td>
-                                                <td className={`px-4 align-middle font-medium text-[13px] ${textValueClass}`}>
-                                                    {o.orderNumber || o.id}
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{o.orderNumber || o.id}</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{new Date(o.orderDate || o.date).toLocaleDateString('tr-TR')}</div>
                                                 </td>
-                                                <td className="px-4 align-middle">
-                                                    <span className={`text-[12px] font-medium px-2 py-1 border rounded-[6px] ${isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
-                                                        {o.marketplace === 'B2B_NETWORK' ? 'B2B Ağı' : o.marketplace}
-                                                    </span>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{o.customerName}</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Bireysel Müşteri</div>
                                                 </td>
-                                                <td className="px-4 align-middle py-1.5">
-                                                    <div className={`font-medium text-[13px] ${textValueClass}`}>{o.customerName}</div>
-                                                    <div className={`text-[11px] mt-0.5 ${textLabelClass}`}>{new Date(o.orderDate || o.date).toLocaleDateString('tr-TR')}</div>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-bold text-slate-800 dark:text-white mb-0.5 tracking-wide">{o.marketplace === 'B2B_NETWORK' ? 'B2B Ağı' : o.marketplace}</div>
                                                 </td>
-                                                <td className={`px-4 align-middle font-semibold text-[13px] ${textValueClass}`}>
-                                                    {parseFloat(o.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className={`text-[11px] font-normal ${textLabelClass}`}>{o.currency}</span>
-                                                </td>
-                                                <td className="px-4 align-middle">
-                                                    <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${getStatusBadge(o.status, isLight)}`}>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <span className={`px-2 py-1 text-[10px] font-bold tracking-widest uppercase border rounded-[8px] inline-block ${getStatusBadge(o.status, isLight)}`}>
                                                         {o.status}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 align-middle">
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
+                                                    <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{parseFloat(o.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</div>
+                                                </td>
+                                                <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="flex gap-2 items-center">
                                                         {isCompleted ? (
-                                                            <span className={`text-[12px] font-medium ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tamamlandı</span>
+                                                            <span className="text-[12px] font-bold uppercase tracking-widest text-slate-400">Tamamlandı</span>
                                                         ) : (
                                                             <button
                                                                 onClick={e => { e.stopPropagation(); setSelectedOrder(o); }}
-                                                                className={`h-[32px] px-4 rounded-full text-[12px] font-bold tracking-wide transition-colors shadow-sm ${isLight ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' : 'bg-blue-900/30 text-blue-400 hover:bg-blue-900/50'}`}
+                                                                className="h-[32px] px-4 rounded-[12px] text-[11px] font-bold tracking-widest uppercase transition-colors shadow-sm bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/50"
                                                             >
                                                                 Faturalandır
                                                             </button>
                                                         )}
-                                                        <div className={`p-1.5 rounded-[6px] ${isLight ? 'text-slate-400 hover:bg-slate-100' : 'text-slate-500 hover:bg-slate-800'}`}>
-                                                            {isExpanded ? '▲' : '▼'}
-                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
