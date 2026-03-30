@@ -65,6 +65,8 @@ export function OnlineOrdersTab({
     const [isGeneratingBulk, setIsGeneratingBulk] = useState(false);
     const [bulkInvoiceStatus, setBulkInvoiceStatus] = useState<string | null>(null);
 
+    const [searchQuery, setSearchQuery] = useState('');
+
     const toggleExpand = async (id: string, order?: any) => {
         const isExpanding = expandedOrderId !== id;
         setExpandedOrderId(isExpanding ? id : null);
@@ -143,7 +145,14 @@ export function OnlineOrdersTab({
             }
         }
         let marketplaceMatch = marketplaceFilter === 'ALL' ? !['B2B_NETWORK', 'B2B'].includes(order.marketplace) : order.marketplace === marketplaceFilter;
-        return marketplaceMatch && statusMatch && dateMatch;
+        let searchMatch = true;
+        if (searchQuery.trim() !== '') {
+            const q = searchQuery.toLowerCase();
+            const orderNo = (order.orderNumber || order.id || '').toLowerCase();
+            const custName = (order.customerName || '').toLowerCase();
+            searchMatch = orderNo.includes(q) || custName.includes(q);
+        }
+        return marketplaceMatch && statusMatch && dateMatch && searchMatch;
     });
 
     const ordersPerPage = 10;
@@ -179,39 +188,26 @@ export function OnlineOrdersTab({
             {/* LOCAL KPIS REMOVED IN FAVOR OF GLOBAL TOP PILLS */}
 
             {/* ═══════════════ HEADER + FILTERS ═══════════════ */}
-            {/* ═══════════════ SEARCH & FILTERS ═══════════════ */}
-            <div className="flex flex-col md:flex-row items-center justify-center gap-2 mb-6">
-                <div className="relative w-full md:w-[350px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input 
-                        type="text" 
-                        placeholder="Kayıt ara..."
-                        className="w-full pl-9 pr-4 h-[44px] bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:bg-[#1e293b] dark:border-white/10 dark:text-white"
-                    />
+            {/* ═══════════════ PLATFORM AND STATUS FILTERS ═══════════════ */}
+            <div className="flex flex-col gap-4 mb-6">
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">PLATFORM</span>
+                    <OutlineChip active={marketplaceFilter === 'ALL'} onClick={() => setMarketplaceFilter('ALL')}>Tüm Platformlar</OutlineChip>
+                    {['Trendyol', 'Hepsiburada', 'N11', 'Pazarama'].map(mp => (
+                        <OutlineChip key={mp} active={marketplaceFilter === mp} onClick={() => setMarketplaceFilter(mp)}>{mp}</OutlineChip>
+                    ))}
                 </div>
-                <select 
-                    value={marketplaceFilter} 
-                    onChange={e => setMarketplaceFilter(e.target.value)}
-                    className="h-[44px] px-4 bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none font-medium text-slate-700 min-w-[140px] appearance-none dark:bg-[#1e293b] dark:border-white/10 dark:text-white cursor-pointer"
-                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
-                >
-                    <option value="ALL">Tüm Platformlar</option>
-                    <option value="Trendyol">Trendyol</option>
-                    <option value="Hepsiburada">Hepsiburada</option>
-                    <option value="N11">N11</option>
-                    <option value="Pazarama">Pazarama</option>
-                </select>
-                <select 
-                    value={statusFilter} 
-                    onChange={e => setStatusFilter(e.target.value)}
-                    className="h-[44px] px-4 bg-white rounded-[12px] border border-slate-200 text-[13px] outline-none font-medium text-slate-700 min-w-[140px] appearance-none dark:bg-[#1e293b] dark:border-white/10 dark:text-white cursor-pointer"
-                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
-                >
-                    <option value="ALL">Tüm Durumlar</option>
-                    <option value="NEW">Onaylanan & Yeni</option>
-                    <option value="SHIPPED">Hazırlanıyor & Kargo</option>
-                    <option value="COMPLETED">Tamamlandı</option>
-                </select>
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">DURUM</span>
+                    {[
+                        { val: 'ALL', label: 'Tüm Durumlar' },
+                        { val: 'NEW', label: 'Onaylanan & Yeni' },
+                        { val: 'SHIPPED', label: 'Hazırlanıyor & Kargo' },
+                        { val: 'COMPLETED', label: 'Tamamlandı' },
+                    ].map(({ val, label }) => (
+                        <OutlineChip key={val} active={statusFilter === val} onClick={() => setStatusFilter(val)}>{label}</OutlineChip>
+                    ))}
+                </div>
             </div>
 
             {/* Bulk Actions Context (Only visible when items selected) */}
@@ -351,12 +347,26 @@ export function OnlineOrdersTab({
             )}
 
             {/* ═══════════════ TABLE ═══════════════ */}
-            {filteredOnlineOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm">
-                    <div className="text-[12px] font-black uppercase tracking-widest text-slate-400">Sonuç bulunamadı</div>
+            <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden flex flex-col">
+                <div className="p-4 md:px-6 md:py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-white/5">
+                    <h3 className="text-[13px] font-black text-slate-800 dark:text-white uppercase tracking-widest">Kayıt Listesi</h3>
+                    <div className="relative w-full md:w-[320px]">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input 
+                            type="text" 
+                            placeholder="Kayıt ara..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-9 pr-4 h-[38px] bg-slate-50 dark:bg-black/20 rounded-full border border-slate-200 dark:border-white/10 text-[12px] font-bold outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-slate-800 dark:text-white"
+                        />
+                    </div>
                 </div>
-            ) : (
-                <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden">
+
+                {filteredOnlineOrders.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="text-[12px] font-black uppercase tracking-widest text-slate-400">Sonuç bulunamadı</div>
+                    </div>
+                ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead className="bg-transparent border-b border-slate-200 dark:border-white/5">
@@ -469,8 +479,8 @@ export function OnlineOrdersTab({
                             </tbody>
                         </table>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             <div className={`pt-4 border-t ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                 <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
