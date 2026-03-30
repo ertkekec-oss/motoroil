@@ -95,7 +95,7 @@ export default function PurchasingPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:p-8 bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/5 shadow-sm gap-4">
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+                        <span className="flex items-center justify-center w-10 h-10 rounded-[16px] bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
                             📦
                         </span>
                         Satın Alma & Mal Kabul
@@ -103,26 +103,26 @@ export default function PurchasingPage() {
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 sm:ml-[3.25rem]">Gelen Faturalar ve Depo Giriş İşlemleri</p>
                 </div>
                 {view === 'list' && (
-                    <button onClick={() => setView('new_invoice')} className="flex items-center gap-2 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-[#0f172a]">
-                        <span>+ Yeni Alım Faturası Gir</span>
+                    <button onClick={() => setView('new_invoice')} className="flex items-center gap-2 h-[38px] px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-widest shadow-sm shadow-blue-500/20 transition-all outline-none">
+                        <span>+ YENİ ALIM FATURASI GİR</span>
                     </button>
                 )}
             </div>
 
             {/* --- LIST VIEW --- */}
             {view === 'list' && (
-            <div className="p-6 sm:p-8 flex-1 overflow-y-auto">
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead className="bg-slate-50 dark:bg-[#0f172a]/50 border-b border-slate-200 dark:border-white/5">
+            <div className="p-6 sm:p-8 flex-1 overflow-y-auto w-full">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col w-full">
+                    <div className="overflow-x-auto w-full">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
+                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-widest sticky top-0 z-10 border-b border-slate-200 dark:border-white/5">
                                 <tr>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fatura Bilgisi</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hedef Depo</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tarih</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tutar</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Durum</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">İşlem</th>
+                                    <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">Fatura Bilgisi</th>
+                                    <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">Hedef Depo</th>
+                                    <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">Tarih</th>
+                                    <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">Tutar</th>
+                                    <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">Durum</th>
+                                    <th className="px-6 py-4 font-bold text-right border-b border-slate-200 dark:border-white/5 pr-8">İşlem</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -132,21 +132,20 @@ export default function PurchasingPage() {
                                             <div className="font-bold text-slate-900 dark:text-white text-sm">{inv.supplier}</div>
                                             <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{inv.id} - {inv.msg}</div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/5">
+                                        <td className="px-6 py-4 align-middle">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold tracking-widest uppercase text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                                 {inv.target}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-300">{inv.date}</td>
-                                        <td className="px-6 py-4 font-black text-slate-900 dark:text-white">{inv.total.toLocaleString()} ₺</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${inv.status === 'Onaylandı' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'}`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${inv.status === 'Onaylandı' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-                                                {inv.status === 'Onaylandı' ? 'Stokta' : 'Bekliyor'}
+                                        <td className="px-6 py-4 text-[11px] font-bold tracking-widest text-slate-500 align-middle">{inv.date}</td>
+                                        <td className="px-6 py-4 text-[14px] font-black text-slate-900 dark:text-white align-middle">{inv.total.toLocaleString()} ₺</td>
+                                        <td className="px-6 py-4 align-middle">
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border ${inv.status === 'Onaylandı' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'}`}>
+                                                {inv.status === 'Onaylandı' ? 'STOKTA' : 'BEKLİYOR'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <button className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <td className="px-6 py-4 pr-8 align-middle text-right">
+                                            <button className="px-3 py-1.5 rounded-full border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                                                 Detay
                                             </button>
                                         </td>
@@ -170,15 +169,15 @@ export default function PurchasingPage() {
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] flex justify-center items-center p-4 sm:p-6 animate-in fade-in">
                     <div className="bg-white dark:bg-[#0f172a] w-full max-w-5xl max-h-[90vh] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Modal Header */}
-                        <div className="flex justify-between items-center px-8 py-5 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e293b]/50">
+                        <div className="flex justify-between items-center px-8 py-5 border-b border-slate-200 dark:border-white/10 bg-[#f8fafc] dark:bg-[#1e293b]/50 shrink-0">
                             <div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span className="text-xl">📥</span> MANUEL FATURA GİRİŞ
+                                <h3 className="text-[18px] font-black text-slate-900 dark:text-white flex items-center gap-3">
+                                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100/50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">📥</span> MANUEL FATURA GİRİŞ
                                 </h3>
-                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Alış faturanızı ve detaylarını girip envantere işleyin.</p>
+                                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Alış faturanızı ve detaylarını girip envantere işleyin.</p>
                             </div>
-                            <button onClick={() => setView('list')} className="p-2 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            <button onClick={() => setView('list')} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                             </button>
                         </div>
 
@@ -191,7 +190,7 @@ export default function PurchasingPage() {
                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Tedarikçi</label>
                                     <select
                                         value={formData.supplierId} onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
-                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
+                                        className="w-full h-11 px-3 rounded-[16px] bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
                                     >
                                         <option value="" disabled>Seçiniz...</option>
                                         {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -201,7 +200,7 @@ export default function PurchasingPage() {
                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Hedef Depo / Şube</label>
                                     <select
                                         value={formData.targetBranch} onChange={e => setFormData({ ...formData, targetBranch: e.target.value })}
-                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
+                                        className="w-full h-11 px-3 rounded-[16px] bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
                                     >
                                         <option>Merkez Depo</option>
                                         <option>Kadıköy Şube</option>
@@ -216,7 +215,7 @@ export default function PurchasingPage() {
                                         placeholder="Örn: GIB2026..." 
                                         value={formData.invNo} 
                                         onChange={e => setFormData({ ...formData, invNo: e.target.value })} 
-                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                        className="w-full h-11 px-3 rounded-[16px] bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
                                     />
                                 </div>
                                 <div>
@@ -225,13 +224,13 @@ export default function PurchasingPage() {
                                         type="date" 
                                         value={formData.date} 
                                         onChange={e => setFormData({ ...formData, date: e.target.value })} 
-                                        className="w-full h-11 px-3 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                        className="w-full h-11 px-3 rounded-[16px] bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
                                     />
                                 </div>
                             </div>
 
                             {/* ITEMS ADDER */}
-                            <div className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm">
+                            <div className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[24px] p-6 shadow-sm">
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Ürün Girişi</h4>
                                 
                                 <div className="flex flex-col md:flex-row gap-3 items-end">
@@ -243,7 +242,7 @@ export default function PurchasingPage() {
                                                 const p = products.find(prod => prod.id === e.target.value);
                                                 setTempItem({ ...tempItem, productId: e.target.value, name: p?.name || '', price: parseFloat(String(p?.buyPrice)) || 0 });
                                             }}
-                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
+                                            className="w-full h-11 px-3 rounded-[16px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none"
                                         >
                                             <option value="" disabled>Ürün Arayın & Seçin...</option>
                                             {products.map(p => <option key={p.id} value={p.id}>{p.name} ({p.code})</option>)}
@@ -257,7 +256,7 @@ export default function PurchasingPage() {
                                             placeholder="Adet" 
                                             value={tempItem.qty || ''} 
                                             onChange={e => setTempItem({ ...tempItem, qty: parseInt(e.target.value) || 0 })} 
-                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                            className="w-full h-11 px-3 rounded-[16px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
                                         />
                                     </div>
                                     <div className="w-full md:w-40">
@@ -268,7 +267,7 @@ export default function PurchasingPage() {
                                             placeholder="Fiyat" 
                                             value={tempItem.price || ''} 
                                             onChange={e => setTempItem({ ...tempItem, price: parseFloat(e.target.value) || 0 })} 
-                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                            className="w-full h-11 px-3 rounded-[16px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
                                         />
                                     </div>
                                     <div className="w-full md:w-3/12">
@@ -278,21 +277,21 @@ export default function PurchasingPage() {
                                             placeholder="Örn: ŞASE: XYZ123" 
                                             value={tempItem.description || ''} 
                                             onChange={e => setTempItem({ ...tempItem, description: e.target.value })} 
-                                            className="w-full h-11 px-3 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+                                            className="w-full h-11 px-3 rounded-[16px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
                                         />
                                     </div>
                                     <button 
                                         onClick={addItem}
                                         disabled={!tempItem.productId || tempItem.qty <= 0}
-                                        className="h-11 px-6 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto"
+                                        className="h-11 px-6 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-[10px] uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto"
                                     >
-                                        Listeye Ekle
+                                        LİSTEYE EKLE
                                     </button>
                                 </div>
 
                                 {/* ITEMS LIST */}
                                 {formData.items.length > 0 && (
-                                    <div className="mt-8 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden bg-white dark:bg-[#0f172a]">
+                                    <div className="mt-8 border border-slate-200 dark:border-white/5 rounded-[24px] overflow-hidden bg-white dark:bg-[#0f172a]">
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left border-collapse">
                                                 <thead className="bg-slate-50/50 dark:bg-[#1e293b]/50 border-b border-slate-200 dark:border-white/5">
@@ -340,7 +339,7 @@ export default function PurchasingPage() {
 
                             {/* SUMMARY & SAVE */}
                             {formData.items.length > 0 && (
-                                <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-center sm:items-start gap-6 shadow-xl relative overflow-hidden">
+                                <div className="bg-slate-900 text-white rounded-[24px] p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-center sm:items-start gap-6 shadow-xl relative overflow-hidden">
                                     <div className="absolute -right-8 -top-8 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
                                     <div className="absolute -left-8 -bottom-8 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
                                     
@@ -368,16 +367,16 @@ export default function PurchasingPage() {
 
                         {/* Modal Footer */}
                         <div className="px-8 py-5 border-t border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e293b]/50 flex justify-end gap-3 z-20">
-                            <button onClick={() => setView('list')} className="px-6 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-sm transition-colors">
-                                İptal & Vazgeç
+                            <button onClick={() => setView('list')} className="px-6 py-3 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-[10px] uppercase tracking-widest transition-colors">
+                                İPTAL & VAZGEÇ
                             </button>
                             <button 
                                 onClick={handleSaveInvoice} 
                                 disabled={formData.items.length === 0 || !formData.supplierId}
-                                className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                className="h-11 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] tracking-widest uppercase transition-colors shadow-sm shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
-                                <span>Faturayı Kaydet ve İlerlet</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                <span>KAYDET VE İLERLET</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                             </button>
                         </div>
                     </div>

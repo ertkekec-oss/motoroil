@@ -2135,7 +2135,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {
                 invoiceModalOpen && selectedOrder && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div className="w-[1200px] max-w-[98vw] flex flex-col h-[90vh] overflow-hidden bg-white dark:bg-[#080a0f] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl">
+                        <div className="w-[1200px] max-w-[98vw] flex flex-col h-[90vh] overflow-hidden bg-white dark:bg-[#080a0f] rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl">
                             {/* Header */}
                             <div className="px-6 pt-4 pb-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
                                 <div className="flex items-center gap-3">
@@ -2146,7 +2146,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 md:gap-4">
-                                    <label className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                                    <label className="flex items-center gap-2 px-3 py-1.5 rounded-[24px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
                                         <input
                                             type="checkbox"
                                             id="inv_create_wayslip"
@@ -2180,7 +2180,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                                         return (
                                             <div className="relative group/vadewrap">
-                                                <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer transition-colors ${isAlreadyVadelendi ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-500/50'}`}>
+                                                <label className={`flex items-center gap-2 px-3 py-1.5 rounded-[24px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer transition-colors ${isAlreadyVadelendi ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-500/50'}`}>
                                                     <input
                                                         type="checkbox"
                                                         disabled={isAlreadyVadelendi}
@@ -2192,10 +2192,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 </label>
                                                 
                                                 {isInstallmentInvoice && !isAlreadyVadelendi && (
-                                                    <div className="absolute right-0 top-[120%] z-50 w-72 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl animate-in fade-in zoom-in-95 duration-200 flex flex-col gap-3">
+                                                    <div className="absolute right-0 top-[120%] z-50 w-72 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-xl animate-in fade-in zoom-in-95 duration-200 flex flex-col gap-3">
                                                         <div className="flex flex-col gap-1.5">
                                                             <label className="text-[10px] uppercase font-bold text-slate-500">Taksit Türü</label>
-                                                            <select id="inv_installment_type" defaultValue="Açık Hesap" className="p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold outline-none focus:ring-1 focus:ring-blue-500">
+                                                            <select id="inv_installment_type" defaultValue="Açık Hesap" className="p-2 text-xs rounded-[24px] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold outline-none focus:ring-1 focus:ring-blue-500">
                                                                 <option value="Açık Hesap">Açık Hesap / Cari</option>
                                                                 <option value="Çek">Çek Alınacak</option>
                                                                 <option value="Senet">Senet / Promissory Note</option>
@@ -2203,7 +2203,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         </div>
                                                         <div className="flex flex-col gap-1.5">
                                                             <label className="text-[10px] uppercase font-bold text-slate-500">Ödeme Vadesi (Düzen)</label>
-                                                            <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full text-xs p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg outline-none font-bold">
+                                                            <select value={invoiceInstallmentCount} onChange={e => setInvoiceInstallmentCount(Number(e.target.value))} className="w-full text-xs p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-[24px] outline-none font-bold">
                                                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Ay Seç</option>)}
                                                             </select>
                                                         </div>
@@ -2213,7 +2213,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         );
                                     })()}
 
-                                    <button onClick={() => setInvoiceModalOpen(false)} className="ml-2 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-slate-500 transition-colors">
+                                    <button onClick={() => setInvoiceModalOpen(false)} className="ml-2 w-8 h-8 flex items-center justify-center rounded-[24px] hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-slate-500 transition-colors">
                                         &times;
                                     </button>
                                 </div>
@@ -2233,7 +2233,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             <div className="md:col-span-2">
                                                 <div className="flex flex-col gap-1.5">
                                                     <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400">ADRES</label>
-                                                    <textarea id="inv_address" defaultValue={customer.address} className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all min-h-[50px] resize-y" />
+                                                    <textarea id="inv_address" defaultValue={customer.address} className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all min-h-[50px] resize-y" />
                                                 </div>
                                             </div>
                                         </div>
@@ -2412,7 +2412,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     <td className="px-4 py-2">
                                                         <div className="flex flex-col gap-2 min-w-[250px]">
                                                             <select
-                                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-medium focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 outline-none"
+                                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] text-sm font-medium focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 outline-none"
                                                                 value={it.productId || ''}
                                                                 onChange={(e) => {
                                                                     const selectedProduct = products.find(p => String(p.id) === e.target.value);
@@ -2496,7 +2496,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         placeholder="Malzeme / Hizmet Açıklaması (Örn: ŞASE NO: XYZ, Motor NO: 123...)"
                                                                         value={it.description || ''}
                                                                         onChange={(e) => updateItem('description', e.target.value)}
-                                                                        className="w-full min-h-[60px] p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md outline-none focus:ring-1 focus:ring-blue-500/30 resize-y"
+                                                                        className="w-full min-h-[60px] p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] outline-none focus:ring-1 focus:ring-blue-500/30 resize-y"
                                                                     />
                                                                 </div>
                                                             )}
@@ -2507,7 +2507,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             type="number"
                                                             value={it.qty}
                                                             onChange={(e) => updateItem('qty', Number(e.target.value))}
-                                                            className="w-[70px] h-9 px-2 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300 ml-auto"
+                                                            className="w-[70px] h-9 px-2 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300 ml-auto"
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 text-right">
@@ -2518,7 +2518,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 value={netPrice > 0 ? Number(netPrice.toFixed(4)) : ''}
                                                                 placeholder="0.00"
                                                                 onChange={(e) => updateItem('price', Number(e.target.value))}
-                                                                className="w-[100px] h-9 px-2 text-right bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-mono font-semibold outline-none focus:ring-1 focus:ring-slate-300"
+                                                                className="w-[100px] h-9 px-2 text-right bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] text-sm font-mono font-semibold outline-none focus:ring-1 focus:ring-slate-300"
                                                             />
                                                             <span className="text-xs font-semibold text-slate-500">₺ + KDV</span>
                                                         </div>
@@ -2529,7 +2529,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 type="number"
                                                                 value={it.discountRate || 0}
                                                                 onChange={(e) => updateItem('discountRate', Number(e.target.value))}
-                                                                className="w-full h-9 pl-2 pr-6 text-center bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/50 rounded-md text-sm text-rose-600 dark:text-rose-400 font-semibold outline-none focus:ring-1 focus:ring-rose-300"
+                                                                className="w-full h-9 pl-2 pr-6 text-center bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/50 rounded-[24px] text-sm text-rose-600 dark:text-rose-400 font-semibold outline-none focus:ring-1 focus:ring-rose-300"
                                                             />
                                                             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-rose-400 pointer-events-none">%</span>
                                                         </div>
@@ -2543,7 +2543,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 type="number"
                                                                 value={it.vat}
                                                                 onChange={(e) => updateItem('vat', Number(e.target.value))}
-                                                                className="w-full h-9 pl-2 pr-6 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300"
+                                                                className="w-full h-9 pl-2 pr-6 text-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] text-sm font-semibold outline-none focus:ring-1 focus:ring-slate-300"
                                                             />
                                                             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">%</span>
                                                         </div>
@@ -2556,13 +2556,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             type="number"
                                                             value={lineGrossTotal.toFixed(2)}
                                                             onChange={(e) => handleGrossChange(Number(e.target.value))}
-                                                            className="w-[110px] h-9 px-2 text-right bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-md text-sm font-mono font-bold outline-none ml-auto"
+                                                            className="w-[110px] h-9 px-2 text-right bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-[24px] text-sm font-mono font-bold outline-none ml-auto"
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 text-center">
                                                         <button
                                                             onClick={() => setInvoiceItems(invoiceItems.filter((_, idx) => idx !== i))}
-                                                            className="w-8 h-8 flex items-center justify-center rounded-md bg-red-50 text-red-500 hover:bg-red-500 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-500 transition-colors mx-auto"
+                                                            className="w-8 h-8 flex items-center justify-center rounded-[24px] bg-red-50 text-red-500 hover:bg-red-500 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-500 transition-colors mx-auto"
                                                         >
                                                             🗑️
                                                         </button>
@@ -2689,7 +2689,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                         window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                     }}
-                                    className="w-full h-14 rounded-xl flex items-center justify-center gap-3 font-semibold text-white bg-green-500 hover:bg-green-600 shadow-sm shadow-green-500/30 transition-all hover:-translate-y-0.5"
+                                    className="w-full h-14 rounded-[24px] flex items-center justify-center gap-3 font-semibold text-white bg-green-500 hover:bg-green-600 shadow-sm shadow-green-500/30 transition-all hover:-translate-y-0.5"
                                 >
                                     <span className="text-2xl">💬</span> Müşteriye WhatsApp&apos;tan İlet
                                 </button>
@@ -2707,7 +2707,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 {lastInvoice?.description?.includes('Senet') && (
                                     <button
                                         onClick={() => setOtpModalOpen(true)}
-                                        className="w-full h-14 rounded-xl flex items-center justify-center gap-3 font-semibold text-amber-700 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 transition-colors hover:bg-amber-100 dark:hover:bg-amber-500/20"
+                                        className="w-full h-14 rounded-[24px] flex items-center justify-center gap-3 font-semibold text-amber-700 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 transition-colors hover:bg-amber-100 dark:hover:bg-amber-500/20"
                                     >
                                         <span className="text-xl">✍️</span> Seneti Yazdır / OTP İmzaya Sun
                                     </button>
@@ -2723,7 +2723,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                             <button
                                 onClick={() => setShareModalOpen(false)}
-                                className="mt-8 w-full p-4 rounded-xl font-bold tracking-wide text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 transition-colors"
+                                className="mt-8 w-full p-4 rounded-[24px] font-bold tracking-wide text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 transition-colors"
                             >
                                 PENCEREYİ KAPAT
                             </button>
@@ -2753,7 +2753,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <p className="text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
                                     Bu siparişin <strong>{installmentPrompt.paidAmount?.toLocaleString('tr-TR')} ₺</strong>&apos;lik tutarı daha önce Kasa/Kart üzerinden tahsil edilmiştir.
                                 </p>
-                                <p className="text-[15px] text-amber-700 dark:text-amber-500 font-semibold p-4 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20">
+                                <p className="text-[15px] text-amber-700 dark:text-amber-500 font-semibold p-4 bg-amber-50 dark:bg-amber-500/10 rounded-[24px] border border-amber-200 dark:border-amber-500/20">
                                     Eğer bu işleme yinede vade yapmak istiyorsanız Vadelendir&apos;e basarak önceki tahsilatı iptal edip tüm bakiyeyi vadelendirebilirsiniz.
                                 </p>
                                 <div className="flex gap-4 mt-2">
@@ -2789,7 +2789,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         setInstallmentPrompt({ isOpen: false, type: null });
                                         proceedWithInvoice(installmentPrompt.invoiceData, installmentPrompt.difference || 0);
                                     }}
-                                    className="p-4 rounded-xl text-left flex flex-col gap-1 border border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5 hover:bg-blue-100 dark:hover:bg-blue-500/10 transition-colors"
+                                    className="p-4 rounded-[24px] text-left flex flex-col gap-1 border border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5 hover:bg-blue-100 dark:hover:bg-blue-500/10 transition-colors"
                                 >
                                     <span className="text-base font-bold text-blue-600 dark:text-blue-500">1. Sadece Kalanı Vadelendir</span>
                                     <span className="text-sm text-slate-500 dark:text-slate-400">Sadece yeni eklenen/kalan tutar ({installmentPrompt.difference?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
@@ -2801,7 +2801,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         setInstallmentPrompt({ isOpen: false, type: null });
                                         proceedWithInvoice(data, installmentPrompt.newTotalAmount || 0);
                                     }}
-                                    className="p-4 rounded-xl text-left flex flex-col gap-1 border border-amber-200 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 hover:bg-amber-100 dark:hover:bg-amber-500/10 transition-colors"
+                                    className="p-4 rounded-[24px] text-left flex flex-col gap-1 border border-amber-200 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 hover:bg-amber-100 dark:hover:bg-amber-500/10 transition-colors"
                                 >
                                     <span className="text-base font-bold text-amber-600 dark:text-amber-500">2. Eski Tahsilatı İptal Et & Tümünü Vadelendir</span>
                                     <span className="text-sm text-slate-500 dark:text-slate-400">Önceki tahsilat iptal edilecek ve tüm tutar ({installmentPrompt.newTotalAmount?.toLocaleString('tr-TR')} ₺) vadelendirilecek.</span>
@@ -2822,7 +2822,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             type="text"
                                             value={customInstallAmount}
                                             onChange={e => setCustomInstallAmount(formatCurrencyInput(e.target.value))}
-                                            className="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-blue-500 text-slate-900 dark:text-white text-lg font-bold font-mono outline-none focus:ring-2 focus:ring-blue-500/30 transition-shadow pr-10"
+                                            className="w-full p-4 rounded-[24px] bg-slate-50 dark:bg-slate-900 border border-blue-500 text-slate-900 dark:text-white text-lg font-bold font-mono outline-none focus:ring-2 focus:ring-blue-500/30 transition-shadow pr-10"
                                         />
                                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₺</span>
                                     </div>
@@ -3079,7 +3079,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </div>
                                 <button
                                     onClick={() => setIsProductPickerOpen(false)}
-                                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-[24px] transition-colors"
                                 >
                                     <span className="text-2xl leading-none">&times;</span>
                                 </button>
@@ -3092,7 +3092,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     placeholder="Ürün adı, barkod veya stok kodu ile arayın..."
                                     value={productSearchTerm}
                                     onChange={(e) => setProductSearchTerm(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:border-blue-500 dark:focus:border-blue-500/50 text-slate-900 dark:text-white font-medium outline-none transition-colors"
+                                    className="w-full pl-12 pr-4 py-4 rounded-[24px] bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:border-blue-500 dark:focus:border-blue-500/50 text-slate-900 dark:text-white font-medium outline-none transition-colors"
                                 />
                             </div>
 
@@ -3145,10 +3145,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     setIsProductPickerOpen(false);
                                                     setProductSearchTerm('');
                                                 }}
-                                                className="group p-4 bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:border-blue-500/50 hover:bg-blue-50 dark:hover:bg-blue-500/5 transition-all flex justify-between items-center"
+                                                className="group p-4 bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-[24px] cursor-pointer hover:border-blue-500/50 hover:bg-blue-50 dark:hover:bg-blue-500/5 transition-all flex justify-between items-center"
                                             >
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-lg flex items-center justify-center text-xl text-blue-600 dark:text-blue-500">
+                                                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-[24px] flex items-center justify-center text-xl text-blue-600 dark:text-blue-500">
                                                         {p.category?.charAt(0) || '📦'}
                                                     </div>
                                                     <div>
@@ -3179,7 +3179,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         setInvoiceItems([...invoiceItems, { name: 'Yeni Manuel Hizmet / Ürün', qty: 1, price: 0, vat: 20 }]);
                                         setIsProductPickerOpen(false);
                                     }}
-                                    className="w-full p-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-50 dark:bg-slate-900/30 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all font-bold flex items-center justify-center gap-2 text-sm"
+                                    className="w-full p-4 rounded-[24px] border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-50 dark:bg-slate-900/30 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all font-bold flex items-center justify-center gap-2 text-sm"
                                 >
                                     <span className="text-lg">➕</span> Envanter Dışı Manuel Hizmet Ekle
                                 </button>
@@ -3208,7 +3208,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
 
                             <div className="flex flex-col gap-6">
-                                <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-[24px] border border-slate-200 dark:border-slate-800 text-center">
                                     <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                                         {activeCheck.type}
                                     </div>
@@ -3368,7 +3368,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 />
                             </div>
 
-                            <div className="flex-col gap-2 mt-4 p-4 border rounded-xl" style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)' }}>
+                            <div className="flex-col gap-2 mt-4 p-4 border rounded-[24px]" style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)' }}>
                                 <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-main, #fff)', letterSpacing: '0.5px', display: 'flex', gap: '6px', alignItems: 'center' }}>
                                     <span>📸</span> EVRAK GÖRSELİ YÜKLE
                                 </label>
