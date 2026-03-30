@@ -38,19 +38,35 @@ export default async function InboxSignaturesPage() {
         <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-white pb-24">
             <div className="max-w-[1600px] mx-auto p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
                 
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-8">
-                    <div className="flex items-center gap-4">
-                        <Link href="/signatures" className="w-12 h-12 rounded-2xl bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-[#1e293b] flex items-center justify-center text-slate-500 dark:text-slate-400 transition-all shrink-0">
-                            <ChevronLeft className="w-6 h-6" />
+                {/* Enterprise Level 10 Unified Oval Navigation */}
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-6 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="flex flex-wrap items-center gap-1 overflow-x-auto no-scrollbar">
+                        {[
+                            { path: '/signatures', label: 'İmza Panosu' },
+                            { path: '/signatures/inbox', label: 'Gelen Talepler' },
+                            { path: '/signatures/envelopes', label: 'Zarflar' },
+                            { path: '/signatures/pending', label: 'Bekleyenler' },
+                            { path: '/signatures/completed', label: 'Tamamlananlar' }
+                        ].map(tab => {
+                            const isActive = '/signatures/inbox' === tab.path;
+                            return (
+                                <Link
+                                    key={tab.path}
+                                    href={tab.path}
+                                    className={`h-[38px] flex flex-row items-center px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300'}`}
+                                >
+                                    {tab.label}
+                                </Link>
+                            );
+                        })}
+                    </div>
+                    <div>
+                        <Link
+                            href="/signatures/new"
+                            className="h-[38px] px-6 flex flex-row items-center gap-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm whitespace-nowrap"
+                        >
+                            + YENİ ZARF
                         </Link>
-                        <div>
-                            <h1 className="text-[24px] font-black text-slate-800 dark:text-white tracking-tight leading-none mb-1">
-                                Bana Gelenler (Inbox)
-                            </h1>
-                            <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                                Onayınıza veya imzanıza sunulan aktif tüm belgeler
-                            </p>
-                        </div>
                     </div>
                 </div>
 

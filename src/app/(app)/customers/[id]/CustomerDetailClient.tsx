@@ -1025,85 +1025,37 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </Link>
                 </div>
 
-                {/* GROUPED NAVIGATION & FILTERS - OLD STYLE V2 */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-center gap-4 mt-4 mb-2">
-                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-3 px-1 custom-scroll select-none pb-2">
-                        
-                        {/* Group 1 */}
-                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
-                            {[
-                                { id: 'all', label: 'Tüm Hareketler' },
-                                { id: 'sales', label: 'Satışlar & Faturalar' },
-                                { id: 'payments', label: 'Finansal İşlemler' },
-                                { id: 'offers', label: 'Teklifler' }
-                            ].map(tab => (
+                {/* Enterprise Level 10 Oval Tabs Navigation */}
+                <div className="flex flex-wrap items-center gap-1 mb-2 mt-4 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm overflow-x-auto no-scrollbar">
+                    {[
+                        { id: 'all', label: 'Tüm Hareketler', group: 1 },
+                        { id: 'sales', label: 'Satışlar & Faturalar', group: 1 },
+                        { id: 'payments', label: 'Finansal İşlemler', group: 1 },
+                        { id: 'offers', label: 'Teklifler', group: 1 },
+                        { id: 'documents', label: 'Dosyalar', group: 2 },
+                        { id: 'warranties', label: 'Garantiler', group: 2 },
+                        { id: 'services', label: 'Servis', group: 3 },
+                        { id: 'checks', label: 'Vadeler', group: 4 },
+                        { id: 'reconciliation', label: 'Mutabakat', group: 4 }
+                    ].map((tab, idx, arr) => {
+                        const isActive = activeTab === tab.id;
+                        const showDivider = idx > 0 && tab.group !== arr[idx - 1].group;
+                        return (
+                            <React.Fragment key={tab.id}>
+                                {showDivider && <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0 mx-1"></div>}
                                 <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as any)}
-                                    className={activeTab === tab.id
-                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
-                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
+                                    onClick={() => { 
+                                        setActiveTab(tab.id as any); 
+                                        if (tab.id === 'documents') fetchDocuments(); 
+                                        if (tab.id === 'services') fetchServices(); 
+                                    }}
+                                    className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300'}`}
                                 >
                                     {tab.label}
                                 </button>
-                            ))}
-                        </div>
-
-                        <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0"></div>
-
-                        {/* Group 2 */}
-                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
-                            {[
-                                { id: 'documents', label: 'Dosyalar & Evraklar' },
-                                { id: 'warranties', label: 'Garantiler' }
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => { setActiveTab(tab.id as any); if (tab.id === 'documents') fetchDocuments(); }}
-                                    className={activeTab === tab.id
-                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
-                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0"></div>
-
-                        {/* Group 3 */}
-                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
-                            <button
-                                onClick={() => { setActiveTab('services' as any); fetchServices(); }}
-                                className={activeTab === 'services'
-                                    ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
-                                    : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
-                            >
-                                Servis
-                            </button>
-                        </div>
-
-                        <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0"></div>
-
-                        {/* Group 4 */}
-                        <div className="flex items-center gap-1 p-1 rounded-full border border-slate-200 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/20">
-                            {[
-                                { id: 'checks', label: 'Evraklar & Vadeler' },
-                                { id: 'reconciliation', label: 'Mutabakatlar' }
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as any)}
-                                    className={activeTab === tab.id
-                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 shadow-sm border border-slate-200/50 dark:border-white/5 rounded-full transition-all"
-                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-
-                    </div>
+                            </React.Fragment>
+                        );
+                    })}
                 </div>
 
                 {/* CONTENT AREA */}

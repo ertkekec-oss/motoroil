@@ -323,17 +323,26 @@ export default function CustomersPage() {
 
     return (
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans" style={{ background: isLight ? '#FAFAFA' : undefined }}>
-
-            <div className="flex justify-between items-start mb-2">
-                <div>
-                    <h1 className={`text-[24px] font-semibold tracking-tight ${textValueClass}`}>Müşteri Kontrol Konsolu</h1>
-                    <p className={`text-[13px] mt-1 font-medium ${textLabelClass}`}>Portföy, bakiyeler ve hesap hareketleri</p>
+            {/* Enterprise Oval Tabs & Header Replacement */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+                <div className="flex flex-wrap items-center gap-1 overflow-x-auto no-scrollbar">
+                    {tabs.map(tab => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => handleTabChange(tab.id)}
+                                className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300'}`}
+                            >
+                                {tab.label}
+                            </button>
+                        );
+                    })}
                 </div>
-                <div className="flex gap-3">
+                <div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className={`h-[40px] px-5 flex items-center gap-2 rounded-[12px] font-medium text-[13px] transition-all shadow-sm ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'
-                            }`}
+                        className="h-[38px] px-6 flex flex-row items-center gap-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm whitespace-nowrap"
                     >
                         <Plus className="w-4 h-4" />
                         Yeni Müşteri
@@ -439,26 +448,6 @@ export default function CustomersPage() {
                 {/* Filters Collapse */}
                 {showFilters && (
                     <div className={`p-5 rounded-[12px] border flex flex-wrap gap-8 animate-in slide-in-from-top-2 overflow-hidden ${cardClass}`}>
-                        <div>
-                            <div className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${textLabelClass}`}>Kategori</div>
-                            <div className="flex flex-wrap gap-2">
-                                {tabs.map(tab => {
-                                    const isActive = activeTab === tab.id;
-                                    return (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => handleTabChange(tab.id)}
-                                            className={`h-[32px] px-4 rounded-[10px] text-[12px] font-medium border transition-colors ${isActive
-                                                ? (isLight ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-blue-900/20 border-blue-800/50 text-blue-400')
-                                                : (isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800')
-                                                }`}
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    )
-                                })}
-                            </div>
-                        </div>
                         <div className="flex-1 min-w-[200px] max-w-[300px]">
                             <div className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${textLabelClass}`}>Şube</div>
                             <select
@@ -665,7 +654,7 @@ export default function CustomersPage() {
 
             {/* MODALS */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm z-[9999]">
                     <div className={`w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[16px] shadow-2xl animate-in fade-in zoom-in-95 ${cardClass}`}>
                         <div className={`p-6 border-b flex justify-between items-center sticky top-0 bg-inherit z-10 ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                             <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Yeni Müşteri Ekle</h3>
@@ -750,7 +739,7 @@ export default function CustomersPage() {
             )}
 
             {isEditModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm z-[9999]">
                     <div className={`w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[16px] shadow-2xl animate-in fade-in zoom-in-95 ${cardClass}`}>
                         <div className={`p-6 border-b flex justify-between items-center sticky top-0 bg-inherit z-10 ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                             <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Müşteri Düzenle</h3>
@@ -835,7 +824,7 @@ export default function CustomersPage() {
 
             {/* Bulk Category Assignment Modal */}
             {isBulkCategoryModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm z-[9999]">
                     <div className={`w-full max-w-[400px] rounded-[16px] shadow-2xl animate-in fade-in zoom-in-95 ${cardClass}`}>
                         <div className={`p-6 border-b flex justify-between items-center ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                             <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Toplu Sınıf Ata</h3>

@@ -281,23 +281,29 @@ export default function SuppliersPage() {
       data-pos-theme={theme}
       className={`w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans ${isLight ? "bg-[#FAFAFA]" : ""}`}
     >
-      {/* HEADER */}
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h1 className={`text-[24px] font-semibold tracking-tight ${textValueClass}`}>
-            Tedarikçi Kontrol Konsolu
-          </h1>
-          <p className={`text-[13px] mt-1 font-medium ${textLabelClass}`}>
-            Toptancı listesi, bakiyeler ve satın alma işlemleri
-          </p>
+      {/* HEADER & OVAL TABS */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
+        <div className="flex flex-wrap items-center gap-1 overflow-x-auto no-scrollbar">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive
+                    ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300"
+                  }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
-        <div className="flex gap-3">
+        <div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className={`h-[40px] px-5 flex items-center gap-2 rounded-[12px] font-medium text-[13px] transition-all shadow-sm ${isLight
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-blue-600 text-white hover:bg-blue-500"
-              }`}
+            className="h-[38px] px-6 flex flex-row items-center gap-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             Yeni Tedarikçi
@@ -424,32 +430,6 @@ export default function SuppliersPage() {
         {/* Filters Collapse */}
         {showFilters && (
           <div className={`p-5 rounded-[12px] border flex flex-wrap gap-8 animate-in slide-in-from-top-2 overflow-hidden ${cardClass}`}>
-            <div>
-              <div className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${textLabelClass}`}>
-                Görünüm
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {tabs.map((tab) => {
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => handleTabChange(tab.id)}
-                      className={`h-[32px] px-4 rounded-[10px] text-[12px] font-medium border transition-colors ${isActive
-                          ? isLight
-                            ? "bg-blue-50 border-blue-200 text-blue-700"
-                            : "bg-blue-900/20 border-blue-800/50 text-blue-400"
-                          : isLight
-                            ? "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-                            : "bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800"
-                        }`}
-                    >
-                      {tab.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
             <div className="flex-1 min-w-[200px] max-w-[300px]">
               <div className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${textLabelClass}`}>
                 Şube
@@ -686,10 +666,10 @@ export default function SuppliersPage() {
 
       {/* ADD/EDIT MODAL FORMS */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 ">
-          <div className={`w-[600px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
-            <div className={`flex justify-between items-center px-6 py-4 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
-              <h2 className={`text-[16px] font-semibold ${textValueClass}`}>Yeni Tedarikçi Ekle</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm z-[9999]">
+          <div className={`w-[600px] max-w-full rounded-[24px] overflow-hidden flex flex-col max-h-[90vh] bg-white dark:bg-[#0f172a] shadow-2xl animate-in zoom-in-95 duration-200 border-0`}>
+            <div className={`flex justify-between items-center px-6 py-5 border-b sticky top-0 bg-inherit z-10 ${isLight ? "border-slate-100" : "border-slate-800/50"}`}>
+              <h2 className={`text-[16px] font-black tracking-tight ${textValueClass}`}>YENİ TEDARİKÇİ EKLE</h2>
               <button onClick={() => setIsModalOpen(false)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
             </div>
             <div className="p-6 overflow-y-auto custom-scroll flex flex-col gap-4">
@@ -764,7 +744,7 @@ export default function SuppliersPage() {
               </div>
             </div>
             <div className={`p-6 bg-slate-50 dark:bg-slate-900 border-t ${isLight ? "border-slate-100" : "border-slate-800"}`}>
-              <button onClick={handleAddSupplier} disabled={isProcessing} className={`w-full h-[44px] rounded-[10px] text-[14px] font-semibold text-white transition-all ${isLight ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-500"} ${isProcessing ? 'opacity-50' : ''}`}>
+              <button onClick={handleAddSupplier} disabled={isProcessing} className={`w-full h-[48px] rounded-full text-[13px] tracking-widest font-black uppercase text-white transition-all bg-indigo-600 hover:bg-indigo-500 shadow-lg active:scale-[0.98] ${isProcessing ? "opacity-50" : ""}`}>
                 {isProcessing ? "Kaydediliyor..." : "Kaydet"}
               </button>
             </div>
@@ -773,10 +753,10 @@ export default function SuppliersPage() {
       )}
 
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 ">
-          <div className={`w-[600px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
-            <div className={`flex justify-between items-center px-6 py-4 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
-              <h2 className={`text-[16px] font-semibold ${textValueClass}`}>Tedarikçi Düzenle</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm z-[9999]">
+          <div className={`w-[600px] max-w-full rounded-[24px] overflow-hidden flex flex-col max-h-[90vh] bg-white dark:bg-[#0f172a] shadow-2xl animate-in zoom-in-95 duration-200 border-0`}>
+            <div className={`flex justify-between items-center px-6 py-5 border-b sticky top-0 bg-inherit z-10 ${isLight ? "border-slate-100" : "border-slate-800/50"}`}>
+              <h2 className={`text-[16px] font-black tracking-tight ${textValueClass}`}>TEDARİKÇİ DÜZENLE</h2>
               <button onClick={() => setIsEditModalOpen(false)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
             </div>
             <div className="p-6 overflow-y-auto custom-scroll flex flex-col gap-4">
@@ -851,7 +831,7 @@ export default function SuppliersPage() {
               </div>
             </div>
             <div className={`p-6 bg-slate-50 dark:bg-slate-900 border-t ${isLight ? "border-slate-100" : "border-slate-800"}`}>
-              <button onClick={handleEditSupplier} disabled={isProcessing} className={`w-full h-[44px] rounded-[10px] text-[14px] font-semibold text-white transition-all ${isLight ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-500"} ${isProcessing ? 'opacity-50' : ''}`}>
+              <button onClick={handleEditSupplier} disabled={isProcessing} className={`w-full h-[48px] rounded-full text-[13px] tracking-widest font-black uppercase text-white transition-all bg-indigo-600 hover:bg-indigo-500 shadow-lg active:scale-[0.98] ${isProcessing ? "opacity-50" : ""}`}>
                 {isProcessing ? "Güncelleniyor..." : "Değişiklikleri Kaydet"}
               </button>
             </div>

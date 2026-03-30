@@ -326,13 +326,36 @@ const TargetsView = ({ targets, statsData, user }: any) => {
 const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
     const [subTab, setSubTab] = useState<'pending' | 'completed' | 'all'>('pending');
     const [selectedTask, setSelectedTask] = useState<any>(null);
+    const [feedbackContent, setFeedbackContent] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    const markAsCompleted = async () => {
+    const updateTaskStatus = async (status: string) => {
         if(!selectedTask) return;
+        setIsUpdating(true);
         try {
-            const res = await fetch(`/api/staff/tasks/${selectedTask.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ status: 'Tamamlandı' }) });
-            if(res.ok) { fetchTasks(); setSelectedTask({ ...selectedTask, status: 'Tamamlandı' }); }
-        } catch(e) {}
+            const bodyData: any = { status };
+            if (status === 'Tamamlandı' && feedbackContent) {
+                bodyData.feedbackContent = feedbackContent;
+                bodyData.isFromStaff = true;
+            }
+            const res = await fetch(`/api/staff/tasks/${selectedTask.id}`, { 
+                method: 'PUT', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(bodyData) 
+            });
+            if(res.ok) { 
+                fetchTasks(); 
+                setSelectedTask({ ...selectedTask, status }); 
+                if (status === 'Tamamlandı') setFeedbackContent('');
+                toast.success(`Görev ${status} olarak güncellendi.`);
+            } else {
+                toast.error("İşlem başarısız.");
+            }
+        } catch(e) {
+            toast.error("Bağlantı hatası.");
+        } finally {
+            setIsUpdating(false);
+        }
     };
     
     const displayTasks = tasks.filter((t: any) => {
@@ -372,15 +395,14 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {displayTasks.map((t: any) => (
-                                    <tr key={t.id} onClick={() => setSelectedTask(t)} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[54px] group cursor-pointer">
+                                    <tr key={t.id} onClick={() => setSelectedTask(t)} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[64px] group cursor-pointer">
                                         <td className="px-4 py-3 pl-6 align-middle">
                                             <div className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest leading-snug">{t.title}</div>
+                                            <div className="text-[10px] text-slate-500 mt-1 line-clamp-1">{t.description || "Açıklama yok"}</div>
                                         </td>
-                                        <td className="px-4 py-3 pr-6 align-middle text-right flex justify-end">
-                                            <div className="flex flex-col items-end gap-1">
-                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t.status}</span>
-                                                {t.priority === 'HIGH' && <span className="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 dark:bg-red-500/10 px-2 py-0.5 rounded border border-red-100 dark:border-red-500/20">YÜKSEK</span>}
-                                            </div>
+                                        <td className="px-4 py-3 pr-6 align-middle text-right flex flex-col items-end gap-1">
+                                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${t.status === 'Tamamlandı' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : t.status === 'Devam Ediyor' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-white/5'}`}>{t.status || 'Bekliyor'}</span>
+                                            {t.priority === 'HIGH' && <span className="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 dark:bg-red-500/10 px-2 py-0.5 rounded border border-red-100 dark:border-red-500/20">YÜKSEK</span>}
                                         </td>
                                     </tr>
                                 ))}
@@ -393,15 +415,36 @@ const TasksView = ({ user, tasks=[], fetchTasks, loading }: any) => {
                     {selectedTask ? (
                         <div className="p-6 flex flex-col h-full animate-in fade-in duration-300">
                             <h2 className="text-[14px] font-black uppercase tracking-widest text-slate-800 dark:text-white mb-2">{selectedTask.title}</h2>
-                            <div className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-6">DURUM: <span className="text-blue-500">{selectedTask.status}</span></div>
+                            <div className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+                                DURUM: <span className={selectedTask.status === 'Tamamlandı' ? 'text-emerald-500' : selectedTask.status === 'Devam Ediyor' ? 'text-blue-500' : 'text-slate-600'}>{selectedTask.status || 'Bekliyor'}</span>
+                            </div>
                             
-                            <div className="flex-1 bg-slate-50 dark:bg-slate-800/30 rounded-xl p-4 border border-slate-100 dark:border-white/5 whitespace-pre-wrap text-[13px] font-medium text-slate-700 dark:text-slate-300">
+                            <div className="bg-slate-50 dark:bg-slate-800/30 rounded-xl p-4 border border-slate-100 dark:border-white/5 whitespace-pre-wrap text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-6 flex-1 max-h-[300px] overflow-auto">
+                                <div className="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2">Görev Açıklaması</div>
                                 {selectedTask.description || 'Görevin detaylı açıklaması bulunmuyor.'}
                             </div>
                             
-                            <div className="mt-6 flex justify-end gap-3 shrink-0">
-                                {selectedTask.status !== 'Tamamlandı' && (
-                                    <button onClick={markAsCompleted} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-[12px] text-[11px] uppercase tracking-widest shadow-sm transition-all focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                            {selectedTask.status === 'Devam Ediyor' && (
+                                <div className="mb-6">
+                                    <div className="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2">Rapor / Sonuç Geri Bildirimi</div>
+                                    <textarea 
+                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-4 text-[13px] text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px] resize-none"
+                                        placeholder="Görev ile ilgili raporunuzu veya notunuzu buraya yazın..."
+                                        value={feedbackContent}
+                                        onChange={(e) => setFeedbackContent(e.target.value)}
+                                        disabled={isUpdating}
+                                    />
+                                </div>
+                            )}
+                            
+                            <div className="mt-2 flex justify-end gap-3 shrink-0">
+                                {(!selectedTask.status || selectedTask.status === 'Bekliyor') && (
+                                    <button onClick={() => updateTaskStatus('Devam Ediyor')} disabled={isUpdating} className="px-6 py-3 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-black rounded-full text-[11px] uppercase tracking-widest shadow-sm transition-all focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 border border-blue-200 dark:border-blue-500/20 disabled:opacity-50 w-full md:w-auto">
+                                        İşleme Al / Başla
+                                    </button>
+                                )}
+                                {selectedTask.status === 'Devam Ediyor' && (
+                                    <button onClick={() => updateTaskStatus('Tamamlandı')} disabled={isUpdating} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-full text-[11px] uppercase tracking-widest shadow-sm transition-all focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 w-full md:w-auto">
                                         Tamamlandı Olarak Raporla
                                     </button>
                                 )}
@@ -457,7 +500,7 @@ const LeavesView = ({ user }: any) => {
         <div className="flex flex-col animate-in fade-in duration-500 gap-6">
             <style>{printStyles}</style>
 
-            <div className="flex gap-6 items-start">
+            <div className="flex gap-6 items-start print:hidden">
                 {/* 1. YENİ TALEP KUTUSU */}
                 <div className="w-[380px] shrink-0 bg-white dark:bg-[#0f172a] rounded-[20px] p-8 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col gap-6">
                     <div className="flex items-center gap-3 mb-2">
@@ -687,13 +730,13 @@ const PayrollView = ({ payrolls, user }: any) => {
 
                         <div className="grid grid-cols-2 gap-12 mb-12 border-b-2 border-black pb-8">
                             <div className="space-y-4">
-                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Brüt Kesinleşmiş Maaş:</span> <span>₺{Number(printablePayroll.basePay).toLocaleString()}</span></div>
-                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Performans / Prim Eklentisi:</span> <span className="text-green-700">+ ₺{Number(printablePayroll.bonus).toLocaleString()}</span></div>
-                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Özel Kesintiler:</span> <span className="text-red-700">- ₺{Number(printablePayroll.deductions).toLocaleString()}</span></div>
+                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Brüt Kesinleşmiş Maaş:</span> <span>₺{Number(printablePayroll.basePay || 0).toLocaleString()}</span></div>
+                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Performans / Prim Eklentisi:</span> <span className="text-green-700">+ ₺{Number(printablePayroll.bonus || 0).toLocaleString()}</span></div>
+                                <div className="flex justify-between border-b pb-2"><span className="font-bold">Özel Kesintiler:</span> <span className="text-red-700">- ₺{Number(printablePayroll.deductions || 0).toLocaleString()}</span></div>
                             </div>
                             <div className="bg-slate-100 p-6 rounded-xl border border-slate-300 flex flex-col justify-center">
                                 <span className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">Net Ödenecek Hakediş</span>
-                                <span className="text-4xl font-black">₺{Number(printablePayroll.netPay).toLocaleString()}</span>
+                                <span className="text-4xl font-black">₺{Number(printablePayroll.netPay || 0).toLocaleString()}</span>
                             </div>
                         </div>
 
@@ -705,7 +748,7 @@ const PayrollView = ({ payrolls, user }: any) => {
                 )}
             </div>
 
-            <SoftContainer className="min-h-[400px]" title="Geçmiş Bordro ve Hakedişlerim" icon={<DollarSign className="w-4 h-4" />}>
+            <SoftContainer className="min-h-[400px] print:hidden" title="Geçmiş Bordro ve Hakedişlerim" icon={<DollarSign className="w-4 h-4" />}>
                 <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-widest sticky top-0 z-10">
@@ -722,10 +765,11 @@ const PayrollView = ({ payrolls, user }: any) => {
                                 payrolls.map((pr: any) => (
                                     <tr key={pr.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[64px] group">
                                         <td className="px-4 py-3 pl-6 align-middle text-[12px] font-black tracking-widest uppercase text-slate-800 dark:text-white">{pr.period}</td>
-                                        <td className="px-4 py-3 align-middle text-[14px] font-black text-emerald-600">₺{Number(pr.netPay).toLocaleString()}</td>
+                                        <td className="px-4 py-3 align-middle text-[14px] font-black text-emerald-600">₺{Number(pr.netPay || 0).toLocaleString()}</td>
                                         <td className="px-4 py-3 align-middle text-[10px] font-bold text-slate-500 uppercase tracking-widest space-y-1">
-                                            <div>Brüt: ₺{Number(pr.grossSalary).toLocaleString()}</div>
-                                            <div className="text-blue-500">Prim: ₺{Number(pr.bonus).toLocaleString()} </div>
+                                            <div>Brüt: ₺{Number(pr.basePay || 0).toLocaleString()}</div>
+                                            <div className="text-blue-500">Prim: ₺{Number(pr.bonus || 0).toLocaleString()} </div>
+                                            <div className="text-red-500">Kesinti: ₺{Number(pr.deductions || 0).toLocaleString()} </div>
                                         </td>
                                         <td className="px-4 py-3 align-middle">
                                              <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded border ${pr.status === 'Ödendi' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400 dark:border-white/5'}`}>{pr.status || 'BEKLİYOR'}</span>
@@ -948,7 +992,7 @@ export default function PersonelPanel() {
     );
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-white pb-24 no-print relative">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-white pb-24 relative">
     <div className="max-w-[1700px] mx-auto p-6 md:p-8 space-y-8 duration-700">
                 <div className="flex flex-wrap items-center justify-center gap-2 mb-8 bg-transparent">
     {[

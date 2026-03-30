@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
@@ -275,30 +275,26 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                     </Link>
                 </div>
 
-                {/* GROUPED NAVIGATION */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2">
-                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                {/* Enterprise Level 10 Oval Tabs Navigation */}
+                <div className="flex flex-wrap items-center gap-1 mb-2 mt-4 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm overflow-x-auto no-scrollbar">
+                    {[
+                        { id: 'all', label: 'Tüm Hareketler', group: 1 },
+                        { id: 'checks', label: 'Çek & Senetler', group: 1 }
+                    ].map((tab, idx, arr) => {
+                        const isActive = activeTab === tab.id;
+                        const showDivider = idx > 0 && tab.group !== arr[idx - 1].group;
+                        return (
+                            <React.Fragment key={tab.id}>
+                                {showDivider && <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0 mx-1"></div>}
                                 <button
-                                    onClick={() => setActiveTab('all')}
-                                    className={activeTab === 'all'
-                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px] transition-all"
-                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300'}`}
                                 >
-                                    Tüm Hareketler
+                                    {tab.label}
                                 </button>
-                                <button
-                                    onClick={() => setActiveTab('checks')}
-                                    className={activeTab === 'checks'
-                                        ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px] transition-all"
-                                        : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"}
-                                >
-                                    Çek & Senetler
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                            </React.Fragment>
+                        );
+                    })}
                 </div>
 
                 {/* CONTENT AREA */}
