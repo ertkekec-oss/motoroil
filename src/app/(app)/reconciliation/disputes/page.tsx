@@ -107,7 +107,7 @@ export default async function ReconciliationDisputesPage() {
                                             </td>
                                             <td className="px-6 py-4 align-top">
                                                 <div className="text-[13px] font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">
-                                                    {d.reason.replace(/_/g, ' ')}
+                                                    {(d.reason || 'BELİRTİLMEMİŞ').replace(/_/g, ' ')}
                                                 </div>
                                                 <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-white/5 inline-block">
                                                     "{d.customerNote ? d.customerNote : 'Özel bir not düşülmemiş.'}"
