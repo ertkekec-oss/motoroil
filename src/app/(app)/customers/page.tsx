@@ -324,28 +324,28 @@ export default function CustomersPage() {
     return (
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans" style={{ background: isLight ? '#FAFAFA' : undefined }}>
             {/* Enterprise Oval Tabs & Header Replacement */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
-                <div className="flex flex-wrap items-center gap-1 overflow-x-auto no-scrollbar">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
+                <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
                     {tabs.map(tab => {
                         const isActive = activeTab === tab.id;
                         return (
                             <button
                                 key={tab.id}
                                 onClick={() => handleTabChange(tab.id)}
-                                className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300'}`}
+                                className={`flex-1 min-w-[120px] h-11 px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
                             >
                                 {tab.label}
                             </button>
                         );
                     })}
                 </div>
-                <div>
+                <div className="flex items-center pr-2">
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="h-[38px] px-6 flex flex-row items-center gap-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm whitespace-nowrap"
+                        className="px-6 h-[38px] bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm shadow-indigo-600/20 active:scale-95 flex items-center gap-2 shrink-0"
                     >
                         <Plus className="w-4 h-4" />
-                        Yeni Müşteri
+                        YENİ MÜŞTERİ
                     </button>
                 </div>
             </div>

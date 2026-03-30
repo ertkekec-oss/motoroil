@@ -45,28 +45,30 @@ export default function RevenueIntelligenceDashboard() {
     return (
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans">
             
-            {/* Enterprise Oval Tabs */}
-            <div className="flex flex-wrap items-center gap-3 mb-6 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm justify-center">
-                {[
-                    { key: 'all', label: 'Tüm Satışlar', onClick: () => router.push('/sales') },
-                    { key: 'online', label: 'E-Ticaret', onClick: () => router.push('/sales') },
-                    { key: 'store', label: 'Mağaza Satışları', onClick: () => router.push('/sales') },
-                    { key: 'b2b', label: 'B2B Satışları', onClick: () => router.push('/sales') },
-                    { key: 'invoices', label: 'Faturalar', onClick: () => router.push('/sales') },
-                    { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => router.push('/sales') },
-                    { key: 'revenue', label: 'Revenue Intelligence', onClick: () => {} },
-                ].map(({ key, label, onClick }) => {
-                    const isActive = activeTab === key;
-                    return (
-                        <button
-                            key={key}
-                            onClick={onClick}
-                            className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}`}
-                        >
-                            {label}
-                        </button>
-                    );
-                })}
+            {/* Enterprise Oval Tabs container */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
+                <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
+                    {[
+                        { key: 'all', label: 'Tüm Satışlar', onClick: () => router.push('/sales') },
+                        { key: 'online', label: 'E-Ticaret', onClick: () => router.push('/sales') },
+                        { key: 'store', label: 'Mağaza Satışları', onClick: () => router.push('/sales') },
+                        { key: 'b2b', label: 'B2B Satışları', onClick: () => router.push('/sales') },
+                        { key: 'invoices', label: 'Faturalar', onClick: () => router.push('/sales') },
+                        { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => router.push('/sales') },
+                        { key: 'revenue', label: 'Revenue Intelligence', onClick: () => {} },
+                    ].map(({ key, label, onClick }) => {
+                        const isActive = activeTab === key;
+                        return (
+                            <button
+                                key={key}
+                                onClick={onClick}
+                                className={`flex-1 min-w-[120px] h-11 px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             <div className="w-full">

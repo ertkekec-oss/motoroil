@@ -51,7 +51,7 @@ export function NewWayslipModal({
     };
 
     return (
-        (
+
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }} className="flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm">
             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-2xl w-full max-w-2xl relative animate-in zoom-in-95 duration-200 flex flex-col overflow-hidden max-h-[90vh]">
                 
@@ -172,7 +172,7 @@ export function NewWayslipModal({
                                         });
                                     }
                                 }}
-                                className="px-5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 font-black text-[11px] rounded-xl transition-colors tracking-widest uppercase border border-indigo-200 dark:border-white/5"
+                                className="px-5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 font-black text-[11px] rounded-full transition-colors tracking-widest uppercase border border-indigo-200 dark:border-white/5"
                             >
                                 Ekle
                             </button>

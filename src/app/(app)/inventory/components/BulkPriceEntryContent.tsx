@@ -19,21 +19,22 @@ export default function BulkPriceEntryContent({
     return (
         <div className="flex flex-col h-[calc(100vh-230px)] min-h-[500px]">
              {/* Navigation Tabs */}
-             <div className="flex items-center gap-6 border-b border-slate-200 dark:border-white/10 px-4 pb-[0px] shrink-0">
-                <button 
-                    onClick={() => setActiveTab('sync')} 
-                    className={`pb-3 font-semibold text-[13px] relative transition-colors ${activeTab === 'sync' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
-                >
-                    Fiyat Senkronizasyon Konsolu
-                    {activeTab === 'sync' && <div className="absolute bottom-[0px] left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
-                </button>
-                <button 
-                    onClick={() => setActiveTab('settings')} 
-                    className={`pb-3 font-semibold text-[13px] relative transition-colors ${activeTab === 'settings' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
-                >
-                    Fiyat Listeleri & Kanal Yönetimi
-                    {activeTab === 'settings' && <div className="absolute bottom-[0px] left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
-                </button>
+             <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full max-w-max mx-auto md:mx-0 overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll shrink-0 mb-2">
+                {[
+                    { id: 'sync', label: 'FİYAT SENKRONİZASYON KONSOLU' },
+                    { id: 'settings', label: 'FİYAT LİSTELERİ & KANAL YÖNETİMİ' }
+                ].map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`flex-1 min-w-[200px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${isActive ? 'bg-white text-indigo-600 shadow-sm border-slate-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 border-transparent dark:text-slate-400 dark:hover:text-slate-300'}`}
+                        >
+                            {tab.label}
+                        </button>
+                    )
+                })}
             </div>
 
             <div className="flex-1 mt-4 relative overflow-hidden flex flex-col">

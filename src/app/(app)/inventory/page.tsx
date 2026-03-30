@@ -1387,10 +1387,10 @@ function InventoryContent() {
                 Enflasyon ve ani döviz şoklarına karşı fiyatları otomatik korumaya alır. Sistemin temel Alış maliyetlerini asla ezmez.
               </div>
             </button>
-            <button onClick={() => setShowAddModal(true)} className="h-[42px] px-6 bg-blue-600 hover:bg-blue-700 !text-white font-black rounded-[10px] text-[13px] uppercase tracking-widest transition-colors shadow-sm flex items-center justify-center gap-2 whitespace-nowrap border border-blue-600">
+            <button onClick={() => setShowAddModal(true)} className="h-[42px] px-6 bg-blue-600 hover:bg-blue-700 !text-white font-black rounded-full text-[13px] uppercase tracking-widest transition-colors shadow-lg shadow-blue-500/20 active:scale-[0.98] flex items-center justify-center gap-2 whitespace-nowrap border border-blue-600">
               Yeni Ürün
             </button>
-            <button onClick={() => setShowHealthReport(true)} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap group relative">
+            <button onClick={() => setShowHealthReport(true)} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide rounded-full text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap group relative">
               Health Raporu
               <div className="absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] shadow-lg text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed z-[100] pointer-events-none font-normal text-center whitespace-normal">
                 Stok sağlığı ve devir analiz raporunu görüntüler.
@@ -1402,35 +1402,29 @@ function InventoryContent() {
 
       {/* --- SEKMELER + STRATEJİK MOD SEÇİMİ --- */}
       {!isCounting ? (
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8 z-20 relative w-full">
-          <div className="w-full flex-1 overflow-x-auto scrollbar-hide">
-             <div className="flex w-full xl:w-max whitespace-nowrap items-center gap-6 px-1 select-none pb-2">
+        <div className="flex flex-col xl:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
+            <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full xl:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
                 {[
-                  { group: 'GÖRÜNÜM', items: [{ id: 'all', label: 'Envanter Listesi' }, { id: 'focus', label: 'Focus Queue' }, { id: 'strategic', label: 'Stratejik Görünüm' }] },
-                  { group: 'OPERASYON', items: [{ id: 'bulk-price', label: 'Fiyat Yönetimi' }] }
-                ].map((grp, i) => (
-                  <div key={grp.group} className="flex items-center gap-3">
-                    {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
-                    <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-[#0f172a]/60 p-1.5 rounded-xl border border-slate-200/50 dark:border-white/5 shadow-sm">
-                      {grp.items.map(tab => (
-                        <button
-                          key={tab.id}
-                          onClick={() => setActiveTab(tab.id)}
-                          className={activeTab === tab.id
-                            ? "px-4 py-2 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#1e293b] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[8px] transition-all tracking-wide"
-                            : "px-4 py-2 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all rounded-[8px] tracking-wide"}
-                        >
-                          {tab.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  { id: 'all', label: 'ENVANTER LİSTESİ' },
+                  { id: 'focus', label: 'FOCUS QUEUE' },
+                  { id: 'strategic', label: 'STRATEJİK GÖRÜNÜM' },
+                  { id: 'bulk-price', label: 'FİYAT YÖNETİMİ' }
+                ].map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex-1 min-w-[140px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
             </div>
-          </div>
 
           {activeTab === 'all' && (
-            <div className="flex items-center gap-4 z-30 pb-2">
+            <div className="flex items-center gap-4 z-30 pr-2">
               <InventoryFilterBar
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
@@ -1494,7 +1488,7 @@ function InventoryContent() {
           <div className="bg-amber-500 text-white font-bold p-3 text-center rounded-xl mb-4 shadow-sm flex items-center justify-center gap-2 animate-in slide-in-from-top-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4" /><path d="M3.34 19a10 10 0 1 1 17.32 0" /></svg>
             SİMÜLASYON AKTİF — Gerçek veriler değiştirilmiyor (What-If engine running)
-            <button onClick={() => setIsSimulationMode(false)} className="ml-4 px-3 py-1 bg-white/20 hover:bg-white dark:bg-[#0f172a]/30 rounded-lg text-xs">Kapat</button>
+            <button onClick={() => setIsSimulationMode(false)} className="ml-4 px-4 py-1.5 bg-white/20 hover:bg-white dark:bg-[#0f172a]/30 rounded-full text-xs font-bold tracking-wide">Kapat</button>
           </div>
         )}
 

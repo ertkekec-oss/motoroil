@@ -165,9 +165,9 @@ export function OnlineOrdersTab({
 
     // Enterprise Outline Chip component
     const OutlineChip = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
-        <button onClick={onClick} className={`h-[36px] px-4 rounded-[10px] text-[13px] font-medium border transition-colors whitespace-nowrap ${active
-                ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700' : 'bg-blue-900/20 border-blue-500 text-blue-400')
-                : (isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800')
+        <button onClick={onClick} className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${active
+                ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm' : 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-sm')
+                : (isLight ? 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-700/50 text-slate-400 hover:text-slate-300 hover:bg-slate-800')
             }`}>
             {children}
         </button>
@@ -289,7 +289,7 @@ export function OnlineOrdersTab({
                                     setIsGeneratingBulk(false);
                                 }
                             }}
-                            className={`h-[40px] px-4 rounded-[12px] font-medium text-[13px] transition-colors flex items-center justify-center gap-2 ${isLight ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} ${isGeneratingBulk ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`h-[40px] px-5 rounded-full font-bold tracking-wide text-[13px] transition-colors flex items-center justify-center gap-2 shadow-sm ${isLight ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} ${isGeneratingBulk ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isGeneratingBulk ? (
                                 <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
@@ -378,7 +378,7 @@ export function OnlineOrdersTab({
                                     }
                                 });
                             }}
-                            className={`h-[40px] px-4 rounded-[12px] font-medium text-[13px] transition-colors flex items-center justify-center gap-2 ${isLight ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} ${(!!bulkInvoiceStatus || isGeneratingBulk) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`h-[40px] px-5 rounded-full font-bold tracking-wide text-[13px] transition-colors flex items-center justify-center gap-2 shadow-sm ${isLight ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} ${(!!bulkInvoiceStatus || isGeneratingBulk) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {!!bulkInvoiceStatus ? (
                                 <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
@@ -509,7 +509,7 @@ export function OnlineOrdersTab({
                                                         ) : (
                                                             <button
                                                                 onClick={e => { e.stopPropagation(); setSelectedOrder(o); }}
-                                                                className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' : 'bg-blue-900/30 text-blue-400 hover:bg-blue-900/50'}`}
+                                                                className={`h-[32px] px-4 rounded-full text-[12px] font-bold tracking-wide transition-colors shadow-sm ${isLight ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' : 'bg-blue-900/30 text-blue-400 hover:bg-blue-900/50'}`}
                                                             >
                                                                 Faturalandır
                                                             </button>

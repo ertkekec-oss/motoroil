@@ -187,7 +187,7 @@ export default function InventoryBulkEditModal({
                                     />
                                     <button
                                         onClick={applyAdjustmentRule}
-                                        className="bg-blue-600 text-white border-none py-1.5 px-4 rounded-[8px] text-[11px] font-semibold tracking-wider hover:bg-blue-700 transition-colors shadow-sm ml-2"
+                                        className="bg-blue-600 text-white border-none py-1.5 px-5 rounded-full text-[11px] font-bold tracking-widest uppercase hover:bg-blue-700 transition-colors shadow-sm ml-2"
                                     >
                                         Hepsini Güncelle
                                     </button>
@@ -238,8 +238,8 @@ export default function InventoryBulkEditModal({
                 </div>
 
                 <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e293b] flex justify-end gap-3 items-center rounded-b-[24px]">
-                    <button className="text-[12px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors px-4 py-2" onClick={onClose} disabled={isProcessing}>VAZGEÇ</button>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-[12px] text-[13px] font-semibold tracking-wider transition-colors shadow-sm disabled:opacity-50" onClick={handleApply} disabled={isProcessing}>
+                    <button className="text-[12px] font-bold tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors px-5 py-2.5 rounded-full" onClick={onClose} disabled={isProcessing}>VAZGEÇ</button>
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-full text-[13px] font-bold tracking-widest transition-colors shadow-sm disabled:opacity-50" onClick={handleApply} disabled={isProcessing}>
                         {isProcessing ? 'SİSTEME İŞLENİYOR...' : 'ONAYLA'}
                     </button>
                 </div>

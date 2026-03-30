@@ -1032,34 +1032,38 @@ export default function SalesPage() {
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans">
             
 
-            {/* Enterprise Oval Tabs */}
-            <div className="flex flex-wrap items-center gap-3 mb-6 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm justify-center">
-                {[
-                    { key: 'all', label: 'Tüm Satışlar', onClick: () => setActiveTab('all') },
-                    { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
-                    { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
-                    { key: 'b2b', label: 'B2B Satışları', onClick: () => setActiveTab('b2b') },
-                    { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
-                    { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
-                    { key: 'revenue', label: 'Revenue Intelligence', onClick: () => router.push('/sales/revenue-intelligence') },
-                ].map(({ key, label, onClick }) => {
-                    const isActive = activeTab === key || (activeTab === 'invoices' && key === 'invoices' && invoiceSubTab === 'sales') || (activeTab === 'wayslips' && key === 'wayslips' && invoiceSubTab === 'wayslips');
-                    return (
-                        <button
-                            key={key}
-                            onClick={onClick}
-                            className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}`}
-                        >
-                            {label}
-                        </button>
-                    );
-                })}
+            {/* Enterprise Oval Tabs container */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
+                <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
+                    {[
+                        { key: 'all', label: 'Tüm Satışlar', onClick: () => setActiveTab('all') },
+                        { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
+                        { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
+                        { key: 'b2b', label: 'B2B Satışları', onClick: () => setActiveTab('b2b') },
+                        { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
+                        { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
+                        { key: 'revenue', label: 'Revenue Intelligence', onClick: () => router.push('/sales/revenue-intelligence') },
+                    ].map(({ key, label, onClick }) => {
+                        const isActive = activeTab === key || (activeTab === 'invoices' && key === 'invoices' && invoiceSubTab === 'sales') || (activeTab === 'wayslips' && key === 'wayslips' && invoiceSubTab === 'wayslips');
+                        return (
+                            <button
+                                key={key}
+                                onClick={onClick}
+                                className={`flex-1 min-w-[120px] h-11 px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
+                </div>
 
                 {/* New Wayslip Add Button */}
                 {activeTab === 'wayslips' && (
-                     <button onClick={() => setView('new_wayslip')} className="px-5 h-[38px] bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center gap-2 ml-auto">
-                         🚚 Yeni İrsaliye Düzenle
-                     </button>
+                    <div className="flex items-center pr-2">
+                        <button onClick={() => setView('new_wayslip')} className="px-6 h-[38px] bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm shadow-emerald-500/20 active:scale-95 flex items-center gap-2 shrink-0">
+                            🚚 YENİ İRSALİYE DÜZENLE
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -1165,7 +1169,7 @@ export default function SalesPage() {
                 {/* DEBUG LABEL MODAL */}
                 {debugLabelData && (
                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 ">
-                        <div className={`w-[800px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${theme === 'light' ? 'bg-white shadow-2xl' : 'bg-[#0f111a] border border-[#1e2332] shadow-2xl'}`}>
+                        <div className={`w-[800px] max-w-full rounded-full overflow-hidden flex flex-col max-h-[90vh] ${theme === 'light' ? 'bg-white shadow-2xl' : 'bg-[#0f111a] border border-[#1e2332] shadow-2xl'}`}>
                             <div className="flex justify-between items-center p-6 border-b border-[#1e2332] dark:border-white/5">
                                 <h3 className={`text-[16px] font-semibold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                                     Trendyol API Ham Yanıtı (İnceleme)
@@ -1177,7 +1181,7 @@ export default function SalesPage() {
                                 </button>
                             </div>
                             <div className="p-6 overflow-y-auto custom-scroll" style={{ maxHeight: '60vh' }}>
-                                <pre className={`p-4 rounded-[10px] text-[12px] font-mono overflow-x-auto ${theme === 'light' ? 'bg-slate-50 text-slate-800 border border-slate-200' : 'bg-black/40 text-emerald-400 border border-emerald-900/30'}`}>
+                                <pre className={`p-4 rounded-full text-[12px] font-mono overflow-x-auto ${theme === 'light' ? 'bg-slate-50 text-slate-800 border border-slate-200' : 'bg-black/40 text-emerald-400 border border-emerald-900/30'}`}>
                                     {JSON.stringify(debugLabelData.payload, null, 2)}
                                 </pre>
                             </div>

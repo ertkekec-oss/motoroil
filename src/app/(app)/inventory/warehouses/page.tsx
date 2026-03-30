@@ -202,8 +202,8 @@ export default function WarehouseManagementPage() {
   const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
   const textValueClass = isLight ? "text-slate-900" : "text-white";
   const inputClass = isLight
-    ? "h-[40px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
-    : "h-[40px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
+    ? "h-[40px] px-4 rounded-[16px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
+    : "h-[40px] px-4 rounded-[16px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
 
   const totalBranches = branches?.length || 0;
   
@@ -252,44 +252,43 @@ export default function WarehouseManagementPage() {
         {/* ACTION BUTTONS FROM INVENTORY */}
         <div className="flex items-center justify-start xl:justify-end gap-3 flex-wrap xl:flex-nowrap w-full xl:w-auto mt-4 xl:mt-0">
           <input type="file" ref={fileInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls" className="hidden" />
-          <button onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+          <button onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide rounded-full text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
             {isProcessing ? "İşleniyor..." : "Yükle"}
           </button>
-          <button onClick={exportToExcel} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+          <button onClick={exportToExcel} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide rounded-full text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
             İndir
           </button>
-          <button onClick={startCount} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+          <button onClick={startCount} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide rounded-full text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
             Stok Sayımı
           </button>
-          <button onClick={() => router.push('/inventory/labels')} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+          <button onClick={() => router.push('/inventory/labels')} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide rounded-full text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
             Etiket Yazdır
           </button>
         </div>
       </div>
 
-      <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-[#0f172a]/60 p-1.5 rounded-xl border border-slate-200/50 dark:border-white/5 shadow-sm w-max mb-6">
-          <button
-            onClick={() => setActiveTab("general")}
-            className={activeTab === "general"
-              ? "px-5 py-2.5 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#1e293b] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[8px] transition-all tracking-wide"
-              : "px-5 py-2.5 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all rounded-[8px] tracking-wide"}
-          >
-            Depo Yönetimi
-          </button>
-          <button
-            onClick={() => setActiveTab("transfers")}
-            className={activeTab === "transfers"
-              ? "px-5 py-2.5 text-[13px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#1e293b] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[8px] transition-all tracking-wide"
-              : "px-5 py-2.5 text-[13px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all rounded-[8px] tracking-wide"}
-          >
-            Transfer İşlemleri
-          </button>
+      <div className={`flex p-1.5 rounded-full w-full max-w-max mx-auto md:mx-0 mb-6 overflow-x-auto shadow-inner border custom-scroll ${isLight ? "bg-slate-100 border-slate-200/50" : "bg-[#1e293b]/50 border-white/5"}`}>
+          {[
+            { id: "general", label: "DEPO YÖNETİMİ" },
+            { id: "transfers", label: "TRANSFER İŞLEMLERİ" }
+          ].map((tab) => {
+             const isActive = activeTab === tab.id;
+             return (
+                 <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 min-w-[160px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${isActive ? (isLight ? 'bg-white text-indigo-600 shadow-sm border-slate-200' : 'bg-indigo-500/20 text-indigo-400 shadow-sm border-indigo-500/30') : (isLight ? 'text-slate-500 hover:text-slate-700 border-transparent' : 'text-slate-400 hover:text-slate-300 border-transparent')}`}
+                 >
+                    {tab.label}
+                 </button>
+             );
+          })}
       </div>
 
       {activeTab === "general" && (
         <>
-        <div className={`flex rounded-[14px] border overflow-hidden ${cardClass}`}>
+        <div className={`flex rounded-[24px] border overflow-hidden shadow-sm ${cardClass}`}>
         <div className={`flex-1 p-5 border-r ${isLight ? "border-slate-200" : "border-slate-800"}`}>
           <div className="flex items-center gap-2 mb-2">
             <MapPin className={`w-4 h-4 ${isLight ? "text-indigo-500" : "text-indigo-400"}`} />
@@ -317,7 +316,7 @@ export default function WarehouseManagementPage() {
           {/* LEFT SIDEBAR - WAREHOUSE LIST */}
           <div className="w-[300px] flex-shrink-0 space-y-4">
               <h3 className={`text-[14px] font-bold uppercase tracking-wider ${textLabelClass}`}>Filtrele</h3>
-              <div className={`rounded-[14px] border overflow-hidden flex flex-col ${cardClass}`}>
+              <div className={`rounded-[24px] border overflow-hidden shadow-sm flex flex-col ${cardClass}`}>
                  <button 
                     onClick={() => setSelectedBranch("Tümü")}
                     className={`w-full text-left p-4 flex flex-col border-b last:border-0 transition-colors ${selectedBranch === "Tümü" ? (isLight ? "bg-indigo-50 border-l-4 border-l-indigo-500" : "bg-indigo-900/20 border-l-4 border-l-indigo-500") : (isLight ? "hover:bg-slate-50" : "hover:bg-slate-800/50")} ${isLight ? "border-slate-100" : "border-slate-800"}`}
@@ -383,13 +382,13 @@ export default function WarehouseManagementPage() {
             {isLoading ? (
                 <div className="py-20 text-center">Yükleniyor...</div>
             ) : displayProducts.length === 0 ? (
-                <div className={`flex flex-col items-center justify-center py-20 rounded-[14px] border border-dashed ${cardClass}`}>
+                <div className={`flex flex-col items-center justify-center py-20 rounded-[24px] border border-dashed ${cardClass}`}>
                 <Box className={`w-12 h-12 mb-4 opacity-20 ${textLabelClass}`} />
                 <h3 className={`text-[16px] font-semibold ${textValueClass}`}>Depo Boş veya Kayıt Bulunamadı</h3>
                 <p className={`text-[13px] mt-1 ${textLabelClass}`}>Seçili depoda mevcut stok kaydı bulunmamaktadır.</p>
                 </div>
             ) : (
-                <div className={`rounded-[14px] border overflow-hidden ${cardClass}`}>
+                <div className={`rounded-[24px] border overflow-hidden shadow-sm ${cardClass}`}>
                 <div className="overflow-x-auto custom-scroll max-h-[calc(100vh-320px)]">
                     <table className="w-full text-left border-collapse relative">
                     <thead className="sticky top-0 z-10 backdrop-blur-md">
@@ -415,12 +414,12 @@ export default function WarehouseManagementPage() {
                               <div className={`text-[13px] font-semibold ${textValueClass}`}>{p.name}</div>
                             </td>
                             <td className="px-5 py-3">
-                               <span className={`inline-flex px-2 py-0.5 rounded-[6px] text-[10px] font-bold uppercase ${isLight ? "bg-slate-100 text-slate-600" : "bg-slate-800 text-slate-300"}`}>{p.category}</span>
+                               <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${isLight ? "bg-slate-100 text-slate-600" : "bg-slate-800 text-slate-300"}`}>{p.category}</span>
                             </td>
                             <td className="px-5 py-3">
                               <div className="flex flex-wrap gap-1">
                                   {p.stocks?.filter((s:any) => s.quantity > 0).map((s:any) => (
-                                      <span key={s.id} className={`inline-flex items-center px-1.5 py-0.5 border rounded-[4px] text-[10px] font-semibold ${selectedBranch === s.branch ? "border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10" : "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400"}`}>
+                                      <span key={s.id} className={`inline-flex items-center px-2 py-0.5 border rounded-md text-[10px] font-semibold ${selectedBranch === s.branch ? "border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10" : "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400"}`}>
                                            {s.branch}: {s.quantity}
                                       </span>
                                   ))}

@@ -166,8 +166,8 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
     const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
     const textValueClass = isLight ? "text-slate-900" : "text-white";
     const inputClass = isLight
-        ? "w-full h-[44px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
-        : "w-full h-[44px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
+        ? "w-full h-[44px] px-3 rounded-[16px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
+        : "w-full h-[44px] px-3 rounded-[16px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
@@ -179,7 +179,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                         placeholder="Reçete adı, kodu veya ürün ile ara..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className={`w-full h-[40px] pl-[38px] pr-4 rounded-[10px] text-[13px] font-medium border outline-none ${isLight ? "bg-white border-slate-200 text-slate-800" : "bg-slate-900 border-slate-800 text-slate-200"}`}
+                        className={`w-full h-[40px] pl-[38px] pr-4 rounded-[16px] text-[13px] font-medium border outline-none ${isLight ? "bg-white border-slate-200 text-slate-800" : "bg-slate-900 border-slate-800 text-slate-200"}`}
                     />
                 </div>
                 {canManage && (
@@ -188,7 +188,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                             setNewBom({ id: "", productId: "", name: "", code: "", description: "", items: [] });
                             setIsModalOpen(true);
                         }}
-                        className={`h-[40px] px-5 flex items-center gap-2 rounded-[12px] font-medium text-[13px] shadow-sm ${isLight ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-600 text-white hover:bg-blue-500"}`}
+                        className={`h-[40px] px-5 flex items-center gap-2 rounded-full font-bold tracking-wide text-[13px] shadow-sm ${isLight ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-600 text-white hover:bg-blue-500"}`}
                     >
                         <Plus className="w-4 h-4" /> Kullanarak Yeni Reçete (BOM)
                     </button>
@@ -196,7 +196,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
             </div>
 
             {filteredBoms.length === 0 ? (
-                <div className={`flex flex-col items-center justify-center py-20 rounded-[14px] border border-dashed ${cardClass}`}>
+                <div className={`flex flex-col items-center justify-center py-20 rounded-[20px] shadow-sm border border-dashed ${cardClass}`}>
                     <Database className={`w-12 h-12 mb-4 opacity-20 ${textLabelClass}`} />
                     <h3 className={`text-[16px] font-semibold ${textValueClass}`}>Reçete Bulunamadı</h3>
                     <p className={`text-[13px] mt-1 ${textLabelClass}`}>Tanımlanmış bir malzeme reçetesi yok.</p>
@@ -204,10 +204,10 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredBoms.map((bom) => (
-                        <div key={bom.id} className={`rounded-[14px] p-5 flex flex-col gap-4 border transition-all hover:scale-[1.01] ${cardClass}`}>
+                        <div key={bom.id} className={`rounded-[20px] shadow-sm p-5 flex flex-col gap-4 border transition-all hover:scale-[1.01] ${cardClass}`}>
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center text-[15px] font-bold ${isLight ? "bg-indigo-50 text-indigo-600" : "bg-indigo-900/30 text-indigo-400"}`}>
+                                    <div className={`w-10 h-10 rounded-[16px] flex items-center justify-center text-[15px] font-bold ${isLight ? "bg-indigo-50 text-indigo-600" : "bg-indigo-900/30 text-indigo-400"}`}>
                                         <Box className="w-5 h-5" />
                                     </div>
                                     <div className="overflow-hidden">
@@ -219,7 +219,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                                 </div>
                             </div>
 
-                            <div className={`flex items-center justify-between p-3 rounded-[10px] border ${isLight ? "bg-slate-50 border-slate-100" : "bg-slate-800/50 border-slate-800/80"}`}>
+                            <div className={`flex items-center justify-between p-3 rounded-[16px] border ${isLight ? "bg-slate-50 border-slate-100" : "bg-slate-800/50 border-slate-800/80"}`}>
                                 <div>
                                     <div className={`text-[11px] font-semibold uppercase tracking-wide opacity-80 ${textLabelClass}`}>Mamul</div>
                                     <div className={`text-[13px] font-bold mt-0.5 ${textValueClass}`}>{bom.product?.name}</div>
@@ -238,16 +238,16 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                             <div className={`flex items-center gap-2 mt-auto pt-4 border-t ${isLight ? "border-slate-100" : "border-slate-800/50"}`}>
                                 <button
                                     onClick={() => setSelectedBom(bom)}
-                                    className={`flex-1 h-[36px] flex items-center justify-center gap-2 rounded-[8px] text-[13px] font-medium border ${isLight ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50" : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800"}`}
+                                    className={`flex-1 h-[36px] flex items-center justify-center gap-2 rounded-full text-[13px] font-bold tracking-wide border ${isLight ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50" : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800"}`}
                                 >
                                     <ListPlus className="w-4 h-4" /> İncele
                                 </button>
                                 {canManage && (
                                     <>
-                                        <button onClick={() => handleEditBom(bom)} className={`h-[36px] px-3 rounded-[8px] border flex items-center justify-center ${isLight ? "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700"}`}>
+                                        <button onClick={() => handleEditBom(bom)} className={`h-[36px] px-3 rounded-full border flex items-center justify-center ${isLight ? "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" : "bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700"}`}>
                                             <Pencil className="w-4 h-4" />
                                         </button>
-                                        <button onClick={() => handleDeleteBom(bom.id, bom.name || bom.code)} className={`h-[36px] px-3 rounded-[8px] border flex items-center justify-center ${isLight ? "bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100" : "bg-rose-900/20 border-rose-800/50 text-rose-400 hover:bg-rose-900/40"}`}>
+                                        <button onClick={() => handleDeleteBom(bom.id, bom.name || bom.code)} className={`h-[36px] px-3 rounded-full border flex items-center justify-center ${isLight ? "bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100" : "bg-rose-900/20 border-rose-800/50 text-rose-400 hover:bg-rose-900/40"}`}>
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </>
@@ -261,7 +261,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
             {/* CREATE / EDIT MODAL */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-                    <div className={`w-[900px] max-w-full rounded-[24px] overflow-hidden flex flex-col max-h-[95vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
+                    <div className={`w-[900px] max-w-full rounded-[32px]} animate-in zoom-in-95 duration-200`}>
                         <div className={`flex justify-between items-center px-8 py-5 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
                             <h2 className={`text-[18px] font-bold ${textValueClass}`}>{newBom.id ? "Reçete Düzenle" : "Yeni Reçete (BOM) Tasarla"}</h2>
                             <button onClick={() => setIsModalOpen(false)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
@@ -301,7 +301,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                                         <h3 className={`text-[16px] font-bold ${textValueClass}`}>Ağaç Görünümü (Bileşenler)</h3>
                                         <p className={`text-[12px] opacity-70 ${textLabelClass}`}>Mamul üretimi için gereken hammaddeler ve fire oranları</p>
                                     </div>
-                                    <button onClick={handleAddBomItem} className={`px-4 py-2 rounded-[10px] text-[13px] font-bold flex items-center gap-2 transition-colors ${isLight ? "bg-indigo-50 text-indigo-700 hover:bg-indigo-100" : "bg-indigo-900/30 text-indigo-400 hover:bg-indigo-900/50"}`}>
+                                    <button onClick={handleAddBomItem} className={`px-4 py-2 rounded-full text-[13px] font-bold flex items-center gap-2 transition-colors ${isLight ? "bg-indigo-50 text-indigo-700 hover:bg-indigo-100" : "bg-indigo-900/30 text-indigo-400 hover:bg-indigo-900/50"}`}>
                                         <Plus className="w-4 h-4" /> Kalem Ekle
                                     </button>
                                 </div>
@@ -314,13 +314,13 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                                         const liveCost = parseFloat(item.quantity || 0) * unitCostRaw * wasteMulti;
 
                                         return (
-                                            <div key={idx} className={`flex items-end gap-3 p-4 rounded-[12px] border ${isLight ? "bg-white border-slate-200" : "bg-slate-800/80 border-slate-700"}`}>
+                                            <div key={idx} className={`flex items-end gap-3 p-4 rounded-[20px] border ${isLight ? "bg-white border-slate-200" : "bg-slate-800/80 border-slate-700"}`}>
                                                 <div className="flex-1">
                                                     <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${textLabelClass}`}>Girdi Ürünü</label>
                                                     <select
                                                         value={item.productId}
                                                         onChange={e => handleUpdateBomItem(idx, "productId", e.target.value)}
-                                                        className={`w-full h-[40px] px-3 rounded-[8px] text-[13px] font-medium border outline-none ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-700 text-slate-200"}`}
+                                                        className={`w-full h-[40px] px-3 rounded-[16px] text-[13px] font-medium border outline-none ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-700 text-slate-200"}`}
                                                     >
                                                         <option value="">Ürün Seçiniz...</option>
                                                         {products.filter(p => p.id !== newBom.productId).map(p => (
@@ -335,7 +335,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                                                             type="number" min="0.0001" step="any"
                                                             value={item.quantity}
                                                             onChange={e => handleUpdateBomItem(idx, "quantity", e.target.value)}
-                                                            className={`w-full h-[40px] pl-3 pr-10 rounded-[8px] text-[13px] font-bold border outline-none ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-700 text-slate-200"}`}
+                                                            className={`w-full h-[40px] pl-3 pr-10 rounded-[16px] text-[13px] font-bold border outline-none ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-700 text-slate-200"}`}
                                                         />
                                                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold opacity-50">{item.unit}</span>
                                                     </div>
@@ -346,16 +346,16 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                                                         type="number" min="0" max="100"
                                                         value={item.wastePercentage}
                                                         onChange={e => handleUpdateBomItem(idx, "wastePercentage", e.target.value)}
-                                                        className={`w-full h-[40px] px-3 rounded-[8px] text-[13px] font-bold border outline-none text-rose-500 ${isLight ? "bg-rose-50 border-rose-100" : "bg-rose-900/10 border-rose-900/30"}`}
+                                                        className={`w-full h-[40px] px-3 rounded-[16px] text-[13px] font-bold border outline-none text-rose-500 ${isLight ? "bg-rose-50 border-rose-100" : "bg-rose-900/10 border-rose-900/30"}`}
                                                     />
                                                 </div>
-                                                <div className={`w-[130px] h-[40px] flex flex-col justify-center px-3 rounded-[8px] border ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900/50 border-slate-800"}`}>
+                                                <div className={`w-[130px] h-[40px] flex flex-col justify-center px-3 rounded-[16px] border ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900/50 border-slate-800"}`}>
                                                     <span className={`text-[10px] font-bold uppercase tracking-wider opacity-60 ${textLabelClass}`}>Satır Maliyeti</span>
                                                     <span className={`text-[12px] font-bold ${textValueClass}`}>{formatCurrency(liveCost)}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => handleRemoveBomItem(idx)}
-                                                    className={`w-[40px] h-[40px] flex items-center justify-center rounded-[8px] border transition-colors ${isLight ? "text-rose-500 border-rose-200 hover:bg-rose-50" : "text-rose-400 border-rose-900/50 hover:bg-rose-900/20"}`}
+                                                    className={`w-[40px] h-[40px] flex items-center justify-center rounded-full border transition-colors ${isLight ? "text-rose-500 border-rose-200 hover:bg-rose-50" : "text-rose-400 border-rose-900/50 hover:bg-rose-900/20"}`}
                                                 >
                                                     <Trash2 className="w-5 h-5" />
                                                 </button>
@@ -375,7 +375,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                             <button
                                 onClick={handleSaveBom}
                                 disabled={isProcessing}
-                                className={`px-10 h-[48px] rounded-[12px] text-[14px] font-bold text-white transition-all ${isLight ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-600 hover:bg-indigo-500"}`}
+                                className={`px-10 h-[48px] rounded-full text-[14px] font-bold tracking-wide text-white transition-all ${isLight ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-600 hover:bg-indigo-500"}`}
                             >
                                 {isProcessing ? "İşleniyor..." : "Reçeteyi Onayla"}
                             </button>
@@ -387,13 +387,13 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
             {/* INCELE MODAL */}
             {selectedBom && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-                    <div className={`w-[600px] max-w-full rounded-[20px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
+                    <div className={`w-[600px] max-w-full rounded-[32px]} animate-in zoom-in-95 duration-200`}>
                         <div className={`flex justify-between items-center px-6 py-5 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
                             <h2 className={`text-[16px] font-bold ${textValueClass}`}>Reçete: {selectedBom.name || selectedBom.product?.name}</h2>
                             <button onClick={() => setSelectedBom(null)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
                         </div>
                         <div className="p-6 overflow-y-auto custom-scroll flex flex-col gap-4">
-                            <div className={`p-5 rounded-[12px] border flex justify-between items-center ${isLight ? "bg-indigo-50 border-indigo-100" : "bg-indigo-900/10 border-indigo-900/30"}`}>
+                            <div className={`p-5 rounded-[20px] border flex justify-between items-center ${isLight ? "bg-indigo-50 border-indigo-100" : "bg-indigo-900/10 border-indigo-900/30"}`}>
                                 <div>
                                     <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isLight ? "text-indigo-600/70" : "text-indigo-400/70"}`}>Hedef Ürün</div>
                                     <div className={`text-[15px] font-[900] ${isLight ? "text-indigo-900" : "text-indigo-100"}`}>{selectedBom.product?.name}</div>
@@ -412,7 +412,7 @@ export default function BomManager({ boms, fetchBoms, products }: { boms: any[],
                                     const liveCost = parseFloat(item.quantity || 0) * unitCostRaw * wasteMulti;
 
                                     return (
-                                    <div key={idx} className={`flex justify-between items-center p-4 rounded-[12px] border ${isLight ? "bg-white border-slate-100" : "bg-slate-800/50 border-slate-700"}`}>
+                                    <div key={idx} className={`flex justify-between items-center p-4 rounded-[20px] border ${isLight ? "bg-white border-slate-100" : "bg-slate-800/50 border-slate-700"}`}>
                                         <div>
                                             <div className={`text-[13px] font-bold ${textValueClass}`}>{item.product?.name}</div>
                                             <div className={`text-[11px] mt-1 opacity-70 ${textLabelClass}`}>Birim Maliyet: {formatCurrency(unitCostRaw)}</div>

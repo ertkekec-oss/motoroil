@@ -138,8 +138,8 @@ export default function ManufacturingPage() {
     const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
     const textValueClass = isLight ? "text-slate-900" : "text-white";
     const inputClass = isLight
-        ? "w-full h-[40px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
-        : "w-full h-[40px] px-3 rounded-[10px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
+        ? "w-full h-[40px] px-3 rounded-[16px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
+        : "w-full h-[40px] px-3 rounded-[16px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
 
     return (
         <div data-pos-theme={theme} className={`w-full h-full min-h-[100vh] px-8 py-8 transition-colors duration-300 font-sans flex flex-col ${isLight ? "bg-[#FAFAFA]" : ""}`}>
@@ -158,7 +158,7 @@ export default function ManufacturingPage() {
                     {canManage && activeTab === 'KANBAN' && (
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className={`h-[40px] px-5 flex items-center justify-center gap-2 rounded-[12px] text-[13px] font-bold tracking-wide transition-all shadow-sm ${isLight ? "bg-slate-800 text-white hover:bg-black" : "bg-blue-600 text-white hover:bg-blue-500"}`}
+                            className={`h-[40px] px-5 flex items-center justify-center gap-2 rounded-full text-[13px] font-bold tracking-wide transition-all shadow-sm ${isLight ? "bg-slate-800 text-white hover:bg-black" : "bg-blue-600 text-white hover:bg-blue-500"}`}
                         >
                             <Play className="w-4 h-4" />
                             Yeni Üretim Başlat
@@ -168,25 +168,26 @@ export default function ManufacturingPage() {
             </div>
 
             {/* SEKMELER */}
-            <div className={`flex border-b mb-6 shrink-0 ${isLight ? "border-slate-200" : "border-slate-800"}`}>
-                <button
-                    onClick={() => setActiveTab("KANBAN")}
-                    className={`h-[48px] px-6 text-[13px] font-bold uppercase tracking-widest relative transition-colors ${activeTab === "KANBAN" ? (isLight ? "text-slate-900" : "text-white") : textLabelClass}`}
-                >
-                    <div className="flex items-center gap-2">
-                        <Box className="w-4 h-4" /> Üretim Ekranı (Kanban)
-                    </div>
-                    {activeTab === "KANBAN" && <div className={`absolute bottom-0 left-0 right-0 h-[3px] rounded-t-lg ${isLight ? "bg-slate-900" : "bg-blue-500"}`}></div>}
-                </button>
-                <button
-                    onClick={() => setActiveTab("BOM")}
-                    className={`h-[48px] px-6 text-[13px] font-bold uppercase tracking-widest relative transition-colors ${activeTab === "BOM" ? (isLight ? "text-slate-900" : "text-white") : textLabelClass}`}
-                >
-                    <div className="flex items-center gap-2">
-                        <Layers className="w-4 h-4" /> Ürün Reçeteleri (BOM)
-                    </div>
-                    {activeTab === "BOM" && <div className={`absolute bottom-0 left-0 right-0 h-[3px] rounded-t-lg ${isLight ? "bg-slate-900" : "bg-blue-500"}`}></div>}
-                </button>
+            <div className={`flex flex-col md:flex-row justify-between items-center gap-4 p-2 rounded-[20px] mb-6 border shadow-sm relative z-10 w-full ${isLight ? "bg-white border-slate-200" : "bg-[#0f172a] border-white/5"}`}>
+                <div className={`flex p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border custom-scroll ${isLight ? "bg-slate-100 border-slate-200/50" : "bg-[#1e293b]/50 border-white/5"}`}>
+                    {[
+                        { id: 'KANBAN', label: 'ÜRETİM EKRANI (KANBAN)', icon: Box },
+                        { id: 'BOM', label: 'ÜRÜN REÇETELERİ (BOM)', icon: Layers }
+                    ].map((tab) => {
+                        const isActive = activeTab === tab.id;
+                        const Icon = tab.icon;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as any)}
+                                className={`flex-1 min-w-[200px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${isActive ? (isLight ? 'bg-white text-indigo-600 shadow-sm border-slate-200' : 'bg-indigo-500/20 text-indigo-400 shadow-sm border-indigo-500/30') : (isLight ? 'text-slate-500 hover:text-slate-700 border-transparent' : 'text-slate-400 hover:text-slate-300 border-transparent')}`}
+                            >
+                                <Icon className="w-3.5 h-3.5" />
+                                {tab.label}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* İçerik */}
@@ -205,7 +206,7 @@ export default function ManufacturingPage() {
             {/* YENİ ÜRETİM EMRİ MODALI (SAYFAMIZIN "AKILLI CHECK" BÖLÜMÜNÜ İÇERİR) */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className={`w-[600px] max-w-full rounded-[24px] overflow-hidden flex flex-col max-h-[95vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
+                    <div className={`w-[600px] max-w-full rounded-[32px]} animate-in zoom-in-95 duration-200`}>
                         <div className={`flex justify-between items-center px-8 py-5 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
                             <h2 className={`text-[18px] font-bold flex items-center gap-2 ${textValueClass}`}>
                                 <Factory className="w-5 h-5 text-indigo-500" />
@@ -215,7 +216,7 @@ export default function ManufacturingPage() {
                         </div>
 
                         <div className="p-8 overflow-y-auto custom-scroll flex flex-col gap-6">
-                            <div className={`p-4 rounded-[12px] border flex gap-4 ${isLight ? "bg-indigo-50/50 border-indigo-100" : "bg-indigo-900/10 border-indigo-900/30"}`}>
+                            <div className={`p-4 rounded-[20px] border flex gap-4 ${isLight ? "bg-indigo-50/50 border-indigo-100" : "bg-indigo-900/10 border-indigo-900/30"}`}>
                                 <AlertCircle className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-indigo-600" : "text-indigo-400"}`} />
                                 <div>
                                     <h4 className={`text-[14px] font-[900] tracking-wider uppercase ${isLight ? "text-indigo-800" : "text-indigo-300"}`}>BOM & Fire Kontrolü Çalışacak</h4>
@@ -285,7 +286,7 @@ export default function ManufacturingPage() {
                             <button
                                 onClick={handleSaveOrder}
                                 disabled={isProcessing}
-                                className={`w-full h-[54px] rounded-[14px] text-[15px] font-[900] tracking-widest uppercase text-white transition-all flex justify-center items-center gap-2 ${isLight ? "bg-indigo-600 hover:bg-slate-900" : "bg-indigo-600 hover:bg-white hover:text-indigo-900"} ${isProcessing ? 'opacity-50' : ''}`}
+                                className={`w-full h-[54px] rounded-full text-[15px] font-[900] tracking-widest uppercase text-white transition-all flex justify-center items-center gap-2 ${isLight ? "bg-indigo-600 hover:bg-slate-900" : "bg-indigo-600 hover:bg-white hover:text-indigo-900"} ${isProcessing ? 'opacity-50' : ''}`}
                             >
                                 {isProcessing ? "Eşzamanlanıyor..." : "Üretime Al & Kaynakları Bağla"}
                             </button>
@@ -297,7 +298,7 @@ export default function ManufacturingPage() {
             {/* SADECE BİLGİLENDİRME AMAÇLI ORDER DETAIL MODALI (Kanbandan tıklandığında) */}
             {selectedOrder && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className={`w-[600px] max-w-full rounded-[24px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
+                    <div className={`w-[600px] max-w-full rounded-[32px]} animate-in zoom-in-95 duration-200`}>
                         <div className={`flex justify-between items-center px-8 py-5 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
                             <h2 className={`text-[16px] font-[900] tracking-wider uppercase flex items-center gap-2 ${textValueClass}`}><Factory className="w-5 h-5 opacity-60" /> Emir Detay: {selectedOrder.orderNumber}</h2>
                             <button onClick={() => setSelectedOrder(null)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
@@ -325,7 +326,7 @@ export default function ManufacturingPage() {
                                 <h3 className={`text-[14px] font-[900] tracking-wider uppercase mb-3 ${textValueClass}`}>Reçete İhtiyaç Haritası</h3>
                                 <div className="space-y-2">
                                     {selectedOrder.items?.map((item: any, idx: number) => (
-                                        <div key={idx} className={`flex justify-between items-center p-3 rounded-[12px] border ${isLight ? "bg-white border-slate-100" : "bg-slate-800/50 border-slate-700"}`}>
+                                        <div key={idx} className={`flex justify-between items-center p-3 rounded-[20px] border ${isLight ? "bg-white border-slate-100" : "bg-slate-800/50 border-slate-700"}`}>
                                             <div>
                                                 <div className={`text-[13px] font-[900] ${textValueClass}`}>{item.product?.name}</div>
                                                 <div className={`text-[11px] font-bold uppercase tracking-wider mt-1 opacity-60 ${textLabelClass}`}>Br MLYT: {formatCurrency(item.unitCost)}</div>

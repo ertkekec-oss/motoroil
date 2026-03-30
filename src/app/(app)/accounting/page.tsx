@@ -12,15 +12,15 @@ import { useModal } from "@/contexts/ModalContext";
 import AccountingModals from "./components/AccountingModals";
 
 const TopPills = ({ pills }: any) => (
-    <div className="flex flex-wrap items-center gap-4 shrink-0 mb-8 w-full">
+    <div className="flex flex-wrap items-center gap-4 shrink-0 mb-8 w-full overflow-x-auto pb-2 custom-scroll">
         {pills.map((p: any, i: number) => (
-            <div key={i} className={`flex flex-1 min-w-[200px] bg-white dark:bg-[#0f172a] rounded-[24px] pl-4 pr-6 py-4 items-center gap-5 transition-transform hover:-translate-y-1 hover:shadow-md border border-slate-200 dark:border-white/5 shadow-sm group`}>
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${p.bg} ${p.color} transition-colors`}>
+            <div key={i} className={`flex flex-1 min-w-[220px] bg-white dark:bg-[#0f172a] rounded-[24px] pl-4 pr-6 py-4 items-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md border border-slate-200 dark:border-white/5 shadow-sm group shrink-0`}>
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${p.bg} ${p.color} transition-colors`}>
                     {p.icon}
                 </div>
-                <div className="flex flex-col justify-center">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-1">{p.title}</span>
-                    <span className={`text-[28px] font-black ${p.valueColor || 'text-slate-800 dark:text-white'} leading-none`}>{p.value}</span>
+                <div className="flex flex-col justify-center overflow-hidden">
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-1 line-clamp-1">{p.title}</span>
+                    <span className={`text-[16px] xl:text-[20px] font-black truncate ${p.valueColor || 'text-slate-800 dark:text-white'} leading-tight`}>{p.value}</span>
                 </div>
             </div>
         ))}
@@ -132,12 +132,12 @@ export default function AccountingPage() {
     };
 
     const tabs = [
-        { id: 'receivables', label: 'ALACAKLAR' },
-        { id: 'payables', label: 'BORÇLAR' },
-        { id: 'checks', label: 'ÇEK / SENET' },
-        { id: 'banks', label: 'BANKA/KASA' },
-        { id: 'expenses', label: 'GİDERLER' },
-        { id: 'transactions', label: 'HAREKETLER' }
+        { id: 'receivables', label: 'Alacaklar' },
+        { id: 'payables', label: 'Borçlar' },
+        { id: 'checks', label: 'Çek / Senet' },
+        { id: 'banks', label: 'Banka' },
+        { id: 'expenses', label: 'Giderler' },
+        { id: 'transactions', label: 'Hareketler' }
     ];
 
     const handleCheckImageUpload = async (checkId: string, file: File) => {
@@ -166,38 +166,52 @@ export default function AccountingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-white pb-24">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-white pb-24 font-sans">
             <AccountingModals
                 isOpen={!!modalType}
                 onClose={() => setModalType(null)}
                 type={modalType || ''}
             />
 
-            <div className="max-w-[1600px] mx-auto p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
-                <div className="w-full flex justify-end mb-4">
-    <button onClick={refreshData} className="px-5 py-2.5 bg-white dark:bg-[#1e293b]/50 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2">
-        <RefreshCw className={`w-3.5 h-3.5 ${isInitialLoading ? 'animate-spin' : ''}`} /> YENİLE
-    </button>
-</div>
-<TopPills pills={[
-                    { title: 'TOPLAM ALACAK', value: formatCurrency(stats.totalReceivables), icon: <ArrowDownLeft className="w-6 h-6"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500', valueColor: 'text-emerald-600 dark:text-emerald-400' },
-                    { title: 'TOPLAM BORÇ (ÖDEME)', value: formatCurrency(stats.totalPayables), icon: <ArrowUpRight className="w-6 h-6"/>, bg: 'bg-rose-50 dark:bg-rose-500/10', color: 'text-rose-500', valueColor: 'text-rose-600 dark:text-rose-400' },
-                    { title: 'NET KASA DEĞERİ', value: formatCurrency(stats.netCash), icon: <Landmark className="w-6 h-6"/>, bg: 'bg-blue-50 dark:bg-blue-500/10', color: 'text-blue-500', valueColor: 'text-blue-600 dark:text-blue-400' },
-                    { title: 'İŞLETME GİDERİ', value: formatCurrency(stats.totalExpenses), icon: <CreditCard className="w-6 h-6"/>, bg: 'bg-slate-100 dark:bg-slate-800/80', color: 'text-slate-500', valueColor: 'text-slate-700 dark:text-slate-300' }
+            <div className="max-w-[1600px] mx-auto p-4 md:p-8 space-y-6 animate-in fade-in duration-500">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-white/5 pb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20">
+                            <Landmark className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">FİNANSAL YÖNETİM</h1>
+                             <div className="flex items-center gap-2 mt-0.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Mali Durum & Nakit Akışı</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onClick={refreshData} className="px-5 py-2.5 bg-white dark:bg-[#1e293b]/50 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2 outline-none">
+                        <RefreshCw className={`w-3.5 h-3.5 ${isInitialLoading ? 'animate-spin' : ''}`} /> YENİLE
+                    </button>
+                </div>
+
+                <TopPills pills={[
+                    { title: 'TOPLAM ALACAK', value: formatCurrency(stats.totalReceivables), icon: <ArrowDownLeft className="w-5 h-5"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500', valueColor: 'text-emerald-600 dark:text-emerald-400' },
+                    { title: 'TOPLAM BORÇ (ÖDEME)', value: formatCurrency(stats.totalPayables), icon: <ArrowUpRight className="w-5 h-5"/>, bg: 'bg-rose-50 dark:bg-rose-500/10', color: 'text-rose-500', valueColor: 'text-rose-600 dark:text-rose-400' },
+                    { title: 'NET KASA DEĞERİ', value: formatCurrency(stats.netCash), icon: <Landmark className="w-5 h-5"/>, bg: 'bg-blue-50 dark:bg-blue-500/10', color: 'text-blue-500', valueColor: 'text-blue-600 dark:text-blue-400' },
+                    { title: 'İŞLETME GİDERİ', value: formatCurrency(stats.totalExpenses), icon: <CreditCard className="w-5 h-5"/>, bg: 'bg-slate-100 dark:bg-slate-800/80', color: 'text-slate-500', valueColor: 'text-slate-700 dark:text-slate-300' }
                 ]} />
 
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm">
-                    <div className="flex flex-wrap items-center p-1 w-full md:w-auto">
-                        {tabs.map(tab => {
-                            const isActive = activeTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`h-[38px] px-5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}`}
-                                >
-                                    {tab.label}
-                                </button>
+                    <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
+                    {tabs.map(tab => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex-1 min-w-[120px] h-11 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
+                            >
+                                {tab.label}
+                            </button>
                             );
                         })}
                     </div>

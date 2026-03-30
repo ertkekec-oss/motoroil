@@ -104,7 +104,7 @@ export default function TransferTabContent({
                             </h3>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Kabul bekleyen aktif stok hareketleri ({inTransitTransfers.length})</p>
                         </div>
-                        <button onClick={refreshStockTransfers} className="px-5 py-2.5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-semibold rounded-lg text-xs hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center gap-2">
+                        <button onClick={refreshStockTransfers} className="px-6 py-2 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide rounded-full text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center gap-2">
                             Yenile
                         </button>
                     </div>
@@ -140,16 +140,16 @@ export default function TransferTabContent({
                                         </div>
                                         <div className="flex gap-2">
                                             {(isSystemAdmin || t.fromBranch === activeBranchName) && (
-                                                <button onClick={() => handleCancel(t)} className="px-4 py-2 border border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-bold transition-colors">
+                                                <button onClick={() => handleCancel(t)} className="px-5 py-2 border border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full text-[13px] tracking-wide font-bold transition-colors">
                                                     İptal
                                                 </button>
                                             )}
                                             {t.toBranch === activeBranchName || activeBranchName === 'Tümü' || isSystemAdmin ? (
-                                                <button onClick={() => handleReceive(t)} className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition-colors">
+                                                <button onClick={() => handleReceive(t)} className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-[13px] tracking-wide font-bold shadow-sm transition-colors">
                                                     Kabul Et
                                                 </button>
                                             ) : (
-                                                <div className="px-4 py-2 bg-slate-50 dark:bg-[#1e293b] text-slate-400 border border-slate-100 dark:border-white/5 rounded-lg text-xs font-bold italic">
+                                                <div className="px-5 py-2 bg-slate-50 dark:bg-[#1e293b] text-slate-400 border border-slate-100 dark:border-white/5 rounded-full text-[13px] tracking-wide font-bold italic">
                                                     Kabul Bekleniyor
                                                 </div>
                                             )}
@@ -169,7 +169,7 @@ export default function TransferTabContent({
                             <div className="text-sm font-bold text-blue-900 mb-1">Ağır Vasıta Filtre Seti (10 Adet)</div>
                             <div className="text-[11px] font-bold text-blue-600 flex items-center gap-1.5"><span className="text-blue-800 bg-blue-100/50 px-1 py-0.5 rounded">Kadıköy (Fazla Stok)</span> <ArrowRight className="w-3 h-3" /> <span className="text-blue-800 bg-blue-100/50 px-1 py-0.5 rounded">Ümraniye (Yok Satma Riski)</span></div>
                         </div>
-                        <button className="px-4 py-2 bg-white dark:bg-[#0f172a] border border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                        <button className="px-5 py-2 bg-white dark:bg-[#0f172a] border border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white rounded-full text-[13px] tracking-wide font-bold transition-all shadow-sm">
                             Hemen Başlat
                         </button>
                     </div>
@@ -290,7 +290,7 @@ export default function TransferTabContent({
                                         <p className="text-sm font-bold text-slate-600 dark:text-slate-400">Sepetiniz Boş</p>
                                         <p className="text-[11px] mt-1 text-slate-500">Ürün Ekle bölümünden listeye parça ekleyin.</p>
                                     </div>
-                                    <button onClick={() => setViewMode('products')} className="mt-2 text-xs font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-lg border border-indigo-100 dark:border-indigo-500/20">Ürün Listesine Git</button>
+                                    <button onClick={() => setViewMode('products')} className="mt-2 text-[13px] font-bold tracking-wide text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-5 py-2 rounded-full border border-indigo-100 dark:border-indigo-500/20">Ürün Listesine Git</button>
                                 </div>
                             ) : (
                                 transferCart.map((item: any, idx: number) => (
@@ -300,7 +300,7 @@ export default function TransferTabContent({
                                                 <div className="text-[13px] font-bold text-slate-900 dark:text-white truncate" title={item.name}>{item.name}</div>
                                                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-1 uppercase">MAX DEPO: {item.stock} ADET</div>
                                             </div>
-                                            <button onClick={() => setTransferCart(transferCart.filter((_, i) => i !== idx))} className="text-slate-400 hover:text-rose-500 bg-slate-50 hover:bg-rose-50 dark:bg-slate-900/50 dark:hover:bg-rose-500/20 p-1.5 rounded-lg transition-colors">
+                                            <button onClick={() => setTransferCart(transferCart.filter((_, i) => i !== idx))} className="text-slate-400 hover:text-rose-500 bg-slate-50 hover:bg-rose-50 dark:bg-slate-900/50 dark:hover:bg-rose-500/20 p-2 rounded-full transition-colors">
                                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
                                             </button>
                                         </div>

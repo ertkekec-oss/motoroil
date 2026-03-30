@@ -62,36 +62,25 @@ export default function InventoryDetailModal({
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto p-6">
                     {/* Tabs */}
-                    <div className="flex gap-2 mb-6 border-b border-slate-200 dark:border-white/10 pb-2 overflow-x-auto custom-scroll">
-                        <button
-                            onClick={() => setDetailTab('general')}
-                            className={`px-4 py-2 text-[13px] font-semibold rounded-[10px] transition-colors whitespace-nowrap ${detailTab === 'general' ? 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
-                        >
-                            Genel Bilgiler
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setDetailTab('pricing')}
-                            className={`px-4 py-2 text-[13px] font-semibold rounded-[10px] transition-colors whitespace-nowrap ${detailTab === 'pricing' ? 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
-                        >
-                            Fiyat & Vergi
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setDetailTab('multi-prices')}
-                            className={`px-4 py-2 text-[13px] font-semibold rounded-[10px] transition-colors whitespace-nowrap ${detailTab === 'multi-prices' ? 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
-                        >
-                            Çoklu Fiyat
-                        </button>
-                        {selectedProduct && selectedProduct.isParent && (
+                    <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll mb-6">
+                        {[
+                          { id: 'general', label: 'GENEL BİLGİLER' },
+                          { id: 'pricing', label: 'FİYAT & VERGİ' },
+                          { id: 'multi-prices', label: 'ÇOKLU FİYAT' },
+                          ...(selectedProduct && selectedProduct.isParent ? [{ id: 'variants', label: 'VARYANTLAR' }] : [])
+                        ].map((tab) => {
+                          const isActive = detailTab === tab.id;
+                          return (
                             <button
+                                key={tab.id}
                                 type="button"
-                                onClick={() => setDetailTab('variants')}
-                                className={`px-4 py-2 text-[13px] font-semibold rounded-[10px] transition-colors whitespace-nowrap ${detailTab === 'variants' ? 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                                onClick={() => setDetailTab(tab.id)}
+                                className={`flex-1 min-w-[140px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
                             >
-                                Varyantlar
+                              {tab.label}
                             </button>
-                        )}
+                          );
+                        })}
                     </div>
 
                     <form id="product-edit-form" onSubmit={onSave} className="space-y-6">
@@ -398,7 +387,7 @@ export default function InventoryDetailModal({
                             <button
                                 type="button"
                                 onClick={onDelete}
-                                className="px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 text-[13px] font-semibold rounded-[10px] transition-colors border border-red-200 dark:border-red-500/20"
+                                className="px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 text-[13px] font-bold tracking-wide rounded-full transition-colors border border-red-200 dark:border-red-500/20 shadow-sm"
                             >
                                 Ürünü Sil
                             </button>
@@ -408,7 +397,7 @@ export default function InventoryDetailModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-2.5 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-semibold text-[13px] rounded-[10px] transition-colors border border-slate-200 dark:border-white/10"
+                            className="px-6 py-2.5 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide text-[13px] rounded-full transition-colors border border-slate-200 dark:border-white/10 shadow-sm"
                         >
                             Vazgeç
                         </button>
@@ -416,7 +405,7 @@ export default function InventoryDetailModal({
                             <button
                                 type="button"
                                 onClick={onSave}
-                                className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[13px] rounded-[10px] shadow-sm transition-colors flex items-center gap-2"
+                                className="px-8 py-2.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 font-bold tracking-wide text-[13px] rounded-full shadow-sm transition-all flex items-center gap-2"
                             >
                                 Değişiklikleri Kaydet
                             </button>

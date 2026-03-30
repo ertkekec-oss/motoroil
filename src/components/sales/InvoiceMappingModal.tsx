@@ -95,7 +95,7 @@ export function InvoiceMappingModal({
     };
 
     return (
-        (
+
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }} className="flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm">
             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-2xl w-full max-w-4xl relative animate-in zoom-in-95 duration-200 flex flex-col overflow-hidden max-h-[90vh]">
                 
@@ -213,7 +213,7 @@ export function InvoiceMappingModal({
                                                         </select>
                                                         <button
                                                             onClick={() => setQuickCreate({ ...quickCreate, [item.name]: { name: item.name, code: item.code || '', stock: '0', price: '0' } })}
-                                                            className="px-5 py-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[11px] font-black uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-500/20 active:scale-95 transition-all whitespace-nowrap"
+                                                            className="px-5 py-3 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[11px] font-black uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-500/20 active:scale-95 transition-all whitespace-nowrap"
                                                         >
                                                             + Yeni Kart Oluştur
                                                         </button>
@@ -257,11 +257,11 @@ export function InvoiceMappingModal({
                                                         <div className="flex gap-3 mt-1">
                                                             <button onClick={() => handleCreateProduct(item.name, quickCreate[item.name]!)}
                                                                 disabled={isCreating === item.name}
-                                                                className="flex-1 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] uppercase tracking-widest disabled:opacity-50 transition-colors">
+                                                                className="flex-1 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] uppercase tracking-widest disabled:opacity-50 transition-colors">
                                                                 {isCreating === item.name ? 'Oluşturuluyor...' : '✅ Stok Kartı Oluştur ve Seç'}
                                                             </button>
                                                             <button onClick={() => setQuickCreate({ ...quickCreate, [item.name]: null })}
-                                                                className="px-5 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-black text-[11px] uppercase tracking-widest transition-colors">
+                                                                className="px-5 py-2 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-black text-[11px] uppercase tracking-widest transition-colors">
                                                                 İptal
                                                             </button>
                                                         </div>

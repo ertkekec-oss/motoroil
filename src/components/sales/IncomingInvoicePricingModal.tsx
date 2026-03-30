@@ -183,7 +183,7 @@ export function IncomingInvoicePricingModal({
                     <button 
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className={`px-6 py-3 rounded-xl border font-bold text-sm transition-colors disabled:opacity-50 ${
+                        className={`px-6 py-3 rounded-full border font-bold tracking-wide text-[13px] transition-colors disabled:opacity-50 shadow-sm ${
                             isLight 
                             ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' 
                             : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'
@@ -194,7 +194,7 @@ export function IncomingInvoicePricingModal({
                     <button 
                         onClick={handleConfirm}
                         disabled={isSubmitting}
-                        className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                        className="px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide text-[13px] shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
                     >
                         {isSubmitting ? 'Kaydediliyor...' : 'Belirlediğim Fiyatlarla Kaydet ve Onayla'}
                     </button>

@@ -1,0 +1,9 @@
+{
+  "src/app/(app)/inventory/warehouses/page.tsx": {
+    "rounded-[10px]": 2,
+    "rounded-full": 6,
+    "rounded-[14px]": 4,
+    "rounded-[6px]": 1,
+    "rounded-[4px]": 1
+  }
+}

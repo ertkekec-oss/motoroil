@@ -147,25 +147,25 @@ export default function ProductWizardModal({
                                 
                                 {/* ACTIONS */}
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <button onClick={() => { router.push('/purchasing'); onClose(); }} className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/purchasing'); onClose(); }} className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 px-4 py-2 rounded-full text-[13px] tracking-wide font-bold hover:bg-indigo-100 transition-colors shadow-sm">
                                         <ShoppingCart size={14} /> Tedarikçiden Alış Yap
                                     </button>
-                                    <button onClick={() => { router.push('/inventory?action=count'); onClose(); }} className="flex items-center gap-1.5 bg-sky-50 border border-sky-200 text-sky-700 dark:bg-sky-500/10 dark:border-sky-500/20 dark:text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-sky-100 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/inventory?action=count'); onClose(); }} className="flex items-center gap-1.5 bg-sky-50 border border-sky-200 text-sky-700 dark:bg-sky-500/10 dark:border-sky-500/20 dark:text-sky-400 px-4 py-2 rounded-full text-[13px] tracking-wide font-bold hover:bg-sky-100 transition-colors shadow-sm">
                                         <PlusCircle size={14} /> Manuel Stok Ekle
                                     </button>
-                                    <button onClick={() => { router.push('/reports?type=product_statement&product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/reports?type=product_statement&product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-4 py-2 rounded-full text-[13px] tracking-wide font-bold hover:bg-slate-50 transition-colors shadow-sm">
                                         <FileText size={14} /> Ekstre Al
                                     </button>
                                     
                                     <input type="file" ref={fileInputRef} className="hidden" accept="application/pdf" onChange={handleDocumentUpload} />
-                                    <button onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50">
+                                    <button onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-4 py-2 rounded-full text-[13px] tracking-wide font-bold hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50">
                                         {isUploading ? (
                                             <div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
                                         ) : <FileDown size={14} />} 
                                         {isUploading ? "Yükleniyor..." : "Döküman Yükle"}
                                     </button>
                                     
-                                    <button onClick={() => { router.push('/inventory/labels?product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                    <button onClick={() => { router.push('/inventory/labels?product=' + data.id); onClose(); }} className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-700 dark:bg-[#0f172a] dark:border-white/10 dark:text-slate-300 px-4 py-2 rounded-full text-[13px] tracking-wide font-bold hover:bg-slate-50 transition-colors shadow-sm">
                                         <Printer size={14} /> Etiket Yazdır
                                     </button>
                                 </div>
@@ -246,7 +246,7 @@ export default function ProductWizardModal({
                         {mode === "edit" && onDelete && (
                             <button
                                 onClick={onDelete}
-                                className="px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-100 transition-colors"
+                                className="px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-full text-sm font-bold tracking-wide hover:bg-red-100 dark:bg-red-900/20 dark:border-red-900/30 dark:text-red-400 transition-colors shadow-sm"
                             >
                                 Ürünü Sil
                             </button>
@@ -255,7 +255,7 @@ export default function ProductWizardModal({
                     <div className="flex items-center gap-3">
                         <button
                             onClick={currentStep === 1 ? onClose : handlePrev}
-                            className="px-6 py-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                            className="px-6 py-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-full text-sm font-bold tracking-wide hover:bg-slate-50 dark:hover:bg-white/5 transition-colors shadow-sm"
                         >
                             {currentStep === 1 ? "Vazgeç" : "Geri"}
                         </button>
@@ -264,7 +264,7 @@ export default function ProductWizardModal({
                             <button
                                 onClick={handleNext}
                                 disabled={currentStep === 1 && !data.name}
-                                className="px-8 py-2.5 bg-slate-900 dark:bg-white border border-transparent text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-8 py-2.5 bg-slate-900 dark:bg-white border border-transparent text-white dark:text-slate-900 rounded-full text-sm font-bold tracking-wide hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                             >
                                 İleri
                             </button>
@@ -276,7 +276,7 @@ export default function ProductWizardModal({
                                 <button
                                     onClick={onSave}
                                     disabled={isProcessing}
-                                    className="px-8 py-2.5 bg-slate-900 dark:bg-white border border-transparent text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-8 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full text-sm font-bold tracking-wide hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                                 >
                                     {isProcessing ? "Kaydediliyor..." : (mode === "create" ? "✨ Ürünü Oluştur" : "Değişiklikleri Kaydet")}
                                 </button>
@@ -385,7 +385,7 @@ function StepIdentity({ data, onChange, categories }: any) {
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </a>
                                 )}
-                                <button onClick={() => onChange({...data, documentName: null, documentUrl: null})} className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors" title="Kaldır">
+                                <button onClick={() => onChange({...data, documentName: null, documentUrl: null})} className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors" title="Kaldır">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                 </button>
                             </div>
@@ -666,7 +666,7 @@ function StepOtherInfo({ data, onChange, categories, globalCategories }: any) {
                     <div className="space-y-2">
                         <label className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
                             <span>Barkod</span>
-                            <button type="button" onClick={() => onChange({ ...data, barcode: Math.floor(1000000000000 + Math.random() * 9000000000000).toString() })} className="text-[10px] bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-0.5 rounded-md font-bold transition-colors">BARKOD ÜRET</button>
+                            <button type="button" onClick={() => onChange({ ...data, barcode: Math.floor(1000000000000 + Math.random() * 9000000000000).toString() })} className="text-[10px] bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-full font-bold tracking-widest uppercase transition-colors">BARKOD ÜRET</button>
                         </label>
                         <input type="text" value={data.barcode || ''} onChange={e => onChange({ ...data, barcode: e.target.value })} className="w-full h-12 px-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-900 outline-none shadow-sm font-mono text-sm" />
                     </div>
@@ -824,7 +824,7 @@ function StepVariantsPriceLists({
 
                             {selectedAttributes.length > 0 && (
                                 <div className="space-y-4">
-                                    <button onClick={generateCombinations} className="w-full py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                                    <button onClick={generateCombinations} className="w-full py-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-full text-[13px] font-bold tracking-wide text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
                                         🔄 Kombinasyonları Oluştur
                                     </button>
                                     {generatedVariants.length > 0 && (
@@ -927,7 +927,7 @@ function StepConnectedProducts({ mode, data, onChange, setCurrentStep }: any) {
                     <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-3 rounded-xl text-xs text-amber-800 dark:text-amber-400 font-medium leading-relaxed">
                         Tanımladığınız kodlar oluşan e-faturanın XML'inde "BuyersItemIdentification" adlı özel bir alanda iletilir. Eğer bu kodun XML haricinde, ayrıca fatura çıktısı üzerinde de gözükmesini istiyorsanız, e-fatura entegratörünüze "BuyersItemIdentification" alanını "Alıcı Ürün Kodu" isimli bir kolonda görmek istediğinizi iletin.
                     </div>
-                    <button onClick={() => { if(typeof window !== 'undefined') window.location.href = '/customers?action=map_code&product=' + data.id }} className="w-full py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all">
+                    <button onClick={() => { if(typeof window !== 'undefined') window.location.href = '/customers?action=map_code&product=' + data.id }} className="w-full py-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-full tracking-wide text-[13px] font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-all">
                         + Müşteri Kodu Ekle
                     </button>
                 </div>
@@ -1008,7 +1008,7 @@ function StepB2BDetails({ mode, data, onChange }: any) {
                                     Ağ üzerindeki Toptan Koli / Palet Alımları Teşvik Edin
                                 </p>
                             </div>
-                            <button className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow border-b-[3px] border-indigo-800 active:translate-y-[2px] active:border-b-0 transition-all flex items-center gap-1 uppercase tracking-widest">
+                            <button className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[13px] rounded-full shadow border-b-[3px] border-indigo-800 active:translate-y-[2px] active:border-b-0 transition-all flex items-center gap-1 uppercase tracking-widest">
                                 <span>+ Kural Ekle</span>
                             </button>
                         </div>

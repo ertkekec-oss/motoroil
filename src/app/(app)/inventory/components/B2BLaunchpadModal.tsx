@@ -97,7 +97,7 @@ export function B2BLaunchpadModal({ isOpen, onClose, productIds, products, onCon
                                         </li>
                                     ))}
                                 </ul>
-                                <button onClick={onClose} className="mt-4 w-full py-3 bg-white dark:bg-rose-950/30 text-rose-600 dark:text-rose-300 rounded-xl font-bold text-sm hover:bg-rose-100 transition-colors border border-rose-100 dark:border-rose-500/20">
+                                <button onClick={onClose} className="mt-4 w-full py-3.5 bg-white dark:bg-rose-950/30 text-rose-600 dark:text-rose-300 rounded-full font-bold text-sm tracking-wide hover:bg-rose-100 transition-colors border border-rose-100 dark:border-rose-500/20 shadow-sm active:scale-[0.98]">
                                     Geri Dön ve Düzelt
                                 </button>
                             </div>
@@ -117,7 +117,7 @@ export function B2BLaunchpadModal({ isOpen, onClose, productIds, products, onCon
                         {validationErrors.length === 0 && (
                             <button 
                                 onClick={handleLaunch} 
-                                className="w-full h-16 bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-xl shadow-slate-900/20 dark:shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-3 overflow-hidden relative"
+                                className="w-full h-16 bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-black text-[13px] uppercase tracking-widest rounded-full shadow-xl shadow-slate-900/20 dark:shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-3 overflow-hidden relative"
                             >
                                 <Rocket className="w-5 h-5"/> ATEŞLE VE YAYINLA
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>

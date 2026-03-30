@@ -72,9 +72,9 @@ export function B2bOrdersTab({ onlineOrders, fetchOnlineOrders }: { onlineOrders
     };
 
     const OutlineChip = ({ active, onClick, children }: any) => (
-        <button onClick={onClick} className={`h-[36px] px-4 rounded-[10px] text-[13px] font-medium border transition-colors whitespace-nowrap ${active
-                ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700' : 'bg-blue-900/20 border-blue-500 text-blue-400')
-                : (isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800')
+        <button onClick={onClick} className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${active
+                ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm' : 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-sm')
+                : (isLight ? 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-700/50 text-slate-400 hover:text-slate-300 hover:bg-slate-800')
             }`}>
             {children}
         </button>
@@ -134,10 +134,10 @@ export function B2bOrdersTab({ onlineOrders, fetchOnlineOrders }: { onlineOrders
                                         {/* Actions */}
                                         {order.status === 'PENDING_APPROVAL' && (
                                             <>
-                                                <button onClick={() => handleReject(order.id)} className="p-2 border rounded-lg text-rose-500 hover:bg-rose-50 border-rose-200" title="Reddet">
+                                                <button onClick={() => handleReject(order.id)} className="p-2 border rounded-full text-rose-500 hover:bg-rose-50 border-rose-200" title="Reddet">
                                                     <X className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => handleApprove(order.id)} className="p-2 border rounded-lg text-emerald-600 hover:bg-emerald-50 border-emerald-200" title="Onayla">
+                                                <button onClick={() => handleApprove(order.id)} className="p-2 border rounded-full text-emerald-600 hover:bg-emerald-50 border-emerald-200" title="Onayla">
                                                     <Check className="w-4 h-4" />
                                                 </button>
                                             </>
@@ -147,7 +147,7 @@ export function B2bOrdersTab({ onlineOrders, fetchOnlineOrders }: { onlineOrders
                                                 let rData: any = {};
                                                 try { rData = typeof order.rawData === 'string' ? JSON.parse(order.rawData) : (order.rawData || {}); } catch (e) {}
                                                 router.push(rData.customerId ? `/customers/${rData.customerId}` : `/customers`);
-                                            }} className="px-3 py-1.5 border rounded-lg text-[12px] font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-50 border-slate-200 transition-colors ml-auto mr-0">
+                                            }} className="px-4 py-1.5 border rounded-full text-[12px] font-bold tracking-wide flex items-center gap-2 text-slate-600 hover:bg-slate-50 border-slate-200 transition-colors ml-auto mr-0">
                                                 Cari Detayına Git
                                             </button>
                                         )}
@@ -171,11 +171,11 @@ export function B2bOrdersTab({ onlineOrders, fetchOnlineOrders }: { onlineOrders
             {/* Pagination */}
             {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-2 mt-4 pb-4">
-                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-4 py-2 text-[12px] font-semibold border rounded-lg hover:bg-slate-50">Önceki</button>
+                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-5 py-2 text-[12px] font-bold tracking-wide border rounded-full hover:bg-slate-50">Önceki</button>
                     <span className="text-[13px] font-medium text-slate-500">
                         {currentPage} / {totalPages}
                     </span>
-                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-4 py-2 text-[12px] font-semibold border rounded-lg hover:bg-slate-50">Sonraki</button>
+                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-5 py-2 text-[12px] font-bold tracking-wide border rounded-full hover:bg-slate-50">Sonraki</button>
                 </div>
             )}
         </div>

@@ -1025,37 +1025,36 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </Link>
                 </div>
 
-                {/* Enterprise Level 10 Oval Tabs Navigation */}
-                <div className="flex flex-wrap items-center gap-1 mb-2 mt-4 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm overflow-x-auto no-scrollbar">
-                    {[
-                        { id: 'all', label: 'Tüm Hareketler', group: 1 },
-                        { id: 'sales', label: 'Satışlar & Faturalar', group: 1 },
-                        { id: 'payments', label: 'Finansal İşlemler', group: 1 },
-                        { id: 'offers', label: 'Teklifler', group: 1 },
-                        { id: 'documents', label: 'Dosyalar', group: 2 },
-                        { id: 'warranties', label: 'Garantiler', group: 2 },
-                        { id: 'services', label: 'Servis', group: 3 },
-                        { id: 'checks', label: 'Vadeler', group: 4 },
-                        { id: 'reconciliation', label: 'Mutabakat', group: 4 }
-                    ].map((tab, idx, arr) => {
-                        const isActive = activeTab === tab.id;
-                        const showDivider = idx > 0 && tab.group !== arr[idx - 1].group;
-                        return (
-                            <React.Fragment key={tab.id}>
-                                {showDivider && <div className="w-px h-5 bg-slate-200 dark:bg-slate-800/60 flex-shrink-0 mx-1"></div>}
+                {/* Enterprise Level 10 Oval Tabs Navigation Container */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 mt-4 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
+                    <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
+                        {[
+                            { id: 'all', label: 'TÜMÜ' },
+                            { id: 'sales', label: 'SATIŞ/FATURA' },
+                            { id: 'payments', label: 'FİNANS' },
+                            { id: 'offers', label: 'TEKLİFLER' },
+                            { id: 'documents', label: 'DOSYALAR' },
+                            { id: 'warranties', label: 'GARANTİLER' },
+                            { id: 'services', label: 'SERVİS' },
+                            { id: 'checks', label: 'VADELER' },
+                            { id: 'reconciliation', label: 'MUTABAKAT' }
+                        ].map((tab, idx, arr) => {
+                            const isActive = activeTab === tab.id;
+                            return (
                                 <button
+                                    key={tab.id}
                                     onClick={() => { 
                                         setActiveTab(tab.id as any); 
                                         if (tab.id === 'documents') fetchDocuments(); 
                                         if (tab.id === 'services') fetchServices(); 
                                     }}
-                                    className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-300'}`}
+                                    className={`flex-1 min-w-max h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
                                 >
                                     {tab.label}
                                 </button>
-                            </React.Fragment>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* CONTENT AREA */}

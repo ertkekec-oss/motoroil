@@ -54,10 +54,10 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-slate-900 px-4 py-2 rounded-xl shadow-xl flex items-center gap-4 z-50 animate-in slide-in-from-top-2 text-white">
                     <span className="text-xs font-bold">{selectedIds.length} ürün seçildi</span>
                     <div className="flex items-center gap-2 border-l border-slate-700 pl-4">
-                        <button className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors">Toplu Fiyat Güncelle</button>
-                        <button className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors">Toplu Transfer</button>
-                        <button onClick={onPublishB2B} className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors text-blue-400">B2B Ağına Gönder</button>
-                        <button className="px-3 py-1.5 hover:bg-slate-800 rounded-lg text-xs font-semibold transition-colors text-rose-400">Pasife Al</button>
+                        <button className="px-5 py-2 hover:bg-slate-800 rounded-full text-[13px] font-bold tracking-wide transition-colors">Toplu Fiyat Güncelle</button>
+                        <button className="px-5 py-2 hover:bg-slate-800 rounded-full text-[13px] font-bold tracking-wide transition-colors">Toplu Transfer</button>
+                        <button onClick={onPublishB2B} className="px-5 py-2 hover:bg-slate-800 rounded-full text-[13px] font-bold tracking-wide transition-colors text-blue-400">B2B Ağına Gönder</button>
+                        <button className="px-5 py-2 hover:bg-slate-800 rounded-full text-[13px] font-bold tracking-wide transition-colors text-rose-400">Pasife Al</button>
                     </div>
                 </div>
             )}

@@ -127,14 +127,14 @@ export function DespatchModal({
                     <div className="flex justify-end mt-10 gap-4">
                         <button
                             onClick={() => setShowDespatchModal(false)}
-                            className="px-8 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white font-medium transition-all"
+                            className="px-8 py-3 rounded-full border border-white/10 hover:bg-white/5 text-white font-bold tracking-wide transition-all"
                         >
                             İptal
                         </button>
                         <button
                             onClick={handleFinalSendDespatch}
                             disabled={isSendingDespatch}
-                            className="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold shadow-sm shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all"
+                            className="px-8 py-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold tracking-wide shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all"
                         >
                             {isSendingDespatch ? 'GÖNDERİLİYOR...' : 'Resmileştir ve Gönder'}
                         </button>

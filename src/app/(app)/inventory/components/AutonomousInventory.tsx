@@ -96,7 +96,7 @@ export function WeeklyHealthReport({ products = [], onClose }: { products?: any[
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Envanter sağlığı ve trend analizi</p>
                 </div>
-                <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-200/50 text-slate-500 dark:text-slate-400 transition-colors">✕</button>
+                <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-200/50 text-slate-500 dark:text-slate-400 transition-colors">✕</button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
@@ -203,14 +203,14 @@ export function FocusQueueTab({ products }: { products: any[] }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                            {finalAnomalies.length === 0 && (
+                            {anomalies.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
                                         Müdahale edilecek bir anomali bulunamadı.
                                     </td>
                                 </tr>
                             )}
-                            {finalAnomalies.map((a, i) => (
+                            {anomalies.map((a, i) => (
                                 <tr key={i} className="hover:bg-slate-50 dark:bg-[#1e293b] transition-colors group">
                                     <td className="px-4 py-3">
                                         <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${i === 0 ? 'bg-rose-50 text-rose-600 border border-rose-100' : i === 1 ? 'bg-amber-50 text-amber-600 border border-amber-100' : i === 2 ? 'bg-slate-50 text-slate-600 border border-slate-200' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>{a.type}</span>
@@ -364,7 +364,7 @@ export function RiskScoreIndicator({ score }: { score: number }) {
 export function ExcessStockB2BButton({ count }: { count: number }) {
     if (!count) return null;
     return (
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors shadow-sm">
+        <button className="flex items-center gap-2 px-5 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-full hover:bg-blue-100 transition-colors shadow-sm">
             <Factory className="w-4 h-4" />
             <div className="text-left">
                 <div className="text-[10px] font-bold uppercase tracking-wider">B2B Açılış Önerisi</div>

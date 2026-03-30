@@ -123,21 +123,17 @@ export function InvoicesTab({
         <div className="space-y-6 font-sans">
             {/* Invoices Sub-Tabs */}
             {invoiceSubTab !== 'wayslips' && (
-                <div className={`flex gap-6 border-b pb-[1px] ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
+                <div className={`flex gap-2 p-1.5 rounded-full w-fit mb-6 ${isLight ? 'bg-slate-100 border border-slate-200/50 shadow-inner' : 'bg-[#1e293b]/50 border border-white/5 shadow-inner'}`}>
                     {[
-                        { key: 'sales', label: '📄 Satış Faturaları', onClick: () => setInvoiceSubTab('sales') },
-                        { key: 'incoming', label: '📥 Gelen Faturalar', onClick: () => setInvoiceSubTab('incoming') }
+                        { key: 'sales', label: '📄 SATIŞ FATURALARI', onClick: () => setInvoiceSubTab('sales') },
+                        { key: 'incoming', label: '📥 GELEN FATURALAR', onClick: () => setInvoiceSubTab('incoming') }
                     ]?.map(({ key, label, onClick }) => {
                         const isActive = invoiceSubTab === key;
                         return (
                             <button
                                 key={key}
                                 onClick={onClick}
-                                className={`pb-3 text-[13px] font-semibold transition-colors relative -mb-[2px]`}
-                                style={{
-                                    color: isActive ? (isLight ? '#2563EB' : '#60A5FA') : (isLight ? '#64748B' : '#94A3B8'),
-                                    borderBottom: isActive ? `2px solid ${isLight ? '#2563EB' : '#60A5FA'}` : '2px solid transparent'
-                                }}
+                                className={`h-9 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none ${isActive ? (isLight ? 'bg-white text-indigo-600 shadow-sm border border-slate-200' : 'bg-indigo-500/20 text-indigo-400 shadow-sm border border-indigo-500/30') : (isLight ? 'text-slate-500 hover:text-slate-700 border border-transparent' : 'text-slate-400 hover:text-slate-300 border border-transparent')}`}
                             >
                                 {label}
                             </button>
@@ -165,7 +161,7 @@ export function InvoicesTab({
                             </select>
                             <button
                                 onClick={fetchInvoices}
-                                className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                                className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-full font-bold tracking-wide text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                                     }`}
                             >
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -275,13 +271,13 @@ export function InvoicesTab({
                                                                         <div className="mt-6 flex gap-3">
                                                                             <button
                                                                                 onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
-                                                                                className={`h-[40px] px-5 rounded-[10px] text-[13px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                                                className={`h-[40px] px-6 rounded-full text-[13px] font-bold tracking-wide transition-colors shadow-sm ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
                                                                             >
                                                                                 e-Fatura / e-Arşiv Gönder
                                                                             </button>
                                                                             <button
                                                                                 onClick={() => handleSendToELogo(inv.id, 'EIRSALIYE')}
-                                                                                className={`h-[40px] px-5 rounded-[10px] text-[13px] font-medium border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                                                className={`h-[40px] px-6 rounded-full text-[13px] font-bold tracking-wide border transition-colors shadow-sm ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
                                                                             >
                                                                                 e-İrsaliye Gönder
                                                                             </button>
@@ -296,7 +292,7 @@ export function InvoicesTab({
                                                                             </div>
                                                                             <button
                                                                                 onClick={() => handleViewPDF(inv.id)}
-                                                                                className={`h-[36px] px-4 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-600 text-white hover:bg-emerald-500'}`}
+                                                                                className={`h-[36px] px-5 rounded-full text-[12px] font-bold tracking-wide transition-colors shadow-sm ${isLight ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-600 text-white hover:bg-emerald-500'}`}
                                                                             >
                                                                                 PDF Görüntüle
                                                                             </button>
@@ -336,7 +332,7 @@ export function InvoicesTab({
                             </select>
                             <button
                                 onClick={fetchPurchaseInvoices}
-                                className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                                className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-full font-bold tracking-wide text-[12px] border transition-colors outline-none shadow-sm ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                                     }`}
                             >
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -382,13 +378,13 @@ export function InvoicesTab({
                                                         <>
                                                             <button
                                                                 onClick={() => handleAcceptPurchaseInvoice(inv.id, inv.documentType || 'INVOICE')}
-                                                                className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                                                className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-wider transition-colors shadow-sm ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
                                                             >
                                                                 Kabul Et
                                                             </button>
                                                             <button
                                                                 onClick={() => handleRejectPurchaseInvoice(inv.id)}
-                                                                className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors border ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'}`}
+                                                                className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-wider transition-colors border shadow-sm ${isLight ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'}`}
                                                             >
                                                                 Reddet
                                                             </button>
@@ -396,7 +392,7 @@ export function InvoicesTab({
                                                     )}
                                                     <button
                                                         onClick={() => handleViewPDF(inv.id)}
-                                                        className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium transition-colors border ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                                        className={`h-[32px] px-4 rounded-full text-[11px] font-bold tracking-wider transition-colors border shadow-sm ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
                                                     >
                                                         PDF
                                                     </button>
@@ -430,13 +426,13 @@ export function InvoicesTab({
                             </select>
                             <button
                                 onClick={() => setView('new_wayslip')}
-                                className={`h-[36px] px-4 rounded-[10px] text-[12px] font-medium transition-colors flex items-center gap-2 ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                                className={`h-[36px] px-5 rounded-full text-[12px] font-bold tracking-wide transition-colors flex items-center gap-2 shadow-sm ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
                             >
                                 + Yeni İrsaliye
                             </button>
                             <button
                                 onClick={fetchWayslips}
-                                className={`h-[36px] px-4 flex items-center justify-center gap-2 rounded-[10px] font-medium text-[12px] border transition-colors outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                                className={`h-[36px] px-5 flex items-center justify-center gap-2 rounded-full font-bold tracking-wide text-[12px] border transition-colors outline-none shadow-sm ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                                     }`}
                             >
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -445,16 +441,16 @@ export function InvoicesTab({
                         </div>
                     </div>
 
-                    <div className={`p-1 flex gap-2 rounded-[12px] w-fit border ${isLight ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-900/50 border-slate-800'}`}>
+                    <div className={`p-1.5 flex gap-2 rounded-full w-fit border shadow-inner ${isLight ? 'bg-slate-100 border-slate-200/50' : 'bg-[#1e293b]/50 border-white/5'}`}>
                         <button
                             onClick={() => setWayslipType('giden')}
-                            className={`h-[36px] px-6 rounded-[10px] text-[13px] font-medium transition-colors ${wayslipType === 'giden' ? (isLight ? 'bg-white shadow-sm text-blue-700' : 'bg-slate-800 text-blue-400') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}
+                            className={`h-[36px] px-6 rounded-full text-[11px] font-black tracking-widest uppercase transition-all outline-none ${wayslipType === 'giden' ? (isLight ? 'bg-white shadow-sm text-indigo-600 border border-slate-200' : 'bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 shadow-sm') : (isLight ? 'text-slate-500 hover:text-slate-700 border border-transparent' : 'text-slate-400 hover:text-slate-300 border border-transparent')}`}
                         >
                             Giden İrsaliyeler
                         </button>
                         <button
                             onClick={() => setWayslipType('gelen')}
-                            className={`h-[36px] px-6 rounded-[10px] text-[13px] font-medium transition-colors ${wayslipType === 'gelen' ? (isLight ? 'bg-white shadow-sm text-blue-700' : 'bg-slate-800 text-blue-400') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}
+                            className={`h-[36px] px-6 rounded-full text-[11px] font-black tracking-widest uppercase transition-all outline-none ${wayslipType === 'gelen' ? (isLight ? 'bg-white shadow-sm text-indigo-600 border border-slate-200' : 'bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 shadow-sm') : (isLight ? 'text-slate-500 hover:text-slate-700 border border-transparent' : 'text-slate-400 hover:text-slate-300 border border-transparent')}`}
                         >
                             Gelen İrsaliyeler
                         </button>
