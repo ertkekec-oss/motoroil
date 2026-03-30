@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+const fs = require('fs');
+
+let code = `import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/contexts/ThemeContext';
 import { EnterpriseCard, EnterpriseSectionHeader, EnterpriseButton } from '@/components/ui/enterprise';
@@ -61,7 +63,7 @@ export default function RevenueIntelligenceDashboard() {
                         <button
                             key={key}
                             onClick={onClick}
-                            className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}`}
+                            className={\`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all \${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}\`}
                         >
                             {label}
                         </button>
@@ -116,7 +118,7 @@ export default function RevenueIntelligenceDashboard() {
                                         }
 
                                         return (
-                                            <div key={insight.id} className={`p-4 rounded-xl border border-slate-100 dark:border-white/5 flex items-start gap-4 transition-colors ${bg}`}>
+                                            <div key={insight.id} className={\`p-4 rounded-xl border border-slate-100 dark:border-white/5 flex items-start gap-4 transition-colors \${bg}\`}>
                                                 <div className="mt-0.5 shrink-0">{icon}</div>
                                                 <div>
                                                     <h5 className="text-sm font-bold text-slate-900 dark:text-white capitalize">{insight.title}</h5>
@@ -224,3 +226,7 @@ export default function RevenueIntelligenceDashboard() {
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/sales/revenue-intelligence/page.tsx', code);
+console.log('done rewriting revenue intelligence page');

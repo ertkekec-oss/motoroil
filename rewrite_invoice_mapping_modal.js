@@ -1,101 +1,9 @@
+const fs = require('fs');
+let code = fs.readFileSync('src/components/sales/InvoiceMappingModal.tsx', 'utf8');
 
-"use client";
-
-import { Fragment, useState } from 'react';
-import { apiFetch } from '@/lib/api-client';
-import { useModal } from '@/contexts/ModalContext';
-
-interface InvoiceMappingModalProps {
-    selectedOrder: any;
-    setSelectedOrder: (order: any) => void;
-    isLoadingMapping: boolean;
-    mappedItems: { [key: string]: any }; // itemName → { productId, status }
-    setMappedItems: (items: any) => void;
-    inventoryProducts: any[];
-    finalizeInvoice: () => void;
-    // New: raw API mapping results (keyed by item code)
-    rawMappings?: Record<string, any>;
-}
-
-// Inline "New Product" quick-create form state (per item)
-interface QuickCreateState {
-    name: string;
-    code: string;
-    stock: string;
-    price: string;
-}
-
-const SCORE_COLORS: Record<string, string> = {
-    mapped: '#02C951',  // green
-    suggest: '#F59E0B',  // amber
-    notFound: '#E53E3E',  // red
-};
-const SCORE_LABELS: Record<string, string> = {
-    mapped: '✅ Otomatik Eşleşti',
-    suggest: '⚠️ Öneri — Doğrula',
-    notFound: '❌ Stokta Bulunamadı',
-};
-
-export function InvoiceMappingModal({
-    selectedOrder,
-    setSelectedOrder,
-    isLoadingMapping,
-    mappedItems,
-    setMappedItems,
-    inventoryProducts,
-    finalizeInvoice,
-    rawMappings = {},
-}: InvoiceMappingModalProps) {
-    if (!selectedOrder) return null;
-
-    const [quickCreate, setQuickCreate] = useState<Record<string, QuickCreateState | null>>({});
-    const [isCreating, setIsCreating] = useState<string | null>(null);
-    const { showError } = useModal();
-
-    // Get the mapping status for a given item
-    const getMappingInfo = (item: any) => {
-        const key = item.code || item.barcode || item.name;
-        return rawMappings[key] || { status: 'notFound', score: 0, suggestions: [], marketplaceName: item.name };
-    };
-
-    const allMapped = selectedOrder.items.every((i: any) => {
-        const mapped = mappedItems[i.name];
-        return mapped && mapped.productId;
-    });
-
-    const handleCreateProduct = async (itemName: string, form: QuickCreateState) => {
-        if (!form.name) return;
-        setIsCreating(itemName);
-        try {
-            const res = await apiFetch('/api/inventory', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: form.name,
-                    code: form.code || undefined,
-                    stock: parseFloat(form.stock) || 0,
-                    price: parseFloat(form.price) || 0,
-                    source: 'marketplace_mapping',
-                })
-            });
-            const data = await res.json();
-            if (data.success && data.product) {
-                // Auto-select new product
-                setMappedItems({ ...mappedItems, [itemName]: { productId: data.product.id, status: 'new' } });
-                setQuickCreate({ ...quickCreate, [itemName]: null }); // close form
-                inventoryProducts.push(data.product); // optimistic push
-            } else {
-                showError('Hata', 'Ürün oluşturulamadı: ' + (data.error || 'Bilinmeyen hata'));
-            }
-        } catch (e: any) {
-            showError('Hata', 'İşlem Başarısız: ' + e.message);
-        } finally {
-            setIsCreating(null);
-        }
-    };
-
-    return (
-        (
+// Replace standard outer block
+code = code.replace(/<div style={{ position: 'fixed'[\s\S]*?<\/div>[\s]*<\/div>[\s]*\);/m, 
+`(
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }} className="flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm">
             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-2xl w-full max-w-4xl relative animate-in zoom-in-95 duration-200 flex flex-col overflow-hidden max-h-[90vh]">
                 
@@ -146,7 +54,7 @@ export function InvoiceMappingModal({
                                 const showCreate = quickCreate[item.name] !== undefined && quickCreate[item.name] !== null;
 
                                 return (
-                                    <div key={idx} className={`p-4 rounded-2xl border ${bgStyle} ${borderStyle}`}>
+                                    <div key={idx} className={\`p-4 rounded-2xl border \${bgStyle} \${borderStyle}\`}>
                                         {/* Row: marketplace item */}
                                         <div className="flex justify-between items-start mb-3">
                                             <div>
@@ -158,7 +66,7 @@ export function InvoiceMappingModal({
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className={`text-[10px] font-black uppercase tracking-widest ${statusColor}`}>
+                                                <div className={\`text-[10px] font-black uppercase tracking-widest \${statusColor}\`}>
                                                     {isDone ? '✅ Eşleştirildi' : SCORE_LABELS[info.status]}
                                                 </div>
                                                 {info.score > 0 && <div className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Skor: {info.score}/100</div>}
@@ -174,13 +82,13 @@ export function InvoiceMappingModal({
 
                                         {info.status !== 'notFound' || isDone ? (
                                             <select
-                                                className={`w-full px-4 py-3 rounded-xl text-[13px] font-bold outline-none border transition-colors ${isDone ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400' : 'bg-white dark:bg-[#1e293b] border-amber-300 dark:border-amber-500/30 text-slate-800 dark:text-white'}`}
+                                                className={\`w-full px-4 py-3 rounded-xl text-[13px] font-bold outline-none border transition-colors \${isDone ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400' : 'bg-white dark:bg-[#1e293b] border-amber-300 dark:border-amber-500/30 text-slate-800 dark:text-white'}\`}
                                                 value={currentMap?.productId || ''}
                                                 onChange={e => setMappedItems({ ...mappedItems, [item.name]: { productId: e.target.value, status: 'manual' } })}
                                             >
                                                 <option value="">— Stok Kartı Seçin —</option>
                                                 {(info.suggestions || []).length > 0 && (
-                                                    <optgroup label={`🤖 AI Önerileri (en iyi ${info.suggestions.length})`}>
+                                                    <optgroup label={\`🤖 AI Önerileri (en iyi \${info.suggestions.length})\`}>
                                                         {(info.suggestions as any[])?.map((s: any) => (
                                                             <option key={s.product.id} value={s.product.id}>
                                                                 {s.product.name} — Stok: {s.product.stock} — Skor: {s.score}
@@ -279,14 +187,16 @@ export function InvoiceMappingModal({
                             <button
                                 onClick={finalizeInvoice}
                                 disabled={isLoadingMapping || !allMapped}
-                                className={`w-full h-14 rounded-full font-black text-[13px] uppercase tracking-widest transition-all ${allMapped ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 active:scale-[0.98]' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed'}`}
+                                className={\`w-full h-14 rounded-full font-black text-[13px] uppercase tracking-widest transition-all \${allMapped ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 active:scale-[0.98]' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed'}\`}
                             >
-                                {isLoadingMapping ? 'İŞLENİYOR...' : (allMapped ? '✅ Eşleştirmeyi Kaydet ve Faturayı Oluştur' : `⚠️ Lütfen Tüm Ürünleri Eşleştirin (${selectedOrder.items.filter((i: any) => !mappedItems[i.name]?.productId).length} eksik)`)}
+                                {isLoadingMapping ? 'İŞLENİYOR...' : (allMapped ? '✅ Eşleştirmeyi Kaydet ve Faturayı Oluştur' : \`⚠️ Lütfen Tüm Ürünleri Eşleştirin (\${selectedOrder.items.filter((i: any) => !mappedItems[i.name]?.productId).length} eksik)\`)}
                             </button>
                         </div>
                     </div>
                 )}
             </div>
         </div>
-    );
-}
+    );`
+);
+fs.writeFileSync('src/components/sales/InvoiceMappingModal.tsx', code);
+console.log('done rewriting InvoiceMappingModal');

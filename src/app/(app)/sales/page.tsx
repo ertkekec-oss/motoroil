@@ -1030,47 +1030,41 @@ export default function SalesPage() {
 
     return (
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans">
-            <header className="flex justify-between items-center">
-                <div>
-                    <h1 className={`text-[22px] font-semibold tracking-tight ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
-                        Sales Control Console
-                    </h1>
-                    <p className={`mt-1 text-[13px] font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
-                        E-Ticaret, Mağaza Satışları ve Faturalar
-                    </p>
-                </div>
-            </header>
+            
 
-            {/* Premium Minimal Tab Navigation */}
-            <div className={`flex gap-6 border-b pb-[1px] ${theme === 'light' ? 'border-slate-200' : 'border-slate-800'}`}>
+            {/* Enterprise Oval Tabs */}
+            <div className="flex flex-wrap items-center gap-3 mb-6 relative z-10 w-full bg-white dark:bg-[#0f172a] p-2 rounded-full border border-slate-200 dark:border-white/5 shadow-sm justify-center">
                 {[
+                    { key: 'all', label: 'Tüm Satışlar', onClick: () => setActiveTab('all') },
                     { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
                     { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
                     { key: 'b2b', label: 'B2B Satışları', onClick: () => setActiveTab('b2b') },
                     { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
                     { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
+                    { key: 'revenue', label: 'Revenue Intelligence', onClick: () => router.push('/sales/revenue-intelligence') },
                 ].map(({ key, label, onClick }) => {
-                    const isActive = activeTab === key;
+                    const isActive = activeTab === key || (activeTab === 'invoices' && key === 'invoices' && invoiceSubTab === 'sales') || (activeTab === 'wayslips' && key === 'wayslips' && invoiceSubTab === 'wayslips');
                     return (
                         <button
                             key={key}
                             onClick={onClick}
-                            className={`pb-3 text-[14px] font-semibold transition-colors relative -mb-[2px]`}
-                            style={{
-                                color: isActive
-                                    ? (theme === 'light' ? '#2563EB' : '#60A5FA')
-                                    : (theme === 'light' ? '#64748B' : '#94A3B8'),
-                                borderBottom: isActive ? `2px solid ${theme === 'light' ? '#2563EB' : '#60A5FA'}` : '2px solid transparent'
-                            }}
+                            className={`h-[38px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}`}
                         >
                             {label}
                         </button>
                     );
                 })}
+
+                {/* New Wayslip Add Button */}
+                {activeTab === 'wayslips' && (
+                     <button onClick={() => setView('new_wayslip')} className="px-5 h-[38px] bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center gap-2 ml-auto">
+                         🚚 Yeni İrsaliye Düzenle
+                     </button>
+                )}
             </div>
 
             <div className="w-full">
-                {activeTab === 'online' && (
+                {(activeTab === 'online' || activeTab === 'all') && (
                     <OnlineOrdersTab
                         onlineOrders={onlineOrders}
                         fetchOnlineOrders={fetchOnlineOrders}

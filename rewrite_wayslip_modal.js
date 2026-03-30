@@ -1,57 +1,10 @@
+const fs = require('fs');
 
-"use client";
+let code = fs.readFileSync('src/components/sales/NewWayslipModal.tsx', 'utf8');
 
-interface NewWayslipModalProps {
-    view: string;
-    setView: (view: 'list' | 'new_wayslip') => void;
-    newWayslipData: any;
-    setNewWayslipData: (data: any) => void;
-    customers: any[];
-    suppliers: any[];
-    inventoryProducts: any[];
-    handleSaveWayslip: () => void;
-    isSavingWayslip: boolean;
-    realInvoices?: any[];
-}
-
-export function NewWayslipModal({
-    view,
-    setView,
-    newWayslipData,
-    setNewWayslipData,
-    customers,
-    suppliers,
-    inventoryProducts,
-    handleSaveWayslip,
-    isSavingWayslip,
-    realInvoices
-}: NewWayslipModalProps) {
-    if (view !== 'new_wayslip') return null;
-
-    const unfactoredInvoices = realInvoices?.filter(i => 
-        i.customerId === newWayslipData.customerId && 
-        i.formalType !== 'EIRSALIYE' &&
-        !(i.description || '').includes('[İrsaliyeli]')
-    ) || [];
-
-    const handleSelectInvoice = (invoiceId: string) => {
-        if (!invoiceId) {
-            setNewWayslipData({ ...newWayslipData, relatedInvoiceId: undefined, relatedInvoiceNo: undefined, items: [] });
-            return;
-        }
-        const inv = unfactoredInvoices.find(i => i.id === invoiceId);
-        if (inv) {
-            setNewWayslipData({
-                ...newWayslipData,
-                relatedInvoiceId: inv.id,
-                relatedInvoiceNo: inv.invoiceNo,
-                items: Array.isArray(inv.items) ? inv.items.map((it:any) => ({...it})) : []
-            });
-        }
-    };
-
-    return (
-        (
+// Replace standard outer block
+code = code.replace(/<div style={{ position: 'fixed'[\s\S]*?<\/div>[\s]*<\/div>[\s]*\);/m, 
+`(
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }} className="flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm">
             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-2xl w-full max-w-2xl relative animate-in zoom-in-95 duration-200 flex flex-col overflow-hidden max-h-[90vh]">
                 
@@ -215,7 +168,7 @@ export function NewWayslipModal({
                         <button
                             onClick={handleSaveWayslip}
                             disabled={isSavingWayslip}
-                            className={`px-8 h-[42px] ${isSavingWayslip ? 'opacity-50' : ''} bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-[11px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]`}
+                            className={\`px-8 h-[42px] \${isSavingWayslip ? 'opacity-50' : ''} bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-[11px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]\`}
                         >
                             {isSavingWayslip ? 'Kaydediliyor...' : 'Oluştur ve Kaydet'}
                         </button>
@@ -223,5 +176,8 @@ export function NewWayslipModal({
                 </div>
             </div>
         </div>
-    );
-}
+    );`
+);
+
+fs.writeFileSync('src/components/sales/NewWayslipModal.tsx', code);
+console.log('done rewriting NewWayslipModal');

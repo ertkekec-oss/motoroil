@@ -174,29 +174,12 @@ export default function AccountingPage() {
             />
 
             <div className="max-w-[1600px] mx-auto p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-6 mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
-                            <Activity className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h1 className="text-[24px] font-black text-slate-800 dark:text-white tracking-tight leading-none mb-1">
-                                Finansal Yönetim
-                            </h1>
-                            <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                                Nakit Akışı, Cariler ve Kasa Takibi
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <button onClick={refreshData} className="px-6 py-2.5 bg-white dark:bg-[#1e293b]/50 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2">
-                            <RefreshCw className={`w-3.5 h-3.5 ${isInitialLoading ? 'animate-spin' : ''}`} /> YENİLE
-                        </button>
-                    </div>
-                </div>
-
-                <TopPills pills={[
+                <div className="w-full flex justify-end mb-4">
+    <button onClick={refreshData} className="px-5 py-2.5 bg-white dark:bg-[#1e293b]/50 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full text-[11px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2">
+        <RefreshCw className={`w-3.5 h-3.5 ${isInitialLoading ? 'animate-spin' : ''}`} /> YENİLE
+    </button>
+</div>
+<TopPills pills={[
                     { title: 'TOPLAM ALACAK', value: formatCurrency(stats.totalReceivables), icon: <ArrowDownLeft className="w-6 h-6"/>, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-500', valueColor: 'text-emerald-600 dark:text-emerald-400' },
                     { title: 'TOPLAM BORÇ (ÖDEME)', value: formatCurrency(stats.totalPayables), icon: <ArrowUpRight className="w-6 h-6"/>, bg: 'bg-rose-50 dark:bg-rose-500/10', color: 'text-rose-500', valueColor: 'text-rose-600 dark:text-rose-400' },
                     { title: 'NET KASA DEĞERİ', value: formatCurrency(stats.netCash), icon: <Landmark className="w-6 h-6"/>, bg: 'bg-blue-50 dark:bg-blue-500/10', color: 'text-blue-500', valueColor: 'text-blue-600 dark:text-blue-400' },
@@ -221,17 +204,17 @@ export default function AccountingPage() {
                     
                     <div className="flex items-center pr-2">
                         {activeTab === 'receivables' && (
-                            <button onClick={() => setModalType('collection')} className="h-[38px] px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm shadow-emerald-500/20 transition-all flex items-center gap-2">
+                            <button onClick={() => setModalType('collection')} className="h-[38px] px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-emerald-500/20 transition-all flex items-center gap-2">
                                 <ArrowDownLeft className="w-3.5 h-3.5"/> TAHSİLAT EKLE
                             </button>
                         )}
                         {activeTab === 'payables' && (
-                            <button onClick={() => setModalType('debt')} className="h-[38px] px-6 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm shadow-rose-500/20 transition-all flex items-center gap-2">
+                            <button onClick={() => setModalType('debt')} className="h-[38px] px-6 bg-rose-500 hover:bg-rose-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-rose-500/20 transition-all flex items-center gap-2">
                                 <ArrowUpRight className="w-3.5 h-3.5"/> ÖDEME YAP (BORÇ)
                             </button>
                         )}
                         {activeTab === 'checks' && (
-                            <button onClick={() => setModalType('check')} className="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm shadow-blue-500/20 transition-all flex items-center gap-2">
+                            <button onClick={() => setModalType('check')} className="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-blue-500/20 transition-all flex items-center gap-2">
                                 <CopyPlus className="w-3.5 h-3.5"/> ÇEK / SENET EKLE
                             </button>
                         )}
@@ -240,7 +223,7 @@ export default function AccountingPage() {
                                 <button onClick={() => setModalType('statement')} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
                                     <FileText className="w-3.5 h-3.5"/> EKSTRE YÜKLE
                                 </button>
-                                <button onClick={() => setModalType('expense')} className="h-[38px] px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm shadow-orange-500/20 transition-all flex items-center gap-2">
+                                <button onClick={() => setModalType('expense')} className="h-[38px] px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-orange-500/20 transition-all flex items-center gap-2">
                                     <Plus className="w-3.5 h-3.5"/> GİDER EKLE
                                 </button>
                             </div>
@@ -253,7 +236,7 @@ export default function AccountingPage() {
                                 <button onClick={() => syncAccount()} disabled={syncStates['GLOBAL'] === 'SYNCING'} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2 disabled:opacity-50">
                                     <RefreshCw className={`w-3.5 h-3.5 ${syncStates['GLOBAL'] === 'SYNCING' ? 'animate-spin' : ''}`}/> AKTARIM
                                 </button>
-                                <button onClick={() => setModalType('account')} className="h-[38px] px-6 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
+                                <button onClick={() => setModalType('account')} className="h-[38px] px-6 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
                                     <Plus className="w-3.5 h-3.5"/> YENİ HESAP EKLE
                                 </button>
                             </div>
