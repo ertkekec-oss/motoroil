@@ -1,4 +1,6 @@
-"use client";
+const fs = require('fs');
+
+const code = `"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
@@ -14,13 +16,13 @@ import AccountingModals from "./components/AccountingModals";
 const TopPills = ({ pills }: any) => (
     <div className="flex flex-wrap items-center gap-4 shrink-0 mb-8 w-full">
         {pills.map((p: any, i: number) => (
-            <div key={i} className={`flex flex-1 min-w-[200px] bg-white dark:bg-[#0f172a] rounded-[24px] pl-4 pr-6 py-4 items-center gap-5 transition-transform hover:-translate-y-1 hover:shadow-md border border-slate-200 dark:border-white/5 shadow-sm group`}>
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${p.bg} ${p.color} transition-colors`}>
+            <div key={i} className={\`flex flex-1 min-w-[200px] bg-white dark:bg-[#0f172a] rounded-[24px] pl-4 pr-6 py-4 items-center gap-5 transition-transform hover:-translate-y-1 hover:shadow-md border border-slate-200 dark:border-white/5 shadow-sm group\`}>
+                <div className={\`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 \${p.bg} \${p.color} transition-colors\`}>
                     {p.icon}
                 </div>
                 <div className="flex flex-col justify-center">
                     <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-1">{p.title}</span>
-                    <span className={`text-[28px] font-black ${p.valueColor || 'text-slate-800 dark:text-white'} leading-none`}>{p.value}</span>
+                    <span className={\`text-[28px] font-black \${p.valueColor || 'text-slate-800 dark:text-white'} leading-none\`}>{p.value}</span>
                 </div>
             </div>
         ))}
@@ -28,7 +30,7 @@ const TopPills = ({ pills }: any) => (
 );
 
 const SoftContainer = ({ title, icon, children, className="", action }: any) => (
-    <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={\`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col \${className}\`}>
         {title && (
             <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center justify-between relative">
                 <div className="flex items-center gap-2">
@@ -147,7 +149,7 @@ export default function AccountingPage() {
             const formData = new FormData();
             formData.append('file', file);
             
-            const res = await fetch(`/api/financials/checks/${checkId}/image`, {
+            const res = await fetch(\`/api/financials/checks/\${checkId}/image\`, {
                 method: 'POST',
                 body: formData
             });
@@ -191,7 +193,7 @@ export default function AccountingPage() {
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <button onClick={refreshData} className="px-6 py-2.5 bg-white dark:bg-[#1e293b]/50 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2">
-                            <RefreshCw className={`w-3.5 h-3.5 ${isInitialLoading ? 'animate-spin' : ''}`} /> YENİLE
+                            <RefreshCw className={\`w-3.5 h-3.5 \${isInitialLoading ? 'animate-spin' : ''}\`} /> YENİLE
                         </button>
                     </div>
                 </div>
@@ -211,7 +213,7 @@ export default function AccountingPage() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`h-[38px] px-5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}`}
+                                    className={\`h-[38px] px-5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all \${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300'}\`}
                                 >
                                     {tab.label}
                                 </button>
@@ -251,7 +253,7 @@ export default function AccountingPage() {
                                     <Send className="w-3.5 h-3.5"/> VİRMAN (TRANSFER)
                                 </button>
                                 <button onClick={() => syncAccount()} disabled={syncStates['GLOBAL'] === 'SYNCING'} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2 disabled:opacity-50">
-                                    <RefreshCw className={`w-3.5 h-3.5 ${syncStates['GLOBAL'] === 'SYNCING' ? 'animate-spin' : ''}`}/> AKTARIM
+                                    <RefreshCw className={\`w-3.5 h-3.5 \${syncStates['GLOBAL'] === 'SYNCING' ? 'animate-spin' : ''}\`}/> AKTARIM
                                 </button>
                                 <button onClick={() => setModalType('account')} className="h-[38px] px-6 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
                                     <Plus className="w-3.5 h-3.5"/> YENİ HESAP EKLE
@@ -278,7 +280,7 @@ export default function AccountingPage() {
                                 {activeTab === 'receivables' && (
                                     <>
                                         {customers.filter(c => Number(c.balance) > 0).map((customer, i) => (
-                                            <tr key={`cust-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`cust-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{customer.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Açık Hesap Carisi</div>
@@ -294,7 +296,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {suppliers.filter(s => Number(s.balance) > 0).map((supplier, i) => (
-                                            <tr key={`supp-pos-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`supp-pos-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{supplier.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Fazla Gönderim (Emanet)</div>
@@ -310,7 +312,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {checks.filter(c => c.type === 'In').map((check, i) => (
-                                            <tr key={`check-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`check-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{check.description || 'Çek/Senet Kaydı'}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Portföydeki Evrak</div>
@@ -334,7 +336,7 @@ export default function AccountingPage() {
                                 {activeTab === 'payables' && (
                                     <>
                                         {suppliers.filter(s => Number(s.balance) < 0).map((supplier, i) => (
-                                            <tr key={`supp-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`supp-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{supplier.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Tedarikçi Borcu</div>
@@ -350,7 +352,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {customers.filter(c => Number(c.balance) < 0).map((customer, i) => (
-                                            <tr key={`cust-neg-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`cust-neg-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{customer.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Alınan Avans/Fazladan Ödeme</div>
@@ -366,7 +368,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {checks.filter(c => c.type === 'Out').map((check, i) => (
-                                            <tr key={`check-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`check-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{check.description || 'Borç Çeki'}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Verilen Evrak</div>
@@ -377,7 +379,7 @@ export default function AccountingPage() {
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">{new Date(check.dueDate).toLocaleDateString('tr-TR')}</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-rose-500 dark:text-rose-400 text-right">{formatCurrency(check.amount)}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase ${check.status === 'Ödendi' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}`}>{check.status}</span>
+                                                    <span className={\`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase \${check.status === 'Ödendi' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}\`}>{check.status}</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -390,7 +392,7 @@ export default function AccountingPage() {
                                 {activeTab === 'expenses' && (
                                     <>
                                         {transactions.filter(t => t.type === 'Expense').map((tx, i) => (
-                                            <tr key={`exp-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`exp-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{tx.description}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Dışarıya Nakit Çıkışı</div>
@@ -414,17 +416,17 @@ export default function AccountingPage() {
                                 {activeTab === 'checks' && (
                                     <>
                                         {checks.map((check, i) => (
-                                            <tr key={`ch-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`ch-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{check.description || 'Kimliksiz Evrak'}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{(check.type === 'In' || check.type.includes('Alınan')) ? 'Müşteriden Alınan' : 'Tedarikçiye Verilen'}</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border ${
+                                                    <span className={\`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border \${
                                                         (check.type === 'In' || check.type.includes('Alınan')) 
                                                         ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' 
                                                         : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
-                                                    }`}>
+                                                    }\`}>
                                                         {(check.type === 'In' || check.type.includes('Alınan')) ? 'ALINACAK BELGE (ALACAK)' : 'VERİLEN BELGE (BORÇ)'}
                                                     </span>
                                                 </td>
@@ -439,7 +441,7 @@ export default function AccountingPage() {
                                                             (check as any).signatureStatus === 'İmzalandı' ? (
                                                                 <button onClick={() => window.open((check as any).signedDocumentUrl, '_blank')} className="px-3 py-1.5 text-[9px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black tracking-widest rounded-lg border border-emerald-200 dark:border-emerald-500/20 uppercase">İmzalı Belge (PDF)</button>
                                                             ) : (
-                                                                <button onClick={() => window.open(`/signatures/envelopes/new?ref=${check.id}`, '_blank')} className="px-3 py-1.5 text-[9px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-black tracking-widest rounded-lg border border-blue-200 dark:border-blue-500/20 uppercase whitespace-nowrap">İmzaya Sun (OTP)</button>
+                                                                <button onClick={() => window.open(\`/signatures/envelopes/new?ref=\${check.id}\`, '_blank')} className="px-3 py-1.5 text-[9px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-black tracking-widest rounded-lg border border-blue-200 dark:border-blue-500/20 uppercase whitespace-nowrap">İmzaya Sun (OTP)</button>
                                                             )
                                                         ) : (
                                                             <>
@@ -448,8 +450,8 @@ export default function AccountingPage() {
                                                                 )}
                                                                 {!((check as any).imageUrl) && (
                                                                     <>
-                                                                        <input type="file" id={`upload-${check.id}`} className="hidden" accept="image/*,.pdf" onChange={(e) => { if (e.target.files?.[0]) handleCheckImageUpload(check.id, e.target.files[0]) }} />
-                                                                        <label htmlFor={`upload-${check.id}`} className="cursor-pointer px-3 py-1.5 text-[9px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-black tracking-widest rounded-lg border border-amber-200 dark:border-amber-500/20 uppercase whitespace-nowrap inline-flex items-center gap-1">
+                                                                        <input type="file" id={\`upload-\${check.id}\`} className="hidden" accept="image/*,.pdf" onChange={(e) => { if (e.target.files?.[0]) handleCheckImageUpload(check.id, e.target.files[0]) }} />
+                                                                        <label htmlFor={\`upload-\${check.id}\`} className="cursor-pointer px-3 py-1.5 text-[9px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-black tracking-widest rounded-lg border border-amber-200 dark:border-amber-500/20 uppercase whitespace-nowrap inline-flex items-center gap-1">
                                                                             {syncStates['upload_' + check.id] === 'SYNCING' ? 'YÜKLENİYOR...' : 'GÖRSEL YÜKLE'}
                                                                         </label>
                                                                     </>
@@ -469,7 +471,7 @@ export default function AccountingPage() {
                                 {activeTab === 'banks' && (
                                     <>
                                         {kasalar.map((kasa, i) => (
-                                            <tr key={`bn-${i}`} onClick={() => window.location.href = `/accounting/kasalar/${kasa.id}`} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                            <tr key={\`bn-\${i}\`} onClick={() => window.location.href = \`/accounting/kasalar/\${kasa.id}\`} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{kasa.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{kasa.branch || 'Merkez Kasası'}</div>
@@ -480,11 +482,11 @@ export default function AccountingPage() {
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">Mevcut Bakiye</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-emerald-600 dark:text-emerald-400 text-right">{formatCurrency(kasa.balance)}</td>
                                                 <td className="px-6 py-3 pr-8 text-right">
-                                                    <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border ${
+                                                    <span className={\`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border \${
                                                         kasa.bankConnectionId 
                                                         ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20' 
                                                         : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                                                    }`}>
+                                                    }\`}>
                                                         {kasa.bankConnectionId ? 'Açık Bankacılık' : 'Manuel Hesap'}
                                                     </span>
                                                 </td>
@@ -501,17 +503,17 @@ export default function AccountingPage() {
                                         {transactions.map((tx: any, i) => {
                                             const isIncome = ['Sales', 'Collection', 'SalesInvoice'].includes(tx.type);
                                             return (
-                                                <tr key={`tx-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <tr key={\`tx-\${i}\`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
                                                     <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                         <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5 truncate max-w-[300px]">{tx.description || tx.type}</div>
                                                         <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Genel Hareket</div>
                                                     </td>
                                                     <td className="px-6 py-3 align-middle">
-                                                        <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border ${
+                                                        <span className={\`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border \${
                                                             isIncome 
                                                             ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' 
                                                             : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                                                        }`}>
+                                                        }\`}>
                                                             {isIncome ? 'TAHSİLAT (GELİR)' : 'GİDER / ÇIKIŞ'}
                                                         </span>
                                                     </td>
@@ -536,3 +538,7 @@ export default function AccountingPage() {
         </div>
     );
 }
+`;
+
+fs.writeFileSync('src/app/(app)/accounting/page.tsx', code);
+console.log('done rewriting accounting page');

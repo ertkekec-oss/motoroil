@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+const fs = require('fs');
+
+const code = `import React, { useState } from 'react';
 import { useFinancials } from '@/contexts/FinancialContext';
 import { useModal } from '@/contexts/ModalContext';
 import { useCRM } from '@/contexts/CRMContext';
@@ -132,7 +134,7 @@ export default function AccountingModals({
                 });
                 const result = await res.json();
                 if (result.success) {
-                    showSuccess('Başarılı', `${result.imported} işlem içeri aktarıldı.`);
+                    showSuccess('Başarılı', \`\${result.imported} işlem içeri aktarıldı.\`);
                     refreshKasalar();
                     onClose();
                 } else {
@@ -251,7 +253,7 @@ export default function AccountingModals({
                                                     <div className="text-[10px] font-medium text-slate-500">{tx.date}</div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`text-[13px] font-black ${tx.amount > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                    <div className={\`text-[13px] font-black \${tx.amount > 0 ? 'text-emerald-500' : 'text-rose-500'}\`}>
                                                         {tx.amount} TL
                                                     </div>
                                                     <button onClick={() => handleImportTransaction(tx)} className="px-3 py-1.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-800 dark:text-white text-[10px] font-black uppercase tracking-widest transition-all">
@@ -357,7 +359,7 @@ export default function AccountingModals({
                                     </div>
                                     <div>
                                         <label className={labelClasses}>Açılış Bakiyesi (TL)</label>
-                                        <input type="number" className={`${inputClasses} text-lg font-black`} placeholder="0.00" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })}/>
+                                        <input type="number" className={\`\${inputClasses} text-lg font-black\`} placeholder="0.00" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })}/>
                                     </div>
                                 </>
                             ) : (
@@ -375,8 +377,8 @@ export default function AccountingModals({
                                     </div>
 
                                     <div>
-                                        <label className={labelClasses}>Tutar {formData.currency ? `(${formData.currency})` : '(TL)'}</label>
-                                        <input type="number" required className={`${inputClasses} text-2xl font-black py-4`} placeholder="0.00" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })}/>
+                                        <label className={labelClasses}>Tutar {formData.currency ? \`(\${formData.currency})\` : '(TL)'}</label>
+                                        <input type="number" required className={\`\${inputClasses} text-2xl font-black py-4\`} placeholder="0.00" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })}/>
                                     </div>
 
                                     {type !== 'check' && (
@@ -402,7 +404,7 @@ export default function AccountingModals({
                             )}
 
                             <div className="pt-4">
-                                <button type="submit" disabled={loading} className={`w-full h-12 ${loading ? 'opacity-50 cursor-not-allowed' : ''} bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]`}>
+                                <button type="submit" disabled={loading} className={\`w-full h-12 \${loading ? 'opacity-50 cursor-not-allowed' : ''} bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]\`}>
                                     {loading ? 'KAYDEDİLİYOR...' : 'ONAYLA VE KAYDET'}
                                 </button>
                             </div>
@@ -412,4 +414,7 @@ export default function AccountingModals({
             </div>
         </div>
     );
-}
+}`;
+
+fs.writeFileSync('src/app/(app)/accounting/components/AccountingModals.tsx', code);
+console.log('done rewriting accounting modals');
