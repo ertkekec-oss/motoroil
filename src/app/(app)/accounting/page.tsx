@@ -6,21 +6,21 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFinancials } from "@/contexts/FinancialContext";
 import { useCRM } from "@/contexts/CRMContext";
 import { formatCurrency } from "@/lib/utils";
-import { ChevronDown, Plus, RefreshCw, CalendarDays, Inbox, ArrowDownLeft, ArrowUpRight, CopyPlus, Landmark, CreditCard, Activity, Send, Wallet, Settings2, FileText, CheckCircle2 } from "lucide-react";
+import { ChevronDown, Plus, RefreshCw, CalendarDays, Inbox, ArrowDownLeft, ArrowUpRight, CopyPlus, Landmark, CreditCard, Activity, Send, Wallet, Settings2, FileText, CheckCircle2, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useModal } from "@/contexts/ModalContext";
 import AccountingModals from "./components/AccountingModals";
 
 const TopPills = ({ pills }: any) => (
-    <div className="flex flex-wrap items-center gap-4 shrink-0 mb-8 w-full overflow-x-auto pb-2 custom-scroll">
+    <div className="flex flex-wrap items-center justify-center gap-4 mb-6 w-full">
         {pills.map((p: any, i: number) => (
-            <div key={i} className={`flex flex-1 min-w-[220px] bg-white dark:bg-[#0f172a] rounded-[24px] pl-4 pr-6 py-4 items-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md border border-slate-200 dark:border-white/5 shadow-sm group shrink-0`}>
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${p.bg} ${p.color} transition-colors`}>
+            <div key={i} className={`flex items-center gap-3 bg-white dark:bg-[#0f172a] rounded-[24px] px-6 py-4 border border-slate-200 dark:border-white/5 shadow-sm min-w-[200px] shrink-0`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${p.bg} ${p.color}`}>
                     {p.icon}
                 </div>
-                <div className="flex flex-col justify-center overflow-hidden">
-                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase mb-1 line-clamp-1">{p.title}</span>
-                    <span className={`text-[16px] xl:text-[20px] font-black truncate ${p.valueColor || 'text-slate-800 dark:text-white'} leading-tight`}>{p.value}</span>
+                <div className="flex flex-col justify-center">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase leading-tight mb-0.5">{p.title}</span>
+                    <span className={`text-[18px] font-black truncate ${p.valueColor || 'text-slate-800 dark:text-white'} leading-tight`}>{p.value}</span>
                 </div>
             </div>
         ))}
@@ -30,7 +30,7 @@ const TopPills = ({ pills }: any) => (
 const SoftContainer = ({ title, icon, children, className="", action }: any) => (
     <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>
         {title && (
-            <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 flex items-center justify-between relative">
+            <div className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest px-6 py-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     {icon && <span className="opacity-70 text-slate-400">{icon}</span>}
                     {title}
@@ -200,69 +200,91 @@ export default function AccountingPage() {
                     { title: 'İŞLETME GİDERİ', value: formatCurrency(stats.totalExpenses), icon: <CreditCard className="w-5 h-5"/>, bg: 'bg-slate-100 dark:bg-slate-800/80', color: 'text-slate-500', valueColor: 'text-slate-700 dark:text-slate-300' }
                 ]} />
 
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm">
-                    <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
+                {/* Centered Actions Row */}
+                <div className="flex items-center justify-center flex-wrap gap-3 mb-6 w-full">
+                    {activeTab === 'receivables' && (
+                        <button onClick={() => setModalType('collection')} className="h-[40px] px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2">
+                            <Plus className="w-4 h-4"/> Tahsilat Ekle
+                        </button>
+                    )}
+                    {activeTab === 'payables' && (
+                        <button onClick={() => setModalType('debt')} className="h-[40px] px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2">
+                            <Plus className="w-4 h-4"/> Ödeme Yap (Borç)
+                        </button>
+                    )}
+                    {activeTab === 'checks' && (
+                        <button onClick={() => setModalType('check')} className="h-[40px] px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2">
+                            <Plus className="w-4 h-4"/> Çek / Senet Ekle
+                        </button>
+                    )}
+                    {activeTab === 'expenses' && (
+                        <>
+                            <button onClick={() => setModalType('expense')} className="h-[40px] px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2">
+                                <Plus className="w-4 h-4"/> Gider Ekle
+                            </button>
+                            <button onClick={() => setModalType('statement')} className="h-[40px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2">
+                                <FileText className="w-4 h-4"/> Ekstre Yükle
+                            </button>
+                        </>
+                    )}
+                    {activeTab === 'banks' && (
+                        <>
+                            <button onClick={() => setModalType('account')} className="h-[40px] px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2">
+                                <Plus className="w-4 h-4"/> Yeni Hesap Ekle
+                            </button>
+                            <button onClick={() => setModalType('transfer')} className="h-[40px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 rounded-[12px] font-semibold text-[13px] transition-all flex items-center gap-2">
+                                <Send className="w-4 h-4"/> Virman (Transfer)
+                            </button>
+                            <button onClick={() => syncAccount()} disabled={syncStates['GLOBAL'] === 'SYNCING'} className="h-[40px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-[12px] font-semibold text-[13px] shadow-sm transition-all flex items-center gap-2 disabled:opacity-50">
+                                <RefreshCw className={`w-4 h-4 ${syncStates['GLOBAL'] === 'SYNCING' ? 'animate-spin' : ''}`}/> Aktarım
+                            </button>
+                        </>
+                    )}
+                    <button className="h-[40px] px-5 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-[12px] font-semibold text-[13px] transition-all flex items-center gap-2">
+                        Dışa Aktar
+                    </button>
+                </div>
+
+                {/* Centered Tabs Row */}
+                <div className="flex flex-wrap items-center justify-center gap-1 mb-8 w-full border-b border-slate-200 dark:border-white/5 pb-6">
                     {tabs.map(tab => {
                         const isActive = activeTab === tab.id;
                         return (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex-1 min-w-[120px] h-11 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
+                                className={`px-5 py-2 rounded-[16px] text-[13px] transition-all outline-none ${isActive ? 'bg-white font-bold text-slate-800 shadow-sm border border-slate-200 dark:bg-slate-800 dark:text-white dark:border-slate-700' : 'font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#1e293b]'}`}
                             >
                                 {tab.label}
                             </button>
-                            );
-                        })}
+                        );
+                    })}
+                </div>
+
+                {/* Centered Search Bar & Filters */}
+                <div className="flex items-center justify-center gap-3 w-full mb-8">
+                    <div className="relative w-full max-w-[320px]">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input type="text" placeholder="Kayıt ara..." className="w-full h-[40px] pl-10 pr-4 rounded-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 dark:text-slate-200 transition-shadow hover:shadow-sm" />
                     </div>
-                    
-                    <div className="flex items-center pr-2">
-                        {activeTab === 'receivables' && (
-                            <button onClick={() => setModalType('collection')} className="h-[38px] px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-emerald-500/20 transition-all flex items-center gap-2">
-                                <ArrowDownLeft className="w-3.5 h-3.5"/> TAHSİLAT EKLE
-                            </button>
-                        )}
-                        {activeTab === 'payables' && (
-                            <button onClick={() => setModalType('debt')} className="h-[38px] px-6 bg-rose-500 hover:bg-rose-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-rose-500/20 transition-all flex items-center gap-2">
-                                <ArrowUpRight className="w-3.5 h-3.5"/> ÖDEME YAP (BORÇ)
-                            </button>
-                        )}
-                        {activeTab === 'checks' && (
-                            <button onClick={() => setModalType('check')} className="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-blue-500/20 transition-all flex items-center gap-2">
-                                <CopyPlus className="w-3.5 h-3.5"/> ÇEK / SENET EKLE
-                            </button>
-                        )}
-                        {activeTab === 'expenses' && (
-                            <div className="flex gap-2">
-                                <button onClick={() => setModalType('statement')} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
-                                    <FileText className="w-3.5 h-3.5"/> EKSTRE YÜKLE
-                                </button>
-                                <button onClick={() => setModalType('expense')} className="h-[38px] px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-orange-500/20 transition-all flex items-center gap-2">
-                                    <Plus className="w-3.5 h-3.5"/> GİDER EKLE
-                                </button>
-                            </div>
-                        )}
-                        {activeTab === 'banks' && (
-                            <div className="flex gap-2">
-                                <button onClick={() => setModalType('transfer')} className="h-[38px] px-5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-full font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border border-indigo-200 dark:border-indigo-500/20">
-                                    <Send className="w-3.5 h-3.5"/> VİRMAN (TRANSFER)
-                                </button>
-                                <button onClick={() => syncAccount()} disabled={syncStates['GLOBAL'] === 'SYNCING'} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2 disabled:opacity-50">
-                                    <RefreshCw className={`w-3.5 h-3.5 ${syncStates['GLOBAL'] === 'SYNCING' ? 'animate-spin' : ''}`}/> AKTARIM
-                                </button>
-                                <button onClick={() => setModalType('account')} className="h-[38px] px-6 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
-                                    <Plus className="w-3.5 h-3.5"/> YENİ HESAP EKLE
-                                </button>
-                            </div>
-                        )}
+                    <div className="relative w-[140px]">
+                        <select className="w-full h-[40px] pl-4 pr-10 rounded-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-[13px] font-medium text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer transition-shadow hover:shadow-sm">
+                            <option>Tüm Dept.</option>
+                            <option>Alacaklar</option>
+                            <option>Borçlar</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     </div>
                 </div>
 
-                <SoftContainer title="FİNANSAL VERİ LİSTESİ" icon={<Settings2 className="w-4 h-4"/>}>
+                <SoftContainer>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[800px]">
-                            <thead className="bg-[#f8fafc] dark:bg-[#1e293b]/50 text-[10px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-widest sticky top-0 z-10">
+                            <thead className="bg-white dark:bg-[#0f172a] text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-10">
                                 <tr>
+                                    <th className="px-6 py-4 w-12 border-b border-slate-200 dark:border-white/5">
+                                        <div className="w-4 h-4 rounded-[6px] border-2 border-slate-200 dark:border-slate-700 bg-transparent"></div>
+                                    </th>
                                     <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">MÜŞTERİ / CARİ / AÇIKLAMA</th>
                                     <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">DURUM TİPİ</th>
                                     <th className="px-6 py-4 font-bold border-b border-slate-200 dark:border-white/5">VADE / TARİH</th>
@@ -276,6 +298,9 @@ export default function AccountingPage() {
                                     <>
                                         {customers.filter(c => Number(c.balance) > 0).map((customer, i) => (
                                             <tr key={`cust-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{customer.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Açık Hesap Carisi</div>
@@ -292,6 +317,9 @@ export default function AccountingPage() {
                                         ))}
                                         {suppliers.filter(s => Number(s.balance) > 0).map((supplier, i) => (
                                             <tr key={`supp-pos-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{supplier.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Fazla Gönderim (Emanet)</div>
@@ -308,6 +336,9 @@ export default function AccountingPage() {
                                         ))}
                                         {checks.filter(c => c.type === 'In').map((check, i) => (
                                             <tr key={`check-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{check.description || 'Çek/Senet Kaydı'}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Portföydeki Evrak</div>
@@ -323,7 +354,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {(customers.filter(c => Number(c.balance) > 0).length + suppliers.filter(s => Number(s.balance) > 0).length + checks.filter(c => c.type === 'In').length) === 0 && (
-                                            <tr><td colSpan={5} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Alacak kaydı bulunmuyor.</td></tr>
+                                            <tr><td colSpan={6} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Alacak kaydı bulunmuyor.</td></tr>
                                         )}
                                     </>
                                 )}
@@ -332,6 +363,9 @@ export default function AccountingPage() {
                                     <>
                                         {suppliers.filter(s => Number(s.balance) < 0).map((supplier, i) => (
                                             <tr key={`supp-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{supplier.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Tedarikçi Borcu</div>
@@ -348,6 +382,9 @@ export default function AccountingPage() {
                                         ))}
                                         {customers.filter(c => Number(c.balance) < 0).map((customer, i) => (
                                             <tr key={`cust-neg-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{customer.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Alınan Avans/Fazladan Ödeme</div>
@@ -364,6 +401,9 @@ export default function AccountingPage() {
                                         ))}
                                         {checks.filter(c => c.type === 'Out').map((check, i) => (
                                             <tr key={`check-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{check.description || 'Borç Çeki'}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Verilen Evrak</div>
@@ -379,7 +419,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {(suppliers.filter(s => Number(s.balance) < 0).length + customers.filter(c => Number(c.balance) < 0).length + checks.filter(c => c.type === 'Out').length) === 0 && (
-                                            <tr><td colSpan={5} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Ödenecek borç kaydı bulunmuyor.</td></tr>
+                                            <tr><td colSpan={6} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Ödenecek borç kaydı bulunmuyor.</td></tr>
                                         )}
                                     </>
                                 )}
@@ -388,6 +428,9 @@ export default function AccountingPage() {
                                     <>
                                         {transactions.filter(t => t.type === 'Expense').map((tx, i) => (
                                             <tr key={`exp-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{tx.description}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Dışarıya Nakit Çıkışı</div>
@@ -403,7 +446,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {transactions.filter(t => t.type === 'Expense').length === 0 && (
-                                            <tr><td colSpan={5} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Kaydedilmiş gider bulunmuyor.</td></tr>
+                                            <tr><td colSpan={6} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Kaydedilmiş gider bulunmuyor.</td></tr>
                                         )}
                                     </>
                                 )}
@@ -412,6 +455,9 @@ export default function AccountingPage() {
                                     <>
                                         {checks.map((check, i) => (
                                             <tr key={`ch-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{check.description || 'Kimliksiz Evrak'}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{(check.type === 'In' || check.type.includes('Alınan')) ? 'Müşteriden Alınan' : 'Tedarikçiye Verilen'}</div>
@@ -458,7 +504,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {checks.length === 0 && (
-                                            <tr><td colSpan={6} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Çek veya senet kaydı bulunmuyor.</td></tr>
+                                            <tr><td colSpan={7} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Çek veya senet kaydı bulunmuyor.</td></tr>
                                         )}
                                     </>
                                 )}
@@ -467,6 +513,9 @@ export default function AccountingPage() {
                                     <>
                                         {kasalar.map((kasa, i) => (
                                             <tr key={`bn-${i}`} onClick={() => window.location.href = `/accounting/kasalar/${kasa.id}`} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                <td className="px-6 py-3 align-middle w-12">
+                                                    <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                </td>
                                                 <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                     <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5">{kasa.name}</div>
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{kasa.branch || 'Merkez Kasası'}</div>
@@ -488,7 +537,7 @@ export default function AccountingPage() {
                                             </tr>
                                         ))}
                                         {kasalar.length === 0 && (
-                                            <tr><td colSpan={5} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Kasa veya banka tanımlı değil.</td></tr>
+                                            <tr><td colSpan={6} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Kasa veya banka tanımlı değil.</td></tr>
                                         )}
                                     </>
                                 )}
@@ -499,6 +548,9 @@ export default function AccountingPage() {
                                             const isIncome = ['Sales', 'Collection', 'SalesInvoice'].includes(tx.type);
                                             return (
                                                 <tr key={`tx-${i}`} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[72px] group">
+                                                    <td className="px-6 py-3 align-middle w-12">
+                                                        <div className="w-4 h-4 rounded-[4px] border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors"></div>
+                                                    </td>
                                                     <td className="px-6 py-3 align-middle whitespace-nowrap">
                                                         <div className="text-[13px] font-black text-slate-800 dark:text-white mb-0.5 truncate max-w-[300px]">{tx.description || tx.type}</div>
                                                         <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Genel Hareket</div>
@@ -521,7 +573,7 @@ export default function AccountingPage() {
                                             );
                                         })}
                                         {transactions.length === 0 && (
-                                            <tr><td colSpan={5} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Son hareket bulunmuyor.</td></tr>
+                                            <tr><td colSpan={6} className="py-16 text-center text-[11px] font-bold uppercase tracking-widest text-slate-400">Son hareket bulunmuyor.</td></tr>
                                         )}
                                     </>
                                 )}
