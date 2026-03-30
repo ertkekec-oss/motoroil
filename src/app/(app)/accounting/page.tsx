@@ -234,7 +234,7 @@ export default function AccountingPage() {
                         )}
                         {activeTab === 'expenses' && (
                             <div className="flex gap-2">
-                                <button onClick={() => setModalType('statement')} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
+                                <button onClick={() => setModalType('statement')} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
                                     <FileText className="w-3.5 h-3.5"/> EKSTRE YÜKLE
                                 </button>
                                 <button onClick={() => setModalType('expense')} className="h-[38px] px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm shadow-orange-500/20 transition-all flex items-center gap-2">
@@ -244,10 +244,10 @@ export default function AccountingPage() {
                         )}
                         {activeTab === 'banks' && (
                             <div className="flex gap-2">
-                                <button onClick={() => setModalType('transfer')} className="h-[38px] px-5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border border-indigo-200 dark:border-indigo-500/20">
+                                <button onClick={() => setModalType('transfer')} className="h-[38px] px-5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-full font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border border-indigo-200 dark:border-indigo-500/20">
                                     <Send className="w-3.5 h-3.5"/> VİRMAN (TRANSFER)
                                 </button>
-                                <button onClick={() => syncAccount()} disabled={syncStates['GLOBAL'] === 'SYNCING'} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2 disabled:opacity-50">
+                                <button onClick={() => syncAccount()} disabled={syncStates['GLOBAL'] === 'SYNCING'} className="h-[38px] px-5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2 disabled:opacity-50">
                                     <RefreshCw className={`w-3.5 h-3.5 ${syncStates['GLOBAL'] === 'SYNCING' ? 'animate-spin' : ''}`}/> AKTARIM
                                 </button>
                                 <button onClick={() => setModalType('account')} className="h-[38px] px-6 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm transition-all flex items-center gap-2">
@@ -281,12 +281,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Açık Hesap Carisi</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">Cari Alacak</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">Cari Alacak</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">Açık Vade</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-emerald-600 dark:text-emerald-400 text-right">{formatCurrency(customer.balance)}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">Tahsilat Bekliyor</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">Tahsilat Bekliyor</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -297,12 +297,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Fazla Gönderim (Emanet)</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Tedarikçi Fazlası</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Tedarikçi Fazlası</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">Bakiye Fazlası</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-blue-600 dark:text-blue-400 text-right">{formatCurrency(supplier.balance)}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">Alacaklı Konumundasınız</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">Alacaklı Konumundasınız</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -313,12 +313,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Portföydeki Evrak</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">Çek/Senet (Alınan)</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">Çek/Senet (Alınan)</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">{new Date(check.dueDate).toLocaleDateString('tr-TR')}</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-emerald-600 dark:text-emerald-400 text-right">{formatCurrency(check.amount)}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{check.status}</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{check.status}</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -337,12 +337,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Tedarikçi Borcu</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20">Tedarikçi Kaydı</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20">Tedarikçi Kaydı</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">Açık Vade</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-rose-500 dark:text-rose-400 text-right">{formatCurrency(Math.abs(Number(supplier.balance)))}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">Ödeme Yapılacak</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">Ödeme Yapılacak</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -353,12 +353,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Alınan Avans/Fazladan Ödeme</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Müşteri Emaneti</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Müşteri Emaneti</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">Müşteri Alacaklı</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-orange-500 dark:text-orange-400 text-right">{formatCurrency(Math.abs(Number(customer.balance)))}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">İade veya Mahsuplaşma</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">İade veya Mahsuplaşma</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -369,12 +369,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Verilen Evrak</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Çek/Senet (Verilen)</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Çek/Senet (Verilen)</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">{new Date(check.dueDate).toLocaleDateString('tr-TR')}</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-rose-500 dark:text-rose-400 text-right">{formatCurrency(check.amount)}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase ${check.status === 'Ödendi' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}`}>{check.status}</span>
+                                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${check.status === 'Ödendi' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}`}>{check.status}</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -393,12 +393,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Dışarıya Nakit Çıkışı</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{tx.category || 'Genel Gider'}</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{tx.category || 'Genel Gider'}</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">{new Date(tx.date).toLocaleDateString('tr-TR')}</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-rose-500 dark:text-rose-400 text-right">{formatCurrency(tx.amount)}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20">GİDER</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20">GİDER</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -417,7 +417,7 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{(check.type === 'In' || check.type.includes('Alınan')) ? 'Müşteriden Alınan' : 'Tedarikçiye Verilen'}</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border ${
+                                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${
                                                         (check.type === 'In' || check.type.includes('Alınan')) 
                                                         ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' 
                                                         : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
@@ -428,25 +428,25 @@ export default function AccountingPage() {
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">{new Date(check.dueDate).toLocaleDateString('tr-TR')}</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-slate-800 dark:text-white text-right">{formatCurrency(check.amount)}</td>
                                                 <td className="px-6 py-3 text-right">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{check.status}</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{check.status}</span>
                                                 </td>
                                                 <td className="px-6 py-3 pr-8 align-middle text-right">
                                                     <div className="flex gap-2 justify-end items-center">
                                                         {check.type?.includes('Senet') ? (
                                                             (check as any).signatureStatus === 'İmzalandı' ? (
-                                                                <button onClick={() => window.open((check as any).signedDocumentUrl, '_blank')} className="px-3 py-1.5 text-[9px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black tracking-widest rounded-lg border border-emerald-200 dark:border-emerald-500/20 uppercase">İmzalı Belge (PDF)</button>
+                                                                <button onClick={() => window.open((check as any).signedDocumentUrl, '_blank')} className="px-3 py-1.5 text-[9px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black tracking-widest rounded-full border border-emerald-200 dark:border-emerald-500/20 uppercase">İmzalı Belge (PDF)</button>
                                                             ) : (
-                                                                <button onClick={() => window.open(`/signatures/envelopes/new?ref=${check.id}`, '_blank')} className="px-3 py-1.5 text-[9px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-black tracking-widest rounded-lg border border-blue-200 dark:border-blue-500/20 uppercase whitespace-nowrap">İmzaya Sun (OTP)</button>
+                                                                <button onClick={() => window.open(`/signatures/envelopes/new?ref=${check.id}`, '_blank')} className="px-3 py-1.5 text-[9px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-black tracking-widest rounded-full border border-blue-200 dark:border-blue-500/20 uppercase whitespace-nowrap">İmzaya Sun (OTP)</button>
                                                             )
                                                         ) : (
                                                             <>
                                                                 {(check as any).imageUrl && (
-                                                                    <button onClick={() => window.open((check as any).imageUrl, '_blank')} className="px-3 py-1.5 text-[9px] bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-black tracking-widest rounded-lg border border-indigo-200 dark:border-indigo-500/20 uppercase">Çek Resmi</button>
+                                                                    <button onClick={() => window.open((check as any).imageUrl, '_blank')} className="px-3 py-1.5 text-[9px] bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-black tracking-widest rounded-full border border-indigo-200 dark:border-indigo-500/20 uppercase">Çek Resmi</button>
                                                                 )}
                                                                 {!((check as any).imageUrl) && (
                                                                     <>
                                                                         <input type="file" id={`upload-${check.id}`} className="hidden" accept="image/*,.pdf" onChange={(e) => { if (e.target.files?.[0]) handleCheckImageUpload(check.id, e.target.files[0]) }} />
-                                                                        <label htmlFor={`upload-${check.id}`} className="cursor-pointer px-3 py-1.5 text-[9px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-black tracking-widest rounded-lg border border-amber-200 dark:border-amber-500/20 uppercase whitespace-nowrap inline-flex items-center gap-1">
+                                                                        <label htmlFor={`upload-${check.id}`} className="cursor-pointer px-3 py-1.5 text-[9px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-black tracking-widest rounded-full border border-amber-200 dark:border-amber-500/20 uppercase whitespace-nowrap inline-flex items-center gap-1">
                                                                             {syncStates['upload_' + check.id] === 'SYNCING' ? 'YÜKLENİYOR...' : 'GÖRSEL YÜKLE'}
                                                                         </label>
                                                                     </>
@@ -472,12 +472,12 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{kasa.branch || 'Merkez Kasası'}</div>
                                                 </td>
                                                 <td className="px-6 py-3 align-middle">
-                                                    <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{kasa.type === 'bank' ? 'Banka Hesabı' : 'Nakit Kasa'}</span>
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{kasa.type === 'bank' ? 'Banka Hesabı' : 'Nakit Kasa'}</span>
                                                 </td>
                                                 <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">Mevcut Bakiye</td>
                                                 <td className="px-6 py-3 text-[14px] font-black text-emerald-600 dark:text-emerald-400 text-right">{formatCurrency(kasa.balance)}</td>
                                                 <td className="px-6 py-3 pr-8 text-right">
-                                                    <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border ${
+                                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${
                                                         kasa.bankConnectionId 
                                                         ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20' 
                                                         : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
@@ -504,7 +504,7 @@ export default function AccountingPage() {
                                                         <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Genel Hareket</div>
                                                     </td>
                                                     <td className="px-6 py-3 align-middle">
-                                                        <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase border ${
+                                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${
                                                             isIncome 
                                                             ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' 
                                                             : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
@@ -515,7 +515,7 @@ export default function AccountingPage() {
                                                     <td className="px-6 py-3 text-[11px] font-bold tracking-widest text-slate-500">{new Date(tx.date).toLocaleDateString('tr-TR')}</td>
                                                     <td className="px-6 py-3 text-[14px] font-black text-slate-800 dark:text-white text-right">{formatCurrency(tx.amount)}</td>
                                                     <td className="px-6 py-3 pr-8 text-right">
-                                                        <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold tracking-widest uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">Onaylı</span>
+                                                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">Onaylı</span>
                                                     </td>
                                                 </tr>
                                             );

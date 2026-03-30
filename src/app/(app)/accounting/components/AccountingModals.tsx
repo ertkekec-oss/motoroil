@@ -173,8 +173,8 @@ export default function AccountingModals({
         }
     };
 
-    const inputClasses = "w-full bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-[13px] font-semibold text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors";
-    const labelClasses = "block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5";
+    const inputClasses = "w-full bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/10 rounded-[16px] px-4 py-3 text-[13px] font-semibold text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors";
+    const labelClasses = "block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1";
 
     return (
         <div style={{ position: 'fixed', inset: 0, zIndex: 2000 }} className="flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm">
@@ -402,7 +402,7 @@ export default function AccountingModals({
                             )}
 
                             <div className="pt-4">
-                                <button type="submit" disabled={loading} className={`w-full h-12 ${loading ? 'opacity-50 cursor-not-allowed' : ''} bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]`}>
+                                <button type="submit" disabled={loading} className={`w-full h-12 ${loading ? 'opacity-50 cursor-not-allowed' : ''} bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-[11px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]`}>
                                     {loading ? 'KAYDEDİLİYOR...' : 'ONAYLA VE KAYDET'}
                                 </button>
                             </div>

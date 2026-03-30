@@ -51,7 +51,7 @@ export default function KasaDetailPage() {
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => router.push('/accounting?tab=banks')}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${theme === 'light' ? 'bg-white hover:bg-slate-100 text-slate-600' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'} shadow-sm`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${theme === 'light' ? 'bg-white hover:bg-slate-100 text-slate-600' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'} shadow-sm`}
                 >
                     <ArrowLeft size={20} />
                 </button>
@@ -118,7 +118,7 @@ export default function KasaDetailPage() {
                                         <tr key={i} className={`h-[56px] transition-colors ${theme === 'light' ? 'hover:bg-slate-50/50' : 'hover:bg-blue-500/5'}`}>
                                             <td className="px-4 text-sm font-medium">{new Date(tx.date).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' })}</td>
                                             <td className="px-4">
-                                                <span className={`px-2.5 py-1 rounded-[6px] text-[11px] font-bold uppercase tracking-[0.05em] ${tx.type === 'Transfer' ? 'bg-indigo-500/10 text-indigo-500' : isIncome ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                                <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.05em] ${tx.type === 'Transfer' ? 'bg-indigo-500/10 text-indigo-500' : isIncome ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
                                                     {tx.type === 'Transfer' ? (isIncome ? 'Gelen Transfer' : 'Giden Transfer') : (isIncome ? 'Giriş' : 'Çıkış')}
                                                 </span>
                                             </td>
