@@ -48,6 +48,7 @@ const parseCurrencyToFloat = (val: string | number): number => {
 export default function CustomerDetailClient({ customer, historyList }: { customer: any, historyList: any[] }) {
     const router = useRouter();
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'all' | 'sales' | 'payments' | 'documents' | 'services' | 'warranties' | 'checks' | 'reconciliations' | 'offers'>('all');
     const [documents, setDocuments] = useState<any[]>([]);
     const [services, setServices] = useState<any[]>([]);
