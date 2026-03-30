@@ -106,92 +106,105 @@ export default function ReconciliationWizard({
     };
 
     return (
-        <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(15, 23, 42, 0.85)', zIndex: 9999,
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-        }} onClick={onClose}>
-
-            <div onClick={e => e.stopPropagation()} style={{
-                background: 'var(--bg-card, #1e293b)', width: '100%', maxWidth: '600px',
-                borderRadius: '24px', overflow: 'hidden', display: 'flex', flexDirection: 'column',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))'
-            }} className="animate-scale-in">
+        <div 
+            className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+            onClick={onClose}
+        >
+            <div 
+                onClick={e => e.stopPropagation()} 
+                className="bg-white dark:bg-[#0f172a] w-full max-w-[600px] rounded-[24px] overflow-hidden flex flex-col shadow-[0_20px_40px_rgb(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgb(0,0,0,0.5)] border border-slate-200 dark:border-white/10 animate-scale-in"
+            >
 
                 {/* Header */}
-                <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', background: 'var(--bg-panel, rgba(255,255,255,0.02))' }}>
-                    <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-main, white)' }}>
+                <div className="px-8 py-6 border-b border-light dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+                    <h2 className="m-0 text-[20px] font-black text-slate-800 dark:text-white">
                         B2B Cari Mutabakatı
                     </h2>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', marginTop: '4px' }}>
+                    <div className="text-[13px] text-slate-500 dark:text-slate-400 mt-1 font-semibold">
                         {customer.name} ({customer.taxNumber || 'V.N Yok'})
                     </div>
                 </div>
 
                 {/* Steps */}
-                <div style={{ display: 'flex', padding: '16px 32px', gap: '8px', background: 'rgba(0,0,0,0.2)' }}>
-                    {[1, 2, 3]?.map(s => (
-                        <div key={s} style={{ flex: 1, height: '4px', background: s <= step ? '#3b82f6' : 'rgba(255,255,255,0.1)', borderRadius: '2px', transition: 'background 0.3s' }} />
+                <div className="flex px-8 py-4 gap-2 bg-slate-100/50 dark:bg-black/20">
+                    {[1, 2, 3].map(s => (
+                        <div 
+                            key={s} 
+                            className={`flex-1 h-1.5 rounded-full transition-colors ${s <= step ? 'bg-blue-500 shadow-[0_0_10px_rgb(59,130,246,0.3)]' : 'bg-slate-200 dark:bg-white/10'}`} 
+                        />
                     ))}
                 </div>
 
                 {/* Body */}
-                <div style={{ padding: '32px', minHeight: '320px' }}>
+                <div className="p-8 min-h-[320px] bg-white dark:bg-transparent">
 
                     {step === 1 && (
                         <div className="animate-fade-in">
-                            <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '16px', color: 'var(--text-main, white)' }}>Adım 1: Dönem Seçimi</h3>
+                            <h3 className="text-[16px] font-black mb-4 text-slate-800 dark:text-white">Adım 1: Dönem Seçimi</h3>
 
-                            <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-                                <button onClick={() => handlePreset('month')} className="btn" style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: '1px solid currentColor' }}>Bu Ay</button>
-                                <button onClick={() => handlePreset('lastMonth')} className="btn" style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: '1px solid currentColor' }}>Geçen Ay</button>
-                                <button onClick={() => handlePreset('year')} className="btn" style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: '1px solid currentColor' }}>Bu Yıl</button>
+                            <div className="flex gap-2 mb-6">
+                                <button onClick={() => handlePreset('month')} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30 transition-all font-bold text-[12px]">Bu Ay</button>
+                                <button onClick={() => handlePreset('lastMonth')} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30 transition-all font-bold text-[12px]">Geçen Ay</button>
+                                <button onClick={() => handlePreset('year')} className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30 transition-all font-bold text-[12px]">Bu Yıl</button>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <div>
-                                    <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-muted, #94a3b8)', display: 'block', marginBottom: '8px' }}>Başlangıç</label>
-                                    <input type="date" value={periodStart} onChange={e => setPeriodStart(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', colorScheme: 'dark' }} />
+                                    <label className="text-[12px] font-extrabold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wide">Başlangıç</label>
+                                    <input 
+                                        type="date" 
+                                        value={periodStart} 
+                                        onChange={e => setPeriodStart(e.target.value)} 
+                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-black/20 dark:border-white/10 dark:text-white transition-all font-semibold"
+                                    />
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-muted, #94a3b8)', display: 'block', marginBottom: '8px' }}>Bitiş</label>
-                                    <input type="date" value={periodEnd} onChange={e => setPeriodEnd(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', colorScheme: 'dark' }} />
+                                    <label className="text-[12px] font-extrabold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wide">Bitiş</label>
+                                    <input 
+                                        type="date" 
+                                        value={periodEnd} 
+                                        onChange={e => setPeriodEnd(e.target.value)} 
+                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-black/20 dark:border-white/10 dark:text-white transition-all font-semibold"
+                                    />
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleGenerate}
                                 disabled={generating}
-                                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: '#3b82f6', color: 'white', fontWeight: '800', border: 'none', opacity: generating ? 0.7 : 1, cursor: generating ? 'not-allowed' : 'pointer' }}
+                                className={`w-full py-4 rounded-[16px] bg-blue-600 hover:bg-blue-700 text-white font-black text-[14px] transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_4px_14px_rgb(59,130,246,0.3)]`}
                             >
-                                {generating ? 'Hesaplanıyor ve Snapshot Üretiliyor...' : 'Devam Et (Snapshot Al)'}
+                                {generating ? 'Hesaplanıyor...' : 'Devam Et (Snapshot Al)'}
                             </button>
                         </div>
                     )}
 
                     {step === 2 && recon && (
                         <div className="animate-fade-in">
-                            <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '16px', color: 'var(--text-main, white)' }}>Adım 2: Önizleme & İmzaya Gönder</h3>
+                            <h3 className="text-[16px] font-black mb-4 text-slate-800 dark:text-white">Adım 2: Önizleme & İmzaya Gönder</h3>
 
-                            <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '12px', padding: '16px', marginBottom: '24px' }}>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #94a3b8)', marginBottom: '4px' }}>Snapshot Bakiyesi ({new Date(recon.periodStart).toLocaleDateString()} - {new Date(recon.periodEnd).toLocaleDateString()})</div>
-                                <div style={{ fontSize: '24px', fontWeight: '900', color: Number(recon.balance) > 0 ? '#ef4444' : '#10b981' }}>
-                                    {Math.abs(Number(recon.balance)).toLocaleString()} <span style={{ fontSize: '16px' }}>₺</span>
-                                    <span style={{ fontSize: '12px', marginLeft: '8px', fontWeight: '600', textTransform: 'uppercase', padding: '2px 6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
+                            <div className="bg-slate-50 border border-slate-200 dark:bg-black/20 dark:border-white/10 rounded-[16px] p-6 mb-6">
+                                <div className="text-[12px] text-slate-500 dark:text-slate-400 mb-1 font-bold">Snapshot Bakiyesi ({new Date(recon.periodStart).toLocaleDateString()} - {new Date(recon.periodEnd).toLocaleDateString()})</div>
+                                <div className={`text-[28px] font-black ${Number(recon.balance) > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                    {Math.abs(Number(recon.balance)).toLocaleString()} <span className="text-[20px]">₺</span>
+                                    <span className="text-[12px] ml-3 font-bold uppercase tracking-wide px-3 py-1 bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/80 rounded-full align-middle inline-block -mt-1">
                                         {Number(recon.balance) > 0 ? 'Borçlu' : Number(recon.balance) < 0 ? 'Alacaklı' : 'Dengeli'}
                                     </span>
                                 </div>
-                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', marginTop: '8px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px', wordBreak: 'break-all' }}>
-                                    <span style={{ opacity: 0.6 }}>Hash: </span>
+                                <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-4 pt-3 border-t border-slate-200 dark:border-white/5 break-all font-mono">
+                                    <span className="opacity-60">Hash: </span>
                                     {Array(8).fill("")?.map(() => Math.random().toString(36).substring(2, 6)).join("")}
-                                    {/* Mock Hash visual */}
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <div>
-                                    <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-muted, #94a3b8)', display: 'block', marginBottom: '8px' }}>Gönderim Yöntemi</label>
-                                    <select value={deliveryMethod} onChange={e => setDeliveryMethod(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)' }}>
+                                    <label className="text-[12px] font-extrabold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wide">Gönderim Yöntemi</label>
+                                    <select 
+                                        value={deliveryMethod} 
+                                        onChange={e => setDeliveryMethod(e.target.value)} 
+                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-black/20 dark:border-white/10 dark:text-white transition-all font-semibold"
+                                    >
                                         <option value="INTERNAL">Periodya Ağında (Ücretsiz)</option>
                                         <option value="EMAIL">E-Posta (Ücretsiz)</option>
                                         <option value="SMS">SMS (0.1 TL/Gönderim)</option>
@@ -199,8 +212,12 @@ export default function ReconciliationWizard({
                                     </select>
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-muted, #94a3b8)', display: 'block', marginBottom: '8px' }}>İmza Tipi (Auth)</label>
-                                    <select value={authMethod} onChange={e => setAuthMethod(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)' }}>
+                                    <label className="text-[12px] font-extrabold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wide">İmza Tipi (Auth)</label>
+                                    <select 
+                                        value={authMethod} 
+                                        onChange={e => setAuthMethod(e.target.value)} 
+                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-black/20 dark:border-white/10 dark:text-white transition-all font-semibold"
+                                    >
                                         <option value="OTP">Sms OTP (Basit)</option>
                                         <option value="QUALIFIED_ESIGN">Nitelikli E-İmza (E-Güven)</option>
                                         <option value="BOTH">Hangisi Uygunsa</option>
@@ -211,24 +228,24 @@ export default function ReconciliationWizard({
                             <button
                                 onClick={handleSend}
                                 disabled={sending}
-                                style={{ width: '100%', padding: '12px', borderRadius: '12px', background: '#10b981', color: 'white', fontWeight: '800', border: 'none', opacity: sending ? 0.7 : 1, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                className="w-full py-4 rounded-[16px] bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[14px] transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_4px_14px_rgb(16,185,129,0.3)] flex items-center justify-center gap-2"
                             >
-                                {sending ? 'Mutabakat Zarfı Oluşturuluyor...' : 'Mutabakata Sun (İmzaya Gönder)'}
+                                {sending ? 'Zarf Oluşturuluyor...' : 'Mutabakata Sun (İmzaya Gönder)'}
                             </button>
                         </div>
                     )}
 
                     {step === 3 && recon && (
-                        <div className="animate-fade-in" style={{ textAlign: 'center', padding: '20px 0' }}>
-                            <div style={{ fontSize: '48px', marginBottom: '16px' }}>✨</div>
-                            <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px', color: 'var(--text-main, white)' }}>Mutabakat Gönderildi</h3>
-                            <p style={{ fontSize: '14px', color: 'var(--text-muted, #94a3b8)', marginBottom: '24px', lineHeight: '1.5' }}>
-                                Mutabakat belgesi (ID: <strong>{recon.id.substring(0, 8)}</strong>) {deliveryMethod.toLowerCase()} yöntemiyle müşteriye iletildi. İmzalandığında "Reconciliation Engine" <span style={{ color: '#10b981' }}>RECON_OK</span> sinyali üretecektir.
+                        <div className="animate-fade-in text-center py-8">
+                            <div className="text-[64px] mb-4">✨</div>
+                            <h3 className="text-[24px] font-black mb-2 text-slate-800 dark:text-white">Mutabakat Gönderildi</h3>
+                            <p className="text-[14px] text-slate-500 dark:text-slate-400 mb-8 leading-relaxed max-w-[400px] mx-auto font-medium">
+                                Mutabakat belgesi (ID: <strong className="text-slate-700 dark:text-white">{recon.id.substring(0, 8)}</strong>) {deliveryMethod.toLowerCase()} yöntemiyle müşteriye iletildi. İmzalandığında "Reconciliation Engine" <span className="text-emerald-500 font-bold">RECON_OK</span> sinyali üretecektir.
                             </p>
 
                             <button
                                 onClick={onClose}
-                                style={{ padding: '12px 24px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', color: 'white', fontWeight: '800', border: 'none', cursor: 'pointer' }}
+                                className="px-8 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/5 font-black transition-all"
                             >
                                 Kapat
                             </button>
@@ -236,10 +253,15 @@ export default function ReconciliationWizard({
                     )}
                 </div>
 
-                {/* Footer Controls if needed */}
-                <div style={{ padding: '16px 32px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'flex-end', background: 'var(--bg-panel, rgba(255,255,255,0.02))' }}>
+                {/* Footer Controls */}
+                <div className="px-8 py-4 border-t border-slate-200 dark:border-white/5 flex justify-end bg-slate-50/50 dark:bg-white/[0.02]">
                     {(step === 1 || step === 2) && (
-                        <button onClick={onClose} style={{ border: 'none', background: 'transparent', color: 'var(--text-muted, #94a3b8)', fontWeight: '600', cursor: 'pointer', padding: '8px 16px', borderRadius: '8px' }} className="hover:bg-white/5">İptal</button>
+                        <button 
+                            onClick={onClose} 
+                            className="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10 transition-colors"
+                        >
+                            İptal
+                        </button>
                     )}
                 </div>
 

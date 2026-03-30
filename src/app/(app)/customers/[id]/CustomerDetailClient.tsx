@@ -990,72 +990,82 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* MAIN CONTENT AREA */}
             <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
-                {/* PREMIUM ACTION BAR */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                {/* ENTERPRISE ACTION BAR */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
                     <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(16, 185, 129, 0.05)', color: '#10b981', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(16, 185, 129, 0.2)' }}
-                        className="hover:-translate-y-1 hover:bg-emerald-500/10 hover:border-emerald-500/40"
+                        className="group flex flex-col justify-center items-center gap-3 bg-white dark:bg-[#0f172a] p-6 rounded-[24px] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-200 dark:border-white/5 relative overflow-hidden"
                     >
-                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💰</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>TAHSİLAT AL</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Cari hesaptan nakit / kk ile ödeme al</div>
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] dark:opacity-5">
+                            <span className="text-[64px] leading-none select-none">💰</span>
+                        </div>
+                        <div className="w-12 h-12 rounded-[16px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-[24px] shadow-sm z-10 transition-transform group-hover:scale-110">
+                            💰
+                        </div>
+                        <div className="text-center z-10">
+                            <div className="font-black text-[14px] tracking-widest mb-1 text-slate-800 dark:text-white uppercase">Tahsilat Al</div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Cari hesaptan nakit / kk ile ödeme al</div>
                         </div>
                     </Link>
 
                     <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(239, 68, 68, 0.2)' }}
-                        className="hover:-translate-y-1 hover:bg-red-500/10 hover:border-red-500/40"
+                        className="group flex flex-col justify-center items-center gap-3 bg-white dark:bg-[#0f172a] p-6 rounded-[24px] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-200 dark:border-white/5 relative overflow-hidden"
                     >
-                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💸</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>ÖDEME YAP</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Firmadan nakit / kk ile ödeme çıkışı yap</div>
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] dark:opacity-5">
+                            <span className="text-[64px] leading-none select-none">💸</span>
+                        </div>
+                        <div className="w-12 h-12 rounded-[16px] bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center text-[24px] shadow-sm z-10 transition-transform group-hover:scale-110">
+                            💸
+                        </div>
+                        <div className="text-center z-10">
+                            <div className="font-black text-[14px] tracking-widest mb-1 text-slate-800 dark:text-white uppercase">Ödeme Yap</div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Firmadan nakit / kk ile ödeme çıkışı yap</div>
                         </div>
                     </Link>
 
                     <Link href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(59, 130, 246, 0.05)', color: '#3b82f6', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(59, 130, 246, 0.2)' }}
-                        className="hover:-translate-y-1 hover:bg-blue-500/10 hover:border-blue-500/40"
+                        className="group flex flex-col justify-center items-center gap-3 bg-white dark:bg-[#0f172a] p-6 rounded-[24px] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-200 dark:border-white/5 relative overflow-hidden"
                     >
-                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--bg-panel, rgba(59, 130, 246, 0.1))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛒</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>SATIŞ YAP (POS)</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Bu müşteriye terminalde yeni satış başlat</div>
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] dark:opacity-5">
+                            <span className="text-[64px] leading-none select-none">🛒</span>
+                        </div>
+                        <div className="w-12 h-12 rounded-[16px] bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-[24px] shadow-sm z-10 transition-transform group-hover:scale-110">
+                            🛒
+                        </div>
+                        <div className="text-center z-10">
+                            <div className="font-black text-[14px] tracking-widest mb-1 text-slate-800 dark:text-white uppercase">Satış Yap (POS)</div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Bu müşteriye terminalde yeni satış başlat</div>
                         </div>
                     </Link>
                 </div>
 
-                {/* Enterprise Level 10 Oval Tabs Navigation Container */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 mt-4 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
-                    <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
-                        {[
-                            { id: 'all', label: 'TÜMÜ' },
-                            { id: 'sales', label: 'SATIŞ/FATURA' },
-                            { id: 'payments', label: 'FİNANS' },
-                            { id: 'offers', label: 'TEKLİFLER' },
-                            { id: 'documents', label: 'DOSYALAR' },
-                            { id: 'warranties', label: 'GARANTİLER' },
-                            { id: 'services', label: 'SERVİS' },
-                            { id: 'checks', label: 'VADELER' },
-                            { id: 'reconciliation', label: 'MUTABAKAT' }
-                        ].map((tab, idx, arr) => {
-                            const isActive = activeTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => { 
-                                        setActiveTab(tab.id as any); 
-                                        if (tab.id === 'documents') fetchDocuments(); 
-                                        if (tab.id === 'services') fetchServices(); 
-                                    }}
-                                    className={`flex-1 min-w-max h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
-                                >
-                                    {tab.label}
-                                </button>
-                            );
-                        })}
-                    </div>
+                {/* FILTERS (ENTERPRISE STANDARD) */}
+                <div className="flex flex-wrap items-center gap-2 mb-6 mt-4 relative z-10 w-full">
+                    {[
+                        { id: 'all', label: 'TÜMÜ' },
+                        { id: 'sales', label: 'SATIŞ/FATURA' },
+                        { id: 'payments', label: 'FİNANS' },
+                        { id: 'offers', label: 'TEKLİFLER' },
+                        { id: 'documents', label: 'DOSYALAR' },
+                        { id: 'warranties', label: 'GARANTİLER' },
+                        { id: 'services', label: 'SERVİS' },
+                        { id: 'checks', label: 'VADELER' },
+                        { id: 'reconciliations', label: 'MUTABAKAT' }
+                    ].map(tab => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => { 
+                                    setActiveTab(tab.id as any); 
+                                    if (tab.id === 'documents') fetchDocuments(); 
+                                    if (tab.id === 'services') fetchServices(); 
+                                }}
+                                className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${isActive ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm dark:bg-blue-500/10 dark:border-blue-500/50 dark:text-blue-400' : 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700/50 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:bg-slate-800'}`}
+                            >
+                                {tab.label}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* CONTENT AREA */}
