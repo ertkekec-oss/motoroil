@@ -17,6 +17,7 @@ const ITEMS_PER_PAGE = 10;
 export default function CustomersPage() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('all');
+    const [classFilter, setClassFilter] = useState('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const { currentUser, hasPermission, branches, activeBranchName } = useApp();
     const { customers, suppClasses, custClasses } = useCRM();
@@ -63,8 +64,8 @@ export default function CustomersPage() {
         if (activeTab === 'alacaklilar' && cust.balance >= 0) return false;
         
         // Filter by dynamic category class
-        if (activeTab !== 'all' && activeTab !== 'borclular' && activeTab !== 'alacaklilar') {
-            if (cust.customerClass !== activeTab && cust.category !== activeTab) return false;
+        if (classFilter !== 'all') {
+            if (cust.customerClass !== classFilter && cust.category !== classFilter) return false;
         }
 
         if (branchFilter !== 'all' && (cust.branch || 'Merkez').trim().toLocaleLowerCase('tr-TR') !== branchFilter.trim().toLocaleLowerCase('tr-TR')) return false;
@@ -78,8 +79,7 @@ export default function CustomersPage() {
     const tabs = [
         { id: 'all', label: 'Tümü' },
         { id: 'borclular', label: 'Borçlular' },
-        { id: 'alacaklilar', label: 'Alacaklılar' },
-        ...custClasses.map(c => ({ id: c, label: c }))
+        { id: 'alacaklilar', label: 'Alacaklılar' }
     ];
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -323,30 +323,26 @@ export default function CustomersPage() {
 
     return (
         <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans" style={{ background: isLight ? '#FAFAFA' : undefined }}>
-            {/* Enterprise Oval Tabs & Header Replacement */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
-                <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
-                    {tabs.map(tab => {
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabChange(tab.id)}
-                                className={`flex-1 min-w-[120px] h-11 px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
-                            >
-                                {tab.label}
-                            </button>
-                        );
-                    })}
-                </div>
-                <div className="flex items-center pr-2">
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="px-6 h-[38px] bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm shadow-indigo-600/20 active:scale-95 flex items-center gap-2 shrink-0"
-                    >
-                        <Plus className="w-4 h-4" />
-                        YENİ MÜŞTERİ
-                    </button>
+            {/* Staff-Style Top Tabs */}
+            <div className="mb-6 flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                        {tabs.map(tab => {
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => handleTabChange(tab.id)}
+                                    className={isActive
+                                        ? "px-6 py-2.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px] transition-all"
+                                        : "px-6 py-2.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
+                                    }
+                                >
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
@@ -394,34 +390,29 @@ export default function CustomersPage() {
                 </div>
             </div>
 
-            {/* Controls */}
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-center gap-4">
-                    <div className="relative flex-1 max-w-[600px]">
-                        <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-slate-400' : 'text-slate-500'}`} />
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                            placeholder="Müşteri adı, telefon, vergi no veya e-posta..."
-                            className={`w-full h-[40px] pl-[38px] pr-4 rounded-full text-[13px] font-medium border outline-none transition-all ${isLight
-                                ? 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                                : 'bg-slate-900 border-slate-800 text-slate-200 placeholder:text-slate-500 focus:border-blue-500'
-                                }`}
-                        />
-                    </div>
-
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className={`h-[40px] px-4 rounded-full text-[13px] font-semibold border flex items-center gap-2 transition-all ${showFilters
-                                ? (isLight ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-blue-900/20 border-blue-800/50 text-blue-400')
-                                : (isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800')
-                                }`}
-                        >
-                            <Filter className="w-4 h-4" />
-                            Filtreler
+            {/* Branch Filters (Eskiden Controls içinde select olan filte) */}
+            {hasPermission('branch_administration') && (
+                <div className="flex flex-col gap-4 mt-6">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">ŞUBE</span>
+                        <button onClick={() => setBranchFilter('all')} className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${branchFilter === 'all' ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm' : 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-sm') : (isLight ? 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-700/50 text-slate-400 hover:text-slate-300 hover:bg-slate-800')}`}>
+                            Tüm Şubeler
                         </button>
+                        {branches.map(b => (
+                            <button key={b.name} onClick={() => setBranchFilter(b.name)} className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${branchFilter === b.name ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm' : 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-sm') : (isLight ? 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-700/50 text-slate-400 hover:text-slate-300 hover:bg-slate-800')}`}>
+                                {b.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* List/Grid Container */}
+            <div className={`mt-6 rounded-[24px] border border-slate-200 dark:border-white/5 flex flex-col overflow-hidden shadow-sm bg-white dark:bg-[#0f172a]`}>
+                {/* ═══════════════ LİSTE BAŞLIĞI VE ARAMA ═══════════════ */}
+                <div className="p-4 md:px-6 md:py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-white/5">
+                    <div className="flex items-center gap-4">
+                        <h3 className="text-[13px] font-black text-slate-800 dark:text-white uppercase tracking-widest">Kayıt Listesi</h3>
                         <div className={`flex p-1 rounded-full border ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-900/50 border-slate-800'}`}>
                             <button
                                 onClick={() => setViewMode('grid')}
@@ -443,63 +434,69 @@ export default function CustomersPage() {
                             </button>
                         </div>
                     </div>
+                    <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+                        <select
+                            value={classFilter}
+                            onChange={(e) => setClassFilter(e.target.value)}
+                            className="h-[38px] bg-white dark:bg-[#0f172a] border border-slate-200/50 dark:border-white/10 text-slate-700 dark:text-slate-200 rounded-[8px] text-[12px] font-bold px-3 outline-none focus:border-indigo-500 transition-all cursor-pointer shadow-sm w-full md:w-[130px]"
+                        >
+                            <option value="all">Tüm Sınıflar</option>
+                            {custClasses.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <div className="relative w-full md:w-[260px]">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                placeholder="Müşteri, VKN, Telefon..."
+                                className="w-full pl-9 pr-4 h-[38px] bg-white dark:bg-black/20 rounded-[8px] border border-slate-200 dark:border-white/10 text-[12px] font-bold outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-slate-800 dark:text-white"
+                            />
+                        </div>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="px-6 h-[38px] bg-indigo-600 hover:bg-indigo-700 text-white rounded-[8px] text-[11px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 shrink-0 w-full md:w-auto"
+                        >
+                            <Plus className="w-4 h-4" />
+                            YENİ MÜŞTERİ
+                        </button>
+                    </div>
                 </div>
 
-                {/* Filters Collapse */}
-                {showFilters && (
-                    <div className={`p-5 rounded-[24px] border flex flex-wrap gap-8 animate-in slide-in-from-top-2 overflow-hidden ${cardClass}`}>
-                        <div className="flex-1 min-w-[200px] max-w-[300px]">
-                            <div className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${textLabelClass}`}>Şube</div>
-                            <select
-                                value={branchFilter}
-                                onChange={(e) => setBranchFilter(e.target.value)}
-                                disabled={!hasPermission('branch_administration')}
-                                className={`w-full h-[36px] px-3 rounded-full text-[13px] font-medium border outline-none ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-900 border-slate-800 text-slate-300'
-                                    }`}
+                {/* Bulk Actions Banner (Sadece List View) */}
+                {viewMode === 'list' && selectedIds.length > 0 && (
+                    <div className={`flex items-center justify-between px-6 py-3 border-b ${isLight ? 'bg-blue-50/50 border-slate-200' : 'bg-blue-900/10 border-slate-800'}`}>
+                        <div className="flex items-center gap-3">
+                            <span className={`text-[13px] font-semibold ${isLight ? 'text-blue-700' : 'text-blue-400'}`}>
+                                {selectedIds.length} müşteri seçildi
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setIsBulkCategoryModal(true)}
+                                className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors ${isLight ? 'bg-white border text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'}`}
                             >
-                                {hasPermission('branch_administration') && <option value="all">Tüm Şubeler</option>}
-                                {branches.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
-                            </select>
+                                Sınıf Ata
+                            </button>
+                            {canDelete && (
+                                <button
+                                    onClick={handleBulkDelete}
+                                    className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors border ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'}`}
+                                >
+                                    Toplu Sil
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
-            </div>
 
-            {/* List View */}
-            {viewMode === 'list' && (
-                <div className={`rounded-[24px] border p-0 overflow-hidden ${cardClass}`}>
-                    
-                    {/* Bulk Actions Banner */}
-                    {selectedIds.length > 0 && (
-                        <div className={`flex items-center justify-between px-6 py-3 border-b ${isLight ? 'bg-blue-50/50 border-slate-200' : 'bg-blue-900/10 border-slate-800'}`}>
-                            <div className="flex items-center gap-3">
-                                <span className={`text-[13px] font-semibold ${isLight ? 'text-blue-700' : 'text-blue-400'}`}>
-                                    {selectedIds.length} müşteri seçildi
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setIsBulkCategoryModal(true)}
-                                    className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors ${isLight ? 'bg-white border text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'}`}
-                                >
-                                    Sınıf Ata
-                                </button>
-                                {canDelete && (
-                                    <button
-                                        onClick={handleBulkDelete}
-                                        className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors border ${isLight ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'}`}
-                                    >
-                                        Toplu Sil
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    <table className="w-full text-left border-collapse">
-                        <thead className="bg-transparent border-b">
-                            <tr className={isLight ? 'border-slate-200' : 'border-slate-800'}>
-                                <th className="w-[48px] px-6 text-center">
+                {/* GÖRÜNÜM: LİSTE VEYA GRİD */}
+                {viewMode === 'list' ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-20">
+                            <tr>
+                                <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap w-[48px] text-center">
                                     <input 
                                         type="checkbox" 
                                         className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
@@ -507,22 +504,22 @@ export default function CustomersPage() {
                                         onChange={handleSelectAll}
                                     />
                                 </th>
-                                <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Müşteri</th>
-                                <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İletişim</th>
-                                <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Kategori</th>
-                                <th className={`h-[48px] px-4 text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Bakiye</th>
-                                <th className={`h-[48px] px-6 text-right text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İşlemler</th>
+                                <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap">Müşteri</th>
+                                <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap">İletişim</th>
+                                <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap">Kategori</th>
+                                <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap">Bakiye</th>
+                                <th className="px-5 py-4 font-bold border-b border-slate-200 dark:border-white/5 whitespace-nowrap text-right">İşlemler</th>
                             </tr>
                         </thead>
-                        <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {paginatedCustomers.map(cust => {
                                 const rawBalance = Number(cust.balance);
                                 const effectiveBalance = rawBalance;
                                 const isSelected = selectedIds.includes(cust.id as string);
 
                                 return (
-                                    <tr key={cust.id} className={`h-[60px] transition-colors ${isSelected ? (isLight ? 'bg-blue-50/30' : 'bg-blue-900/10') : (isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50')}`}>
-                                        <td className="px-6 py-3 align-middle text-center">
+                                    <tr key={cust.id} className={`h-[48px] transition-colors group ${isSelected ? "bg-slate-50 dark:bg-white/5" : "hover:bg-slate-50 dark:hover:bg-[#1e293b]/80"}`}>
+                                        <td className="px-5 py-3 align-middle text-[12px] text-center font-semibold text-slate-600 dark:text-slate-400">
                                             <input 
                                                 type="checkbox" 
                                                 className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
@@ -530,7 +527,7 @@ export default function CustomersPage() {
                                                 onChange={(e) => handleSelectOne(e, cust.id as string)}
                                             />
                                         </td>
-                                        <td className="px-4 py-3 align-middle">
+                                        <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                             <div className={`font-semibold text-[14px] ${textValueClass}`}>{cust.name}</div>
                                             <div className="flex items-center gap-2 mt-1">
                                                 <span className={`text-[11px] font-medium ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>⭐ {Number(cust.points || 0).toFixed(0)}</span>
@@ -539,17 +536,17 @@ export default function CustomersPage() {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3 align-middle">
+                                        <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                             <div className={`text-[13px] font-medium ${textValueClass}`}>{cust.phone || '-'}</div>
                                             <div className={`text-[12px] truncate max-w-[150px] ${textLabelClass}`}>{cust.email || '-'}</div>
                                         </td>
-                                        <td className="px-4 py-3 align-middle">
+                                        <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                             <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
                                                 }`}>
                                                 {cust.customerClass || cust.category || 'Genel'}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 align-middle">
+                                        <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                             <div className={`font-semibold text-[14px] ${effectiveBalance > 0 ? (isLight ? 'text-blue-600' : 'text-blue-400')
                                                 : effectiveBalance < 0 ? (isLight ? 'text-emerald-600' : 'text-emerald-500')
                                                     : textLabelClass
@@ -563,82 +560,77 @@ export default function CustomersPage() {
                                                 {effectiveBalance > 0 ? 'Borçlu' : effectiveBalance < 0 ? 'Alacaklı' : 'Dengeli'}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-3 align-middle text-right flex gap-2 justify-end items-center h-full pt-4">
-                                            <Link href={`/customers/${cust.id}`} className={`h-[32px] px-4 flex items-center justify-center rounded-full text-[10px] font-black uppercase tracking-widest transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
-                                                Detay
-                                            </Link>
+                                        <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400 text-right">
+                                            <Link href={`/customers/${cust.id}`} className="px-4 py-1.5 h-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[6px] font-bold text-[11px] flex items-center justify-center transition-all whitespace-nowrap shadow-sm">Detay</Link>
                                         </td>
                                     </tr>
                                 )
                             })}
                         </tbody>
                     </table>
-                </div>
-            )}
+                    </div>
+                ) : (
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 bg-slate-50/50 dark:bg-[#0f172a]/20">
+                        {paginatedCustomers.map(cust => {
+                            const rawBalance = Number(cust.balance);
+                            const effectiveBalance = rawBalance;
 
-            {/* Grid View */}
-            {viewMode === 'grid' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {paginatedCustomers.map(cust => {
-                        const rawBalance = Number(cust.balance);
-                        const effectiveBalance = rawBalance;
-
-                        return (
-                            <div key={cust.id} className={`rounded-[24px] border overflow-hidden flex flex-col ${cardClass}`}>
-                                <div className={`p-5 flex-1 ${isLight ? 'bg-white' : 'bg-slate-900'}`}>
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[16px] font-bold text-white shadow-sm ${isLight ? 'bg-blue-600' : 'bg-blue-600'
-                                            }`}>
-                                            {cust.name?.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div className="text-right">
-                                            <div className={`text-[16px] font-bold ${effectiveBalance > 0 ? (isLight ? 'text-blue-600' : 'text-blue-400')
-                                                : effectiveBalance < 0 ? (isLight ? 'text-emerald-600' : 'text-emerald-500')
-                                                    : textLabelClass
-                                                }`}>
-                                                {formatCurrency(Math.abs(effectiveBalance))}
+                            return (
+                                <div key={cust.id} className={`rounded-[24px] border overflow-hidden flex flex-col ${isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-slate-900 border-slate-800'}`}>
+                                    <div className="p-5 flex-1">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-[16px] font-bold text-white shadow-sm bg-blue-600">
+                                                {cust.name?.charAt(0).toUpperCase()}
                                             </div>
-                                            <div className={`text-[10px] font-bold uppercase tracking-wide mt-0.5 ${effectiveBalance > 0 ? (isLight ? 'text-blue-600/70' : 'text-blue-400/80')
-                                                : effectiveBalance < 0 ? (isLight ? 'text-emerald-600/70' : 'text-emerald-500/80')
-                                                    : textLabelClass
-                                                }`}>
-                                                {effectiveBalance > 0 ? '● Borçlu' : effectiveBalance < 0 ? '● Alacaklı' : '● Dengeli'}
+                                            <div className="text-right">
+                                                <div className={`text-[16px] font-bold ${effectiveBalance > 0 ? (isLight ? 'text-blue-600' : 'text-blue-400')
+                                                    : effectiveBalance < 0 ? (isLight ? 'text-emerald-600' : 'text-emerald-500')
+                                                        : textLabelClass
+                                                    }`}>
+                                                    {formatCurrency(Math.abs(effectiveBalance))}
+                                                </div>
+                                                <div className={`text-[10px] font-bold uppercase tracking-wide mt-0.5 ${effectiveBalance > 0 ? (isLight ? 'text-blue-600/70' : 'text-blue-400/80')
+                                                    : effectiveBalance < 0 ? (isLight ? 'text-emerald-600/70' : 'text-emerald-500/80')
+                                                        : textLabelClass
+                                                    }`}>
+                                                    {effectiveBalance > 0 ? '● Borçlu' : effectiveBalance < 0 ? '● Alacaklı' : '● Dengeli'}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <h3 className={`font-semibold text-[15px] leading-tight mb-2 truncate ${textValueClass}`}>{cust.name}</h3>
+                                        <h3 className={`font-semibold text-[15px] leading-tight mb-2 truncate ${textValueClass}`}>{cust.name}</h3>
 
-                                    <div className="flex gap-2 flex-wrap mb-4">
-                                        <span className={`px-2 py-1 text-[10px] font-semibold border rounded-[6px] ${isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                                            }`}>
-                                            ⭐ Puan: {Number(cust.points || 0).toFixed(0)}
-                                        </span>
-                                        <span className={`px-2 py-1 text-[10px] font-semibold border rounded-[6px] ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
-                                            }`}>
-                                            {cust.customerClass || cust.category || 'Genel'}
-                                        </span>
+                                        <div className="flex gap-2 flex-wrap mb-4">
+                                            <span className={`px-2 py-1 text-[10px] font-semibold border rounded-[6px] ${isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                }`}>
+                                                ⭐ Puan: {Number(cust.points || 0).toFixed(0)}
+                                            </span>
+                                            <span className={`px-2 py-1 text-[10px] font-semibold border rounded-[6px] ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
+                                                }`}>
+                                                {cust.customerClass || cust.category || 'Genel'}
+                                            </span>
+                                        </div>
+
+                                        <div className="space-y-1.5 mt-auto">
+                                            <div className={`text-[12px] font-medium flex gap-2 items-center ${textLabelClass}`}>
+                                                <span>📞</span> <span className={textValueClass}>{cust.phone || '-'}</span>
+                                            </div>
+                                            <div className={`text-[12px] font-medium flex gap-2 items-center truncate ${textLabelClass}`}>
+                                                <span>📧</span> <span className={textValueClass}>{cust.email || '-'}</span>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div className="space-y-1.5 mt-auto">
-                                        <div className={`text-[12px] font-medium flex gap-2 items-center ${textLabelClass}`}>
-                                            <span>📞</span> <span className={textValueClass}>{cust.phone || '-'}</span>
-                                        </div>
-                                        <div className={`text-[12px] font-medium flex gap-2 items-center truncate ${textLabelClass}`}>
-                                            <span>📧</span> <span className={textValueClass}>{cust.email || '-'}</span>
-                                        </div>
+                                    <div className={`p-4 flex gap-2 border-t flex-shrink-0 ${isLight ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-900/50 border-slate-800'}`}>
+                                        <Link href={`/customers/${cust.id}`} className="w-full h-[36px] flex items-center justify-center rounded-full text-[10px] uppercase tracking-widest font-black transition-colors bg-blue-600 text-white hover:bg-blue-700 shadow-sm">
+                                            DETAY
+                                        </Link>
                                     </div>
                                 </div>
-
-                                <div className={`p-4 flex gap-2 border-t ${isLight ? 'bg-slate-50/50 border-slate-200' : 'bg-slate-900/50 border-slate-800'}`}>
-                                    <Link href={`/customers/${cust.id}`} className={`flex-1 h-[36px] flex items-center justify-center rounded-full text-[10px] uppercase tracking-widest font-black transition-colors ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
-                                        DETAY
-                                    </Link>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
 
             {filteredCustomers.length === 0 && (
                 <div className={`py-16 text-center rounded-[24px] border border-dashed ${isLight ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-700'}`}>
