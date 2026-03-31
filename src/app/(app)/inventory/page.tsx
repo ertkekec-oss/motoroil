@@ -1495,7 +1495,7 @@ function InventoryContent() {
         {showDailyBrief && activeTab === "all" && <DailyBriefPanel onClose={handleDismissBrief} />}
         {showHealthReport && <WeeklyHealthReport products={products || []} onClose={() => setShowHealthReport(false)} />}
 
-        {activeTab === "focus" && <FocusQueueTab products={products || []} onRunAiMap={handleAiMap} />}
+        {activeTab === "focus" && <FocusQueueTab products={products || []} />}
         {activeTab === "strategic" && <ExecutiveSummaryMode products={products} />}
 
         {activeTab === "all" && (

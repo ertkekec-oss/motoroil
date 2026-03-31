@@ -100,7 +100,7 @@ export default async function AdminCategoriesPage() {
                         <EnterpriseSectionHeader 
                             title="Active Hierarchy Network" 
                             icon={<FolderTree className="h-5 w-5" />}
-                            className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20"
+                            
                         />
                         
                         <div className="p-4 bg-transparent max-h-[70vh] overflow-y-auto custom-scrollbar">

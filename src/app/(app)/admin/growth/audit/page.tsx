@@ -59,9 +59,9 @@ export default function AdminGrowthAuditTrail() {
             description="AÄŸa etki eden tÃ¼m finansal, promosyonel ve yÃ¶netimsel aksiyonlarÄ±n (Boost/Policy/Guard) kayÄ±t altÄ±na alÄ±ndÄ±ÄŸÄ± gÃ¼venli defter."
             actions={actions}
             className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans w-full pb-16 focus:outline-none"
-            titleIcon={<ShieldCheck className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />}
+            
         >
-            <EnterpriseCard padding="none">
+            <EnterpriseCard >
                 <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b] flex items-center justify-between">
                     <h2 className="text-[13px] font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 uppercase tracking-widest">
                         <Terminal className="w-4 h-4 text-slate-400" />

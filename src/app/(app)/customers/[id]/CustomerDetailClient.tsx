@@ -1191,7 +1191,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 <th className="px-5 py-4 font-bold whitespace-nowrap">Detay</th>
                                             </tr>
                                         </thead><tbody className="divide-y divide-slate-100 dark:divide-white/5">
-{(!customer.offers || customer.offers.length === 0) ? (<tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Teklif Bulunamadı. Müşteriye henüz bir teklif oluşturulmamış.</td></tr>) : customer.offers.map((offer: any) => (
+
+{(!customer.offers || customer.offers.length === 0) && (
+    <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Teklif Bulunamadı. Müşteriye henüz bir teklif oluşturulmamış.</td></tr>
+)}
+{customer.offers && customer.offers.length > 0 && customer.offers.map((offer: any) => (
+
                                                 <tr key={offer.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group border-b border-slate-100 dark:border-white/5">
                                                     <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400" style={{ verticalAlign: 'middle' }}>
                                                         <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main, #fff)', marginBottom: '4px' }}>
@@ -1231,9 +1236,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         </tbody>
                                     </table>
                                 </div>
-                            )}
+
                         </div>
-                    ) : activeTab === 'reconciliation' ? (
+                    ) : activeTab === 'reconciliations' ? (
                         <div className="p-12 text-center text-slate-500 rounded-[20px] bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5">
                             <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🤝</div>
                             <h4 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Mutabakatlar</h4>
@@ -1452,7 +1457,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 </tbody>
                                             </table>
                                         </div>
-                                    )}
+
                                 </div>
 
                                 {/* PAYMENT PLANS COLUMN */}
@@ -1530,7 +1535,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 </tbody>
                                             </table>
                                         </div>
-                                    )}
+
                                 </div>
                             </div>
                         </div>

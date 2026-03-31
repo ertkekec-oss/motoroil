@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useModal } from "@/contexts/ModalContext";
-import { ChevronLeft, FileText, CheckCircle2, History, AlertCircle, Users, Download, Eye, XCircle, PenTool, Activity, ShieldAlert, Navigation } from "lucide-react";
+import { ChevronLeft, FileText, CheckCircle2, History, AlertCircle, Users, Download, Eye, XCircle, PenTool, Activity, ShieldAlert, Navigation , Clock} from "lucide-react";
 
 const SoftContainer = ({ title, icon, children, className="" }: any) => (
     <div className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col ${className}`}>

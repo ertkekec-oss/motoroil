@@ -73,7 +73,7 @@ export default async function OnboardingAdminPage() {
                             title="Aktif Navigasyon Adımları" 
                             subtitle="Bütün müşterilerde sıralı olarak görünecek olan keşif görevleri." 
                             icon={<ListChecks className="w-5 h-5" />}
-                            className="p-6 md:p-8 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20"
+                            
                         />
                         
                         <div className="p-6 md:p-8">
