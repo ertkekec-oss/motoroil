@@ -281,32 +281,7 @@ export default function SuppliersPage() {
       data-pos-theme={theme}
       className={`w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans ${isLight ? "bg-[#FAFAFA]" : ""}`}
     >
-      {/* Enterprise Oval Tabs & Header Replacement */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
-        <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex-1 min-w-[120px] h-11 px-5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all outline-none ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex items-center pr-2">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-6 h-[38px] bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm shadow-indigo-600/20 active:scale-95 flex items-center gap-2 shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            YENİ TEDARİKÇİ
-          </button>
-        </div>
-      </div>
+      
 
       {/* KPI Banner */}
       <div className={`flex rounded-[14px] border overflow-hidden ${cardClass}`}>
@@ -360,11 +335,78 @@ export default function SuppliersPage() {
         </div>
       </div>
 
+      {/* TABS */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/5 pb-2 mb-2 w-full overflow-x-auto custom-scroll">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`px-4 py-1.5 text-[12px] font-bold rounded-[6px] transition-all whitespace-nowrap ${
+                isActive
+                  ? "bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-white/10"
+                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent"
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Controls */}
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center gap-4">
-          {/* Search Box */}
-          <div className="relative flex-1 max-w-[600px]">
+        <div className="flex flex-wrap justify-between items-center gap-4">
+          <div className="flex items-center gap-4">
+             <h3 className="text-[13px] font-black text-slate-800 dark:text-white uppercase tracking-widest hidden sm:block">Kayıt Listesi</h3>
+             <div className={`flex p-1 rounded-full border ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900/50 border-slate-800"}`}>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`w-7 h-7 flex items-center justify-center rounded-[6px] transition-colors ${viewMode === "grid"
+                    ? isLight
+                      ? "bg-white shadow-sm text-blue-600"
+                      : "bg-slate-800 text-blue-400"
+                    : isLight
+                      ? "text-slate-400 hover:text-slate-600"
+                      : "text-slate-500 hover:text-slate-300"
+                  }`}
+              >
+                <Grid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`w-7 h-7 flex items-center justify-center rounded-[6px] transition-colors ${viewMode === "list"
+                    ? isLight
+                      ? "bg-white shadow-sm text-blue-600"
+                      : "bg-slate-800 text-blue-400"
+                    : isLight
+                      ? "text-slate-400 hover:text-slate-600"
+                      : "text-slate-500 hover:text-slate-300"
+                  }`}
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-2 flex-1 sm:flex-none justify-start sm:justify-end">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`h-[36px] px-4 rounded-[8px] text-[12px] font-semibold border flex items-center gap-2 transition-all shadow-sm ${showFilters
+                  ? isLight
+                    ? "bg-blue-50 border-blue-200 text-blue-700"
+                    : "bg-blue-900/20 border-blue-800/50 text-blue-400"
+                  : isLight
+                    ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800"
+                }`}
+            >
+              <Filter className="w-4 h-4" />
+              Filtreler
+            </button>
+
+            <div className="relative flex-1 max-w-[600px]">
             <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? "text-slate-400" : "text-slate-500"}`} />
             <input
               type="text"
@@ -378,49 +420,13 @@ export default function SuppliersPage() {
             />
           </div>
 
-          <div className="flex gap-2">
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`h-[40px] px-4 rounded-[10px] text-[13px] font-semibold border flex items-center gap-2 transition-all ${showFilters
-                  ? isLight
-                    ? "bg-blue-50 border-blue-200 text-blue-700"
-                    : "bg-blue-900/20 border-blue-800/50 text-blue-400"
-                  : isLight
-                    ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
-                    : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800"
-                }`}
+               onClick={() => setIsModalOpen(true)}
+               className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
             >
-              <Filter className="w-4 h-4" />
-              Filtreler
+               <Plus className="w-4 h-4" />
+               YENİ
             </button>
-            <div className={`flex p-1 rounded-[10px] border ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900/50 border-slate-800"}`}>
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`w-8 h-8 flex items-center justify-center rounded-[6px] transition-colors ${viewMode === "grid"
-                    ? isLight
-                      ? "bg-white shadow-sm text-blue-600"
-                      : "bg-slate-800 text-blue-400"
-                    : isLight
-                      ? "text-slate-400 hover:text-slate-600"
-                      : "text-slate-500 hover:text-slate-300"
-                  }`}
-              >
-                <Grid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`w-8 h-8 flex items-center justify-center rounded-[6px] transition-colors ${viewMode === "list"
-                    ? isLight
-                      ? "bg-white shadow-sm text-blue-600"
-                      : "bg-slate-800 text-blue-400"
-                    : isLight
-                      ? "text-slate-400 hover:text-slate-600"
-                      : "text-slate-500 hover:text-slate-300"
-                  }`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
           </div>
         </div>
 

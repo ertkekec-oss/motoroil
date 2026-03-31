@@ -112,170 +112,114 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
     };
 
     return (
-        <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-main)', color: 'var(--text-main)' }}>
+        <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-900 font-sans">
 
             {/* EXECUTIVE HEADER STRIP */}
-            <div style={{
-                background: 'var(--bg-panel, rgba(15, 23, 42, 0.6))',
-                borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
-                padding: '24px 40px',
-                position: 'sticky',
-                top: 0,
-                zIndex: 40
-            }}>
-                <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/5 p-6 sticky top-0 z-40 w-full shadow-sm">
+                <div className="max-w-[1400px] mx-auto flex flex-col xl:flex-row gap-6 items-start xl:items-center justify-between">
+                    
+                    {/* Left: Avatar & Details */}
+                    <div className="flex gap-5 items-center">
+                        <div className="w-[64px] h-[64px] rounded-[16px] flex items-center justify-center text-[24px] font-bold text-white shadow-sm shrink-0" style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' }}>
+                            {val(supplier.name, '?').charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-3">
+                                <Link href="/suppliers" className="text-slate-400 hover:text-blue-500 transition-colors" title="Tedarikçilere Dön">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                                </Link>
+                                <h1 className="text-[20px] font-black tracking-tight text-slate-800 dark:text-white m-0">
+                                    {val(supplier.name)}
+                                </h1>
+                                <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-[6px] text-[11px] font-bold uppercase tracking-wider border border-slate-200 dark:border-white/5">
+                                    {val(supplier.category, 'Genel Tedarikçi')}
+                                </span>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-4 text-[12px] font-semibold text-slate-500">
+                                <span className="flex items-center gap-1.5"><span className="opacity-50">📍</span>
+                                    {(() => {
+                                        if (supplier.city || supplier.district) {
+                                            return `${supplier.district ? supplier.district + ' / ' : ''}${supplier.city || ''}`;
+                                        }
+                                        return supplier.address || 'Adres Yok';
+                                    })()}
+                                </span>
+                                {supplier.phone && <span className="flex items-center gap-1.5"><span className="opacity-50">📱</span> {supplier.phone}</span>}
+                                {supplier.email && <span className="flex items-center gap-1.5"><span className="opacity-50">📧</span> {supplier.email}</span>}
+                            </div>
+                        </div>
+                    </div>
 
-                    {/* Top Row: Back link & Title */}
-                    <div className="flex justify-between items-center">
-                        <Link href="/suppliers" style={{ color: 'var(--text-muted, #888)', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', transition: 'color 0.2s' }} className="hover:text-blue-500">
-                            <span style={{ fontSize: '16px' }}>←</span> Tedarikçi Merkezi
-                        </Link>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                                onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
-                                className="btn"
-                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
+                    {/* Right: Actions & Balance on SAME ROW */}
+                    <div className="flex flex-wrap items-center justify-end gap-4 flex-1 w-full xl:w-auto mt-2 xl:mt-0 xl:ml-auto">
+                        
+                        {/* Quick Actions */}
+                        <div className="flex flex-wrap items-center gap-2">
+                             <button
+                                onClick={() => router.push(`/suppliers?edit=${supplier.id}`)}
+                                className="h-[36px] px-4 bg-slate-100/50 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                                title="Düzenle"
                             >
-                                📄 Özet Ekstre
-                            </button>
-                            <button
-                                onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
-                                className="btn"
-                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
-                            >
-                                📑 Detaylı Ekstre
+                                ✏️ Detay
                             </button>
                             <button
                                 onClick={() => setIsAdjustModalOpen(true)}
-                                className="btn"
-                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
+                                className="h-[36px] px-4 bg-orange-50 hover:bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:hover:bg-orange-500/20 dark:text-orange-400 border border-orange-200 dark:border-orange-500/10 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
                             >
                                 ⚖️ Bakiye Düzelt
                             </button>
                             <button
-                                onClick={() => router.push(`/suppliers?edit=${supplier.id}`)}
-                                className="btn"
-                                style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: '#3b82f6', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
+                                onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
+                                className="h-[36px] px-4 bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
                             >
-                                ✏️ Düzenle
+                                📑 Ekstre
                             </button>
+                            <button
+                                onClick={() => setIsUploadModalOpen(true)}
+                                className="h-[36px] px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                🚀 Fatura
+                            </button>
+                            <button
+                                onClick={() => setIsPurchaseModalOpen(true)}
+                                className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                🛒 Fiş
+                            </button>
+                            <Link 
+                                href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&amount=${Math.abs(supplier.balance)}`}
+                                className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                💸 Ödeme Yap
+                            </Link>
                         </div>
-                    </div>
 
-                    {/* Business/Profile Row */}
-                    <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                        {/* Left: Avatar + Details */}
-                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                            <div style={{
-                                width: '72px', height: '72px', borderRadius: '18px',
-                                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '28px', fontWeight: '800', color: 'white',
-                                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.25)',
-                                border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
-                                {val(supplier.name, '?').charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <h1 style={{ fontSize: '26px', fontWeight: '800', margin: '0 0 6px 0', color: 'var(--text-main, #fff)', letterSpacing: '-0.5px' }}>
-                                    {val(supplier.name)}
-                                </h1>
-                                <div style={{ display: 'flex', gap: '16px', color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '500', flexWrap: 'wrap' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷️</span> {val(supplier.category, 'Genel Tedarikçi')}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📱</span> {val(supplier.phone, 'Telefon Yok')}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📧</span> {val(supplier.email, 'E-posta Yok')}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📍</span>
-                                        {(() => {
-                                            if (supplier.city || supplier.district) {
-                                                return `${supplier.district ? supplier.district + ' / ' : ''}${supplier.city || ''}`;
-                                            }
-                                            return supplier.address || 'Adres Yok';
-                                        })()}
+                        {/* Balance Badge (Rightmost) */}
+                        <div className="flex items-center gap-3 bg-slate-50 dark:bg-[#1e293b] py-2 px-4 rounded-[12px] border border-slate-200 dark:border-white/5 shadow-sm whitespace-nowrap w-full sm:w-auto mt-2 sm:mt-0 justify-end md:justify-center">
+                            <div className="flex flex-col items-end">
+                                <span className="text-[10px] font-black tracking-widest uppercase text-slate-400">DENGELİ BAKİYESİ</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[18px] font-black font-mono tracking-tight" style={{ color: balance < 0 ? '#ef4444' : balance > 0 ? '#10b981' : 'var(--text-main, #333)' }}>
+                                        {Math.abs(balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                    </span>
+                                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-[4px] tracking-wider" style={{
+                                        background: balance < 0 ? 'rgba(239, 68, 68, 0.1)' : balance > 0 ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))',
+                                        color: balance < 0 ? '#ef4444' : balance > 0 ? '#10b981' : 'var(--text-main, #333)'
+                                    }}>
+                                        {balance < 0 ? 'BORÇLUYUZ' : balance > 0 ? 'ALACAKLIYIZ' : 'DENGELİ'}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right: Balance & Financial Health */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
-                            <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                                FİNANSAL DURUM (NET BAKİYE)
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                                <div style={{ fontSize: '36px', fontWeight: '900', color: balanceColor, lineHeight: '1', letterSpacing: '-1px' }}>
-                                    {Math.abs(balance).toLocaleString()} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span>
-                                </div>
-                                <div style={{
-                                    padding: '4px 10px',
-                                    borderRadius: '8px',
-                                    fontSize: '11px',
-                                    fontWeight: '800',
-                                    background: balance < 0 ? 'rgba(239, 68, 68, 0.1)' : balance > 0 ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))',
-                                    color: balanceColor,
-                                    border: `1px solid ${balance < 0 ? 'rgba(239, 68, 68, 0.3)' : balance > 0 ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-color, rgba(255,255,255,0.1))'}`,
-                                    textTransform: 'uppercase'
-                                }}>
-                                    {balance < 0 ? 'Borçluyuz (Açık)' : balance > 0 ? 'Alacaklıyız' : 'Kapalı (Dengeli)'}
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                                <div style={{ fontSize: '12px', color: '#888', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                    <span>Hacim:</span> <span style={{ fontWeight: 'bold', color: '#ccc' }}>{totalInvoiced.toLocaleString('tr-TR')} ₺</span>
-                                </div>
-                                {portfolioChecks > 0 && (
-                                    <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '600', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                        <span>⚠️</span> Bekleyen Evrak: {portfolioChecks.toLocaleString('tr-TR')} ₺
-                                    </div>
-                                )}
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
 
             {/* MAIN CONTENT AREA */}
-            <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-
+            <div className="max-w-[1400px] mx-auto w-full p-4 lg:p-10 flex flex-col gap-8">
                 {/* PREMIUM ACTION BAR */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-                    <button 
-                        onClick={() => setIsUploadModalOpen(true)}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(99, 102, 241, 0.05)', color: '#6366f1', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(99, 102, 241, 0.2)' }}
-                        className="hover:-translate-y-1 hover:bg-indigo-500/10 hover:border-indigo-500/40 cursor-pointer w-full"
-                    >
-                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🚀</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>AKILLI FATURA YÜKLE</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>UBL, XML veya PDF faturayı sisteme yükle</div>
-                        </div>
-                    </button>
-
-                    <button 
-                        onClick={() => setIsPurchaseModalOpen(true)}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(59, 130, 246, 0.05)', color: '#3b82f6', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(59, 130, 246, 0.2)' }}
-                        className="hover:-translate-y-1 hover:bg-blue-500/10 hover:border-blue-500/40 cursor-pointer w-full"
-                    >
-                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛒</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>MANUEL ALIŞ GİRİŞİ</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Gelen faturayı stok kalemi detaylarıyla manuel işle</div>
-                        </div>
-                    </button>
-                    
-                    <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&amount=${Math.abs(supplier.balance)}`}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(239, 68, 68, 0.02)', color: '#ef4444', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(239, 68, 68, 0.2)' }}
-                        className="hover:-translate-y-1 hover:bg-red-500/5 hover:border-red-500/40"
-                    >
-                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💸</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>ÖDEME YAP</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Tedarikçiye nakit, kart veya havale çıkışı yap</div>
-                        </div>
-                    </Link>
-                </div>
-
-                {/* Enterprise Level 10 Oval Tabs Navigation Container */}
+                {/* Tabs Navigation Container */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 mt-4 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
                     <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
                         {[
@@ -297,14 +241,8 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                 </div>
 
                 {/* CONTENT AREA */}
-                <div style={{
-                    background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))',
-                    borderRadius: '20px',
-                    border: '1px solid var(--border-color, rgba(255,255,255,0.05))',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
-                }}>
-                    <div style={{ overflowX: 'auto' }}>
+                <div className="w-full">
+                    
                         {(() => {
                             const currentList = activeTab === 'all' ? displayHistory : (supplier.checks || []);
                             const totalPages = Math.ceil(currentList.length / ITEMS_PER_PAGE);
@@ -313,21 +251,21 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                             if (activeTab === 'all') {
                                 return (
                                     <>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                                        <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4"><table className="w-full text-left border-collapse">
                                             <thead>
-                                                <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                                    <th style={{ padding: '20px' }}>TARİH & TÜR</th>
-                                                    <th style={{ padding: '20px' }}>AÇIKLAMA / REFERANS</th>
-                                                    <th style={{ padding: '20px', textAlign: 'right' }}>TUTAR</th>
-                                                    <th style={{ padding: '20px', textAlign: 'center' }}>İŞLEM</th>
+                                                <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
+                                                    <th className="px-5 py-4 font-bold whitespace-nowrap">TARİH & TÜR</th>
+                                                    <th className="px-5 py-4 font-bold whitespace-nowrap">AÇIKLAMA / REFERANS</th>
+                                                    <th className="px-5 py-4 font-bold text-right whitespace-nowrap">TUTAR</th>
+                                                    <th className="px-5 py-4 font-bold text-center whitespace-nowrap">İŞLEM</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                                 {paginatedList.map((item, idx) => (
-                                                    <tr key={idx} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.03))', transition: 'background 0.2s' }} className="hover:bg-white/5">
-                                                        <td style={{ padding: '20px' }}>
+                                                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group border-b border-slate-100 dark:border-white/5">
+                                                        <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                                             <div style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)', marginBottom: '4px' }}>{item.date}</div>
-                                                            <span style={{
+<span style={{
                                                                 fontSize: '10px',
                                                                 padding: '4px 8px',
                                                                 borderRadius: '6px',
@@ -339,34 +277,25 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                                                 {item.type.toUpperCase()}
                                                             </span>
                                                         </td>
-                                                        <td style={{ padding: '20px', fontSize: '14px', color: 'var(--text-main, #eee)' }}>
+                                                        <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                                             <div style={{ fontWeight: '600' }}>{item.desc}</div>
                                                             <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', marginTop: '4px' }}>Ref: {item.method}</div>
                                                         </td>
-                                                        <td style={{ padding: '20px', textAlign: 'right', fontWeight: '800', color: (item.amount < 0 && item.type !== 'Ödeme') ? '#ef4444' : '#10b981', fontSize: '16px' }}>
+                                                        <td className="px-5 py-3 align-middle text-right text-[14px] font-extrabold" style={{ color: (item.amount < 0 && item.type !== 'Ödeme') ? '#ef4444' : '#10b981' }}>
                                                             {item.amount.toLocaleString('tr-TR')} ₺
                                                         </td>
-                                                        <td style={{ padding: '20px', textAlign: 'center' }}>
+                                                        <td className="px-5 py-3 align-middle">
                                                             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                                                                 <button
                                                                     onClick={() => { setSelectedTransaction(item); setIsDetailModalOpen(true); }}
-                                                                    style={{ fontSize: '11px', padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', borderRadius: '8px', cursor: 'pointer', fontWeight: '700' }}
+                                                                    className="px-3 py-1.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:border-white/10 dark:hover:bg-slate-700 text-slate-700 dark:text-white rounded-[6px] text-[11px] font-bold transition-colors shadow-sm"
                                                                 >
                                                                     🔍 Detay
                                                                 </button>
                                                                 {(item.invoiceId || (item.type === 'Bekleyen Fatura' && item.id)) && (
                                                                     <button
                                                                         onClick={() => handleViewPDF(item.invoiceId || item.id)}
-                                                                        style={{
-                                                                            fontSize: '11px',
-                                                                            padding: '6px 12px',
-                                                                            background: 'rgba(59, 130, 246, 0.1)',
-                                                                            border: '1px solid rgba(59, 130, 246, 0.3)',
-                                                                            color: '#3b82f6',
-                                                                            borderRadius: '8px',
-                                                                            cursor: 'pointer',
-                                                                            fontWeight: '700'
-                                                                        }}
+                                                                        className="px-3 py-1.5 bg-blue-50 border border-blue-200 hover:bg-blue-100 dark:bg-blue-500/10 dark:border-blue-500/30 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-[6px] text-[11px] font-bold transition-colors shadow-sm"
                                                                     >
                                                                         📄 Fatura
                                                                     </button>
@@ -375,35 +304,34 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                                         </td>
                                                     </tr>
                                                 ))}
-                                                {paginatedList.length === 0 && (
-                                                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted, #888)' }}>Henüz bir işlem kaydı bulunmuyor.</td></tr>
-                                                )}
+                                                {paginatedList.length === 0 && (<tr><td colSpan={4} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Henüz bir işlem kaydı bulunmuyor.</td></tr>)}
                                             </tbody>
-                                        </table>
-                                        <div style={{ padding: '20px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                                            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-                                        </div>
+</table>
+</div>
+<div className="flex justify-center mt-4">
+<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+</div>
                                     </>
                                 );
                             } else {
                                 return (
                                     <>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                                        <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4"><table className="w-full text-left border-collapse">
                                             <thead>
-                                                <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                                    <th style={{ padding: '20px' }}>VADE VE BANKA</th>
-                                                    <th style={{ padding: '20px' }}>DURUM & TÜR</th>
+                                                <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
+                                                    <th className="px-5 py-4 font-bold whitespace-nowrap">VADE VE BANKA</th>
+                                                    <th className="px-5 py-4 font-bold whitespace-nowrap">DURUM & TÜR</th>
                                                     <th style={{ padding: '20px', textAlign: 'right' }}>TUTAR</th>
                                                     <th style={{ padding: '20px', textAlign: 'center' }}>İŞLEM</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                                 {paginatedList.length === 0 ? (
-                                                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted, #888)' }}>Kayıtlı evrak bulunmuyor.</td></tr>
+                                                    <tr><td colSpan={4} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Kayıtlı evrak bulunmuyor.</td></tr>
                                                 ) : (
                                                     paginatedList.map((c: any) => (
-                                                        <tr key={c.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.03))', transition: 'background 0.2s' }} className="hover:bg-white/5">
-                                                            <td style={{ padding: '20px' }}>
+                                                        <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group border-b border-slate-100 dark:border-white/5">
+                                                            <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                                                 <div style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)', marginBottom: '4px' }}>
                                                                     {new Date(c.dueDate).toLocaleDateString('tr-TR')}
                                                                 </div>
@@ -411,20 +339,20 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                                                     {c.bank} - {c.number}
                                                                 </div>
                                                             </td>
-                                                            <td style={{ padding: '20px' }}>
+                                                            <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                                                 <div style={{ fontWeight: '600', color: 'var(--text-main, #fff)', marginBottom: '4px' }}>{c.type}</div>
                                                                 <span style={{ padding: '4px 8px', background: 'var(--bg-panel, rgba(255,255,255,0.1))', borderRadius: '6px', fontSize: '10px', fontWeight: '700', color: 'var(--text-muted, #ccc)' }}>
                                                                     {c.status}
                                                                 </span>
                                                             </td>
-                                                            <td style={{ padding: '20px', textAlign: 'right', fontWeight: '800', color: '#3b82f6', fontSize: '16px' }}>
+                                                            <td className="px-5 py-3 align-middle text-right text-[14px] font-extrabold text-blue-600 dark:text-blue-400">
                                                                 {Number(c.amount).toLocaleString('tr-TR')} ₺
                                                             </td>
-                                                            <td style={{ padding: '20px', textAlign: 'center' }}>
+                                                            <td className="px-5 py-3 align-middle">
                                                                 {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
                                                                     <button
                                                                         onClick={() => { setActiveCheck(c); setTargetKasaId(String(kasalar[0]?.id || '')); setShowCheckCollectModal(true); }}
-                                                                        style={{ fontSize: '11px', padding: '8px 16px', background: '#3b82f6', border: 'none', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: '800', boxShadow: '0 4px 10px rgba(59, 130, 246, 0.2)' }}
+                                                                        className="px-4 h-[32px] bg-blue-600 hover:bg-blue-700 text-white rounded-[6px] font-bold text-[11px] transition-colors shadow-sm"
                                                                     >
                                                                         {c.type.includes('Alınan') ? 'Tahsil Et' : 'Öde'}
                                                                     </button>
@@ -434,20 +362,18 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                                     ))
                                                 )}
                                             </tbody>
-                                        </table>
-                                        <div style={{ padding: '20px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                                            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-                                        </div>
+</table>
+</div>
+<div className="flex justify-center mt-4">
+<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+</div>
                                     </>
                                 );
                             }
                         })()}
                     </div>
-                </div>
-
-            </div>
-
-            {/* MODALS */}
+</div>
+{/* MODALS */}
             <SupplierPurchaseModal
                 isOpen={isPurchaseModalOpen}
                 onClose={() => setIsPurchaseModalOpen(false)}
@@ -481,31 +407,33 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
 
             {/* CHECK COLLECT MODAL */}
             {showCheckCollectModal && activeCheck && (
-                <div style={{
-                    position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 10000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)'
-                }}>
-                    <div style={{ background: 'var(--bg-card, #1e293b)', padding: '32px', borderRadius: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 50px rgba(0,0,0,0.5)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-main, #fff)', fontWeight: '800' }}>
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[24px] shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+                        
+                        <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
+                            <h3 className="text-[16px] font-black text-slate-800 dark:text-white flex items-center gap-2">
                                 {activeCheck.type.includes('Alınan') ? '📥 Tahsilat Onayı' : '📤 Ödeme Onayı'}
                             </h3>
-                            <button onClick={() => setShowCheckCollectModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+                            <button onClick={() => setShowCheckCollectModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 transition-colors">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <div style={{ padding: '24px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', textAlign: 'center' }}>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: '700', letterSpacing: '1px' }}>{activeCheck.type}</div>
-                                <div style={{ fontSize: '32px', fontWeight: '900', color: 'var(--text-main, #fff)' }}>{Number(activeCheck.amount).toLocaleString('tr-TR')} ₺</div>
-                                <div style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', marginTop: '8px', fontWeight: '600' }}>{activeCheck.bank} - {activeCheck.number}</div>
+                        <div className="p-6 flex flex-col gap-6">
+                            <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[16px] border border-slate-100 dark:border-white/5 text-center flex flex-col items-center justify-center">
+                                <div className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">{activeCheck.type}</div>
+                                <div className="text-[32px] font-black text-slate-800 dark:text-white mb-1">{Number(activeCheck.amount).toLocaleString('tr-TR')} ₺</div>
+                                <div className="text-[13px] font-semibold text-slate-500">{activeCheck.bank} - {activeCheck.number}</div>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', fontWeight: '600', marginLeft: '4px' }}>{activeCheck.type.includes('Alınan') ? 'Tahsilatın Aktarılacağı' : 'Ödemenin Çıkacağı'} Hesap</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[12px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1">
+                                    {activeCheck.type.includes('Alınan') ? 'Tahsilatın Aktarılacağı' : 'Ödemenin Çıkacağı'} Hesap
+                                </label>
                                 <select
                                     value={targetKasaId}
                                     onChange={(e) => setTargetKasaId(e.target.value)}
-                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '15px', outline: 'none', fontWeight: '600' }}
+                                    className="w-full h-[48px] px-4 rounded-[12px] bg-white dark:bg-[#0f172a] border-2 border-slate-200 dark:border-white/10 focus:border-blue-500 dark:focus:border-blue-500 outline-none text-[14px] font-bold text-slate-700 dark:text-white transition-colors appearance-none"
                                 >
                                     <option value="">Seçiniz...</option>
                                     {kasalar.filter((k: any) => k.name !== 'ÇEK / SENET PORTFÖYÜ').map((k: any) => (
@@ -513,49 +441,94 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                     ))}
                                 </select>
                             </div>
+                        </div>
 
+                        <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+                            <button onClick={() => setShowCheckCollectModal(false)} className="px-5 h-[42px] rounded-[10px] text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+                                İptal
+                            </button>
                             <button
                                 onClick={handleExecuteCheckCollect}
                                 disabled={isProcessingCollection || !targetKasaId}
-                                style={{
-                                    width: '100%', padding: '16px', borderRadius: '14px', background: '#3b82f6', color: '#fff',
-                                    border: 'none', fontWeight: '800', fontSize: '15px', cursor: 'pointer',
-                                    opacity: (isProcessingCollection || !targetKasaId) ? 0.5 : 1, transition: '0.2s',
-                                    boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', marginTop: '8px'
-                                }}
+                                className="px-6 h-[42px] rounded-[10px] text-[13px] font-black text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                             >
                                 {isProcessingCollection ? 'İŞLENİYOR...' : 'İŞLEMİ ONAYLA'}
                             </button>
                         </div>
+
                     </div>
                 </div>
             )}
 
             {/* ADJUSTMENT MODAL */}
             {isAdjustModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)' }}>
-                    <div style={{ background: 'var(--bg-card, #1e293b)', padding: '32px', borderRadius: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 50px rgba(0,0,0,0.5)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>⚖️ Bakiye Düzeltme</h3>
-                            <button onClick={() => setIsAdjustModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', lineHeight: 1 }}>×</button>
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[24px] shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+                        
+                        <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
+                            <h3 className="text-[16px] font-black text-slate-800 dark:text-white flex items-center gap-2">
+                                ⚖️ Bakiye Düzeltme
+                            </h3>
+                            <button onClick={() => setIsAdjustModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 transition-colors">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <div style={{ display: 'flex', gap: '12px' }}>
-                                <button onClick={() => setAdjustData({ ...adjustData, type: 'DEBT' })} style={{ flex: 1, padding: '12px', background: adjustData.type === 'DEBT' ? 'rgba(239, 68, 68, 0.1)' : 'var(--bg-panel, rgba(255,255,255,0.05))', border: adjustData.type === 'DEBT' ? '2px solid #ef4444' : '2px solid transparent', color: adjustData.type === 'DEBT' ? '#ef4444' : 'var(--text-muted, #888)', borderRadius: '12px', fontWeight: '800', transition: 'all 0.2s' }}>BORÇLANDIR 🔴</button>
-                                <button onClick={() => setAdjustData({ ...adjustData, type: 'CREDIT' })} style={{ flex: 1, padding: '12px', background: adjustData.type === 'CREDIT' ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-panel, rgba(255,255,255,0.05))', border: adjustData.type === 'CREDIT' ? '2px solid #10b981' : '2px solid transparent', color: adjustData.type === 'CREDIT' ? '#10b981' : 'var(--text-muted, #888)', borderRadius: '12px', fontWeight: '800', transition: 'all 0.2s' }}>ALACAKLANDIR 🟢</button>
+
+                        <div className="p-6 flex flex-col gap-6">
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={() => setAdjustData({ ...adjustData, type: 'DEBT' })} 
+                                    className={`flex-1 h-[48px] rounded-[12px] font-black text-[12px] transition-all ${adjustData.type === 'DEBT' ? 'bg-red-50 text-red-600 border-2 border-red-500 dark:bg-red-500/10 dark:text-red-400' : 'bg-slate-50 text-slate-500 border-2 border-transparent hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400'}`}
+                                >
+                                    BORÇLANDIR 🔴
+                                </button>
+                                <button 
+                                    onClick={() => setAdjustData({ ...adjustData, type: 'CREDIT' })} 
+                                    className={`flex-1 h-[48px] rounded-[12px] font-black text-[12px] transition-all ${adjustData.type === 'CREDIT' ? 'bg-emerald-50 text-emerald-600 border-2 border-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-50 text-slate-500 border-2 border-transparent hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400'}`}
+                                >
+                                    ALACAKLANDIR 🟢
+                                </button>
                             </div>
-                            <div>
-                                <label style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', fontWeight: '600', marginLeft: '4px' }}>TUTAR (₺)</label>
-                                <input type="number" placeholder="0.00" value={adjustData.amount} onChange={e => setAdjustData({ ...adjustData, amount: e.target.value })} style={{ width: '100%', padding: '16px', background: 'var(--bg-panel, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '12px', color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: 'bold', outline: 'none', marginTop: '8px' }} />
-                                <p style={{ fontSize: '12px', color: 'var(--text-muted, #888)', marginTop: '8px', marginLeft: '4px', fontWeight: '500' }}>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[12px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1">
+                                    TUTAR (₺)
+                                </label>
+                                <input 
+                                    type="number" 
+                                    placeholder="0.00" 
+                                    value={adjustData.amount} 
+                                    onChange={e => setAdjustData({ ...adjustData, amount: e.target.value })} 
+                                    className="w-full h-[54px] px-4 rounded-[12px] bg-white dark:bg-[#0f172a] border-2 border-slate-200 dark:border-white/10 focus:border-blue-500 dark:focus:border-blue-500 outline-none text-[20px] font-black text-slate-800 dark:text-white transition-colors"
+                                />
+                                <p className="text-[11px] font-bold text-slate-500 ml-1 mt-1">
                                     {adjustData.type === 'DEBT' ? '🔴 Girdiğiniz miktar borcumuza eklenecektir.' : '🟢 Girdiğiniz miktar borcumuzdan düşülecektir.'}
                                 </p>
                             </div>
-                            <div>
-                                <label style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', fontWeight: '600', marginLeft: '4px' }}>AÇIKLAMA / NOT</label>
-                                <textarea placeholder="Düzeltme sebebi..." value={adjustData.description} onChange={e => setAdjustData({ ...adjustData, description: e.target.value })} style={{ width: '100%', padding: '16px', background: 'var(--bg-panel, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '12px', color: 'var(--text-main, #fff)', minHeight: '100px', outline: 'none', marginTop: '8px', fontSize: '14px', fontFamily: 'inherit' }} />
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[12px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1">
+                                    AÇIKLAMA / NOT
+                                </label>
+                                <textarea 
+                                    placeholder="Düzeltme sebebi..." 
+                                    value={adjustData.description} 
+                                    onChange={e => setAdjustData({ ...adjustData, description: e.target.value })} 
+                                    className="w-full min-h-[100px] p-4 rounded-[12px] bg-white dark:bg-[#0f172a] border-2 border-slate-200 dark:border-white/10 focus:border-blue-500 dark:focus:border-blue-500 outline-none text-[14px] font-semibold text-slate-700 dark:text-white transition-colors resize-y custom-scroll"
+                                />
                             </div>
-                            <button onClick={handleAdjustment} style={{ padding: '16px', background: adjustData.type === 'DEBT' ? '#ef4444' : '#10b981', color: 'white', fontWeight: '800', borderRadius: '14px', border: 'none', cursor: 'pointer', fontSize: '15px', marginTop: '8px', boxShadow: `0 4px 15px ${adjustData.type === 'DEBT' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)'}` }}>BAKİYEYİ GÜNCELLE</button>
+                        </div>
+
+                        <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+                            <button onClick={() => setIsAdjustModalOpen(false)} className="px-5 h-[42px] rounded-[10px] text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+                                İptal
+                            </button>
+                            <button 
+                                onClick={handleAdjustment} 
+                                className={`px-6 h-[42px] rounded-[10px] text-[13px] font-black text-white transition-colors shadow-sm ${adjustData.type === 'DEBT' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                            >
+                                BAKİYEYİ GÜNCELLE
+                            </button>
                         </div>
                     </div>
                 </div>
