@@ -477,31 +477,25 @@ const ProfitabilityHeatmapContent = () => {
 const SmartPricingContent = () => {
     const [loading, setLoading] = useState(true);
     const [recommendations, setRecommendations] = useState<any[]>([]);
+    const [summary, setSummary] = useState<any>({ activeRules: 0, marginProtected: 0, criticalCount: 0 });
     const [isAutoPilot, setIsAutoPilot] = useState(false);
 
     useEffect(() => {
-        // Simulation Data
-        const mockData = [
-            {
-                productId: '1', productName: 'Castrol Edge 5W-30 4L', marketplace: 'Trendyol',
-                currentPrice: 1250.00, recommendedPrice: 1340.50, change: 7.2,
-                targetMargin: 15, currentMargin: 8.4, reason: 'Commission Spike', status: 'CRITICAL'
-            },
-            {
-                productId: '2', productName: 'Mobil 1 ESP 5W-30 5L', marketplace: 'Hepsiburada',
-                currentPrice: 1850.00, recommendedPrice: 1920.00, change: 3.8,
-                targetMargin: 12, currentMargin: 10.1, reason: 'FIFO Cost Increase', status: 'WARNING'
-            },
-            {
-                productId: '3', productName: 'Shell Helix Ultra 0W-40', marketplace: 'Trendyol',
-                currentPrice: 1450.00, recommendedPrice: 1410.00, change: -2.7,
-                targetMargin: 18, currentMargin: 21.5, reason: 'Market Optimization', status: 'STABLE'
+        const fetchPricing = async () => {
+            try {
+                const res = await fetch('/api/fintech/dashboard/pricing');
+                const json = await res.json();
+                if (json.success) {
+                    setRecommendations(json.data);
+                    if (json.summary) setSummary(json.summary);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
             }
-        ];
-        setTimeout(() => {
-            setRecommendations(mockData);
-            setLoading(false);
-        }, 1000);
+        };
+        fetchPricing();
     }, []);
 
     if (loading) return <div className="p-12 animate-pulse h-64 bg-slate-50 dark:bg-white/5 rounded-2xl" />;
@@ -535,26 +529,26 @@ const SmartPricingContent = () => {
                 <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 border-orange-500/20">
                     <IconActivity className="w-6 h-6 text-orange-600 dark:text-orange-400 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Rules</h4>
-                    <p className="text-2xl font-black text-slate-900 dark:text-white">42</p>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white">{summary.activeRules}</p>
                     <p className="text-[10px] text-gray-500 mt-2">Across 3 Marketplaces</p>
                 </div>
                 <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20">
                     <IconShield className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Margin Protected</h4>
-                    <p className="text-2xl font-black text-slate-900 dark:text-white">12,450 ₺</p>
-                    <p className="text-[10px] text-indigo-600 dark:text-indigo-400 mt-2">+4.2% since yesterday</p>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white">{summary.marginProtected.toLocaleString('tr-TR')} ₺</p>
+                    <p className="text-[10px] text-indigo-600 dark:text-indigo-400 mt-2">Dynamic Protection</p>
                 </div>
                 <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 border-rose-500/20">
                     <IconAlert className="w-6 h-6 text-rose-600 dark:text-rose-400 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loss Prevention</h4>
-                    <p className="text-2xl font-black text-rose-600 dark:text-rose-400">8 Critical</p>
+                    <p className="text-2xl font-black text-rose-600 dark:text-rose-400">{summary.criticalCount} Critical</p>
                     <p className="text-[10px] text-gray-500 mt-2">Prices below cost!</p>
                 </div>
                 <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 bg-gradient-to-br from-orange-900/10 to-transparent">
                     <IconRefresh className="w-6 h-6 text-orange-600 dark:text-orange-400 mb-4 animate-spin-slow" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Next Re-calc</h4>
-                    <p className="text-2xl font-black text-slate-900 dark:text-white">14:02</p>
-                    <p className="text-[10px] text-gray-500 mt-2">Every 15 minutes</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white">Gerçek Zamanlı</p>
+                    <p className="text-[10px] text-gray-500 mt-2">Marketplace API</p>
                 </div>
             </div>
 
@@ -682,7 +676,7 @@ export default function FintechControlTower() {
     );
 
     return (
-        <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-24 bg-slate-50 min-h-screen pb-16 w-full font-sans dark:bg-[#0f172a]">
+        <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40 bg-slate-50 min-h-screen w-full font-sans dark:bg-[#0f172a]">
 <EnterpriseSectionHeader 
                 title="FİNANSAL KONTROL KULESİ" 
                 subtitle="Otonom Finansal Komuta Merkezi • Açık Bankacılık Senkronizasyon Konsolu"
