@@ -37,29 +37,76 @@ export default function TransferTabContent({
     });
     const [viewMode, setViewMode] = useState<'cart' | 'products'>('products');
 
+    // Senkronizasyon ve doğrulama: Kaynak ve Hedef depo aynı olamaz, geçerli bir depo olmalı.
+    useEffect(() => {
+        if (!branches || branches.length === 0) return;
+        
+        setTransferData(prev => {
+            let newFrom = prev.from;
+            let newTo = prev.to;
+            
+            // source geçerli degilse ilkini al
+            if (!branches.includes(newFrom)) {
+                newFrom = branches[0];
+            }
+            // target gecerli degilse veya source ile ayniysa
+            if (!branches.includes(newTo) || newFrom === newTo) {
+                newTo = branches.find(b => b !== newFrom) || '';
+            }
+            
+            if (prev.from !== newFrom || prev.to !== newTo) {
+                return { from: newFrom, to: newTo };
+            }
+            return prev;
+        });
+    }, [branches, transferData.from]);
+
     const handleStartShipment = async () => {
         if (transferCart.length === 0) return;
 
         let successCount = 0;
+        let lastError = '';
         for (const item of transferCart) {
-            const ok = await startStockTransfer({
-                productId: String(item.id),
-                productName: item.name,
-                productCode: item.code,
-                qty: item.qty,
-                fromBranch: transferData.from,
-                toBranch: transferData.to,
-                requestedBy: currentUser?.name || 'Sistem',
-                notes: 'Hızlı Transfer'
-            });
-            if (ok) successCount++;
+            try {
+                const res = await fetch('/api/inventory/transfer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId: String(item.id),
+                        productName: item.name,
+                        productCode: item.code,
+                        qty: item.qty,
+                        fromBranch: transferData.from,
+                        toBranch: transferData.to,
+                        requestedBy: currentUser?.name || 'Sistem',
+                        notes: 'Hızlı Transfer'
+                    })
+                });
+                const responseText = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch(e) {
+                    console.error("Non-JSON API Response:", responseText);
+                    lastError = "Sunucudan geçersiz bir yanıt döndü.";
+                    continue;
+                }
+                if (data.success) {
+                    successCount++;
+                } else {
+                    lastError = data.error || 'Bilinmeyen hata';
+                }
+            } catch (e: any) {
+                lastError = e.message;
+            }
         }
 
         if (successCount > 0) {
-            showSuccess('Sevkiyat Başlatıldı', `${successCount} kalem ürün yola çıktı.`);
+            showSuccess('Sevkiyat Başlatıldı', `${successCount} kalem ürün yola çıktı.` + (lastError ? `\n(Bazı ürünler reddedildi: ${lastError})` : ''));
+            refreshStockTransfers();
             setTransferCart([]);
         } else {
-            showError('Hata', 'Transfer başlatılamadı.');
+            showError('Hata', `Transfer başlatılamadı:\n${lastError}`);
         }
     };
 
@@ -209,6 +256,7 @@ export default function TransferTabContent({
                             value={transferData.to}
                             onChange={(e) => setTransferData({ ...transferData, to: e.target.value })}
                         >
+                            {!transferData.to && <option value="">Seçiniz</option>}
                             {branches.filter(b => b !== transferData.from).map(b => <option key={b} value={b} className="text-black">{b}</option>)}
                         </select>
                     </div>

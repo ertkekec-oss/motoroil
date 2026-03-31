@@ -39,13 +39,23 @@ export async function POST(request: Request) {
         const quantity = parseInt(qty);
 
         const result = await prisma.$transaction(async (tx) => {
+            // 0. Get Product
+            const product = await tx.product.findUnique({ where: { id: productId } });
+            if (!product) throw new Error("Ürün bulunamadı.");
+
             // 1. Check source stock
-            const sourceStock = await tx.stock.findUnique({
+            let sourceStock = await tx.stock.findUnique({
                 where: { productId_branch: { productId, branch: fromBranch } }
             });
 
-            if (!sourceStock || sourceStock.quantity < quantity) {
-                throw new Error(`Kaynak şubede (${fromBranch}) yeterli stok yok. Mevcut: ${sourceStock?.quantity || 0}`);
+            // If no stock record exists but this is the default branch of the product, proxy the product's main stock.
+            let availableQty = sourceStock ? sourceStock.quantity : 0;
+            if (!sourceStock && product.branch === fromBranch) {
+                availableQty = product.stock || 0;
+            }
+
+            if (availableQty < quantity) {
+                throw new Error(`Kaynak şubede (${fromBranch}) yeterli stok yok. Mevcut: ${availableQty}`);
             }
 
             // 2. Create Transfer Record
@@ -66,15 +76,26 @@ export async function POST(request: Request) {
             });
 
             // 3. Decrement Source Stock
-            await tx.stock.update({
-                where: { productId_branch: { productId, branch: fromBranch } },
-                data: { quantity: { decrement: quantity } }
-            });
+            // If the stock record doesn't exist, we MUST create it with the decremented value relative to product.stock, 
+            // OR simply rely on upsert.
+            if (sourceStock) {
+                await tx.stock.update({
+                    where: { productId_branch: { productId, branch: fromBranch } },
+                    data: { quantity: { decrement: quantity } }
+                });
+            } else if (product.branch === fromBranch) {
+                // If no stock record exists but we rely on product.stock, we should instantiate the stock record now for consistency.
+                await tx.stock.create({
+                    data: {
+                        productId,
+                        branch: fromBranch,
+                        quantity: availableQty - quantity
+                    }
+                });
+            }
 
             // 4. Update Product Stock (If Product record represents this branch or sum)
-            // We follow the logic from purchasing/approve: update both Product and Stock
-            const product = await tx.product.findUnique({ where: { id: productId } });
-            if (product && product.branch === fromBranch) {
+            if (product.branch === fromBranch) {
                 await tx.product.update({
                     where: { id: productId },
                     data: { stock: { decrement: quantity } }
@@ -120,6 +141,8 @@ export async function PUT(request: Request) {
         if (transfer.status !== 'IN_TRANSIT') return NextResponse.json({ error: 'Bu transfer zaten işlenmiş' }, { status: 400 });
 
         const result = await prisma.$transaction(async (tx) => {
+            const product = await tx.product.findUnique({ where: { id: transfer.productId } });
+
             if (action === 'RECEIVE') {
                 // 1. Update Transfer Status
                 await tx.stockTransfer.update({
@@ -139,7 +162,6 @@ export async function PUT(request: Request) {
                 });
 
                 // 3. Update Product Stock if target is the product's main branch
-                const product = await tx.product.findUnique({ where: { id: transfer.productId } });
                 if (product && product.branch === transfer.toBranch) {
                     await tx.product.update({
                         where: { id: transfer.productId },
@@ -168,13 +190,13 @@ export async function PUT(request: Request) {
                 });
 
                 // 2. Return Stock to Source
-                await tx.stock.update({
+                await tx.stock.upsert({
                     where: { productId_branch: { productId: transfer.productId, branch: transfer.fromBranch } },
-                    data: { quantity: { increment: transfer.qty } }
+                    update: { quantity: { increment: transfer.qty } },
+                    create: { productId: transfer.productId, branch: transfer.fromBranch, quantity: transfer.qty }
                 });
 
                 // 3. Update Product Stock if source was main
-                const product = await tx.product.findUnique({ where: { id: transfer.productId } });
                 if (product && product.branch === transfer.fromBranch) {
                     await tx.product.update({
                         where: { id: transfer.productId },

@@ -134,22 +134,15 @@ export default function ManufacturingPage() {
         });
     };
 
-    const modalClass = isLight ? "bg-white border border-slate-200 shadow-2xl" : "bg-slate-900 border border-slate-800 shadow-2xl";
-    const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
-    const textValueClass = isLight ? "text-slate-900" : "text-white";
-    const inputClass = isLight
-        ? "w-full h-[40px] px-3 rounded-[16px] text-[13px] font-medium border border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all"
-        : "w-full h-[40px] px-3 rounded-[16px] text-[13px] font-medium border border-slate-800 bg-slate-900/50 text-slate-200 focus:border-blue-500 outline-none transition-all";
-
     return (
-        <div data-pos-theme={theme} className={`w-full h-full min-h-[100vh] px-8 py-8 transition-colors duration-300 font-sans flex flex-col ${isLight ? "bg-[#FAFAFA]" : ""}`}>
+        <div data-pos-theme={theme} className="w-full h-full min-h-[100vh] px-6 py-6 transition-colors duration-300 font-sans flex flex-col relative">
             {/* ÜST BAŞLIK & YENİ ÜRETİM EMRİ ÇAĞRISI */}
-            <div className="flex justify-between items-end mb-6 shrink-0">
-                <div>
-                    <h1 className={`text-[24px] font-[900] tracking-tight ${textValueClass}`}>
+            <div className="flex justify-between items-end mb-8 shrink-0 relative z-30">
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <h1 className="text-[26px] font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                         Üretim Kontrol Merkezi
                     </h1>
-                    <p className={`text-[13px] mt-1.5 font-bold uppercase tracking-wider ${textLabelClass}`}>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 font-bold tracking-wide mt-1 uppercase">
                         Gelişmiş MRP Panosu: Reçete (BOM), Kanban ve Sipariş Karşılama
                     </p>
                 </div>
@@ -158,9 +151,9 @@ export default function ManufacturingPage() {
                     {canManage && activeTab === 'KANBAN' && (
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className={`h-[40px] px-5 flex items-center justify-center gap-2 rounded-full text-[13px] font-bold tracking-wide transition-all shadow-sm ${isLight ? "bg-slate-800 text-white hover:bg-black" : "bg-blue-600 text-white hover:bg-blue-500"}`}
+                            className="h-[46px] px-8 bg-indigo-600 hover:bg-indigo-700 !text-white font-black rounded-full text-[13px] uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/20 active:scale-[0.98] flex items-center justify-center gap-2 whitespace-nowrap border border-indigo-600"
                         >
-                            <Play className="w-4 h-4" />
+                            <Play className="w-4 h-4 fill-current" />
                             Yeni Üretim Başlat
                         </button>
                     )}
@@ -168,8 +161,8 @@ export default function ManufacturingPage() {
             </div>
 
             {/* SEKMELER */}
-            <div className={`flex flex-col md:flex-row justify-between items-center gap-4 p-2 rounded-[20px] mb-6 border shadow-sm relative z-10 w-full ${isLight ? "bg-white border-slate-200" : "bg-[#0f172a] border-white/5"}`}>
-                <div className={`flex p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border custom-scroll ${isLight ? "bg-slate-100 border-slate-200/50" : "bg-[#1e293b]/50 border-white/5"}`}>
+            <div className={`flex flex-col xl:flex-row justify-between items-center gap-4 p-2 rounded-[24px] mb-6 shadow-sm relative z-10 w-full border ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-slate-800/80'}`}>
+                <div className={`flex p-1.5 rounded-full w-full xl:w-auto overflow-x-auto shadow-inner border custom-scroll ${theme === 'light' ? 'bg-slate-100 border-slate-200/50' : 'bg-[#1e293b]/50 border-white/5'}`}>
                     {[
                         { id: 'KANBAN', label: 'ÜRETİM EKRANI (KANBAN)', icon: Box },
                         { id: 'BOM', label: 'ÜRÜN REÇETELERİ (BOM)', icon: Layers }
@@ -180,9 +173,9 @@ export default function ManufacturingPage() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`flex-1 min-w-[200px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${isActive ? (isLight ? 'bg-white text-indigo-600 shadow-sm border-slate-200' : 'bg-indigo-500/20 text-indigo-400 shadow-sm border-indigo-500/30') : (isLight ? 'text-slate-500 hover:text-slate-700 border-transparent' : 'text-slate-400 hover:text-slate-300 border-transparent')}`}
+                                className={`flex-1 min-w-[220px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${isActive ? (theme === 'light' ? 'bg-white text-indigo-600 shadow-sm border-slate-200' : 'bg-indigo-500/20 text-indigo-400 shadow-sm border-indigo-500/30') : (theme === 'light' ? 'text-slate-500 hover:text-slate-700 border-transparent' : 'text-slate-400 hover:text-slate-300 border-transparent')}`}
                             >
-                                <Icon className="w-3.5 h-3.5" />
+                                <Icon className="w-4 h-4" />
                                 {tab.label}
                             </button>
                         );
@@ -192,9 +185,12 @@ export default function ManufacturingPage() {
 
             {/* İçerik */}
             {isLoading ? (
-                <div className="flex-1 flex items-center justify-center py-20 text-[14px] font-bold uppercase tracking-wider text-slate-400">Yükleniyor...</div>
+                <div className="flex-1 flex flex-col items-center justify-center py-20 animate-in fade-in duration-500">
+                    <Factory className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-4 animate-pulse" />
+                    <div className="text-[12px] font-black uppercase tracking-widest text-slate-400">Veriler Yükleniyor...</div>
+                </div>
             ) : (
-                <div className="flex-1 min-h-0 relative">
+                <div className="flex-1 min-h-0 relative animate-in fade-in duration-500">
                     {activeTab === "KANBAN" ? (
                         <KanbanBoard orders={orders} handleUpdateStatus={handleUpdateStatus} setSelectedOrder={setSelectedOrder} />
                     ) : (
@@ -203,35 +199,46 @@ export default function ManufacturingPage() {
                 </div>
             )}
 
-            {/* YENİ ÜRETİM EMRİ MODALI (SAYFAMIZIN "AKILLI CHECK" BÖLÜMÜNÜ İÇERİR) */}
+            {/* YENİ ÜRETİM EMRİ MODALI */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className={`w-[600px] max-w-full rounded-[32px]} animate-in zoom-in-95 duration-200`}>
-                        <div className={`flex justify-between items-center px-8 py-5 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
-                            <h2 className={`text-[18px] font-bold flex items-center gap-2 ${textValueClass}`}>
-                                <Factory className="w-5 h-5 text-indigo-500" />
-                                <span className={isLight ? "text-indigo-900" : "text-indigo-100"}>Pre-flight: Üretim Kontrolü</span>
-                            </h2>
-                            <button onClick={() => setIsModalOpen(false)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-[#0f172a] w-full max-w-2xl rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-8 zoom-in-95 duration-500">
+                        <div className="flex justify-between items-start px-8 py-6 border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-[#0f172a] relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                            <div className="relative z-10">
+                                <h2 className="text-[20px] font-black text-slate-900 dark:text-white flex items-center gap-2 mb-1 tracking-tight">
+                                    <Factory className="w-5 h-5 text-indigo-500" />
+                                    <span>Pre-flight: Üretim Kontrolü</span>
+                                </h2>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)] animate-pulse"></span>
+                                    <p className="text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest">Reçete bazlı stok rezervasyonu</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400 relative z-10 border border-slate-200 dark:border-slate-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
 
-                        <div className="p-8 overflow-y-auto custom-scroll flex flex-col gap-6">
-                            <div className={`p-4 rounded-[20px] border flex gap-4 ${isLight ? "bg-indigo-50/50 border-indigo-100" : "bg-indigo-900/10 border-indigo-900/30"}`}>
-                                <AlertCircle className={`w-6 h-6 shrink-0 mt-0.5 ${isLight ? "text-indigo-600" : "text-indigo-400"}`} />
+                        <div className="p-8 overflow-y-auto custom-scroll flex flex-col gap-6 bg-slate-50/50 dark:bg-[#0f172a]/50">
+                            <div className="p-5 rounded-[24px] border bg-indigo-50/50 dark:bg-indigo-500/10 border-indigo-100 dark:border-indigo-500/20 flex gap-4">
+                                <AlertCircle className="w-6 h-6 shrink-0 mt-0.5 text-indigo-600 dark:text-indigo-400" />
                                 <div>
-                                    <h4 className={`text-[14px] font-[900] tracking-wider uppercase ${isLight ? "text-indigo-800" : "text-indigo-300"}`}>BOM & Fire Kontrolü Çalışacak</h4>
-                                    <p className={`text-[12px] font-medium mt-1 ${isLight ? "text-indigo-600/80" : "text-indigo-400/80"}`}>
+                                    <h4 className="text-[13px] font-black tracking-widest uppercase text-indigo-800 dark:text-indigo-300 mb-1">BOM & Fire Kontrolü Çalışacak</h4>
+                                    <p className="text-[12px] font-bold text-indigo-600/80 dark:text-indigo-400/80 leading-relaxed">
                                         Seçilen reçete katsayılarına göre <b>tahmini hammadde ihtiyacı</b> hesaplanacaktır. Hammaddeler stoka rezerve edilerek "Planlandı" aşamasına dahil edilir.
                                     </p>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className={`block text-[11px] font-bold uppercase tracking-wider mb-2 ${textLabelClass}`}>Reçete (BOM) <span className="text-red-500">*</span></label>
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[11px] font-black uppercase tracking-widest px-1 text-slate-500 dark:text-slate-400">Reçete (BOM) <span className="text-red-500">*</span></label>
                                 <select
                                     value={newOrder.bomId}
                                     onChange={e => setNewOrder({ ...newOrder, bomId: e.target.value })}
-                                    className={`${inputClass} !h-[48px]`}
+                                    className="w-full bg-white dark:bg-[#1e293b] p-3.5 text-[13px] font-bold text-slate-900 dark:text-white rounded-[16px] border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors cursor-pointer shadow-sm"
                                 >
                                     <option value="">Kayıtlı reçetelerden seçin...</option>
                                     {boms.map(bom => (
@@ -240,28 +247,28 @@ export default function ManufacturingPage() {
                                 </select>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className={`block text-[11px] font-bold uppercase tracking-wider mb-2 ${textLabelClass}`}>Üretilecek Miktar <span className="text-red-500">*</span></label>
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[11px] font-black uppercase tracking-widest px-1 text-slate-500 dark:text-slate-400">Üretilecek Miktar <span className="text-red-500">*</span></label>
                                     <input
                                         type="number"
                                         min="1"
-                                        value={newOrder.plannedQuantity}
+                                        value={newOrder.plannedQuantity || ''}
                                         onChange={e => setNewOrder({ ...newOrder, plannedQuantity: parseInt(e.target.value) || 1 })}
-                                        className={`${inputClass} !h-[48px]`}
+                                        className="w-full bg-white dark:bg-[#1e293b] py-3.5 px-4 text-[16px] font-black text-slate-900 dark:text-white rounded-[16px] border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors shadow-inner"
                                     />
                                     {newOrder.bomId && (
-                                        <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-emerald-500">
+                                        <div className="mt-1 ml-1 text-[10px] font-black uppercase tracking-widest text-emerald-500">
                                             Miktar * BOM Formülü = Rezerve
                                         </div>
                                     )}
                                 </div>
-                                <div>
-                                    <label className={`block text-[11px] font-bold uppercase tracking-wider mb-2 ${textLabelClass}`}>Bağlı Şube / Atölye <span className="text-red-500">*</span></label>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[11px] font-black uppercase tracking-widest px-1 text-slate-500 dark:text-slate-400">Bağlı Şube / Atölye <span className="text-red-500">*</span></label>
                                     <select
                                         value={newOrder.branch}
                                         onChange={e => setNewOrder({ ...newOrder, branch: e.target.value })}
-                                        className={`${inputClass} !h-[48px]`}
+                                        className="w-full bg-white dark:bg-[#1e293b] p-3.5 text-[13px] font-bold text-slate-900 dark:text-white rounded-[16px] border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors cursor-pointer shadow-sm"
                                     >
                                         {branches.map(b => (
                                             <option key={b.name} value={b.name}>{b.name}</option>
@@ -270,70 +277,85 @@ export default function ManufacturingPage() {
                                 </div>
                             </div>
 
-                            <div>
-                                <label className={`block text-[11px] font-bold uppercase tracking-wider mb-2 ${textLabelClass}`}>Atölye Notları</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[11px] font-black uppercase tracking-widest px-1 text-slate-500 dark:text-slate-400">Atölye Notları</label>
                                 <textarea
                                     value={newOrder.notes}
                                     onChange={e => setNewOrder({ ...newOrder, notes: e.target.value })}
-                                    className={`${inputClass} min-h-[100px] py-3 resize-none`}
+                                    className="w-full bg-white dark:bg-[#1e293b] p-4 text-[13px] font-bold text-slate-900 dark:text-white rounded-[16px] border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors shadow-inner min-h-[100px] resize-none"
                                     placeholder="Ustabaşına / atölyeye verilecek kritik notlar..."
                                 />
                             </div>
 
                         </div>
 
-                        <div className={`p-8 bg-slate-50 dark:bg-slate-900 border-t ${isLight ? "border-slate-100" : "border-slate-800"}`}>
+                        <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-[#0f172a] relative z-10 flex flex-col gap-3">
                             <button
                                 onClick={handleSaveOrder}
                                 disabled={isProcessing}
-                                className={`w-full h-[54px] rounded-full text-[15px] font-[900] tracking-widest uppercase text-white transition-all flex justify-center items-center gap-2 ${isLight ? "bg-indigo-600 hover:bg-slate-900" : "bg-indigo-600 hover:bg-white hover:text-indigo-900"} ${isProcessing ? 'opacity-50' : ''}`}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-[16px] font-black text-[14px] uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98] flex items-center justify-center gap-2 border border-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                             >
                                 {isProcessing ? "Eşzamanlanıyor..." : "Üretime Al & Kaynakları Bağla"}
+                            </button>
+                            <button
+                                className="w-full py-3 text-[12px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                onClick={() => setIsModalOpen(false)}
+                                disabled={isProcessing}
+                            >
+                                İptal Et
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* SADECE BİLGİLENDİRME AMAÇLI ORDER DETAIL MODALI (Kanbandan tıklandığında) */}
+            {/* ORDER DETAIL MODALI */}
             {selectedOrder && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className={`w-[600px] max-w-full rounded-[32px]} animate-in zoom-in-95 duration-200`}>
-                        <div className={`flex justify-between items-center px-8 py-5 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
-                            <h2 className={`text-[16px] font-[900] tracking-wider uppercase flex items-center gap-2 ${textValueClass}`}><Factory className="w-5 h-5 opacity-60" /> Emir Detay: {selectedOrder.orderNumber}</h2>
-                            <button onClick={() => setSelectedOrder(null)} className={`text-2xl leading-none ${textLabelClass} hover:${textValueClass}`}>&times;</button>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-[#0f172a] w-full max-w-2xl rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-8 zoom-in-95 duration-500">
+                        <div className="flex justify-between items-start px-8 py-6 border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-[#0f172a] relative overflow-hidden">
+                            <div className="relative z-10">
+                                <h2 className="text-[20px] font-black text-slate-900 dark:text-white flex items-center gap-2 mb-1 tracking-tight">
+                                    <Factory className="w-5 h-5 opacity-60" /> Emir Detay: {selectedOrder.orderNumber}
+                                </h2>
+                            </div>
+                            <button onClick={() => setSelectedOrder(null)} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400 relative z-10 border border-slate-200 dark:border-slate-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                        <div className="p-8 overflow-y-auto custom-scroll flex flex-col gap-6">
-                            <div className={`p-5 rounded-[16px] border ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-800/30 border-slate-700"}`}>
-                                <div className="grid grid-cols-2 gap-4">
+                        <div className="p-8 overflow-y-auto custom-scroll flex flex-col gap-6 bg-slate-50/50 dark:bg-[#0f172a]/50">
+                            <div className="p-6 rounded-[24px] border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/20 shadow-sm">
+                                <div className="grid grid-cols-2 gap-5">
                                     <div className="col-span-2">
-                                        <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 opacity-70 ${textLabelClass}`}>Hedef Mamul</div>
-                                        <div className={`text-[16px] font-[900] ${textValueClass}`}>{selectedOrder.product?.name}</div>
-                                        <div className={`text-[12px] font-bold mt-1 ${isLight ? "text-indigo-600" : "text-indigo-400"}`}>Reçete: {selectedOrder.bom?.name}</div>
+                                        <div className="text-[11px] font-black uppercase tracking-widest mb-1 text-slate-400 dark:text-slate-500">Hedef Mamul</div>
+                                        <div className="text-[18px] font-black text-slate-900 dark:text-white">{selectedOrder.product?.name}</div>
+                                        <div className="text-[12px] font-bold mt-1 text-indigo-600 dark:text-indigo-400">Reçete: {selectedOrder.bom?.name}</div>
                                     </div>
-                                    <div>
-                                        <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 opacity-70 ${textLabelClass}`}>Planlanan</div>
-                                        <div className={`text-[20px] font-[900] ${textValueClass}`}>{selectedOrder.plannedQuantity} Brm</div>
+                                    <div className="p-4 bg-slate-50 dark:bg-[#0f172a] rounded-[16px] border border-slate-100 dark:border-slate-800">
+                                        <div className="text-[11px] font-black uppercase tracking-widest mb-1 text-slate-400 dark:text-slate-500">Planlanan</div>
+                                        <div className="text-[24px] font-black text-slate-900 dark:text-white tabular-nums">{selectedOrder.plannedQuantity} <span className="text-[12px] text-slate-400">Brm</span></div>
                                     </div>
-                                    <div>
-                                        <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 opacity-70 ${textLabelClass}`}>Bağlı Atölye</div>
-                                        <div className={`text-[16px] font-bold mt-1 ${textValueClass}`}>{selectedOrder.branch}</div>
+                                    <div className="p-4 bg-slate-50 dark:bg-[#0f172a] rounded-[16px] border border-slate-100 dark:border-slate-800">
+                                        <div className="text-[11px] font-black uppercase tracking-widest mb-1 text-slate-400 dark:text-slate-500">Bağlı Atölye</div>
+                                        <div className="text-[16px] font-bold mt-2 text-slate-900 dark:text-white">{selectedOrder.branch}</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <h3 className={`text-[14px] font-[900] tracking-wider uppercase mb-3 ${textValueClass}`}>Reçete İhtiyaç Haritası</h3>
-                                <div className="space-y-2">
+                                <h3 className="text-[13px] font-black tracking-widest uppercase mb-4 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">Reçete İhtiyaç Haritası</h3>
+                                <div className="space-y-3">
                                     {selectedOrder.items?.map((item: any, idx: number) => (
-                                        <div key={idx} className={`flex justify-between items-center p-3 rounded-[20px] border ${isLight ? "bg-white border-slate-100" : "bg-slate-800/50 border-slate-700"}`}>
+                                        <div key={idx} className="flex justify-between items-center px-5 py-4 rounded-[20px] border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/30 shadow-sm transition-colors hover:border-indigo-200 dark:hover:border-indigo-900/50 group">
                                             <div>
-                                                <div className={`text-[13px] font-[900] ${textValueClass}`}>{item.product?.name}</div>
-                                                <div className={`text-[11px] font-bold uppercase tracking-wider mt-1 opacity-60 ${textLabelClass}`}>Br MLYT: {formatCurrency(item.unitCost)}</div>
+                                                <div className="text-[14px] font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{item.product?.name}</div>
+                                                <div className="text-[10px] font-bold uppercase tracking-widest mt-1 text-slate-400 dark:text-slate-500">Br MLYT: {formatCurrency(item.unitCost)}</div>
                                             </div>
                                             <div className="text-right">
-                                                <div className={`text-[13px] font-[900] ${textValueClass}`}>{parseFloat(item.plannedQuantity).toFixed(2)} Adet İhtiyaç</div>
-                                                <div className={`text-[11px] font-[900] uppercase tracking-wider mt-0.5 text-indigo-500`}>∑ {formatCurrency(item.totalCost)}</div>
+                                                <div className="text-[15px] font-black text-slate-900 dark:text-white tabular-nums">{parseFloat(item.plannedQuantity).toFixed(2)} İhtiyaç</div>
+                                                <div className="text-[11px] font-bold uppercase tracking-widest mt-0.5 text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-md inline-block">∑ {formatCurrency(item.totalCost)}</div>
                                             </div>
                                         </div>
                                     ))}

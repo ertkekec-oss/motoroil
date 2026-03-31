@@ -1,5 +1,6 @@
-
 "use client";
+
+import React from 'react';
 
 interface TransactionDetailModalProps {
     isOpen: boolean;
@@ -12,79 +13,90 @@ export default function TransactionDetailModal({ isOpen, onClose, transaction }:
 
     const items = transaction.items || [];
     const isManual = items.length === 0;
+    
+    // Güvenli Tutar Formatı
+    const safeAmount = Number(transaction.amount || transaction.totalAmount || 0);
 
     return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-in" style={{ width: '600px', background: 'var(--bg-card)', padding: '24px' }}>
-                <div className="flex-between mb-6">
-                    <h3>📄 İşlem Detayı</h3>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[1100] p-4">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[24px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+                
+                {/* Header */}
+                <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
+                    <h3 className="text-[16px] font-black text-slate-800 dark:text-white flex items-center gap-2">
+                        📄 İşlem Detayı
+                    </h3>
+                    <button 
+                        onClick={onClose} 
+                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 transition-colors"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                 </div>
 
-                <div className="flex-col gap-4">
-                    <div className="grid-cols-2 gap-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                        <div>
-                            <label className="text-muted" style={{ fontSize: '11px' }}>İŞLEM TARİHİ</label>
-                            <div style={{ fontWeight: 'bold' }}>{transaction.date || transaction.invoiceDate}</div>
+                <div className="p-6 flex flex-col gap-6">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-[12px] border border-slate-100 dark:border-white/5">
+                            <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 block mb-1">İŞLEM TARİHİ</label>
+                            <div className="text-[13px] font-bold text-slate-800 dark:text-white">{transaction.date || transaction.invoiceDate || '-'}</div>
                         </div>
-                        <div>
-                            <label className="text-muted" style={{ fontSize: '11px' }}>FATURA / REF NO</label>
-                            <div style={{ fontWeight: 'bold' }}>{transaction.method || transaction.invoiceNo}</div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-[12px] border border-slate-100 dark:border-white/5">
+                            <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 block mb-1">FATURA / REF NO</label>
+                            <div className="text-[13px] font-bold text-slate-800 dark:text-white">{transaction.method || transaction.invoiceNo || transaction.desc?.split('-')?.[0]?.trim() || '-'}</div>
                         </div>
                     </div>
 
                     <div>
-                        <label className="text-muted" style={{ fontSize: '11px' }}>AÇIKLAMA</label>
-                        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', marginTop: '4px' }}>
-                            {transaction.desc || transaction.description}
+                        <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 block mb-1.5 px-1">AÇIKLAMA</label>
+                        <div className="bg-slate-50 dark:bg-slate-800/30 p-4 rounded-[12px] border border-slate-100 dark:border-white/5 text-[13px] font-semibold text-slate-600 dark:text-slate-300">
+                            {transaction.desc || transaction.description || '-'}
                         </div>
                     </div>
 
-                    <div className="divider" style={{ height: '1px', background: 'var(--border-light)', margin: '10px 0' }}></div>
-
                     {isManual ? (
-                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-                            <p className="text-muted" style={{ fontSize: '13px' }}>Bu işlem manuel tutar girişi olarak kaydedilmiştir.</p>
-                            <div style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '10px', color: 'var(--danger)' }}>
-                                {Math.abs(transaction.amount || transaction.totalAmount).toLocaleString()} ₺
+                        <div className="text-center p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[16px] border border-slate-100 dark:border-white/5 flex flex-col items-center">
+                            <p className="text-[12px] font-bold text-slate-500 mb-2">Bu işlem manuel tutar girişi olarak kaydedilmiştir.</p>
+                            <div className="text-[28px] font-black tracking-tight" style={{ color: safeAmount < 0 ? '#ef4444' : '#10b981' }}>
+                                {Math.abs(safeAmount).toLocaleString('tr-TR')} ₺
                             </div>
                         </div>
                     ) : (
                         <div>
-                            <h4 className="mb-3">Ürün Kalemleri</h4>
-                            <div className="flex-col gap-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                {items?.map((item: any, idx: number) => (
-                                    <div key={idx} className="flex-between" style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <div>
-                                            <div style={{ fontWeight: '500' }}>{item.name}</div>
-                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{item.qty} adet x {item.price.toLocaleString()} ₺</div>
+                            <h4 className="text-[12px] font-black uppercase tracking-widest text-slate-800 dark:text-white mb-3">Ürün Kalemleri</h4>
+                            <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto custom-scroll pr-2">
+                                {items?.map((item: any, idx: number) => {
+                                    const parsedPrice = Number(item.price || 0);
+                                    const parsedQty = Number(item.qty || 1);
+                                    return (
+                                        <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/30 rounded-[10px] border border-slate-100 dark:border-white/5">
+                                            <div className="flex flex-col">
+                                                <div className="text-[13px] font-bold text-slate-800 dark:text-white">{item.name || 'İsimsiz Ürün'}</div>
+                                                <div className="text-[11px] font-semibold text-slate-500 mt-0.5">{parsedQty} adet x {parsedPrice.toLocaleString('tr-TR')} ₺</div>
+                                            </div>
+                                            <div className="text-[13px] font-black text-slate-800 dark:text-white">{(parsedQty * parsedPrice).toLocaleString('tr-TR')} ₺</div>
                                         </div>
-                                        <div style={{ fontWeight: 'bold' }}>{(item.qty * item.price).toLocaleString()} ₺</div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
-                            <div className="flex-between mt-6" style={{ padding: '15px', background: 'rgba(var(--primary-rgb), 0.1)', borderRadius: '12px' }}>
-                                <span style={{ fontWeight: 'bold' }}>TOPLAM TUTAR:</span>
-                                <span style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--danger)' }}>
-                                    {Math.abs(transaction.amount || transaction.totalAmount).toLocaleString()} ₺
+                            <div className="flex items-center justify-between mt-4 p-4 bg-slate-900 dark:bg-slate-800 text-white rounded-[12px] border border-slate-700">
+                                <span className="text-[11px] font-black tracking-widest uppercase">TOPLAM TUTAR</span>
+                                <span className="text-[20px] font-black" style={{ color: safeAmount < 0 ? '#ef4444' : '#10b981' }}>
+                                    {Math.abs(safeAmount).toLocaleString('tr-TR')} ₺
                                 </span>
                             </div>
                         </div>
                     )}
+                </div>
 
-                    <div className="flex-end mt-4">
-                        <button onClick={onClose} className="btn btn-primary" style={{ padding: '10px 30px' }}>Kapat</button>
-                    </div>
+                <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
+                    <button 
+                        onClick={onClose} 
+                        className="px-8 h-[42px] bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white rounded-[10px] font-bold text-[13px] transition-colors shadow-sm"
+                    >
+                        Kapat
+                    </button>
                 </div>
             </div>
-
-            <style jsx>{`
-                .flex-between { display: flex; align-items: center; justify-content: space-between; }
-                .flex-col { display: flex; flex-direction: column; }
-                .flex-end { display: flex; align-items: center; justify-content: flex-end; }
-                .gap-2 { gap: 8px; }
-                .gap-4 { gap: 16px; }
-            `}</style>
         </div>
     );
 }

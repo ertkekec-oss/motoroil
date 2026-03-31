@@ -242,6 +242,112 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
 
                 {/* CONTENT AREA */}
                 <div className="w-full">
+                        {(() => {
+
+                                        if (supplier.city || supplier.district) {
+                                            return `${supplier.district ? supplier.district + ' / ' : ''}${supplier.city || ''}`;
+                                        }
+                                        return supplier.address || 'Adres Yok';
+                                    })()}
+                                </span>
+                                {supplier.phone && <span className="flex items-center gap-1.5"><span className="opacity-50">📱</span> {supplier.phone}</span>}
+                                {supplier.email && <span className="flex items-center gap-1.5"><span className="opacity-50">📧</span> {supplier.email}</span>}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right: Actions & Balance on SAME ROW */}
+                    <div className="flex flex-wrap items-center justify-end gap-4 flex-1 w-full xl:w-auto mt-2 xl:mt-0 xl:ml-auto">
+                        
+                        {/* Quick Actions */}
+                        <div className="flex flex-wrap items-center gap-2">
+                             <button
+                                onClick={() => router.push(`/suppliers?edit=${supplier.id}`)}
+                                className="h-[36px] px-4 bg-slate-100/50 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                                title="Düzenle"
+                            >
+                                ✏️ Detay
+                            </button>
+                            <button
+                                onClick={() => setIsAdjustModalOpen(true)}
+                                className="h-[36px] px-4 bg-orange-50 hover:bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:hover:bg-orange-500/20 dark:text-orange-400 border border-orange-200 dark:border-orange-500/10 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                ⚖️ Bakiye Düzelt
+                            </button>
+                            <button
+                                onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
+                                className="h-[36px] px-4 bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                📑 Ekstre
+                            </button>
+                            <button
+                                onClick={() => setIsUploadModalOpen(true)}
+                                className="h-[36px] px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                🚀 Fatura
+                            </button>
+                            <button
+                                onClick={() => setIsPurchaseModalOpen(true)}
+                                className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                🛒 Fiş
+                            </button>
+                            <Link 
+                                href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&amount=${Math.abs(supplier.balance)}`}
+                                className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                💸 Ödeme Yap
+                            </Link>
+                        </div>
+
+                        {/* Balance Badge (Rightmost) */}
+                        <div className="flex items-center gap-3 bg-slate-50 dark:bg-[#1e293b] py-2 px-4 rounded-[12px] border border-slate-200 dark:border-white/5 shadow-sm whitespace-nowrap w-full sm:w-auto mt-2 sm:mt-0 justify-end md:justify-center">
+                            <div className="flex flex-col items-end">
+                                <span className="text-[10px] font-black tracking-widest uppercase text-slate-400">DENGELİ BAKİYESİ</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[18px] font-black font-mono tracking-tight" style={{ color: balance < 0 ? '#ef4444' : balance > 0 ? '#10b981' : 'var(--text-main, #333)' }}>
+                                        {Math.abs(balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                    </span>
+                                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-[4px] tracking-wider" style={{
+                                        background: balance < 0 ? 'rgba(239, 68, 68, 0.1)' : balance > 0 ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))',
+                                        color: balance < 0 ? '#ef4444' : balance > 0 ? '#10b981' : 'var(--text-main, #333)'
+                                    }}>
+                                        {balance < 0 ? 'BORÇLUYUZ' : balance > 0 ? 'ALACAKLIYIZ' : 'DENGELİ'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            {/* MAIN CONTENT AREA */}
+            <div className="max-w-[1400px] mx-auto w-full p-4 lg:p-10 flex flex-col gap-8">
+                {/* PREMIUM ACTION BAR */}
+                {/* Tabs Navigation Container */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f172a] p-2 rounded-[20px] mb-6 mt-4 border border-slate-200 dark:border-white/5 shadow-sm relative z-10 w-full">
+                    <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full md:w-auto overflow-x-auto shadow-inner border border-slate-200/50 dark:border-white/5 custom-scroll">
+                        {[
+                            { id: 'all', label: 'TÜM HAREKETLER' },
+                            { id: 'checks', label: 'ÇEK & SENETLER' }
+                        ].map((tab, idx, arr) => {
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={`flex-1 min-w-[140px] h-11 px-6 rounded-full text-[11px] font-black tracking-widest transition-all outline-none whitespace-nowrap ${isActive ? 'bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/30' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 border border-transparent'}`}
+                                >
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* CONTENT AREA */}
+                <div className="w-full">
                     
                         {(() => {
                             const currentList = activeTab === 'all' ? displayHistory : (supplier.checks || []);
@@ -463,8 +569,9 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
             {/* ADJUSTMENT MODAL */}
             {isAdjustModalOpen && (
                 <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[24px] shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[24px] shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
                         
+                        {/* Header */}
                         <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
                             <h3 className="text-[16px] font-black text-slate-800 dark:text-white flex items-center gap-2">
                                 ⚖️ Bakiye Düzeltme
@@ -475,59 +582,65 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                         </div>
 
                         <div className="p-6 flex flex-col gap-6">
-                            <div className="flex gap-3">
-                                <button 
-                                    onClick={() => setAdjustData({ ...adjustData, type: 'DEBT' })} 
-                                    className={`flex-1 h-[48px] rounded-[12px] font-black text-[12px] transition-all ${adjustData.type === 'DEBT' ? 'bg-red-50 text-red-600 border-2 border-red-500 dark:bg-red-500/10 dark:text-red-400' : 'bg-slate-50 text-slate-500 border-2 border-transparent hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400'}`}
+                            
+                            {/* Unified Toggle Instead of Spread Buttons */}
+                            <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-[14px] flex relative border border-slate-200/50 dark:border-white/5 shadow-inner">
+                                <div 
+                                    className="absolute inset-y-1 w-[calc(50%-4px)] bg-white dark:bg-slate-700 rounded-[10px] shadow-sm transition-all duration-300 ease-out"
+                                    style={{ transform: adjustData.type === 'DEBT' ? 'translateX(0)' : 'translateX(100%)', left: '4px' }}
+                                />
+                                <button
+                                    onClick={() => setAdjustData({ ...adjustData, type: 'DEBT' })}
+                                    className={`relative z-10 flex-1 h-[40px] text-[12px] font-bold rounded-[10px] transition-colors ${adjustData.type === 'DEBT' ? 'text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                 >
-                                    BORÇLANDIR 🔴
+                                    🔴 BORÇLANDIR
                                 </button>
-                                <button 
-                                    onClick={() => setAdjustData({ ...adjustData, type: 'CREDIT' })} 
-                                    className={`flex-1 h-[48px] rounded-[12px] font-black text-[12px] transition-all ${adjustData.type === 'CREDIT' ? 'bg-emerald-50 text-emerald-600 border-2 border-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-50 text-slate-500 border-2 border-transparent hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400'}`}
+                                <button
+                                    onClick={() => setAdjustData({ ...adjustData, type: 'CREDIT' })}
+                                    className={`relative z-10 flex-1 h-[40px] text-[12px] font-bold rounded-[10px] transition-colors ${adjustData.type === 'CREDIT' ? 'text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                 >
-                                    ALACAKLANDIR 🟢
+                                    🟢 ALACAKLANDIR
                                 </button>
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <label className="text-[12px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1">
-                                    TUTAR (₺)
-                                </label>
-                                <input 
-                                    type="number" 
-                                    placeholder="0.00" 
-                                    value={adjustData.amount} 
-                                    onChange={e => setAdjustData({ ...adjustData, amount: e.target.value })} 
-                                    className="w-full h-[54px] px-4 rounded-[12px] bg-white dark:bg-[#0f172a] border-2 border-slate-200 dark:border-white/10 focus:border-blue-500 dark:focus:border-blue-500 outline-none text-[20px] font-black text-slate-800 dark:text-white transition-colors"
-                                />
+                                <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 block px-1">TUTAR (₺)</label>
+                                <div className="relative">
+                                    <input 
+                                        type="number" 
+                                        placeholder="0.00" 
+                                        value={adjustData.amount} 
+                                        onChange={e => setAdjustData({ ...adjustData, amount: e.target.value })} 
+                                        className="w-full h-[54px] px-4 rounded-[16px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-[20px] font-black text-slate-800 dark:text-white transition-all pl-12"
+                                    />
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[20px] font-black text-slate-400">₺</span>
+                                </div>
                                 <p className="text-[11px] font-bold text-slate-500 ml-1 mt-1">
-                                    {adjustData.type === 'DEBT' ? '🔴 Girdiğiniz miktar borcumuza eklenecektir.' : '🟢 Girdiğiniz miktar borcumuzdan düşülecektir.'}
+                                    {adjustData.type === 'DEBT' ? 'İlgili tutar size borç olarak yansıyacaktır.' : 'İlgili tutar borcunuzdan eksilecektir.'}
                                 </p>
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <label className="text-[12px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1">
-                                    AÇIKLAMA / NOT
-                                </label>
+                                <label className="text-[10px] font-black tracking-widest uppercase text-slate-400 block px-1">AÇIKLAMA (NEDEN?)</label>
                                 <textarea 
-                                    placeholder="Düzeltme sebebi..." 
+                                    placeholder="Manuel düzeltme sebebi..." 
                                     value={adjustData.description} 
                                     onChange={e => setAdjustData({ ...adjustData, description: e.target.value })} 
-                                    className="w-full min-h-[100px] p-4 rounded-[12px] bg-white dark:bg-[#0f172a] border-2 border-slate-200 dark:border-white/10 focus:border-blue-500 dark:focus:border-blue-500 outline-none text-[14px] font-semibold text-slate-700 dark:text-white transition-colors resize-y custom-scroll"
+                                    className="w-full h-[80px] p-4 rounded-[16px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-[13px] font-semibold text-slate-700 dark:text-white transition-all resize-none custom-scroll"
                                 />
                             </div>
                         </div>
 
                         <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
-                            <button onClick={() => setIsAdjustModalOpen(false)} className="px-5 h-[42px] rounded-[10px] text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+                            <button onClick={() => setIsAdjustModalOpen(false)} className="px-6 h-[42px] rounded-[10px] text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
                                 İptal
                             </button>
                             <button 
                                 onClick={handleAdjustment} 
-                                className={`px-6 h-[42px] rounded-[10px] text-[13px] font-black text-white transition-colors shadow-sm ${adjustData.type === 'DEBT' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                                className="px-8 h-[42px] rounded-[10px] text-[13px] font-bold text-white transition-colors shadow-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                                disabled={!adjustData.amount}
                             >
-                                BAKİYEYİ GÜNCELLE
+                                KAYDET
                             </button>
                         </div>
                     </div>
