@@ -5,7 +5,7 @@ import Link from "next/link";
 import { updateDisputeStatusAction } from "@/services/finance/reconciliation/actions";
 import { useRouter } from "next/navigation";
 import { useModal } from "@/contexts/ModalContext";
-import { EnterpriseCard } from "@/components/ui/EnterpriseCard";
+import { EnterpriseCard } from "@/components/ui/enterprise";
 
 export default function DisputesClient({ disputes }: { disputes: any[] }) {
     const { showSuccess, showError, showWarning } = useModal();

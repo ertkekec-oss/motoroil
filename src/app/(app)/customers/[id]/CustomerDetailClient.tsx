@@ -12,6 +12,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useModal } from '@/contexts/ModalContext';
 import StatementModal from '@/components/modals/StatementModal';
 import Pagination from '@/components/Pagination';
+import EnterpriseCommandCenter from '@/components/ui/EnterpriseCommandCenter';
 import ReconciliationWizard from '@/components/modals/ReconciliationWizard';
 import {
     EnterpriseCard,
@@ -1473,7 +1474,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </div>
                             </div>
                         </div>
-                    ) : activeTab === 'reconciliations' ? (
+                    ) : (activeTab as any) === 'reconciliations' ? (
                         <div className="p-4 sm:p-6">
                             <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Cari Mutabakatlar</h3>
@@ -2874,11 +2875,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
 
                             <EnterpriseButton
-                                onClick={handleSaveWarranty}
-                                disabled={isSavingWarranty || !newWarranty.invoiceId || !newWarranty.productId || !newWarranty.serialNo}
+                                onClick={handleStartWarranty}
+                                disabled={!newWarranty.invoiceId || !newWarranty.productId || !newWarranty.serialNo}
                                 className="w-full h-14 mt-4 font-bold text-base bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
                             >
-                                {isSavingWarranty ? 'KAYDEDİLİYOR...' : 'SİSTEME KAYDET VE BAŞLAT'}
+                                SİSTEME KAYDET VE BAŞLAT
                             </EnterpriseButton>
                         </div>
                     </EnterpriseCard>

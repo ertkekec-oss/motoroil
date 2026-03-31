@@ -10,7 +10,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         let pdf: any;
         try {
             const pdfParseModule = await import('pdf-parse');
-            pdf = pdfParseModule.default || pdfParseModule;
+            pdf = (pdfParseModule as any).default || pdfParseModule;
         } catch (loaderErr) {
             console.error("Failed to load pdf-parse:", loaderErr);
             return NextResponse.json({ success: false, error: 'Sunucuda PDF okuyucu eklentisi bulunamadı.' }, { status: 500 });

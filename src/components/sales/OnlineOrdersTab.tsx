@@ -4,7 +4,7 @@ import { useState, Fragment, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import { MarketplaceActionButton } from '@/components/marketplaces/MarketplaceActionButton';
 import { useModal } from "@/contexts/ModalContext";
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 interface OnlineOrdersTabProps {
     onlineOrders: any[];

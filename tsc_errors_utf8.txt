@@ -1,1 +1,8 @@
-﻿src/lib/auth.ts(137,1): error TS1005: ',' expected.
+﻿src/app/(app)/customers/[id]/CustomerDetailClient.tsx(1477,25): error TS2367: This comparison appears to be unintentional because the types '"payments" | "all" | "sales"' and '"reconciliations"' have no overlap.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(2878,42): error TS2552: Cannot find name 'handleSaveWarranty'. Did you mean 'handleStartWarranty'?
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(2879,43): error TS2304: Cannot find name 'isSavingWarranty'.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(2882,34): error TS2304: Cannot find name 'isSavingWarranty'.
+src/app/(app)/inventory/components/TransferTabContent.tsx(41,5): error TS2304: Cannot find name 'useEffect'.
+src/app/api/suppliers/[id]/invoice/parse/route.ts(13,34): error TS2339: Property 'default' does not exist on type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/node_modules/pdf-parse/dist/pdf-parse/esm/index")'.
+src/components/sales/OnlineOrdersTab.tsx(376,129): error TS2304: Cannot find name 'CheckCircle2'.
+src/components/sales/OnlineOrdersTab.tsx(398,92): error TS2304: Cannot find name 'CheckCircle2'.

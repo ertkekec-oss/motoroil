@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
 import { resendReconAction, voidReconAction, exportReconEvidenceAction } from "@/services/finance/reconciliation/actions";
 import { useRouter } from "next/navigation";
-import { EnterpriseCard } from "@/components/ui/EnterpriseCard";
+import { EnterpriseCard } from "@/components/ui/enterprise";
 
 export default function ReconciliationsClient({ reconciliations, stats, pagination }: { reconciliations: any[], stats: any, pagination: any }) {
     const { showSuccess, showError, showConfirm } = useModal();

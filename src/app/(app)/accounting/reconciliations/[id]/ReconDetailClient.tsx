@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
 import { resendReconAction, voidReconAction, exportReconEvidenceAction, openReconDisputeAction, updateDisputeStatusAction, addDisputeInternalNoteAction } from "@/services/finance/reconciliation/actions";
 import { useRouter } from "next/navigation";
-import { EnterpriseCard } from "@/components/ui/EnterpriseCard";
+import { EnterpriseCard } from "@/components/ui/enterprise";
 
 export default function ReconDetailClient({ reconciliation: r }: { reconciliation: any }) {
     const { showSuccess, showError, showConfirm } = useModal();

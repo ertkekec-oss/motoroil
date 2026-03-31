@@ -5,10 +5,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinancials } from '@/contexts/FinancialContext';
-import EnterpriseCard from '@/components/ui/EnterpriseCard';
-import EnterpriseButton from '@/components/ui/EnterpriseButton';
-import EnterpriseInput from '@/components/ui/EnterpriseInput';
-import EnterpriseSelect from '@/components/ui/EnterpriseSelect';
+import { EnterpriseCard, EnterpriseButton, EnterpriseInput, EnterpriseSelect } from '@/components/ui/enterprise';
 
 function PaymentContent() {
     const searchParams = useSearchParams();
@@ -257,7 +254,7 @@ function PaymentContent() {
                 {/* Bottom Actions */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-center pt-8 border-t border-slate-200 dark:border-slate-800">
                     <EnterpriseButton
-                        variant="outline"
+                        variant="secondary"
                         onClick={() => router.back()}
                         disabled={isProcessing}
                         className="w-full sm:w-auto h-16 px-8 rounded-[20px] text-[15px] font-bold"

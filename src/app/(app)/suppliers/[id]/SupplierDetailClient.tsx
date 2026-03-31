@@ -11,6 +11,7 @@ import TransactionDetailModal from '@/components/modals/TransactionDetailModal';
 import StatementModal from '@/components/modals/StatementModal';
 import SupplierInvoiceUploadModal from '@/components/modals/SupplierInvoiceUploadModal';
 import Pagination from '@/components/Pagination';
+import EnterpriseCommandCenter from '@/components/ui/EnterpriseCommandCenter';
 
 const val = (v: any, fallback = '-') => (v ? v : fallback);
 
