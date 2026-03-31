@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '@/contexts/InventoryContext';
 import { ProductPricesTab } from '@/components/pricing/ProductPricesTab';
+import { EnterpriseInput, EnterpriseSelect, EnterpriseButton, EnterpriseTextarea } from '@/components/ui/enterprise';
 
 interface InventoryDetailModalProps {
     isOpen: boolean;
@@ -151,54 +152,26 @@ export default function InventoryDetailModal({
                                     <div className="space-y-5">
                                         <div>
                                             <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Ürün Adı</label>
-                                            <input
-                                                type="text"
-                                                value={selectedProduct.name}
-                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
-                                                disabled={!canEdit}
-                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                            />
+                                            <EnterpriseInput type="text" value={selectedProduct.name} onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })} disabled={!canEdit} />
                                         </div>
                                         <div>
                                             <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Stok Kodu</label>
-                                            <input
-                                                type="text"
-                                                value={selectedProduct.code}
-                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, code: e.target.value })}
-                                                disabled={!canEdit}
-                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                            />
+                                            <EnterpriseInput type="text" value={selectedProduct.code} onChange={(e) => setSelectedProduct({ ...selectedProduct, code: e.target.value })} disabled={!canEdit} />
                                         </div>
                                         <div>
                                             <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Barkod</label>
-                                            <input
-                                                type="text"
-                                                value={selectedProduct.barcode}
-                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, barcode: e.target.value })}
-                                                disabled={!canEdit}
-                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                            />
+                                            <EnterpriseInput type="text" value={selectedProduct.barcode} onChange={(e) => setSelectedProduct({ ...selectedProduct, barcode: e.target.value })} disabled={!canEdit} />
                                         </div>
                                     </div>
                                     <div className="space-y-5">
                                         <div>
                                             <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Marka</label>
-                                            <input
-                                                type="text"
-                                                value={selectedProduct.brand}
-                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, brand: e.target.value })}
-                                                disabled={!canEdit}
-                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
-                                            />
+                                            <EnterpriseInput type="text" value={selectedProduct.brand} onChange={(e) => setSelectedProduct({ ...selectedProduct, brand: e.target.value })} disabled={!canEdit} />
                                         </div>
                                         <div>
                                             <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Kategori</label>
-                                            <select
-                                                value={selectedProduct.category}
-                                                onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e.target.value })}
-                                                disabled={!canEdit}
-                                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors appearance-none shadow-sm disabled:opacity-50"
-                                            >
+                                            <EnterpriseSelect value={selectedProduct.category} onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e.target.value })} disabled={!canEdit}>
+
                                                 {categories.length > 0 ? (
                                                     categories.map(cat => (
                                                         <option key={cat} value={cat}>{cat}</option>
@@ -212,7 +185,8 @@ export default function InventoryDetailModal({
                                                         <option value="Yedek Parça">Yedek Parça</option>
                                                     </>
                                                 )}
-                                            </select>
+                                            
+                                            </EnterpriseSelect>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
@@ -227,12 +201,8 @@ export default function InventoryDetailModal({
                                             </div>
                                             <div>
                                                 <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Satış Birimi</label>
-                                                <select
-                                                    value={selectedProduct.unit || 'Adet'}
-                                                    onChange={(e) => setSelectedProduct({ ...selectedProduct, unit: e.target.value })}
-                                                    disabled={!canEdit}
-                                                    className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors appearance-none shadow-sm disabled:opacity-50"
-                                                >
+                                                <EnterpriseSelect value={selectedProduct.unit || 'Adet'} onChange={(e) => setSelectedProduct({ ...selectedProduct, unit: e.target.value })} disabled={!canEdit}>
+
                                                     <option value="Adet">Adet</option>
                                                     <option value="KG">Kilogram (KG)</option>
                                                     <option value="Litre">Litre (L)</option>
@@ -240,19 +210,14 @@ export default function InventoryDetailModal({
                                                     <option value="Paket">Paket</option>
                                                     <option value="Koli">Koli</option>
                                                     <option value="Set">Set</option>
-                                                </select>
+                                                
+                                            </EnterpriseSelect>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-span-2">
                                         <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Açıklama</label>
-                                        <textarea
-                                            rows={3}
-                                            value={selectedProduct.description || ''}
-                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, description: e.target.value })}
-                                            disabled={!canEdit}
-                                            className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-4 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none shadow-sm disabled:opacity-50"
-                                        />
+                                        <EnterpriseTextarea rows={3} value={selectedProduct.description || ''} onChange={(e) => setSelectedProduct({ ...selectedProduct, description: e.target.value })} disabled={!canEdit} />
                                     </div>
                                 </div>
                             </div>
@@ -273,17 +238,14 @@ export default function InventoryDetailModal({
                                                     disabled={!canEdit}
                                                     className="flex-[2] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
                                                 />
-                                                <select
-                                                    value={selectedProduct.purchaseCurrency || 'TRY'}
-                                                    onChange={(e) => setSelectedProduct({ ...selectedProduct, purchaseCurrency: e.target.value })}
-                                                    disabled={!canEdit}
-                                                    className="flex-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors appearance-none shadow-sm disabled:opacity-50"
-                                                >
+                                                <EnterpriseSelect value={selectedProduct.purchaseCurrency || 'TRY'} onChange={(e) => setSelectedProduct({ ...selectedProduct, purchaseCurrency: e.target.value })} disabled={!canEdit}>
+
                                                     <option value="TRY">₺ TRY</option>
                                                     <option value="USD">$ USD</option>
                                                     <option value="EUR">€ EUR</option>
                                                     <option value="GBP">£ GBP</option>
-                                                </select>
+                                                
+                                            </EnterpriseSelect>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
@@ -328,17 +290,14 @@ export default function InventoryDetailModal({
                                                     disabled={!canEdit}
                                                     className="flex-[2] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-bold text-blue-600 dark:text-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm disabled:opacity-50"
                                                 />
-                                                <select
-                                                    value={selectedProduct.currency || 'TRY'}
-                                                    onChange={(e) => setSelectedProduct({ ...selectedProduct, currency: e.target.value })}
-                                                    disabled={!canEdit}
-                                                    className="flex-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-3 text-[13px] font-medium text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors appearance-none shadow-sm disabled:opacity-50"
-                                                >
+                                                <EnterpriseSelect value={selectedProduct.currency || 'TRY'} onChange={(e) => setSelectedProduct({ ...selectedProduct, currency: e.target.value })} disabled={!canEdit}>
+
                                                     <option value="TRY">₺ TRY</option>
                                                     <option value="USD">$ USD</option>
                                                     <option value="EUR">€ EUR</option>
                                                     <option value="GBP">£ GBP</option>
-                                                </select>
+                                                
+                                            </EnterpriseSelect>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
@@ -384,31 +343,13 @@ export default function InventoryDetailModal({
                 <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e293b] flex justify-between items-center rounded-b-[24px]">
                     <div>
                         {canDelete && onDelete && (
-                            <button
-                                type="button"
-                                onClick={onDelete}
-                                className="px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 text-[13px] font-bold tracking-wide rounded-full transition-colors border border-red-200 dark:border-red-500/20 shadow-sm"
-                            >
-                                Ürünü Sil
-                            </button>
+                            <EnterpriseButton variant="danger" onClick={onDelete}>Ürünü Sil</EnterpriseButton>
                         )}
                     </div>
                     <div className="flex gap-3">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-6 py-2.5 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold tracking-wide text-[13px] rounded-full transition-colors border border-slate-200 dark:border-white/10 shadow-sm"
-                        >
-                            Vazgeç
-                        </button>
+                        <EnterpriseButton variant="secondary" onClick={onClose}>Vazgeç</EnterpriseButton>
                         {canEdit && (
-                            <button
-                                type="button"
-                                onClick={onSave}
-                                className="px-8 py-2.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 font-bold tracking-wide text-[13px] rounded-full shadow-sm transition-all flex items-center gap-2"
-                            >
-                                Değişiklikleri Kaydet
-                            </button>
+                            <EnterpriseButton onClick={onSave}>Değişiklikleri Kaydet</EnterpriseButton>
                         )}
                     </div>
                 </div>

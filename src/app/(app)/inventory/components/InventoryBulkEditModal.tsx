@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Product } from '@/contexts/AppContext';
+import { EnterpriseInput, EnterpriseSelect, EnterpriseButton } from '@/components/ui/enterprise';
 
 interface InventoryBulkEditModalProps {
     isOpen: boolean;
@@ -95,15 +96,14 @@ export default function InventoryBulkEditModal({
                     {mode === 'category' && (
                         <div className="flex flex-col gap-4 py-2">
                             <label className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase">Yeni Kategori Hedefi</label>
-                            <select
-                                className="w-full bg-slate-50 dark:bg-[#1e293b] px-4 py-3 rounded-[12px] border border-slate-200 dark:border-white/10 text-[14px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer transition-colors shadow-sm"
-                                onChange={(e) => setBulkValues({ category: e.target.value })}
-                            >
+                            <EnterpriseSelect onChange={(e) => setBulkValues({ category: e.target.value })}>
+
                                 <option value="">--- Bir kategori seçin ---</option>
                                 <option value="uncategorized">📁 Kategorisiz Olarak İşaretle</option>
                                 {categories.filter(c => c).map(c => <option key={c} value={c}>{c}</option>)}
                                 <option value="Yeni Kategori">➕ Yeni Kategori Oluştur...</option>
-                            </select>
+                            
+                                </EnterpriseSelect>
                         </div>
                     )}
 
@@ -111,21 +111,11 @@ export default function InventoryBulkEditModal({
                         <div className="grid grid-cols-2 gap-6 py-2">
                             <div className="flex flex-col gap-3">
                                 <label className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase">Satış KDV (%)</label>
-                                <input
-                                    type="number"
-                                    placeholder="20"
-                                    className="w-full bg-slate-50 dark:bg-[#1e293b] px-4 py-3 rounded-[12px] border border-slate-200 dark:border-white/10 text-[18px] font-semibold text-center text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
-                                    onChange={e => setBulkValues({ ...bulkValues, salesVat: parseInt(e.target.value) })}
-                                />
+                                <EnterpriseInput type="number" placeholder="20" onChange={e => setBulkValues({ ...bulkValues, salesVat: parseInt(e.target.value) })} />
                             </div>
                             <div className="flex flex-col gap-3">
                                 <label className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase">Alış KDV (%)</label>
-                                <input
-                                    type="number"
-                                    placeholder="20"
-                                    className="w-full bg-slate-50 dark:bg-[#1e293b] px-4 py-3 rounded-[12px] border border-slate-200 dark:border-white/10 text-[18px] font-semibold text-center text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
-                                    onChange={e => setBulkValues({ ...bulkValues, purchaseVat: parseInt(e.target.value) })}
-                                />
+                                <EnterpriseInput type="number" placeholder="20" onChange={e => setBulkValues({ ...bulkValues, purchaseVat: parseInt(e.target.value) })} />
                             </div>
                         </div>
                     )}
@@ -138,14 +128,7 @@ export default function InventoryBulkEditModal({
                                         <div className="text-[13px] font-semibold text-slate-900 dark:text-white truncate mb-0.5">{product.name}</div>
                                         <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wider">{product.code}</div>
                                     </div>
-                                    <input
-                                        type="text"
-                                        placeholder="Barkodu okutun..."
-                                        defaultValue={product.barcode}
-                                        onChange={(e) => setBulkValues({ ...bulkValues, [product.id]: e.target.value })}
-                                        autoFocus={selectedIds[0] === product.id}
-                                        className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-3 py-2.5 rounded-[10px] text-blue-600 dark:text-blue-400 font-semibold text-[13px] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all shadow-sm"
-                                    />
+                                    <EnterpriseInput placeholder="Barkodu okutun..." defaultValue={product.barcode} onChange={(e) => setBulkValues({ ...bulkValues, [product.id]: e.target.value })} autoFocus={selectedIds[0] === product.id} />
                                 </div>
                             ))}
                         </div>
@@ -178,19 +161,8 @@ export default function InventoryBulkEditModal({
                                         <option value="percent">Yüzde (%)</option>
                                         <option value="amount">Tutar (₺)</option>
                                     </select>
-                                    <input
-                                        type="number"
-                                        placeholder="0"
-                                        value={adjValue || ''}
-                                        onChange={e => setAdjValue(parseFloat(e.target.value) || 0)}
-                                        className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 w-20 py-1.5 px-3 text-slate-900 dark:text-white rounded-[8px] text-[13px] font-semibold text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
-                                    />
-                                    <button
-                                        onClick={applyAdjustmentRule}
-                                        className="bg-blue-600 text-white border-none py-1.5 px-5 rounded-full text-[11px] font-bold tracking-widest uppercase hover:bg-blue-700 transition-colors shadow-sm ml-2"
-                                    >
-                                        Hepsini Güncelle
-                                    </button>
+                                    <EnterpriseInput type="number" placeholder="0" value={adjValue || ''} onChange={e => setAdjValue(parseFloat(e.target.value) || 0)} className="w-24" />
+                                    <EnterpriseButton onClick={applyAdjustmentRule}>Hepsini Güncelle</EnterpriseButton>
                                 </div>
                             </div>
 
@@ -206,27 +178,11 @@ export default function InventoryBulkEditModal({
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div className="flex flex-col gap-1.5">
                                                     <label className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold tracking-wider uppercase">ALIŞ</label>
-                                                    <input
-                                                        type="number"
-                                                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 p-2 rounded-[8px] text-[12px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
-                                                        value={currentValues.buyPrice}
-                                                        onChange={(e) => {
-                                                            const newVals = { ...bulkValues, [product.id]: { ...currentValues, buyPrice: parseFloat(e.target.value) } };
-                                                            setBulkValues(newVals);
-                                                        }}
-                                                    />
+                                                    <EnterpriseInput type="number" value={currentValues.buyPrice} onChange={(e) => { const newVals = { ...bulkValues, [product.id]: { ...currentValues, buyPrice: parseFloat(e.target.value) || 0 } }; setBulkValues(newVals); }} />
                                                 </div>
                                                 <div className="flex flex-col gap-1.5">
                                                     <label className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold tracking-wider uppercase">SATIŞ</label>
-                                                    <input
-                                                        type="number"
-                                                        className="w-full bg-blue-50/50 dark:bg-blue-500/5 border border-blue-200 dark:border-blue-500/20 p-2 rounded-[8px] text-[12px] font-bold text-blue-600 dark:text-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
-                                                        value={currentValues.price}
-                                                        onChange={(e) => {
-                                                            const newVals = { ...bulkValues, [product.id]: { ...currentValues, price: parseFloat(e.target.value) } };
-                                                            setBulkValues(newVals);
-                                                        }}
-                                                    />
+                                                    <EnterpriseInput type="number" value={currentValues.price} onChange={(e) => { const newVals = { ...bulkValues, [product.id]: { ...currentValues, price: parseFloat(e.target.value) || 0 } }; setBulkValues(newVals); }} className="!bg-indigo-50/50 dark:!bg-indigo-500/10" />
                                                 </div>
                                             </div>
                                         </div>
@@ -238,10 +194,8 @@ export default function InventoryBulkEditModal({
                 </div>
 
                 <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e293b] flex justify-end gap-3 items-center rounded-b-[24px]">
-                    <button className="text-[12px] font-bold tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors px-5 py-2.5 rounded-full" onClick={onClose} disabled={isProcessing}>VAZGEÇ</button>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-full text-[13px] font-bold tracking-widest transition-colors shadow-sm disabled:opacity-50" onClick={handleApply} disabled={isProcessing}>
-                        {isProcessing ? 'SİSTEME İŞLENİYOR...' : 'ONAYLA'}
-                    </button>
+                    <EnterpriseButton variant="secondary" onClick={onClose} disabled={isProcessing}>VAZGEÇ</EnterpriseButton>
+                    <EnterpriseButton onClick={handleApply} disabled={isProcessing}>{isProcessing ? 'SİSTEME İŞLENİYOR...' : 'ONAYLA'}</EnterpriseButton>
                 </div>
             </div>
         </div>
