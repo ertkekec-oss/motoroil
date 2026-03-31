@@ -205,6 +205,41 @@ export class HepsiburadaService implements IMarketplaceService {
         return x;
     }
 
+    
+    async getOrderSettlements(orderNumber: string): Promise<any[]> {
+        try {
+            // Hepsiburada Settlement API endpoint details may vary by integration version.
+            // Typically: GET https://mpop-api.hepsiburada.com/finances/settlements?orderNumber={orderNumber}
+            const merchantId = (this.config.merchantId || '').trim();
+            const url = `${this.baseUrl.replace('oms-external', 'mpop-api')}/finances/settlements?orderuid=${encodeURIComponent(orderNumber)}&merchantId=${merchantId}`;
+            const fetchUrl = this.getFetchUrl(url);
+            
+            const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
+            
+            // Adapter translation: map Hepsiburada's schema to our expected standard schema internally if needed,
+            // or just return the raw array.
+            return response.data?.transactions || response.data?.content || [];
+        } catch (error: any) {
+            console.warn(`[HB_SETTLEMENT_WARN] ${orderNumber}: ${error.message}`);
+            return []; // Graceful fallback
+        }
+    }
+
+    async getOrderDeductions(orderNumber: string): Promise<any[]> {
+        try {
+            // Hepsiburada Cargo/Deduction API endpoint
+            const merchantId = (this.config.merchantId || '').trim();
+            const url = `${this.baseUrl.replace('oms-external', 'mpop-api')}/finances/deductions?orderuid=${encodeURIComponent(orderNumber)}&merchantId=${merchantId}`;
+            const fetchUrl = this.getFetchUrl(url);
+            
+            const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
+            return response.data?.transactions || response.data?.content || [];
+        } catch (error: any) {
+            console.warn(`[HB_DEDUCTION_WARN] ${orderNumber}: ${error.message}`);
+            return [];
+        }
+    }
+
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         const allOrdersMap = new Map<string, MarketplaceOrder>();
         const merchantId = (this.config.merchantId || '').trim();

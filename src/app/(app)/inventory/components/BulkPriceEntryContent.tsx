@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Product } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { useModal } from '@/contexts/ModalContext';
+import { EnterpriseInput, EnterpriseSelect, EnterpriseButton } from "@/components/ui/enterprise";
 
 interface BulkPriceEntryContentProps {
     products: Product[];
@@ -271,12 +272,7 @@ function SyncView({ products, onSave, isProcessing }: any) {
                         </div>
                         <div className="flex flex-col gap-1.5 w-32">
                             <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Değer</label>
-                            <input 
-                                type="number" 
-                                className="w-full bg-white dark:bg-[#0f172a] text-sm border-slate-200 dark:border-slate-700 outline-none rounded-lg p-2 tabular-nums font-bold text-blue-600"
-                                value={modifierValue}
-                                onChange={e => setModifierValue(parseFloat(e.target.value) || 0)}
-                            />
+                            <EnterpriseInput type="number" value={modifierValue} onChange={e => setModifierValue(parseFloat(e.target.value) || 0)} />
                         </div>
                         <div className="pb-0.5 pt-4">
                             <button 

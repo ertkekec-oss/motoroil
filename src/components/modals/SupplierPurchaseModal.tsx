@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useInventory } from '@/contexts/InventoryContext';
 import { useModal } from '@/contexts/ModalContext';
+import { EnterpriseInput, EnterpriseSelect, EnterpriseButton } from '@/components/ui/enterprise';
 
 interface PurchaseModalProps {
     isOpen: boolean;
@@ -174,7 +175,7 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
 
                         <div>
                             <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-1.5">FATURA NO / REF</label>
-                            <input type="text" placeholder="Örn: ABC-12345" value={purchaseData.invoiceNo} onChange={e => setPurchaseData({ ...purchaseData, invoiceNo: e.target.value })} className="w-full h-[48px] px-4 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] text-[15px] font-bold text-slate-800 dark:text-white focus:border-blue-500 dark:focus:border-blue-500 outline-none transition-colors" />
+                            <EnterpriseInput placeholder="Örn: ABC-12345" value={purchaseData.invoiceNo} onChange={e => setPurchaseData({ ...purchaseData, invoiceNo: e.target.value })} />
                         </div>
 
                         <div className="flex flex-col gap-3">
@@ -250,15 +251,13 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
                         {purchaseData.items.length === 0 && (
                             <div className="bg-white dark:bg-[#0f172a] p-4 rounded-[16px] border border-slate-200 dark:border-white/10">
                                 <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">MANUEL TUTAR GİRİŞİ (Hızlı Giriş İçin)</label>
-                                <input type="number" placeholder="0.00" value={purchaseData.amount || ''} onChange={e => setPurchaseData({ ...purchaseData, amount: parseFloat(e.target.value) || 0 })} className="w-full h-[54px] px-4 bg-slate-50 dark:bg-slate-800 border-2 border-blue-500/50 rounded-[12px] text-[20px] font-black text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-colors" />
+                                <EnterpriseInput type="number" placeholder="0.00" value={purchaseData.amount || ''} onChange={e => setPurchaseData({ ...purchaseData, amount: parseFloat(e.target.value) || 0 })} />
                             </div>
                         )}
 
                         <div className="flex items-center justify-end gap-3 mt-auto pt-4">
-                            <button onClick={onClose} disabled={isProcessing} className="px-5 h-[48px] rounded-[12px] text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">Vazgeç</button>
-                            <button onClick={handleManualPurchase} disabled={isProcessing} className="flex-1 h-[48px] rounded-[12px] text-[13px] font-black text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm">
-                                {isProcessing ? 'İŞLENİYOR...' : 'Faturayı Sisteme İşle'}
-                            </button>
+                            <EnterpriseButton variant="secondary" onClick={onClose} disabled={isProcessing}>Vazgeç</EnterpriseButton>
+                            <EnterpriseButton onClick={handleManualPurchase} disabled={isProcessing}>{isProcessing ? 'İŞLENİYOR...' : 'Faturayı Sisteme İşle'}</EnterpriseButton>
                         </div>
                     </div>
                 </div>
@@ -298,17 +297,19 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
 
                                 <div className="flex flex-col gap-3">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-1">MARKA</label>
-                                    <select value={newProduct.brand} onChange={e => setNewProduct({ ...newProduct, brand: e.target.value })} className="w-full h-[48px] px-4 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] text-[14px] font-bold text-slate-800 dark:text-white focus:border-blue-500 dark:focus:border-blue-500 outline-none transition-colors">
-                                        <option value="">Seçiniz</option>
+                                    <EnterpriseSelect value={newProduct.brand || ''} onChange={e => setNewProduct({ ...newProduct, brand: e.target.value })}>
+<option value="">Seçiniz</option>
                                         <option>Yamaha</option><option>Honda</option><option>Motul</option><option>Shimano</option>
-                                    </select>
+                                    
+                                    </EnterpriseSelect>
                                 </div>
 
                                 <div className="flex flex-col gap-3">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-1">KATEGORİ</label>
-                                    <select value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })} className="w-full h-[48px] px-4 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] text-[14px] font-bold text-slate-800 dark:text-white focus:border-blue-500 dark:focus:border-blue-500 outline-none transition-colors">
-                                        <option>Motosiklet</option><option>Bisiklet</option><option>Yağ/Sıvı</option><option>Ekipman</option>
-                                    </select>
+                                    <EnterpriseSelect value={newProduct.category || ''} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
+<option>Motosiklet</option><option>Bisiklet</option><option>Yağ/Sıvı</option><option>Ekipman</option>
+                                    
+                                    </EnterpriseSelect>
                                 </div>
 
                                 <div className="flex flex-col gap-3">
@@ -338,10 +339,8 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
                             </div>
 
                             <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-800/50 mt-4 rounded-b-[24px]">
-                                <button className="px-5 h-[48px] rounded-[12px] text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors" onClick={() => setIsProductModalOpen(false)}>İptal</button>
-                                <button className="h-[48px] px-8 rounded-[12px] text-[13px] font-black text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm" onClick={handleAddQuickProduct} disabled={isProcessing}>
-                                    {isProcessing ? 'İŞLENİYOR...' : 'KAYDI TAMAMLA'}
-                                </button>
+                                <EnterpriseButton variant="secondary" onClick={() => setIsProductModalOpen(false)}>İptal</EnterpriseButton>
+                                <EnterpriseButton onClick={handleAddQuickProduct} disabled={isProcessing}>{isProcessing ? 'İŞLENİYOR...' : 'KAYDI TAMAMLA'}</EnterpriseButton>
                             </div>
                         </div>
                     </div>

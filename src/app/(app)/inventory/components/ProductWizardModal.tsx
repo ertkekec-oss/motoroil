@@ -6,6 +6,7 @@ import { ProductPricesTab } from "@/components/pricing/ProductPricesTab";
 import ProductImageUpload from "./ProductImageUpload";
 import { Package, Settings, FileText, Printer, FileDown, PlusCircle, ShoppingCart } from "lucide-react";
 import { useModal } from "@/contexts/ModalContext";
+import { EnterpriseInput, EnterpriseSelect, EnterpriseTextarea } from "@/components/ui/enterprise";
 
 export default function ProductWizardModal({
     isOpen,

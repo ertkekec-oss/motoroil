@@ -50,6 +50,38 @@ export class N11Service implements IMarketplaceService {
         }
     }
 
+    
+    async getOrderSettlements(orderNumber: string): Promise<any[]> {
+        try {
+            // N11 Settlement / Finans endpoint
+            // N11 SOA/REST API typically uses a search settlement approach.
+            const result = await this.makeRequest('settlements', {
+                orderNumber: orderNumber,
+                page: '0',
+                size: '100'
+            });
+            return result?.content || [];
+        } catch (error: any) {
+            console.warn(`[N11_SETTLEMENT_WARN] ${orderNumber}: ${error.message}`);
+            return [];
+        }
+    }
+
+    async getOrderDeductions(orderNumber: string): Promise<any[]> {
+        try {
+            // N11 Cargo/Deduction endpoint
+            const result = await this.makeRequest('deductions', {
+                orderNumber: orderNumber,
+                page: '0',
+                size: '100'
+            });
+            return result?.content || [];
+        } catch (error: any) {
+            console.warn(`[N11_DEDUCTION_WARN] ${orderNumber}: ${error.message}`);
+            return [];
+        }
+    }
+
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         try {
             // Statuses to fetch (REST API expects one status per request)

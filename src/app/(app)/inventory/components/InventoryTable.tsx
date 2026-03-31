@@ -48,7 +48,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
     };
 
     return (
-        <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-sm relative z-0 flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
+        <div className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border border-white/20 dark:border-white/5 rounded-[24px] shadow-sm relative z-0 flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
             {selectedIds.length > 0 && !isCounting && (
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-4 z-50 animate-in slide-in-from-top-2 border border-slate-800 dark:border-slate-700/50">
                     <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                                     value={countValues[item.id] !== undefined ? countValues[item.id] : ''}
                                                     onChange={(e) => onCountChange(item.id, parseInt(e.target.value) || 0)}
                                                     placeholder="Miktar Gir..."
-                                                    className={`w-full bg-slate-50 dark:bg-slate-900 border !border-slate-200 dark:!border-slate-700 rounded-[10px] px-3 py-2 text-slate-900 dark:text-white font-black text-[13px] outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:focus:border-indigo-500 placeholder-slate-400`}
+                                                    className={`w-full bg-white dark:bg-[#0f172a] border !border-slate-200 dark:!border-white/10 rounded-[12px] px-3 py-2 text-slate-900 dark:text-white font-black text-[13px] outline-none transition-all shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:focus:border-indigo-500 placeholder-slate-400`}
                                                 />
                                             </div>
                                         </>

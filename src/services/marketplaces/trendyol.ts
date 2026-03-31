@@ -401,6 +401,33 @@ export class TrendyolService implements IMarketplaceService {
         throw new Error('Paket detayları alınamadı.');
     }
 
+    
+    async getOrderSettlements(orderNumber: string): Promise<any[]> {
+        try {
+            const url = `${this.baseUrl}/integration/finance/cheques/v1/settlements?transactionType=Sale&orderNumber=${encodeURIComponent(orderNumber)}`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+            const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
+            return response.data?.content || [];
+        } catch (error) {
+             console.error(`Trendyol getOrderSettlements failed for ${orderNumber}:`, error);
+             return [];
+        }
+    }
+
+    async getOrderDeductions(orderNumber: string): Promise<any[]> {
+        try {
+            // Fetch any other penalties, early payout interest, refund deductions etc for this order
+            const url = `${this.baseUrl}/integration/finance/cheques/v1/other-financial-deductions?orderNumber=${encodeURIComponent(orderNumber)}`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+            const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
+            return response.data?.content || [];
+        } catch (error) {
+             return [];
+        }
+    }
+
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         try {
             const queryParams = new URLSearchParams();

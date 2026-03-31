@@ -3,6 +3,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useInventory, Product, StockTransfer } from '@/contexts/InventoryContext';
 import { useModal } from '@/contexts/ModalContext';
 import { Truck, ArrowRight, ArrowRightLeft, PackageOpen, AlertTriangle } from 'lucide-react';
+import { EnterpriseInput, EnterpriseSelect, EnterpriseButton } from "@/components/ui/enterprise";
 
 interface TransferTabContentProps {
     isSystemAdmin: boolean;
@@ -288,9 +289,7 @@ export default function TransferTabContent({
                     {viewMode === 'products' ? (
                         <>
                             <div className="relative border-b border-slate-200 dark:border-slate-800/80 bg-white dark:bg-transparent">
-                                <input type="text" placeholder="Ad, Kod veya Barkod ara..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full h-12 pl-11 pr-4 bg-transparent border-none text-sm font-semibold text-slate-900 dark:text-white outline-none placeholder-slate-400"
-                                />
+                                <EnterpriseInput placeholder="Ad, Kod veya Barkod ara..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                                 <div className="absolute left-4 top-3.5 text-slate-400">
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                 </div>
