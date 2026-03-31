@@ -18,7 +18,7 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
         const ctx = `[HB-ACTION:${actionKey}][IDEMP:${idempotencyKey}]`;
 
         const lockKey = `lock:action:${idempotencyKey}`;
-        const acquired = await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX');
+        const acquired = redisConnection ? await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX') : true;
 
         if (!acquired) {
             const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
@@ -307,7 +307,7 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
                 httpStatus
             };
         } finally {
-            await redisConnection.del(lockKey);
+            if (redisConnection) await redisConnection.del(lockKey);
         }
     }
 }

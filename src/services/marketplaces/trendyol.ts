@@ -404,7 +404,7 @@ export class TrendyolService implements IMarketplaceService {
     
     async getOrderSettlements(orderNumber: string): Promise<any[]> {
         try {
-            const url = `${this.baseUrl}/integration/finance/cheques/v1/settlements?transactionType=Sale&orderNumber=${encodeURIComponent(orderNumber)}`;
+            const url = `${this.baseUrl}/integration/finance/che/sellers//settlements?transactionType=Sale${encodeURIComponent(orderNumber)}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
             const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });

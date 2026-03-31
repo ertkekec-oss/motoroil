@@ -19,7 +19,7 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
         // 1) Redis Lock Check
         const lockKey = `lock:action:${idempotencyKey}`;
-        const acquired = await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX');
+        const acquired = redisConnection ? await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX') : true;
 
         console.log(`${ctx} Redis lock acquired: ${!!acquired}`);
 
@@ -357,7 +357,7 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
             return { status: "FAILED", errorMessage: error.message, errorCode: MarketplaceActionErrorCode.E_UNKNOWN, auditId };
 
         } finally {
-            await redisConnection.del(lockKey);
+            if (redisConnection) await redisConnection.del(lockKey);
         }
     }
 }

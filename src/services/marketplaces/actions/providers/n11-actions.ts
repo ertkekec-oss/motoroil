@@ -18,7 +18,7 @@ export class N11ActionProvider implements MarketplaceActionProvider {
         const ctx = `[N11-ACTION:${actionKey}][IDEMP:${idempotencyKey}]`;
 
         const lockKey = `lock:action:${idempotencyKey}`;
-        const acquired = await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX');
+        const acquired = redisConnection ? await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX') : true;
 
         if (!acquired) {
             const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
@@ -275,7 +275,7 @@ export class N11ActionProvider implements MarketplaceActionProvider {
             const auditFailed = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
             return { status: "FAILED", errorMessage: error.message, errorCode: MarketplaceActionErrorCode.E_REMOTE_API_ERROR, auditId: auditFailed?.id };
         } finally {
-            await redisConnection.del(lockKey);
+            if (redisConnection) await redisConnection.del(lockKey);
         }
     }
 }

@@ -1,3 +1,4 @@
+process.env.PRISMA_BYPASS_EXTENSION = "true"; // Add bypass for CLI test scripts
 import { PrismaClient } from '@prisma/client';
 import { ActionProviderRegistry } from '../src/services/marketplaces/actions/registry';
 
@@ -8,9 +9,10 @@ async function run() {
 
     // 1. Find a Trendyol Order
     const tyOrder = await prisma.order.findFirst({
-        where: { marketplace: 'trendyol' },
-        orderBy: { orderDate: 'desc' }
+        where: { marketplace: { in: ['trendyol', 'Trendyol'] }, status: { in: ['Teslim Edildi', 'Delivered'] } },
+        orderBy: { orderDate: 'asc' }
     });
+
 
     if (tyOrder) {
         console.log(`\n[TEST] 1 Adet Trendyol Siparişi Bulundu: ${tyOrder.orderNumber}. Mutabakat Çekiliyor...`);
@@ -29,8 +31,8 @@ async function run() {
 
     // 2. Find a Hepsiburada Order
     const hbOrder = await prisma.order.findFirst({
-        where: { marketplace: 'hepsiburada' },
-        orderBy: { orderDate: 'desc' }
+        where: { marketplace: { in: ['hepsiburada', 'Hepsiburada'] }, status: { in: ['Teslim Edildi', 'Delivered'] } },
+        orderBy: { orderDate: 'asc' }
     });
 
     if (hbOrder) {
@@ -48,16 +50,37 @@ async function run() {
          console.log(`\n[UYARI] Hepsiburada siparişi bulunamadı.`);
     }
 
-    // 3. Show Product PNL if populated
+    // 3. Find an N11 Order
+    const n11Order = await prisma.order.findFirst({
+        where: { marketplace: { in: ['n11', 'N11'] }, status: { in: ['Teslim Edildi', 'Delivered'] } },
+        orderBy: { orderDate: 'asc' }
+    });
+
+    if (n11Order) {
+        console.log(`\n[TEST] 1 Adet N11 Siparişi Bulundu: ${n11Order.orderNumber}. Mutabakat Çekiliyor...`);
+        const n11Provider = ActionProviderRegistry.getProvider('n11');
+        const res3 = await n11Provider.executeAction({
+            companyId: n11Order.companyId,
+            marketplace: 'n11',
+            orderId: n11Order.id,
+            actionKey: 'SYNC_SETTLEMENT' as any,
+            idempotencyKey: `SIMULATION_N11_${n11Order.id}`
+        });
+        console.log("N11 Çevirmen (Adapter) Sonucu:", res3);
+    } else {
+         console.log(`\n[UYARI] N11 siparişi bulunamadı.`);
+    }
+
+    // 4. Show Product PNL if populated
     const pnls = await prisma.marketplaceProductPnl.findMany({
-        take: 3,
+        take: 5,
         orderBy: { id: 'desc' },
         include: { product: true }
     });
 
     console.log(`\n[TEST] Ürün Bazlı Kârlılık ve Defter Dağılımı Sonucu:`);
     pnls.forEach(p => {
-        console.log(`[${p.marketplace}] Ürün: ${p.product?.name} -> Ciro: ${p.grossRevenue} TL | Komisyon: ${p.commissionTotal} TL | Kargo: ${p.shippingTotal} TL | Kesinti: ${p.otherFeesTotal} TL | KÂR (PNL): ${p.netProfit} TL | Marj: %${p.profitMargin}`);
+        console.log(`[${p.marketplace}] Ürün: ${p.product?.name} -> Ciro: ${p.grossRevenue} TL | Kom: ${p.commissionTotal} TL | Kargo: ${p.shippingTotal} TL | D.Kesinti: ${p.otherFeesTotal} TL | KÂR (PNL): ${p.netProfit} TL | Marj: %${p.profitMargin}`);
     });
 }
 
