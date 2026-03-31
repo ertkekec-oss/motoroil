@@ -1,0 +1,202 @@
+﻿[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+=== B├£Y├£K MUTABAKAT TEST─░ (GRAND SETTLEMENT TEST) ===
+
+[TEST] 1 Adet Trendyol Sipari┼şi Bulundu: 11029796559. Mutabakat ├çekiliyor...
+[ACTION:SYNC_SETTLEMENT][IDEMP:SIMULATION_TY_cmncfnkyz00a512dfa3lg42rb] Redis lock acquired: true
+[ACTION:SYNC_SETTLEMENT][IDEMP:SIMULATION_TY_cmncfnkyz00a512dfa3lg42rb] Executing...
+[ACTION:SYNC_SETTLEMENT][IDEMP:SIMULATION_TY_cmncfnkyz00a512dfa3lg42rb] Sipari┼ş bulundu (11029796559), Trendyol Finans API'lerinden mutabakat ├ğekiliyor...
+node.exe : Trendyol getOrd
+erDeductions failed for 11
+029796559: Error: Trendyol
+ API Hatas─▒: 404 - Resour
+ce not found
+At line:1 char:1
++ & "C:\Program Files\node
+js/node.exe" "C:\Program F
+iles\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (T  
+  rendyol getOrd...ourc   
+ e not found:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+    at TrendyolService.saf
+eFetchJson (C:\Users\ertke
+\OneDrive\Masa├╝st├╝\perio
+dya\muhasebeapp\motoroil\s
+rc\services\marketplaces\t
+rendyol.ts:54:23)
+    at process.processTick
+sAndRejections (node:inter
+nal/process/task_queues:10
+5:5)
+    at async TrendyolServi
+ce.getOrderDeductions (C:\
+Users\ertke\OneDrive\Masa├
+╝st├╝\periodya\muhasebeapp
+\motoroil\src\services\mar
+ketplaces\trendyol.ts:427:
+30)
+    at async Promise.all (
+index 1)
+    at async TrendyolActio
+nProvider.executeAction (C
+:\Users\ertke\OneDrive\Mas
+a├╝st├╝\periodya\muhasebea
+pp\motoroil\src\services\m
+arketplaces\actions\provid
+ers\trendyol-actions.ts:20
+3:51)
+    at async run (C:\Users
+\ertke\OneDrive\Masa├╝st├╝
+\periodya\muhasebeapp\moto
+roil\scripts\test-settleme
+nt-sync.ts:20:22)
+Trendyol getOrderSettlemen
+ts failed for 11029796559:
+ Error: Trendyol API Hatas
+─▒: 500 - {"timestamp":"20
+26-03-31T21:53:52.264+00:0
+0","status":500,"error":"I
+nternal Server Error","pat
+h":"/sellers/548512/settle
+ments"}
+    at TrendyolService.saf
+eFetchJson (C:\Users\ertke
+\OneDrive\Masa├╝st├╝\perio
+dya\muhasebeapp\motoroil\s
+rc\services\marketplaces\t
+rendyol.ts:54:23)
+    at process.processTick
+sAndRejections (node:inter
+nal/process/task_queues:10
+5:5)
+    at async TrendyolServi
+ce.getOrderSettlements (C:
+\Users\ertke\OneDrive\Masa
+├╝st├╝\periodya\muhasebeap
+p\motoroil\src\services\ma
+rketplaces\trendyol.ts:412
+:30)
+    at async Promise.all (
+index 0)
+    at async TrendyolActio
+nProvider.executeAction (C
+:\Users\ertke\OneDrive\Mas
+a├╝st├╝\periodya\muhasebea
+pp\motoroil\src\services\m
+arketplaces\actions\provid
+ers\trendyol-actions.ts:20
+3:51)
+    at async run (C:\Users
+\ertke\OneDrive\Masa├╝st├╝
+\periodya\muhasebeapp\moto
+roil\scripts\test-settleme
+nt-sync.ts:20:22)
+{"level":"INFO","timestamp":"2026-03-31T21:53:53.608Z","message":"METRIC: external_call","marketplace":"trendyol","actionKey":"SYNC_SETTLEMENT","status":"SUCCESS"}
+Trendyol ├çevirmen (Adapter) Sonucu: {
+  status: 'SUCCESS',
+  auditId: 'cmnf0h0fs0000t4rma5mxs1lq',
+  result: {
+    syncedLedgers: 0,
+    totals: { netRevenue: 0, totalCommission: 0, totalCargo: 0, totalOther: 0 }
+  }
+}
+
+[UYARI] Hepsiburada sipari┼şi bulunamad─▒.
+
+[TEST] 1 Adet N11 Sipari┼şi Bulundu: 208818282337. Mutabakat ├çekiliyor...
+[N11-ACTION:SYNC_SETTLEMENT][IDEMP:SIMULATION_N11_cmnez3b1a0027h8e1ky4pqe4x] Sipari┼ş bulundu (208818282337), N11 Finans/Mutabakat API ├ğekiliyor...
+N11 REST Request Hatas─▒ [
+settlements]: Error: N11 R
+EST API Hatas─▒ (404): No 
+Mapping Rule matched
+    at N11Service.makeRequ
+est (C:\Users\ertke\OneDri
+ve\Masa├╝st├╝\periodya\muh
+asebeapp\motoroil\src\serv
+ices\marketplaces\n11.ts:2
+8:23)
+    at process.processTick
+sAndRejections (node:inter
+nal/process/task_queues:10
+5:5)
+    at async N11Service.ge
+tOrderSettlements (C:\User
+s\ertke\OneDrive\Masa├╝st├
+╝\periodya\muhasebeapp\mot
+oroil\src\services\marketp
+laces\n11.ts:58:28)
+    at async Promise.all (
+index 0)
+    at async N11ActionProv
+ider.executeAction (C:\Use
+rs\ertke\OneDrive\Masa├╝st
+├╝\periodya\muhasebeapp\mo
+toroil\src\services\market
+places\actions\providers\n
+11-actions.ts:121:51)
+    at async run (C:\Users
+\ertke\OneDrive\Masa├╝st├╝
+\periodya\muhasebeapp\moto
+roil\scripts\test-settleme
+nt-sync.ts:62:22)
+[N11_SETTLEMENT_WARN] 2088
+18282337: N11 REST API Hat
+as─▒ (404): No Mapping Rul
+e matched
+N11 REST Request Hatas─▒ [
+deductions]: Error: N11 RE
+ST API Hatas─▒ (404): No M
+apping Rule matched
+    at N11Service.makeRequ
+est (C:\Users\ertke\OneDri
+ve\Masa├╝st├╝\periodya\muh
+asebeapp\motoroil\src\serv
+ices\marketplaces\n11.ts:2
+8:23)
+    at process.processTick
+sAndRejections (node:inter
+nal/process/task_queues:10
+5:5)
+    at async N11Service.ge
+tOrderDeductions (C:\Users
+\ertke\OneDrive\Masa├╝st├╝
+\periodya\muhasebeapp\moto
+roil\src\services\marketpl
+aces\n11.ts:73:28)
+    at async Promise.all (
+index 1)
+    at async N11ActionProv
+ider.executeAction (C:\Use
+rs\ertke\OneDrive\Masa├╝st
+├╝\periodya\muhasebeapp\mo
+toroil\src\services\market
+places\actions\providers\n
+11-actions.ts:121:51)
+    at async run (C:\Users
+\ertke\OneDrive\Masa├╝st├╝
+\periodya\muhasebeapp\moto
+roil\scripts\test-settleme
+nt-sync.ts:62:22)
+[N11_DEDUCTION_WARN] 20881
+8282337: N11 REST API Hata
+s─▒ (404): No Mapping Rule
+ matched
+{"level":"INFO","timestamp":"2026-03-31T21:53:54.029Z","message":"METRIC: external_call","marketplace":"n11","actionKey":"SYNC_SETTLEMENT","status":"SUCCESS"}
+N11 ├çevirmen (Adapter) Sonucu: {
+  status: 'SUCCESS',
+  auditId: 'cmnf0h1mo0001t4rmom6y8p6m',
+  result: {
+    syncedLedgers: 0,
+    totals: { netRevenue: 0, totalCommission: 0, totalCargo: 0, totalOther: 0 }
+  }
+}
+
+[TEST] ├£r├╝n Bazl─▒ K├órl─▒l─▒k ve Defter Da─ş─▒l─▒m─▒ Sonucu:

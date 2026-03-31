@@ -404,11 +404,13 @@ export class TrendyolService implements IMarketplaceService {
     
     async getOrderSettlements(orderNumber: string): Promise<any[]> {
         try {
-            const url = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/settlements?orderNumber=${encodeURIComponent(orderNumber)}`;
+            const endDate = Date.now();
+            const startDate = endDate - 14 * 24 * 60 * 60 * 1000;
+            const url = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/settlements?startDate=${startDate}&endDate=${endDate}&transactionType=Sale&orderNumber=${encodeURIComponent(orderNumber)}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
             const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
-            return response.content || [];
+            return response.data?.content || response.content || [];
         } catch (error) {
              console.error(`Trendyol getOrderSettlements failed for ${orderNumber}:`, error);
              return [];
@@ -417,11 +419,14 @@ export class TrendyolService implements IMarketplaceService {
 
     async getOrderDeductions(orderNumber: string): Promise<any[]> {
         try {
-            const url = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/other-financial-deductions?orderNumber=${encodeURIComponent(orderNumber)}`;
+            const endDate = Date.now();
+            const startDate = endDate - 14 * 24 * 60 * 60 * 1000;
+            // For deductions, there might not be a transactionType query param, but let's see. Typically deductions are just mapped to the order. Let's leave transactionType=Sale out for deductions initially like standard. Wait, the docs say it. I'll just add it just in case if it throws 500 without it. I will NOT add transactionType for deductions, just for settlements as that's where the 500 occurred in the log ('/sellers/.../settlements'). Wait, no, deductions threw 404 in my log! '404 - Resource not found' for deductions!
+            const url = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/other-financial-deductions?startDate=${startDate}&endDate=${endDate}&orderNumber=${encodeURIComponent(orderNumber)}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
             const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
-            return response.content || [];
+            return response.data?.content || response.content || [];
         } catch (error) {
              console.error(`Trendyol getOrderDeductions failed for ${orderNumber}:`, error);
              return [];
