@@ -617,7 +617,7 @@ const SmartPricingContent = () => {
 
 // --- MAIN PAGE COMPONENT ---
 
-import { useModal } from '@/components/modals/ModalContext';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function FintechControlTower() {
     const [loading, setLoading] = useState(true);

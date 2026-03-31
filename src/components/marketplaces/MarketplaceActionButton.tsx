@@ -9,7 +9,7 @@ import { useModal } from "@/contexts/ModalContext";
 interface Props {
     marketplace: string;
     orderId: string;
-    actionKey: "REFRESH_STATUS" | "PRINT_LABEL_A4" | "CHANGE_CARGO";
+    actionKey: "REFRESH_STATUS" | "PRINT_LABEL_A4" | "CHANGE_CARGO" | "SYNC_SETTLEMENT";
     shipmentPackageId?: string;
     label?: string;
     variant?: "outline" | "default" | "ghost";
@@ -197,6 +197,7 @@ export function MarketplaceActionButton({
         if (actionKey === "PRINT_LABEL_A4") return <Printer className="h-4 w-4" />;
         if (actionKey === "REFRESH_STATUS") return <RefreshCw className="h-4 w-4 text-amber-500" />;
         if (actionKey === "CHANGE_CARGO") return <Truck className="h-4 w-4 text-blue-500" />;
+        if (actionKey === "SYNC_SETTLEMENT") return <span className="font-bold text-green-600">₺</span>;
         return <RefreshCw className="h-4 w-4" />;
     };
 
@@ -230,7 +231,7 @@ export function MarketplaceActionButton({
             className={`flex items-center gap-2 transition-all ${status === 'SUCCESS' ? 'border-green-500 text-green-500 bg-green-50' : ''} ${isDisabled && requiresShipmentId ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
             {getIcon()}
-            {label || (isLabel ? "Etiket Yazdır" : actionKey === "CHANGE_CARGO" ? "Kargo Değiştir" : "Durum Yenile")}
+            {label || (isLabel ? "Etiket Yazdır" : actionKey === "CHANGE_CARGO" ? "Kargo Değiştir" : actionKey === "SYNC_SETTLEMENT" ? "Mutabakat Senkronize Et" : "Durum Yenile")}
         </Button>
     );
 }

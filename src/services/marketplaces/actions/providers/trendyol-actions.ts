@@ -205,6 +205,10 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                     (service as any).getOrderDeductions(order.orderNumber)
                 ]);
 
+                if (settlements.length === 0 && deductions.length === 0) {
+                    throw new Error("Pazaryeri API'si bu sipariş için henüz komisyon/kesinti (mutabakat) belgesi oluşturmamış. İlerleyen günlerde tekrar deneyin.");
+                }
+
                 let newLedgerCount = 0;
                 let netRevenue = 0;
                 let totalCommission = 0;

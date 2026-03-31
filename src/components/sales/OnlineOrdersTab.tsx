@@ -464,6 +464,7 @@ export function OnlineOrdersTab({
                                                             <div className={`mt-5 pt-4 border-t ${isLight ? 'border-slate-100' : 'border-slate-800'}`}>
                                                                 <div className="flex gap-3 flex-wrap">
                                                                     <MarketplaceActionButton orderId={o.id} marketplace={o.marketplace} actionKey="REFRESH_STATUS" onSuccess={fetchOnlineOrders} />
+                                                                    <MarketplaceActionButton orderId={o.id} marketplace={o.marketplace} actionKey="SYNC_SETTLEMENT" onSuccess={fetchOnlineOrders} />
                                                                     {['trendyol', 'hepsiburada', 'pazarama', 'n11'].includes(o.marketplace?.toLowerCase() || '') && (
                                                                         <MarketplaceActionButton orderId={o.id} marketplace={o.marketplace} actionKey="PRINT_LABEL_A4" shipmentPackageId={o.shipmentPackageId || (['hepsiburada', 'pazarama', 'n11'].includes(o.marketplace?.toLowerCase() || '') ? o.orderNumber : undefined)} />
                                                                     )}
