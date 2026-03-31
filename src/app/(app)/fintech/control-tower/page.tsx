@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { EnterpriseCard, EnterpriseSectionHeader, EnterpriseButton, EnterpriseInput } from '@/components/ui/enterprise';
 import {
     IconActivity,
     IconShield,
@@ -24,7 +25,7 @@ const Layers = ({ className }: any) => <svg className={className} fill="none" vi
 
 // --- CONTROL CENTER COMPONENTS ---
 const MetricCard = ({ title, value, unit, subtitle, color, icon: Icon, trend }: any) => (
-    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+    <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
         <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-10 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:opacity-20`} />
         <div className="relative">
             <div className="flex justify-between items-start mb-4">
@@ -32,12 +33,12 @@ const MetricCard = ({ title, value, unit, subtitle, color, icon: Icon, trend }: 
                 <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
             </div>
             <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-3xl font-black text-white">{value}</span>
+                <span className="text-3xl font-black text-slate-900 dark:text-white">{value}</span>
                 <span className="text-gray-500 font-bold">{unit}</span>
             </div>
             <p className="text-xs text-gray-400 mb-4">{subtitle}</p>
             {trend !== undefined && (
-                <div className={`flex items-center gap-1 text-[10px] font-bold ${trend > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <div className={`flex items-center gap-1 text-[10px] font-bold ${trend > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
                     {trend > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                     %{Math.abs(trend)} (Geçen haftaya göre)
                 </div>
@@ -47,20 +48,20 @@ const MetricCard = ({ title, value, unit, subtitle, color, icon: Icon, trend }: 
 );
 
 const HealthSnapshot = ({ data }: any) => (
-    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
+    <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 space-y-4">
         <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider">Sistem Sağlık Özeti</h3>
         <div className="space-y-3">
             <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500 font-medium">Bağlı Bankalar</span>
-                <span className="text-sm font-black text-white">{data?.connectedBanks || 0}</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white">{data?.connectedBanks || 0}</span>
             </div>
             <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500 font-medium">Otonom Eşleşme Oranı</span>
-                <span className="text-sm font-black text-emerald-400">%{data?.todayMatchedPct?.toFixed(1) || '0.0'}</span>
+                <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">%{data?.todayMatchedPct?.toFixed(1) || '0.0'}</span>
             </div>
             <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500 font-medium">Çalışma Modu</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${data?.autopilotState === 'LIVE' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${data?.autopilotState === 'LIVE' ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}`}>
                     {data?.autopilotState === 'LIVE' ? 'CANLI (LIVE)' : 'DENEME (DRY_RUN)'}
                 </span>
             </div>
@@ -75,17 +76,17 @@ const ConfidenceChart = ({ dist }: any) => {
     const lp = ((dist?.low || 0) / total) * 100;
 
     return (
-        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+        <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6">
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Eşleşme Doğruluğu</h3>
-            <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden flex mb-4">
-                <div style={{ width: `${hp}%` }} className="h-full bg-emerald-500" title="Yüksek" />
+            <div className="h-4 w-full bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden flex mb-4">
+                <div style={{ width: `${hp}%` }} className="h-full bg-indigo-500" title="Yüksek" />
                 <div style={{ width: `${mp}%` }} className="h-full bg-amber-500" title="Orta" />
-                <div style={{ width: `${lp}%` }} className="h-full bg-rose-500" title="Düşük" />
+                <div style={{ width: `${lp}%` }} className="h-full bg-rose-600 dark:bg-rose-500" title="Düşük" />
             </div>
             <div className="grid grid-cols-3 gap-2 text-center">
-                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Yüksek</p><p className="text-xs font-black text-emerald-400">{dist?.high || 0}</p></div>
-                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Orta</p><p className="text-xs font-black text-amber-400">{dist?.medium || 0}</p></div>
-                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Düşük</p><p className="text-xs font-black text-rose-400">{dist?.low || 0}</p></div>
+                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Yüksek</p><p className="text-xs font-black text-indigo-600 dark:text-indigo-400">{dist?.high || 0}</p></div>
+                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Orta</p><p className="text-xs font-black text-amber-600 dark:text-amber-400">{dist?.medium || 0}</p></div>
+                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Düşük</p><p className="text-xs font-black text-rose-600 dark:text-rose-400">{dist?.low || 0}</p></div>
             </div>
         </div>
     );
@@ -94,20 +95,20 @@ const ConfidenceChart = ({ dist }: any) => {
 const FlowAccuracy = ({ data }: any) => {
     const accuracy = data?.forecast > 0 ? (1 - Math.abs(data.actual - data.forecast) / data.forecast) * 100 : 0;
     return (
-        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+        <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6">
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Tahmin vs Gerçekleşen</h3>
             <div className="space-y-3">
                 <div className="flex justify-between items-end">
                     <p className="text-[10px] text-gray-500 font-bold uppercase">Günlük Hedef Giriş</p>
-                    <p className="text-sm font-black text-white">{data?.forecast?.toLocaleString('tr-TR') || 0} ₺</p>
+                    <p className="text-sm font-black text-slate-900 dark:text-white">{data?.forecast?.toLocaleString('tr-TR') || 0} ₺</p>
                 </div>
                 <div className="flex justify-between items-end">
                     <p className="text-[10px] text-gray-500 font-bold uppercase">Gerçekleşen Giriş</p>
-                    <p className="text-sm font-black text-emerald-400">{data?.actual?.toLocaleString('tr-TR') || 0} ₺</p>
+                    <p className="text-sm font-black text-indigo-600 dark:text-indigo-400">{data?.actual?.toLocaleString('tr-TR') || 0} ₺</p>
                 </div>
-                <div className="pt-2 border-t border-white/5 flex justify-between items-center">
+                <div className="pt-2 border-t border-slate-200 dark:border-white/5 flex justify-between items-center">
                     <span className="text-[10px] text-gray-500 font-bold uppercase">Model Başarımı</span>
-                    <span className={`text-xs font-black ${accuracy > 80 ? 'text-emerald-400' : 'text-amber-400'}`}>{accuracy.toFixed(1)}%</span>
+                    <span className={`text-xs font-black ${accuracy > 80 ? 'text-indigo-600 dark:text-indigo-400' : 'text-amber-600 dark:text-amber-400'}`}>{accuracy.toFixed(1)}%</span>
                 </div>
             </div>
         </div>
@@ -122,13 +123,13 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Otonom Başarı Mesajı */}
             {metrics.healthSnapshot.todayMatchedPct > 0 && (
-                <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-between group animate-in slide-in-from-top duration-700">
+                <div className="p-4 bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20 rounded-2xl flex items-center justify-between group animate-in slide-in-from-top duration-700">
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                            <IconZap className="w-6 h-6 text-emerald-400" />
+                        <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                            <IconZap className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-black text-white">OTONOM BAŞARI</h4>
+                            <h4 className="text-sm font-black text-slate-900 dark:text-white">OTONOM BAŞARI</h4>
                             <p className="text-[10px] text-gray-500 font-bold uppercase">Sistem bugün banka hareketlerinin %{metrics.healthSnapshot.todayMatchedPct?.toFixed(0)}'ini insan müdahalesi olmadan işledi.</p>
                         </div>
                     </div>
@@ -140,12 +141,12 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                 <HealthSnapshot data={metrics.healthSnapshot} />
                 <ConfidenceChart dist={metrics.confidenceDist} />
                 <FlowAccuracy data={metrics.flowReality} />
-                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col items-center justify-center text-center">
+                <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 flex flex-col items-center justify-center text-center">
                     <div className="flex items-center gap-2 mb-2">
-                        <IconActivity className="w-4 h-4 text-emerald-500" />
-                        <span className="text-xs font-black text-white">GÜVENLİK ŞALTERİ</span>
+                        <IconActivity className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        <span className="text-xs font-black text-slate-900 dark:text-white">GÜVENLİK ŞALTERİ</span>
                     </div>
-                    <p className={`text-lg font-black ${metrics.engine.safetyBreakerStatus === 'TRIGGERED' ? 'text-rose-500' : 'text-emerald-500'}`}>
+                    <p className={`text-lg font-black ${metrics.engine.safetyBreakerStatus === 'TRIGGERED' ? 'text-rose-600 dark:text-rose-400' : 'text-indigo-600 dark:text-indigo-400'}`}>
                         {metrics.engine.safetyBreakerStatus === 'TRIGGERED' ? 'DEVREDE (DURDU)' : 'STABİL'}
                     </p>
                     <p className="text-[9px] text-gray-400 uppercase mt-1 font-bold">Limit: 500 ₺ Askı Bakiyesi</p>
@@ -159,7 +160,7 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                     value={metrics.financials.totalReceivable.toLocaleString('tr-TR')}
                     unit="₺"
                     subtitle={`${metrics.financials.openInvoiceCount} Bekleyen İşlem`}
-                    color="bg-emerald-500"
+                    color="bg-indigo-500"
                     icon={IconTrendingUp}
                     trend={12}
                 />
@@ -168,7 +169,7 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                     value={metrics.financials.suspenseAmount.toLocaleString('tr-TR')}
                     unit="₺"
                     subtitle="Manuel inceleme bekleyen tutar"
-                    color="bg-rose-500"
+                    color="bg-rose-600 dark:bg-rose-500"
                     icon={IconAlert}
                 />
                 <MetricCard
@@ -184,10 +185,10 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
             {/* Orta Bölüm: Nakit Akışı ve Yaşlandırma */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Nakit Akışı Projeksiyonu */}
-                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-8 border-l-4 border-indigo-500">
+                <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-8 border-l-4 border-indigo-500">
                     <div className="mb-8">
-                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <IconTrendingUp className="w-5 h-5 text-indigo-400" /> Nakit Akışı Projeksiyonu
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <IconTrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Nakit Akışı Projeksiyonu
                         </h3>
                         <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Yapay Zeka Destekli Tahmin</p>
                     </div>
@@ -197,23 +198,23 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                             <div key={i} className="group cursor-default">
                                 <div className="flex justify-between items-end mb-2">
                                     <span className="text-sm font-bold text-gray-400">Gelecek {f.horizonDays} Gün</span>
-                                    <span className={`text-sm font-black ${Number(f.netPosition) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    <span className={`text-sm font-black ${Number(f.netPosition) >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                         {Number(f.netPosition).toLocaleString('tr-TR')} ₺
                                     </span>
                                 </div>
-                                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden flex">
+                                <div className="w-full h-1.5 bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden flex">
                                     <div
-                                        className="h-full bg-emerald-500 transition-all duration-1000 group-hover:opacity-80"
+                                        className="h-full bg-indigo-500 transition-all duration-1000 group-hover:opacity-80"
                                         style={{ width: `${(Number(f.expectedIn) / (Math.max(Number(f.expectedIn) + Number(f.expectedOut), 1))) * 100}%` }}
                                     />
                                     <div
-                                        className="h-full bg-rose-500 transition-all duration-1000 group-hover:opacity-80"
+                                        className="h-full bg-rose-600 dark:bg-rose-500 transition-all duration-1000 group-hover:opacity-80"
                                         style={{ width: `${(Number(f.expectedOut) / (Math.max(Number(f.expectedIn) + Number(f.expectedOut), 1))) * 100}%` }}
                                     />
                                 </div>
                                 <div className="flex justify-between text-[10px] mt-1 font-bold">
-                                    <span className="text-emerald-500/70">GİRİŞ: {Number(f.expectedIn).toLocaleString('tr-TR')}</span>
-                                    <span className="text-rose-500/70">ÇIKIŞ: {Number(f.expectedOut).toLocaleString('tr-TR')}</span>
+                                    <span className="text-indigo-600 dark:text-indigo-400/70">GİRİŞ: {Number(f.expectedIn).toLocaleString('tr-TR')}</span>
+                                    <span className="text-rose-600 dark:text-rose-400/70">ÇIKIŞ: {Number(f.expectedOut).toLocaleString('tr-TR')}</span>
                                 </div>
                             </div>
                         )) : (
@@ -225,11 +226,11 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                 </div>
 
                 {/* Yaşlandırma Analizi */}
-                <div className="lg:col-span-2 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-8">
+                <div className="lg:col-span-2 bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-8">
                     <div className="flex justify-between items-center mb-8">
                         <div>
-                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                <IconClock className="w-5 h-5 text-indigo-400" /> Alacak Yaşlandırma Analizi
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <IconClock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Alacak Yaşlandırma Analizi
                             </h3>
                             <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">120.03 Hesabı Risk Dağılımı</p>
                         </div>
@@ -239,16 +240,16 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                     <div className="grid grid-cols-4 gap-4">
                         {(metrics.aging || []).map((bucket: any, i: number) => (
                             <div key={i} className="space-y-4">
-                                <div className="relative h-48 w-full bg-white/5 rounded-2xl overflow-hidden flex flex-col justify-end p-1">
+                                <div className="relative h-48 w-full bg-slate-50 dark:bg-white/5 rounded-2xl overflow-hidden flex flex-col justify-end p-1">
                                     <div
-                                        className={`w-full rounded-xl transition-all duration-1000 ease-out ${i === 0 ? 'bg-emerald-500/50' : i === 1 ? 'bg-blue-500/50' : i === 2 ? 'bg-amber-500/50' : 'bg-rose-500/50'
+                                        className={`w-full rounded-xl transition-all duration-1000 ease-out ${i === 0 ? 'bg-indigo-500/50' : i === 1 ? 'bg-blue-500/50' : i === 2 ? 'bg-amber-500/50' : 'bg-rose-600 dark:bg-rose-100 dark:bg-rose-500/20'
                                             }`}
                                         style={{ height: `${Math.min((bucket.amount / (Math.max(metrics.financials.totalReceivable, 1))) * 100, 100) || 5}%` }}
                                     />
                                 </div>
                                 <div className="text-center">
                                     <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">{bucket.label}</p>
-                                    <p className="text-sm font-black text-white leading-none">{bucket.amount.toLocaleString('tr-TR')} ₺</p>
+                                    <p className="text-sm font-black text-slate-900 dark:text-white leading-none">{bucket.amount.toLocaleString('tr-TR')} ₺</p>
                                 </div>
                             </div>
                         ))}
@@ -258,42 +259,42 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
 
             {/* Alt Bölüm: Akıllı Sinyaller ve Motor Performansı */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-amber-500/10 hover:border-amber-500/30 transition-colors">
-                    <h3 className="text-xs font-bold text-amber-400 mb-3 uppercase tracking-widest flex items-center gap-2">
+                <div className="lg:col-span-2 bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 border-amber-500/10 hover:border-amber-500/30 transition-colors">
+                    <h3 className="text-xs font-bold text-amber-600 dark:text-amber-400 mb-3 uppercase tracking-widest flex items-center gap-2">
                         <IconShield className="w-4 h-4" /> Sistem Zekası Sinyalleri
                     </h3>
                     <div className="space-y-3">
                         <div className="flex items-center gap-3 text-xs">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            <p className="text-gray-400"><span className="text-white font-bold">Otopilot:</span> ±1 ₺ Tolerans robotu aktif ve hakediş uzlaşmalarını denetliyor.</p>
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                            <p className="text-gray-400"><span className="text-slate-900 dark:text-white font-bold">Otopilot:</span> ±1 ₺ Tolerans robotu aktif ve hakediş uzlaşmalarını denetliyor.</p>
                         </div>
                         <div className="flex items-center gap-3 text-xs">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            <p className="text-gray-400"><span className="text-white font-bold">Veri Koruması:</span> Layer-1 veri muhafızı mükerrer kayıtlara karşı %100 etkin.</p>
+                            <p className="text-gray-400"><span className="text-slate-900 dark:text-white font-bold">Veri Koruması:</span> Layer-1 veri muhafızı mükerrer kayıtlara karşı %100 etkin.</p>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-amber-400/80 italic">
+                        <div className="flex items-center gap-3 text-xs text-amber-600 dark:text-amber-400/80 italic">
                             <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                             <p>"Açık Bankacılık senkronizasyonu başarılı. Bugün manuel girişlerinizden 3 yeni eşleşme kuralı öğrenildi."</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 bg-gradient-to-br from-indigo-900/10 to-transparent border-indigo-500/20">
-                    <h3 className="text-sm font-bold text-white mb-6 uppercase tracking-wider flex items-center gap-2">
+                <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 bg-gradient-to-br from-indigo-900/10 to-transparent border-indigo-500/20">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-wider flex items-center gap-2">
                         <IconZap className="w-4 h-4 text-yellow-400" /> Motor Performansı
                     </h3>
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <span className="text-xs text-gray-400 font-medium">Ort. Gecikme (P50)</span>
-                            <span className="text-sm font-black text-indigo-400">{metrics.performance.avgLatency}ms</span>
+                            <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{metrics.performance.avgLatency}ms</span>
                         </div>
-                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden">
                             <div className="h-full bg-indigo-500 w-[75%]" />
                         </div>
 
                         <div className="flex justify-between items-center text-xs">
                             <span className="text-gray-500 font-bold uppercase">7 Günlük Hatalı Event</span>
-                            <span className={`font-black ${metrics.health.failedEventCount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                            <span className={`font-black ${metrics.health.failedEventCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-indigo-600 dark:text-indigo-400'}`}>
                                 {metrics.health.failedEventCount}
                             </span>
                         </div>
@@ -330,10 +331,10 @@ const ProfitabilityHeatmapContent = () => {
     );
 
     const getMarginColor = (margin: number) => {
-        if (margin >= 20) return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
-        if (margin >= 5) return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
-        if (margin > 0) return 'text-orange-400 bg-orange-500/10 border-orange-500/20';
-        return 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+        if (margin >= 20) return 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20';
+        if (margin >= 5) return 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20';
+        if (margin > 0) return 'text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/20';
+        return 'text-rose-600 dark:text-rose-400 bg-rose-600 dark:bg-rose-50 dark:bg-rose-500/10 border-rose-500/20';
     };
 
     const getStatusText = (margin: number) => {
@@ -345,10 +346,10 @@ const ProfitabilityHeatmapContent = () => {
 
     if (loading) return (
         <div className="space-y-8 animate-pulse p-4">
-            <div className="h-12 bg-white/5 rounded-2xl w-1/3" />
+            <div className="h-12 bg-slate-50 dark:bg-white/5 rounded-2xl w-1/3" />
             <div className="space-y-4">
                 {Array.from({ length: 10 }).map((_, i) => (
-                    <div key={i} className="h-24 bg-white/5 rounded-2xl" />
+                    <div key={i} className="h-24 bg-slate-50 dark:bg-white/5 rounded-2xl" />
                 ))}
             </div>
         </div>
@@ -359,7 +360,7 @@ const ProfitabilityHeatmapContent = () => {
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Marketplace Profitability Heatmap</h2>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Marketplace Profitability Heatmap</h2>
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Real-time FIFO Cost & Net Margin Analysis</p>
                 </div>
                 <div className="relative">
@@ -369,7 +370,7 @@ const ProfitabilityHeatmapContent = () => {
                         placeholder="SKU veya Ürün adı ile ara..."
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-sm font-medium text-white focus:outline-none focus:border-emerald-500/50 transition-all w-64"
+                        className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-10 py-2.5 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20 transition-all w-64"
                     />
                 </div>
             </div>
@@ -377,7 +378,7 @@ const ProfitabilityHeatmapContent = () => {
             {/* Heatmap Grid */}
             <div className="grid grid-cols-1 gap-4">
                 {filteredData.map((item) => (
-                    <div key={item.id} className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4 group hover:scale-[1.005] transition-all duration-300 relative border-l-4 border-l-transparent hover:border-l-emerald-500">
+                    <div key={item.id} className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-4 group hover:scale-[1.005] transition-all duration-300 relative border-l-4 border-l-transparent hover:border-l-emerald-500">
                         <div className="grid grid-cols-12 gap-6 items-center">
                             {/* Product Info */}
                             <div className="col-span-3 space-y-1">
@@ -385,19 +386,19 @@ const ProfitabilityHeatmapContent = () => {
                                     <IconPackage className="w-4 h-4 text-gray-500" />
                                     <span className="text-[10px] font-bold text-gray-500 tracking-widest">{item.marketplace.toUpperCase()}</span>
                                 </div>
-                                <h3 className="text-sm font-black text-white truncate">{item.productName}</h3>
+                                <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">{item.productName}</h3>
                                 <p className="text-[10px] text-gray-500 font-mono tracking-tighter uppercase">{item.productCode} • {item.category || 'GENEL'}</p>
                             </div>
 
                             {/* Revenue & Margin Heat Area */}
-                            <div className="col-span-4 grid grid-cols-3 gap-4 border-x border-white/5 px-6">
+                            <div className="col-span-4 grid grid-cols-3 gap-4 border-x border-slate-200 dark:border-white/5 px-6">
                                 <div className="text-center">
                                     <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Gross Revenue</p>
-                                    <p className="text-sm font-black text-white">{item.grossRevenue.toLocaleString('tr-TR')} ₺</p>
+                                    <p className="text-sm font-black text-slate-900 dark:text-white">{item.grossRevenue.toLocaleString('tr-TR')} ₺</p>
                                 </div>
                                 <div className="text-center">
                                     <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Net Profit</p>
-                                    <p className={`text-sm font-black ${item.netProfit > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    <p className={`text-sm font-black ${item.netProfit > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                         {item.netProfit.toLocaleString('tr-TR')} ₺
                                     </p>
                                 </div>
@@ -410,7 +411,7 @@ const ProfitabilityHeatmapContent = () => {
                             </div>
 
                             {/* Cost Breakdown */}
-                            <div className="col-span-3 flex items-center justify-around gap-2 text-center border-r border-white/5 pr-6">
+                            <div className="col-span-3 flex items-center justify-around gap-2 text-center border-r border-slate-200 dark:border-white/5 pr-6">
                                 <div>
                                     <p className="text-[9px] text-gray-500 font-bold uppercase mb-1 flex items-center gap-1">
                                         <Layers className="w-3 h-3" /> FIFO Cost
@@ -431,7 +432,7 @@ const ProfitabilityHeatmapContent = () => {
                                         {getStatusText(item.margin)}
                                     </p>
                                 </div>
-                                <button className="p-2 bg-white/5 hover:bg-emerald-500/20 rounded-xl transition-all text-gray-500 hover:text-emerald-400">
+                                <button className="p-2 bg-slate-50 dark:bg-white/5 hover:bg-indigo-500/20 rounded-xl transition-all text-gray-500 hover:text-indigo-600 dark:text-indigo-400">
                                     <ChevronRight className="w-5 h-5" />
                                 </button>
                             </div>
@@ -440,7 +441,7 @@ const ProfitabilityHeatmapContent = () => {
                 ))}
 
                 {filteredData.length === 0 && (
-                    <div className="p-12 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center space-y-4">
+                    <div className="p-12 bg-white dark:bg-[#1e293b]/50 !border-none rounded-[24px] shadow-sm text-center space-y-4">
                         <IconAlert className="w-12 h-12 text-gray-600 mx-auto" />
                         <h3 className="text-xl font-bold text-gray-400">P&L Verisi Bulunamadı</h3>
                         <p className="text-sm text-gray-500 max-w-sm mx-auto">
@@ -451,9 +452,9 @@ const ProfitabilityHeatmapContent = () => {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-6 pt-8 border-t border-white/5">
+            <div className="flex items-center gap-6 pt-8 border-t border-slate-200 dark:border-white/5">
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                    <div className="w-3 h-3 rounded-full bg-indigo-500" />
                     <span className="text-[10px] font-bold text-gray-500 uppercase">Golden ({'>'}20%)</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -465,7 +466,7 @@ const ProfitabilityHeatmapContent = () => {
                     <span className="text-[10px] font-bold text-gray-500 uppercase">Critical ({'>'}0%)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-rose-500" />
+                    <div className="w-3 h-3 rounded-full bg-rose-600 dark:bg-rose-500" />
                     <span className="text-[10px] font-bold text-gray-500 uppercase">Loss View</span>
                 </div>
             </div>
@@ -503,26 +504,26 @@ const SmartPricingContent = () => {
         }, 1000);
     }, []);
 
-    if (loading) return <div className="p-12 animate-pulse h-64 bg-white/5 rounded-2xl" />;
+    if (loading) return <div className="p-12 animate-pulse h-64 bg-slate-50 dark:bg-white/5 rounded-2xl" />;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Smart Pricing Engine</h2>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Smart Pricing Engine</h2>
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Autonomous Margin Protection & Price Optimization</p>
                 </div>
-                <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10">
+                <div className="flex items-center gap-4 bg-slate-50 dark:bg-white/5 p-2 rounded-2xl border border-slate-200 dark:border-white/10">
                     <div className="flex flex-col items-end px-2">
                         <span className="text-[10px] font-bold text-gray-500 uppercase">Engine Status</span>
-                        <span className={`text-[11px] font-black ${isAutoPilot ? 'text-emerald-400' : 'text-orange-400'}`}>
+                        <span className={`text-[11px] font-black ${isAutoPilot ? 'text-indigo-600 dark:text-indigo-400' : 'text-orange-600 dark:text-orange-400'}`}>
                             {isAutoPilot ? 'AUTOPILOT: ON' : 'MANUAL REVIEW'}
                         </span>
                     </div>
                     <button
                         onClick={() => setIsAutoPilot(!isAutoPilot)}
-                        className={`relative w-14 h-7 rounded-full transition-all duration-300 ${isAutoPilot ? 'bg-emerald-500' : 'bg-gray-700'}`}
+                        className={`relative w-14 h-7 rounded-full transition-all duration-300 ${isAutoPilot ? 'bg-indigo-500' : 'bg-gray-700'}`}
                     >
                         <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-300 ${isAutoPilot ? 'left-8' : 'left-1'}`} />
                     </button>
@@ -531,83 +532,83 @@ const SmartPricingContent = () => {
 
             {/* Strategy Insight */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-orange-500/20">
-                    <IconActivity className="w-6 h-6 text-orange-500 mb-4" />
+                <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 border-orange-500/20">
+                    <IconActivity className="w-6 h-6 text-orange-600 dark:text-orange-400 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Rules</h4>
-                    <p className="text-2xl font-black text-white">42</p>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white">42</p>
                     <p className="text-[10px] text-gray-500 mt-2">Across 3 Marketplaces</p>
                 </div>
-                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-emerald-500/20">
-                    <IconShield className="w-6 h-6 text-emerald-500 mb-4" />
+                <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20">
+                    <IconShield className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Margin Protected</h4>
-                    <p className="text-2xl font-black text-white">12,450 ₺</p>
-                    <p className="text-[10px] text-emerald-500 mt-2">+4.2% since yesterday</p>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white">12,450 ₺</p>
+                    <p className="text-[10px] text-indigo-600 dark:text-indigo-400 mt-2">+4.2% since yesterday</p>
                 </div>
-                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-rose-500/20">
-                    <IconAlert className="w-6 h-6 text-rose-500 mb-4" />
+                <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 border-rose-500/20">
+                    <IconAlert className="w-6 h-6 text-rose-600 dark:text-rose-400 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loss Prevention</h4>
-                    <p className="text-2xl font-black text-rose-400">8 Critical</p>
+                    <p className="text-2xl font-black text-rose-600 dark:text-rose-400">8 Critical</p>
                     <p className="text-[10px] text-gray-500 mt-2">Prices below cost!</p>
                 </div>
-                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 bg-gradient-to-br from-orange-900/10 to-transparent">
-                    <IconRefresh className="w-6 h-6 text-orange-400 mb-4 animate-spin-slow" />
+                <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 bg-gradient-to-br from-orange-900/10 to-transparent">
+                    <IconRefresh className="w-6 h-6 text-orange-600 dark:text-orange-400 mb-4 animate-spin-slow" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Next Re-calc</h4>
-                    <p className="text-2xl font-black text-white">14:02</p>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white">14:02</p>
                     <p className="text-[10px] text-gray-500 mt-2">Every 15 minutes</p>
                 </div>
             </div>
 
             {/* Recommendations List */}
             <div className="space-y-4">
-                <h3 className="text-sm font-black text-white tracking-widest uppercase flex items-center gap-2">
-                    <IconTrendingUp className="w-4 h-4 text-emerald-500" /> Pending Price Actions
+                <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-widest uppercase flex items-center gap-2">
+                    <IconTrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Pending Price Actions
                 </h3>
 
                 <div className="grid grid-cols-1 gap-4">
                     {recommendations.map(rec => (
-                        <div key={rec.productId} className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 hover:border-orange-500/30 transition-all group overflow-hidden relative">
+                        <div key={rec.productId} className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6 hover:border-orange-500/30 transition-all group overflow-hidden relative">
                             <div className={`absolute top-0 right-0 w-32 h-full opacity-5 bg-gradient-to-l ${rec.change > 5 ? 'from-rose-500' : 'from-orange-500'}`} />
 
                             <div className="grid grid-cols-12 gap-8 items-center relative">
                                 <div className="col-span-3">
                                     <div className="flex items-center gap-2 mb-1">
                                         <IconPackage className="w-3 h-3 text-gray-500" />
-                                        <span className="text-[10px] font-bold text-indigo-400 uppercase">{rec.marketplace}</span>
+                                        <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">{rec.marketplace}</span>
                                     </div>
-                                    <h4 className="text-sm font-black text-white truncate">{rec.productName}</h4>
-                                    <p className={`text-[10px] font-bold mt-1 ${rec.status === 'CRITICAL' ? 'text-rose-400' : 'text-orange-400'}`}>
+                                    <h4 className="text-sm font-black text-slate-900 dark:text-white truncate">{rec.productName}</h4>
+                                    <p className={`text-[10px] font-bold mt-1 ${rec.status === 'CRITICAL' ? 'text-rose-600 dark:text-rose-400' : 'text-orange-600 dark:text-orange-400'}`}>
                                         Reason: {rec.reason}
                                     </p>
                                 </div>
 
-                                <div className="col-span-3 flex items-center justify-between border-x border-white/5 px-8">
+                                <div className="col-span-3 flex items-center justify-between border-x border-slate-200 dark:border-white/5 px-8">
                                     <div className="text-center">
                                         <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Current</p>
                                         <p className="text-xs font-bold text-gray-400">{rec.currentPrice.toLocaleString('tr-TR')} ₺</p>
                                     </div>
-                                    <ArrowUpRight className={`w-4 h-4 ${rec.change > 0 ? 'text-rose-400' : 'text-emerald-400'}`} />
+                                    <ArrowUpRight className={`w-4 h-4 ${rec.change > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-indigo-600 dark:text-indigo-400'}`} />
                                     <div className="text-center">
                                         <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">New Sync</p>
-                                        <p className="text-sm font-black text-white">{rec.recommendedPrice.toLocaleString('tr-TR')} ₺</p>
+                                        <p className="text-sm font-black text-slate-900 dark:text-white">{rec.recommendedPrice.toLocaleString('tr-TR')} ₺</p>
                                     </div>
                                 </div>
 
-                                <div className="col-span-4 grid grid-cols-2 gap-4 text-center border-r border-white/5 pr-8">
+                                <div className="col-span-4 grid grid-cols-2 gap-4 text-center border-r border-slate-200 dark:border-white/5 pr-8">
                                     <div>
                                         <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Net Margin At Current</p>
-                                        <p className="text-xs font-black text-rose-400">{rec.currentMargin}%</p>
+                                        <p className="text-xs font-black text-rose-600 dark:text-rose-400">{rec.currentMargin}%</p>
                                     </div>
-                                    <div className="bg-emerald-500/5 rounded-xl p-2 border border-emerald-500/10">
-                                        <p className="text-[9px] text-emerald-500/70 font-bold uppercase mb-1">Target Margin</p>
-                                        <p className="text-sm font-black text-emerald-400">{rec.targetMargin}%</p>
+                                    <div className="bg-indigo-500/5 rounded-xl p-2 border border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20">
+                                        <p className="text-[9px] text-indigo-600 dark:text-indigo-400/70 font-bold uppercase mb-1">Target Margin</p>
+                                        <p className="text-sm font-black text-indigo-600 dark:text-indigo-400">{rec.targetMargin}%</p>
                                     </div>
                                 </div>
 
                                 <div className="col-span-2 flex justify-end gap-3">
-                                    <button className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-emerald-500/20 hover:border-emerald-500/30 text-[10px] font-black text-white transition-all uppercase tracking-widest">
+                                    <button className="px-4 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-indigo-500/20 hover:border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20 text-[10px] font-black text-slate-900 dark:text-white transition-all uppercase tracking-widest">
                                         Apply
                                     </button>
-                                    <button className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                                    <button className="p-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-white/10 transition-all">
                                         <ChevronRight className="w-4 h-4 text-gray-500" />
                                     </button>
                                 </div>
@@ -669,55 +670,49 @@ export default function FintechControlTower() {
     };
 
     if (loading) return (
-        <div className="p-12 space-y-8 animate-pulse text-indigo-400/50">
-            <div className="h-20 bg-white/5 rounded-2xl w-full" />
+        <div className="p-12 space-y-8 animate-pulse text-indigo-600 dark:text-indigo-400/50">
+            <div className="h-20 bg-slate-50 dark:bg-white/5 rounded-2xl w-full" />
             <div className="grid grid-cols-4 gap-6">
-                <div className="h-32 bg-white/5 rounded-2xl" />
-                <div className="h-32 bg-white/5 rounded-2xl" />
-                <div className="h-32 bg-white/5 rounded-2xl" />
-                <div className="h-32 bg-white/5 rounded-2xl" />
+                <div className="h-32 bg-slate-50 dark:bg-white/5 rounded-2xl" />
+                <div className="h-32 bg-slate-50 dark:bg-white/5 rounded-2xl" />
+                <div className="h-32 bg-slate-50 dark:bg-white/5 rounded-2xl" />
+                <div className="h-32 bg-slate-50 dark:bg-white/5 rounded-2xl" />
             </div>
         </div>
     );
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700 pb-24">
-            {/* Premium Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
-                    <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-emerald-400 to-white animate-gradient">
-                        FİNANSAL KONTROL KULESİ
-                    </h1>
-                    <p className="text-gray-500 text-sm font-medium mt-1 uppercase tracking-widest flex items-center gap-2">
-                        <IconShield className="w-4 h-4 text-emerald-500" /> OTONOM FİNANSAL KOMUTA MERKEZİ
-                    </p>
-                </div>
-                <div className="flex items-center gap-6">
-                    <button className="btn-premium px-6 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2">
+        <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-24 bg-slate-50 min-h-screen pb-16 w-full font-sans dark:bg-[#0f172a]">
+<EnterpriseSectionHeader 
+                title="FİNANSAL KONTROL KULESİ" 
+                subtitle="Otonom Finansal Komuta Merkezi • Açık Bankacılık Senkronizasyon Konsolu"
+                icon={<IconShield />}
+                rightElement={
+                    <EnterpriseButton variant="secondary" className="flex items-center gap-2" onClick={() => {}}>
                         <IconActivity className="w-4 h-4" /> Sistem Denetim Kaydı
-                    </button>
-                </div>
-            </div>
+                    </EnterpriseButton>
+                } 
+            />
 
             {/* Premium Tabs */}
-            <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl w-fit">
+            <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full max-w-max md:mx-0 overflow-x-auto shadow-inner border border-slate-200/50 dark:border-slate-200 dark:border-white/5 custom-scroll shrink-0 mb-6 relative z-10">
                 <button
                     onClick={() => setActiveTab('control')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'control' ? 'bg-emerald-500 text-white shadow-sm ' : 'text-gray-500 hover:text-white'}`}
+                    className={`flex-1 min-w-[200px] h-10 px-6 rounded-full text-[11px] font-bold tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${activeTab === 'control' ? 'bg-white text-slate-800 shadow-sm border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700 border-transparent dark:text-slate-400 dark:hover:text-slate-300'}`}
                 >
-                    <IconActivity className="w-4 h-4" /> Komuta Merkezi
+                    <IconActivity className="w-4 h-4" /> KOMUTA MERKEZİ
                 </button>
                 <button
                     onClick={() => setActiveTab('heatmap')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'heatmap' ? 'bg-emerald-500 text-white shadow-sm ' : 'text-gray-500 hover:text-white'}`}
+                    className={`flex-1 min-w-[200px] h-10 px-6 rounded-full text-[11px] font-bold tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${activeTab === 'heatmap' ? 'bg-white text-slate-800 shadow-sm border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700 border-transparent dark:text-slate-400 dark:hover:text-slate-300'}`}
                 >
-                    <IconZap className="w-4 h-4" /> Kârlılık Isı Haritası
+                    <IconZap className="w-4 h-4" /> KÂRLILIK ISI HARİTASI
                 </button>
                 <button
                     onClick={() => setActiveTab('pricing')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'pricing' ? 'bg-emerald-500 text-white shadow-sm ' : 'text-gray-500 hover:text-white'}`}
+                    className={`flex-1 min-w-[200px] h-10 px-6 rounded-full text-[11px] font-bold tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${activeTab === 'pricing' ? 'bg-white text-slate-800 shadow-sm border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700 border-transparent dark:text-slate-400 dark:hover:text-slate-300'}`}
                 >
-                    <IconTrendingUp className="w-4 h-4" /> Otonom Fiyatlandırma
+                    <IconTrendingUp className="w-4 h-4" /> OTONOM FİYATLANDIRMA
                 </button>
             </div>
 
@@ -733,16 +728,16 @@ export default function FintechControlTower() {
             {activeTab === 'pricing' && <SmartPricingContent />}
 
             {/* Sticky Alt Çubuk */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/60  border-t border-white/5 z-50 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-200 dark:border-white/5  border-t border-slate-200 dark:border-white/5 z-50 flex justify-center">
                 <div className="max-w-7xl w-full flex justify-between items-center">
                     <div className="flex items-center gap-6">
                         <div className="flex flex-col">
                             <span className="text-[10px] text-gray-500 font-bold uppercase">Ana Banka Hesabı</span>
-                            <span className="text-xs text-white font-medium">102.01 - Aktif</span>
+                            <span className="text-xs text-slate-900 dark:text-white font-medium">102.01 - Aktif</span>
                         </div>
-                        <div className="flex flex-col border-l border-white/10 pl-6">
+                        <div className="flex flex-col border-l border-slate-200 dark:border-white/10 pl-6">
                             <span className="text-[10px] text-gray-500 font-bold uppercase">Fintech Sürümü</span>
-                            <span className="text-xs text-indigo-400 font-black tracking-widest">OS v2.0-STABIL</span>
+                            <span className="text-xs text-indigo-600 dark:text-indigo-400 font-black tracking-widest">OS v2.0-STABIL</span>
                         </div>
                     </div>
                 </div>
