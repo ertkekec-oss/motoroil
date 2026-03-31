@@ -621,7 +621,27 @@ export default function FintechControlTower() {
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState<any>(null);
     const [toggling, setToggling] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [activeTab, setActiveTab] = useState<'control' | 'heatmap' | 'pricing'>('control');
+
+    const handleSync = async () => {
+        setIsSyncing(true);
+        try {
+            const res = await fetch('/api/fintech/dashboard/sync-all', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert(data.message);
+                await fetchMetrics(); // refresh metrics after sync
+            } else {
+                alert("Senkronizasyon başarısız: " + data.error);
+            }
+        } catch (err: any) {
+            console.error(err);
+            alert("Senkronizasyon hatası: " + err.message);
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     const fetchMetrics = async () => {
         try {
@@ -682,9 +702,20 @@ export default function FintechControlTower() {
                 subtitle="Otonom Finansal Komuta Merkezi • Açık Bankacılık Senkronizasyon Konsolu"
                 icon={<IconShield />}
                 rightElement={
-                    <EnterpriseButton variant="secondary" className="flex items-center gap-2" onClick={() => {}}>
-                        <IconActivity className="w-4 h-4" /> Sistem Denetim Kaydı
-                    </EnterpriseButton>
+                    <div className="flex items-center gap-3">
+                        <EnterpriseButton 
+                            variant="primary" 
+                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" 
+                            onClick={handleSync}
+                            disabled={isSyncing}
+                        >
+                            <IconActivity className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} /> 
+                            {isSyncing ? 'Senkronize Ediliyor...' : 'Şimdi Senkronize Et'}
+                        </EnterpriseButton>
+                        <EnterpriseButton variant="secondary" className="flex items-center gap-2" onClick={() => {}}>
+                            <IconShield className="w-4 h-4" /> Sistem Denetim Kaydı
+                        </EnterpriseButton>
+                    </div>
                 } 
             />
 
