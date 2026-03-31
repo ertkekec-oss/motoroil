@@ -881,39 +881,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </div>
 
                     {/* Right: Compact Metrics & Actions */}
-                    <div className="flex flex-col md:items-end gap-3 flex-1 w-full md:w-auto">
-                        
-                        {/* Metrics */}
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[14px] ${balance > 0 ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : balance < 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500' : 'bg-slate-50 dark:bg-slate-700 text-slate-500'}`}>💰</div>
-                                <div>
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{`${balance > 0 ? 'Borç' : balance < 0 ? 'Alacak' : 'Dengeli'}`} Bakiyesi</div>
-                                    <div className={`text-[16px] font-black leading-none mt-0.5 ${balance > 0 ? 'text-red-600 dark:text-red-400' : balance < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>{Math.abs(balance).toLocaleString()} ₺</div>
-                                </div>
-                            </div>
-
-                            {overdueInstallments.length > 0 && (
-                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                    <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center text-[14px]">⏳</div>
-                                    <div>
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vadesi Geçen</div>
-                                        <div className="text-[16px] font-black leading-none text-red-600 dark:text-red-400 mt-0.5">{overdueAmount.toLocaleString()} ₺</div>
-                                    </div>
-                                </div>
-                            )}
-
-                             {portfolioChecks > 0 && (
-                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">🧾</div>
-                                    <div>
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Açık Çek/Senet</div>
-                                        <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{portfolioChecks.toLocaleString()} ₺</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    
+                    <div className="flex flex-wrap items-center justify-end gap-4 flex-1 w-full md:w-auto mt-4 xl:mt-0 xl:ml-auto">
                         {/* Quick Actions */}
                         <div className="flex flex-wrap items-center gap-2">
                             <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
@@ -958,7 +926,40 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </button>
                         </div>
 
-                                            </div>
+                                            
+                        {/* Metrics */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[14px] ${balance > 0 ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : balance < 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500' : 'bg-slate-50 dark:bg-slate-700 text-slate-500'}`}>💰</div>
+                                <div>
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{`${balance > 0 ? 'Borç' : balance < 0 ? 'Alacak' : 'Dengeli'}`} Bakiyesi</div>
+                                    <div className={`text-[16px] font-black leading-none mt-0.5 ${balance > 0 ? 'text-red-600 dark:text-red-400' : balance < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>{Math.abs(balance).toLocaleString()} ₺</div>
+                                </div>
+                            </div>
+
+                            {overdueInstallments.length > 0 && (
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center text-[14px]">⏳</div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vadesi Geçen</div>
+                                        <div className="text-[16px] font-black leading-none text-red-600 dark:text-red-400 mt-0.5">{overdueAmount.toLocaleString()} ₺</div>
+                                    </div>
+                                </div>
+                            )}
+
+                             {portfolioChecks > 0 && (
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">🧾</div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Açık Çek/Senet</div>
+                                        <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{portfolioChecks.toLocaleString()} ₺</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    
+                        
+                    </div>
                 </div>
 
                 {/* GROUPED NAVIGATION & FILTERS */}
@@ -1177,16 +1178,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         <div className="p-4 sm:p-6">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                                 <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Teklifler</h3>
-                                <Link href={`/offers?customerId=${customer.id}`} style={{ padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '800', textDecoration: 'none' }}>Yeni Teklif</Link>
+                                <Link href={`/offers?customerId=${customer.id}`} className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm">Yeni Teklif</Link>
                             </div>
-                            {(!customer.offers || customer.offers.length === 0) ? (
-                                <div style={{ padding: '40px', background: 'var(--bg-card, rgba(0,0,0,0.2))', borderRadius: '16px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
-                                    <div style={{ fontSize: '32px', marginBottom: '16px', opacity: 0.5 }}>📝</div>
-                                    <h4 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Teklif Bulunamadı</h4>
-                                    Müşteriye henüz bir teklif oluşturulmamış.
-                                </div>
-                            ) : (
-                                <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
+                            <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
                                             <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
@@ -1196,9 +1190,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 <th className="px-5 py-4 font-bold whitespace-nowrap">Durum</th>
                                                 <th className="px-5 py-4 font-bold whitespace-nowrap">Detay</th>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {customer.offers.map((offer: any) => (
+                                        </thead><tbody className="divide-y divide-slate-100 dark:divide-white/5">
+{(!customer.offers || customer.offers.length === 0) ? (<tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Teklif Bulunamadı. Müşteriye henüz bir teklif oluşturulmamış.</td></tr>) : customer.offers.map((offer: any) => (
                                                 <tr key={offer.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group border-b border-slate-100 dark:border-white/5">
                                                     <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400" style={{ verticalAlign: 'middle' }}>
                                                         <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main, #fff)', marginBottom: '4px' }}>
@@ -1252,21 +1245,19 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         <div className="p-4 sm:p-6">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                                 <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Dosyaları</h3>
-                                <label className="btn btn-primary" style={{ cursor: uploading ? 'wait' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: uploading ? 'var(--bg-card)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: 'white', fontWeight: '800' }}>
+                                <label className="h-[36px] px-4 bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm">
                                     {uploading ? 'Yükleniyor...' : '⬆️ Dosya Yükle'}
                                     <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} disabled={uploading} accept=".pdf,.png,.jpg,.jpeg" />
                                 </label>
                             </div>
 
                             {docsLoading ? (
-                                <div className="p-12 text-center text-slate-500 rounded-[20px] bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5">
-                                    <div className="loader" style={{ margin: '0 auto 16px', width: '24px', height: '24px', border: '3px solid rgba(59, 130, 246, 0.3)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                                <div className="p-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px] bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm">
                                     Dosyalar getiriliyor...
                                 </div>
                             ) : documents.length === 0 ? (
-                                <div className="p-10 text-center bg-slate-50 dark:bg-[#0f172a] rounded-[16px] border border-dashed border-slate-200 dark:border-white/10">
-                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📁</div>
-                                    <div style={{ color: 'var(--text-muted, #888)', fontSize: '15px', fontWeight: '500' }}>Henüz dosyası yüklenmemiş. (Maks 5MB PDF, PNG, JPEG)</div>
+                                <div className="p-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px] bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm">
+                                    Henüz dosyası yüklenmemiş. (Maks 5MB PDF, PNG, JPEG)
                                 </div>
                             ) : (
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
@@ -1299,17 +1290,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </div>
                                 <button
                                     onClick={() => setWarrantyModalOpen(true)}
-                                    className="btn btn-primary"
-                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '800', border: 'none', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}
+                                    className="h-[36px] px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                                 >
                                     🛡️ Garanti Başlat
                                 </button>
                             </div>
 
                             {warranties.length === 0 ? (
-                                <div className="p-10 text-center bg-slate-50 dark:bg-[#0f172a] rounded-[16px] border border-dashed border-slate-200 dark:border-white/10">
-                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🛡️</div>
-                                    <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Henüz kayıtlı garanti karnesi bulunmuyor.</div>
+                                <div className="p-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px] bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm">
+                                    Henüz kayıtlı garanti karnesi bulunmuyor.
                                 </div>
                             ) : (
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
@@ -1378,8 +1367,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Evraklar & Vadeler</h3>
                                 <button
                                     onClick={() => setCheckAddModalOpen(true)}
-                                    className="btn btn-primary"
-                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', fontWeight: '800', border: 'none', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}
+                                    className="h-[36px] px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                                 >
                                     ➕ Yeni Evrak Ekle
                                 </button>
@@ -1391,22 +1379,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <span style={{ fontSize: '20px' }}>📥</span> Çek & Senet Portföyü
                                     </h4>
-                                    {!customer.checks || customer.checks.length === 0 ? (
-                                        <div className="p-10 text-center bg-slate-50 dark:bg-[#0f172a] rounded-[16px] border border-dashed border-slate-200 dark:border-white/10">
-                                            <div style={{ fontSize: '36px', marginBottom: '12px', opacity: 0.5 }}>📑</div>
-                                            <div style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '600' }}>Kayıtlı evrak bulunmuyor.</div>
-                                        </div>
-                                    ) : (
-                                        <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
+                                    <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
                                             <table className="w-full text-left border-collapse">
                                                 <thead>
                                                     <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
                                                         <th className="px-5 py-4 font-bold whitespace-nowrap">EVRAK DESTEĞİ & TARİH</th>
                                                         <th className="px-5 py-4 font-bold text-right whitespace-nowrap">TUTAR & DURUM</th>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {customer.checks.map((c: any) => (
+                                                </thead><tbody className="divide-y divide-slate-100 dark:divide-white/5">
+{(!customer.checks || customer.checks.length === 0) ? (<tr><td colSpan={2} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Kayıtlı evrak bulunmuyor.</td></tr>) : customer.checks.map((c: any) => (
                                                         <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group border-b border-slate-100 dark:border-white/5">
                                                             <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
                                                                 <div style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)', marginBottom: '4px' }}>{c.type} - {c.bank}</div>
@@ -1479,22 +1460,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '700', color: 'var(--text-muted, #aaa)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <span style={{ fontSize: '20px' }}>📅</span> Taksit & Vadelendirme Planları
                                     </h4>
-                                    {!customer.paymentPlans || customer.paymentPlans.length === 0 ? (
-                                        <div className="p-10 text-center bg-slate-50 dark:bg-[#0f172a] rounded-[16px] border border-dashed border-slate-200 dark:border-white/10">
-                                            <div style={{ fontSize: '36px', marginBottom: '12px', opacity: 0.5 }}>📅</div>
-                                            <div style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '600' }}>Aktif vadelendirme planı bulunmuyor.</div>
-                                        </div>
-                                    ) : (
-                                        <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
+                                    <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
                                             <table className="w-full text-left border-collapse">
                                                 <thead>
                                                     <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
                                                         <th className="px-5 py-4 font-bold whitespace-nowrap">SATIŞ/KONU & TARİH</th>
                                                         <th className="px-5 py-4 font-bold text-right whitespace-nowrap">TUTAR & İŞLEM</th>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {customer.paymentPlans.filter((p:any)=>p.status!=='İptal'&&p.status!=='Cancelled').map((p: any) => (
+                                                </thead><tbody className="divide-y divide-slate-100 dark:divide-white/5">
+{(!customer.paymentPlans || customer.paymentPlans.length === 0) ? (<tr><td colSpan={2} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Aktif vadelendirme planı bulunmuyor.</td></tr>) : customer.paymentPlans.filter((p:any)=>p.status!=='İptal'&&p.status!=='Cancelled').map((p: any) => (
                                                         <Fragment key={p.id}>
                                                         <tr onClick={() => setExpandedRowId(expandedRowId === p.id ? null : p.id)} style={{ borderBottom: expandedRowId === p.id ? 'none' : '1px solid var(--border-color, rgba(255,255,255,0.05))', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s', background: expandedRowId === p.id ? 'var(--bg-card, rgba(255,255,255,0.03))' : 'transparent' }} className="hover:bg-white/5">
                                                             <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400">
@@ -1566,38 +1540,26 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Cari Mutabakatlar</h3>
                                 <button
                                     onClick={() => setReconWizardOpen(true)}
-                                    className="btn btn-primary"
-                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', fontWeight: '800', border: 'none', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}
+                                    className="h-[36px] px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                                 >
                                     🤝 Mutabakat Başlat
                                 </button>
                             </div>
 
-                            {(!customer.reconciliations || customer.reconciliations.length === 0) ? (
-                                <div className="p-10 text-center bg-slate-50 dark:bg-[#0f172a] rounded-[16px] border border-dashed border-slate-200 dark:border-white/10">
-                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🤝</div>
-                                    <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Bu cariyle henüz mutabakat yapılmamış.</div>
-                                    <button
-                                        onClick={() => router.push('/reconciliation/list')}
-                                        style={{ padding: '10px 20px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', fontSize: '13px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
-                                        className="hover:bg-blue-500 hover:text-white"
-                                    >
-                                        Mevcut İşlemleri Gör
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
+                            <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col mb-4">
+        <table className="w-full text-left border-collapse">
+            <thead>
+                <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#1e293b]">
                                                 <th style={{ padding: '16px 20px' }}>DÖNEM</th>
                                                 <th style={{ padding: '16px 20px' }}>TARİH</th>
                                                 <th style={{ padding: '16px 20px' }}>DURUM</th>
                                                 <th className="px-5 py-4 font-bold text-right whitespace-nowrap">BAKİYE</th>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {customer.reconciliations.map((r: any) => (
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                {(!customer.reconciliations || customer.reconciliations.length === 0) ? (
+                    <tr><td colSpan={4} className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px]">Bu cariyle henüz mutabakat yapılmamış.</td></tr>
+                ) : customer.reconciliations.map((r: any) => (
                                                 <tr key={r.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s', cursor: 'pointer' }} onClick={() => router.push('/reconciliation')} className="hover:bg-white/5">
                                                     <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400" style={{ fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{new Date(r.periodStart).toLocaleDateString('tr-TR')} - {new Date(r.periodEnd).toLocaleDateString('tr-TR')}</td>
                                                     <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400" style={{ color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{new Date(r.createdAt || r.date).toLocaleDateString('tr-TR')}</td>
@@ -1607,13 +1569,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#3b82f6', fontSize: '14px' }}>{Number(r.balance || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
                                                 </tr>
                                             ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col">
+                                        </tbody></table></div></div>) : ( <div className="overflow-auto max-h-[calc(100vh-270px)] custom-scroll bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col">
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-20">
                                     <tr>
@@ -1901,19 +1857,19 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     <td style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #666)' }}>{item.items ? (expandedRowId === item.id ? '▲' : '▼') : ''}</td>
                                                 </tr>
                                                 {expandedRowId === item.id && item.items && (
-                                                    <tr style={{ background: '#080a0f', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.03))' }}>
+                                                    <tr className="bg-slate-50 dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/5">
                                                         <td colSpan={6} style={{ padding: '24px 32px' }}>
                                                             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
                                                                 {/* Sol Taraf: Kalemler (Order Summary) ve Ödeme Planı */}
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                                                                    <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                    <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-[20px] p-6 border border-slate-200 dark:border-white/5">
                                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', paddingBottom: '16px' }}>
                                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                                             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
                                                                                 📦
                                                                             </div>
                                                                             <div>
-                                                                                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: 'var(--text-main, #fff)', letterSpacing: '0.5px' }}>SATIŞ ÖZETİ</h4>
+                                                                                <h4 className="m-0 text-[14px] font-extrabold text-slate-800 dark:text-white tracking-wide">SATIŞ ÖZETİ</h4>
                                                                                 <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.items.length} Kalem Listeleniyor</div>
                                                                             </div>
                                                                         </div>
@@ -1937,7 +1893,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div style={{ fontWeight: '800', color: 'var(--text-main, #fff)', fontFamily: 'monospace', fontSize: '15px' }}>
+                                                                                <div className="font-extrabold text-slate-800 dark:text-white font-mono text-[15px]">
                                                                                     {((sub.price || 0) * (sub.qty || sub.quantity || 1)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                                                 </div>
                                                                             </div>
@@ -1949,19 +1905,19 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                     const attachedPlan = customer?.paymentPlans?.find((p: any) => p.title === item.desc || p.description === item.id || (item.orderId && p.description === item.orderId) || (item.formalInvoiceId && p.description === item.formalInvoiceId));
                                                                     if (!attachedPlan) return null;
                                                                     return (
-                                                                        <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                        <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-[20px] p-6 border border-slate-200 dark:border-white/5">
                                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                                                                                 <h4 style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#f59e0b', letterSpacing: '1px' }}>ÖDEME PLANI DETAYI</h4>
                                                                                 <span style={{ fontSize: '11px', fontWeight: '800', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', padding: '4px 8px', borderRadius: '8px' }}>{attachedPlan.installments?.length || attachedPlan.installmentCount} Taksit</span>
                                                                             </div>
                                                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                                                 {attachedPlan.installments?.map((inst: any) => (
-                                                                                    <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', opacity: inst.status === 'Cancelled' ? 0.5 : 1 }}>
+                                                                                    <div key={inst.id} className="flex justify-between p-3 bg-white dark:bg-[#0f172a]/50 rounded-[8px] border border-slate-200/50 dark:border-white/5 shadow-sm" style={{ opacity: inst.status === 'Cancelled' ? 0.5 : 1 }}>
                                                                                         <span style={{ color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '600', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>
                                                                                             {inst.installmentNo}. Taksit ({new Date(inst.dueDate).toLocaleDateString('tr-TR')})
                                                                                             {inst.status === 'Cancelled' && <span style={{ color: '#ef4444', marginLeft: '6px' }}>(İptal Edildi)</span>}
                                                                                         </span>
-                                                                                        <span style={{ color: 'var(--text-main, #fff)', fontSize: '14px', fontWeight: '800', fontFamily: 'monospace', textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                                        <span className="text-slate-800 dark:text-white text-[14px] font-extrabold font-mono" style={{ textDecoration: inst.status === 'Cancelled' ? 'line-through' : 'none' }}>{Number(inst.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
                                                                                     </div>
                                                                                 ))}
                                                                             </div>
@@ -1973,7 +1929,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 {/* Sağ Taraf: Payment Breakdown & Timeline */}
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-                                                                    <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                    <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-[20px] p-6 border border-slate-200 dark:border-white/5">
                                                                         <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>FİNANSAL ÖZET</h4>
                                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                                                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
@@ -1986,7 +1942,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                             </div>
                                                                             <div style={{ height: '1px', background: 'var(--border-color, rgba(255,255,255,0.1))', margin: '8px 0' }}></div>
                                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                                <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>GENEL TOPLAM</span>
+                                                                                <span className="text-[12px] font-bold text-slate-800 dark:text-white">GENEL TOPLAM</span>
                                                                                 <span style={{ fontSize: '20px', fontWeight: '900', color: '#3b82f6', fontFamily: 'monospace' }}>
                                                                                     {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                                                 </span>
@@ -1996,7 +1952,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
 
 
-                                                                    <div style={{ background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                    <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-[20px] p-6 border border-slate-200 dark:border-white/5">
                                                                         <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>ZAMAN ÇİZELGESİ</h4>
                                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative' }}>
                                                                             <div style={{ position: 'absolute', left: '7px', top: '10px', bottom: '10px', width: '2px', background: 'var(--border-color, rgba(255,255,255,0.05))' }}></div>
