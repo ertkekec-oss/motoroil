@@ -74,7 +74,7 @@ export function InvoiceMappingModal({
         const itemName = wizardItem.productName || wizardItem.name || 'İsimsiz Ürün';
         setIsCreating(itemName);
         try {
-            const res = await apiFetch('/api/inventory', {
+            const res = await apiFetch('/api/inventory/products', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
