@@ -1072,18 +1072,7 @@ function InventoryContent() {
       className="p-6 pb-32 animate-fade-in relative transition-colors duration-300"
       data-theme={theme}
     >
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            transform: translate(-50%, 100px);
-            opacity: 0;
-          }
-          to {
-            transform: translate(-50%, 0);
-            opacity: 1;
-          }
-        }
-      `}</style>
+
       {/* --- HEADER (ÜST OPERASYON BAR) --- */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8 relative z-30 pt-4 w-full">
         <div className="flex-1 text-left">

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
-import { resendReconAction, voidReconAction, exportReconEvidenceAction, openReconDisputeAction, updateDisputeStatusAction, addDisputeInternalNoteAction, assignDisputeAction } from "@/services/finance/reconciliation/actions";
+import { resendReconAction, voidReconAction, exportReconEvidenceAction, openReconDisputeAction, updateDisputeStatusAction, addDisputeInternalNoteAction } from "@/services/finance/reconciliation/actions";
 import { useRouter } from "next/navigation";
+import { EnterpriseCard } from "@/components/ui/EnterpriseCard";
 
 export default function ReconDetailClient({ reconciliation: r }: { reconciliation: any }) {
     const { showSuccess, showError, showConfirm } = useModal();
@@ -13,7 +14,6 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
     const [processing, setProcessing] = useState<string | null>(null);
     const [noteInputs, setNoteInputs] = useState<Record<string, string>>({});
 
-    // --- DOC STATE & HANDLERS ---
     const [documents, setDocuments] = useState<any[]>([]);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -165,7 +165,7 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
     };
 
     const handleDispute = async () => {
-        showConfirm("İtiraz / Dispute", "Bir itiraz başlatmak istediğinize emin misiniz? Karşı tarafın mutabakata red yanıtı vermesi otomatik Dispute açabilir.", async () => {
+        showConfirm("İtiraz / Dispute", "Bir itiraz başlatmak istediğinize emin misiniz?", async () => {
             setProcessing('DISPUTE');
             const res = await openReconDisputeAction(r.id, "OTHER", "Manuel Dispute from Admin interface.");
             if (res.success) { showSuccess("Başarılı", "Dispute talebi açıldı."); router.refresh(); }
@@ -183,51 +183,77 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
     };
 
     return (
-        <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-main)', color: 'var(--text-main)', paddingBottom: '100px' }}>
-            {/* Header Strip */}
-            <div style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border-color)', padding: '24px 40px', position: 'sticky', top: 0, zIndex: 40 }}>
-                <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div className="flex-between">
-                        <Link href="/accounting/reconciliations" style={{ color: 'var(--text-muted, #888)', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }} className="hover:text-blue-500">
-                            <span style={{ fontSize: '16px' }}>←</span> Mutabakatlara Dön
+        <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#07090e] pb-12">
+            {/* Extended Sticky Header with Glassmorphism */}
+            <div className="sticky top-0 z-40 bg-white/80 dark:bg-[#0b101a]/80 backdrop-blur-xl border-b border-light dark:border-white/5 pt-8 pb-6 px-4 md:px-8 xl:px-12 transition-all">
+                <div className="max-w-[1400px] mx-auto w-full flex flex-col gap-6">
+                    <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                        <Link 
+                            href="/accounting/reconciliations" 
+                            className="group flex items-center gap-2 text-sm font-black tracking-wide text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors uppercase"
+                        >
+                            <span className="text-lg group-hover:-translate-x-1 transition-transform">←</span>
+                            MUTABAKATLARA DÖN
                         </Link>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        
+                        <div className="flex flex-wrap gap-2">
                             {!['SIGNED', 'VOID'].includes(r.status) && (
                                 <>
-                                    <button onClick={handleResend} disabled={!!processing} className="btn" style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#3b82f6', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
+                                    <button 
+                                        onClick={handleResend} 
+                                        disabled={!!processing} 
+                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-black rounded-xl hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all border border-blue-200 dark:border-blue-500/20 disabled:opacity-50"
+                                    >
                                         {processing === 'RESEND' ? '...' : '📩 Yeniden Gönder'}
                                     </button>
-                                    <button onClick={handleVoid} disabled={!!processing} className="btn" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
+                                    <button 
+                                        onClick={handleVoid} 
+                                        disabled={!!processing} 
+                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-black rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition-all border border-red-200 dark:border-red-500/20 disabled:opacity-50"
+                                    >
                                         🚨 İptal Et (VOID)
                                     </button>
                                 </>
                             )}
-                            <button onClick={handleExport} disabled={!!processing} className="btn" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'white', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
-                                ⬇️ Tamamını Dışa Aktar (Export)
+                            <button 
+                                onClick={handleExport} 
+                                disabled={!!processing} 
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white text-xs font-black rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all border border-slate-200 dark:border-white/10 disabled:opacity-50"
+                            >
+                                ⬇️ Tamamını Dışa Aktar
                             </button>
-                            <button onClick={handleDispute} disabled={!!processing} className="btn" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
-                                ⚠️ İtiraz (Dispute) Aç
+                            <button 
+                                onClick={handleDispute} 
+                                disabled={!!processing} 
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-500 text-xs font-black rounded-xl hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-all border border-amber-200 dark:border-amber-500/20 disabled:opacity-50"
+                            >
+                                ⚠️ İtiraz Aç
                             </button>
-                            <button onClick={() => showSuccess("Bilgi", 'Future-ready: İmzaya Gönder V1 Katmanı')} disabled={!!processing} className="btn hover:bg-emerald-500/20" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: 'bold' }}>
+                            <button 
+                                onClick={() => showSuccess("Bilgi", 'Future-ready: İmzaya Gönder V1 Katmanı')} 
+                                disabled={!!processing} 
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all border border-emerald-200 dark:border-emerald-500/20 disabled:opacity-50"
+                            >
                                 ✍️ İmzaya Gönder
                             </button>
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div className="flex flex-col md:flex-row gap-6 md:items-end justify-between">
                         <div>
-                            <h1 style={{ fontSize: '26px', fontWeight: '800', margin: '0 0 6px 0', letterSpacing: '-0.5px' }}>
-                                Mutabakat Zarfı <span style={{ opacity: 0.5, fontSize: '20px' }}>#{r.id.substring(r.id.length - 8).toUpperCase()}</span>
+                            <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
+                                Mutabakat Zarfı 
+                                <span className="text-xl font-bold text-slate-400 dark:text-slate-600">#{r.id.substring(r.id.length - 8).toUpperCase()}</span>
                             </h1>
-                            <div style={{ display: 'flex', gap: '16px', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '500' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏢</span> {r.customer?.name} (VN: {r.customer?.taxNumber})</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📅</span> Dönem: {new Date(r.periodStart).toLocaleDateString()} - {new Date(r.periodEnd).toLocaleDateString()}</span>
+                            <div className="flex flex-wrap items-center gap-4 mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">
+                                <span className="flex items-center gap-1.5"><span className="opacity-70">🏢</span> {r.customer?.name} (VN: {r.customer?.taxNumber})</span>
+                                <span className="flex items-center gap-1.5"><span className="opacity-70">📅</span> Dönem: {new Date(r.periodStart).toLocaleDateString()} - {new Date(r.periodEnd).toLocaleDateString()}</span>
                             </div>
                         </div>
 
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>DURUM</div>
-                            <div style={{ fontSize: '18px', fontWeight: '900', color: r.status === 'SIGNED' ? '#10b981' : r.status === 'DISPUTED' ? '#f59e0b' : r.status === 'VOID' ? '#64748b' : '#3b82f6' }}>
+                        <div className="text-right">
+                            <div className="text-[10px] font-black tracking-widest text-slate-500 dark:text-slate-400 uppercase mb-1">Durum</div>
+                            <div className={`text-lg font-black ${r.status === 'SIGNED' ? 'text-emerald-500 dark:text-emerald-400' : r.status === 'DISPUTED' ? 'text-amber-500 dark:text-amber-400' : r.status === 'VOID' ? 'text-slate-500 dark:text-slate-400' : 'text-blue-500 dark:text-blue-400'}`}>
                                 🟢 {r.status}
                             </div>
                         </div>
@@ -235,114 +261,121 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                 </div>
             </div>
 
-            <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-
-                {/* SNAPSHOT CARD AND CONTRACT CARD ROW */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+            <div className="max-w-[1400px] w-full mx-auto px-4 md:px-8 xl:px-12 mt-8 flex flex-col gap-8">
+                
+                {/* SNAPSHOT & CONTRACT ROW */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Snapshot Card */}
-                    <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '32px', border: '1px solid var(--border-color)', position: 'relative' }}>
-                        <div style={{ position: 'absolute', top: '16px', right: '16px', opacity: 0.4, fontSize: '48px' }}>🔐</div>
-                        <h2 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '24px', letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Mali Özet (Snapshot)</h2>
+                    <EnterpriseCard className="p-8 relative overflow-hidden group">
+                        <div className="absolute top-6 right-6 text-6xl opacity-[0.03] dark:opacity-[0.02] grayscale group-hover:scale-110 transition-transform">🔐</div>
+                        <h2 className="text-[12px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-6">Mali Özet (Snapshot)</h2>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                        <div className="grid grid-cols-2 gap-6 mb-6">
                             <div>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Toplam Borç Kayıtları</div>
-                                <div style={{ fontSize: '18px', fontWeight: '800', color: '#ef4444' }}>{Number(r.snapshot?.totalDebit || 0).toLocaleString()} <span style={{ fontSize: '12px', opacity: 0.8 }}>₺</span></div>
+                                <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Toplam Borç Kayıtları</div>
+                                <div className="text-xl font-black text-red-500 dark:text-red-400">
+                                    {Number(r.snapshot?.totalDebit || 0).toLocaleString()} <span className="text-sm font-bold opacity-80">₺</span>
+                                </div>
                             </div>
                             <div>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Toplam Alacak Kayıtları</div>
-                                <div style={{ fontSize: '18px', fontWeight: '800', color: '#10b981' }}>{Number(r.snapshot?.totalCredit || 0).toLocaleString()} <span style={{ fontSize: '12px', opacity: 0.8 }}>₺</span></div>
+                                <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Toplam Alacak Kayıtları</div>
+                                <div className="text-xl font-black text-emerald-500 dark:text-emerald-400">
+                                    {Number(r.snapshot?.totalCredit || 0).toLocaleString()} <span className="text-sm font-bold opacity-80">₺</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div style={{ padding: '24px', background: 'rgba(0,0,0,0.2)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>Net Bakiye:</div>
-                            <div style={{ fontSize: '36px', fontWeight: '900', color: Number(r.balance) > 0 ? '#ef4444' : '#10b981', letterSpacing: '-1px' }}>
-                                {Math.abs(Number(r.balance)).toLocaleString()} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span>
-                                <span style={{ fontSize: '14px', marginLeft: '12px', padding: '4px 8px', borderRadius: '6px', background: 'var(--bg-panel)', textTransform: 'uppercase' }}>
+                        <div className="p-6 bg-slate-50 dark:bg-white/[0.02] rounded-2xl border border-slate-200 dark:border-white/5">
+                            <div className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">Net Bakiye:</div>
+                            <div className={`text-4xl font-black tracking-tight flex flex-wrap items-center gap-4 ${Number(r.balance) > 0 ? 'text-red-500 dark:text-red-400' : 'text-emerald-500 dark:text-emerald-400'}`}>
+                                <div>{Math.abs(Number(r.balance)).toLocaleString()} <span className="text-2xl font-bold opacity-80">₺</span></div>
+                                <span className="px-3 py-1.5 bg-slate-200 dark:bg-[#0f172a] rounded-lg text-xs font-black tracking-widest text-slate-700 dark:text-slate-300 uppercase shrink-0">
                                     {Number(r.balance) > 0 ? 'BORÇLU (AÇIK RİSK)' : Number(r.balance) < 0 ? 'ALACAKLI' : 'DENGELİ'}
                                 </span>
                             </div>
                         </div>
 
-                        <div style={{ marginTop: '24px', fontSize: '11px', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', wordBreak: 'break-all' }}>
-                            <b>Immutable Digital Signature Hash (SHA-256):</b><br />
-                            {r.snapshot?.hashSha256 || "Yükleniyor..."}
+                        <div className="mt-6 p-4 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 break-all">
+                            <div className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Immutable Hash (SHA-256):</div>
+                            <div className="text-xs font-mono text-slate-600 dark:text-slate-300">{r.snapshot?.hashSha256 || "Yükleniyor..."}</div>
                         </div>
-                    </div>
+                    </EnterpriseCard>
 
                     {/* Contracts Card */}
-                    <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '32px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                            <h2 style={{ fontSize: '16px', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--text-muted)', margin: 0 }}>Entegrasyon & İmza</h2>
-                            <div style={{ padding: '4px 12px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', borderRadius: '20px', fontSize: '12px', fontWeight: '800' }}>e-İmza & Otomasyon</div>
+                    <EnterpriseCard className="p-8 flex flex-col relative overflow-hidden group">
+                        <div className="absolute top-6 right-6 text-6xl opacity-[0.03] dark:opacity-[0.02] grayscale group-hover:scale-110 transition-transform">⚙️</div>
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-[12px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest m-0">Entegrasyon & İmza</h2>
+                            <div className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-widest">e-İmza & Otomasyon</div>
                         </div>
 
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid var(--border-color)' }}>
-                                <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Gönderim Yöntemi</span>
-                                <span style={{ fontWeight: '700' }}>{r.deliveryMethod}</span>
+                        <div className="flex-1 flex flex-col gap-4 relative z-10">
+                            <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-white/5">
+                                <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Gönderim Yöntemi</span>
+                                <span className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wide bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-lg">{r.deliveryMethod}</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid var(--border-color)' }}>
-                                <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Yetkilendirme (Auth)</span>
-                                <span style={{ fontWeight: '700' }}>{r.authMethod} Method</span>
+                            <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-white/5">
+                                <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Yetkilendirme (Auth)</span>
+                                <span className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wide bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-lg">{r.authMethod} Method</span>
                             </div>
 
                             {r.linkedEnvelopeId ? (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid var(--border-color)' }}>
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Zarf ID (Signature Engine)</span>
-                                    <span style={{ fontWeight: '700', color: '#10b981' }}>Aktif Zarf: {r.linkedEnvelopeId}</span>
+                                <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-emerald-500/20">
+                                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Zarf ID (Signature Engine)</span>
+                                    <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Aktif Zarf: {r.linkedEnvelopeId}</span>
                                 </div>
                             ) : (
-                                <div style={{ fontSize: '12px', color: '#f59e0b', padding: '12px', background: 'rgba(245,158,11,0.05)', borderRadius: '8px' }}>
+                                <div className="p-4 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20 text-sm font-bold text-amber-700 dark:text-amber-500">
                                     ⚠️ Orijinal sözleşme motoruna henüz linklenmemiş e-imza kanıtı beklemede.
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </EnterpriseCard>
                 </div>
 
                 {/* DOCUMENTS PANEL */}
-                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '32px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                <EnterpriseCard className="p-6 md:p-8 flex flex-col mt-4">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-6 md:mb-8">
                         <div>
-                            <h2 style={{ fontSize: '16px', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--text-muted)', margin: 0 }}>Mutabakat Ekleri</h2>
-                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Manuel yüklenen referans veya ek belgeleri buradan yönetebilirsiniz.</p>
+                            <h2 className="text-[12px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest m-0">Mutabakat Ekleri</h2>
+                            <p className="text-sm font-bold text-slate-400 dark:text-slate-500 mt-2">Manuel yüklenen referans veya ek belgeleri yönetin.</p>
                         </div>
-                        <label style={{ padding: '8px 16px', background: 'rgba(16,185,129,0.1)', color: '#10b981', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', opacity: isUploading ? 0.5 : 1, pointerEvents: isUploading ? 'none' : 'auto' }} className="hover:bg-[rgba(16,185,129,0.2)]">
+                        <label className={`inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black uppercase tracking-widest cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all border border-emerald-200 dark:border-emerald-500/20 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                             {isUploading ? 'Yükleniyor...' : '+ Ek Yükle'}
-                            <input type="file" style={{ display: 'none' }} accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} />
+                            <input type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} />
                         </label>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div className="flex flex-col gap-3">
                         {documents.length === 0 ? (
-                            <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Henüz eklenen bir belge yok.</p>
+                            <div className="text-sm font-bold text-slate-400 dark:text-slate-500 italic p-6 bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-slate-200 dark:border-white/5 text-center">Henüz eklenen bir belge yok.</div>
                         ) : (
                             documents.map(doc => (
-                                <div key={doc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'rgba(0,0,0,0.1)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div style={{ overflow: 'hidden', paddingRight: '16px' }}>
-                                        <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={doc.fileName}>{doc.name || doc.fileName}</div>
-                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '4px' }}>
-                                            {new Date(doc.createdAt).toLocaleDateString()} • {(doc.size / 1024).toFixed(0)} KB
+                                <div key={doc.id} className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-slate-200 dark:border-white/5 gap-4">
+                                    <div className="overflow-hidden w-full md:pr-4">
+                                        <div className="text-sm font-black text-slate-800 dark:text-white truncate" title={doc.fileName}>{doc.name || doc.fileName}</div>
+                                        <div className="text-[10px] font-black text-slate-500 tracking-widest uppercase mt-1.5 flex items-center gap-2">
+                                            <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
+                                            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                                            <span>{(doc.size / 1024).toFixed(0)} KB</span>
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                                        <button onClick={() => handleDownloadDocument(doc.id, doc.fileName)} style={{ padding: '6px', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '6px' }} title="İndir" className="hover:text-blue-500 hover:bg-blue-500/10">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    <div className="flex gap-2 w-full md:w-auto shrink-0 justify-end mt-2 md:mt-0">
+                                        <button onClick={() => handleDownloadDocument(doc.id, doc.fileName)} className="p-2 text-slate-500 dark:text-slate-400 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-500/20" title="İndir">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                         </button>
-                                        <button onClick={() => handleDeleteDocument(doc.id)} style={{ padding: '6px', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '6px' }} title="Sil" className="hover:text-red-500 hover:bg-red-500/10">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                        <button onClick={() => handleDeleteDocument(doc.id)} className="p-2 text-slate-500 dark:text-slate-400 bg-transparent hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-500/20" title="Sil">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                         </button>
                                     </div>
                                 </div>
                             ))
                         )}
                     </div>
-                </div>
+                </EnterpriseCard>
 
-                {/* TABS FOR DETAILS */}
-                <div style={{ display: 'flex', gap: '32px', borderBottom: '1px solid var(--border-color)', marginTop: '24px' }}>
+                {/* TABS HEADER */}
+                <div className="flex overflow-x-auto gap-8 border-b border-light dark:border-white/5 mt-4 no-scrollbar">
                     {[
                         { id: 'ITEMS', label: 'Hareket Detayları', count: r.items?.length || 0 },
                         { id: 'DISPUTES', label: 'Aktif İtirazlar', count: r.disputes?.length || 0 },
@@ -351,44 +384,39 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                         <button
                             key={t.id}
                             onClick={() => setActiveTab(t.id as any)}
-                            style={{
-                                padding: '16px 4px', background: 'transparent', border: 'none',
-                                color: activeTab === t.id ? '#3b82f6' : 'var(--text-muted)',
-                                fontWeight: activeTab === t.id ? '800' : '600',
-                                fontSize: '13px', textTransform: 'uppercase', cursor: 'pointer',
-                                position: 'relative'
-                            }}
+                            className={`px-2 py-4 whitespace-nowrap text-[12px] font-black uppercase tracking-widest relative transition-colors ${activeTab === t.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}
                         >
-                            {t.label} ({t.count})
-                            {activeTab === t.id && <div style={{ position: 'absolute', bottom: '-1px', left: 0, right: 0, height: '2px', background: '#3b82f6' }} />}
+                            {t.label} 
+                            <span className="ml-2 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 text-[10px]">{t.count}</span>
+                            {activeTab === t.id && <div className="absolute bottom-[-1px] left-0 right-0 height-px bg-blue-600 dark:bg-blue-400 h-0.5 rounded-t-full" />}
                         </button>
                     ))}
                 </div>
 
                 {/* TAB CONTENTS */}
-                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+                <EnterpriseCard className="p-0 overflow-hidden shadow-lg border-slate-200 dark:border-white/5 min-h-[400px]">
                     {activeTab === 'ITEMS' && (
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[800px] text-left border-collapse">
                                 <thead>
-                                    <tr style={{ background: 'rgba(0,0,0,0.2)', borderBottom: '1px solid var(--border-color)' }}>
-                                        <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)' }}>Tarih</th>
-                                        <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)' }}>Açıklama / Fatura Belge</th>
-                                        <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right' }}>Borç (Size)</th>
-                                        <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right' }}>Alacak (Müşteriye)</th>
-                                        <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)' }}>Source / Hash</th>
+                                    <tr className="bg-slate-50 dark:bg-white/[0.02] border-b border-slate-200 dark:border-white/5">
+                                        <th className="py-4 px-6 text-[11px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase">Tarih</th>
+                                        <th className="py-4 px-6 text-[11px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase">Açıklama / Fatura Belge</th>
+                                        <th className="py-4 px-6 text-[11px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase text-right">Borç (Size)</th>
+                                        <th className="py-4 px-6 text-[11px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase text-right">Alacak (Müşteriye)</th>
+                                        <th className="py-4 px-6 text-[11px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase">Source / Hash</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {r.items?.length === 0 ? (
-                                        <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Mevcut kalem yok.</td></tr>
+                                        <tr><td colSpan={5} className="py-8 px-6 text-center text-sm font-bold text-slate-400 dark:text-slate-500 italic">Mevcut kalem yok.</td></tr>
                                     ) : r.items?.map((item: any) => (
-                                        <tr key={item.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                            <td style={{ padding: '12px 24px', fontSize: '13px' }}>{new Date(item.date).toLocaleString()}</td>
-                                            <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: '600' }}>{item.description}</td>
-                                            <td style={{ padding: '12px 24px', fontSize: '13px', color: '#ef4444', textAlign: 'right', fontWeight: '700' }}>{Number(item.debit) > 0 ? Number(item.debit).toLocaleString() : ''}</td>
-                                            <td style={{ padding: '12px 24px', fontSize: '13px', color: '#10b981', textAlign: 'right', fontWeight: '700' }}>{Number(item.credit) > 0 ? Number(item.credit).toLocaleString() : ''}</td>
-                                            <td style={{ padding: '12px 24px', fontSize: '12px', color: 'var(--text-muted)' }}>{item.sourceType}</td>
+                                        <tr key={item.id} className="border-b border-light dark:border-white/5 hover:bg-slate-50/50 dark:hover:bg-white/[0.015]">
+                                            <td className="py-4 px-6 text-xs font-black text-slate-600 dark:text-slate-400">{new Date(item.date).toLocaleString()}</td>
+                                            <td className="py-4 px-6 text-sm font-black text-slate-800 dark:text-white">{item.description}</td>
+                                            <td className="py-4 px-6 text-sm font-black text-red-500 dark:text-red-400 text-right">{Number(item.debit) > 0 ? Number(item.debit).toLocaleString() : ''}</td>
+                                            <td className="py-4 px-6 text-sm font-black text-emerald-500 dark:text-emerald-400 text-right">{Number(item.credit) > 0 ? Number(item.credit).toLocaleString() : ''}</td>
+                                            <td className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{item.sourceType}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -397,76 +425,85 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                     )}
 
                     {activeTab === 'DISPUTES' && (
-                        <div style={{ padding: '32px' }}>
+                        <div className="p-6 md:p-8 flex flex-col gap-6">
                             {r.disputes?.length === 0 ? (
-                                <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Açılmış itiraz kaydı yok. Müşteri belgeyi imzalama sürecinde veya ret işleminde bulunmamış.</div>
+                                <div className="py-12 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-center gap-3">
+                                    <div className="text-5xl opacity-50 grayscale">🕊️</div>
+                                    <div className="text-sm font-bold max-w-sm">Açılmış itiraz kaydı yok. Müşteri belgeyi imzalama sürecinde veya ret işleminde bulunmamış.</div>
+                                </div>
                             ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                    {r.disputes.map((d: any) => (
-                                        <div key={d.id} style={{ padding: '24px', border: '1px solid rgba(245,158,11,0.3)', background: 'rgba(245,158,11,0.05)', borderRadius: '16px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                                <div style={{ fontWeight: '800', fontSize: '16px', color: '#f59e0b' }}>[#{d.id.substring(d.id.length - 6).toUpperCase()}] İtiraz Formu</div>
-                                                <div style={{ display: 'flex', gap: '8px' }}>
-                                                    {d.status === 'OPEN' && (
-                                                        <>
-                                                            <button onClick={() => handleUpdateDisputeStatus(d.id, 'RESOLVED')} disabled={!!processing} style={{ padding: '4px 12px', background: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }} className="hover:bg-emerald-500/20">✔ Çözüldü İşaretle</button>
-                                                            <button onClick={() => handleUpdateDisputeStatus(d.id, 'REJECTED')} disabled={!!processing} style={{ padding: '4px 12px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }} className="hover:bg-red-500/20">✖ İtirazı Reddet</button>
-                                                        </>
-                                                    )}
-                                                    <div style={{ padding: '4px 12px', background: d.status === 'OPEN' ? 'rgba(245,158,11,0.1)' : 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '12px', color: d.status === 'OPEN' ? '#f59e0b' : 'white' }}>Durum: {d.status}</div>
-                                                </div>
+                                r.disputes.map((d: any) => (
+                                    <div key={d.id} className="p-6 bg-amber-50/50 dark:bg-amber-500/[0.02] border border-amber-200 dark:border-amber-500/20 rounded-2xl flex flex-col">
+                                        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 pb-4 border-b border-amber-200/50 dark:border-amber-500/10">
+                                            <div className="font-black text-amber-700 dark:text-amber-500 flex items-center gap-2">
+                                                <span className="text-xl">⚖️</span>
+                                                [#{d.id.substring(d.id.length - 6).toUpperCase()}] İtiraz Formu
                                             </div>
-                                            <div style={{ fontSize: '14px', color: 'white', lineHeight: '1.6', marginBottom: '16px' }}>
-                                                {d.message || 'Detay girilmedi.'}
-                                            </div>
-
-                                            {d.internalNotes && (
-                                                <div style={{ padding: '12px', background: 'rgba(59,130,246,0.1)', borderLeft: '2px solid #3b82f6', marginBottom: '16px', fontSize: '13px', color: '#e2e8f0', borderRadius: '4px' }}>
-                                                    <span style={{ fontWeight: 'bold', color: '#3b82f6', display: 'block', marginBottom: '4px' }}>İç Not (Ops):</span>
-                                                    {d.internalNotes}
-                                                </div>
-                                            )}
-
-                                            {d.status === 'OPEN' && !d.internalNotes && (
-                                                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Sadece iç ekibin görebileceği not ekle..."
-                                                        value={noteInputs[d.id] || ''}
-                                                        onChange={e => setNoteInputs({ ...noteInputs, [d.id]: e.target.value })}
-                                                        style={{ flex: 1, padding: '8px 12px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', fontSize: '13px' }}
-                                                    />
-                                                    <button onClick={() => handleSaveNote(d.id)} disabled={!noteInputs[d.id] || !!processing} style={{ padding: '8px 16px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: noteInputs[d.id] ? 'pointer' : 'not-allowed', opacity: noteInputs[d.id] ? 1 : 0.5 }}>Kaydet</button>
-                                                </div>
-                                            )}
-
-                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <span>Açan: Portal (Dış Müşteri) • Tarih: {new Date(d.createdAt).toLocaleString()}{d.assigneeId ? ` • Sorumlu: ${d.assigneeId}` : ''}</span>
-                                                {d.attachmentKey && (
-                                                    <button onClick={() => handleDownloadDisputeAttachment(d.id)} className="btn hover:text-blue-500" style={{ padding: '6px 16px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#3b82f6', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}>
-                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                                        Ek Dosya (İndir)
-                                                    </button>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                {d.status === 'OPEN' && (
+                                                    <>
+                                                        <button onClick={() => handleUpdateDisputeStatus(d.id, 'RESOLVED')} disabled={!!processing} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors border border-emerald-200 dark:border-emerald-500/20 disabled:opacity-50">✔ Çözüldü İşaretle</button>
+                                                        <button onClick={() => handleUpdateDisputeStatus(d.id, 'REJECTED')} disabled={!!processing} className="px-3 py-1.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors border border-red-200 dark:border-red-500/20 disabled:opacity-50">✖ İtirazı Reddet</button>
+                                                    </>
                                                 )}
+                                                <div className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest ${d.status === 'OPEN' ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30' : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white border border-slate-200 dark:border-white/10'}`}>Durum: {d.status}</div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+                                        <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 leading-relaxed max-w-4xl whitespace-pre-wrap">
+                                            {d.message || 'Detay girilmedi.'}
+                                        </div>
+
+                                        {d.internalNotes && (
+                                            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-500/10 border-l-4 border-blue-500 rounded-r-xl text-sm font-semibold text-blue-800 dark:text-blue-300">
+                                                <span className="block text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">İç Not (Opsiyonel):</span>
+                                                {d.internalNotes}
+                                            </div>
+                                        )}
+
+                                        {d.status === 'OPEN' && !d.internalNotes && (
+                                            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Sadece iç ekibin görebileceği not ekleyiniz..."
+                                                    value={noteInputs[d.id] || ''}
+                                                    onChange={e => setNoteInputs({ ...noteInputs, [d.id]: e.target.value })}
+                                                    className="flex-1 w-full h-11 px-4 bg-white dark:bg-[#0b101a] border border-slate-200 dark:border-white/10 rounded-xl text-sm font-bold focus:border-blue-500 dark:focus:border-blue-500 transition-colors outline-none"
+                                                />
+                                                <button onClick={() => handleSaveNote(d.id)} disabled={!noteInputs[d.id] || !!processing} className="h-11 px-6 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 disabled:opacity-50 transition-colors">Kaydet</button>
+                                            </div>
+                                        )}
+
+                                        <div className="mt-6 flex flex-wrap justify-between items-center gap-4 text-[11px] font-black tracking-widest uppercase text-slate-500 dark:text-slate-400">
+                                            <span>Portal (Dış Müşteri) • {new Date(d.createdAt).toLocaleDateString()}{d.assigneeId ? ` • Sorumlu: ${d.assigneeId}` : ''}</span>
+                                            {d.attachmentKey && (
+                                                <button onClick={() => handleDownloadDisputeAttachment(d.id)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg transition-colors border border-slate-200 dark:border-white/5">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                    Ek Dosya (İndir)
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
                             )}
                         </div>
                     )}
 
                     {activeTab === 'AUDIT' && (
-                        <div style={{ padding: '32px' }}>
-                            <div style={{ borderLeft: '2px solid var(--border-color)', paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <div className="p-6 md:p-12">
+                            <div className="border-l-2 border-slate-200 dark:border-white/10 pl-6 md:pl-8 flex flex-col gap-10">
                                 {r.auditEvents?.map((ev: any, idx: number) => (
-                                    <div key={ev.id} style={{ position: 'relative' }}>
-                                        <div style={{ position: 'absolute', left: '-31px', top: '0', width: '12px', height: '12px', borderRadius: '50%', background: idx === 0 ? '#3b82f6' : 'var(--text-muted)', border: '2px solid var(--bg-panel)' }} />
-                                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted)', marginBottom: '4px' }}>{new Date(ev.createdAt).toLocaleString()} • {ev.actorType}</div>
-                                        <div style={{ fontSize: '15px', fontWeight: '700', color: idx === 0 ? 'white' : 'var(--text-muted)' }}>{ev.action}</div>
+                                    <div key={ev.id} className="relative">
+                                        <div className={`absolute -left-[27px] md:-left-[35px] top-0 w-3 h-3 md:w-4 md:h-4 rounded-full border-[3px] border-white dark:border-[#0f172a] ${idx === 0 ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1 flex items-center gap-2">
+                                            {new Date(ev.createdAt).toLocaleString()} <span className="w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full"></span> <span className="text-blue-500 dark:text-blue-400">{ev.actorType}</span>
+                                        </div>
+                                        <div className={`text-sm font-black ${idx === 0 ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>{ev.action}</div>
+                                        
                                         {ev.metaJson && Object.keys(ev.metaJson).length > 0 && (
-                                            <div style={{ marginTop: '8px', padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', fontSize: '12px', color: 'var(--text-muted)', display: 'inline-block' }}>
-                                                <pre style={{ margin: 0, fontFamily: 'monospace' }}>{JSON.stringify(ev.metaJson, null, 2)}</pre>
+                                            <div className="mt-3 p-4 bg-slate-50 dark:bg-[#0b101a]/50 border border-slate-200 dark:border-white/5 rounded-xl inline-block max-w-full overflow-x-auto shadow-inner">
+                                                <pre className="m-0 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                                                    {JSON.stringify(ev.metaJson, null, 2)}
+                                                </pre>
                                             </div>
                                         )}
                                     </div>
@@ -474,7 +511,7 @@ export default function ReconDetailClient({ reconciliation: r }: { reconciliatio
                             </div>
                         </div>
                     )}
-                </div>
+                </EnterpriseCard>
             </div>
         </div>
     );

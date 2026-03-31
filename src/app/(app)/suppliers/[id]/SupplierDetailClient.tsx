@@ -115,153 +115,93 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
         <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-900 font-sans">
 
             {/* --- TEDARİKÇİ COMMAND CENTER (STICKY) --- */}
-            <div className="sticky top-0 z-40 bg-slate-50/95 dark:bg-[#0f172a]/95 backdrop-blur-md pb-4 pt-4 mb-6 border-b border-slate-200 dark:border-white/5 space-y-4 w-full">
-                
-                {/* PROFILE & COMPACT METRICS & ACTIONS */}
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-2 flex flex-col md:flex-row md:items-start justify-between gap-6 w-full">
-                    
-                    {/* Left: Avatar & Info */}
-                    <div className="flex flex-col gap-4">
-                        <Link href="/suppliers" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 font-semibold text-[13px] flex items-center gap-2 transition-colors">
-                            <span className="text-[16px]">←</span> Tedarikçi Merkezi
+            <EnterpriseCommandCenter 
+                title={val(supplier.name)}
+                backLink="/suppliers"
+                backLabel="Tedarikçi Merkezi"
+                avatarInitials={val(supplier.name, '?').charAt(0).toUpperCase()}
+                avatarGradient="from-indigo-900 to-indigo-500"
+                category={val(supplier.category, 'Genel Tedarikçi')}
+                contact={{
+                    phone: supplier.phone,
+                    email: supplier.email,
+                    address: (() => {
+                        if (supplier.city || supplier.district) {
+                            return `${supplier.district ? supplier.district + ' / ' : ''}${supplier.city || ''}`;
+                        }
+                        return supplier.address || 'Adres Yok';
+                    })()
+                }}
+                balance={{
+                    value: balance,
+                    positiveLabel: 'Alacak',
+                    negativeLabel: 'Borç',
+                    neutralLabel: 'Dengeli',
+                    positiveColor: 'text-emerald-600 dark:text-emerald-400',
+                    negativeColor: 'text-red-600 dark:text-red-400'
+                }}
+                metrics={[
+                    ...(portfolioChecks > 0 ? [{
+                        label: 'Açık Çek/Senet',
+                        value: `${portfolioChecks.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺`,
+                        icon: '🧾',
+                        colorClass: 'bg-amber-50 dark:bg-amber-500/10 text-amber-500'
+                    }] : [])
+                ]}
+                tabs={[
+                    { group: 'İŞLEMLER', items: [{ id: 'all', label: 'Tümü' }] },
+                    { group: 'FİNANS & EVRAK', items: [{ id: 'checks', label: 'Vadeler & Çekler' }] }
+                ]}
+                activeTab={activeTab}
+                onTabChange={(id) => setActiveTab(id as any)}
+                actions={
+                    <>
+                        <Link 
+                            href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&amount=${Math.abs(supplier.balance)}`}
+                            className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
+                        >
+                            💸 Ödeme Çıkışı
                         </Link>
-                        <div className="flex gap-4 items-center">
-                            <div className="w-14 h-14 rounded-[14px] bg-gradient-to-br from-indigo-900 to-indigo-500 flex items-center justify-center text-[24px] font-black text-white shadow-sm border border-white/10 shrink-0">
-                                {val(supplier.name, '?').charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h1 className="text-[20px] font-black m-0 text-slate-900 dark:text-white leading-tight">
-                                        {val(supplier.name)}
-                                    </h1>
-                                </div>
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                                    <span className="flex items-center gap-1.5"><span className="opacity-60">🏷️</span> {val(supplier.category, 'Genel Tedarikçi')}</span>
-                                    {supplier.phone && <span className="flex items-center gap-1.5"><span className="opacity-60">📱</span> {supplier.phone}</span>}
-                                    {supplier.email && <span className="flex items-center gap-1.5"><span className="opacity-60">📧</span> {supplier.email}</span>}
-                                    <span className="flex items-center gap-1.5"><span className="opacity-60">📍</span>
-                                        {(() => {
-                                            if (supplier.city || supplier.district) {
-                                                return `${supplier.district ? supplier.district + ' / ' : ''}${supplier.city || ''}`;
-                                            }
-                                            return supplier.address || 'Adres Yok';
-                                        })()}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right: Actions & Balance */}
-                    <div className="flex flex-wrap items-center justify-end gap-4 flex-1 w-full md:w-auto mt-4 xl:mt-0 xl:ml-auto">
-                        
-                        {/* Quick Actions */}
-                        <div className="flex flex-wrap items-center gap-2">
-                             
-                            <Link 
-                                href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&amount=${Math.abs(supplier.balance)}`}
-                                className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
-                            >
-                                💸 Ödeme Çıkışı
-                            </Link>
-
-                            <button
-                                onClick={() => setIsPurchaseModalOpen(true)}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-                            >
-                                + İç Alım Fişi
-                            </button>
-
-                            <button
-                                onClick={() => setIsUploadModalOpen(true)}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-                            >
-                                🚀 Fatura Girişi
-                            </button>
-
-                            <button
-                                onClick={() => setIsAdjustModalOpen(true)}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-                            >
-                                ⚖️ Bakiye
-                            </button>
-                            
-                            <button
-                                onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-                            >
-                                📄 Özet Ekstre
-                            </button>
-                            
-                            <button
-                                onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-                            >
-                                📑 Detaylı Ekstre
-                            </button>
-
-                             <button
-                                onClick={() => router.push(`/suppliers?edit=${supplier.id}`)}
-                                className="w-[36px] h-[36px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-500 rounded-[8px] flex items-center justify-center transition-colors shadow-sm hover:text-blue-600 hover:border-blue-200"
-                                title="Düzenle"
-                            >
-                                ✏️
-                            </button>
-                        </div>
-
-                        {/* Metrics */}
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[14px] ${balance > 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500' : balance < 0 ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : 'bg-slate-50 dark:bg-slate-700 text-slate-500'}`}>💰</div>
-                                <div>
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{`${balance > 0 ? 'Alacak' : balance < 0 ? 'Borç' : 'Dengeli'}`} Bakiyesi</div>
-                                    <div className={`text-[16px] font-black leading-none mt-0.5 ${balance > 0 ? 'text-emerald-600 dark:text-emerald-400' : balance < 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>{Math.abs(balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
-                                </div>
-                            </div>
-                            
-                            {portfolioChecks > 0 && (
-                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">🧾</div>
-                                    <div>
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Açık Çek/Senet</div>
-                                        <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{portfolioChecks.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                    </div>
-                </div>
-
-                {/* GROUPED NAVIGATION & FILTERS */}
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
-                        {[
-                            { group: 'İŞLEMLER', items: [{ id: 'all', label: 'Tümü' }] },
-                            { group: 'FİNANS & EVRAK', items: [{ id: 'checks', label: 'Vadeler & Çekler' }] },
-                        ].map((grp, i) => (
-                            <div key={grp.group} className="flex items-center gap-3">
-                                {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
-                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
-                                    {grp.items.map(tab => (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => setActiveTab(tab.id as any)}
-                                            className={activeTab === tab.id
-                                                ? "px-4 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
-                                                : "px-4 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
-                                            }
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-            </div>
+                        <button
+                            onClick={() => setIsPurchaseModalOpen(true)}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            + İç Alım Fişi
+                        </button>
+                        <button
+                            onClick={() => setIsUploadModalOpen(true)}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            🚀 Fatura Girişi
+                        </button>
+                        <button
+                            onClick={() => setIsAdjustModalOpen(true)}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            ⚖️ Bakiye
+                        </button>
+                        <button
+                            onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            📄 Özet Ekstre
+                        </button>
+                        <button
+                            onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            📑 Detaylı Ekstre
+                        </button>
+                        <button
+                            onClick={() => router.push(`/suppliers?edit=${supplier.id}`)}
+                            className="w-[36px] h-[36px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-500 rounded-[8px] flex items-center justify-center transition-colors shadow-sm hover:text-blue-600 hover:border-blue-200"
+                            title="Düzenle"
+                        >
+                            ✏️
+                        </button>
+                    </>
+                }
+            />
 
             {/* MAIN CONTENT AREA */}
             <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-8 flex flex-col gap-6">

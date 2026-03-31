@@ -828,188 +828,122 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             )}
 
                                     {/* --- CARI COMMAND CENTER (STICKY) --- */}
-            <div className="sticky top-0 z-40 bg-slate-50/95 dark:bg-[#0f172a]/95 backdrop-blur-md pb-4 pt-4 mb-6 border-b border-slate-200 dark:border-white/5 space-y-4 w-full">
-                
-                {/* PROFILE & COMPACT METRICS & ACTIONS */}
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-2 flex flex-col md:flex-row md:items-start justify-between gap-6 w-full">
-                    
-                    {/* Left: Avatar & Info */}
-                    <div className="flex flex-col gap-4">
-                        <Link href="/customers" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 font-semibold text-[13px] flex items-center gap-2 transition-colors">
-                            <span className="text-[16px]">←</span> Müşteri Merkezi
+            <EnterpriseCommandCenter 
+                title={val(customer.name)}
+                titleSuffix={services.length > 0 && services[0].plate ? (
+                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-[8px] text-[13px] font-black tracking-widest uppercase border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5">
+                        <span className="opacity-50">🚗</span> {services[0].plate}
+                    </span>
+                ) : undefined}
+                backLink="/customers"
+                backLabel="Müşteri Merkezi"
+                avatarInitials={val(customer.name, '?').charAt(0).toUpperCase()}
+                avatarGradient="from-blue-900 to-blue-500"
+                contact={{
+                    phone: customer.phone,
+                    email: customer.email,
+                    address: (() => {
+                        if (customer.city || customer.district) {
+                            return `${customer.district ? customer.district + ' / ' : ''}${customer.city || ''}`;
+                        }
+                        return customer.address || 'Adres Yok';
+                    })()
+                }}
+                balance={{
+                    value: balance,
+                    positiveLabel: 'Borç',
+                    negativeLabel: 'Alacak',
+                    neutralLabel: 'Dengeli',
+                    positiveColor: 'text-red-600 dark:text-red-400',
+                    negativeColor: 'text-emerald-600 dark:text-emerald-400'
+                }}
+                metrics={[
+                    ...(overdueInstallments.length > 0 ? [{
+                        label: 'Vadesi Geçen',
+                        value: `${overdueAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺`,
+                        icon: '⏳',
+                        colorClass: 'bg-red-50 dark:bg-red-500/10 text-red-500'
+                    }] : []),
+                    ...(portfolioChecks > 0 ? [{
+                        label: 'Açık Çek/Senet',
+                        value: `${portfolioChecks.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺`,
+                        icon: '🧾',
+                        colorClass: 'bg-amber-50 dark:bg-amber-500/10 text-amber-500'
+                    }] : [])
+                ]}
+                tabs={[
+                    { group: 'İŞLEMLER', items: [{ id: 'all', label: 'Tümü' }, { id: 'sales', label: 'Satış/Fatura' }, { id: 'payments', label: 'Finans' }] },
+                    { group: 'RİSK & ONAY', items: [{ id: 'checks', label: 'Vadeler' }, { id: 'reconciliations', label: 'Mutabakat' }, { id: 'offers', label: 'Teklifler' }] },
+                    { group: 'SERVİS', items: [{ id: 'warranties', label: 'Garantiler' }, { id: 'services', label: 'Servis' }, { id: 'documents', label: 'Dosyalar' }] }
+                ]}
+                activeTab={activeTab}
+                onTabChange={(id) => { 
+                    setActiveTab(id as any); 
+                    if (id === 'documents') fetchDocuments(); 
+                    if (id === 'services') fetchServices(); 
+                }}
+                tabRightElement={
+                    <div className="relative w-full lg:w-[260px]">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                        </span>
+                        <input
+                            type="text"
+                            placeholder="Satır ve işlemlerde ara..."
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-[8px] h-[36px] pl-9 pr-3 text-[12px] font-semibold outline-none focus:border-blue-500 shadow-sm transition-all text-slate-900 dark:text-white"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                }
+                actions={
+                    <>
+                        <Link 
+                            href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
+                            className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                        >
+                            <span>+</span> Tahsilat Al
                         </Link>
-                        <div className="flex gap-4 items-center">
-                            <div className="w-14 h-14 rounded-[14px] bg-gradient-to-br from-blue-900 to-blue-500 flex items-center justify-center text-[24px] font-black text-white shadow-sm border border-white/10 shrink-0">
-                                {val(customer.name, '?').charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h1 className="text-[20px] font-black m-0 text-slate-900 dark:text-white leading-tight">
-                                        {val(customer.name)}
-                                    </h1>
-                                    {services.length > 0 && services[0].plate && (
-                                        <button
-                                            onClick={() => setQrPlate(services[0].plate)}
-                                            className="px-2.5 py-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-[6px] text-[10px] font-bold shadow-sm hover:border-blue-500 transition-colors flex items-center gap-1.5"
-                                        >
-                                            📱 Karne (QR)
-                                        </button>
-                                    )}
-                                </div>
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                                    <span className="flex items-center gap-1.5"><span className="opacity-60">🏷️</span> {val(customer.category?.name, 'Genel Müşteri')}</span>
-                                    <span className="flex items-center gap-1.5"><span className="opacity-60">📱</span> {val(customer.phone, 'Telefon Yok')}</span>
-                                    <span className="flex items-center gap-1.5"><span className="opacity-60">📧</span> {val(customer.email, 'E-posta Yok')}</span>
-                                    <span className="flex items-center gap-1.5"><span className="opacity-60">📍</span>
-                                        {(() => {
-                                            let addr = customer.address;
-                                            if (customer.city || customer.district) {
-                                                return `${customer.district ? customer.district + ' / ' : ''}${customer.city || ''}`;
-                                            }
-                                            try {
-                                                if (addr && typeof addr === 'string' && addr.trim().startsWith('{')) {
-                                                    const parsed = JSON.parse(addr);
-                                                    return `${parsed.district ? parsed.district : ''} ${parsed.city ? '/' + parsed.city : ''}`;
-                                                }
-                                            } catch (e) { }
-                                            return 'Adres Yok';
-                                        })()}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right: Compact Metrics & Actions */}
-                    <div className="flex flex-wrap items-center justify-end gap-4 flex-1 w-full md:w-auto mt-4 xl:mt-0 xl:ml-auto">
-                        {/* Quick Actions */}
-                        <div className="flex flex-wrap items-center gap-2">
-                            <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
-                                className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
-                            >
-                                <span>+</span> Tahsilat Al
-                            </Link>
-                            <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
-                            >
-                                Ödeme Yap
-                            </Link>
-                            <Link href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden md:flex"
-                            >
-                                Satış Yap (POS)
-                            </Link>
-                            <button
-                                onClick={() => setReconWizardOpen(true)}
-                                className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-                            >
-                                🤝 Mutabakat
-                            </button>
-                            <button
-        onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
-        className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-    >
-        📄 Özet Ekstre
-    </button>
-    <button
-        onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
-        className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
-    >
-        📑 Detaylı Ekstre
-    </button>
-                            <button
-                                onClick={() => router.push(`/customers?edit=${customer.id}`)}
-                                className="w-[36px] h-[36px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-500 rounded-[8px] flex items-center justify-center transition-colors shadow-sm hover:text-blue-600 hover:border-blue-200"
-                                title="Düzenle"
-                            >
-                                ✏️
-                            </button>
-                        </div>
-
-                                            
-                        {/* Metrics */}
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[14px] ${balance > 0 ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : balance < 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500' : 'bg-slate-50 dark:bg-slate-700 text-slate-500'}`}>💰</div>
-                                <div>
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{`${balance > 0 ? 'Borç' : balance < 0 ? 'Alacak' : 'Dengeli'}`} Bakiyesi</div>
-                                    <div className={`text-[16px] font-black leading-none mt-0.5 ${balance > 0 ? 'text-red-600 dark:text-red-400' : balance < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>{Math.abs(balance).toLocaleString()} ₺</div>
-                                </div>
-                            </div>
-
-                            {overdueInstallments.length > 0 && (
-                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                    <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center text-[14px]">⏳</div>
-                                    <div>
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vadesi Geçen</div>
-                                        <div className="text-[16px] font-black leading-none text-red-600 dark:text-red-400 mt-0.5">{overdueAmount.toLocaleString()} ₺</div>
-                                    </div>
-                                </div>
-                            )}
-
-                             {portfolioChecks > 0 && (
-                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">🧾</div>
-                                    <div>
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Açık Çek/Senet</div>
-                                        <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{portfolioChecks.toLocaleString()} ₺</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    
-                        
-                    </div>
-                </div>
-
-                {/* GROUPED NAVIGATION & FILTERS */}
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
-                        {[
-                            { group: 'İŞLEMLER', items: [{ id: 'all', label: 'Tümü' }, { id: 'sales', label: 'Satış/Fatura' }, { id: 'payments', label: 'Finans' }] },
-                            { group: 'RİSK & ONAY', items: [{ id: 'checks', label: 'Vadeler' }, { id: 'reconciliations', label: 'Mutabakat' }, { id: 'offers', label: 'Teklifler' }] },
-                            { group: 'SERVİS', items: [{ id: 'warranties', label: 'Garantiler' }, { id: 'services', label: 'Servis' }, { id: 'documents', label: 'Dosyalar' }] }
-                        ].map((grp, i) => (
-                            <div key={grp.group} className="flex items-center gap-3">
-                                {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
-                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
-                                    {grp.items.map(tab => (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => { 
-                                                setActiveTab(tab.id as any); 
-                                                if (tab.id === 'documents') fetchDocuments(); 
-                                                if (tab.id === 'services') fetchServices(); 
-                                            }}
-                                            className={activeTab === tab.id
-                                                ? "px-4 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
-                                                : "px-4 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
-                                            }
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center gap-2 w-full md:w-auto ml-auto justify-end mt-4 lg:mt-0">
-                        <div className="relative w-full lg:w-[260px]">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-                            </span>
-                            <input
-                                type="text"
-                                placeholder="Satır ve işlemlerde ara..."
-                                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-[8px] h-[36px] pl-9 pr-3 text-[12px] font-semibold outline-none focus:border-blue-500 shadow-sm transition-all text-slate-900 dark:text-white"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <Link 
+                            href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
+                        >
+                            Ödeme Yap
+                        </Link>
+                        <Link 
+                            href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden md:flex"
+                        >
+                            Satış Yap (POS)
+                        </Link>
+                        <button
+                            onClick={() => setReconWizardOpen(true)}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            🤝 Mutabakat
+                        </button>
+                        <button
+                            onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            📄 Özet Ekstre
+                        </button>
+                        <button
+                            onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden lg:flex"
+                        >
+                            📑 Detaylı Ekstre
+                        </button>
+                        <button
+                            onClick={() => router.push(`/customers?edit=${customer.id}`)}
+                            className="w-[36px] h-[36px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-500 rounded-[8px] flex items-center justify-center transition-colors shadow-sm hover:text-blue-600 hover:border-blue-200"
+                            title="Düzenle"
+                        >
+                            ✏️
+                        </button>
+                    </>
+                }
+            />
 
             <div className="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-8 mt-2">
 {/* CONTENT AREA */}
@@ -2034,7 +1968,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* INVOICE MODAL (Professional E-Fatura Style) */}
             {
                 invoiceModalOpen && selectedOrder && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[4000] flex items-center justify-center p-4 animate-in fade-in duration-200">
                         <div className="w-[1200px] max-w-[98vw] flex flex-col h-[90vh] overflow-hidden bg-white dark:bg-[#080a0f] rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl">
                             {/* Header */}
                             <div className="px-6 pt-4 pb-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
@@ -2853,439 +2787,184 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             }
 
             {/* WARRANTY START MODAL */}
-            {
-                warrantyModalOpen && (
-                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)', }}>
-                            <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
-                                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <span style={{ fontSize: '24px' }}>🛡️</span> Garanti Başlat
-                                </h3>
-                                <button onClick={() => setWarrantyModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
-                            </div>
-
-                            <div className="flex-col gap-5">
-                                <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>FATURA SEÇİMİ (Satın Alma Kaydı)</label>
-                                    <select
-                                        value={newWarranty.invoiceId}
-                                        onChange={(e) => {
-                                            setNewWarranty({ ...newWarranty, invoiceId: e.target.value, productId: '', productName: '' });
-                                        }}
-                                        style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
-                                    >
-                                        <option value="">İlgili faturayı seçiniz...</option>
-                                        {customerInvoices.map(inv => (
-                                            <option key={inv.id} value={inv.id}>{inv.number} - {inv.date} ({inv.total} ₺)</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {newWarranty.invoiceId && (
-                                    <div className="flex-col gap-2 animate-scale-in">
-                                        <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>ÜRÜN SEÇİMİ</label>
-                                        <select
-                                            value={newWarranty.productId}
-                                            onChange={(e) => {
-                                                const inv = customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId);
-                                                const prodItem = inv?.items.find((p: any) => (p.productId || p.id || '').toString() === e.target.value);
-                                                let pName = prodItem?.name || '';
-                                                if (!pName && prodItem?.productId) {
-                                                    const realProd = products.find(p => p.id === prodItem.productId);
-                                                    if (realProd) pName = realProd.name;
-                                                }
-                                                setNewWarranty({ ...newWarranty, productId: e.target.value, productName: pName });
-                                            }}
-                                            style={{ padding: '16px 20px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.05)', color: 'var(--text-main, white)', border: '1px solid rgba(59, 130, 246, 0.2)', fontWeight: '700', fontSize: '14px' }}
-                                        >
-                                            <option value="">Garanti tanımlanacak ürünü seçin...</option>
-                                            {customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId)?.items.map((p: any) => {
-                                                let displayName = p.name;
-                                                if (!displayName && p.productId) {
-                                                    const realProd = products.find((prod: any) => prod.id === p.productId);
-                                                    if (realProd) displayName = realProd.name;
-                                                }
-                                                return (
-                                                    <option key={p.productId || p.id || Math.random()} value={p.productId || p.id}>
-                                                        {displayName || 'İsimsiz Ürün'}
-                                                    </option>
-                                                );
-                                            })}
-                                        </select>
-                                    </div>
-                                )}
-
-                                <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>SERİ NO (KADRO / ŞASİ NO)</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Örn: CR12345678"
-                                        value={newWarranty.serialNo}
-                                        onChange={(e) => setNewWarranty({ ...newWarranty, serialNo: e.target.value })}
-                                        style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
-                                        className="focus:border-blue-500 transition-colors"
-                                    />
-                                </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                    <div className="flex-col gap-2">
-                                        <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>GARANTİ SÜRESİ</label>
-                                        <select
-                                            value={newWarranty.period}
-                                            onChange={(e) => setNewWarranty({ ...newWarranty, period: e.target.value })}
-                                            style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
-                                        >
-                                            {(warrantyPeriods && warrantyPeriods.length > 0 ? warrantyPeriods : ['6 Ay', '1 Yıl', '2 Yıl', '3 Yıl', '5 Yıl']).map(p => (
-                                                <option key={p} value={p}>{p}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="flex-col gap-2">
-                                        <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>BAŞLANGIÇ TARİHİ</label>
-                                        <input
-                                            type="date"
-                                            value={newWarranty.startDate}
-                                            onChange={(e) => setNewWarranty({ ...newWarranty, startDate: e.target.value })}
-                                            style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
-                                            className="input-date-dark"
-                                        />
-                                    </div>
-                                </div>
-
-                                <button
-                                    onClick={handleStartWarranty}
-                                    className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
-                                    style={{ marginTop: '24px', padding: '18px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', transition: 'all 0.2s', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                                >
-                                    <span>✅</span> GARANTİYİ BAŞLAT VE ONAYLA
-                                </button>
-                            </div>
+            {warrantyModalOpen && (
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[4000] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <EnterpriseCard className="w-full max-w-xl max-h-[90vh] overflow-y-auto custom-scroll animate-in zoom-in-95 duration-200 shadow-2xl border-blue-500/30 text-left">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                            <h3 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-3 tracking-tight">
+                                <span className="text-2xl">🛡️</span> Garanti Başlat
+                            </h3>
+                            <button
+                                onClick={() => setWarrantyModalOpen(false)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
                         </div>
-                    </div>
-                )
-            }
 
-            {/* PRODUCT PICKER MODAL */}
-            {
-                isProductPickerOpen && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[4000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-3xl animate-in zoom-in-95 duration-200 shadow-2xl border-blue-500/30">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Envanterden Ürün Seçimi</h3>
-                                    <div className="text-xs font-semibold text-blue-600 dark:text-blue-500 mt-1 uppercase tracking-wider">
-                                        Gerçek Zamanlı Stok & Fiyat Bilgisi
-                                    </div>
+                        <div className="flex flex-col gap-6">
+                            <EnterpriseSelect
+                                label="FATURA SEÇİMİ (SATIN ALMA KAYDI)"
+                                value={newWarranty.invoiceId}
+                                onChange={(e) => setNewWarranty({ ...newWarranty, invoiceId: e.target.value, productId: '', productName: '' })}
+                            >
+                                <option value="">İlgili faturayı seçiniz...</option>
+                                {customerInvoices.map((inv: any) => (
+                                    <option key={inv.id} value={inv.id}>{inv.number} - {inv.date} ({inv.total} ₺)</option>
+                                ))}
+                            </EnterpriseSelect>
+
+                            {newWarranty.invoiceId && (
+                                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <EnterpriseSelect
+                                        label="ÜRÜN SEÇİMİ"
+                                        value={newWarranty.productId}
+                                        onChange={(e) => {
+                                            const inv = customerInvoices.find((i: any) => i.id.toString() === newWarranty.invoiceId);
+                                            const prodItem = inv?.items.find((p: any) => (p.productId || p.id || '').toString() === e.target.value);
+                                            let pName = prodItem?.name || '';
+                                            if (!pName && prodItem?.productId) {
+                                                const realProd = products.find((p: any) => p.id === prodItem.productId);
+                                                if (realProd) pName = realProd.name;
+                                            }
+                                            setNewWarranty({ ...newWarranty, productId: e.target.value, productName: pName });
+                                        }}
+                                    >
+                                        <option value="">Garanti tanımlanacak ürünü seçin...</option>
+                                        {customerInvoices.find((i: any) => i.id.toString() === newWarranty.invoiceId)?.items.map((p: any) => {
+                                            let displayName = p.name;
+                                            if (!displayName && p.productId) {
+                                                const realProd = products.find((prod: any) => prod.id === p.productId);
+                                                if (realProd) displayName = realProd.name;
+                                            }
+                                            return (
+                                                <option key={p.productId || p.id || Math.random()} value={p.productId || p.id}>
+                                                    {displayName || 'İsimsiz Ürün'}
+                                                </option>
+                                            );
+                                        })}
+                                    </EnterpriseSelect>
                                 </div>
-                                <button
-                                    onClick={() => setIsProductPickerOpen(false)}
-                                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-[24px] transition-colors"
-                                >
-                                    <span className="text-2xl leading-none">&times;</span>
-                                </button>
-                            </div>
+                            )}
 
-                            <div className="relative mb-6">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">🔍</span>
-                                <input
-                                    autoFocus
-                                    placeholder="Ürün adı, barkod veya stok kodu ile arayın..."
-                                    value={productSearchTerm}
-                                    onChange={(e) => setProductSearchTerm(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 rounded-[24px] bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:border-blue-500 dark:focus:border-blue-500/50 text-slate-900 dark:text-white font-medium outline-none transition-colors"
-                                />
-                            </div>
+                            <EnterpriseInput
+                                label="SERİ NO (KADRO / ŞASİ NO)"
+                                placeholder="Örn: CR12345678"
+                                value={newWarranty.serialNo}
+                                onChange={(e: any) => setNewWarranty({ ...newWarranty, serialNo: e.target.value })}
+                            />
 
-                            <div className="max-h-[480px] overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-3">
-                                {products
-                                    .filter(p => !productSearchTerm || p.name.toLocaleLowerCase('tr').includes(productSearchTerm.toLocaleLowerCase('tr')) || p.barcode?.includes(productSearchTerm) || p.code?.includes(productSearchTerm))
-                                    .slice(0, 50)
-                                    .map(p => {
-                                        const grossPrice = priceMap[p.id] ?? Number(p.price || 0);
-                                        const vatRate = Number(p.salesVat || 20);
-                                        const otvType = p.otvType || 'Ö.T.V yok';
-                                        const otvRate = Number(p.salesOtv || 0);
-                                        const otvCode = p.otvCode || '0071';
-                                        const oivRate = Number(p.salesOiv || 0);
-                                        const effectiveVatOiv = (1 + (vatRate + oivRate) / 100);
-
-                                        let netPrice = 0;
-                                        if (otvType === 'Yüzdesel') {
-                                            netPrice = grossPrice / ((1 + otvRate / 100) * effectiveVatOiv);
-                                        } else if (otvType === 'Birim Başına') {
-                                            netPrice = (grossPrice / effectiveVatOiv) - otvRate;
-                                        } else {
-                                            netPrice = grossPrice / effectiveVatOiv;
-                                        }
-
-                                        return (
-                                            <div
-                                                key={p.id}
-                                                onClick={() => {
-                                                    const existingIndex = invoiceItems.findIndex(item => item.productId === p.id);
-                                                    if (existingIndex !== -1) {
-                                                        const newItems = [...invoiceItems];
-                                                        newItems[existingIndex].qty = (Number(newItems[existingIndex].qty) || 0) + 1;
-                                                        setInvoiceItems(newItems);
-                                                    } else {
-                                                        setInvoiceItems([...invoiceItems, {
-                                                            name: p.name,
-                                                            qty: 1,
-                                                            price: netPrice,
-                                                            vat: vatRate,
-                                                            otv: otvRate,
-                                                            otvCode: otvCode,
-                                                            otvType: otvType,
-                                                            oiv: oivRate,
-                                                            productId: p.id,
-                                                            description: p.showDescriptionOnInvoice ? (p.description || '') : '',
-                                                            showDesc: p.showDescriptionOnInvoice ? true : false
-                                                        }]);
-                                                    }
-                                                    setIsProductPickerOpen(false);
-                                                    setProductSearchTerm('');
-                                                }}
-                                                className="group p-4 bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-[24px] cursor-pointer hover:border-blue-500/50 hover:bg-blue-50 dark:hover:bg-blue-500/5 transition-all flex justify-between items-center"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-[24px] flex items-center justify-center text-xl text-blue-600 dark:text-blue-500">
-                                                        {p.category?.charAt(0) || '📦'}
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{p.name}</div>
-                                                        <div className="text-xs text-slate-500 font-medium mt-1">
-                                                            Stok: <span className={p.stock > 0 ? "text-emerald-600 dark:text-emerald-500 font-bold" : "text-rose-500 font-bold"}>{p.stock}</span>
-                                                            <span className="mx-2 opacity-50">|</span> 
-                                                            Barkod: <span className="font-mono">{p.barcode || 'Yok'}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-lg font-bold font-mono text-slate-900 dark:text-white">
-                                                        {grossPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
-                                                    </div>
-                                                    <div className="text-[10px] font-bold text-blue-600 dark:text-blue-500 mt-1 uppercase">
-                                                        %{vatRate} KDV DAHİL (BRÜT)
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                            </div>
-
-                            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-                                <button
-                                    onClick={() => {
-                                        setInvoiceItems([...invoiceItems, { name: 'Yeni Manuel Hizmet / Ürün', qty: 1, price: 0, vat: 20 }]);
-                                        setIsProductPickerOpen(false);
-                                    }}
-                                    className="w-full p-4 rounded-[24px] border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-50 dark:bg-slate-900/30 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all font-bold flex items-center justify-center gap-2 text-sm"
-                                >
-                                    <span className="text-lg">➕</span> Envanter Dışı Manuel Hizmet Ekle
-                                </button>
-                            </div>
-                        </EnterpriseCard>
-                    </div>
-                )
-            }
-
-            {/* CHECK COLLECT MODAL */}
-            {
-                showCheckCollectModal && activeCheck && (
-                    <div className="fixed inset-0 bg-slate-900/80 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                        <EnterpriseCard className="w-full max-w-md animate-in zoom-in-95 duration-200 shadow-2xl border-blue-500/30">
-                            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                                    <span className="text-2xl">{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span>
-                                    {activeCheck.type.includes('Alınan') ? 'Tahsilat Onayı' : 'Ödeme Çıkış Onayı'}
-                                </h3>
-                                <button
-                                    onClick={() => setShowCheckCollectModal(false)}
-                                    className="text-2xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                                >
-                                    &times;
-                                </button>
-                            </div>
-
-                            <div className="flex flex-col gap-6">
-                                <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-[24px] border border-slate-200 dark:border-slate-800 text-center">
-                                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                        {activeCheck.type}
-                                    </div>
-                                    <div className="text-3xl font-black font-mono text-slate-900 dark:text-white">
-                                        {Number(activeCheck.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-2xl text-slate-400 opacity-80">₺</span>
-                                    </div>
-                                    <div className="text-sm font-semibold text-slate-500 mt-2">
-                                        {activeCheck.bank} - <span className="font-mono">{activeCheck.number}</span>
-                                    </div>
-                                </div>
-
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <EnterpriseSelect
-                                    label={activeCheck.type.includes('Alınan') ? 'TAHSİLATIN GEÇECEĞİ KASA' : 'ÖDEMENİN ÇIKACAĞI HESAP'}
-                                    value={targetKasaId}
-                                    onChange={(e) => setTargetKasaId(e.target.value)}
+                                    label="GARANTİ SÜRESİ"
+                                    value={newWarranty.period}
+                                    onChange={(e) => setNewWarranty({ ...newWarranty, period: e.target.value })}
                                 >
-                                    <option value="">İşlem yapılacak kasayı seçin...</option>
-                                    {kasalar.filter((k: any) => k.name !== 'ÇEK / SENET PORTFÖYÜ').map((k: any) => (
-                                        <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺)</option>
+                                    {(warrantyPeriods && warrantyPeriods.length > 0 ? warrantyPeriods : ['6 Ay', '1 Yıl', '2 Yıl', '3 Yıl', '5 Yıl']).map((p: any) => (
+                                        <option key={p} value={p}>{p}</option>
                                     ))}
                                 </EnterpriseSelect>
 
-                                <div className="flex gap-4 pt-2">
-                                    <EnterpriseButton
-                                        variant="secondary"
-                                        onClick={() => setShowCheckCollectModal(false)}
-                                        className="flex-1"
-                                    >
-                                        İPTAL
-                                    </EnterpriseButton>
-                                    <EnterpriseButton
-                                        variant="primary"
-                                        onClick={handleExecuteCheckCollect}
-                                        disabled={isProcessingCollection || !targetKasaId}
-                                        className="flex-[2]"
-                                    >
-                                        {isProcessingCollection ? (
-                                            <><div className="loader border-t-white w-4 h-4 rounded-full border-2 border-white/20 animate-spin mr-2 inline-block align-middle"></div> İŞLENİYOR...</>
-                                        ) : (
-                                            <><span>✅</span> İŞLEMİ TAMAMLA</>
-                                        )}
-                                    </EnterpriseButton>
-                                </div>
+                                <EnterpriseInput
+                                    label="BAŞLANGIÇ TARİHİ"
+                                    type="date"
+                                    value={newWarranty.startDate}
+                                    onChange={(e: any) => setNewWarranty({ ...newWarranty, startDate: e.target.value })}
+                                />
                             </div>
-                        </EnterpriseCard>
-                    </div>
-                )
-            }
 
-            {/* MODAL REMOVED */}
-            <StatementModal
-                isOpen={statementOpen}
-                onClose={() => setStatementOpen(false)}
-                title={statementType === 'detailed' ? 'Detaylı Cari Hesap Ekstresi' : 'Özet Cari Hesap Ekstresi'}
-                entity={{
-                    name: customer.name,
-                    phone: customer.phone,
-                    email: customer.email,
-                    address: customer.address,
-                    taxNumber: customer.taxNumber,
-                    taxOffice: customer.taxOffice,
-                    balance: balance
-                }}
-                transactions={historyList}
-                type={statementType}
-                entityType="CUSTOMER"
-            />
-
-            {reconWizardOpen && (
-                <ReconciliationWizard
-                    customer={customer}
-                    onClose={() => setReconWizardOpen(false)}
-                    onSuccess={() => {
-                        // Refresh data after successful reconciliation mapping
-                        router.refresh();
-                    }}
-                />
+                            <EnterpriseButton
+                                onClick={handleSaveWarranty}
+                                disabled={isSavingWarranty || !newWarranty.invoiceId || !newWarranty.productId || !newWarranty.serialNo}
+                                className="w-full h-14 mt-4 font-bold text-base bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                            >
+                                {isSavingWarranty ? 'KAYDEDİLİYOR...' : 'SİSTEME KAYDET VE BAŞLAT'}
+                            </EnterpriseButton>
+                        </div>
+                    </EnterpriseCard>
+                </div>
             )}
-
-            {/* CHECK / SENET ADD MODAL */}
+\n            {/* CHECK / SENET ADD MODAL */}
             {checkAddModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '560px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span style={{ fontSize: '24px' }}>📑</span> Yeni Evrak (Çek/Senet) Ekle
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[6000] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <EnterpriseCard className="w-full max-w-xl animate-in zoom-in-95 duration-200 shadow-2xl border-emerald-500/30 text-left">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                            <h3 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-3 tracking-tight">
+                                <span className="text-2xl">📑</span> Yeni Evrak Ekle
                             </h3>
-                            <button onClick={() => setCheckAddModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
+                            <button
+                                onClick={() => setCheckAddModalOpen(false)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
                         </div>
 
-                        <div className="flex-col gap-4">
-                            <div className="flex-col gap-2">
-                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>EVRAK TÜRÜ</label>
-                                <select 
-                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
-                                    value={newCheckData.type}
-                                    onChange={(e) => setNewCheckData({ ...newCheckData, type: e.target.value })}
-                                >
-                                    <option value="Alınan Çek">Müşteriden Alınan Çek</option>
-                                    <option value="Alınan Senet">Müşteriden Alınan Senet</option>
-                                    <option value="Müşteri Çeki / Cirolu">Müşteri Tarafından Cirolu Çek</option>
-                                </select>
-                            </div>
+                        <div className="flex flex-col gap-5">
+                            <EnterpriseSelect
+                                label="EVRAK TÜRÜ"
+                                value={newCheckData.type}
+                                onChange={(e) => setNewCheckData({ ...newCheckData, type: e.target.value })}
+                            >
+                                <option value="Alınan Çek">Müşteriden Alınan Çek</option>
+                                <option value="Alınan Senet">Müşteriden Alınan Senet</option>
+                                <option value="Müşteri Çeki / Cirolu">Müşteri Tarafından Cirolu Çek</option>
+                            </EnterpriseSelect>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                                <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>TUTAR (₺)</label>
-                                    <input 
-                                        type="text" 
-                                        style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
-                                        value={newCheckData.amount}
-                                        onChange={(e) => setNewCheckData({ ...newCheckData, amount: formatCurrencyInput(e.target.value) })}
-                                        placeholder="0,00"
-                                    />
-                                </div>
-                                <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>VADE TARİHİ</label>
-                                    <input 
-                                        type="date" 
-                                        style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
-                                        value={newCheckData.dueDate}
-                                        onChange={(e) => setNewCheckData({ ...newCheckData, dueDate: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="flex-col gap-2">
-                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>BANKA & ŞUBE (Senet ise boş bırakılabilir)</label>
-                                <input 
-                                    type="text" 
-                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
-                                    value={newCheckData.bank}
-                                    onChange={(e) => setNewCheckData({ ...newCheckData, bank: e.target.value })}
-                                    placeholder="Örn: Garanti Bankası / Beşiktaş Şb."
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <EnterpriseInput
+                                    label="TUTAR (₺)"
+                                    placeholder="0,00"
+                                    value={newCheckData.amount}
+                                    onChange={(e: any) => setNewCheckData({ ...newCheckData, amount: formatCurrencyInput(e.target.value) })}
+                                />
+                                <EnterpriseInput
+                                    label="VADE TARİHİ"
+                                    type="date"
+                                    value={newCheckData.dueDate}
+                                    onChange={(e: any) => setNewCheckData({ ...newCheckData, dueDate: e.target.value })}
                                 />
                             </div>
 
-                            <div className="flex-col gap-2">
-                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>EVRAK/SERİ NO</label>
-                                <input 
-                                    type="text" 
-                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
-                                    value={newCheckData.number}
-                                    onChange={(e) => setNewCheckData({ ...newCheckData, number: e.target.value })}
-                                    placeholder="Seri veya Fis Numarası"
-                                />
-                            </div>
+                            <EnterpriseInput
+                                label="BANKA & ŞUBE (Senet ise boş bırakın)"
+                                placeholder="Örn: Garanti Bankası / Beşiktaş Şb."
+                                value={newCheckData.bank}
+                                onChange={(e: any) => setNewCheckData({ ...newCheckData, bank: e.target.value })}
+                            />
 
-                            <div className="flex-col gap-2">
-                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>AÇIKLAMA (Opsiyonel)</label>
-                                <input 
-                                    type="text" 
-                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', background: 'var(--bg-card, rgba(0,0,0,0.2))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'white', fontWeight: '700' }}
-                                    value={newCheckData.description}
-                                    onChange={(e) => setNewCheckData({ ...newCheckData, description: e.target.value })}
-                                    placeholder="Ek detay veya borçlu bilgisi"
-                                />
-                            </div>
+                            <EnterpriseInput
+                                label="EVRAK/SERİ NO"
+                                placeholder="Seri veya Fiş Numarası"
+                                value={newCheckData.number}
+                                onChange={(e: any) => setNewCheckData({ ...newCheckData, number: e.target.value })}
+                            />
 
-                            <div className="flex-col gap-2 mt-4 p-4 border rounded-[24px]" style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)' }}>
-                                <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-main, #fff)', letterSpacing: '0.5px', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                    <span>📸</span> EVRAK GÖRSELİ YÜKLE
+                            <EnterpriseInput
+                                label="AÇIKLAMA (Opsiyonel)"
+                                placeholder="Ek detay veya borçlu bilgisi"
+                                value={newCheckData.description}
+                                onChange={(e: any) => setNewCheckData({ ...newCheckData, description: e.target.value })}
+                            />
+
+                            <div className="flex flex-col gap-2 mt-2 p-5 border border-slate-200 dark:border-white/5 rounded-[20px] bg-slate-50 dark:bg-slate-800/30">
+                                <label className="text-[12px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                                    <span className="text-lg">📸</span> EVRAK GÖRSELİ
                                 </label>
-                                <span style={{ fontSize: '11px', color: '#888' }}>Evrakın ön yüzünün fotoğrafını ekleyiniz.</span>
-                                <input 
-                                    type="file" 
+                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                    Evrakın ön yüzünün fotoğrafı.
+                                </span>
+                                <input
+                                    type="file"
                                     accept="image/*"
-                                    onChange={(e) => {
-                                        if (e.target.files?.[0]) {
-                                            setNewCheckData({ ...newCheckData, file: e.target.files[0] });
-                                        }
+                                    onChange={(e: any) => {
+                                        if (e.target.files?.[0]) setNewCheckData({ ...newCheckData, file: e.target.files[0] });
                                     }}
-                                    style={{ marginTop: '8px' }}
+                                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 cursor-pointer mt-2"
                                 />
                             </div>
 
-                            <button
+                            <EnterpriseButton
                                 onClick={async () => {
                                     if (!newCheckData.amount || !newCheckData.dueDate || !newCheckData.number) {
                                         showError("Eksik Bilgi", "Lütfen Tutar, Vade Tarihi ve Evrak Numarasını girin.");
@@ -3310,15 +2989,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                                         const data = await res.json();
                                         if (!res.ok) throw new Error(data.error || "Hata oluştu");
-                                        
-                                        // Image upload if file selected
                                         if (data.check?.id && newCheckData.file) {
                                             const formData = new FormData();
                                             formData.append('file', newCheckData.file);
-                                            await fetch(`/api/financials/checks/${data.check.id}/image`, {
-                                                method: 'POST',
-                                                body: formData
-                                            });
+                                            await fetch(`/api/financials/checks/${data.check.id}/image`, { method: 'POST', body: formData });
                                         }
 
                                         showSuccess("Evrak Kaydedildi", "Yeni çek/senet başarıyla portföye eklendi.");
@@ -3332,77 +3006,84 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     }
                                 }}
                                 disabled={isSavingCheck}
-                                style={{ marginTop: '24px', padding: '18px', borderRadius: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', border: 'none', fontWeight: '800', fontSize: '15px', cursor: isSavingCheck ? 'wait' : 'pointer' }}
+                                className="w-full h-14 mt-2 font-bold text-base bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50"
                             >
                                 {isSavingCheck ? 'KAYDEDİLİYOR...' : 'ONAYLA VE PORTFÖYE EKLE'}
-                            </button>
+                            </EnterpriseButton>
                         </div>
-                    </div>
+                    </EnterpriseCard>
                 </div>
             )}
-
-            {/* OTP COMPLIANCE MODAL */}
+\n            {/* OTP COMPLIANCE MODAL */}
             {otpModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '560px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(245, 158, 11, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span style={{ fontSize: '24px' }}>✍️</span> Periodya Trust & Compliance
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[6000] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <EnterpriseCard className="w-full max-w-lg animate-in zoom-in-95 duration-200 shadow-2xl border-amber-500/30 text-left">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                            <h3 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-3 tracking-tight">
+                                <span className="text-2xl">✍️</span> Trust & Compliance
                             </h3>
-                            <button onClick={() => setOtpModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
+                            <button
+                                onClick={() => setOtpModalOpen(false)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
                         </div>
 
-                        <div className="flex-col gap-4">
-                            <p style={{ fontSize: '15px', color: 'var(--text-muted, #aaa)', lineHeight: '1.6' }}>
+                        <div className="flex flex-col gap-6">
+                            <p className="text-[14px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed m-0 px-2 lg:px-0">
                                 Müşteriye senet onayı için OTP (Tek Kullanımlık Şifre) bağlantısı gönderebilir veya doğrudan senedi yazdırabilirsiniz.
                             </p>
                             
-                            <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span style={{ fontSize: '24px' }}>🛡️</span>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: '800', color: '#fbbf24', fontSize: '14px', marginBottom: '4px' }}>Güvenli E-İmza (OTP) Altyapısı</div>
-                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #aaa)', lineHeight: '1.4' }}>Sistem alıcının <strong>{customer.phone || customer.email || 'iletişim adresine'}</strong> benzersiz imza linki iletecektir.</div>
+                            <div className="flex items-center gap-4 p-4 rounded-[16px] bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                                <span className="text-3xl shrink-0">🛡️</span>
+                                <div className="flex flex-col gap-1">
+                                    <span className="font-bold text-[14px] text-amber-700 dark:text-amber-500">Güvenli E-İmza (OTP)</span>
+                                    <span className="text-[12px] font-medium text-amber-600 dark:text-amber-400/80 leading-relaxed">
+                                        Sistem alıcının iletişim adresine imza linki iletecektir.
+                                    </span>
                                 </div>
                             </div>
 
-                            <button
-                                onClick={async () => {
-                                    setIsSendingOtp(true);
-                                    try {
-                                        const res = await fetch(`/api/documents/senet?action=send-otp&invoiceId=${lastInvoice?.id || ''}`);
-                                        const data = await res.json();
-                                        if (data.success) {
-                                            showSuccess("Başarılı", "Müşteriye senet onayı (OTP) SMS ve Email bağlantıları iletildi.");
-                                            setOtpModalOpen(false);
-                                        } else {
-                                            showError("Hata", data.error || "İmza zarfı oluşturulamadı.");
+                            <div className="flex flex-col gap-3 mt-2">
+                                <button
+                                    onClick={async () => {
+                                        setIsSendingOtp(true);
+                                        try {
+                                            const res = await fetch(`/api/documents/senet?action=send-otp&invoiceId=${lastInvoice?.id || ''}`);
+                                            const data = await res.json();
+                                            if (data.success) {
+                                                showSuccess("Başarılı", "Müşteriye bağlantılar iletildi.");
+                                                setOtpModalOpen(false);
+                                            } else {
+                                                showError("Hata", data.error || "Oluşturulamadı.");
+                                            }
+                                        } catch (err: any) {
+                                            showError("Hata", err.message);
+                                        } finally {
+                                            setIsSendingOtp(false);
                                         }
-                                    } catch (err: any) {
-                                        showError("Hata", err.message);
-                                    } finally {
-                                        setIsSendingOtp(false);
-                                    }
-                                }}
-                                disabled={isSendingOtp}
-                                style={{ marginTop: '24px', padding: '18px', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.2) 100%)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)', fontWeight: '800', fontSize: '15px', cursor: isSendingOtp ? 'wait' : 'pointer' }}
-                            >
-                                {isSendingOtp ? 'GÖNDERİLİYOR...' : 'SMS & E-POSTA İLE ONAYA SUN'}
-                            </button>
+                                    }}
+                                    disabled={isSendingOtp}
+                                    className="w-full h-14 rounded-[20px] font-black tracking-wide text-[14px] bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none shadow-amber-500/30 shadow-lg disabled:opacity-70 hover:-translate-y-1 transition-all duration-300 flex justify-center items-center"
+                                >
+                                    {isSendingOtp ? 'GÖNDERİLİYOR...' : 'SMS & E-POSTA İLE ONAYA SUN'}
+                                </button>
 
-                            <button
-                                onClick={() => {
-                                    window.open(`/api/documents/senet?action=get-pdf&invoiceId=${lastInvoice?.id || ''}`, '_blank');
-                                    setOtpModalOpen(false);
-                                }}
-                                style={{ marginTop: '12px', padding: '18px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', fontSize: '15px', cursor: 'pointer' }}
-                                className="hover:bg-white/10"
-                            >
-                                SENEDİ YAZDIR / GÖRÜNTÜLE
-                            </button>
+                                <button
+                                    onClick={() => {
+                                        window.open(`/api/documents/senet?action=get-pdf&invoiceId=${lastInvoice?.id || ''}`, '_blank');
+                                        setOtpModalOpen(false);
+                                    }}
+                                    className="w-full h-14 rounded-[20px] font-bold text-[14px] text-slate-600 dark:text-slate-300 bg-transparent border-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                                >
+                                    🖨️ PDF OLARAK YAZDIR / GÖRÜNTÜLE
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </EnterpriseCard>
                 </div>
-            )}
+            )}\n
         </div >
     );
 }
