@@ -4,6 +4,7 @@
 import { Fragment, useState } from 'react';
 import { apiFetch } from '@/lib/api-client';
 import { useModal } from '@/contexts/ModalContext';
+import ProductWizardModal from '@/app/(app)/inventory/components/ProductWizardModal';
 
 interface InvoiceMappingModalProps {
     selectedOrder: any;
@@ -50,7 +51,11 @@ export function InvoiceMappingModal({
 
     const [quickCreate, setQuickCreate] = useState<Record<string, QuickCreateState | null>>({});
     const [isCreating, setIsCreating] = useState<string | null>(null);
-    const { showError } = useModal();
+    const { showError, showSuccess } = useModal();
+
+    // Wizard State
+    const [wizardItem, setWizardItem] = useState<any>(null);
+    const [wizardData, setWizardData] = useState<any>(null);
 
     // Get the mapping status for a given item
     const getMappingInfo = (item: any) => {
@@ -63,29 +68,32 @@ export function InvoiceMappingModal({
         return mapped && mapped.productId;
     });
 
-    const handleCreateProduct = async (itemName: string, form: QuickCreateState) => {
-        if (!form.name) return;
-        setIsCreating(itemName);
+    const handleWizardSave = async () => {
+        if (!wizardData?.name || !wizardItem) return;
+        setIsCreating(wizardItem.name);
         try {
             const res = await apiFetch('/api/inventory', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: form.name,
-                    code: form.code || undefined,
-                    stock: parseFloat(form.stock) || 0,
-                    price: parseFloat(form.price) || 0,
-                    source: 'marketplace_mapping',
+                    // Destructure everything carefully, matching the API expectations
+                    ...wizardData,
+                    stock: parseFloat(wizardData.stock) || 0,
+                    price: parseFloat(wizardData.price) || 0,
+                    buyPrice: parseFloat(wizardData.buyPrice) || 0,
+                    source: 'marketplace_mapping_wizard',
                 })
             });
             const data = await res.json();
             if (data.success && data.product) {
-                // Auto-select new product
-                setMappedItems({ ...mappedItems, [itemName]: { productId: data.product.id, status: 'new' } });
-                setQuickCreate({ ...quickCreate, [itemName]: null }); // close form
+                setMappedItems({ ...mappedItems, [wizardItem.name]: { productId: data.product.id, status: 'new' } });
+                setQuickCreate({ ...quickCreate, [wizardItem.name]: null }); // close quick form
                 inventoryProducts.push(data.product); // optimistic push
+                showSuccess('Başarılı', 'Stok kartı sihirbaz başarıyla kullanılarak oluşturuldu.');
+                setWizardData(null);
+                setWizardItem(null);
             } else {
-                showError('Hata', 'Ürün oluşturulamadı: ' + (data.error || 'Bilinmeyen hata'));
+                showError('Hata', 'Stok kartı oluşturulamadı: ' + (data.error || 'Bilinmeyen hata'));
             }
         } catch (e: any) {
             showError('Hata', 'İşlem Başarısız: ' + e.message);
@@ -219,53 +227,33 @@ export function InvoiceMappingModal({
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    /* Quick-create form */
-                                                    <div className="bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200 dark:border-indigo-500/20 rounded-xl p-4 flex flex-col gap-3">
-                                                        <div className="font-black text-[12px] text-indigo-600 dark:text-indigo-400 mb-1">🆕 Yeni Stok Kartı Hızlı Oluşturma</div>
-                                                        <div className="grid grid-cols-2 gap-3">
-                                                            <div className="flex flex-col gap-1">
-                                                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Ürün Adı *</label>
-                                                                <input type="text" value={quickCreate[item.name]!.name}
-                                                                    onChange={e => setQuickCreate({ ...quickCreate, [item.name]: { ...quickCreate[item.name]!, name: e.target.value } })}
-                                                                    className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-[13px] font-semibold text-slate-800 dark:text-white outline-none focus:border-indigo-500"
-                                                                />
+                                                        <div className="bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200 dark:border-indigo-500/20 rounded-xl p-6 flex flex-col gap-4 items-center justify-center text-center">
+                                                            <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-2">
+                                                                📦
                                                             </div>
-                                                            <div className="flex flex-col gap-1">
-                                                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Ürün Kodu</label>
-                                                                <input type="text" value={quickCreate[item.name]!.code}
-                                                                    onChange={e => setQuickCreate({ ...quickCreate, [item.name]: { ...quickCreate[item.name]!, code: e.target.value } })}
-                                                                    className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-[13px] font-semibold text-slate-800 dark:text-white outline-none focus:border-indigo-500"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-3">
-                                                            <div className="flex flex-col gap-1">
-                                                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Mevcut Stok</label>
-                                                                <input type="number" value={quickCreate[item.name]!.stock}
-                                                                    onChange={e => setQuickCreate({ ...quickCreate, [item.name]: { ...quickCreate[item.name]!, stock: e.target.value } })}
-                                                                    className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-[13px] font-semibold text-slate-800 dark:text-white outline-none focus:border-indigo-500"
-                                                                />
-                                                            </div>
-                                                            <div className="flex flex-col gap-1">
-                                                                <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Fiyat (₺)</label>
-                                                                <input type="number" value={quickCreate[item.name]!.price}
-                                                                    onChange={e => setQuickCreate({ ...quickCreate, [item.name]: { ...quickCreate[item.name]!, price: e.target.value } })}
-                                                                    className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-[13px] font-semibold text-slate-800 dark:text-white outline-none focus:border-indigo-500"
-                                                                />
+                                                            <h4 className="font-black text-[15px] text-slate-800 dark:text-white uppercase tracking-widest">Gelişmiş Kart Oluşturucu</h4>
+                                                            <p className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 max-w-sm mb-2">Bu ürün için envanter modülündeki gelişmiş özelliklerle tam donanımlı bir stok kartı oluşturulacaktır.</p>
+                                                            <div className="flex gap-3 mt-2 w-full max-w-sm">
+                                                                <button onClick={() => {
+                                                                    setWizardItem(item);
+                                                                    setWizardData({
+                                                                        name: item.name,
+                                                                        code: item.code || item.barcode || '',
+                                                                        stock: Number(item.qty || item.quantity || 1),
+                                                                        price: Number(item.price || item.unitPrice || 0),
+                                                                        buyPrice: 0,
+                                                                        brand: item.brand || '',
+                                                                        type: 'Stoklu Ürün',
+                                                                        status: 'Aktif'
+                                                                    });
+                                                                }} className="flex-1 py-3.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[12px] uppercase tracking-widest transition-all shadow-md shadow-indigo-500/20 active:scale-95">
+                                                                    🚀 Sihirbazı Başlat
+                                                                </button>
+                                                                <button onClick={() => setQuickCreate({ ...quickCreate, [item.name]: null })} className="px-6 py-3.5 rounded-full border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-black text-[12px] uppercase tracking-widest transition-colors shadow-sm">
+                                                                    İptal
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                        <div className="flex gap-3 mt-1">
-                                                            <button onClick={() => handleCreateProduct(item.name, quickCreate[item.name]!)}
-                                                                disabled={isCreating === item.name}
-                                                                className="flex-1 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] uppercase tracking-widest disabled:opacity-50 transition-colors">
-                                                                {isCreating === item.name ? 'Oluşturuluyor...' : '✅ Stok Kartı Oluştur ve Seç'}
-                                                            </button>
-                                                            <button onClick={() => setQuickCreate({ ...quickCreate, [item.name]: null })}
-                                                                className="px-5 py-2 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-black text-[11px] uppercase tracking-widest transition-colors">
-                                                                İptal
-                                                            </button>
-                                                        </div>
-                                                    </div>
                                                 )}
                                             </div>
                                         )}
@@ -273,7 +261,6 @@ export function InvoiceMappingModal({
                                 );
                             })}
                         </div>
-
                         {/* Finalize button */}
                         <div className="pt-2 mt-auto">
                             <button
@@ -287,6 +274,31 @@ export function InvoiceMappingModal({
                     </div>
                 )}
             </div>
+            
+            <ProductWizardModal
+                isOpen={!!wizardData}
+                mode="create"
+                data={wizardData}
+                onChange={setWizardData}
+                onClose={() => { setWizardData(null); setWizardItem(null); setQuickCreate({}); }}
+                onSave={handleWizardSave}
+                isProcessing={isCreating !== null}
+                categories={[]}
+                allProducts={inventoryProducts}
+                priceLists={[]}
+                productPrices={{}}
+                setProductPrices={() => {}}
+                showOtherPrices={false}
+                setShowOtherPrices={() => {}}
+                useVariants={false}
+                setUseVariants={() => {}}
+                variantAttributes={[]}
+                selectedAttributes={[]}
+                setSelectedAttributes={() => {}}
+                generatedVariants={[]}
+                setGeneratedVariants={() => {}}
+                generateCombinations={() => {}}
+            />
         </div>
     );
 }
