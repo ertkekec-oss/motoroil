@@ -28,7 +28,7 @@ export async function GET(req: Request) {
                 id: true,
                 name: true,
                 code: true,
-                sellPrice: true,
+                price: true,
                 buyPrice: true,
             }
         });
@@ -36,15 +36,15 @@ export async function GET(req: Request) {
         // If the user has absolutely no products in DB yet, seed some mock products to demonstrate the Engine
         if (!products || products.length === 0) {
             products = [
-                { id: 'm1', name: 'Castrol Edge 5W-30 4L', code: 'CST-001', sellPrice: 1250, buyPrice: 1000 },
-                { id: 'm2', name: 'Mobil 1 ESP 5W-30 5L', code: 'MBL-002', sellPrice: 1850, buyPrice: 1400 },
-                { id: 'm3', name: 'Shell Helix Ultra 0W-40', code: 'SHL-003', sellPrice: 1450, buyPrice: 1100 }
+                { id: 'm1', name: 'Castrol Edge 5W-30 4L', code: 'CST-001', price: 1250, buyPrice: 1000 },
+                { id: 'm2', name: 'Mobil 1 ESP 5W-30 5L', code: 'MBL-002', price: 1850, buyPrice: 1400 },
+                { id: 'm3', name: 'Shell Helix Ultra 0W-40', code: 'SHL-003', price: 1450, buyPrice: 1100 }
             ];
         }
 
         const pricingData = products.map((p: any, idx: number) => {
             // Force values for simulation if they are 0
-            const current = Number(p.sellPrice) > 0 ? Number(p.sellPrice) : 1000;
+            const current = Number(p.price) > 0 ? Number(p.price) : 1000;
             const buy = Number(p.buyPrice) > 0 ? Number(p.buyPrice) : (current * 0.75); // simulate 25% margin if unknown
             const grossMargin = ((current - buy) / current) * 100;
 
