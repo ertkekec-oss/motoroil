@@ -1,0 +1,10 @@
+Trendyol Sales URL: https://apigw.trendyol.com/integration/finance/che/sellers/548512/settlements?startDate=1767224322410&endDate=1775000322410&transactionType=Sale&orderNumber=11069830379
+TY Sales Status: 400
+TY Sales JSON: {"timestamp":1775000321494,"exception":"CheApiBusinessException","errors":[{"key":"keys.error.parameter.invalid.date-range","message":"Başlangıç ve bitiş tarihi arasındaki fark 15 günden büyük olamaz","errorCode":"Başlangıç ve bitiş tarihi arasındaki fark 15 günden büyük olamaz","args":[]}]}
+
+Trendyol Ded URL: https://apigw.trendyol.com/integration/finance/che/sellers/548512/other-financial-deductions?startDate=1767224322410&endDate=1775000322410&orderNumber=11069830379
+TY Deductions Status: 404
+TY Deductions JSON: Resource not found
+
+HB Sales URL: https://mpop-api.hepsiburada.com/finances/settlements?orderuid=4281248337&merchantId=f225561c-5ae7-4208-9eb4-3541340b7229
+Error: fetch failed

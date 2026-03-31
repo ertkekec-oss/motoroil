@@ -201,8 +201,8 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
                 // 1. Fetch Sales (Commission/Revenue) & Deductions (Cargo/Penalty)
                 const [settlements, deductions] = await Promise.all([
-                    (service as any).getOrderSettlements(order.orderNumber),
-                    (service as any).getOrderDeductions(order.orderNumber)
+                    (service as any).getOrderSettlements(order.orderNumber, order.orderDate),
+                    (service as any).getOrderDeductions(order.orderNumber, order.orderDate)
                 ]);
 
                 if (settlements.length === 0 && deductions.length === 0) {

@@ -401,32 +401,64 @@ export class TrendyolService implements IMarketplaceService {
         throw new Error('Paket detayları alınamadı.');
     }
 
-    
-    async getOrderSettlements(orderNumber: string): Promise<any[]> {
+    async getOrderSettlements(orderNumber: string, orderDate?: Date): Promise<any[]> {
         try {
-            const endDate = Date.now();
-            const startDate = endDate - 14 * 24 * 60 * 60 * 1000;
-            const url = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/settlements?startDate=${startDate}&endDate=${endDate}&transactionType=Sale&orderNumber=${encodeURIComponent(orderNumber)}`;
+            const range1End = Date.now();
+            const range1Start = range1End - 14 * 24 * 60 * 60 * 1000;
+            const url1 = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/settlements?startDate=${range1Start}&endDate=${range1End}&transactionType=Sale&orderNumber=${encodeURIComponent(orderNumber)}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
-            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
-            const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
-            return response.data?.content || response.content || [];
+            const fetchUrl1 = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url1)}` : url1;
+            const response1 = await this.safeFetchJson(fetchUrl1, { headers: this.getHeaders() });
+            
+            let data = response1.data?.content || response1.content || [];
+            if (data.length === 0 && orderDate) {
+                const range2Start = orderDate.getTime() - 24 * 60 * 60 * 1000; // 1 day before
+                const range2End = range2Start + 14 * 24 * 60 * 60 * 1000;
+                
+                // If the second range is entirely in the past and doesn't overlap perfectly with first
+                if (range2End < range1Start) {
+                    const url2 = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/settlements?startDate=${range2Start}&endDate=${range2End}&transactionType=Sale&orderNumber=${encodeURIComponent(orderNumber)}`;
+                    const fetchUrl2 = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url2)}` : url2;
+                    const response2 = await this.safeFetchJson(fetchUrl2, { headers: this.getHeaders() });
+                    data = response2.data?.content || response2.content || [];
+                }
+            }
+
+            return data;
         } catch (error) {
              console.error(`Trendyol getOrderSettlements failed for ${orderNumber}:`, error);
              return [];
         }
     }
 
-    async getOrderDeductions(orderNumber: string): Promise<any[]> {
+    async getOrderDeductions(orderNumber: string, orderDate?: Date): Promise<any[]> {
         try {
-            const endDate = Date.now();
-            const startDate = endDate - 14 * 24 * 60 * 60 * 1000;
-            // For deductions, there might not be a transactionType query param, but let's see. Typically deductions are just mapped to the order. Let's leave transactionType=Sale out for deductions initially like standard. Wait, the docs say it. I'll just add it just in case if it throws 500 without it. I will NOT add transactionType for deductions, just for settlements as that's where the 500 occurred in the log ('/sellers/.../settlements'). Wait, no, deductions threw 404 in my log! '404 - Resource not found' for deductions!
-            const url = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/other-financial-deductions?startDate=${startDate}&endDate=${endDate}&orderNumber=${encodeURIComponent(orderNumber)}`;
+            const range1End = Date.now();
+            const range1Start = range1End - 14 * 24 * 60 * 60 * 1000;
+            const url1 = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/otherfinancials?startDate=${range1Start}&endDate=${range1End}&orderNumber=${encodeURIComponent(orderNumber)}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
-            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
-            const response = await this.safeFetchJson(fetchUrl, { headers: this.getHeaders() });
-            return response.data?.content || response.content || [];
+            const fetchUrl1 = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url1)}` : url1;
+            
+            // We just catch 404 silently for this one, mostly because sometimes there really are no deductions.
+            let response1;
+            try { response1 = await this.safeFetchJson(fetchUrl1, { headers: this.getHeaders() }); } catch(err:any) { if(err.message?.includes('404')) response1 = {data: {content: []}}; else throw err; }
+
+            let data = response1.data?.content || response1.content || [];
+
+            if (data.length === 0 && orderDate) {
+                const range2Start = orderDate.getTime() - 24 * 60 * 60 * 1000;
+                const range2End = range2Start + 14 * 24 * 60 * 60 * 1000;
+                
+                if (range2End < range1Start) {
+                    const url2 = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/otherfinancials?startDate=${range2Start}&endDate=${range2End}&orderNumber=${encodeURIComponent(orderNumber)}`;
+                    const fetchUrl2 = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url2)}` : url2;
+                    let response2;
+                    try { response2 = await this.safeFetchJson(fetchUrl2, { headers: this.getHeaders() }); } catch(err:any) { if(err.message?.includes('404')) response2 = {data: {content: []}}; else throw err; }
+                    data = response2.data?.content || response2.content || [];
+                }
+            }
+
+            return data;
         } catch (error) {
              console.error(`Trendyol getOrderDeductions failed for ${orderNumber}:`, error);
              return [];
