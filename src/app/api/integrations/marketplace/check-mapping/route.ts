@@ -48,11 +48,13 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { marketplace, items } = body; // items: [{ code, name }]
+        let { marketplace, items } = body; // items: [{ code, name }]
 
         if (!marketplace || !items || !Array.isArray(items)) {
             return NextResponse.json({ success: false, error: 'Eksik veri' }, { status: 400 });
         }
+        
+        marketplace = String(marketplace).toLowerCase();
 
         const company = await prisma.company.findFirst({
             where: { tenantId: auth.user.tenantId },

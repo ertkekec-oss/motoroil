@@ -769,8 +769,8 @@ export default function SalesPage() {
             setIsLoadingMapping(true);
             try {
                 const payloadItems = selectedOrder.items.map((i: any) => ({
-                    code: i.code || i.barcode || i.name,
-                    name: i.name
+                    code: i.sku || i.code || i.barcode || i.productName || i.name,
+                    name: i.productName || i.name || 'İsimsiz Ürün'
                 }));
 
                 const res = await apiFetch('/api/integrations/marketplace/check-mapping', {
@@ -788,13 +788,16 @@ export default function SalesPage() {
                     // Auto-populate items with 'mapped' status (exact or high-score)
                     Object.keys(data.mappings).forEach(key => {
                         const map = data.mappings[key];
-                        const item = selectedOrder.items.find((i: any) => (i.code || i.barcode || i.name) === key);
-                        if (item && map.status === 'mapped' && map.internalProduct) {
-                            newMappedItems[item.name] = { productId: map.internalProduct.id, status: 'auto' };
-                        }
-                        // 'suggest' → pre-fill but user must confirm (we pre-fill to speed up)
-                        if (item && map.status === 'suggest' && map.internalProduct) {
-                            newMappedItems[item.name] = { productId: map.internalProduct.id, status: 'suggest' };
+                        const item = selectedOrder.items.find((i: any) => (i.sku || i.code || i.barcode || i.productName || i.name) === key);
+                        if (item) {
+                            const itemName = item.productName || item.name || 'İsimsiz Ürün';
+                            if (map.status === 'mapped' && map.internalProduct) {
+                                newMappedItems[itemName] = { productId: map.internalProduct.id, status: 'auto' };
+                            }
+                            // 'suggest' → pre-fill but user must confirm (we pre-fill to speed up)
+                            if (map.status === 'suggest' && map.internalProduct) {
+                                newMappedItems[itemName] = { productId: map.internalProduct.id, status: 'suggest' };
+                            }
                         }
                         // 'notFound' → leave empty, user will create or manually pick
                     });
@@ -815,10 +818,13 @@ export default function SalesPage() {
         setIsLoadingMapping(true);
         try {
             // 1. Save new mappings (upsert on backend)
-            const mappingPayload = selectedOrder.items.map((item: any) => ({
-                marketplaceCode: item.code || item.barcode || item.name,
-                productId: mappedItems[item.name]?.productId?.toString()
-            })).filter((m: any) => m.productId);
+            const mappingPayload = selectedOrder.items.map((item: any) => {
+                const itemName = item.productName || item.name || 'İsimsiz Ürün';
+                return {
+                    marketplaceCode: String(item.sku || item.code || item.barcode || itemName),
+                    productId: mappedItems[itemName]?.productId?.toString()
+                };
+            }).filter((m: any) => m.productId);
 
             if (mappingPayload.length > 0) {
                 await apiFetch('/api/integrations/marketplace/save-mapping', {
@@ -829,14 +835,17 @@ export default function SalesPage() {
             }
 
             // 2. Process Sale & Invoice
-            const saleItems = selectedOrder.items.map((item: any) => ({
-                productId: mappedItems[item.name]?.productId,
-                qty: item.qty || item.quantity || 1,
-                name: item.name,
-                price: item.price || 0,
-                vat: item.vat || 20, // ensure proper tax
-                otv: item.otv || 0
-            }));
+            const saleItems = selectedOrder.items.map((item: any) => {
+                const itemName = item.productName || item.name || 'İsimsiz Ürün';
+                return {
+                    productId: mappedItems[itemName]?.productId,
+                    qty: Number(item.qty || item.quantity || 1),
+                    name: itemName,
+                    price: Number(item.price || item.unitPrice || 0),
+                    vat: Number(item.vat || item.taxRate || item.vatRate || 20), // ensure proper tax
+                    otv: Number(item.otv || 0)
+                };
+            });
 
             // Call ecommerce-convert to create a SalesInvoice, resolve Customer, update Stock
             const res = await apiFetch('/api/sales/invoices/ecommerce-convert', {

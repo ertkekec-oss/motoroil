@@ -8,12 +8,13 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { marketplace, mappings } = body;
-        // mappings: [{ marketplaceCode: 'M123', productId: 'p1' }, ...]
-
+        let { marketplace, mappings } = body;
+        
         if (!marketplace || !mappings || !Array.isArray(mappings)) {
             return NextResponse.json({ success: false, error: 'Eksik veri' }, { status: 400 });
         }
+        
+        marketplace = String(marketplace).toLowerCase();
 
         // Aktif şirketin ID'sini al (tenant isolation)
         const company = await prisma.company.findFirst({

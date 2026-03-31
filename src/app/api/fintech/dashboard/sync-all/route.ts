@@ -21,12 +21,12 @@ export async function POST(req: Request) {
         }
 
         // Bul: Teslim edilmiş ama son 7 gündeki siparişler, işlemi PENDING/FAILED olanlar veya henüz hiç sync atılmamış olanlar
-        // For demonstration, let's just grab the most recent 10 'DELIVERED' or 'TAMAMLANDI' orders
+        // For demonstration, let's grab recently completed orders
         const orders = await prisma.order.findMany({
             where: {
                 companyId,
                 status: {
-                    in: ['Teslim Edildi', 'DELIVERED', 'TAMAMLANDI', 'Delivered']
+                    in: ['Teslim Edildi', 'DELIVERED', 'TAMAMLANDI', 'Delivered', 'Tamamlandı', 'Faturalandırıldı']
                 }
             },
             orderBy: { orderDate: 'desc' },

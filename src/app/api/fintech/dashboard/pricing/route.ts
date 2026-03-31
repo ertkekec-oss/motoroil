@@ -48,11 +48,11 @@ export async function GET(req: Request) {
             
             return NextResponse.json({
                 success: true,
-                data: {
+                data: pricingDataMock,
+                summary: {
                     activeRules: 0,
                     marginProtected: 0,
-                    lossPrevention: 0,
-                    recommendations: pricingDataMock
+                    criticalCount: 0
                 }
             });
         }

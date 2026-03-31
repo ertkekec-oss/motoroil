@@ -59,18 +59,20 @@ export function InvoiceMappingModal({
 
     // Get the mapping status for a given item
     const getMappingInfo = (item: any) => {
-        const key = item.code || item.barcode || item.name;
-        return rawMappings[key] || { status: 'notFound', score: 0, suggestions: [], marketplaceName: item.name };
+        const key = item.sku || item.code || item.barcode || item.productName || item.name;
+        return rawMappings[key] || { status: 'notFound', score: 0, suggestions: [], marketplaceName: item.productName || item.name };
     };
 
     const allMapped = selectedOrder.items.every((i: any) => {
-        const mapped = mappedItems[i.name];
+        const itemName = i.productName || i.name || 'İsimsiz Ürün';
+        const mapped = mappedItems[itemName];
         return mapped && mapped.productId;
     });
 
     const handleWizardSave = async () => {
         if (!wizardData?.name || !wizardItem) return;
-        setIsCreating(wizardItem.name);
+        const itemName = wizardItem.productName || wizardItem.name || 'İsimsiz Ürün';
+        setIsCreating(itemName);
         try {
             const res = await apiFetch('/api/inventory', {
                 method: 'POST',
@@ -86,8 +88,8 @@ export function InvoiceMappingModal({
             });
             const data = await res.json();
             if (data.success && data.product) {
-                setMappedItems({ ...mappedItems, [wizardItem.name]: { productId: data.product.id, status: 'new' } });
-                setQuickCreate({ ...quickCreate, [wizardItem.name]: null }); // close quick form
+                setMappedItems({ ...mappedItems, [itemName]: { productId: data.product.id, status: 'new' } });
+                setQuickCreate({ ...quickCreate, [itemName]: null }); // close quick form
                 inventoryProducts.push(data.product); // optimistic push
                 showSuccess('Başarılı', 'Stok kartı sihirbaz başarıyla kullanılarak oluşturuldu.');
                 setWizardData(null);
@@ -143,120 +145,96 @@ export function InvoiceMappingModal({
                         </div>
 
                         {/* Items */}
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {selectedOrder.items?.map((item: any, idx: number) => {
+                                const itemName = item.productName || item.name || 'İsimsiz Ürün';
+                                const itemCode = item.sku || item.code || item.barcode || item.stockCode || '—';
+                                const itemQty = item.quantity || item.qty || 1;
+                                const itemPrice = item.price || item.unitPrice || 0;
+
                                 const info = getMappingInfo(item);
-                                const currentMap = mappedItems[item.name];
+                                const currentMap = mappedItems[itemName];
                                 const isDone = !!(currentMap?.productId);
                                 const statusColor = isDone ? 'text-emerald-600 dark:text-emerald-400' : (info.status === 'suggest' ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400');
-                                const bgStyle = isDone ? 'bg-emerald-50/50 dark:bg-emerald-500/5' : (info.status === 'suggest' ? 'bg-amber-50/50 dark:bg-amber-500/5' : 'bg-rose-50/50 dark:bg-rose-500/5');
-                                const borderStyle = isDone ? 'border-emerald-200 dark:border-emerald-500/20' : (info.status === 'suggest' ? 'border-amber-200 dark:border-amber-500/20' : 'border-rose-200 dark:border-rose-500/20');
-                                const showCreate = quickCreate[item.name] !== undefined && quickCreate[item.name] !== null;
+                                const borderStyle = isDone ? 'border-emerald-200 dark:border-emerald-500/20' : (info.status === 'suggest' ? 'border-amber-200 dark:border-amber-500/20' : 'border-slate-200 dark:border-white/10');
+                                const bgStyle = isDone ? 'bg-white dark:bg-[#1e293b]' : 'bg-slate-50 dark:bg-slate-900/50';
+
+                                const handleNewItemClick = () => {
+                                    setWizardItem(item);
+                                    setWizardData({
+                                        name: itemName,
+                                        code: itemCode !== '—' ? itemCode : '',
+                                        stock: Number(itemQty),
+                                        price: Number(itemPrice),
+                                        buyPrice: 0,
+                                        brand: item.brand || '',
+                                        type: 'Stoklu Ürün',
+                                        status: 'Aktif'
+                                    });
+                                };
 
                                 return (
-                                    <div key={idx} className={`p-4 rounded-2xl border ${bgStyle} ${borderStyle}`}>
+                                    <div key={idx} className={`p-5 rounded-2xl border transition-all ${bgStyle} ${borderStyle} shadow-sm group`}>
                                         {/* Row: marketplace item */}
-                                        <div className="flex justify-between items-start mb-3">
-                                            <div>
-                                                <div className="font-bold text-[14px] text-slate-800 dark:text-white mb-1">{item.name}</div>
-                                                <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                                                    <span>Kod: {item.code || item.barcode || '—'}</span>
-                                                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
-                                                    <span>Adet: <strong className="font-black text-slate-700 dark:text-slate-200">x{item.qty || item.quantity || 1}</strong></span>
+                                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                                            <div className="flex-1">
+                                                <div className="font-bold text-[15px] text-slate-800 dark:text-white mb-1.5">{itemName}</div>
+                                                <div className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-3">
+                                                    <span className="bg-white dark:bg-[#0f172a] px-2 py-1 rounded shadow-sm border border-slate-200 dark:border-white/5 font-mono">Kod: <span className="text-slate-700 dark:text-slate-300">{itemCode}</span></span>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                                                    <span className="bg-white dark:bg-[#0f172a] px-2 py-1 rounded shadow-sm border border-slate-200 dark:border-white/5">Adet: <strong className="font-black text-slate-700 dark:text-slate-200 text-indigo-600 dark:text-indigo-400">x{itemQty}</strong></span>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <div className={`text-[10px] font-black uppercase tracking-widest ${statusColor}`}>
+                                            <div className="text-left md:text-right shrink-0">
+                                                <div className={`text-[11px] inline-flex px-3 py-1.5 rounded-full border border-current font-black uppercase tracking-widest ${statusColor} bg-white dark:bg-[#0f172a] shadow-sm`}>
                                                     {isDone ? '✅ Eşleştirildi' : SCORE_LABELS[info.status]}
                                                 </div>
-                                                {info.score > 0 && <div className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Skor: {info.score}/100</div>}
+                                                {info.score > 0 && <div className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">AI Güven Skoru: {info.score}%</div>}
                                             </div>
                                         </div>
 
                                         {/* Match selector */}
                                         {info.status === 'suggest' && !isDone && (
-                                            <div className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/10 mb-3 px-3 py-2 rounded-lg border border-amber-200 dark:border-amber-500/20">
-                                                💡 AI Önerisi: <strong className="font-black">{info.internalProduct?.name}</strong> (Skor: {info.score}) — Lütfen doğrulayın veya listeden başka bir ürün seçin.
+                                            <div className="text-[12px] font-medium text-amber-700 dark:text-amber-400/90 bg-amber-50 dark:bg-amber-500/5 mb-4 px-4 py-3 rounded-xl border border-amber-200 dark:border-amber-500/20 flex items-start sm:items-center gap-3 shadow-sm">
+                                                <span className="text-base leading-none mt-0.5 sm:mt-0">💡</span>
+                                                <span>Yapay zeka tavsiyesi: <strong className="font-black">{info.internalProduct?.name}</strong>. Doğruluyorsanız <span className="hidden sm:inline">aşağıdaki</span> listeden seçin.</span>
                                             </div>
                                         )}
 
-                                        {info.status !== 'notFound' || isDone ? (
-                                            <select
-                                                className={`w-full px-4 py-3 rounded-xl text-[13px] font-bold outline-none border transition-colors ${isDone ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400' : 'bg-white dark:bg-[#1e293b] border-amber-300 dark:border-amber-500/30 text-slate-800 dark:text-white'}`}
-                                                value={currentMap?.productId || ''}
-                                                onChange={e => setMappedItems({ ...mappedItems, [item.name]: { productId: e.target.value, status: 'manual' } })}
-                                            >
-                                                <option value="">— Stok Kartı Seçin —</option>
-                                                {(info.suggestions || []).length > 0 && (
-                                                    <optgroup label={`🤖 AI Önerileri (en iyi ${info.suggestions.length})`}>
-                                                        {(info.suggestions as any[])?.map((s: any) => (
-                                                            <option key={s.product.id} value={s.product.id}>
-                                                                {s.product.name} — Stok: {s.product.stock} — Skor: {s.score}
-                                                            </option>
-                                                        ))}
-                                                    </optgroup>
-                                                )}
-                                                <optgroup label="📦 Tüm Stok Kartları">
+                                        <div className="w-full flex flex-col md:flex-row gap-3">
+                                            <div className="relative flex-1">
+                                                <input 
+                                                    list={`inventory-list-${idx}`} 
+                                                    placeholder="🔎 Stok Ürün Adı Ara veya Eşleştir..."
+                                                    className={`w-full h-12 px-5 rounded-xl text-[13px] font-bold outline-none border transition-all ${isDone ? 'bg-emerald-50 dark:bg-emerald-500/5 border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'bg-white dark:bg-[#0f172a] border-slate-300 dark:border-white/10 text-slate-800 dark:text-white hover:border-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-sm'}`}
+                                                    value={inventoryProducts?.find((p: any) => p.id === currentMap?.productId)?.name || currentMap?.productName || ''}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        const found = inventoryProducts?.find((p: any) => p.name === val);
+                                                        if (found) {
+                                                            setMappedItems({ ...mappedItems, [itemName]: { productId: found.id, status: 'manual' } });
+                                                        } else {
+                                                            setMappedItems({ ...mappedItems, [itemName]: { productId: '', status: 'manual', productName: val } });
+                                                        }
+                                                    }}
+                                                />
+                                                <datalist id={`inventory-list-${idx}`}>
                                                     {inventoryProducts?.map((inv: any) => (
-                                                        <option key={inv.id} value={inv.id}>
-                                                            {inv.name} ({inv.stock} Adet)
+                                                        <option key={inv.id} value={inv.name}>
+                                                            SKU: {inv.code} | Stok: {inv.stock} 
                                                         </option>
                                                     ))}
-                                                </optgroup>
-                                            </select>
-                                        ) : (
-                                            /* notFound — offer create */
-                                            <div>
-                                                {!showCreate ? (
-                                                    <div className="flex gap-3">
-                                                        <select
-                                                            className="flex-1 bg-white dark:bg-[#1e293b] border border-rose-300 dark:border-rose-500/30 px-4 py-3 rounded-xl text-[13px] font-bold text-slate-800 dark:text-white outline-none"
-                                                            value={currentMap?.productId || ''}
-                                                            onChange={e => setMappedItems({ ...mappedItems, [item.name]: { productId: e.target.value, status: 'manual' } })}
-                                                        >
-                                                            <option value="">— Manuel Seçim Yap —</option>
-                                                            {inventoryProducts?.map((inv: any) => (
-                                                                <option key={inv.id} value={inv.id}>{inv.name} ({inv.stock} Adet)</option>
-                                                            ))}
-                                                        </select>
-                                                        <button
-                                                            onClick={() => setQuickCreate({ ...quickCreate, [item.name]: { name: item.name, code: item.code || '', stock: '0', price: '0' } })}
-                                                            className="px-5 py-3 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[11px] font-black uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-500/20 active:scale-95 transition-all whitespace-nowrap"
-                                                        >
-                                                            + Yeni Kart Oluştur
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                        <div className="bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200 dark:border-indigo-500/20 rounded-xl p-6 flex flex-col gap-4 items-center justify-center text-center">
-                                                            <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-2">
-                                                                📦
-                                                            </div>
-                                                            <h4 className="font-black text-[15px] text-slate-800 dark:text-white uppercase tracking-widest">Gelişmiş Kart Oluşturucu</h4>
-                                                            <p className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 max-w-sm mb-2">Bu ürün için envanter modülündeki gelişmiş özelliklerle tam donanımlı bir stok kartı oluşturulacaktır.</p>
-                                                            <div className="flex gap-3 mt-2 w-full max-w-sm">
-                                                                <button onClick={() => {
-                                                                    setWizardItem(item);
-                                                                    setWizardData({
-                                                                        name: item.name,
-                                                                        code: item.code || item.barcode || '',
-                                                                        stock: Number(item.qty || item.quantity || 1),
-                                                                        price: Number(item.price || item.unitPrice || 0),
-                                                                        buyPrice: 0,
-                                                                        brand: item.brand || '',
-                                                                        type: 'Stoklu Ürün',
-                                                                        status: 'Aktif'
-                                                                    });
-                                                                }} className="flex-1 py-3.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[12px] uppercase tracking-widest transition-all shadow-md shadow-indigo-500/20 active:scale-95">
-                                                                    🚀 Sihirbazı Başlat
-                                                                </button>
-                                                                <button onClick={() => setQuickCreate({ ...quickCreate, [item.name]: null })} className="px-6 py-3.5 rounded-full border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-black text-[12px] uppercase tracking-widest transition-colors shadow-sm">
-                                                                    İptal
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                )}
+                                                </datalist>
                                             </div>
-                                        )}
+                                            {!isDone && (
+                                                <button
+                                                    onClick={handleNewItemClick}
+                                                    className="h-12 px-6 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-[12px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white hover:border-indigo-600 dark:hover:bg-indigo-500 dark:hover:text-white transition-all shadow-sm shrink-0 flex items-center justify-center group-hover:shadow-md"
+                                                >
+                                                    + Yeni Kart Aç
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 );
                             })}

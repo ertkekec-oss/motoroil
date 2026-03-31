@@ -119,8 +119,8 @@ export class N11ActionProvider implements MarketplaceActionProvider {
                 console.log(`${ctx} Sipariş bulundu (${order.orderNumber}), N11 Finans/Mutabakat API çekiliyor...`);
 
                 const [settlements, deductions] = await Promise.all([
-                    (service as any).getOrderSettlements(order.orderNumber),
-                    (service as any).getOrderDeductions(order.orderNumber)
+                    (service as any).getOrderSettlements(order.orderNumber, Number(order.totalAmount) || 0),
+                    (service as any).getOrderDeductions(order.orderNumber, Number(order.totalAmount) || 0)
                 ]);
 
                 let newLedgerCount = 0;
