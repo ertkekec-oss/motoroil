@@ -721,6 +721,9 @@ export default function FintechControlTower() {
             {activeTab === 'heatmap' && <ProfitabilityHeatmapContent />}
             {activeTab === 'pricing' && <SmartPricingContent />}
 
+            {/* Spacer to prevent overlap */}
+            <div className="h-32 w-full shrink-0 opacity-0" aria-hidden="true" />
+            
             {/* Sticky Alt Çubuk */}
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-200 dark:border-white/5  border-t border-slate-200 dark:border-white/5 z-50 flex justify-center">
                 <div className="max-w-7xl w-full flex justify-between items-center">
