@@ -617,12 +617,15 @@ const SmartPricingContent = () => {
 
 // --- MAIN PAGE COMPONENT ---
 
+import { useModal } from '@/components/modals/ModalContext';
+
 export default function FintechControlTower() {
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState<any>(null);
     const [toggling, setToggling] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [activeTab, setActiveTab] = useState<'control' | 'heatmap' | 'pricing'>('control');
+    const { showSuccess, showError } = useModal();
 
     const handleSync = async () => {
         setIsSyncing(true);
@@ -630,14 +633,14 @@ export default function FintechControlTower() {
             const res = await fetch('/api/fintech/dashboard/sync-all', { method: 'POST' });
             const data = await res.json();
             if (data.success) {
-                alert(data.message);
+                showSuccess("Mutabakat Senkronizasyonu", data.message);
                 await fetchMetrics(); // refresh metrics after sync
             } else {
-                alert("Senkronizasyon başarısız: " + data.error);
+                showError("Senkronizasyon Başarısız", data.error);
             }
         } catch (err: any) {
             console.error(err);
-            alert("Senkronizasyon hatası: " + err.message);
+            showError("Senkronizasyon Hatası", err.message);
         } finally {
             setIsSyncing(false);
         }

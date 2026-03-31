@@ -60,14 +60,7 @@ export class N11Service implements IMarketplaceService {
             return result?.content || [];
         } catch (error: any) {
             console.warn(`[N11_SETTLEMENT_WARN] ${orderNumber}: ${error.message}`);
-            // Fallback for demo stabilization where N11 endpoint doesn't exist
-            return [{
-                id: `N11-M-${orderNumber}`,
-                transactionId: `N11-M-${orderNumber}`,
-                transactionType: 'Sale',
-                sellerRevenue: fallbackTotal > 0 ? fallbackTotal * 0.85 : 1000,
-                transactionDate: new Date().toISOString()
-            }];
+            return [];
         }
     }
 
@@ -81,13 +74,7 @@ export class N11Service implements IMarketplaceService {
             return result?.content || [];
         } catch (error: any) {
             console.warn(`[N11_DEDUCTION_WARN] ${orderNumber}: ${error.message}`);
-            return [{
-                id: `N11-C-${orderNumber}`,
-                transactionId: `N11-C-${orderNumber}`,
-                transactionType: 'Commission',
-                amount: fallbackTotal > 0 ? fallbackTotal * 0.15 : 150,
-                transactionDate: new Date().toISOString()
-            }];
+            return [];
         }
     }
 
