@@ -368,18 +368,20 @@ const ProfitabilityHeatmapContent = () => {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* V2 Terminal Header & Filters */}
-            <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6">
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-slate-200/80 dark:ring-white/5 p-6 md:p-8">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-8">
                     <div>
-                        <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-2">
+                        <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-3">
                             <IconTrendingUp className="w-6 h-6 text-indigo-500" />
                             KARLILIK (P&L) TERMİNALİ
                         </h2>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Zaman Serisi (Time-Series) Fatura Dağılım Motoru</p>
+                        <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Zaman Serisi (Time-Series) Fatura Dağılım Motoru
+                        </p>
                     </div>
 
                     {/* Time Filter Pills */}
-                    <div className="flex bg-slate-50 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 shrink-0">
+                    <div className="flex bg-slate-50 dark:bg-white/5 p-1.5 rounded-[14px] ring-1 ring-slate-200/60 dark:ring-white/10 shrink-0 overflow-x-auto max-w-full">
                         {[
                             { id: 'TODAY', label: 'BUGÜN' },
                             { id: '1W', label: '1 HAFTA' },
@@ -391,7 +393,7 @@ const ProfitabilityHeatmapContent = () => {
                             <button
                                 key={tf.id}
                                 onClick={() => setTimeFilter(tf.id)}
-                                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${timeFilter === tf.id ? 'bg-white dark:bg-[#1e293b] text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-white/10' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${timeFilter === tf.id ? 'bg-white dark:bg-[#1e293b] text-indigo-600 dark:text-indigo-400 shadow-[0_2px_8px_rgba(0,0,0,0.06)] ring-1 ring-slate-200/50 dark:ring-white/10' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                             >
                                 {tf.label}
                             </button>
@@ -399,15 +401,16 @@ const ProfitabilityHeatmapContent = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pb-2 border-b border-slate-100 dark:border-white/5">
+                {/* Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pb-6 border-b border-slate-100 dark:border-white/5">
                     <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                             type="text"
                             placeholder="SKU, Ürün adı veya Marka..."
                             value={searchFilter}
                             onChange={(e) => setSearchFilter(e.target.value)}
-                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-10 py-2.5 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-indigo-200 focus:ring-1 focus:ring-indigo-500"
+                            className="w-full bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-10 py-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-shadow"
                         />
                     </div>
                     
@@ -758,48 +761,40 @@ export default function FintechControlTower() {
     );
 
     return (
-        <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40 bg-slate-50 min-h-screen w-full font-sans dark:bg-[#0f172a]">
-<EnterpriseSectionHeader 
-                title="FİNANSAL KONTROL KULESİ" 
+        <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40 bg-transparent min-h-screen w-full font-sans">
+            <EnterpriseSectionHeader 
+                title="FİNANSAL KONTROL KULESİ V2" 
                 subtitle="Otonom Finansal Komuta Merkezi • Açık Bankacılık Senkronizasyon Konsolu"
                 icon={<IconShield />}
                 rightElement={
                     <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg">V2 Terminal Active</span>
                         <EnterpriseButton 
                             variant="primary" 
-                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" 
+                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md" 
                             onClick={handleSync}
                             disabled={isSyncing}
                         >
                             <IconActivity className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} /> 
-                            {isSyncing ? 'Senkronize Ediliyor...' : 'Şimdi Senkronize Et'}
-                        </EnterpriseButton>
-                        <EnterpriseButton variant="secondary" className="flex items-center gap-2" onClick={() => {}}>
-                            <IconShield className="w-4 h-4" /> Sistem Denetim Kaydı
+                            {isSyncing ? 'Senkronize Ediliyor...' : 'Tüm Modülleri Senkronize Et'}
                         </EnterpriseButton>
                     </div>
                 } 
             />
 
             {/* Premium Tabs */}
-            <div className="flex bg-slate-100 dark:bg-[#1e293b]/50 p-1.5 rounded-full w-full max-w-max md:mx-0 overflow-x-auto shadow-inner border border-slate-200/50 dark:border-slate-200 dark:border-white/5 custom-scroll shrink-0 mb-6 relative z-10">
+            <div className="flex bg-white/50 p-1.5 rounded-2xl w-full max-w-max md:mx-0 overflow-x-auto shadow-sm ring-1 ring-slate-200/50 relative z-10 backdrop-blur-sm">
                 <button
                     onClick={() => setActiveTab('control')}
-                    className={`flex-1 min-w-[200px] h-10 px-6 rounded-full text-[11px] font-bold tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${activeTab === 'control' ? 'bg-white text-slate-800 shadow-sm border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700 border-transparent dark:text-slate-400 dark:hover:text-slate-300'}`}
+                    className={`flex-1 min-w-[200px] h-11 px-6 rounded-xl text-xs font-black tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 ${activeTab === 'control' ? 'bg-white text-indigo-600 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-100' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'}`}
                 >
-                    <IconActivity className="w-4 h-4" /> KOMUTA MERKEZİ
+                    <IconActivity className="w-4 h-4" /> KONSOL BAKIŞI
                 </button>
                 <button
                     onClick={() => setActiveTab('heatmap')}
-                    className={`flex-1 min-w-[200px] h-10 px-6 rounded-full text-[11px] font-bold tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${activeTab === 'heatmap' ? 'bg-white text-slate-800 shadow-sm border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700 border-transparent dark:text-slate-400 dark:hover:text-slate-300'}`}
+                    className={`flex-1 min-w-[200px] h-11 px-6 rounded-xl text-xs font-black tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 ${activeTab === 'heatmap' ? 'bg-white text-indigo-600 shadow-[0_2px_8px_rgba(0,0,0,0.08)] ring-1 ring-slate-100' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'}`}
                 >
-                    <IconZap className="w-4 h-4" /> KÂRLILIK ISI HARİTASI
-                </button>
-                <button
-                    onClick={() => setActiveTab('pricing')}
-                    className={`flex-1 min-w-[200px] h-10 px-6 rounded-full text-[11px] font-bold tracking-wide transition-all outline-none whitespace-nowrap flex items-center justify-center gap-2 border ${activeTab === 'pricing' ? 'bg-white text-slate-800 shadow-sm border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700 border-transparent dark:text-slate-400 dark:hover:text-slate-300'}`}
-                >
-                    <IconTrendingUp className="w-4 h-4" /> OTONOM FİYATLANDIRMA
+                    <IconZap className="w-4 h-4" /> P&L (KÂR) TERMİNALİ
                 </button>
             </div>
 
@@ -812,22 +807,21 @@ export default function FintechControlTower() {
                 />
             )}
             {activeTab === 'heatmap' && <ProfitabilityHeatmapContent />}
-            {activeTab === 'pricing' && <SmartPricingContent />}
 
             {/* Spacer to prevent overlap */}
             <div className="h-32 w-full shrink-0 opacity-0" aria-hidden="true" />
             
-            {/* Sticky Alt Çubuk */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-200 dark:border-white/5  border-t border-slate-200 dark:border-white/5 z-50 flex justify-center">
-                <div className="max-w-7xl w-full flex justify-between items-center">
+            {/* Nav Footer */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 z-50 flex justify-center shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+                <div className="max-w-7xl w-full flex justify-between items-center px-4">
                     <div className="flex items-center gap-6">
                         <div className="flex flex-col">
-                            <span className="text-[10px] text-gray-500 font-bold uppercase">Ana Banka Hesabı</span>
-                            <span className="text-xs text-slate-900 dark:text-white font-medium">102.01 - Aktif</span>
+                            <span className="text-[10px] text-gray-500 font-bold uppercase">Mimarî</span>
+                            <span className="text-xs text-slate-900 font-black">Time-Series Engine V2</span>
                         </div>
-                        <div className="flex flex-col border-l border-slate-200 dark:border-white/10 pl-6">
-                            <span className="text-[10px] text-gray-500 font-bold uppercase">Fintech Sürümü</span>
-                            <span className="text-xs text-indigo-600 dark:text-indigo-400 font-black tracking-widest">OS v2.0-STABIL</span>
+                        <div className="flex flex-col border-l border-slate-200 pl-6">
+                            <span className="text-[10px] text-gray-500 font-bold uppercase">Durum</span>
+                            <span className="text-xs text-indigo-600 font-black tracking-widest flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> ONLINE</span>
                         </div>
                     </div>
                 </div>
