@@ -193,64 +193,79 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
                     await processRow(d, 'Deduction', !!isCg);
                 }
 
-                // Ürün PNL Tablosunu Güncelle (Trendyol ile birebir aynı kod, Adaptör Pattern gücü)
+                // Ürün PNL (Kârlılık) Tablosunu Pro-Rate (Ağırlıklı Üleştirme) Mantığıyla Güncelle!
                 const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items as any[]);
+                
                 if (items && items.length > 0 && newLedgerCount > 0) {
-                    const mainItem = items[0];
-                    const barcode = mainItem.sku;
-                    
-                    const maps = await prisma.marketplaceProductMap.findMany({
-                        where: { companyId, marketplace, marketplaceCode: String(barcode) },
-                        include: { product: true }
-                    });
-                    
-                    if (maps.length > 0) {
-                        const pMap = maps[0];
-                        const fifoCost = Number(pMap.product.buyPrice) || 0;
-                        const quantity = Number(mainItem.quantity) || 1;
-                        const totalCost = fifoCost * quantity;
+                    const totalOrderValue = items.reduce((sum: number, item: any) => sum + (Number(item.price) * Number(item.quantity) || 0), 0);
 
-                        const expectedProfit = netRevenue - totalCommission - totalCargo - totalOther - totalCost;
+                    for (const item of items) {
+                        const barcode = item.sku || item.barcode;
+                        const quantity = Number(item.quantity) || 1;
+                        const itemValue = Number(item.price) * quantity;
+                        
+                        const weight = totalOrderValue > 0 ? (itemValue / totalOrderValue) : (1 / items.length);
 
-                        const incrementData = {
-                            grossRevenue: { increment: netRevenue },
-                            commissionTotal: { increment: totalCommission },
-                            shippingTotal: { increment: totalCargo },
-                            otherFeesTotal: { increment: totalOther },
-                            fifoCostTotal: { increment: totalCost },
-                            netProfit: { increment: expectedProfit },
-                            saleCount: { increment: quantity }
-                        };
+                        const allocatedRevenue = netRevenue * weight;
+                        const allocatedCommission = totalCommission * weight;
+                        const allocatedCargo = totalCargo * weight;
+                        const allocatedOther = totalOther * weight;
 
-                        await prisma.marketplaceProductPnl.upsert({
-                            where: { companyId_productId_marketplace: { companyId, productId: pMap.productId, marketplace } },
-                            update: incrementData,
-                            create: {
-                                companyId,
-                                marketplace,
-                                productId: pMap.productId,
-                                grossRevenue: netRevenue,
-                                commissionTotal: totalCommission,
-                                shippingTotal: totalCargo,
-                                otherFeesTotal: totalOther,
-                                fifoCostTotal: totalCost,
-                                netProfit: expectedProfit,
-                                saleCount: quantity,
-                                refundCount: 0,
-                                refundedQuantity: 0,
-                                profitMargin: 0
-                            }
-                        });
-
-                        const updatedPnl = await prisma.marketplaceProductPnl.findUnique({
-                            where: { companyId_productId_marketplace: { companyId, productId: pMap.productId, marketplace } }
+                        const maps = await prisma.marketplaceProductMap.findMany({
+                            where: { companyId, marketplace, marketplaceCode: String(barcode) },
+                            include: { product: true }
                         });
                         
-                        if (updatedPnl && Number(updatedPnl.grossRevenue) > 0) {
-                            let margin = (Number(updatedPnl.netProfit) / Number(updatedPnl.grossRevenue)) * 100;
-                            await prisma.marketplaceProductPnl.update({
-                                where: { id: updatedPnl.id },
-                                data: { profitMargin: new Prisma.Decimal(margin.toFixed(2)) }
+                        if (maps.length > 0) {
+                            const pMap = maps[0];
+                            const currentCogs = Number(pMap.product.buyPrice) || 0;
+                            const totalCost = currentCogs * quantity;
+                            const expectedProfit = allocatedRevenue - allocatedCommission - allocatedCargo - allocatedOther - totalCost;
+
+                            const incrementData = {
+                                grossRevenue: { increment: allocatedRevenue },
+                                commissionTotal: { increment: allocatedCommission },
+                                shippingTotal: { increment: allocatedCargo },
+                                otherFeesTotal: { increment: allocatedOther },
+                                fifoCostTotal: { increment: totalCost },
+                                netProfit: { increment: expectedProfit },
+                                saleCount: { increment: quantity }
+                            };
+
+                            // V1: Eski PNL Tablosu (Legacy Uyum)
+                            await prisma.marketplaceProductPnl.upsert({
+                                where: { companyId_productId_marketplace: { companyId, productId: pMap.productId, marketplace } },
+                                update: incrementData,
+                                create: {
+                                    companyId, marketplace, productId: pMap.productId,
+                                    grossRevenue: allocatedRevenue, commissionTotal: allocatedCommission,
+                                    shippingTotal: allocatedCargo, otherFeesTotal: allocatedOther,
+                                    fifoCostTotal: totalCost, netProfit: expectedProfit,
+                                    saleCount: quantity, refundCount: 0, refundedQuantity: 0, profitMargin: 0
+                                }
+                            });
+
+                            // V2: Yeni Finansal Veri Ambarı Katmanı (Zaman Serisi Küpü)
+                            const orderDate = order.orderDate ? new Date(order.orderDate) : new Date();
+                            const dateOnly = new Date(Date.UTC(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate()));
+
+                            await prisma.marketplaceProductDailyPnl.upsert({
+                                where: { companyId_productId_marketplace_date: { companyId, productId: pMap.productId, marketplace, date: dateOnly } },
+                                update: {
+                                    grossRevenue: { increment: allocatedRevenue },
+                                    commissionTotal: { increment: allocatedCommission },
+                                    shippingTotal: { increment: allocatedCargo },
+                                    otherFeesTotal: { increment: allocatedOther },
+                                    penaltyTotal: { increment: 0 }, 
+                                    saleCount: { increment: quantity },
+                                    cogsAtSale: { increment: totalCost }
+                                },
+                                create: {
+                                    companyId, marketplace, productId: pMap.productId,  date: dateOnly,
+                                    grossRevenue: allocatedRevenue, commissionTotal: allocatedCommission,
+                                    shippingTotal: allocatedCargo, otherFeesTotal: allocatedOther,
+                                    saleCount: quantity, cogsAtSale: totalCost
+                                }
                             });
                         }
                     }

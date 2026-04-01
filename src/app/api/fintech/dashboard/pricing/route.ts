@@ -66,13 +66,30 @@ export async function GET(req: Request) {
         });
 
         const pricingData = pnlRecords.map((pnl: any) => {
-            const mapSync = mappings.find((m:any) => m.productId === pnl.productId && m.marketplace === pnl.marketplace);
-            const liveMarketplacePrice = mapSync && Number(mapSync.price) > 0 ? Number(mapSync.price) : 0;
-            const fallbackPrice = Number(pnl.product?.price) > 0 ? Number(pnl.product.price) : 1000;
+            // 1. Ortalama Birim Ciro
+            const saleCount = Number(pnl.saleCount) || 1;
+            const avgUnitPrice = Number(pnl.grossRevenue) > 0 ? (Number(pnl.grossRevenue) / saleCount) : 0;
             
-            const current = liveMarketplacePrice > 0 ? liveMarketplacePrice : fallbackPrice;
-            const buy = Number(pnl.product?.buyPrice) > 0 ? Number(pnl.product.buyPrice) : (current * 0.75); // simulate 25% margin if unknown
-            const grossMargin = pnl.profitMargin ? Number(pnl.profitMargin) : (((current - buy) / current) * 100);
+            // 2. Ortalama Giderler
+            const avgCommission = Number(pnl.commissionTotal) / saleCount;
+            const avgCargo = Number(pnl.shippingTotal) / saleCount;
+            const avgOther = Number(pnl.otherFeesTotal) / saleCount;
+
+            // 3. Sabit Maliyet: Bugünün Güncel Alış Fiyatı (Değişene Kadar Sabit)
+            const currentCogs = Number(pnl.product?.buyPrice) > 0 ? Number(pnl.product.buyPrice) : 0;
+
+            // Eğer ortalama fiyat yoksa, mecburi sistem fiyatına geç ama hesaplamayı sıfırla.
+            const current = avgUnitPrice > 0 ? avgUnitPrice : (Number(pnl.product?.price) > 0 ? Number(pnl.product.price) : 1000);
+            const actualCost = currentCogs > 0 ? currentCogs : (current * 0.75); // Eğer maliyet 0 girilmişse varsayım
+            
+            // 4. BUGÜNÜN REEL MARJI = (Ortalama Fiyat - Ortalama Giderler - Güncel Alış Maliyeti) / Ortalama Fiyat
+            // Geçmiş net kârı kullanmıyoruz, çünkü geçmişte maliyet farklı olabilirdi!
+            const averagePayout = current - avgCommission - avgCargo - avgOther;
+            const realNetProfit = averagePayout - actualCost;
+            
+            // Sıfıra bölme hatasını önle
+            const grossMargin = current > 0 ? (realNetProfit / current) * 100 : 0;
+            const buy = actualCost;
 
             let recommendedPrice = current;
             let status = 'STABLE';
