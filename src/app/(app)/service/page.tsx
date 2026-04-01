@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { 
     IconWrench,
     IconSearch,
-    IconFilter,
     IconCheck,
-    IconUser
+    IconUsers
 } from "@/components/icons/PremiumIcons";
 
 export default function ServiceDashboardLevel10() {
@@ -173,7 +172,7 @@ export default function ServiceDashboardLevel10() {
                                             </td>
                                             <td className="py-5 px-4 w-1/4">
                                                 <div className="flex items-center gap-2">
-                                                    <IconUser className="w-4 h-4 text-slate-400" />
+                                                    <IconUsers className="w-4 h-4 text-slate-400" />
                                                     <span className="text-xs font-bold text-slate-700">{order.customer?.name}</span>
                                                 </div>
                                                 {order.customer?.phone && <span className="text-[10px] font-bold text-slate-400 ml-6 tracking-widest block mt-1">{order.customer.phone}</span>}
@@ -211,6 +210,14 @@ function IconAlertCircle(props: any) {
             <circle cx={12} cy={12} r={10} />
             <path d="M12 8v4" />
             <path d="M12 16h.01" />
+        </svg>
+    )
+}
+
+function IconFilter(props: any) {
+    return (
+        <svg fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
         </svg>
     )
 }
