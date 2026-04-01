@@ -383,6 +383,7 @@ export default function ServiceOrderDetailPage() {
                     {/* 1. KABUL AŞAMASI */}
                     {status === 'PENDING' && (
                         <div className="space-y-8 animate-in slide-in-from-right-4 duration-300 border-t border-slate-200 pt-8">
+                            <div>
                                 <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-indigo-500 pb-2 mb-5 inline-block">Sisteme Yansılatılacak Maliyetler (Reçete)</h3>
                                 <ReceiptTable allowEdit={true} />
                             </div>
