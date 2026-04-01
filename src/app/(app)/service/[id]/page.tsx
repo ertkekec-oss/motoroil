@@ -7,26 +7,26 @@ import {
     IconAlertCircle, 
     IconActivity,
     IconPrinter,
-    IconFileText,
-    IconSettings,
-    IconUsers,
     IconPlus,
-    IconSave,
     IconCornerUpRight
 } from "@/components/icons/PremiumIcons";
 import { useRouter, useParams } from "next/navigation";
+import { useSettings } from "@/contexts/SettingsContext";
 
+// YENİDEN SIRALANAN İŞ AKIŞI: 1) Kabul, 2) Onay Bekliyor, 3) İşlemde, 4) Hazır
 const WORKFLOW = [
     { id: 'PENDING', label: '1. Kabul Aşaması' },
-    { id: 'IN_PROGRESS', label: '2. İşlemde' },
-    { id: 'WAITING_APPROVAL', label: '3. Onay Bekliyor' },
+    { id: 'WAITING_APPROVAL', label: '2. Onay Bekliyor' },
+    { id: 'IN_PROGRESS', label: '3. İşlemde' },
     { id: 'READY', label: '4. Teslimat (Hazır)' },
 ];
 
 export default function ServiceOrderDetailPage() {
     const router = useRouter();
     const params = useParams();
-    const [status, setStatus] = useState('PENDING'); // Acting ad dynamic tab and actual DB status
+    const { serviceSettings } = useSettings();
+
+    const [status, setStatus] = useState('PENDING'); 
     const [items, setItems] = useState<any[]>([]);
     const [orderData, setOrderData] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -34,9 +34,11 @@ export default function ServiceOrderDetailPage() {
     // Modal States
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [itemModalType, setItemModalType] = useState<'PART'|'LABOR'|'OUTSOURCED'>('PART');
-    const [staffList, setStaffList] = useState<any[]>([]);
-    const [itemForm, setItemForm] = useState({ name: '', quantity: 1, unitPrice: 0, technicianId: '', isWarrantyCovered: false });
+    const [itemForm, setItemForm] = useState({ name: '', quantity: 1, unitPrice: 0, productId: '', isWarrantyCovered: false });
     const [isSavingItem, setIsSavingItem] = useState(false);
+
+    // Products pool
+    const [products, setProducts] = useState<any[]>([]);
 
     // Logs / Forms state mock
     const [progressLog, setProgressLog] = useState('');
@@ -45,7 +47,7 @@ export default function ServiceOrderDetailPage() {
     useEffect(() => {
         if (!params || !params.id || params.id === 'new') return;
         fetchData();
-        fetchStaff();
+        fetchProducts();
     }, [params.id]);
 
     const fetchData = () => {
@@ -62,17 +64,19 @@ export default function ServiceOrderDetailPage() {
             .catch(() => setIsLoading(false));
     };
 
-    const fetchStaff = () => {
-        fetch('/api/staff')
+    const fetchProducts = () => {
+        fetch('/api/products')
             .then(res => res.json())
             .then(data => {
-                if (data.success && data.staff) setStaffList(data.staff);
+                let list = [];
+                if (Array.isArray(data)) list = data;
+                else if (data && data.products) list = data.products;
+                setProducts(list);
             }).catch(() => {});
     };
 
     const handleTabChange = async (newStatus: string) => {
         setStatus(newStatus);
-        // Anında DB update (gerçek aşama geçişi)
         await fetch(`/api/service-v2/${params.id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -82,13 +86,13 @@ export default function ServiceOrderDetailPage() {
 
     const openAddItemModal = (type: 'PART'|'LABOR'|'OUTSOURCED') => {
         setItemModalType(type);
-        setItemForm({ name: '', quantity: 1, unitPrice: 0, technicianId: '', isWarrantyCovered: false });
+        setItemForm({ name: '', quantity: 1, unitPrice: 0, productId: '', isWarrantyCovered: false });
         setIsItemModalOpen(true);
     };
 
     const saveItem = async () => {
-        if (!itemForm.name || Number(itemForm.unitPrice) <= 0) {
-            alert("Lütfen geçerli bir hizmet adı ve fiyat girin.");
+        if (!itemForm.name || Number(itemForm.unitPrice) < 0) {
+            alert("Lütfen geçerli bir kalem adı ve fiyat (0 veya üstü) girin.");
             return;
         }
         setIsSavingItem(true);
@@ -114,67 +118,62 @@ export default function ServiceOrderDetailPage() {
         if (!confirm('Kalemi silmek istediğinize emin misiniz?')) return;
         try {
             const res = await fetch(`/api/service-v2/${params.id}/items/${itemId}`, { method: 'DELETE' });
-            if (res.ok) {
-                fetchData();
-            }
-        } catch (e) {
-            console.error(e);
-        }
+            if (res.ok) fetchData();
+        } catch (e) {}
     };
 
-    if (isLoading) return <div className="p-10 text-slate-500 font-semibold">Veriler yükleniyor...</div>;
-    if (!orderData) return <div className="p-10 text-slate-500 font-semibold">İş emri bulunamadı.</div>;
+    if (isLoading) return <div className="p-10 text-slate-500 font-semibold tracking-widest uppercase text-sm">Yükleniyor...</div>;
+    if (!orderData) return <div className="p-10 text-slate-500 font-semibold tracking-widest uppercase text-sm">İş Emri Bulunamadı.</div>;
 
     const totalAmount = items.reduce((sum, item) => sum + Number(item.totalPrice || 0), 0);
-    const taxAmount = totalAmount * 0.20;
+    const taxAmount = totalAmount * 0.20; // Example static 20%
     const finalAmount = totalAmount + taxAmount;
 
-    // Ortak Reçete Tablosu Modülü (Tespit ve İşlemde kullanılacak)
+    // Component: Receipt Table
     const ReceiptTable = ({ allowEdit = true }) => (
-        <div className="border border-slate-200 bg-white rounded-md mt-4">
-            <div className="bg-slate-50 border-b border-slate-200 p-3 flex justify-between items-center">
-                <h4 className="font-semibold text-sm text-slate-700">Tespit & Kullanılan Malzeme / İşçilik</h4>
+        <div className="border border-slate-200 bg-white rounded-xl mt-4 shadow-sm overflow-hidden">
+            <div className="bg-slate-50 border-b border-slate-200 p-4 flex justify-between items-center">
+                <h4 className="font-bold text-[14px] text-slate-800 tracking-tight">Kullanılan Malzeme & İşçilik Reçetesi</h4>
                 {allowEdit && (
                     <div className="flex gap-2">
-                        <button onClick={() => openAddItemModal('OUTSOURCED')} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50">Fason Ekle</button>
-                        <button onClick={() => openAddItemModal('LABOR')} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50">İşçilik Ekle</button>
-                        <button onClick={() => openAddItemModal('PART')} className="px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 border border-blue-700 rounded hover:bg-blue-700">Parça / Stok</button>
+                        <button onClick={() => openAddItemModal('OUTSOURCED')} className="h-8 px-3 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm transition-all">Fason / Dış Ek</button>
+                        <button onClick={() => openAddItemModal('LABOR')} className="h-8 px-3 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded hover:bg-indigo-100 transition-all shadow-sm">İşçilik Yansıt</button>
+                        <button onClick={() => openAddItemModal('PART')} className="h-8 px-3 text-xs font-bold text-white bg-slate-900 border border-slate-900 rounded hover:bg-slate-800 transition-all shadow-sm">Parça / Stok Seç</button>
                     </div>
                 )}
             </div>
             {items.length === 0 ? (
-                <div className="p-8 text-center text-sm text-slate-500">Reçeteye henüz kayıt eklenmedi.</div>
+                <div className="p-10 text-center text-[13px] font-semibold text-slate-400">Reçeteye henüz işlem eklenmemiş.</div>
             ) : (
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-left">
                     <thead>
-                        <tr className="border-b border-slate-200 bg-white text-slate-500">
-                            <th className="p-3 font-medium">Tur</th>
-                            <th className="p-3 font-medium">Hizmet/Ürün</th>
-                            <th className="p-3 font-medium text-center">Miktar</th>
-                            <th className="p-3 font-medium text-right">Tutar</th>
-                            {allowEdit && <th className="p-3 w-12 text-center"></th>}
+                        <tr className="border-b border-slate-100 bg-white text-slate-400 uppercase tracking-widest text-[10px]">
+                            <th className="px-4 py-3 font-black">Tür</th>
+                            <th className="px-4 py-3 font-black">Kalem / Açıklama</th>
+                            <th className="px-4 py-3 font-black text-center">Miktar</th>
+                            <th className="px-4 py-3 font-black text-right">Tutar (KDV Dahil)</th>
+                            {allowEdit && <th className="px-4 py-3 text-center"></th>}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-50">
                         {items.map(item => (
-                            <tr key={item.id} className="hover:bg-slate-50">
-                                <td className="p-3">
-                                    <span className={`px-2 py-0.5 text-xs border rounded ${item.type === 'PART' ? 'border-blue-200 text-blue-700 bg-blue-50' : item.type === 'LABOR' ? 'border-green-200 text-green-700 bg-green-50' : 'border-orange-200 text-orange-700 bg-orange-50'}`}>
-                                        {item.type === 'PART' ? 'Stok' : item.type === 'LABOR' ? 'İşçilik' : 'Fason'}
+                            <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                                <td className="px-4 py-3">
+                                    <span className={`px-2 py-1 text-[10px] font-bold border rounded uppercase ${item.type === 'PART' ? 'border-sky-200 text-sky-700 bg-sky-50' : item.type === 'LABOR' ? 'border-indigo-200 text-indigo-700 bg-indigo-50' : 'border-slate-200 text-slate-600 bg-slate-100'}`}>
+                                        {item.type === 'PART' ? 'Y. PARÇA / STOK' : item.type === 'LABOR' ? 'İŞÇİLİK' : 'DIŞ FASON'}
                                     </span>
                                 </td>
-                                <td className="p-3 text-slate-800">
+                                <td className="px-4 py-3 text-[13px] font-semibold text-slate-800">
                                     {item.name}
-                                    {item.isWarrantyCovered && <span className="ml-2 text-[10px] bg-slate-100 border border-slate-200 px-1 rounded text-slate-500">(Garanti)</span>}
-                                    {item.technician && <div className="text-[10px] text-slate-500 mt-0.5">Teknisyen: {item.technician.name}</div>}
+                                    {item.isWarrantyCovered && <span className="ml-2 px-1 text-[10px] bg-amber-100 text-amber-700 rounded font-bold uppercase tracking-widest">Garanti İçi (Bedelsiz)</span>}
                                 </td>
-                                <td className="p-3 text-center">{item.quantity}</td>
-                                <td className="p-3 text-right">
-                                    {item.isWarrantyCovered ? '0 ₺' : `${Number(item.totalPrice).toLocaleString()} ₺`}
+                                <td className="px-4 py-3 text-center font-bold text-[13px] text-slate-600">{item.quantity}</td>
+                                <td className="px-4 py-3 text-right font-black text-[13px] text-slate-800">
+                                    {item.isWarrantyCovered ? '0.00 ₺' : `${Number(item.totalPrice).toLocaleString()} ₺`}
                                 </td>
                                 {allowEdit && (
-                                    <td className="p-3 text-center">
-                                        <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700 font-bold">×</button>
+                                    <td className="px-4 py-3 text-center">
+                                        <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 transition-colors" title="Satırı Sil">✕</button>
                                     </td>
                                 )}
                             </tr>
@@ -182,18 +181,18 @@ export default function ServiceOrderDetailPage() {
                     </tbody>
                 </table>
             )}
-            <div className="bg-slate-50 border-t border-slate-200 p-4 shrink-0 flex justify-end">
-                <div className="text-right w-64">
-                    <div className="flex justify-between text-sm text-slate-500 mb-1">
+            <div className="bg-slate-50 border-t border-slate-200 p-4 flex flex-col items-end">
+                <div className="w-64 space-y-2">
+                    <div className="flex justify-between text-[13px] font-bold text-slate-500">
                         <span>Ara Toplam:</span>
                         <span>{totalAmount.toLocaleString()} ₺</span>
                     </div>
-                    <div className="flex justify-between text-sm text-slate-500 mb-2">
-                        <span>KDV (%20):</span>
+                    <div className="flex justify-between text-[11px] font-bold tracking-widest text-slate-400 uppercase">
+                        <span>Vergiler:</span>
                         <span>{taxAmount.toLocaleString()} ₺</span>
                     </div>
-                    <div className="flex justify-between text-lg font-semibold text-slate-800 border-t border-slate-200 pt-2">
-                        <span>Genel Toplam:</span>
+                    <div className="flex justify-between text-[18px] font-black text-slate-900 border-t border-slate-200 pt-3 mt-1">
+                        <span>TOPLAM:</span>
                         <span>{finalAmount.toLocaleString()} ₺</span>
                     </div>
                 </div>
@@ -202,200 +201,223 @@ export default function ServiceOrderDetailPage() {
     );
 
     const PhotoUploader = ({ count }: { count: number }) => (
-        <div className="border border-dashed border-slate-300 rounded-md p-6 bg-slate-50 text-center cursor-pointer hover:bg-slate-100 transition-colors mt-2">
-            <IconPlus className="w-6 h-6 mx-auto mb-2 text-slate-400" />
-            <p className="text-sm font-semibold text-slate-600">Fotoğraf Ekle</p>
-            <p className="text-xs text-slate-400 mt-1">Belge, hasar veya onarım görseli yükleyin ({count} adet yüklü)</p>
+        <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 bg-slate-50/50 text-center cursor-pointer hover:bg-slate-50 transition-colors mt-2 group">
+            <IconActivity className="w-8 h-8 mx-auto mb-3 text-slate-300 group-hover:text-indigo-500 transition-colors" />
+            <p className="text-[13px] font-bold text-slate-700">Fotoğraf veya Belge Yükle</p>
+            <p className="text-[11px] font-semibold text-slate-400 mt-1 uppercase tracking-widest">({count} adet eklendi)</p>
         </div>
     );
 
     return (
-        <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 font-sans">
+        <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 font-sans pb-32 animate-in fade-in duration-500">
             
             {/* Header / Seri & Müşteri */}
-            <div className="flex items-center justify-between border-b border-slate-200 pb-5 mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-200 pb-5 mb-8 gap-4">
                 <div>
-                    <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        İş Emri #{orderData.id.slice(0,8).toUpperCase()}
+                    <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
+                        İŞ EMRİ #{orderData.id.slice(0,8).toUpperCase()}
                     </h1>
-                    <p className="text-sm text-slate-500 mt-1">Cihaz: {orderData.asset?.primaryIdentifier} • Müşteri: {orderData.customer?.name}</p>
+                    <div className="flex items-center gap-3 mt-2 text-[13px] font-semibold text-slate-500">
+                        <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 uppercase tracking-widest text-[10px]">{orderData.asset?.brand || 'MARKA YOK'} {orderData.asset?.model || ''}</span>
+                        <span>Ref: <strong className="text-slate-700">{orderData.asset?.primaryIdentifier}</strong></span>
+                        <span className="text-slate-300">•</span>
+                        <span>Müşteri: <strong className="text-slate-700">{orderData.customer?.name}</strong></span>
+                    </div>
                 </div>
                 <div className="flex gap-2">
-                    <button className="px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded cursor-not-allowed opacity-50">E-Fatura</button>
-                    <button className="px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 flex items-center gap-2">
-                        <IconPrinter className="w-4 h-4" /> Servis Fişi Yazdır
+                    <button className="h-10 px-5 text-[13px] font-bold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2">
+                        <IconPrinter className="w-4 h-4" /> YAZDIR
+                    </button>
+                    <button className="h-10 px-5 text-[13px] font-bold text-white bg-slate-900 border border-slate-900 rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
+                        E-FATURA KES
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 
-                {/* SOL: DİNAMİK AŞAMALAR (SİDEBAR NAVIGATION) */}
+                {/* SOL KOLON: İŞ AKIŞI YÖNETİMİ */}
                 <div className="lg:col-span-3">
-                    <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3 px-1">Tüm Aşamalar</h2>
-                    <div className="flex flex-col gap-1">
+                    <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1 border-b border-slate-100 pb-2">SERVİS İŞ AKIŞI</h2>
+                    <div className="flex flex-col gap-1.5">
                         {WORKFLOW.map((wf) => {
                             const active = status === wf.id;
                             return (
                                 <button
                                     key={wf.id}
                                     onClick={() => handleTabChange(wf.id)}
-                                    className={`text-left px-4 py-3 rounded-md border text-sm transition-all flex items-center justify-between ${
+                                    className={`text-left px-5 py-3.5 rounded-xl border text-[13px] font-bold transition-all flex items-center justify-between group ${
                                         active 
-                                        ? 'bg-blue-50 border-blue-200 text-blue-800 font-semibold shadow-sm' 
-                                        : 'bg-white border-transparent text-slate-600 hover:bg-slate-50 hover:border-slate-200'
+                                        ? 'bg-slate-900 border-slate-900 text-white shadow-xl scale-[1.02]' 
+                                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 shadow-sm'
                                     }`}
                                 >
-                                    {wf.label}
-                                    {active && <IconCornerUpRight className="w-4 h-4 text-blue-500" />}
+                                    <span>{wf.label}</span>
+                                    {active && <IconCornerUpRight className="w-4 h-4 text-white opacity-80" />}
                                 </button>
                             )
                         })}
                     </div>
 
-                    <div className="mt-8 px-1">
-                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Müşteri Detayı</h2>
-                        <div className="bg-slate-50 border border-slate-200 rounded p-4 text-sm text-slate-700 space-y-2">
-                            <p><b>Müşteri:</b> {orderData.customer?.name}</p>
-                            <p><b>Telefon:</b> {orderData.customer?.phone || '-'}</p>
-                            <p className="pt-2 border-t border-slate-200 mt-2"><b>Eklenen Not:</b> {orderData.customer?.email || 'Kayıtlı not yok.'}</p>
+                    <div className="mt-10">
+                        <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1 border-b border-slate-100 pb-2">MÜŞTERİ ÖZETİ</h2>
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-[13px] text-slate-700 space-y-3 font-medium shadow-sm">
+                            <p className="flex justify-between items-center"><span className="text-slate-400 text-[11px] uppercase tracking-widest">Unvan</span> <strong className="text-slate-900 text-right">{orderData.customer?.name}</strong></p>
+                            <p className="flex justify-between items-center"><span className="text-slate-400 text-[11px] uppercase tracking-widest">Gsm</span> <strong className="text-slate-900">{orderData.customer?.phone || '-'}</strong></p>
+                            <div className="pt-3 border-t border-slate-200 mt-2">
+                                <span className="block text-slate-400 text-[11px] uppercase tracking-widest mb-1">Cari Form Notları</span>
+                                <span className="text-slate-600">{orderData.customer?.email || 'Müşteriye ekli özel bir not bulunmamaktadır.'}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* SAĞ: DİNAMİK İÇERİK SAYFALARI */}
+                {/* SAĞ KOLON: İLGİLİ AŞAMA EKRANI */}
                 <div className="lg:col-span-9">
                     
-                    {/* DİNAMİK İÇERİK: KABUL AŞAMASI */}
+                    {/* 1. KABUL AŞAMASI */}
                     {status === 'PENDING' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Cihaz / Araç Karnesi & Arıza Bilgisi</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="border border-slate-200 rounded bg-white p-4">
-                                        <p className="text-xs text-slate-500 font-medium mb-1">Cihaz Bilgisi</p>
-                                        <p className="font-semibold text-slate-800">{orderData.asset?.brand} {orderData.asset?.model}</p>
-                                        <p className="text-sm text-slate-600">Referans: {orderData.asset?.primaryIdentifier}</p>
+                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-amber-500 pb-2 mb-5 inline-block">Müşteri Şikayeti & Cihaz Detayı</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div className="border border-slate-200 rounded-xl bg-white p-6 shadow-sm">
+                                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-2">Cihaz Karnesi (Ayarlar'dan Gelen Kutular)</p>
+                                        <div className="space-y-2 mt-3 text-[13px] font-medium text-slate-700">
+                                            {/* We iterate over metadata object populated during intake */}
+                                            {orderData.asset?.metadata ? Object.entries(orderData.asset.metadata).map(([k,v]) => (
+                                                <div key={k} className="flex justify-between border-b border-slate-50 pb-1">
+                                                    <span className="text-slate-500">{k}:</span>
+                                                    <span className="font-bold text-slate-900">{String(v)}</span>
+                                                </div>
+                                            )) : <span className="text-slate-400">Özel içerik kutusu kaydedilmemiş.</span>}
+                                        </div>
                                     </div>
-                                    <div className="border border-slate-200 rounded bg-white p-4">
-                                        <p className="text-xs text-slate-500 font-medium mb-1">Müşteri Şikayeti / Arıza Notu</p>
-                                        <p className="text-sm text-slate-800">{orderData.complaint || 'Detaylı onarım notu alınmadı.'}</p>
+                                    <div className="border border-slate-200 rounded-xl bg-amber-50/30 p-6 shadow-sm">
+                                        <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-2">Onarım Talebi (Kabul Notu)</p>
+                                        <p className="text-[14px] font-medium text-slate-800 leading-relaxed">{orderData.complaint || 'Detaylı onarım notu alınmadı.'}</p>
                                     </div>
                                 </div>
                             </div>
                             
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Tespit Raporu & Ön Maliyet</h3>
+                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-indigo-500 pb-2 mb-5 inline-block">Sisteme Yansılatılacak Maliyetler (Reçete)</h3>
                                 <ReceiptTable allowEdit={true} />
                             </div>
 
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Görseller & Formlar</h3>
+                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-slate-300 pb-2 mb-5 inline-block mt-4">Kabul Dosyaları & Fiziki Evraklar</h3>
                                 <PhotoUploader count={0} />
                             </div>
                         </div>
                     )}
 
-                    {/* DİNAMİK İÇERİK: ONAY BEKLİYOR */}
+                    {/* 2. ONAY BEKLİYOR */}
                     {status === 'WAITING_APPROVAL' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                            <div className="bg-orange-50 border border-orange-200 rounded-md p-6 text-center">
-                                <IconAlertCircle className="w-10 h-10 text-orange-500 mx-auto mb-3" />
-                                <h3 className="text-lg font-bold text-slate-800 mb-1">Kullanıcı Onayına Sunulmalı</h3>
-                                <p className="text-sm text-slate-600 mb-6">Müşteriye teklif gönderip onay aldıktan sonra "İşlemde" aşamasına aktarın.</p>
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                            <div className="bg-sky-50 border border-sky-200 rounded-2xl p-10 text-center shadow-sm">
+                                <h3 className="text-[20px] font-black text-slate-800 mb-2">Müşteri Onayı Gerekli</h3>
+                                <p className="text-[14px] font-medium text-slate-600 mb-8 max-w-xl mx-auto">Tespit edilen arızanın ve çıkarılan maliyet tablosunun (reçete) işleme alınmadan önce müşteri tarafından onaylanması tavsiye edilir.</p>
                                 
-                                <div className="border border-slate-200 bg-white shadow-sm rounded-md p-6 max-w-lg mx-auto text-left mb-6">
-                                    <h4 className="font-semibold border-b border-slate-100 pb-2 mb-4 text-slate-800">Teklif Özeti</h4>
-                                    <div className="space-y-2 mb-4">
-                                        {items.map(i => (
-                                            <div key={i.id} className="flex justify-between text-sm text-slate-600">
-                                                <span>{i.quantity}x {i.name}</span>
-                                                <span>{Number(i.totalPrice).toLocaleString()} ₺</span>
+                                <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-8 max-w-lg mx-auto text-left mb-8">
+                                    <h4 className="font-black text-[12px] uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3 mb-4">Hazırlanan Teklif Özeti</h4>
+                                    <div className="space-y-3 mb-6">
+                                        {items.length === 0 ? (
+                                            <p className="text-sm text-slate-500 text-center italic py-2">Reçeteye hiçbir kalem yansıtılmamış.</p>
+                                        ) : items.map(i => (
+                                            <div key={i.id} className="flex justify-between text-[13px] font-semibold text-slate-600 items-center">
+                                                <span><span className="text-slate-400 bg-slate-100 px-1 py-0.5 rounded text-[10px] mr-2">{i.quantity}x</span> {i.name}</span>
+                                                <span className="text-slate-800">{Number(i.totalPrice).toLocaleString()} ₺</span>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="flex justify-between font-bold text-lg text-slate-800 border-t border-slate-200 pt-3">
-                                        <span>Teklif Tutarı (KDV Dh.)</span>
-                                        <span className="text-blue-600">{finalAmount.toLocaleString()} ₺</span>
+                                    <div className="flex justify-between items-end font-black text-[16px] text-slate-900 border-t border-slate-200 pt-4">
+                                        <span className="text-[12px] text-slate-500 uppercase">Teklif Tutarı (+Kdv)</span>
+                                        <span className="text-[24px] text-sky-600 tracking-tight">{finalAmount.toLocaleString()} ₺</span>
                                     </div>
                                 </div>
 
-                                <button onClick={() => window.open(`/p/approval/${orderData.id}`, '_blank')} className="px-6 py-2.5 bg-[#25D366] text-white rounded font-semibold flex items-center justify-center gap-2 mx-auto hover:bg-[#20bd5a] transition-colors">
-                                    Müşteriye Gönder (WhatsApp)
+                                <button onClick={() => window.open(`/p/approval/${orderData.id}`, '_blank')} className="h-12 px-8 bg-[#25D366] text-white rounded-xl font-black uppercase tracking-widest text-[13px] shadow-lg hover:bg-[#20bd5a] transition-all hover:-translate-y-0.5 inline-flex items-center gap-2">
+                                    TEKLİFİ WHATSAPP İLE İLET
                                 </button>
                             </div>
                         </div>
                     )}
 
-                    {/* DİNAMİK İÇERİK: İŞLEMDE */}
+                    {/* 3. İŞLEMDE */}
                     {status === 'IN_PROGRESS' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Usta Çalışma Logu / Neler Yapıldı?</h3>
-                                <div className="border border-slate-200 bg-white rounded-md p-1">
+                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-emerald-500 pb-2 mb-5 inline-block">Operasyon (Usta) Çalışma Günlüğü</h3>
+                                <div className="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-emerald-500 transition-all">
                                     <textarea 
-                                        className="w-full h-32 p-3 text-sm border-none focus:ring-0 outline-none resize-y" 
-                                        placeholder="Satır satır yapılan işlemleri buraya yazabilirsiniz... Örn: Motor kulakları değişti, test sürüşü yapıldı."
+                                        className="w-full h-40 p-5 text-[14px] font-medium text-slate-800 border-none focus:ring-0 outline-none resize-none placeholder:text-slate-300" 
+                                        placeholder="Usta/Teknisyen buraya işlem notlarını girecek. (Örn: Anakart entegresi değiştirildi, test edildi...)"
                                         value={progressLog}
                                         onChange={e => setProgressLog(e.target.value)}
                                     ></textarea>
-                                    <div className="bg-slate-50 border-t border-slate-100 p-2 flex justify-end">
-                                        <button className="px-4 py-1.5 text-xs font-semibold text-white bg-slate-800 rounded hover:bg-slate-700">Notu Kaydet</button>
+                                    <div className="bg-slate-50 border-t border-slate-100 p-3 flex justify-end">
+                                        <button className="h-9 px-6 text-[12px] font-bold tracking-widest uppercase text-white bg-slate-800 rounded-lg hover:bg-slate-700 shadow-sm transition-colors">
+                                            GÜNLÜĞÜ KAYDET
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
+                            
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">İşlem Anı Fotoğrafları</h3>
-                                <PhotoUploader count={2} />
+                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-slate-300 pb-2 mb-5 inline-block">Ek Maliyet Ve Değişen Parça Kaydı (İsteğe Bağlı)</h3>
+                                <ReceiptTable allowEdit={true} />
                             </div>
 
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Reçete / Ek Maliyet Gelişimi</h3>
-                                <ReceiptTable allowEdit={true} />
+                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-slate-300 pb-2 mb-5 inline-block">Tamir Anı Kareleri (Müşteriye Gösterilebilir)</h3>
+                                <PhotoUploader count={2} />
                             </div>
                         </div>
                     )}
 
-                    {/* DİNAMİK İÇERİK: HAZIR (TESLİMAT) */}
+                    {/* 4. TESLİMAT (HAZIR) */}
                     {status === 'READY' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                            <div className="bg-emerald-50 border border-emerald-200 rounded p-4 text-emerald-800 flex items-start gap-4 mb-2">
-                                <IconCheck className="w-6 h-6 shrink-0 mt-0.5" />
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 shadow-sm flex items-start gap-4">
+                                <div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center shrink-0">
+                                    <IconCheck className="w-6 h-6" />
+                                </div>
                                 <div>
-                                    <h4 className="font-bold">Servis İşlemi Tamamlandı</h4>
-                                    <p className="text-sm mt-1">Cihaz teste tabi tutuldu ve teslime hazır hale getirildi. Aşağıdan son özet faturayı ve bakım hatırlatıcıyı belirleyebilirsiniz.</p>
+                                    <h4 className="text-[16px] font-black text-emerald-900 tracking-tight">KONTROL ONAYLANDI, CİHAZ TESLİME HAZIR</h4>
+                                    <p className="text-[13px] font-medium text-emerald-700 mt-1">Bu aşamada fatura kesebilir veya müşteriye cihazının teste başarıyla girdiği mesajını gönderebilirsiniz.</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Yapılan İşler Özeti</h3>
-                                    <div className="border border-slate-200 bg-white rounded p-4 text-sm text-slate-700 h-40 overflow-y-auto">
-                                        {progressLog ? progressLog : <i>Usta tarafından girilmiş işlem notu bulunmuyor. Reçetede {items.length} kalem tamamlandı.</i>}
+                                    <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-slate-200 pb-2 mb-5">Çalışma Günlüğü (Son Hali)</h3>
+                                    <div className="border border-slate-200 bg-white rounded-xl p-5 text-[13px] font-medium text-slate-700 h-48 overflow-y-auto shadow-sm leading-relaxed">
+                                        {progressLog ? progressLog : <i className="text-slate-400">Teknisyen tarafından girilmiş onarım notu bulunmuyor.</i>}
                                     </div>
                                 </div>
                                 
                                 <div>
-                                    <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Bakım Hatırlatıcı Kur</h3>
-                                    <div className="border border-slate-200 bg-white rounded p-4 space-y-4 h-40 flex flex-col justify-center">
-                                        <label className="block text-sm font-semibold text-slate-600">Müşteriye Ne Zaman Hatırlatma SMS'i Gitsin?</label>
+                                    <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-slate-200 pb-2 mb-5">Zamanlanmış Hatırlatıcı Kur</h3>
+                                    <div className="border border-slate-200 bg-white rounded-xl p-6 flex flex-col justify-center h-48 shadow-sm">
+                                        <label className="block text-[11px] font-black uppercase text-slate-500 tracking-widest mb-3">Tekrar Servise Çağrı Zamanı</label>
                                         <select 
-                                            className="w-full border border-slate-300 rounded-md p-2.5 text-sm outline-none focus:border-blue-500"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg h-11 px-4 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             value={reminder}
                                             onChange={e => setReminder(e.target.value)}
                                         >
-                                            <option value="">-- SMS Hatırlatıcı Kapalı --</option>
-                                            <option value="1">1 Ay Sonra Periyodik Kontrol</option>
-                                            <option value="6">6 Ay Sonra Periyodik Bakım</option>
-                                            <option value="12">1 Yıl Sonra Genel Bakım</option>
+                                            <option value="">-- OTOMATİK HATIRLATMA KAPALI --</option>
+                                            <option value="1">1 Ay Sonra (Periyodik Garanti Kontrolü)</option>
+                                            <option value="6">6 Ay Sonra (Standart Bakım Çağrısı)</option>
+                                            <option value="12">1 Yıl Sonra (Yıllık Detaylı Bakım)</option>
                                         </select>
+                                        {reminder && <p className="text-[11px] font-bold text-amber-600 mt-4 text-center">Müşteri {reminder} ay sonra SMS ile otomatik davet edilecek.</p>}
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">Son Fatura Görünümü</h3>
+                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-slate-200 pb-2 mb-5">Nihai Hesaplaşma Özeti</h3>
                                 <ReceiptTable allowEdit={false} />
                             </div>
                         </div>
@@ -403,51 +425,95 @@ export default function ServiceOrderDetailPage() {
                 </div>
             </div>
 
-            {/* FASON/İŞÇİLİK/PARÇA EKLEME MODALI */}
+            {/* İŞÇİLİK / FASON / YEDEK PARÇA EKLEME MODALI */}
             {isItemModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
-                    <div className="bg-white rounded border border-slate-200 shadow-xl w-full max-w-md overflow-hidden">
-                        <div className="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                            <h2 className="text-sm font-bold text-slate-800">
-                                {itemModalType === 'PART' ? 'Stok / Parça Yansıt' : itemModalType === 'LABOR' ? 'İşçilik Yansıt' : 'Fason İşlem Ekle'}
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 p-4 transition-opacity fade-in duration-200 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[480px] overflow-hidden transform scale-100 animate-in zoom-in-95">
+                        <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h2 className="text-[15px] font-black tracking-widest text-slate-800 uppercase flex items-center gap-2">
+                                <IconPlus className="w-4 h-4 text-indigo-500" />
+                                {itemModalType === 'PART' ? 'Stok / Parça Yansıt' : itemModalType === 'LABOR' ? 'İşçilik Ücreti Yansıt' : 'Dış Fason Hizmeti Ekle'}
                             </h2>
-                            <button onClick={() => setIsItemModalOpen(false)} className="text-slate-400 hover:text-slate-700">X</button>
+                            <button onClick={() => setIsItemModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition-colors">✕</button>
                         </div>
-                        <div className="p-5 space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-600 mb-1">Açıklama / Kalem</label>
-                                <input type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500" placeholder="Örn: Balata Değişimi" value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} />
-                            </div>
-
-                            {itemModalType === 'LABOR' && (
+                        <div className="p-6 space-y-6">
+                            
+                            {/* DYNAMIC FIELD SELECTOR BASED ON TYPE */}
+                            {itemModalType === 'PART' ? (
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Maliyet Merkezi: Formeni / Usta Seç</label>
-                                    <select className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500 bg-white" value={itemForm.technicianId} onChange={e => setItemForm({...itemForm, technicianId: e.target.value})}>
-                                        <option value="">-- Merkezi Şirket Kârı --</option>
-                                        {staffList.map(s => <option key={s.id} value={s.id}>{s.name} ({s.role})</option>)}
+                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Stok / Envanterden Parça Seç</label>
+                                    <select 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[13px] font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        value={itemForm.productId || ''}
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            if (!val) {
+                                                setItemForm({...itemForm, productId: '', name: '', unitPrice: 0});
+                                                return;
+                                            }
+                                            const selectedProduct = products.find(p => p.id === val);
+                                            if (selectedProduct) {
+                                                setItemForm({...itemForm, productId: selectedProduct.id, name: selectedProduct.name, unitPrice: Number(selectedProduct.price || 0)});
+                                            }
+                                        }}
+                                    >
+                                        <option value="">-- Depodan Yedek Parça Seçiniz --</option>
+                                        {products.map(p => (
+                                            <option key={p.id} value={p.id}>({p.code}) {p.name} - Stok: {p.stock}</option>
+                                        ))}
                                     </select>
+                                    {itemForm.productId && <p className="text-[10px] uppercase font-bold text-sky-600 mt-2 tracking-widest">Bu parça faturalandırıldığında depodan düşülecektir.</p>}
+                                </div>
+                            ) : itemModalType === 'LABOR' ? (
+                                <div>
+                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Otomatik İşçilik Tarifesi Seç (Opsiyonel)</label>
+                                    <input 
+                                        list="laborRates"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[13px] font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                                        placeholder="Listeden seçin veya özel kalemadı yazın" 
+                                        value={itemForm.name} 
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            const mappedPrice = serviceSettings ? serviceSettings[val] : undefined;
+                                            setItemForm({
+                                                ...itemForm, 
+                                                name: val, 
+                                                unitPrice: mappedPrice !== undefined ? Number(mappedPrice) : itemForm.unitPrice
+                                            });
+                                        }} 
+                                    />
+                                    <datalist id="laborRates">
+                                        {Object.entries(serviceSettings || {}).map(([key]) => <option key={key} value={key} />)}
+                                    </datalist>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400 mt-2 tracking-widest">Ayarlar'dan eklediğiniz fiks tarifeleri arayabilirsiniz. İşçilik bedeli otomatik şirkete kâr yazar.</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Açıklama / Fason Kalemi</label>
+                                    <input type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[13px] font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Örn: Dışarıda yapılan boya veya torna işi" value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} />
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-3">
+                            {/* PRICE AND QTY */}
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Miktar (x)</label>
-                                    <input type="number" min="1" className="w-full border border-slate-300 rounded p-2 text-sm text-center outline-none focus:border-blue-500" value={itemForm.quantity} onChange={e => setItemForm({...itemForm, quantity: Number(e.target.value)})} />
+                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Miktar (X)</label>
+                                    <input type="number" min="1" className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[16px] font-black focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center" value={itemForm.quantity} onChange={e => setItemForm({...itemForm, quantity: Number(e.target.value)})} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Birim Fiyatı (₺)</label>
-                                    <input type="number" className="w-full border border-slate-300 rounded p-2 text-sm text-right outline-none focus:border-blue-500" value={itemForm.unitPrice} onChange={e => setItemForm({...itemForm, unitPrice: Number(e.target.value)})} />
+                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Birim Fiyatı (₺)</label>
+                                    <input type="number" className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[16px] font-black focus:outline-none focus:ring-2 focus:ring-indigo-500 text-right" value={itemForm.unitPrice} onChange={e => setItemForm({...itemForm, unitPrice: Number(e.target.value)})} />
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-2 p-3 border border-slate-200 rounded mt-2 cursor-pointer hover:bg-slate-50">
-                                <input type="checkbox" className="w-4 h-4" checked={itemForm.isWarrantyCovered} onChange={e => setItemForm({...itemForm, isWarrantyCovered: e.target.checked})} />
-                                <span className="text-sm font-semibold text-slate-700">Garanti / Sözleşme Kapsamında (Bedelsiz)</span>
+                            <label className="flex items-center gap-3 p-4 border border-slate-200 rounded-xl mt-2 cursor-pointer hover:bg-amber-50 group transition-colors">
+                                <input type="checkbox" className="w-5 h-5 accent-amber-500" checked={itemForm.isWarrantyCovered} onChange={e => setItemForm({...itemForm, isWarrantyCovered: e.target.checked})} />
+                                <span className="text-[12px] font-black uppercase tracking-widest text-slate-700 group-hover:text-amber-800 transition-colors">Cari Garanti / Sözleşme Kapsamı (Bedelsiz Yansıt)</span>
                             </label>
 
-                            <div className="pt-2">
-                                <button onClick={saveItem} disabled={isSavingItem} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm py-2 rounded focus:outline-none focus:ring flex items-center justify-center transition-colors disabled:opacity-50">
-                                    {isSavingItem ? 'KAYDEDİLİYOR...' : 'SEÇİMİ REÇETEYE EKLE'}
+                            <div className="pt-4 border-t border-slate-100">
+                                <button onClick={saveItem} disabled={isSavingItem} className="h-12 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[13px] uppercase tracking-widest rounded-xl transition-all disabled:opacity-50 hover:shadow-lg flex items-center justify-center">
+                                    {isSavingItem ? 'KAYDEDİLİYOR...' : 'SEÇİMİ REÇETEYE İŞLE'}
                                 </button>
                             </div>
                         </div>

@@ -9,20 +9,27 @@ import {
 } from "@/components/ui/enterprise";
 import { IconWrench, IconCheck, IconSearch, IconActivity, IconUsers } from "@/components/icons/PremiumIcons";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner"; // Assuming sonner is used
+import { toast } from "sonner";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function NewServiceIntakePage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const { appSettings } = useSettings();
+    
+    const assetTypes = appSettings?.asset_types_schema || [];
     
     // States for form
+    const [selectedType, setSelectedType] = useState<any>(null);
     const [primaryIdentifier, setPrimaryIdentifier] = useState('');
     const [brand, setBrand] = useState('');
     const [model, setModel] = useState('');
     const [complaint, setComplaint] = useState('');
     const [currentKm, setCurrentKm] = useState('');
     
-    // Select customer & staff mock states (In real implementation, these would be select dropdowns from separate APIs)
+    const [dynamicFields, setDynamicFields] = useState<Record<string, string>>({});
+    
+    // Select customer & staff mock states
     const [customerId, setCustomerId] = useState('');
     const [customers, setCustomers] = useState<any[]>([]);
     
@@ -39,11 +46,33 @@ export default function NewServiceIntakePage() {
             .catch(() => {});
     }, []);
 
+    // Set default selected type if there is one
+    useEffect(() => {
+        if (assetTypes.length > 0 && !selectedType) {
+            setSelectedType(assetTypes[0]);
+        }
+    }, [assetTypes]);
+
+    // Update dynamic fields state when selectedType changes
+    useEffect(() => {
+        if (selectedType) {
+            const initialFields: Record<string, string> = {};
+            selectedType.fields?.forEach((f: any) => {
+                initialFields[f.label] = '';
+            });
+            setDynamicFields(initialFields);
+        }
+    }, [selectedType]);
+
+    const handleDynamicFieldChange = (key: string, value: string) => {
+        setDynamicFields(prev => ({ ...prev, [key]: value }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         if (!primaryIdentifier || !customerId) {
-            toast.error("Lütfen Plaka/Seri No ve Müşteri alanlarını doldurun.");
+            toast.error("Lütfen Referans (Plaka/Seri No) ve Müşteri alanlarını doldurun.");
             return;
         }
 
@@ -54,12 +83,13 @@ export default function NewServiceIntakePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     customerId,
-                    assetType: 'VEHICLE', // Assuming Vehicle for now, logic can expand
+                    assetType: selectedType?.name || 'VEHICLE',
                     primaryIdentifier: primaryIdentifier.toUpperCase(),
                     brand,
                     model,
                     complaint,
-                    currentKm
+                    currentKm,
+                    customFields: dynamicFields
                 })
             });
 
@@ -92,13 +122,34 @@ export default function NewServiceIntakePage() {
                     <EnterpriseCard className="p-6 space-y-6 border-t-4 border-indigo-500">
                         <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
                             <IconActivity className="w-4 h-4 text-indigo-500" />
-                            CİHAZ / TASIT KİMLİĞİ
+                            CİHAZ / TÜR KİMLİĞİ VE KARNESİ
                         </h3>
                         
                         <div className="space-y-4">
+                            {/* DYNAMIC TYPE SELECTOR */}
+                            {assetTypes.length > 0 && (
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">
+                                        Kabul Edilen Cihaz / Taşıt Türü
+                                    </label>
+                                    <select 
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        value={selectedType?.id || ''}
+                                        onChange={(e) => {
+                                            const type = assetTypes.find((t: any) => t.id === e.target.value);
+                                            setSelectedType(type);
+                                        }}
+                                    >
+                                        {assetTypes.map((type: any) => (
+                                            <option key={type.id} value={type.id}>{type.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
                             <div>
                                 <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">
-                                    Plaka / Cihaz Seri No / IMEI (Zorunlu)
+                                    Ana Referans No (Plaka / Cihaz Seri No / IMEI) (Zorunlu)
                                 </label>
                                 <input 
                                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-black text-indigo-700 text-lg uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-300" 
@@ -107,37 +158,48 @@ export default function NewServiceIntakePage() {
                                     onChange={e => setPrimaryIdentifier(e.target.value)}
                                     required
                                 />
-                                <p className="text-[10px] text-slate-400 mt-1 font-medium">Bu seri numarası veya plaka önceden kayıtlıysa cihaz karnesi otomatik eklenecektir.</p>
+                                <p className="text-[10px] text-slate-400 mt-1 font-medium">Sistemde daha önce işlem gördüyse arıza geçmişi otomatik eklenecektir.</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Marka (Opsiyonel)</label>
+                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Aygıt Markası</label>
                                     <input 
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:border-indigo-500"
-                                        placeholder="Örn: Bosch, Apple, Yamaha"
+                                        placeholder="Örn: Bosch, Apple"
                                         value={brand} onChange={e => setBrand(e.target.value)}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Model Bilgisi</label>
+                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Model Serisi</label>
                                     <input 
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:border-indigo-500"
-                                        placeholder="Örn: Çamaşır Mak. Serisi X / iPhone 13"
+                                        placeholder="Örn: Serisi X / iPhone 13"
                                         value={model} onChange={e => setModel(e.target.value)}
                                     />
                                 </div>
                             </div>
-                            
-                            <div>
-                                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Gösterge / Sayaç (KM, Kopya, Çalışma Saati)</label>
-                                <input 
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:border-indigo-500"
-                                    type="number"
-                                    placeholder="Opsiyonel"
-                                    value={currentKm} onChange={e => setCurrentKm(e.target.value)}
-                                />
-                            </div>
+
+                            {/* DYNAMIC FIELDS GENERATION */}
+                            {selectedType?.fields?.length > 0 && (
+                                <div className="mt-6 pt-4 border-t border-slate-100">
+                                    <h4 className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-3">TüRe ÖZEL KARNE KUTULARI</h4>
+                                    <div className="space-y-3">
+                                        {selectedType.fields.map((f: any) => (
+                                            <div key={f.id}>
+                                                <label className="block text-[10px] font-bold uppercase text-slate-600 mb-1">{f.label}</label>
+                                                <input 
+                                                    className="w-full bg-slate-100 border-none rounded-lg px-4 py-2 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                                                    placeholder={`${f.label} değerini girin`}
+                                                    value={dynamicFields[f.label] || ''}
+                                                    onChange={(e) => handleDynamicFieldChange(f.label, e.target.value)}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                     </EnterpriseCard>
 
@@ -167,13 +229,13 @@ export default function NewServiceIntakePage() {
                         <EnterpriseCard className="p-6">
                             <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
                                 <IconSearch className="w-4 h-4 text-rose-500" />
-                                TEŞHİS VE ŞİKAYET
+                                TEŞHİS VE MÜŞTERİ ŞİKAYETİ
                             </h3>
                             <div>
-                                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Müşteri Şikayeti / Kabul Notu</label>
+                                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Kabul Notu / Belirtilen Arıza</label>
                                 <textarea 
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-rose-500 min-h-[120px]"
-                                    placeholder="Örn: Makine su almıyor, alttan damlatıyor veya Cihaz şarj takılıyken kapanıyor..."
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-rose-500 min-h-[170px]"
+                                    placeholder="Örn: Makine su almıyor, alttan damlatıyor veya cihaz şarj takılıyken kapanıyor..."
                                     value={complaint}
                                     onChange={e => setComplaint(e.target.value)}
                                 />
@@ -188,7 +250,7 @@ export default function NewServiceIntakePage() {
                         disabled={isLoading}
                         className={`bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest text-sm px-10 py-4 rounded-xl shadow-xl flex items-center gap-2 transition-all ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        {isLoading ? 'OLUŞTURULUYOR...' : 'İŞ EMRİ OLUŞTUR'} <IconCheck className="w-5 h-5" />
+                        {isLoading ? 'OLUŞTURULUYOR...' : 'YENİ SERVİS FORMU AÇ'} <IconCheck className="w-5 h-5" />
                     </button>
                 </div>
             </form>

@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
 
         const body = await request.json();
-        const { customerId, assetType, primaryIdentifier, brand, model, complaint, currentKm, technicianId } = body;
+        const { customerId, assetType, primaryIdentifier, brand, model, complaint, currentKm, technicianId, customFields } = body;
 
         if (!customerId || !primaryIdentifier) {
              return NextResponse.json({ success: false, error: 'Müşteri ve Cihaz/Plaka zorunludur.' }, { status: 400 });
@@ -78,13 +78,15 @@ export async function POST(request: Request) {
                     primaryIdentifier,
                     brand,
                     model,
+                    metadata: customFields || {},
                 }
             });
         } else if (asset.customerId !== customerId) {
-            // Update owner if asset switched hands
+            // Update owner if asset switched hands, and merge custom fields metadata
+            const mergedMetadata = { ...(asset.metadata as any || {}), ...(customFields || {}) };
             asset = await prisma.customerAsset.update({
                 where: { id: asset.id },
-                data: { customerId }
+                data: { customerId, metadata: mergedMetadata }
             });
         }
 
