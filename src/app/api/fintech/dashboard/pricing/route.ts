@@ -57,10 +57,20 @@ export async function GET(req: Request) {
             });
         }
 
+        // Fetch live Mappings to get actual current selling price on the marketplace
+        const mappings = await prisma.marketplaceProductMap.findMany({
+            where: { 
+                companyId, 
+                productId: { in: pnlRecords.map((p:any) => p.productId) } 
+            }
+        });
+
         const pricingData = pnlRecords.map((pnl: any) => {
-            const saleCount = Number(pnl.saleCount) || 1;
-            const avgUnitPrice = (Number(pnl.grossRevenue) > 0 && saleCount > 0) ? (Number(pnl.grossRevenue) / saleCount) : 0;
-            const current = avgUnitPrice > 0 ? avgUnitPrice : (Number(pnl.product?.price) > 0 ? Number(pnl.product.price) : 1000);
+            const mapSync = mappings.find((m:any) => m.productId === pnl.productId && m.marketplace === pnl.marketplace);
+            const liveMarketplacePrice = mapSync && Number(mapSync.price) > 0 ? Number(mapSync.price) : 0;
+            const fallbackPrice = Number(pnl.product?.price) > 0 ? Number(pnl.product.price) : 1000;
+            
+            const current = liveMarketplacePrice > 0 ? liveMarketplacePrice : fallbackPrice;
             const buy = Number(pnl.product?.buyPrice) > 0 ? Number(pnl.product.buyPrice) : (current * 0.75); // simulate 25% margin if unknown
             const grossMargin = pnl.profitMargin ? Number(pnl.profitMargin) : (((current - buy) / current) * 100);
 
