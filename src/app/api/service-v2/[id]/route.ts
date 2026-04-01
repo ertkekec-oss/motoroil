@@ -4,8 +4,9 @@ import { authorize, resolveCompanyId } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await props.params;
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
 
@@ -13,7 +14,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
 
         const order = await prisma.serviceOrder.findUnique({
-            where: { id: params.id, companyId },
+            where: { id: id, companyId },
             include: {
                 customer: true,
                 asset: true,
@@ -31,8 +32,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await props.params;
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
         const companyId = await resolveCompanyId(auth.user);
@@ -43,7 +45,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         if (body.status) dataToUpdate.status = body.status;
         
         const updated = await prisma.serviceOrder.update({
-            where: { id: params.id, companyId },
+            where: { id: id, companyId },
             data: dataToUpdate
         });
 

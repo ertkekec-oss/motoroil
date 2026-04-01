@@ -4,20 +4,21 @@ import { authorize, resolveCompanyId } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function DELETE(request: Request, { params }: { params: { id: string, itemId: string } }) {
+export async function DELETE(request: Request, props: { params: Promise<{ id: string, itemId: string }> }) {
     try {
+        const { id, itemId } = await props.params;
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
         const companyId = await resolveCompanyId(auth.user);
 
         const order = await prisma.serviceOrder.findUnique({
-            where: { id: params.id, companyId }
+            where: { id: id, companyId }
         });
         if (!order) return NextResponse.json({ success: false, error: 'Bulunamadı' }, { status: 404 });
 
         await prisma.serviceOrderItem.deleteMany({
             where: {
-                id: params.itemId,
+                id: itemId,
                 serviceOrderId: order.id
             }
         });

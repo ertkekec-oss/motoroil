@@ -352,38 +352,37 @@ export default function ServiceOrderDetailPage() {
                 </div>
 
                 {/* SAĞ KOLON: İLGİLİ AŞAMA EKRANI */}
-                <div className="xl:col-span-9">
+                <div className="xl:col-span-9 space-y-8">
                     
-                    {/* 1. KABUL AŞAMASI */}
-                    {status === 'PENDING' && (
-                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
-                            <div>
-                                <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-amber-500 pb-2 mb-5 inline-block">Müşteri Şikayeti & Cihaz Detayı</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div className="border border-slate-200 rounded-xl bg-white p-6 shadow-sm">
-                                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4 border-b border-slate-50 pb-2">Cihaz Karnesi (Ayar Kutuları)</p>
-                                        <div className="space-y-3 text-[13px] font-medium text-slate-700">
-                                            {/* We iterate over metadata object populated during intake */}
-                                            {orderData.asset?.metadata && Object.keys(orderData.asset.metadata).length > 0 ? (
-                                                Object.entries(orderData.asset.metadata).map(([k,v]) => (
-                                                    <div key={k} className="flex flex-col gap-1 bg-slate-50 p-2 px-3 rounded-lg border border-slate-100">
-                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{k}</span>
-                                                        <span className="font-bold text-slate-900">{String(v) || '-'}</span>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="text-center py-4 bg-slate-50 rounded-lg border border-slate-100 border-dashed text-slate-400">Özel içerik kutusu kaydedilmemiş.</div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="border border-slate-200 rounded-xl bg-amber-50/30 p-6 shadow-sm">
-                                        <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-4 border-b border-amber-100 pb-2">Onarım Talebi (Kabul Notu)</p>
-                                        <p className="text-[14px] font-medium text-slate-800 leading-relaxed whitespace-pre-wrap">{orderData.complaint || 'Detaylı onarım notu alınmadı.'}</p>
-                                    </div>
+                    {/* PERMANENT ASSET & COMPLAINT CARD (Görünür Her Aşamada) */}
+                    <div>
+                        <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-amber-500 pb-2 mb-5 inline-block">Cihaz Detayı & Müşteri Şikayeti</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div className="border border-slate-200 rounded-xl bg-white p-6 shadow-sm">
+                                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4 border-b border-slate-50 pb-2">Cihaz Karnesi (Ayar Kutuları)</p>
+                                <div className="space-y-3 text-[13px] font-medium text-slate-700">
+                                    {orderData.asset?.metadata && Object.keys(orderData.asset.metadata).length > 0 ? (
+                                        Object.entries(orderData.asset.metadata).map(([k,v]) => (
+                                            <div key={k} className="flex flex-col gap-1 bg-slate-50 p-2 px-3 rounded-lg border border-slate-100">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{k}</span>
+                                                <span className="font-bold text-slate-900">{String(v) || '-'}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-4 bg-slate-50 rounded-lg border border-slate-100 border-dashed text-slate-400">Özel içerik kutusu kaydedilmemiş.</div>
+                                    )}
                                 </div>
                             </div>
-                            
-                            <div>
+                            <div className="border border-slate-200 rounded-xl bg-amber-50/30 p-6 shadow-sm">
+                                <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-4 border-b border-amber-100 pb-2">Onarım Talebi (Kabul Notu / Teşhis)</p>
+                                <p className="text-[14px] font-medium text-slate-800 leading-relaxed whitespace-pre-wrap">{orderData.complaint || 'Detaylı onarım notu alınmadı.'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 1. KABUL AŞAMASI */}
+                    {status === 'PENDING' && (
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300 border-t border-slate-200 pt-8">
                                 <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-widest border-b border-indigo-500 pb-2 mb-5 inline-block">Sisteme Yansılatılacak Maliyetler (Reçete)</h3>
                                 <ReceiptTable allowEdit={true} />
                             </div>
@@ -397,35 +396,45 @@ export default function ServiceOrderDetailPage() {
 
                     {/* 2. ONAY BEKLİYOR */}
                     {status === 'WAITING_APPROVAL' && (
-                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
-                            <div className="bg-sky-50 border border-sky-200 rounded-2xl p-6 sm:p-10 text-center shadow-sm">
-                                <h3 className="text-[20px] font-black text-slate-800 mb-2">Müşteri Onayı Gerekli</h3>
-                                <p className="text-[14px] font-medium text-slate-600 mb-8 max-w-xl mx-auto">Tespit edilen arızanın ve maliyet tablosunun (reçetenin) işleme alınmadan önce müşteri tarafından onaylanması tavsiye edilir.</p>
-                                
-                                <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 sm:p-8 max-w-lg mx-auto text-left mb-8">
-                                    <h4 className="font-black text-[12px] uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3 mb-4">Hazırlanan Teklif Özeti</h4>
-                                    <div className="space-y-3 mb-6">
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300 border-t border-slate-200 pt-8">
+                            <div className="border border-l-4 border-sky-500 rounded-xl p-8 bg-white shadow-sm flex flex-col items-center">
+                                <div className="w-16 h-16 bg-sky-50 text-sky-500 rounded-full flex items-center justify-center mb-4">
+                                    <IconActivity className="w-8 h-8" />
+                                </div>
+                                <h3 className="text-[20px] font-black text-slate-800 tracking-tight text-center">Fiyat ve İşlem Onayı Bekleniyor</h3>
+                                <p className="text-[13px] font-medium text-slate-500 mt-2 text-center max-w-lg leading-relaxed">
+                                    Müşteriye uygulanacak olan malzeme ve işçilik bedellerinin kesin onayını almanız, sonraki aşamalarda yaşanacak itirazları engeller.
+                                </p>
+
+                                <div className="w-full max-w-2xl bg-slate-50 border border-slate-200 rounded-xl p-6 mt-8 mb-8 shadow-sm">
+                                    <h4 className="font-black text-[11px] uppercase tracking-widest text-slate-400 border-b border-slate-200 pb-3 mb-4">Müşteriye Sunulacak Maliyet Tablosu</h4>
+                                    <div className="space-y-2">
                                         {items.length === 0 ? (
                                             <p className="text-sm text-slate-500 text-center italic py-2">Reçeteye hiçbir kalem yansıtılmamış.</p>
                                         ) : items.map(i => (
-                                            <div key={i.id} className="flex justify-between text-[13px] font-semibold text-slate-600 items-center gap-2">
-                                                <span className="flex items-center gap-2">
-                                                    <span className="text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0">{i.quantity}x</span> 
-                                                    <span className="truncate max-w-[200px] sm:max-w-xs">{i.name}</span>
+                                            <div key={i.id} className="flex justify-between text-[13px] font-semibold text-slate-700 items-center gap-2 bg-white px-4 py-2.5 rounded-lg border border-slate-100">
+                                                <span className="flex items-center gap-3">
+                                                    <span className="text-sky-700 bg-sky-50 px-2 py-0.5 rounded text-[11px] font-black">{i.quantity} AD</span> 
+                                                    <span className="truncate max-w-[250px]">{i.name}</span>
                                                 </span>
-                                                <span className="text-slate-800 font-bold shrink-0">{Number(i.totalPrice).toLocaleString()} ₺</span>
+                                                <span className="text-slate-900 font-bold">{Number(i.totalPrice).toLocaleString()} ₺</span>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="flex justify-between items-end font-black text-[16px] text-slate-900 border-t border-slate-200 pt-4">
-                                        <span className="text-[12px] text-slate-500 uppercase">Teklif Tutarı (+Kdv)</span>
-                                        <span className="text-[20px] sm:text-[24px] text-sky-600 tracking-tight">{finalAmount.toLocaleString()} ₺</span>
+                                    <div className="flex justify-between items-end font-black text-[18px] text-slate-900 border-t border-slate-200 pt-5 mt-5">
+                                        <span className="text-[11px] text-slate-500 uppercase tracking-widest">Genel Toplam (+Kdv)</span>
+                                        <span className="text-[24px] text-sky-600">{finalAmount.toLocaleString()} ₺</span>
                                     </div>
                                 </div>
 
-                                <button onClick={() => window.open(`/p/approval/${orderData.id}`, '_blank')} className="h-12 w-full sm:w-auto px-8 bg-[#25D366] text-white rounded-xl font-black uppercase tracking-widest text-[13px] shadow-lg hover:bg-[#20bd5a] transition-all hover:-translate-y-0.5 inline-flex items-center justify-center gap-2">
-                                    TEKLİFİ WHATSAPP İLE ONAYA İLET
-                                </button>
+                                <div className="flex gap-4 w-full max-w-2xl">
+                                    <button onClick={() => window.open(`/p/approval/${orderData.id}`, '_blank')} className="h-14 flex-1 bg-[#25D366] text-white rounded-xl font-black uppercase tracking-widest text-[13px] shadow hover:bg-[#20bd5a] transition-all flex items-center justify-center gap-2">
+                                        WHATSAPP'TAN ONAY İSTE
+                                    </button>
+                                    <button onClick={() => handleTabChange('IN_PROGRESS')} className="h-14 flex-1 bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-800 hover:text-slate-900 rounded-xl font-black uppercase tracking-widest text-[13px] transition-all flex items-center justify-center gap-2">
+                                        MANUEL ONAY VERDİ
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}

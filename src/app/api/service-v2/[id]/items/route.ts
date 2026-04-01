@@ -4,8 +4,9 @@ import { authorize, resolveCompanyId } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await props.params;
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
         const companyId = await resolveCompanyId(auth.user);
@@ -14,7 +15,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         const { type, name, quantity, unitPrice, technicianId, isWarrantyCovered, productId } = body;
 
         const order = await prisma.serviceOrder.findUnique({
-            where: { id: params.id, companyId }
+            where: { id: id, companyId }
         });
         if (!order) return NextResponse.json({ success: false, error: 'Bulunamadı' }, { status: 404 });
 
