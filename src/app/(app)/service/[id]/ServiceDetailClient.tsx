@@ -1,0 +1,319 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useModal } from '@/contexts/ModalContext';
+import { ChevronLeft, Save, Plus, Trash2, Shield, Wrench, Package, Truck, User, Clock, CheckCircle } from 'lucide-react';
+
+
+export default function ServiceDetailClient({ id }: { id: string }) {
+    const { showError, showSuccess } = useModal();
+    const [loading, setLoading] = useState(true);
+    const [order, setOrder] = useState<any>(null);
+    
+    const [activeTab, setActiveTab] = useState<'details' | 'parts' | 'labor'>('details');
+    // Local state for adding parts or labor
+    const [newItemName, setNewItemName] = useState('');
+    const [newItemQty, setNewItemQty] = useState(1);
+    const [newItemPrice, setNewItemPrice] = useState(0);
+
+    useEffect(() => {
+        if (id) fetchOrder();
+    }, [id]);
+
+    const fetchOrder = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/services/work-orders/${id}`);
+            if (res.ok) {
+                const data = await res.json();
+                setOrder(data);
+            } else {
+                showError("Hata", "İş emri bulunamadı.");
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateStatus = async (newStatus: string) => {
+        try {
+            const res = await fetch(`/api/services/work-orders/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (res.ok) {
+                showSuccess("Başarılı", "Durum güncellendi.");
+                fetchOrder();
+            } else {
+                showError("Hata", "Durum güncellenemedi.");
+            }
+        } catch (e) {
+            showError("Hata", "Bağlantı hatası.");
+        }
+    };
+
+    const handleAddItem = async (type: 'PART' | 'LABOR') => {
+        if (!newItemName || newItemPrice <= 0) {
+            showError("Uyarı", "Lütfen geçerli bir ad ve tutar giriniz.");
+            return;
+        }
+
+        try {
+            const payload = {
+                name: newItemName,
+                quantity: newItemQty,
+                unitPrice: newItemPrice,
+                type
+            };
+
+            const res = await fetch(`/api/services/work-orders/${id}/items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                setNewItemName('');
+                setNewItemPrice(0);
+                setNewItemQty(1);
+                fetchOrder();
+                showSuccess("Eklendi", "Kalem başarıyla servis fişine eklendi.");
+            } else {
+                showError("Hata", "Kalem eklenemedi.");
+            }
+        } catch (e) {
+            showError("Hata", "Bağlantı hatası.");
+        }
+    };
+
+    const handleDeleteItem = async (itemId: string) => {
+        try {
+            const res = await fetch(`/api/services/work-orders/${id}/items/${itemId}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                fetchOrder();
+            } else {
+                showError("Hata", "Silinemedi.");
+            }
+        } catch (e) {
+            showError("Hata", "Bağlantı hatası.");
+        }
+    };
+
+    if (loading) return <div className="p-10 flex items-center justify-center text-slate-500 font-bold">Yükleniyor...</div>;
+    if (!order) return <div className="p-10 flex items-center justify-center text-red-500 font-bold">Bulunamadı</div>;
+
+    const parts = order.items?.filter((i: any) => i.type === 'PART') || [];
+    const labor = order.items?.filter((i: any) => i.type === 'LABOR') || [];
+
+    const getStatusTheme = (status: string) => {
+        switch (status) {
+            case 'COMPLETED': return 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20';
+            case 'IN_PROGRESS': return 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
+            default: return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
+        }
+    };
+
+    return (
+        <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1220]">
+            <div className="flex-shrink-0 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0B1220] z-10 sticky top-0 px-6 py-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link href="/service" className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            <ChevronLeft className="w-5 h-5" />
+                        </Link>
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                            <Wrench className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">
+                                    {order.customer?.name}
+                                </h1>
+                                <span className={`px-2 py-0.5 rounded-[6px] text-[10px] font-black uppercase border ${getStatusTheme(order.status)}`}>
+                                    {order.status}
+                                </span>
+                            </div>
+                            <span className="text-[12px] font-medium text-slate-500 mt-1">
+                                {order.customer?.phone} | {order.customer?.email}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-end mr-4">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Toplam Tutar</span>
+                            <span className="text-[14px] font-black text-emerald-600 dark:text-emerald-400">
+                                {Number(order.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => handleUpdateStatus('IN_PROGRESS')}
+                            disabled={order.status === 'IN_PROGRESS'}
+                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+                        >
+                            İşleme Al
+                        </button>
+                        <button
+                            onClick={() => handleUpdateStatus('COMPLETED')}
+                            disabled={order.status === 'COMPLETED'}
+                            className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+                        >
+                            <CheckCircle className="w-4 h-4" /> Tamamla
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex gap-6 mt-6 border-b border-slate-200 dark:border-white/5">
+                    {[
+                        { id: 'details', label: 'İş Emri Detayı' },
+                        { id: 'parts', label: 'Yedek Parça' },
+                        { id: 'labor', label: 'İşçilik & Hizmet' }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`pb-3 text-[13px] font-bold transition-colors relative ${activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
+                        >
+                            {tab.label}
+                            {activeTab === tab.id && (
+                                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>
+                            )}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="flex-1 p-6 lg:p-10 max-w-[1400px] mx-auto w-full">
+                {activeTab === 'details' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6">
+                                <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
+                                    <FileText className="w-4 h-4" /> Şikayet & İstekler
+                                </h3>
+                                <p className="text-[14px] font-semibold text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
+                                    {order.complaint || 'Belirtilmedi'}
+                                </p>
+                            </div>
+                            
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6">
+                                <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
+                                    <Shield className="w-4 h-4" /> Cihaz Bilgisi
+                                </h3>
+                                {order.asset ? (
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 flex items-center justify-center">
+                                            <Wrench className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <div className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                                {order.asset.brand} <span className="text-sm text-slate-400">{order.asset.primaryIdentifier}</span>
+                                            </div>
+                                            <div className="text-sm font-medium text-slate-500">{order.asset.model || ''}</div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <span className="text-sm font-medium text-slate-500">Cihaz belirtilmemiş.</span>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="lg:col-span-1 space-y-6">
+                            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6 flex flex-col justify-between">
+                                <h3 className="text-[12px] font-black tracking-widest text-slate-500 uppercase mb-4">Finansal Özet</h3>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-400">
+                                        <span>Yedek Parça</span>
+                                        <span>{Number(parts.reduce((s:number, p:any) => s + Number(p.totalPrice), 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-400">
+                                        <span>İşçilik</span>
+                                        <span>{Number(labor.reduce((s:number, l:any) => s + Number(l.totalPrice), 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                    </div>
+                                    <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-2"></div>
+                                    <div className="flex justify-between items-center text-[18px] font-black text-slate-900 dark:text-white">
+                                        <span>GENEL TOPLAM</span>
+                                        <span className="text-blue-600 dark:text-blue-500">{Number(order.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {(activeTab === 'parts' || activeTab === 'labor') && (
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                {activeTab === 'parts' ? <Package className="w-5 h-5 text-blue-500" /> : <Clock className="w-5 h-5 text-orange-500" />}
+                                {activeTab === 'parts' ? 'Kullanılan Yedek Parçalar' : 'Uygulanan İşçilikler'}
+                            </h3>
+                        </div>
+
+                        {/* Add Item Form */}
+                        <div className="flex gap-4 mb-8 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-white/10">
+                            <div className="flex-1">
+                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Hizmet / Parça Adı</label>
+                                <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} placeholder="Açıklama giriniz..." className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                            </div>
+                            <div className="w-24">
+                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Miktar</label>
+                                <input type="number" min="1" value={newItemQty} onChange={e => setNewItemQty(Number(e.target.value))} className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                            </div>
+                            <div className="w-32">
+                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Birim Fiyat (₺)</label>
+                                <input type="number" min="0" value={newItemPrice} onChange={e => setNewItemPrice(Number(e.target.value))} className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                            </div>
+                            <div className="w-24 flex items-end">
+                                <button onClick={() => handleAddItem(activeTab === 'parts' ? 'PART' : 'LABOR')} className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex justify-center items-center gap-1 transition-colors">
+                                    <Plus className="w-4 h-4" /> Ekle
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Items Table */}
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5">
+                                        <th className="py-3 px-4 font-bold whitespace-nowrap">Açıklama</th>
+                                        <th className="py-3 px-4 font-bold whitespace-nowrap text-right">Miktar</th>
+                                        <th className="py-3 px-4 font-bold whitespace-nowrap text-right">B. Fiyat</th>
+                                        <th className="py-3 px-4 font-bold whitespace-nowrap text-right">Toplam</th>
+                                        <th className="py-3 px-4 font-bold whitespace-nowrap text-center">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="'divide-y divide-slate-100 dark:divide-white/5'">
+                                    {(!activeTab.includes('part') ? labor : parts).length === 0 ? (
+                                        <tr><td colSpan={5} className="py-8 text-center text-sm font-medium text-slate-500">Henüz kayıt eklenmemiş.</td></tr>
+                                    ) : (
+                                        (!activeTab.includes('part') ? labor : parts).map((item: any) => (
+                                            <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                                <td className="py-3 px-4 text-sm font-semibold text-slate-900 dark:text-white">{item.name}</td>
+                                                <td className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">{Number(item.quantity)}</td>
+                                                <td className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">{Number(item.unitPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                <td className="py-3 px-4 text-sm font-bold text-blue-600 dark:text-blue-400 text-right">{Number(item.totalPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                <td className="py-3 px-4 text-center">
+                                                    <button onClick={() => handleDeleteItem(item.id)} className="w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center mx-auto transition-colors">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}

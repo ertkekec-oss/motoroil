@@ -27,16 +27,18 @@ export async function GET(req: Request) {
         let rawResponse;
         
         try {
-            rawResponse = await provider.syncSettlement(
-                order.tenantId,
-                order.companyId,
-                order.channelId,
-                {
-                   orderId: order.id,
-                   orderNumber: order.orderNumber,
-                   marketplace: order.marketplace
-                }
-            );
+            rawResponse = await provider.executeAction({
+               companyId: order.companyId,
+               marketplace: order.marketplace as any,
+               orderId: order.id,
+               actionKey: "SYNC_SETTLEMENT",
+               idempotencyKey: `MANUAL_SYNC_${order.orderNumber}_${Date.now()}`,
+               payload: { 
+                    orderNumber: order.orderNumber,
+                    tenantId: order.tenantId,
+                    channelId: order.channelId
+               }
+            });
         } catch(apiErr: any) {
              console.error("API ERROR:", apiErr);
              return NextResponse.json({ 

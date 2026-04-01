@@ -65,6 +65,7 @@ export default function Sidebar() {
             'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
             'inventory-parent': ['/inventory', '/inventory/warehouses', '/inventory/manufacturing', '/inventory/boms'],
+            'service-parent': ['/service', '/service/work-orders', '/service/new'],
             'staff-parent': ['/staff', '/staff/performance']
         };
 
@@ -271,6 +272,17 @@ export default function Sidebar() {
                             { name: 'Envanter Genel', href: '/inventory' },
                             { name: 'Depo & Stoklar', href: '/inventory/warehouses' },
                             { name: 'Üretim Kontrol Merkezi', href: '/inventory/manufacturing' },
+                        ]
+                    },
+                    {
+                        name: 'Servis Masası',
+                        icon: Wrench,
+                        isParent: true,
+                        id: 'service-parent',
+                        subItems: [
+                            { name: 'Servis Dashboard', href: '/service' },
+                            { name: 'İş Emirleri', href: '/service/work-orders' },
+                            { name: 'Yeni İş Emri', href: '/service/new' },
                         ]
                     },
                     { name: 'Teklifler', href: '/offers', icon: FileText },
