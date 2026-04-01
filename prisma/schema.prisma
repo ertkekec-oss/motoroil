@@ -41,116 +41,117 @@ model Tenant {
 }
 
 model Company {
-  id                    String                         @id @default(cuid())
-  tenantId              String
-  name                  String
-  vkn                   String
-  taxOffice             String?
-  address               String?
-  district              String?
-  city                  String?
-  createdAt             DateTime                       @default(now())
-  updatedAt             DateTime                       @updatedAt
-  status                CompanyStatus                  @default(ACTIVE)
-  taxNumber             String
-  type                  CompanyType                    @default(BUYER)
-  accounts              Account[]
-  appSettings           AppSettings[]
-  decisionLogs          AutomationDecisionLog[]
-  b2bSuggestions        B2BSuggestion[]
-  bankConnections       BankConnection[]
-  bankStatements        BankStatement[]
-  bankTransactions      BankTransaction[]
-  boms                  Bom[]
-  createdBoostRules     BoostRule[]
-  branches              Branch[]
-  buySuggestions        BuySuggestion[]
-  campaigns             Campaign[]
-  cashflowForecasts     CashflowForecast[]
-  categoryMappings      CategoryMapping[]
-  checks                Check[]
-  auditLogs             CommerceAuditLog[]
-  commissionPlans       CommissionPlan[]
-  CommissionSnapshot    CommissionSnapshot[]
-  tenant                Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  companyDocuments      CompanyDocument[]
-  companyProductMaps    CompanyProductMap[]
-  coupons               Coupon[]
-  customers             Customer[]
-  customerCategories    CustomerCategory[]
-  locationRequests      CustomerLocationRequest[]
-  discoveryImpressions  DiscoveryImpression[]
-  domainEvents          DomainEvent[]
-  erpCategories         ERPProductCategory[]
-  expenses              Expense[]
-  exportReports         ExportReport[]
-  externalRequests      ExternalRequest[]
-  FinanceAuditLog       FinanceAuditLog[]
-  fintechAudits         FintechAudit[]
-  integratorSettings    IntegratorSettings?
-  inventoryLayers       InventoryLayer[]
-  Journal               Journal[]
-  journalEntries        JournalEntry[]
-  kasalar               Kasa[]
-  ledgerAccount         LedgerAccount?
-  manufacturingOrders   ManufacturingOrder[]
-  MarketplaceConfig     MarketplaceConfig[]
-  orderFinances         MarketplaceOrderFinance[]
-  productMaps           MarketplaceProductMap[]
-  marketplacePnls       MarketplaceProductPnl[]
-  settlements           MarketplaceSettlement[]
-  transactionLedgers    MarketplaceTransactionLedger[]
-  matchingRules         MatchingRule[]
-  networkListings       NetworkListing[]
-  offers                Offer[]
-  orders                Order[]
-  paymentMatches        PaymentMatch[]
-  paymentPlans          PaymentPlan[]
-  payoutDestinations    PayoutDestination[]
-  payoutOutboxes        PayoutOutbox[]                 @relation("OutboxCompany")
-  payoutRequests        PayoutRequest[]
-  predictiveVisits      PredictiveVisit[]
-  priceLists            PriceList[]
-  autopilotConfigs      PricingAutopilotConfig[]
-  products              Product[]
-  productConsumptions   ProductConsumption[]
-  providerPayments      ProviderPayment[]
-  providerPayouts       ProviderPayout[]
-  purchaseInvoices      PurchaseInvoice[]
-  releaseWindowPolicy   ReleaseWindowPolicy?
-  revenueInsights       RevenueInsight[]
-  routes                Route[]
-  routeSuggestions      RouteSuggestion[]
-  routeTemplates        RouteTemplate[]
-  salesForecasts        SalesForecast[]
-  invoices              SalesInvoice[]
-  salesOpportunities    SalesOpportunity[]
-  salesOrders           SalesOrder[]
-  salesRiskAlerts       SalesRiskAlert[]
-  visits                SalesVisit[]
-  salesXInsights        SalesXInsight[]
-  salesXOpportunities   SalesXOpportunity[]
-  securityEvents        SecurityEvent[]                @relation("CompanySecurityEvents")
-  automationPolicy      SellerAutomationPolicy?
-  sellerEarnings        SellerEarning[]
-  sellerPaymentProfile  SellerPaymentProfile?
-  sellerTrustEvents     SellerTrustEvent[]
-  sellerTrustScore      SellerTrustScore?
-  serviceRecords        ServiceRecord[]
-  smartPricingRules     SmartPricingRule[]
-  staff                 Staff[]
-  staffTargets          StaffTarget[]
-  stockMovements        StockMovement[]
-  stockTransfers        StockTransfer[]
-  suppliers             Supplier[]
-  suspendedSales        SuspendedSale[]
-  targetPlans           TargetPlan[]
-  ticketsAsCounterparty Ticket[]                       @relation("TicketCounterparty")
-  ticketsAsTenant       Ticket[]                       @relation("TicketTenant")
-  ticketMessages        TicketMessage[]
-  transactions          Transaction[]
-  trustScoreRecalcJobs  TrustScoreRecalcJob[]
-  users                 UserCompanyAccess[]
+  id                         String                         @id @default(cuid())
+  tenantId                   String
+  name                       String
+  vkn                        String
+  taxOffice                  String?
+  address                    String?
+  district                   String?
+  city                       String?
+  createdAt                  DateTime                       @default(now())
+  updatedAt                  DateTime                       @updatedAt
+  status                     CompanyStatus                  @default(ACTIVE)
+  taxNumber                  String
+  type                       CompanyType                    @default(BUYER)
+  accounts                   Account[]
+  appSettings                AppSettings[]
+  decisionLogs               AutomationDecisionLog[]
+  b2bSuggestions             B2BSuggestion[]
+  bankConnections            BankConnection[]
+  bankStatements             BankStatement[]
+  bankTransactions           BankTransaction[]
+  boms                       Bom[]
+  createdBoostRules          BoostRule[]
+  branches                   Branch[]
+  buySuggestions             BuySuggestion[]
+  campaigns                  Campaign[]
+  cashflowForecasts          CashflowForecast[]
+  categoryMappings           CategoryMapping[]
+  checks                     Check[]
+  auditLogs                  CommerceAuditLog[]
+  commissionPlans            CommissionPlan[]
+  CommissionSnapshot         CommissionSnapshot[]
+  tenant                     Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  companyDocuments           CompanyDocument[]
+  companyProductMaps         CompanyProductMap[]
+  coupons                    Coupon[]
+  customers                  Customer[]
+  customerCategories         CustomerCategory[]
+  locationRequests           CustomerLocationRequest[]
+  discoveryImpressions       DiscoveryImpression[]
+  domainEvents               DomainEvent[]
+  erpCategories              ERPProductCategory[]
+  expenses                   Expense[]
+  exportReports              ExportReport[]
+  externalRequests           ExternalRequest[]
+  FinanceAuditLog            FinanceAuditLog[]
+  fintechAudits              FintechAudit[]
+  integratorSettings         IntegratorSettings?
+  inventoryLayers            InventoryLayer[]
+  Journal                    Journal[]
+  journalEntries             JournalEntry[]
+  kasalar                    Kasa[]
+  ledgerAccount              LedgerAccount?
+  manufacturingOrders        ManufacturingOrder[]
+  MarketplaceConfig          MarketplaceConfig[]
+  orderFinances              MarketplaceOrderFinance[]
+  productMaps                MarketplaceProductMap[]
+  marketplacePnls            MarketplaceProductPnl[]
+  settlements                MarketplaceSettlement[]
+  transactionLedgers         MarketplaceTransactionLedger[]
+  matchingRules              MatchingRule[]
+  networkListings            NetworkListing[]
+  offers                     Offer[]
+  orders                     Order[]
+  paymentMatches             PaymentMatch[]
+  paymentPlans               PaymentPlan[]
+  payoutDestinations         PayoutDestination[]
+  payoutOutboxes             PayoutOutbox[]                 @relation("OutboxCompany")
+  payoutRequests             PayoutRequest[]
+  predictiveVisits           PredictiveVisit[]
+  priceLists                 PriceList[]
+  autopilotConfigs           PricingAutopilotConfig[]
+  products                   Product[]
+  productConsumptions        ProductConsumption[]
+  providerPayments           ProviderPayment[]
+  providerPayouts            ProviderPayout[]
+  purchaseInvoices           PurchaseInvoice[]
+  releaseWindowPolicy        ReleaseWindowPolicy?
+  revenueInsights            RevenueInsight[]
+  routes                     Route[]
+  routeSuggestions           RouteSuggestion[]
+  routeTemplates             RouteTemplate[]
+  salesForecasts             SalesForecast[]
+  invoices                   SalesInvoice[]
+  salesOpportunities         SalesOpportunity[]
+  salesOrders                SalesOrder[]
+  salesRiskAlerts            SalesRiskAlert[]
+  visits                     SalesVisit[]
+  salesXInsights             SalesXInsight[]
+  salesXOpportunities        SalesXOpportunity[]
+  securityEvents             SecurityEvent[]                @relation("CompanySecurityEvents")
+  automationPolicy           SellerAutomationPolicy?
+  sellerEarnings             SellerEarning[]
+  sellerPaymentProfile       SellerPaymentProfile?
+  sellerTrustEvents          SellerTrustEvent[]
+  sellerTrustScore           SellerTrustScore?
+  serviceRecords             ServiceRecord[]
+  smartPricingRules          SmartPricingRule[]
+  staff                      Staff[]
+  staffTargets               StaffTarget[]
+  stockMovements             StockMovement[]
+  stockTransfers             StockTransfer[]
+  suppliers                  Supplier[]
+  suspendedSales             SuspendedSale[]
+  targetPlans                TargetPlan[]
+  ticketsAsCounterparty      Ticket[]                       @relation("TicketCounterparty")
+  ticketsAsTenant            Ticket[]                       @relation("TicketTenant")
+  ticketMessages             TicketMessage[]
+  transactions               Transaction[]
+  trustScoreRecalcJobs       TrustScoreRecalcJob[]
+  users                      UserCompanyAccess[]
+  MarketplaceProductDailyPnl MarketplaceProductDailyPnl[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -339,76 +340,77 @@ model Order {
 }
 
 model Product {
-  id                                String                   @id @default(cuid())
+  id                                String                       @id @default(cuid())
   name                              String
   code                              String
   barcode                           String?
-  price                             Decimal                  @db.Decimal(10, 2)
-  buyPrice                          Decimal                  @default(0) @db.Decimal(10, 2)
-  stock                             Int                      @default(0)
-  reservedStock                     Int                      @default(0)
+  price                             Decimal                      @db.Decimal(10, 2)
+  buyPrice                          Decimal                      @default(0) @db.Decimal(10, 2)
+  stock                             Int                          @default(0)
+  reservedStock                     Int                          @default(0)
   category                          String?
   description                       String?
   b2bDescription                    String?
-  imageUrl                          String?                  @db.VarChar(2048)
-  imageKey                          String?                  @db.VarChar(1024)
-  documentUrl                       String?                  @db.VarChar(2048)
-  documentName                      String?                  @db.VarChar(1024)
-  minStock                          Int                      @default(5)
+  imageUrl                          String?                      @db.VarChar(2048)
+  imageKey                          String?                      @db.VarChar(1024)
+  documentUrl                       String?                      @db.VarChar(2048)
+  documentName                      String?                      @db.VarChar(1024)
+  minStock                          Int                          @default(5)
   brand                             String?
-  type                              String?                  @default("ÃœrÃ¼n")
-  branch                            String?                  @default("Merkez")
-  salesVat                          Decimal?                 @default(20) @db.Decimal(5, 2)
-  salesVatIncluded                  Boolean?                 @default(true)
-  purchaseVat                       Decimal?                 @default(20) @db.Decimal(5, 2)
-  purchaseVatIncluded               Boolean?                 @default(true)
-  salesOiv                          Decimal?                 @default(0) @db.Decimal(10, 2)
-  salesOtv                          Decimal?                 @default(0) @db.Decimal(10, 2)
-  otvType                           String?                  @default("Ã–.T.V yok")
+  type                              String?                      @default("ÃœrÃ¼n")
+  branch                            String?                      @default("Merkez")
+  salesVat                          Decimal?                     @default(20) @db.Decimal(5, 2)
+  salesVatIncluded                  Boolean?                     @default(true)
+  purchaseVat                       Decimal?                     @default(20) @db.Decimal(5, 2)
+  purchaseVatIncluded               Boolean?                     @default(true)
+  salesOiv                          Decimal?                     @default(0) @db.Decimal(10, 2)
+  salesOtv                          Decimal?                     @default(0) @db.Decimal(10, 2)
+  otvType                           String?                      @default("Ã–.T.V yok")
   gtip                              String?
-  purchaseDiscount                  Decimal?                 @default(0) @db.Decimal(5, 2)
-  purchaseOtv                       Decimal?                 @default(0) @db.Decimal(10, 2)
-  otvCode                           String?                  @default("7")
+  purchaseDiscount                  Decimal?                     @default(0) @db.Decimal(5, 2)
+  purchaseOtv                       Decimal?                     @default(0) @db.Decimal(10, 2)
+  otvCode                           String?                      @default("7")
   deletedAt                         DateTime?
-  createdAt                         DateTime                 @default(now())
-  updatedAt                         DateTime                 @updatedAt
+  createdAt                         DateTime                     @default(now())
+  updatedAt                         DateTime                     @updatedAt
   companyId                         String
-  currency                          String                   @default("TRY")
-  isParent                          Boolean                  @default(false)
+  currency                          String                       @default("TRY")
+  isParent                          Boolean                      @default(false)
   parentId                          String?
-  purchaseCurrency                  String                   @default("TRY")
+  purchaseCurrency                  String                       @default("TRY")
   supplierName                      String?
-  unit                              String?                  @default("Adet")
-  status                            String?                  @default("Aktif")
+  unit                              String?                      @default("Adet")
+  status                            String?                      @default("Aktif")
   countryCode                       String?
   invoiceTitle                      String?
-  showDescriptionOnInvoice          Boolean?                 @default(false)
+  showDescriptionOnInvoice          Boolean?                     @default(false)
   shelfLocation                     String?
   tags                              String?
   gtin                              String?
   globalCategoryId                  String?
   b2bSuggestions                    B2BSuggestion[]
-  bomsAsProduct                     Bom[]                    @relation("ProductBom")
-  bomItemsAsMaterial                BomItem[]                @relation("ProductBomItem")
+  bomsAsProduct                     Bom[]                        @relation("ProductBom")
+  bomItemsAsMaterial                BomItem[]                    @relation("ProductBomItem")
   companyProductMaps                CompanyProductMap[]
   dealerCartItems                   DealerCartItem[]
   dealerCatalogItems                DealerCatalogItem[]
-  manufacturingOrdersAsProduct      ManufacturingOrder[]     @relation("ProductManufacturing")
-  manufacturingOrderItemsAsMaterial ManufacturingOrderItem[] @relation("ProductManufacturingItem")
+  manufacturingOrdersAsProduct      ManufacturingOrder[]         @relation("ProductManufacturing")
+  manufacturingOrderItemsAsMaterial ManufacturingOrderItem[]     @relation("ProductManufacturingItem")
   marketplaceMaps                   MarketplaceProductMap[]
   marketplacePnls                   MarketplaceProductPnl[]
   networkListings                   NetworkListing[]
   offerLines                        OfferLine[]
-  company                           Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  globalCategory                    GlobalCategory?          @relation("ProductGlobalCategory", fields: [globalCategoryId], references: [id])
-  parent                            Product?                 @relation("ProductVariants", fields: [parentId], references: [id])
-  variants                          Product[]                @relation("ProductVariants")
+  company                           Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  globalCategory                    GlobalCategory?              @relation("ProductGlobalCategory", fields: [globalCategoryId], references: [id])
+  parent                            Product?                     @relation("ProductVariants", fields: [parentId], references: [id])
+  variants                          Product[]                    @relation("ProductVariants")
   productPrices                     ProductPrice[]
   variantValues                     ProductVariantValue[]
   salesOrderItems                   SalesOrderItem[]
   pricingRules                      SmartPricingRule[]
   stocks                            Stock[]
   movements                         StockMovement[]
+  MarketplaceProductDailyPnl        MarketplaceProductDailyPnl[]
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -2186,6 +2188,35 @@ model MarketplaceProductPnl {
 
   @@unique([companyId, productId, marketplace])
   @@index([companyId, marketplace])
+}
+
+model MarketplaceProductDailyPnl {
+  id          String   @id @default(cuid())
+  companyId   String
+  marketplace String
+  productId   String
+  date        DateTime @db.Date
+
+  grossRevenue    Decimal @default(0) @db.Decimal(15, 2)
+  commissionTotal Decimal @default(0) @db.Decimal(15, 2)
+  shippingTotal   Decimal @default(0) @db.Decimal(15, 2)
+  penaltyTotal    Decimal @default(0) @db.Decimal(15, 2)
+  otherFeesTotal  Decimal @default(0) @db.Decimal(15, 2)
+
+  cogsAtSale      Decimal @default(0) @db.Decimal(15, 2) // O günkü birim başı maliyet toplamı (Historical Tracker)
+  saleCount       Int     @default(0)
+  refundCount     Int     @default(0)
+  refundCostTotal Decimal @default(0) @db.Decimal(15, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, productId, marketplace, date])
+  @@index([companyId, marketplace, date])
+  @@index([productId, date])
 }
 
 model SmartPricingRule {
