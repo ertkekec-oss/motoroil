@@ -151,9 +151,13 @@ export default function ServiceOrderDetailPage({ params }: { params: { id: strin
                                 <span className="text-xs text-slate-500 font-medium">Müşteri Şikayeti</span>
                                 <span className="text-xs font-bold text-slate-800 text-right w-2/3">{orderData.complaint || '-'}</span>
                             </div>
+                            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                                <span className="text-xs text-slate-500 font-medium">Garanti Durumu</span>
+                                <span className="text-[10px] font-black tracking-widest uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">GARANTİ KAPSAMINDA MÜMKÜN</span>
+                            </div>
                             <div className="flex justify-between items-center pt-2">
                                 <span className="text-xs text-slate-500 font-medium">Zimmetli Teknisyen</span>
-                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">{(items.length > 0 && items[0].technician?.name) || 'Atanmadı'}</span>
+                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">{(items.length > 0 && items[0].technician?.name) || 'Henüz Atanmadı'}</span>
                             </div>
                         </div>
 
@@ -167,14 +171,22 @@ export default function ServiceOrderDetailPage({ params }: { params: { id: strin
                 {/* SAĞ: Reçete ve Yedek Parça */}
                 <div className="space-y-6 lg:col-span-2">
                     <EnterpriseCard className="p-0 overflow-hidden flex flex-col h-full">
-                        <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 flex justify-between items-center">
-                            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                        <div className="p-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 flex flex-wrap justify-between items-center gap-4">
+                            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2 block">
                                 <IconSettings className="w-4 h-4 text-slate-500" />
-                                SERVİS REÇETESİ (YEDEK PARÇA & İŞÇİLİK)
+                                SERVİS REÇETESİ (HİZMET MOTORU)
                             </h3>
-                            <button className="text-[10px] font-black uppercase text-indigo-600 bg-white ring-1 ring-indigo-200 px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all">
-                                + KALEM EKLE (STOK)
-                            </button>
+                            <div className="flex gap-2">
+                                <button className="text-[10px] font-black uppercase text-amber-600 bg-white ring-1 ring-amber-200 px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-1">
+                                    + FASON HİZMET
+                                </button>
+                                <button className="text-[10px] font-black uppercase text-emerald-600 bg-white ring-1 ring-emerald-200 px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-1">
+                                    + İŞÇİLİK (HR)
+                                </button>
+                                <button className="text-[10px] font-black uppercase text-indigo-600 bg-white ring-1 ring-indigo-200 px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-1">
+                                    + STOK / PARÇA
+                                </button>
+                            </div>
                         </div>
                         
                         <div className="overflow-x-auto flex-1 p-2">

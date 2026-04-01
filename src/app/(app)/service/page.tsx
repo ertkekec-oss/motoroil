@@ -59,7 +59,7 @@ export default function ServiceV2Dashboard() {
     }));
 
     return (
-        <div className="max-w-[1700px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40">
+        <div className="flex flex-col h-[calc(100vh-80px)] max-w-[2000px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-6 animate-in fade-in duration-700 pb-6">
             <EnterpriseSectionHeader 
                 title="SERVİS HİZMETLERİ V2" 
                 subtitle="Otonom Cihaz Karnesi • Kanban İş Akışı • Envanter Otomasyonu"
@@ -114,14 +114,14 @@ export default function ServiceV2Dashboard() {
                     Veriler Yükleniyor...
                 </div>
             ) : viewMode === 'KANBAN' ? (
-                <div className="flex gap-4 overflow-x-auto pb-8 custom-scroll snap-x">
+                <div className="flex-1 flex gap-4 overflow-x-auto pb-4 custom-scroll snap-x items-start">
                     {groupedOrders.map(stage => (
-                        <div key={stage.id} className="min-w-[320px] max-w-[320px] shrink-0 flex flex-col snap-start">
+                        <div key={stage.id} className="min-w-[320px] max-w-[320px] shrink-0 flex flex-col snap-start h-full max-h-full">
                             <div className={`px-4 py-3 rounded-t-2xl font-black text-xs uppercase tracking-wider flex justify-between items-center ${stage.color}`}>
                                 {stage.label}
                                 <span className="px-2 py-0.5 rounded bg-white/50 text-slate-800 text-[10px]">{stage.items.length}</span>
                             </div>
-                            <div className="bg-slate-50 dark:bg-[#1e293b]/50 p-3 rounded-b-2xl border-x border-b border-slate-200 dark:border-white/5 min-h-[400px] flex flex-col gap-3">
+                            <div className="bg-slate-50 dark:bg-[#1e293b]/50 p-3 rounded-b-2xl border-x border-b border-slate-200 dark:border-white/5 flex-1 overflow-y-auto flex flex-col gap-3 custom-scroll">
                                 {stage.items.length === 0 ? (
                                     <div className="h-24 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-xs font-bold text-slate-400">BOŞ</div>
                                 ) : (

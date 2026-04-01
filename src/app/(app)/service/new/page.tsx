@@ -98,43 +98,43 @@ export default function NewServiceIntakePage() {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">
-                                    Plaka / Seri No (Zorunlu)
+                                    Plaka / Cihaz Seri No / IMEI (Zorunlu)
                                 </label>
                                 <input 
                                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-black text-indigo-700 text-lg uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-300" 
-                                    placeholder="34 ABC 123"
+                                    placeholder="Örn: 34ABC12 veya SN:12345"
                                     value={primaryIdentifier}
                                     onChange={e => setPrimaryIdentifier(e.target.value)}
                                     required
                                 />
-                                <p className="text-[10px] text-slate-400 mt-1 font-medium">Bu plaka/seri önceden kayıtlıysa araç karnesi otomatik eklenecektir.</p>
+                                <p className="text-[10px] text-slate-400 mt-1 font-medium">Bu seri numarası veya plaka önceden kayıtlıysa cihaz karnesi otomatik eklenecektir.</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Marka</label>
+                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Marka (Opsiyonel)</label>
                                     <input 
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:border-indigo-500"
-                                        placeholder="Örn: Yamaha"
+                                        placeholder="Örn: Bosch, Apple, Yamaha"
                                         value={brand} onChange={e => setBrand(e.target.value)}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Model</label>
+                                    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Model Bilgisi</label>
                                     <input 
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:border-indigo-500"
-                                        placeholder="Örn: MT-07"
+                                        placeholder="Örn: Çamaşır Mak. Serisi X / iPhone 13"
                                         value={model} onChange={e => setModel(e.target.value)}
                                     />
                                 </div>
                             </div>
                             
                             <div>
-                                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Servise Giriş KM (Opsiyonel)</label>
+                                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Gösterge / Sayaç (KM, Kopya, Çalışma Saati)</label>
                                 <input 
                                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold focus:outline-none focus:border-indigo-500"
                                     type="number"
-                                    placeholder="85000"
+                                    placeholder="Opsiyonel"
                                     value={currentKm} onChange={e => setCurrentKm(e.target.value)}
                                 />
                             </div>
@@ -173,7 +173,7 @@ export default function NewServiceIntakePage() {
                                 <label className="block text-[10px] font-black uppercase text-slate-500 mb-1 tracking-widest">Müşteri Şikayeti / Kabul Notu</label>
                                 <textarea 
                                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-rose-500 min-h-[120px]"
-                                    placeholder="Rölantide çalışırken stop ediyor. Arka frenden ses geliyor."
+                                    placeholder="Örn: Makine su almıyor, alttan damlatıyor veya Cihaz şarj takılıyken kapanıyor..."
                                     value={complaint}
                                     onChange={e => setComplaint(e.target.value)}
                                 />
