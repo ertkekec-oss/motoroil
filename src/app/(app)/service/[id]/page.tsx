@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
     EnterpriseSectionHeader, 
     EnterpriseButton, 
-    EnterpriseCard,
-    EnterpriseBadge
+    EnterpriseCard
 } from "@/components/ui/enterprise";
 import { 
     IconWrench, 
@@ -21,32 +20,6 @@ import {
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-// Placeholder data for UI mock
-const TICKET_DATA = {
-    id: "SRO-8002",
-    status: "IN_PROGRESS",
-    complaint: "Motor Yağ Kaçağı ve Soğutma Fanı Çalışmıyor",
-    createdAt: "2026-04-01T09:30:00Z",
-    asset: {
-        primaryId: "34ABC212",
-        brand: "Yamaha",
-        model: "Tracer 900",
-        km: 45000,
-        type: "Motosiklet"
-    },
-    customer: {
-        name: "Ahmet Yılmaz",
-        phone: "+90 532 999 88 77"
-    },
-    technician: "Yalçın Usta",
-    items: [
-        { id: 1, type: 'PART', name: 'Yamalube 10W-40', quantity: 3, unitPrice: 450, total: 1350 },
-        { id: 2, type: 'PART', name: 'Yağ Filtresi', quantity: 1, unitPrice: 320, total: 320 },
-        { id: 3, type: 'LABOR', name: 'Periyodik Bakım İşçiliği', quantity: 1, unitPrice: 1500, total: 1500 },
-        { id: 4, type: 'OUTSOURCED', name: 'Radyatör Kaynağı (Dış Servis)', quantity: 1, unitPrice: 850, total: 850 },
-    ]
-};
-
 const WORKFLOW = [
     { id: 'PENDING', label: 'Kabul' },
     { id: 'IN_PROGRESS', label: 'İşlemde' },
@@ -56,23 +29,51 @@ const WORKFLOW = [
 
 export default function ServiceOrderDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
-    const [status, setStatus] = useState(TICKET_DATA.status);
-    const [items, setItems] = useState(TICKET_DATA.items);
+    const [status, setStatus] = useState('PENDING');
+    const [items, setItems] = useState<any[]>([]);
+    const [orderData, setOrderData] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const totalAmount = items.reduce((sum, item) => sum + item.total, 0);
+    useEffect(() => {
+        if (!params.id || params.id === 'new') return; // 'new' is handled by different page
+        fetch(`/api/service-v2/${params.id}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.success && data.order) {
+                    setOrderData(data.order);
+                    setStatus(data.order.status || 'PENDING');
+                    setItems(data.order.items || []);
+                }
+                setIsLoading(false);
+            })
+            .catch(() => setIsLoading(false));
+    }, [params.id]);
+
+    const handleStatusUpdate = async (newStatus: string) => {
+        setStatus(newStatus);
+        await fetch(`/api/service-v2/${params.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+    };
+
+    if (isLoading) return <div className="p-10 text-center animate-pulse font-bold text-slate-500">YÜKLENİYOR...</div>;
+    if (!orderData) return <div className="p-10 text-center font-bold text-slate-500">Maaalesef iş emri bulunamadı.</div>;
+
+    const totalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0);
     const taxAmount = totalAmount * 0.20;
     const finalAmount = totalAmount + taxAmount;
 
     return (
         <div className="max-w-[1400px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40">
             <EnterpriseSectionHeader 
-                title={`İŞ EMRİ: ${TICKET_DATA.id}`} 
-                subtitle={`${TICKET_DATA.asset.brand} ${TICKET_DATA.asset.model} • ${TICKET_DATA.customer.name}`}
+                title={`İŞ EMRİ: ${orderData.id.slice(0,8).toUpperCase()}`} 
+                subtitle={`${orderData.asset?.brand || ''} ${orderData.asset?.model || ''} • ${orderData.customer?.name || ''}`}
                 icon={<IconWrench />}
-                onBack={() => router.push('/service')}
                 rightElement={
                     <div className="flex gap-3 relative z-20">
-                        <EnterpriseButton variant="outline" className="flex items-center gap-2 bg-white rounded-xl">
+                        <EnterpriseButton variant="secondary" className="flex items-center gap-2 bg-white rounded-xl">
                             <IconPrinter className="w-4 h-4 text-slate-500" /> Servis Fişi Yazdır
                         </EnterpriseButton>
                         <EnterpriseButton 
@@ -97,7 +98,7 @@ export default function ServiceOrderDetailPage({ params }: { params: { id: strin
                             {WORKFLOW.map(wf => (
                                 <button
                                     key={wf.id}
-                                    onClick={() => setStatus(wf.id)}
+                                    onClick={() => handleStatusUpdate(wf.id)}
                                     className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${status === wf.id ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
                                 >
                                     {wf.label}
@@ -109,7 +110,7 @@ export default function ServiceOrderDetailPage({ params }: { params: { id: strin
                     {status === 'WAITING_APPROVAL' && (
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] text-amber-400 font-bold uppercase tracking-widest mb-1 animate-pulse">Onay Linki Gönderilmeye Hazır</span>
-                            <button onClick={() => window.open(`/p/approval/${TICKET_DATA.id}`, '_blank')} className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-xl text-xs font-black uppercase tracking-tight shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
+                            <button onClick={() => window.open(`/p/approval/${orderData.id}`, '_blank')} className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-xl text-xs font-black uppercase tracking-tight shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
                                 <BrandWhatsappIcon /> MÜŞTERİDEN ONAY İSTE
                             </button>
                         </div>
@@ -132,27 +133,27 @@ export default function ServiceOrderDetailPage({ params }: { params: { id: strin
                                 <IconWrench className="w-8 h-8 opacity-50" />
                             </div>
                             <div>
-                                <h4 className="text-xl font-black text-slate-900 tracking-tight">{TICKET_DATA.asset.primaryId}</h4>
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{TICKET_DATA.asset.brand} {TICKET_DATA.asset.model}</p>
+                                <h4 className="text-xl font-black text-slate-900 tracking-tight">{orderData.asset?.primaryIdentifier}</h4>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{orderData.asset?.brand} {orderData.asset?.model}</p>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
                                 <span className="text-xs text-slate-500 font-medium">Güncel Kilometre</span>
-                                <span className="text-sm font-bold text-slate-900">{TICKET_DATA.asset.km.toLocaleString()} KM</span>
+                                <span className="text-sm font-bold text-slate-900">{orderData.currentKm_or_Use?.toLocaleString() || 'Bilinmiyor'} KM</span>
                             </div>
                             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
                                 <span className="text-xs text-slate-500 font-medium">Yakıt Durumu</span>
-                                <span className="text-sm font-bold text-slate-900">Çeyrek Depo</span>
+                                <span className="text-sm font-bold text-slate-900">-</span>
                             </div>
                             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
                                 <span className="text-xs text-slate-500 font-medium">Müşteri Şikayeti</span>
-                                <span className="text-xs font-bold text-slate-800 text-right w-2/3">{TICKET_DATA.complaint}</span>
+                                <span className="text-xs font-bold text-slate-800 text-right w-2/3">{orderData.complaint || '-'}</span>
                             </div>
                             <div className="flex justify-between items-center pt-2">
                                 <span className="text-xs text-slate-500 font-medium">Zimmetli Teknisyen</span>
-                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">{TICKET_DATA.technician}</span>
+                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">{(items.length > 0 && items[0].technician?.name) || 'Atanmadı'}</span>
                             </div>
                         </div>
 

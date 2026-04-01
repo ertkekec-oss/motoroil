@@ -35,15 +35,22 @@ export default function ServiceV2Dashboard() {
 
     // Mock Fetching for UI scaffolding
     useEffect(() => {
-        setTimeout(() => {
-            setOrders([
-                { id: 'SRO-1001', asset: { primaryIdentifier: '34ABC123', brand: 'BMW', model: 'M3' }, customer: { name: 'Ahmet Yılmaz' }, status: 'IN_PROGRESS', technician: 'Yalçın Usta', complaint: 'Yağ Kaçağı Var', totalAmount: '0.00' },
-                { id: 'SRO-1002', asset: { primaryIdentifier: '06XYZ99', brand: 'Honda', model: 'Civic' }, customer: { name: 'Veli Demir' }, status: 'WAITING_APPROVAL', technician: 'Ahmet Usta', complaint: 'Şanzıman Vuruyor', totalAmount: '14500.00' },
-                { id: 'SRO-1003', asset: { primaryIdentifier: 'ABC-MAC-BOOK', brand: 'Apple', model: 'MacBook Pro' }, customer: { name: 'Ayşe Kaya' }, status: 'PENDING', technician: 'Bekliyor', complaint: 'Ekran Çizildi', totalAmount: '0.00' },
-                { id: 'SRO-1004', asset: { primaryIdentifier: '34DEF456', brand: 'Yamaha', model: 'MT-07' }, customer: { name: 'Mehmet Han' }, status: 'READY', technician: 'Yalçın Usta', complaint: 'Periyodik Bakım', totalAmount: '3500.00' },
-            ]);
-            setIsLoading(false);
-        }, 800);
+        setIsLoading(true);
+        fetch('/api/service-v2')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.orders) {
+                    setOrders(data.orders);
+                } else {
+                    setOrders([]);
+                }
+            })
+            .catch(() => {
+                setOrders([]);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }, []);
 
     const groupedOrders = WORKFLOW_STAGES.map(stage => ({
