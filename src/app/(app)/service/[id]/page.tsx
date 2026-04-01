@@ -521,26 +521,34 @@ export default function ServiceOrderDetailPage() {
                 </div>
             </div>
 
-            {/* İŞÇİLİK / FASON / YEDEK PARÇA EKLEME MODALI */}
+            {/* İŞÇİLİK / FASON / YEDEK PARÇA EKLEME MODALI (ENTERPRISE PREMIUM) */}
             {isItemModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 p-4 transition-opacity fade-in duration-200 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[500px] max-h-[90vh] overflow-y-auto transform scale-100 animate-in zoom-in-95">
-                        <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 sticky top-0 z-10">
-                            <h2 className="text-[14px] font-black tracking-widest text-slate-800 uppercase flex items-center gap-2">
-                                <IconPlus className="w-4 h-4 text-indigo-500" />
-                                {itemModalType === 'PART' ? 'Gelişmiş Çoklu Parça Ekle' : itemModalType === 'LABOR' ? 'İşçilik Ücreti Yansıt' : 'Dış Fason Hizmeti Ekle'}
-                            </h2>
-                            <button onClick={() => setIsItemModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition-colors">✕</button>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 p-4 transition-opacity fade-in duration-300 backdrop-blur-md">
+                    <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[560px] max-h-[90vh] overflow-hidden flex flex-col transform scale-100 animate-in zoom-in-95 ease-out duration-300">
+                        {/* Header */}
+                        <div className="px-8 py-6 border-b border-slate-100/60 flex justify-between items-center bg-white z-10">
+                            <div className="flex flex-col gap-1">
+                                <h2 className="text-[16px] font-black tracking-tight text-slate-900 flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${itemModalType === 'PART' ? 'bg-sky-50 text-sky-600' : itemModalType === 'LABOR' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-600'}`}>
+                                        <IconPlus className="w-4 h-4" />
+                                    </div>
+                                    {itemModalType === 'PART' ? 'Gelişmiş Çoklu Parça Ekle' : itemModalType === 'LABOR' ? 'İşçilik Ücreti Yansıt' : 'Dış Fason Hizmeti Ekle'}
+                                </h2>
+                                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest pl-11">Servis reçetenize eklenecektir</p>
+                            </div>
+                            <button onClick={() => setIsItemModalOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">✕</button>
                         </div>
-                        <div className="p-6 space-y-6">
+                        
+                        {/* Body */}
+                        <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                             
                             {/* DYNAMIC FIELD SELECTOR BASED ON TYPE */}
                             {itemModalType === 'PART' ? (
                                 <div className="space-y-6">
-                                    <div className="bg-sky-50 border border-sky-200 rounded-xl p-4">
-                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Hızlı Envanter Arama</label>
+                                    <div className="space-y-2 relative">
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-400">Hızlı Envanter Arama</label>
                                         <select 
-                                            className="w-full bg-white border border-slate-200 rounded-xl h-11 px-4 text-[13px] font-bold focus:outline-none focus:ring-2 focus:ring-sky-500"
+                                            className="w-full bg-slate-50 border-transparent hover:border-slate-200 transition-colors rounded-2xl h-14 px-5 text-[14px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:bg-white cursor-pointer shadow-sm"
                                             value=""
                                             onChange={e => {
                                                 if (e.target.value) {
@@ -548,7 +556,7 @@ export default function ServiceOrderDetailPage() {
                                                 }
                                             }}
                                         >
-                                            <option value="">-- Listeden seçerek sepete atın --</option>
+                                            <option value="">-- Listeden parça seçerek sepetinize atın --</option>
                                             {products.map(p => (
                                                 <option key={p.id} value={p.id}>Stok: {p.stock} | {p.code} - {p.name}</option>
                                             ))}
@@ -556,96 +564,115 @@ export default function ServiceOrderDetailPage() {
                                     </div>
 
                                     {/* Eklenecek Parçalar Kuyruğu (Cart UI) */}
-                                    <div>
-                                        <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-800 border-b border-slate-100 pb-2 mb-3">Eklenecek Parçalar ({partQueue.length})</h4>
+                                    <div className="pt-2">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h4 className="text-[12px] font-black uppercase tracking-widest text-slate-800">Seçilen Parçalar <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-[10px] ml-2">{partQueue.length}</span></h4>
+                                        </div>
+                                        
                                         {partQueue.length === 0 ? (
-                                            <div className="text-center py-6 bg-slate-50 rounded border border-dashed border-slate-200 text-[12px] text-slate-400 font-semibold">
-                                                Lütfen yukarıdan 1 veya daha fazla parça seçin.
+                                            <div className="text-center py-10 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200/60 text-[13px] text-slate-400 font-medium flex flex-col items-center justify-center gap-3">
+                                                <IconActivity className="w-6 h-6 text-slate-300" />
+                                                Devam etmek için üstten parça seçin.
                                             </div>
                                         ) : (
                                             <div className="space-y-3">
                                                 {partQueue.map(p => (
-                                                    <div key={p.id} className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col gap-3 shadow-sm relative">
-                                                        <button onClick={() => removePartQueueItem(p.id)} className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-red-50 text-red-500 rounded hover:bg-red-500 hover:text-white transition-colors">✕</button>
-                                                        <p className="text-[13px] font-bold text-slate-800 pr-8 line-clamp-1">{p.name}</p>
+                                                    <div key={p.id} className="bg-white border border-slate-100 hover:border-slate-200 transition-colors rounded-2xl p-5 flex flex-col gap-4 shadow-sm relative group">
+                                                        <button onClick={() => removePartQueueItem(p.id)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100">✕</button>
+                                                        <p className="text-[14px] font-black text-slate-800 pr-10 line-clamp-1">{p.name}</p>
                                                         
-                                                        <div className="flex gap-2">
+                                                        <div className="flex gap-4">
                                                             <div className="flex-1">
-                                                                <label className="block text-[9px] font-black uppercase text-slate-400 mb-1">Miktar</label>
-                                                                <input type="number" min="1" className="w-full bg-slate-50 border border-slate-200 rounded-lg h-9 text-center text-[13px] font-bold" value={p.quantity} onChange={e => updatePartQueueItem(p.id, 'quantity', Number(e.target.value))} />
+                                                                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 ml-1">Miktar</label>
+                                                                <input type="number" min="1" className="w-full bg-slate-50 border-transparent hover:border-slate-200 focus:bg-white rounded-xl h-11 text-center text-[14px] font-bold focus:ring-2 focus:ring-sky-500/40 transition-all outline-none" value={p.quantity} onChange={e => updatePartQueueItem(p.id, 'quantity', Number(e.target.value))} />
                                                             </div>
                                                             <div className="flex-[2]">
-                                                                <label className="block text-[9px] font-black uppercase text-slate-400 mb-1">Birim Fiyat (Satış)</label>
-                                                                <input type="number" className="w-full bg-slate-50 border border-slate-200 rounded-lg h-9 text-right px-2 text-[13px] font-bold text-sky-600" value={p.unitPrice} onChange={e => updatePartQueueItem(p.id, 'unitPrice', Number(e.target.value))} />
+                                                                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 ml-1">Birim Fiyat (Satış)</label>
+                                                                <input type="number" className="w-full bg-slate-50 border-transparent hover:border-slate-200 focus:bg-white rounded-xl h-11 text-right px-4 text-[14px] font-black text-sky-600 focus:ring-2 focus:ring-sky-500/40 transition-all outline-none" value={p.unitPrice} onChange={e => updatePartQueueItem(p.id, 'unitPrice', Number(e.target.value))} />
                                                             </div>
                                                         </div>
-                                                        <label className="flex items-center gap-2 cursor-pointer mt-1">
-                                                            <input type="checkbox" className="w-4 h-4 accent-amber-500" checked={p.isWarrantyCovered} onChange={e => updatePartQueueItem(p.id, 'isWarrantyCovered', e.target.checked)} />
-                                                            <span className="text-[11px] font-bold text-slate-500">Bedelsiz (Garanti / İkram)</span>
-                                                        </label>
+                                                        <div className="pt-2 flex items-center">
+                                                            <label className="flex items-center gap-3 cursor-pointer group/cb">
+                                                                <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-all ${p.isWarrantyCovered ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'bg-slate-100 text-transparent border border-slate-200 group-hover/cb:border-amber-300 group-hover/cb:bg-amber-50'}`}>
+                                                                    <IconCheck className="w-3.5 h-3.5" strokeWidth={3} />
+                                                                </div>
+                                                                <input type="checkbox" className="hidden" checked={p.isWarrantyCovered} onChange={e => updatePartQueueItem(p.id, 'isWarrantyCovered', e.target.checked)} />
+                                                                <span className="text-[12px] font-bold text-slate-500 group-hover/cb:text-slate-800 transition-colors">Bedelsiz Yansıt (Garanti / İkram)</span>
+                                                            </label>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
-                                    <p className="text-[10px] uppercase font-bold text-sky-600 text-center tracking-widest mt-2">Bu parçalar faturaya dönüştüğünde depodan düşülecektir.</p>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400 text-center tracking-widest mt-6">Bu parçalar işlem kaydedildiğinde envanterden (depodan) düşülecektir.</p>
                                 </div>
                             ) : itemModalType === 'LABOR' ? (
-                                <div>
-                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Otomatik İşçilik Tarifesi Seç (Opsiyonel)</label>
-                                    <input 
-                                        list="laborRates"
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[13px] font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                        placeholder="Listeden seçin veya özel kalem adı yazın" 
-                                        value={itemForm.name} 
-                                        onChange={e => {
-                                            const val = e.target.value;
-                                            const mappedPrice = serviceSettings ? serviceSettings[val] : undefined;
-                                            setItemForm({
-                                                ...itemForm, 
-                                                name: val, 
-                                                unitPrice: mappedPrice !== undefined ? Number(mappedPrice) : itemForm.unitPrice
-                                            });
-                                        }} 
-                                    />
-                                    <datalist id="laborRates">
-                                        {Object.entries(serviceSettings || {}).map(([key]) => <option key={key} value={key} />)}
-                                    </datalist>
-                                    <p className="text-[10px] uppercase font-bold text-slate-400 mt-2 tracking-widest text-center">Ayarlar'dan eklediğiniz fiks tarifeleri arayabilirsiniz. İşçilik bedeli doğrudan şirket kasasına yazılır.</p>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">İşçilik Tarifesi Seç (Opsiyonel)</label>
+                                        <input 
+                                            list="laborRates"
+                                            className="w-full bg-slate-50 border-transparent focus:bg-white rounded-2xl h-14 px-5 text-[14px] font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all shadow-sm" 
+                                            placeholder="Listeden seçin veya özel kalem adı yazın" 
+                                            value={itemForm.name} 
+                                            onChange={e => {
+                                                const val = e.target.value;
+                                                const mappedPrice = serviceSettings ? serviceSettings[val] : undefined;
+                                                setItemForm({
+                                                    ...itemForm, 
+                                                    name: val, 
+                                                    unitPrice: mappedPrice !== undefined ? Number(mappedPrice) : itemForm.unitPrice
+                                                });
+                                            }} 
+                                        />
+                                        <datalist id="laborRates">
+                                            {Object.entries(serviceSettings || {}).map(([key]) => <option key={key} value={key} />)}
+                                        </datalist>
+                                    </div>
+                                    <p className="text-[11px] font-medium text-slate-500 text-center leading-relaxed">İşçilik bedeli malzeme çıkışı oluşturmaz, doğrudan hizmet geliri olarak şirketinize yazılır.</p>
                                 </div>
                             ) : (
-                                <div>
-                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Açıklama / Fason Kalemi</label>
-                                    <input type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[13px] font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Örn: Dışarıda yapılan boya veya torna işi" value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} />
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Fason Kalemi Açıklaması</label>
+                                        <input type="text" className="w-full bg-slate-50 border-transparent focus:bg-white rounded-2xl h-14 px-5 text-[14px] font-bold focus:outline-none focus:ring-2 focus:ring-slate-800/40 transition-all shadow-sm" placeholder="Örn: Dışarıda yapılan boya veya torna işi" value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} />
+                                    </div>
                                 </div>
                             )}
 
                             {/* PRICE AND QTY (For Non-Part) */}
                             {itemModalType !== 'PART' && (
-                                <>
-                                    <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 mt-5">
+                                <div className="bg-slate-50/50 rounded-2xl p-6 mt-6 border border-slate-100">
+                                    <div className="grid grid-cols-2 gap-5">
                                         <div>
-                                            <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Miktar (X)</label>
-                                            <input type="number" min="1" className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[16px] font-black focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center" value={itemForm.quantity} onChange={e => setItemForm({...itemForm, quantity: Number(e.target.value)})} />
+                                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Miktar (X)</label>
+                                            <input type="number" min="1" className="w-full bg-white border border-slate-200 rounded-xl h-12 px-4 text-[16px] font-black focus:outline-none focus:ring-2 focus:ring-indigo-500/40 text-center transition-all shadow-sm" value={itemForm.quantity} onChange={e => setItemForm({...itemForm, quantity: Number(e.target.value)})} />
                                         </div>
                                         <div>
-                                            <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">Birim Fiyatı (₺)</label>
-                                            <input type="number" className="w-full bg-slate-50 border border-slate-200 rounded-xl h-11 px-4 text-[16px] font-black focus:outline-none focus:ring-2 focus:ring-indigo-500 text-right text-indigo-700" value={itemForm.unitPrice} onChange={e => setItemForm({...itemForm, unitPrice: Number(e.target.value)})} />
+                                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Birim Fiyatı (₺)</label>
+                                            <input type="number" className="w-full bg-white border border-slate-200 rounded-xl h-12 px-4 text-[16px] font-black focus:outline-none focus:ring-2 focus:ring-indigo-500/40 text-right text-indigo-700 transition-all shadow-sm" value={itemForm.unitPrice} onChange={e => setItemForm({...itemForm, unitPrice: Number(e.target.value)})} />
                                         </div>
                                     </div>
 
-                                    <label className="flex items-center gap-3 p-4 border border-slate-200 rounded-xl mt-2 cursor-pointer hover:bg-amber-50 group transition-colors">
-                                        <input type="checkbox" className="w-5 h-5 accent-amber-500" checked={itemForm.isWarrantyCovered} onChange={e => setItemForm({...itemForm, isWarrantyCovered: e.target.checked})} />
-                                        <span className="text-[12px] font-black uppercase tracking-widest text-slate-700 group-hover:text-amber-800 transition-colors">Bedelsiz Yansıt (Garanti / İkram)</span>
-                                    </label>
-                                </>
+                                    <div className="mt-5 pt-5 border-t border-slate-200/60">
+                                        <label className="flex items-center gap-3 cursor-pointer group/cb">
+                                            <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-all ${itemForm.isWarrantyCovered ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'bg-slate-100 text-transparent border border-slate-200 group-hover/cb:border-amber-300 group-hover/cb:bg-amber-50'}`}>
+                                                <IconCheck className="w-3.5 h-3.5" strokeWidth={3} />
+                                            </div>
+                                            <input type="checkbox" className="hidden" checked={itemForm.isWarrantyCovered} onChange={e => setItemForm({...itemForm, isWarrantyCovered: e.target.checked})} />
+                                            <span className="text-[12px] font-black uppercase tracking-widest text-slate-600 group-hover/cb:text-slate-900 transition-colors">Bedelsiz Yansıt (Garanti / İkram)</span>
+                                        </label>
+                                    </div>
+                                </div>
                             )}
 
-                            <div className="pt-4 border-t border-slate-100 sticky bottom-0 bg-white pb-2">
-                                <button onClick={saveItemsQueue} disabled={isSavingItem || (itemModalType === 'PART' && partQueue.length === 0)} className="h-12 w-full bg-slate-900 hover:bg-slate-800 text-white font-black text-[13px] uppercase tracking-widest rounded-xl transition-all disabled:opacity-50 hover:shadow-lg flex items-center justify-center">
-                                    {isSavingItem ? 'KAYDEDİLİYOR...' : 'SEÇİMLERİ REÇETEYE İŞLE'}
-                                </button>
-                            </div>
+                        </div>
+                        {/* Footer */}
+                        <div className="p-6 pt-0 mt-4 border-t border-transparent bg-white">
+                            <button onClick={saveItemsQueue} disabled={isSavingItem || (itemModalType === 'PART' && partQueue.length === 0)} className="h-14 w-full bg-slate-900 hover:bg-slate-800 hover:-translate-y-0.5 text-white font-black text-[14px] uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-slate-900/20 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center">
+                                {isSavingItem ? 'KAYDEDİLİYOR...' : 'SEÇİMLERİ REÇETEYE İŞLE'}
+                            </button>
                         </div>
                     </div>
                 </div>
