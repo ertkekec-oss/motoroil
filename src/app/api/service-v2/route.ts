@@ -81,12 +81,17 @@ export async function POST(request: Request) {
                     metadata: customFields || {},
                 }
             });
-        } else if (asset.customerId !== customerId) {
-            // Update owner if asset switched hands, and merge custom fields metadata
+        } else {
+            // Update owner if asset switched hands, and always merge custom fields metadata
             const mergedMetadata = { ...(asset.metadata as any || {}), ...(customFields || {}) };
             asset = await prisma.customerAsset.update({
                 where: { id: asset.id },
-                data: { customerId, metadata: mergedMetadata }
+                data: { 
+                    customerId, 
+                    brand: brand || asset.brand,
+                    model: model || asset.model,
+                    metadata: mergedMetadata 
+                }
             });
         }
 
