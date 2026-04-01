@@ -228,10 +228,10 @@ export default function ServiceOrderDetailPage() {
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
                 {/* SOL: DİNAMİK AŞAMALAR (SİDEBAR NAVIGATION) */}
-                <div className="w-full md:w-64 shrink-0">
+                <div className="lg:col-span-3">
                     <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3 px-1">Tüm Aşamalar</h2>
                     <div className="flex flex-col gap-1">
                         {WORKFLOW.map((wf) => {
@@ -264,7 +264,7 @@ export default function ServiceOrderDetailPage() {
                 </div>
 
                 {/* SAĞ: DİNAMİK İÇERİK SAYFALARI */}
-                <div className="flex-1 min-w-0">
+                <div className="lg:col-span-9">
                     
                     {/* DİNAMİK İÇERİK: KABUL AŞAMASI */}
                     {status === 'PENDING' && (

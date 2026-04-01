@@ -29,7 +29,6 @@ const DEF_TABS = [
     { id: 'cust_class', label: 'Cari Sınıfları' },
     { id: 'supp_class', label: 'Tedarikçi Sınıfları' },
     { id: 'warranties', label: 'Garanti Parametreleri' },
-    { id: 'vehicle_types', label: 'Taşıt Türleri' },
     { id: 'payment_methods', label: 'Tahsilat Kanalları' },
 ];
 
@@ -39,7 +38,6 @@ const TAB_TITLE: Record<string, string> = {
     cust_class: 'Müşteri Derecelendirme Sınıfları',
     supp_class: 'Tedarikçi Nitelik Sınıfları',
     warranties: 'Yasal Garanti Süreçleri',
-    vehicle_types: 'Filo & Taşıt Tipolojisi',
     payment_methods: 'Finansal Tahsilat Kanalları',
 };
 
@@ -49,7 +47,6 @@ const TAB_DESC: Record<string, string> = {
     cust_class: 'B2B ve B2C müşterilerinizin fiyatlandırma grupları.',
     supp_class: 'Mal ve hizmet tedariği sağladığınız paydaş sınıfları.',
     warranties: 'Satış sonrası hizmetlerde geçerli yasal teminat süreleri.',
-    vehicle_types: 'Servis modülünde araca atanacak geçerli şasi formları.',
     payment_methods: 'Nakit, banka kartı ve transfer odaklı yasal ödeme yolları.',
 };
 

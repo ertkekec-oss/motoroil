@@ -1106,7 +1106,7 @@ export default function SettingsPage() {
                         { id: 'profile', label: 'Hesabım', icon: <User className="w-5 h-5 text-amber-500" /> },
                         { id: 'pricing', label: 'Fiyatlandırma', icon: <DollarSign className="w-5 h-5 text-green-500" /> },
                         { id: 'invoice', label: 'Fatura Ayarları', icon: <FileText className="w-5 h-5 text-cyan-500" /> },
-                        { id: 'services', label: 'Servis Ücretleri', icon: <Wrench className="w-5 h-5 text-violet-500" /> },
+                        { id: 'services', label: 'Servis Ayarları', icon: <Wrench className="w-5 h-5 text-violet-500" /> },
                         { id: 'taxes', label: 'KDV & Vergiler', icon: <Coins className="w-5 h-5 text-yellow-500" /> },
                         { id: 'expenses', label: 'Satış Giderleri', icon: <CreditCard className="w-5 h-5 text-blue-500" /> },
                         { id: 'definitions', label: 'Tanımlar & Liste', icon: <BookOpen className="w-5 h-5 text-teal-500" /> },
