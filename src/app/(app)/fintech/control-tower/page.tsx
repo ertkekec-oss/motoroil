@@ -308,12 +308,18 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
 const ProfitabilityHeatmapContent = () => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any[]>([]);
-    const [filter, setFilter] = useState('');
+    
+    // V2 Filters
+    const [timeFilter, setTimeFilter] = useState('1M'); 
+    const [searchFilter, setSearchFilter] = useState('');
+    const [marketFilter, setMarketFilter] = useState('ALL');
+    const [catFilter, setCatFilter] = useState('ALL');
 
     useEffect(() => {
         const fetchHeatmap = async () => {
+            setLoading(true);
             try {
-                const res = await fetch('/api/fintech/dashboard/heatmap');
+                const res = await fetch(`/api/fintech/dashboard/heatmap?time=${timeFilter}`);
                 const json = await res.json();
                 if (json.success) setData(json.data);
             } catch (err) {
@@ -323,15 +329,30 @@ const ProfitabilityHeatmapContent = () => {
             }
         };
         fetchHeatmap();
-    }, []);
+    }, [timeFilter]);
 
-    const filteredData = data.filter(item =>
-        item.productName.toLowerCase().includes(filter.toLowerCase()) ||
-        item.productCode.toLowerCase().includes(filter.toLowerCase())
-    );
+    // Extraction for Dropdowns
+    const uniqueMarkets = Array.from(new Set(data.map(d => d.marketplace)));
+    const uniqueCats = Array.from(new Set(data.map(d => d.category).filter(Boolean)));
+
+    const filteredData = data.filter(item => {
+        const matchSearch = String(item.productName || '').toLowerCase().includes(searchFilter.toLowerCase()) ||
+                            String(item.productCode || '').toLowerCase().includes(searchFilter.toLowerCase());
+        const matchMarket = marketFilter === 'ALL' || item.marketplace === marketFilter;
+        const matchCat = catFilter === 'ALL' || item.category === catFilter;
+        return matchSearch && matchMarket && matchCat;
+    });
+
+    // Toplam Özet Metrikler
+    const totalCiro = filteredData.reduce((acc, curr) => acc + curr.grossRevenue, 0);
+    const totalKar = filteredData.reduce((acc, curr) => acc + curr.netProfit, 0);
+    const totalKomisyon = filteredData.reduce((acc, curr) => acc + curr.commission, 0);
+    const totalKargo = filteredData.reduce((acc, curr) => acc + curr.shipping, 0);
+    const totalPenalty = filteredData.reduce((acc, curr) => acc + curr.penalty, 0);
+    const totalCogs = filteredData.reduce((acc, curr) => acc + curr.fifoCost, 0);
 
     const getMarginColor = (margin: number) => {
-        if (margin >= 20) return 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20';
+        if (margin >= 20) return 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20';
         if (margin >= 5) return 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20';
         if (margin > 0) return 'text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/20';
         return 'text-rose-600 dark:text-rose-400 bg-rose-600 dark:bg-rose-50 dark:bg-rose-500/10 border-rose-500/20';
@@ -339,137 +360,175 @@ const ProfitabilityHeatmapContent = () => {
 
     const getStatusText = (margin: number) => {
         if (margin >= 20) return 'ALTIN ÜRÜN';
-        if (margin >= 5) return 'MAKUL';
-        if (margin > 0) return 'KRİTİK';
-        return 'ZARAR EDİYOR';
+        if (margin >= 5) return 'MAKUL KÂR';
+        if (margin > 0) return 'RİSKLİ/KRİTİK';
+        return 'ZARAR/KANAMA';
     };
 
-    if (loading) return (
-        <div className="space-y-8 animate-pulse p-4">
-            <div className="h-12 bg-slate-50 dark:bg-white/5 rounded-2xl w-1/3" />
-            <div className="space-y-4">
-                {Array.from({ length: 10 }).map((_, i) => (
-                    <div key={i} className="h-24 bg-slate-50 dark:bg-white/5 rounded-2xl" />
-                ))}
-            </div>
-        </div>
-    );
-
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Header Area */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Marketplace Profitability Heatmap</h2>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Real-time FIFO Cost & Net Margin Analysis</p>
+        <div className="space-y-6 animate-in fade-in duration-500">
+            {/* V2 Terminal Header & Filters */}
+            <div className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+                    <div>
+                        <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-2">
+                            <IconTrendingUp className="w-6 h-6 text-indigo-500" />
+                            KARLILIK (P&L) TERMİNALİ
+                        </h2>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Zaman Serisi (Time-Series) Fatura Dağılım Motoru</p>
+                    </div>
+
+                    {/* Time Filter Pills */}
+                    <div className="flex bg-slate-50 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 shrink-0">
+                        {[
+                            { id: 'TODAY', label: 'BUGÜN' },
+                            { id: '1W', label: '1 HAFTA' },
+                            { id: '1M', label: '1 AY' },
+                            { id: '3M', label: '3 AY' },
+                            { id: '1Y', label: '1 YIL' },
+                            { id: 'ALL', label: 'TÜM ZAMANLAR' }
+                        ].map(tf => (
+                            <button
+                                key={tf.id}
+                                onClick={() => setTimeFilter(tf.id)}
+                                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${timeFilter === tf.id ? 'bg-white dark:bg-[#1e293b] text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-white/10' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                {tf.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-                <div className="relative">
-                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input
-                        type="text"
-                        placeholder="SKU veya Ürün adı ile ara..."
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                        className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-10 py-2.5 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-indigo-200 dark:border-indigo-500/20 dark:border-indigo-200 dark:border-indigo-500/20 transition-all w-64"
-                    />
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pb-2 border-b border-slate-100 dark:border-white/5">
+                    <div className="relative">
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="SKU, Ürün adı veya Marka..."
+                            value={searchFilter}
+                            onChange={(e) => setSearchFilter(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-10 py-2.5 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-indigo-200 focus:ring-1 focus:ring-indigo-500"
+                        />
+                    </div>
+                    
+                    <select
+                        value={marketFilter}
+                        onChange={(e) => setMarketFilter(e.target.value)}
+                        className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:border-indigo-200 cursor-pointer"
+                    >
+                        <option value="ALL">Tüm Pazaryerleri</option>
+                        {uniqueMarkets.map(m => <option key={String(m)} value={String(m)}>{String(m).toUpperCase()}</option>)}
+                    </select>
+
+                    <select
+                        value={catFilter}
+                        onChange={(e) => setCatFilter(e.target.value)}
+                        className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:border-indigo-200 cursor-pointer"
+                    >
+                        <option value="ALL">Tüm Kategoriler</option>
+                        {uniqueCats.map(c => <option key={String(c)} value={String(c)}>{String(c).toUpperCase()}</option>)}
+                    </select>
+                </div>
+
+                {/* Master Summary Blocks */}
+                <div className="flex items-center gap-6 mt-6">
+                    <div>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Seçili Dönem Ciro</p>
+                        <p className="text-xl font-black text-slate-900 dark:text-white">{totalCiro.toLocaleString('tr-TR')} ₺</p>
+                    </div>
+                    <div>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Net Dönem Kârı</p>
+                        <p className={`text-xl font-black ${totalKar >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                            {totalKar.toLocaleString('tr-TR')} ₺
+                        </p>
+                    </div>
+                    <div className="flex-1 flex justify-end gap-6 text-right">
+                        <div>
+                            <p className="text-[9px] text-rose-500/70 font-bold uppercase">Toplam Kargo Kesintisi</p>
+                            <p className="text-sm font-bold text-rose-600 dark:text-rose-400">-{totalKargo.toLocaleString('tr-TR')} ₺</p>
+                        </div>
+                        <div>
+                            <p className="text-[9px] text-orange-500/70 font-bold uppercase">Komisyon Kesintisi</p>
+                            <p className="text-sm font-bold text-orange-600 dark:text-orange-400">-{totalKomisyon.toLocaleString('tr-TR')} ₺</p>
+                        </div>
+                        <div>
+                            <p className="text-[9px] text-gray-500 font-bold uppercase">Ürün Maliyeti (COGS)</p>
+                            <p className="text-sm font-bold text-gray-700 dark:text-gray-300">-{totalCogs.toLocaleString('tr-TR')} ₺</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Heatmap Grid */}
-            <div className="grid grid-cols-1 gap-4">
-                {filteredData.map((item) => (
-                    <div key={item.id} className="bg-white dark:bg-[#1e293b] !border-none rounded-[24px] shadow-sm md:shadow-md p-4 group hover:scale-[1.005] transition-all duration-300 relative border-l-4 border-l-transparent hover:border-l-emerald-500">
-                        <div className="grid grid-cols-12 gap-6 items-center">
-                            {/* Product Info */}
-                            <div className="col-span-3 space-y-1">
-                                <div className="flex items-center gap-2">
-                                    <IconPackage className="w-4 h-4 text-gray-500" />
-                                    <span className="text-[10px] font-bold text-gray-500 tracking-widest">{item.marketplace.toUpperCase()}</span>
+            {loading ? (
+                <div className="space-y-4 animate-pulse">
+                    {[1,2,3].map(i => <div key={i} className="h-28 bg-slate-50 dark:bg-[#1e293b] rounded-[24px]" />)}
+                </div>
+            ) : filteredData.length === 0 ? (
+                <div className="p-16 bg-white dark:bg-[#1e293b]/50 rounded-[24px] text-center border border-dashed border-slate-200 dark:border-white/10">
+                    <IconPackage className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">İşlenmiş Veri Bulunamadı</h3>
+                    <p className="text-xs text-gray-500 uppercase font-bold mt-2">Bu zaman aralığında herhangi bir kesinleşmiş pazaryeri faturası / dekontu işlenmemiş.</p>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {filteredData.map((item) => (
+                        <div key={item.id} className="bg-white dark:bg-[#1e293b] !border-none rounded-[16px] shadow-sm p-4 group hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 border-l-4 border-l-transparent hover:border-l-indigo-500 transition-all cursor-default">
+                            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                                
+                                {/* 1. Product Context */}
+                                <div className="flex-1 w-full flex items-center gap-4">
+                                    <div className={`shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5`}>
+                                        <Layers className="w-6 h-6 text-slate-400" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 font-black tracking-widest leading-none">
+                                                {item.marketplace.toUpperCase()}
+                                            </span>
+                                            {item.brand && item.brand !== 'GENEL' && (
+                                                <span className="text-[9px] text-indigo-500 font-bold uppercase truncate">{item.brand}</span>
+                                            )}
+                                        </div>
+                                        <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">{item.productName}</h3>
+                                        <p className="text-[10px] text-gray-500 font-mono tracking-tighter uppercase">{item.productCode} • {item.saleCount} Adet Satış</p>
+                                    </div>
                                 </div>
-                                <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">{item.productName}</h3>
-                                <p className="text-[10px] text-gray-500 font-mono tracking-tighter uppercase">{item.productCode} • {item.category || 'GENEL'}</p>
-                            </div>
 
-                            {/* Revenue & Margin Heat Area */}
-                            <div className="col-span-4 grid grid-cols-3 gap-4 border-x border-slate-200 dark:border-white/5 px-6">
-                                <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Gross Revenue</p>
-                                    <p className="text-sm font-black text-slate-900 dark:text-white">{item.grossRevenue.toLocaleString('tr-TR')} ₺</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Net Profit</p>
-                                    <p className={`text-sm font-black ${item.netProfit > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                                        {item.netProfit.toLocaleString('tr-TR')} ₺
-                                    </p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Net Margin</p>
-                                    <div className={`text-xs font-black px-2 py-1 rounded-lg border ${getMarginColor(item.margin)}`}>
-                                        {item.margin.toFixed(1)}%
+                                {/* 2. Financial Metrics Cube */}
+                                <div className="grid grid-cols-4 gap-4 xl:gap-8 items-center border-l lg:border-l border-slate-200 dark:border-white/5 pl-6 w-full lg:w-auto shrink-0">
+                                    <div className="text-right">
+                                        <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Brüt Ciro</p>
+                                        <p className="text-[13px] font-black">{item.grossRevenue.toLocaleString('tr-TR')} ₺</p>
+                                    </div>
+                                    
+                                    {/* Exepenses Breakdown */}
+                                    <div className="flex flex-col gap-1 text-right text-[10px] uppercase font-bold text-gray-500 justify-center">
+                                        <div className="flex justify-between gap-4"><span className="text-orange-500/70">Kom:</span> <span>-{item.commission.toLocaleString('tr-TR')}</span></div>
+                                        <div className="flex justify-between gap-4"><span className="text-rose-500/70">Kargo:</span> <span>-{item.shipping.toLocaleString('tr-TR')}</span></div>
+                                        <div className="flex justify-between gap-4"><span className="text-indigo-500/70">Maliyet:</span> <span>-{item.fifoCost.toLocaleString('tr-TR')}</span></div>
+                                    </div>
+
+                                    {/* Profit */}
+                                    <div className="text-right">
+                                        <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Net Kâr</p>
+                                        <p className={`text-[15px] font-black ${item.netProfit > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                            {item.netProfit.toLocaleString('tr-TR')} ₺
+                                        </p>
+                                    </div>
+
+                                    {/* Margin Heat */}
+                                    <div className="w-[100px] text-center border-l border-slate-200 dark:border-white/5 pl-4">
+                                        <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">{getStatusText(item.margin)}</p>
+                                        <div className={`text-sm font-black px-2 py-1 rounded-lg border ${getMarginColor(item.margin)}`}>
+                                            %{item.margin.toFixed(1)}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Cost Breakdown */}
-                            <div className="col-span-3 flex items-center justify-around gap-2 text-center border-r border-slate-200 dark:border-white/5 pr-6">
-                                <div>
-                                    <p className="text-[9px] text-gray-500 font-bold uppercase mb-1 flex items-center gap-1">
-                                        <Layers className="w-3 h-3" /> FIFO Cost
-                                    </p>
-                                    <p className="text-xs font-bold text-gray-300">{item.fifoCost.toLocaleString('tr-TR')} ₺</p>
-                                </div>
-                                <div>
-                                    <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Fees</p>
-                                    <p className="text-xs font-bold text-gray-400">{(item.commission + item.shipping + item.otherFees).toLocaleString('tr-TR')} ₺</p>
-                                </div>
-                            </div>
-
-                            {/* Status & Action */}
-                            <div className="col-span-2 flex items-center justify-between pl-4">
-                                <div className="text-right">
-                                    <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Health Signal</p>
-                                    <p className={`text-[10px] font-black tracking-tight ${getMarginColor(item.margin).split(' ')[0]}`}>
-                                        {getStatusText(item.margin)}
-                                    </p>
-                                </div>
-                                <button className="p-2 bg-slate-50 dark:bg-white/5 hover:bg-indigo-500/20 rounded-xl transition-all text-gray-500 hover:text-indigo-600 dark:text-indigo-400">
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
-                            </div>
                         </div>
-                    </div>
-                ))}
-
-                {filteredData.length === 0 && (
-                    <div className="p-12 bg-white dark:bg-[#1e293b]/50 !border-none rounded-[24px] shadow-sm text-center space-y-4">
-                        <IconAlert className="w-12 h-12 text-gray-600 mx-auto" />
-                        <h3 className="text-xl font-bold text-gray-400">P&L Verisi Bulunamadı</h3>
-                        <p className="text-sm text-gray-500 max-w-sm mx-auto">
-                            Henüz bu kriterlere uygun satış veya hakediş kaydı işlenmemiş.
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            {/* Legend */}
-            <div className="flex items-center gap-6 pt-8 border-t border-slate-200 dark:border-white/5">
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-indigo-500" />
-                    <span className="text-[10px] font-bold text-gray-500 uppercase">Golden ({'>'}20%)</span>
+                    ))}
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-amber-500" />
-                    <span className="text-[10px] font-bold text-gray-500 uppercase">Healthy ({'>'}5%)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-orange-500" />
-                    <span className="text-[10px] font-bold text-gray-500 uppercase">Critical ({'>'}0%)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-rose-600 dark:bg-rose-500" />
-                    <span className="text-[10px] font-bold text-gray-500 uppercase">Loss View</span>
-                </div>
-            </div>
+            )}
         </div>
     );
 };
