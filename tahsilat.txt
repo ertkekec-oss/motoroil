@@ -1,0 +1,11 @@
+254:     // Check Collection State
+258:     const [isProcessingCollection, setIsProcessingCollection] = useState(false);
+266:         setIsProcessingCollection(true);
+270:                 showSuccess("Başarılı", `${activeCheck.type.includes('Alınan') ? 'Tahsilat' : 'Ödeme'} işlemi tamamlandı.`);
+280:             setIsProcessingCollection(false);
+808:         if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider';
+841:                     <Link href={`/payment?amount=${overdueAmount + todayAmount}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`} style={{ marginLeft: '12px', padding: '6px 12px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', color: 'white', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '11px', fontWeight: '800', textDecoration: 'none' }}>Tahsil Et</Link>
+917:                             href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
+920:                             <span>+</span> Tahsilat Al
+1736:                                                         {(item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider') && (
+2643:                                     <span className="text-base font-bold text-amber-600 dark:text-amber-500">2. Eski Tahsilatı İptal Et & Tümünü Vadelendir</span>
