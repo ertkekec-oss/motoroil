@@ -16,8 +16,7 @@ import {
     IconFileText,
     IconSettings,
     IconCornerUpRight
-} from "@/components/icons/PremiumIcons";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 
 const WORKFLOW = [
@@ -27,15 +26,16 @@ const WORKFLOW = [
     { id: 'READY', label: 'Faturalanacak' },
 ];
 
-export default function ServiceOrderDetailPage({ params }: { params: { id: string } }) {
+export default function ServiceOrderDetailPage() {
     const router = useRouter();
+    const params = useParams();
     const [status, setStatus] = useState('PENDING');
     const [items, setItems] = useState<any[]>([]);
     const [orderData, setOrderData] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!params.id || params.id === 'new') return; // 'new' is handled by different page
+        if (!params || !params.id || params.id === 'new') return; // 'new' is handled by different page
         fetch(`/api/service-v2/${params.id}`)
             .then(res => res.json())
             .then(data => {
@@ -61,7 +61,7 @@ export default function ServiceOrderDetailPage({ params }: { params: { id: strin
     if (isLoading) return <div className="p-10 text-center animate-pulse font-bold text-slate-500">YÜKLENİYOR...</div>;
     if (!orderData) return <div className="p-10 text-center font-bold text-slate-500">Maaalesef iş emri bulunamadı.</div>;
 
-    const totalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0);
+    const totalAmount = items.reduce((sum, item) => sum + Number(item.totalPrice || 0), 0);
     const taxAmount = totalAmount * 0.20;
     const finalAmount = totalAmount + taxAmount;
 
@@ -213,9 +213,9 @@ export default function ServiceOrderDetailPage({ params }: { params: { id: strin
                                                 </span>
                                             </td>
                                             <td className="py-4 px-4 text-sm font-bold text-slate-800">{item.name}</td>
-                                            <td className="py-4 px-4 text-center text-sm font-semibold text-slate-600">{item.quantity}</td>
-                                            <td className="py-4 px-4 text-right text-sm font-medium text-slate-500">{item.unitPrice.toLocaleString()} ₺</td>
-                                            <td className="py-4 px-4 text-right text-sm font-black text-slate-900">{item.total.toLocaleString()} ₺</td>
+                                            <td className="py-4 px-4 text-center text-sm font-semibold text-slate-600">{Number(item.quantity || 1)}</td>
+                                            <td className="py-4 px-4 text-right text-sm font-medium text-slate-500">{Number(item.unitPrice || 0).toLocaleString()} ₺</td>
+                                            <td className="py-4 px-4 text-right text-sm font-black text-slate-900">{Number(item.totalPrice || 0).toLocaleString()} ₺</td>
                                             <td className="py-4 px-4 text-right"><span className="text-red-400 hover:text-red-600 cursor-pointer text-xl">×</span></td>
                                         </tr>
                                     ))}
