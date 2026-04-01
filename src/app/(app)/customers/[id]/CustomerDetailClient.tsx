@@ -53,6 +53,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [activeTab, setActiveTab] = useState<'all' | 'sales' | 'payments' | 'documents' | 'services' | 'warranties' | 'checks' | 'reconciliations' | 'offers'>('all');
     const [documents, setDocuments] = useState<any[]>([]);
     const [services, setServices] = useState<any[]>([]);
+    const [assets, setAssets] = useState<any[]>([]);
+    const [warranties, setWarranties] = useState<any[]>(customer?.warranties || []);
     const [qrPlate, setQrPlate] = useState<string | null>(null);
     const [docsLoading, setDocsLoading] = useState(false);
     const [servicesLoading, setServicesLoading] = useState(false);
@@ -875,7 +877,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 tabs={[
                     { group: 'İŞLEMLER', items: [{ id: 'all', label: 'Tümü' }, { id: 'sales', label: 'Satış/Fatura' }, { id: 'payments', label: 'Finans' }] },
                     { group: 'RİSK & ONAY', items: [{ id: 'checks', label: 'Vadeler' }, { id: 'reconciliations', label: 'Mutabakat' }, { id: 'offers', label: 'Teklifler' }] },
-                    { group: 'SERVİS', items: [{ id: 'warranties', label: 'Garantiler' }, { id: 'services', label: 'Servis' }, { id: 'documents', label: 'Dosyalar' }] }
+                    { group: 'SERVİS & VARLIKLAR', items: [{ id: 'services', label: 'Servis & Varlıklar' }, { id: 'documents', label: 'Dosyalar' }] }
                 ]}
                 activeTab={activeTab}
                 onTabChange={(id) => { 
@@ -1215,86 +1217,6 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
                                                 <button onClick={() => handleViewDoc(doc.id, doc.fileType)} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-panel, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-white/10 hover:border-white/30">Aç</button>
                                                 <button onClick={() => handleDeleteDoc(doc.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-red-500/20">Sil</button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    ) : activeTab === 'warranties' ? (
-                        <div className="p-4 sm:p-6">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                                <div>
-                                    <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Dijital Garanti Karnesi & Takip</h3>
-                                    <p style={{ color: 'var(--text-muted, #888)', fontSize: '13px', marginTop: '6px', fontWeight: '500' }}>Müşteriye satılan ürünlerin garanti süreçlerini yönetin.</p>
-                                </div>
-                                <button
-                                    onClick={() => setWarrantyModalOpen(true)}
-                                    className="h-[36px] px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
-                                >
-                                    🛡️ Garanti Başlat
-                                </button>
-                            </div>
-
-                            {warranties.length === 0 ? (
-                                <div className="p-10 text-center text-slate-500 dark:text-slate-400 font-semibold text-[14px] bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm">
-                                    Henüz kayıtlı garanti karnesi bulunmuyor.
-                                </div>
-                            ) : (
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                                    {warranties.map(w => (
-                                        <div key={w.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-500/30" style={{
-                                            padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.08))',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                            background: 'linear-gradient(90deg, var(--bg-card, rgba(255,255,255,0.03)) 0%, rgba(255,255,255,0) 100%)',
-                                            transition: 'all 0.2s',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                                        }}>
-                                            <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                                                <div style={{
-                                                    width: '56px', height: '56px', borderRadius: '16px',
-                                                    background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px',
-                                                    border: '1px solid rgba(59, 130, 246, 0.2)'
-                                                }}>
-                                                    🛡️
-                                                </div>
-                                                <div>
-                                                    <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main, white)' }}>{w.productName}</div>
-                                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #888)', marginTop: '4px', display: 'flex', gap: '12px', fontWeight: '500' }}>
-                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷</span> S. No: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.serialNo}</span></span>
-                                                        <span>•</span>
-                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🧾</span> Fatura: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.invoiceNo}</span></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
-                                                <div style={{ textAlign: 'center' }}>
-                                                    <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BAŞLANGIÇ</div>
-                                                    <div style={{ color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }}>{new Date(w.startDate).toLocaleDateString()}</div>
-                                                </div>
-
-                                                <div style={{ textAlign: 'center' }}>
-                                                    <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BİTİŞ</div>
-                                                    <div style={{ color: '#ef4444', fontWeight: '700', fontSize: '14px' }}>{new Date(w.endDate).toLocaleDateString()}</div>
-                                                </div>
-
-                                                <div style={{ textAlign: 'right', minWidth: '160px' }}>
-                                                    <div style={{
-                                                        padding: '8px 16px', borderRadius: '8px',
-                                                        background: w.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                                        color: w.status === 'Active' ? '#10b981' : '#ef4444',
-                                                        border: `1px solid ${w.status === 'Active' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                                                        fontSize: '12px', fontWeight: '800',
-                                                        display: 'inline-flex', alignItems: 'center', gap: '6px'
-                                                    }}>
-                                                        {w.status === 'Active' ? '✅ Garantisi Devam Ediyor' : '❌ Süresi Doldu'}
-                                                    </div>
-                                                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #666)', marginTop: '8px', fontWeight: '600' }}>
-                                                        G. Süresi: {w.period}
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                     ))}

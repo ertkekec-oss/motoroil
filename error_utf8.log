@@ -1,0 +1,483 @@
+﻿node.exe : ÔÜá `eslint` co
+nfiguration in next.config
+.ts is no longer supported
+. See more info here: http
+s://nextjs.org/docs/app/ap
+i-reference/cli/next#next-
+lint-options
+At line:1 char:1
++ & "C:\Program Files\node
+js/node.exe" "C:\Program F
+iles\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (Ô  
+  Üá `eslint` co...xt-l   
+ int-options:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+ÔÜá Invalid next.config.ts
+ options detected: 
+ÔÜá     Unrecognized key(s
+) in object: 'eslint'
+ÔÜá See more info here: ht
+tps://nextjs.org/docs/mess
+ages/invalid-next-config
+Ôû▓ Next.js 16.1.4 (Turbopack)
+- Environments: .env.production.local, .env.local, .env.production, .env
+
+ÔÜá The "middleware" file 
+convention is deprecated. 
+Please use "proxy" instead
+. Learn more: https://next
+js.org/docs/messages/middl
+eware-to-proxy
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build fai
+led with 3 errors:
+./src/app/(app)/service/[i
+d]/ServiceDetailClient.tsx
+:7:1
+Module not found: Can't re
+solve '@/components/Enterp
+riseCommandCenter'
+[0m [90m  5 |[39m [36m
+import[39m { useModal } 
+[36mfrom[39m [32m'@/cont
+exts/ModalContext'[39m[3
+3m;[39m
+ [90m  6 |[39m [36mimpo
+rt[39m { [33mChevronLeft
+[39m[33m,[39m [33mSave
+[39m[33m,[39m [33mPlus
+[39m[33m,[39m [33mTras
+h2[39m[33m,[39m [33mSh
+ield[39m[33m,[39m [33m
+Wrench[39m[33m,[39m [3
+3mPackage[39m[33m,[39m 
+[33mTruck[39m[33m,[39m
+ [33mUser[39m[33m,[39m
+ [33mClock[39m[33m,[39
+m [33mCheckCircle[39m } 
+[36mfrom[39m [32m'lucid
+e-react'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 
+ 7 |[39m [36mimport[39m
+ [33mEnterpriseCommandCen
+ter[39m [36mfrom[39m [
+32m'@/components/Enterpris
+eCommandCenter'[39m[33m;
+[39m
+ [90m    |[39m [31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m [36mexpo
+rt[39m [36mdefault[39m 
+[36mfunction[39m [33mSe
+rviceDetailClient[39m({ i
+d }[33m:[39m { id[33m:
+[39m string }) {
+ [90m 10 |[39m     [36m
+const[39m { showError[33
+m,[39m showSuccess } [33
+m=[39m useModal()[33m;[
+39m[0m
+
+Import map: aliased to rel
+ative './src/components/En
+terpriseCommandCenter' ins
+ide of [project]/
+
+
+Import trace:
+  Server Component:
+    ./src/app/(app)/servic
+e/[id]/ServiceDetailClient
+.tsx
+    ./src/app/(app)/servic
+e/[id]/page.tsx
+
+https://nextjs.org/docs/me
+ssages/module-not-found
+
+
+./src/app/(app)/service/Se
+rviceDashboardClient.tsx:7
+:1
+Export Tool doesn't exist 
+in target module
+[0m [90m  5 |[39m [36m
+import[39m { useRouter } 
+[36mfrom[39m [32m'next/
+navigation'[39m[33m;[39
+m
+ [90m  6 |[39m [36mimpo
+rt[39m { useApp } [36mfr
+om[39m [32m'@/contexts/A
+ppContext'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 
+ 7 |[39m [36mimport[39m
+ { [33mWrench[39m[33m,
+[39m [33mShieldCheck[39m
+[33m,[39m [33mHardHat[
+39m[33m,[39m [33mFileTe
+xt[39m[33m,[39m [33mCh
+evronRight[39m[33m,[39m
+ [33mActivity[39m[33m,
+[39m [33mSearch[39m[33m
+,[39m [33mTool[39m[33m
+,[39m [33mMapPin[39m } 
+[36mfrom[39m [32m'lucid
+e-react'[39m[33m;[39m
+ [90m    |[39m [31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m [36mexpo
+rt[39m [36mdefault[39m 
+[36mfunction[39m [33mSe
+rviceDashboardClient[39m(
+) {
+ [90m 10 |[39m     [36m
+const[39m router [33m=[
+39m useRouter()[33m;[39m
+[0m
+
+The export Tool was not fo
+und in module [project]/no
+de_modules/lucide-react/di
+st/esm/lucide-react.js [ap
+p-client] (ecmascript).
+Did you mean to import Too
+lbox?
+All exports of the module 
+are statically known (It d
+oesn't have dynamic export
+s). So it's known statical
+ly that the requested expo
+rt doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/app/(app)/servic
+e/ServiceDashboardClient.t
+sx
+    ./src/app/(app)/servic
+e/page.tsx
+
+
+./src/app/(app)/service/Se
+rviceDashboardClient.tsx:7
+:1
+Export Tool doesn't exist 
+in target module
+[0m [90m  5 |[39m [36m
+import[39m { useRouter } 
+[36mfrom[39m [32m'next/
+navigation'[39m[33m;[39
+m
+ [90m  6 |[39m [36mimpo
+rt[39m { useApp } [36mfr
+om[39m [32m'@/contexts/A
+ppContext'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 
+ 7 |[39m [36mimport[39m
+ { [33mWrench[39m[33m,
+[39m [33mShieldCheck[39m
+[33m,[39m [33mHardHat[
+39m[33m,[39m [33mFileTe
+xt[39m[33m,[39m [33mCh
+evronRight[39m[33m,[39m
+ [33mActivity[39m[33m,
+[39m [33mSearch[39m[33m
+,[39m [33mTool[39m[33m
+,[39m [33mMapPin[39m } 
+[36mfrom[39m [32m'lucid
+e-react'[39m[33m;[39m
+ [90m    |[39m [31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m [36mexpo
+rt[39m [36mdefault[39m 
+[36mfunction[39m [33mSe
+rviceDashboardClient[39m(
+) {
+ [90m 10 |[39m     [36m
+const[39m router [33m=[
+39m useRouter()[33m;[39m
+[0m
+
+The export Tool was not fo
+und in module [project]/no
+de_modules/lucide-react/di
+st/esm/lucide-react.js [ap
+p-ssr] (ecmascript).
+Did you mean to import Too
+lbox?
+All exports of the module 
+are statically known (It d
+oesn't have dynamic export
+s). So it's known statical
+ly that the requested expo
+rt doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/app/(app)/servic
+e/ServiceDashboardClient.t
+sx
+    ./src/app/(app)/servic
+e/page.tsx
+
+
+    at <unknown> (./src/ap
+p/(app)/service/[id]/Servi
+ceDetailClient.tsx:7:1)
+    at <unknown> (https://
+nextjs.org/docs/messages/m
+odule-not-found)
+    at <unknown> (./src/ap
+p/(app)/service/ServiceDas
+hboardClient.tsx:7:1)
+    at <unknown> (./src/ap
+p/(app)/service/ServiceDas
+hboardClient.tsx:7:1)

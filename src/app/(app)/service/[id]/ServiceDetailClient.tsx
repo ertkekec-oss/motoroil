@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useModal } from '@/contexts/ModalContext';
-import { ChevronLeft, Save, Plus, Trash2, Shield, Wrench, Package, Truck, User, Clock, CheckCircle } from 'lucide-react';
+import { ChevronLeft, Save, Plus, Trash2, Shield, Wrench, Package, Truck, User, Clock, CheckCircle, ScanLine, ShoppingCart, FileText } from 'lucide-react';
 
 
 export default function ServiceDetailClient({ id }: { id: string }) {
@@ -122,64 +122,67 @@ export default function ServiceDetailClient({ id }: { id: string }) {
 
     return (
         <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1220]">
-            <div className="flex-shrink-0 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0B1220] z-10 sticky top-0 px-6 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/service" className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <div className="flex-shrink-0 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0B1220] z-10 sticky top-0 px-4 sm:px-6 py-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <Link href="/service" className="w-10 h-10 flex items-center justify-center rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shrink-0">
                             <ChevronLeft className="w-5 h-5" />
                         </Link>
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shrink-0 shadow-lg shadow-slate-900/20">
                             <Wrench className="w-5 h-5 text-white" />
                         </div>
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-3">
-                                <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">
+                        <div className="flex flex-col min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <h1 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none truncate">
                                     {order.customer?.name}
                                 </h1>
-                                <span className={`px-2 py-0.5 rounded-[6px] text-[10px] font-black uppercase border ${getStatusTheme(order.status)}`}>
+                                <span className={`px-2 py-0.5 rounded-[6px] text-[9px] sm:text-[10px] font-black uppercase border shrink-0 ${getStatusTheme(order.status)}`}>
                                     {order.status}
                                 </span>
                             </div>
-                            <span className="text-[12px] font-medium text-slate-500 mt-1">
-                                {order.customer?.phone} | {order.customer?.email}
+                            <span className="text-[11px] sm:text-[12px] font-medium text-slate-500 mt-1 truncate block">
+                                <span className="hidden sm:inline">{order.customer?.phone} | {order.customer?.email}</span>
+                                <span className="inline sm:hidden">{order.customer?.phone || 'Telefon Kaydı Yok'}</span>
                             </span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="flex flex-col items-end mr-4">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Toplam Tutar</span>
-                            <span className="text-[14px] font-black text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto bg-slate-50 sm:bg-transparent dark:bg-slate-800/50 sm:dark:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-transparent border-slate-100 dark:border-white/5">
+                        <div className="flex flex-col items-start sm:items-end mr-2 sm:mr-4">
+                            <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Ödenecek Tutar</span>
+                            <span className="text-[14px] sm:text-[16px] font-black text-emerald-600 dark:text-emerald-400 leading-none">
                                 {Number(order.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                             </span>
                         </div>
-                        <button
-                            onClick={() => handleUpdateStatus('IN_PROGRESS')}
-                            disabled={order.status === 'IN_PROGRESS'}
-                            className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
-                        >
-                            İşleme Al
-                        </button>
-                        <button
-                            onClick={() => handleUpdateStatus('COMPLETED')}
-                            disabled={order.status === 'COMPLETED'}
-                            className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
-                        >
-                            <CheckCircle className="w-4 h-4" /> Tamamla
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => handleUpdateStatus('IN_PROGRESS')}
+                                disabled={order.status === 'IN_PROGRESS'}
+                                className="h-[32px] sm:h-[36px] px-3 sm:px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[11px] sm:text-[12px] flex items-center justify-center transition-colors shadow-sm disabled:opacity-50"
+                            >
+                                İşleme Al
+                            </button>
+                            <button
+                                onClick={() => handleUpdateStatus('COMPLETED')}
+                                disabled={order.status === 'COMPLETED'}
+                                className="h-[32px] sm:h-[36px] px-3 sm:px-4 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 rounded-[8px] font-bold text-[11px] sm:text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+                            >
+                                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Tamamla
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex gap-6 mt-6 border-b border-slate-200 dark:border-white/5">
+                <div className="flex gap-4 sm:gap-6 mt-4 sm:mt-6 border-b border-slate-200 dark:border-white/5 overflow-x-auto custom-scroll -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
                     {[
                         { id: 'details', label: 'İş Emri Detayı' },
-                        { id: 'parts', label: 'Yedek Parça' },
+                        { id: 'parts', label: 'Yedek Parça & Ürün Satış' },
                         { id: 'labor', label: 'İşçilik & Hizmet' }
                     ].map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`pb-3 text-[13px] font-bold transition-colors relative ${activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
+                            className={`pb-3 text-[12px] sm:text-[13px] font-bold transition-colors relative whitespace-nowrap ${activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
                         >
                             {tab.label}
                             {activeTab === tab.id && (
@@ -190,7 +193,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                 </div>
             </div>
 
-            <div className="flex-1 p-6 lg:p-10 max-w-[1400px] mx-auto w-full">
+            <div className="flex-1 p-4 sm:p-6 lg:p-10 max-w-[1400px] mx-auto w-full">
                 {activeTab === 'details' && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in zoom-in-95 duration-200">
                         <div className="lg:col-span-2 space-y-6">
@@ -249,37 +252,45 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                 )}
 
                 {(activeTab === 'parts' || activeTab === 'labor') && (
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-4 sm:p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 {activeTab === 'parts' ? <Package className="w-5 h-5 text-blue-500" /> : <Clock className="w-5 h-5 text-orange-500" />}
-                                {activeTab === 'parts' ? 'Kullanılan Yedek Parçalar' : 'Uygulanan İşçilikler'}
+                                {activeTab === 'parts' ? 'Kullanılan Yedek Parçalar & Ürün Satışı' : 'Uygulanan İşçilikler'}
                             </h3>
+                            {activeTab === 'parts' && (
+                                <button className="w-full sm:w-auto h-[36px] px-4 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/20">
+                                    <ScanLine className="w-4 h-4" />
+                                    Barkod / Katalogdan Seç (Upsell)
+                                </button>
+                            )}
                         </div>
 
                         {/* Add Item Form */}
-                        <div className="flex gap-4 mb-8 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-white/10">
+                        <div className="flex flex-col sm:flex-row gap-3 mb-8 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-[16px] border border-slate-200 dark:border-white/10">
                             <div className="flex-1">
                                 <label className="text-xs font-bold text-slate-500 mb-1.5 block">Hizmet / Parça Adı</label>
-                                <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} placeholder="Açıklama giriniz..." className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                                <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} placeholder="Manuel açıklama giriniz..." className="w-full h-[44px] sm:h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-[13px] font-medium focus:ring-2 focus:ring-blue-500/50 outline-none" />
                             </div>
-                            <div className="w-24">
-                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Miktar</label>
-                                <input type="number" min="1" value={newItemQty} onChange={e => setNewItemQty(Number(e.target.value))} className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                            <div className="flex gap-3">
+                                <div className="w-1/3 sm:w-20">
+                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Miktar</label>
+                                    <input type="number" min="1" value={newItemQty} onChange={e => setNewItemQty(Number(e.target.value))} className="w-full h-[44px] sm:h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-[13px] font-bold focus:ring-2 focus:ring-blue-500/50 outline-none text-center" />
+                                </div>
+                                <div className="w-2/3 sm:w-32">
+                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Birim Fiyat (₺)</label>
+                                    <input type="number" min="0" value={newItemPrice} onChange={e => setNewItemPrice(Number(e.target.value))} className="w-full h-[44px] sm:h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-[13px] font-bold focus:ring-2 focus:ring-blue-500/50 outline-none text-right" />
+                                </div>
                             </div>
-                            <div className="w-32">
-                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Birim Fiyat (₺)</label>
-                                <input type="number" min="0" value={newItemPrice} onChange={e => setNewItemPrice(Number(e.target.value))} className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
-                            </div>
-                            <div className="w-24 flex items-end">
-                                <button onClick={() => handleAddItem(activeTab === 'parts' ? 'PART' : 'LABOR')} className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex justify-center items-center gap-1 transition-colors">
-                                    <Plus className="w-4 h-4" /> Ekle
+                            <div className="w-full sm:w-32 flex items-end mt-2 sm:mt-0">
+                                <button onClick={() => handleAddItem(activeTab === 'parts' ? 'PART' : 'LABOR')} className="w-full h-[44px] sm:h-10 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-[10px] sm:rounded-lg text-sm sm:text-xs font-bold flex justify-center items-center gap-1.5 transition-all shadow-md active:scale-95">
+                                    <Plus className="w-5 h-5 sm:w-4 sm:h-4" /> {activeTab === 'parts' ? 'Parça Ekle' : 'İşçilik Ekle'}
                                 </button>
                             </div>
                         </div>
 
                         {/* Items Table */}
-                        <div className="overflow-x-auto">
+                        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5">

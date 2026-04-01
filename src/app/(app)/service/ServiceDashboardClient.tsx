@@ -142,7 +142,7 @@ export default function ServiceDashboardClient() {
                         </div>
                     </Link>
 
-                    <Link href="/field-sales" className="group rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 overflow-hidden relative transition-all hover:shadow-xl hover:-translate-y-1">
+                    <Link href="#" className="group rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 overflow-hidden relative transition-all hover:shadow-xl hover:-translate-y-1">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-all group-hover:bg-indigo-500/10"></div>
                         <div className="p-5 sm:p-6">
                             <div className="flex justify-between items-start mb-4">
@@ -152,10 +152,10 @@ export default function ServiceDashboardClient() {
                                 <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-slate-200 dark:text-slate-700" />
                             </div>
                             <h3 className="text-[13px] sm:text-[14px] font-bold text-slate-900 dark:text-white mb-1">Saha Ekibi</h3>
-                            <p className="text-[12px] sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium line-clamp-1">Kurulum, Rota ve Mobil Uygulama</p>
+                            <p className="text-[12px] sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium line-clamp-1">Canlı Takip & Check-in</p>
                         </div>
                         <div className="px-5 sm:px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-white/5 flex justify-between items-center text-[11px] sm:text-[12px] font-bold text-slate-600 dark:text-slate-300">
-                            Rota Yönetimi <ChevronRight className="w-4 h-4 text-indigo-500 transition-transform group-hover:translate-x-1" />
+                            Yakında Eklenecek <ChevronRight className="w-4 h-4 text-indigo-500 transition-transform group-hover:translate-x-1" />
                         </div>
                     </Link>
                 </div>
