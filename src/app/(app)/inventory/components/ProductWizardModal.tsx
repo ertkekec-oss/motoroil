@@ -863,6 +863,47 @@ function StepVariantsPriceLists({
 }
 
 function StepConnectedProducts({ mode, data, onChange, setCurrentStep }: any) {
+    const { showPrompt, showSuccess, showError, showConfirm } = useModal();
+    const [mappings, setMappings] = useState<any[]>([]);
+    const [loadingMappings, setLoadingMappings] = useState(false);
+
+    useEffect(() => {
+        if (data?.id) {
+            setLoadingMappings(true);
+            fetch(`/api/products/${data.id}/mappings`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) setMappings(d.mappings || []);
+                })
+                .catch(e => console.error("Mappings error:", e))
+                .finally(() => setLoadingMappings(false));
+        }
+    }, [data?.id]);
+
+    const handleRemoveMapping = async (mappingId: string) => {
+        showConfirm(
+            "Eşleştirmeyi Kaldır",
+            "Bu eşleştirmeyi kaldırmak istediğinize emin misiniz?",
+            async () => {
+                try {
+                    const res = await fetch(`/api/products/${data.id}/mappings`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mappingId })
+                    });
+                    const resData = await res.json();
+                    if (resData.success) {
+                        showSuccess("Başarılı", "Eşleştirme kaldırıldı");
+                        setMappings(prev => prev.filter(m => m.id !== mappingId));
+                    } else {
+                        showError("Hata", resData.error || "Kaldırılamadı.");
+                    }
+                } catch (error: any) {
+                    showError("Hata", error.message);
+                }
+            }
+        );
+    };
 
     const isMissingPrimary = !data.name || !data.category || !data.code || !data.price;
 
@@ -895,21 +936,49 @@ function StepConnectedProducts({ mode, data, onChange, setCurrentStep }: any) {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="p-8 bg-blue-50/50 dark:bg-blue-900/10 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl text-center space-y-4 cursor-pointer hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-all" onClick={() => { if(typeof window !== 'undefined') { window.location.href = '/integrations' } }}>
-                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto text-2xl">
-                        🔗
+                <div className="p-6 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl space-y-4 flex flex-col">
+                    <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center text-xl">
+                                🔗
+                            </div>
+                            <div>
+                                <h4 className="text-base font-bold text-slate-900 dark:text-white">Pazaryeri Eşleştirmeleri</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Bu ürünün bağlı olduğu online ilanlar</p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">E-Ticaret ve Bağlı Ürünler</h4>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mx-auto">
-                            Pazarama, Trendyol ve N11 gibi pazaryeri eşleştirmeleri ürün kaydedildikten sonra ana envanter ekranından veya direkt entegrasyon panelleri üzerinden yönetilebilecektir.
-                        </p>
-                    </div>
-                    <div className="pt-2">
-                        <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 text-xs font-bold rounded-lg mt-2">
-                            YÖNET & ENTEGRE ET
-                        </span>
-                    </div>
+                    
+                    {loadingMappings ? (
+                        <div className="text-xs text-slate-500 flex items-center gap-2 animate-pulse py-4">
+                            <div className="w-4 h-4 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin"></div>
+                            Eşleştirmeler yükleniyor...
+                        </div>
+                    ) : mappings && mappings.length > 0 ? (
+                        <div className="flex flex-col gap-2 max-h-[140px] overflow-y-auto pr-1 flex-1">
+                            {mappings.map(m => (
+                                <div key={m.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase">{m.marketplace}</span>
+                                        </div>
+                                        <span className="text-[11px] text-slate-500 font-mono mt-0.5">{m.marketplaceCode}</span>
+                                    </div>
+                                    <button onClick={() => handleRemoveMapping(m.id)} className="text-xs text-red-500 hover:text-red-700 font-medium bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-colors">
+                                        Kaldır
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-[#0f172a] p-4 rounded-xl border border-dashed border-slate-300 dark:border-white/20 text-center flex-1 flex flex-col justify-center">
+                            Henüz bu ürüne bağlı pazaryeri eşleştirmesi bulunmuyor.
+                        </div>
+                    )}
+                    
+                    <button onClick={() => { if(typeof window !== 'undefined') { window.location.href = '/integrations' } }} className="w-full mt-auto py-2.5 bg-white dark:bg-[#0f172a] border border-blue-200 dark:border-blue-900/30 text-blue-700 dark:text-blue-400 rounded-xl tracking-wide text-[13px] font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all">
+                        Eşleştirmeleri Yönet
+                    </button>
                 </div>
 
                 <div className="p-6 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl space-y-4">
