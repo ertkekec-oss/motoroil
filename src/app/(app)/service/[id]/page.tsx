@@ -1,297 +1,244 @@
 "use client";
 
-import { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
-import { useModal } from '@/contexts/ModalContext';
-import { useTheme } from '@/contexts/ThemeContext';
+import React, { useState } from "react";
 import { 
-    ArrowLeft, 
-    Printer, 
-    Play, 
-    CheckCircle2, 
-    FileText, 
-    Camera, 
-    Trash2, 
-    Clock, 
-    User, 
-    Package, 
-    CreditCard, 
-    Wrench, 
-    Info, 
-    ChevronDown,
-} from 'lucide-react';
+    EnterpriseSectionHeader, 
+    EnterpriseButton, 
+    EnterpriseCard,
+    EnterpriseBadge
+} from "@/components/ui/enterprise";
+import { 
+    IconWrench, 
+    IconCheck, 
+    IconAlertCircle, 
+    IconActivity,
+    IconSave,
+    IconPrinter,
+    IconFileText,
+    IconSettings,
+    IconCornerUpRight
+} from "@/components/icons/PremiumIcons";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-export default function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+// Placeholder data for UI mock
+const TICKET_DATA = {
+    id: "SRO-8002",
+    status: "IN_PROGRESS",
+    complaint: "Motor Yağ Kaçağı ve Soğutma Fanı Çalışmıyor",
+    createdAt: "2026-04-01T09:30:00Z",
+    asset: {
+        primaryId: "34ABC212",
+        brand: "Yamaha",
+        model: "Tracer 900",
+        km: 45000,
+        type: "Motosiklet"
+    },
+    customer: {
+        name: "Ahmet Yılmaz",
+        phone: "+90 532 999 88 77"
+    },
+    technician: "Yalçın Usta",
+    items: [
+        { id: 1, type: 'PART', name: 'Yamalube 10W-40', quantity: 3, unitPrice: 450, total: 1350 },
+        { id: 2, type: 'PART', name: 'Yağ Filtresi', quantity: 1, unitPrice: 320, total: 320 },
+        { id: 3, type: 'LABOR', name: 'Periyodik Bakım İşçiliği', quantity: 1, unitPrice: 1500, total: 1500 },
+        { id: 4, type: 'OUTSOURCED', name: 'Radyatör Kaynağı (Dış Servis)', quantity: 1, unitPrice: 850, total: 850 },
+    ]
+};
+
+const WORKFLOW = [
+    { id: 'PENDING', label: 'Kabul' },
+    { id: 'IN_PROGRESS', label: 'İşlemde' },
+    { id: 'WAITING_APPROVAL', label: 'Onay Bekliyor' },
+    { id: 'READY', label: 'Faturalanacak' },
+];
+
+export default function ServiceOrderDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
-    const { id } = use(params);
-    const { theme } = useTheme();
-    const { showSuccess, showError, showConfirm } = useModal();
-    const isLight = theme === 'light';
+    const [status, setStatus] = useState(TICKET_DATA.status);
+    const [items, setItems] = useState(TICKET_DATA.items);
 
-    const [service, setService] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [technicians, setTechnicians] = useState<any[]>([]);
-    const [elapsedTime, setElapsedTime] = useState<string>('00:00:00');
-    const [isActionsOpen, setIsActionsOpen] = useState(false);
-
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const [sRes, tRes] = await Promise.all([
-                fetch(`/api/services/${id}`),
-                fetch('/api/staff')
-            ]);
-            const sData = await sRes.json();
-            const tData = await tRes.json();
-            if (sData.success) setService(sData.service);
-            if (tData.success) setTechnicians(tData.staff.filter((s: any) => s.type === 'service' || s.role === 'service' || !s.role));
-        } catch (e) { showError('Hata', 'Veri alınamadı.'); }
-        finally { setLoading(false); }
-    };
-
-    useEffect(() => { fetchData(); }, [id]);
-
-    useEffect(() => {
-        if (!service || service.status !== 'İşlemde' || !service.startTime) {
-            setElapsedTime('00:00:00');
-            return;
-        }
-        const interval = setInterval(() => {
-            const start = new Date(service.startTime).getTime();
-            const now = new Date().getTime();
-            const diff = now - start;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff / (1000 * 60)) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-            setElapsedTime(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [service?.status, service?.startTime]);
-
-    const handleUpdate = async (payload: any) => {
-        try {
-            const res = await fetch(`/api/services/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.success) { setService(data.service); return true; }
-            return false;
-        } catch (e) { return false; }
-    };
-
-    const handleStatusChange = async (newStatus: string) => {
-        const payload: any = { status: newStatus };
-        if (newStatus === 'İşlemde') payload.startTime = new Date().toISOString();
-        if (newStatus === 'Tamamlandı') payload.endTime = new Date().toISOString();
-        const success = await handleUpdate(payload);
-        if (success) { showSuccess('Güncellendi', `İş emri #${id.slice(-6)} artık ${newStatus}.`); setIsActionsOpen(false); }
-    };
-
-    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64 = reader.result as string;
-            const currentPhotos = service?.photos || [];
-            handleUpdate({ photos: [...currentPhotos, base64] });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handlePayment = () => {
-        const total = (totalParts + (service.activeLaborCost || 500)) * 1.2;
-        router.push(`/payment?amount=${total.toFixed(0)}&title=ServisBedeli&ref=SRV-${service.id}&customerId=${service.customerId}`);
-    };
-
-    if (loading || !service) return <div className={`flex h-screen items-center justify-center ${isLight ? 'bg-[#F7F8FA] text-[#9CA3AF]' : 'bg-[#030712] text-slate-400'}`}>Yükleniyor...</div>;
-
-    const items = service.items || [];
-    const totalParts = items.reduce((acc: number, item: any) => acc + (item.isWarranty ? 0 : (Number(item.price) || 0) * (Number(item.quantity) || 0)), 0);
-    const laborCost = service.laborCost || 500;
-    const subTotal = totalParts + (service.isLaborWarranty ? 0 : laborCost);
-    const tax = subTotal * 0.20;
-    const finalTotal = subTotal + tax;
-
-    // Enterprise Color System Tokens
-    const bgApp = isLight ? 'bg-[#F7F8FA]' : 'bg-[#020617]';
-    const bgMain = isLight ? 'bg-[#FFFFFF]' : 'bg-[#0f172a]';
-    const bgSidebar = isLight ? 'bg-[#F8FAFC]' : 'bg-[#151a2e]';
-    const bgMuted = isLight ? 'bg-[#F4F6F8]' : 'bg-slate-900/50';
-    const borderMain = isLight ? 'border-[#E1E5EA]' : 'border-slate-800';
-    const borderCard = isLight ? 'border-[#D9DEE5]' : 'border-slate-800';
-    const borderDivider = isLight ? 'border-[#ECEFF3]' : 'border-slate-800';
-    const textMain = isLight ? 'text-[#111827]' : 'text-white';
-    const textSecondary = isLight ? 'text-[#4B5563]' : 'text-slate-400';
-    const textMuted = isLight ? 'text-[#9CA3AF]' : 'text-slate-500';
+    const totalAmount = items.reduce((sum, item) => sum + item.total, 0);
+    const taxAmount = totalAmount * 0.20;
+    const finalAmount = totalAmount + taxAmount;
 
     return (
-        <div className={`min-h-screen ${bgApp} p-6 font-sans transition-colors duration-300`}>
-            <div className="max-w-[1400px] mx-auto space-y-6">
+        <div className="max-w-[1400px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40">
+            <EnterpriseSectionHeader 
+                title={`İŞ EMRİ: ${TICKET_DATA.id}`} 
+                subtitle={`${TICKET_DATA.asset.brand} ${TICKET_DATA.asset.model} • ${TICKET_DATA.customer.name}`}
+                icon={<IconWrench />}
+                onBack={() => router.push('/service')}
+                rightElement={
+                    <div className="flex gap-3 relative z-20">
+                        <EnterpriseButton variant="outline" className="flex items-center gap-2 bg-white rounded-xl">
+                            <IconPrinter className="w-4 h-4 text-slate-500" /> Servis Fişi Yazdır
+                        </EnterpriseButton>
+                        <EnterpriseButton 
+                            variant="primary" 
+                            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white border-none rounded-xl"
+                            onClick={() => alert('Müşteri Ekstre Hesabına Fatura İşlendi')}
+                        >
+                            <IconFileText className="w-4 h-4" /> FATURAYA DÖNÜŞTÜR
+                        </EnterpriseButton>
+                    </div>
+                } 
+            />
+
+            {/* Otonom Durum Çubuğu */}
+            <EnterpriseCard className="p-6 bg-slate-900 !border-none text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                 
-                {/* COMPACT HEADER */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div className="flex items-center gap-4">
-                        <button onClick={() => router.push('/service')} className={`w-9 h-9 rounded-lg border flex items-center justify-center ${bgMain} ${borderMain} ${textSecondary} hover:bg-[#ECEFF3] transition-colors`}><ArrowLeft size={18} /></button>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h1 className={`text-xl font-semibold tracking-tight ${textMain}`}>Servis Kontrol Masası</h1>
-                                <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-widest border ${isLight ? 'bg-[#F1F3F5] border-[#D6DAE1] text-[#4B5563]' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>SRV-{id.slice(-6).toUpperCase()}</span>
-                            </div>
-                            <div className="flex items-center gap-2 mt-1">
-                                <span className={`text-xs font-semibold ${service.status === 'İşlemde' ? 'text-[#027A48]' : 'text-[#175CD3]'}`}>{service.status}</span>
-                                {service.status === 'İşlemde' && <span className={`text-[11px] font-mono ${textMuted}`}>({elapsedTime})</span>}
-                            </div>
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Canlı Durumu (Workflow)</p>
+                        <div className="flex bg-slate-800/80 p-1 rounded-[14px] ring-1 ring-white/10 shrink-0">
+                            {WORKFLOW.map(wf => (
+                                <button
+                                    key={wf.id}
+                                    onClick={() => setStatus(wf.id)}
+                                    className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${status === wf.id ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+                                >
+                                    {wf.label}
+                                </button>
+                            ))}
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 w-full md:w-auto">
-                        <button onClick={() => window.print()} className={`flex-1 md:flex-none h-9 px-4 rounded-lg border text-sm font-medium flex items-center justify-center gap-2 transition-colors ${bgMain} ${borderMain} ${textSecondary} hover:bg-[#F1F3F6]`}><Printer size={16} /> Yazdır</button>
-                        <div className="relative flex-1 md:flex-none">
-                            <button onClick={() => setIsActionsOpen(!isActionsOpen)} className="w-full h-9 px-4 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-                                İşlemler <ChevronDown size={14} className={isActionsOpen ? 'rotate-180' : ''} />
+                    
+                    {status === 'WAITING_APPROVAL' && (
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-amber-400 font-bold uppercase tracking-widest mb-1 animate-pulse">Onay Linki Gönderilmeye Hazır</span>
+                            <button onClick={() => window.open(`/p/approval/${TICKET_DATA.id}`, '_blank')} className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-xl text-xs font-black uppercase tracking-tight shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
+                                <BrandWhatsappIcon /> MÜŞTERİDEN ONAY İSTE
                             </button>
-                            {isActionsOpen && (
-                                <div className={`absolute right-0 top-full mt-2 w-52 rounded-xl border shadow-xl z-50 overflow-hidden py-1.5 ${bgMain} ${borderCard}`}>
-                                    <button onClick={() => handleStatusChange('İşlemde')} className={`w-full text-left px-4 py-2.5 text-sm font-medium text-[#027A48] hover:bg-[#ECFDF3] flex items-center gap-2`}><Play size={14} fill="currentColor" /> İşe Başla</button>
-                                    <button onClick={() => handleStatusChange('Tamamlandı')} className={`w-full text-left px-4 py-2.5 text-sm font-medium text-[#175CD3] hover:bg-[#EFF8FF] flex items-center gap-2`}><CheckCircle2 size={14} /> Bakımı Bitir</button>
-                                    <div className={`h-px my-1.5 ${borderDivider}`}></div>
-                                    <button onClick={() => router.push(`/offers?customerId=${service.customerId}&serviceId=${service.id}`)} className={`w-full text-left px-4 py-2.5 text-sm font-medium ${textSecondary} hover:bg-[#F1F3F6] flex items-center gap-2`}><FileText size={14} /> Teklif Hazırla</button>
-                                </div>
-                            )}
                         </div>
-                    </div>
+                    )}
+                </div>
+            </EnterpriseCard>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* SOL: Cihaz ve Müşteri Karnesi */}
+                <div className="space-y-6 lg:col-span-1">
+                    <EnterpriseCard className="p-6 h-full border-t-4 border-indigo-500">
+                        <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <IconActivity className="w-4 h-4 text-indigo-500" />
+                            CİHAZ / ARAÇ KARNESİ
+                        </h3>
+
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+                                <IconWrench className="w-8 h-8 opacity-50" />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-black text-slate-900 tracking-tight">{TICKET_DATA.asset.primaryId}</h4>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{TICKET_DATA.asset.brand} {TICKET_DATA.asset.model}</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                                <span className="text-xs text-slate-500 font-medium">Güncel Kilometre</span>
+                                <span className="text-sm font-bold text-slate-900">{TICKET_DATA.asset.km.toLocaleString()} KM</span>
+                            </div>
+                            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                                <span className="text-xs text-slate-500 font-medium">Yakıt Durumu</span>
+                                <span className="text-sm font-bold text-slate-900">Çeyrek Depo</span>
+                            </div>
+                            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                                <span className="text-xs text-slate-500 font-medium">Müşteri Şikayeti</span>
+                                <span className="text-xs font-bold text-slate-800 text-right w-2/3">{TICKET_DATA.complaint}</span>
+                            </div>
+                            <div className="flex justify-between items-center pt-2">
+                                <span className="text-xs text-slate-500 font-medium">Zimmetli Teknisyen</span>
+                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">{TICKET_DATA.technician}</span>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 p-4 bg-slate-50 rounded-xl ring-1 ring-slate-200/60">
+                            <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Hasar / Kozmetik Tespit</h4>
+                            <p className="text-sm text-slate-700 font-medium leading-relaxed">Arka stop lambasında çatlak mevcut, sele altında kılcal çizikler kayıt altına alındı. Müşteriye aktarıldı.</p>
+                        </div>
+                    </EnterpriseCard>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-                    {/* LEFT PANEL */}
-                    <div className="xl:col-span-3 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Profile 1 */}
-                            <div className={`p-6 rounded-xl border shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${bgMain} ${borderCard}`}>
-                                <div className={`flex items-center gap-4 mb-4 pb-4 border-b ${borderDivider}`}>
-                                    <div className="w-10 h-10 rounded-lg bg-[#EFF8FF] text-[#175CD3] flex items-center justify-center"><User size={20}/></div>
-                                    <div><div className={`text-[11px] font-semibold uppercase tracking-wider ${textMuted}`}>Müşteri Sahibi</div><div className={`font-semibold ${textMain}`}>{service.customer?.name}</div></div>
-                                </div>
-                                <div className="flex justify-between items-center"><span className={`text-xs ${textSecondary}`}>Telefon</span><span className={`text-sm font-medium ${textMain}`}>{service.customer?.phone || '-'}</span></div>
-                            </div>
-                            {/* Profile 2 */}
-                            <div className={`p-6 rounded-xl border shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${bgMain} ${borderCard}`}>
-                                <div className={`flex items-center gap-4 mb-4 pb-4 border-b ${borderDivider}`}>
-                                    <div className="w-10 h-10 rounded-lg bg-[#ECFDF3] text-[#027A48] flex items-center justify-center font-bold">🔧</div>
-                                    <div><div className={`text-[11px] font-semibold uppercase tracking-wider ${textMuted}`}>Araç / Cihaz</div><div className={`font-semibold ${textMain} tracking-widest`}>{service.plate || service.vehicleSerial || 'BELİRTİLMEMİŞ'}</div></div>
-                                </div>
-                                <div className="flex justify-between items-center"><span className={`text-xs ${textSecondary}`}>Model</span><span className={`text-sm font-medium ${textMain}`}>{service.vehicleBrand || '-'}</span></div>
-                            </div>
-                        </div>
-
-                        {/* ATELIER SECTION */}
-                        <div className={`rounded-xl border shadow-[0_1px_2px_rgba(16,24,40,0.04)] overflow-hidden ${bgMain} ${borderCard}`}>
-                            <div className={`px-6 py-4 border-b flex justify-between items-center ${bgMuted} ${borderDivider}`}>
-                                <h3 className={`text-sm font-semibold flex items-center gap-3 ${textMain}`}><Wrench size={16} className="text-[#2563EB]" /> Atölye Operasyonları</h3>
-                                <div className="flex items-center gap-3">
-                                    <span className={`text-[11px] font-semibold uppercase tracking-wider ${textMuted}`}>Atanan:</span>
-                                    <select value={service.technicianId || ''} onChange={(e) => handleUpdate({ technicianId: e.target.value })} className={`bg-transparent text-sm font-semibold outline-none border-b ${borderCard} pb-0.5 ${textMain}`}>
-                                        <option value="" className={isLight ? 'text-[#111827]' : 'text-[#111827]'}>Seçilmedi</option>
-                                        {technicians.map((t: any) => (<option key={t.id} value={t.id} className={isLight ? 'text-[#111827]' : 'text-[#111827]'}>{t.name}</option>))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                {/* Checklist */}
-                                <div className="space-y-4">
-                                    <h4 className={`text-[11px] font-bold uppercase tracking-wider ${textMuted}`}>Kontrol Listesi</h4>
-                                    <div className="space-y-2">
-                                        {(Object.keys(service.checklist || {})).map(item => (
-                                            <div key={item} className={`flex items-center gap-3 p-2.5 rounded-lg border ${isLight ? 'bg-[#F4F6F8]/50 border-[#EEF1F4]' : 'border-slate-800'}`}>
-                                                <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${service.checklist[item] ? 'bg-[#027A48] border-[#027A48] text-white' : (isLight ? 'border-[#D6DAE1]' : 'border-slate-700')}`}>{service.checklist[item] && <span className="font-bold text-[10px]">✓</span>}</div>
-                                                <span className={`text-xs font-medium ${textMain}`}>{item}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                {/* Parts */}
-                                <div className="space-y-4">
-                                    <h4 className={`text-[11px] font-bold uppercase tracking-wider ${textMuted}`}>Parça & Malzemeler</h4>
-                                    <div className="space-y-2">
-                                        {items.map((item: any, i: number) => (
-                                            <div key={i} className={`flex justify-between items-center p-3 rounded-lg border ${borderCard} ${bgMuted}`}>
-                                                <div className="flex items-center gap-3">
-                                                    <div className={textMuted}><Package size={14}/></div>
-                                                    <div><div className={`text-xs font-semibold ${textMain}`}>{item.name}</div><div className="text-[10px] text-[#2563EB] tracking-widest font-bold">x{item.quantity} KALEM</div></div>
-                                                </div>
-                                                <div className={`text-xs font-bold ${item.isWarranty ? 'text-[#027A48] italic' : textMain}`}>{item.isWarranty ? 'GARANTİ' : `₺${(item.price * item.quantity).toLocaleString()}`}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* GALLERY */}
-                        <div className={`rounded-xl border shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-6 space-y-4 ${bgMain} ${borderCard}`}>
-                            <div className="flex justify-between items-center">
-                                <h3 className={`text-sm font-semibold flex items-center gap-3 ${textMain}`}><Camera size={16} className="text-[#2563EB]" /> Servis Galerisi</h3>
-                                <label className="h-8 px-3 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[11px] font-bold uppercase cursor-pointer flex items-center gap-2 shadow-sm">📷 EKLE <input type="file" className="hidden" onChange={handlePhotoUpload} /></label>
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-                                {(service.photos || []).map((photo: string, idx: number) => (
-                                    <div key={idx} className={`aspect-square rounded-lg border overflow-hidden relative group ${borderDivider}`}>
-                                        <img src={photo} className="w-full h-full object-cover" />
-                                        <button onClick={() => { const n = [...service.photos]; n.splice(idx, 1); handleUpdate({photos: n}); }} className="absolute inset-0 bg-[#B42318]/80 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity"><Trash2 size={20}/></button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* SIDEBAR */}
-                    <div className="space-y-6">
-                        {/* FINANCE SECTION */}
-                        <div className={`rounded-xl border p-6 flex flex-col gap-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${bgSidebar} ${borderCard}`}>
-                            <div className="text-center pb-2">
-                                <span className={`text-[10px] font-bold uppercase tracking-widest ${textMuted}`}>Finansal Özet</span>
-                                <h3 className={`text-3xl font-bold tracking-tighter mt-1 ${textMain}`}><span className="text-lg opacity-30 mr-1">₺</span>{finalTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</h3>
-                            </div>
-                            <div className={`space-y-2 border-t pt-4 ${borderDivider}`}>
-                                <div className="flex justify-between text-xs"><span className={textSecondary}>Ürünler</span><span className={`font-medium ${textMain}`}>₺{totalParts.toLocaleString()}</span></div>
-                                <div className="flex justify-between text-xs text-[#2563EB]"><span className="font-medium">İşçilik</span><span className="font-bold">₺{laborCost.toLocaleString()}</span></div>
-                                <div className="flex justify-between text-xs"><span className={textSecondary}>KDV (%20)</span><span className={`font-medium ${textMain}`}>₺{tax.toLocaleString()}</span></div>
-                            </div>
-                            <button onClick={handlePayment} className="h-12 w-full rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all">
-                                <CreditCard size={18}/> Ödeme Sayfasına Git
+                {/* SAĞ: Reçete ve Yedek Parça */}
+                <div className="space-y-6 lg:col-span-2">
+                    <EnterpriseCard className="p-0 overflow-hidden flex flex-col h-full">
+                        <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 flex justify-between items-center">
+                            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                                <IconSettings className="w-4 h-4 text-slate-500" />
+                                SERVİS REÇETESİ (YEDEK PARÇA & İŞÇİLİK)
+                            </h3>
+                            <button className="text-[10px] font-black uppercase text-indigo-600 bg-white ring-1 ring-indigo-200 px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all">
+                                + KALEM EKLE (STOK)
                             </button>
                         </div>
+                        
+                        <div className="overflow-x-auto flex-1 p-2">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-slate-200 text-[10px] uppercase font-bold text-slate-400 bg-white">
+                                        <th className="py-3 px-4">TÜR</th>
+                                        <th className="py-3 px-4">ÜRÜN / AÇIKLAMA</th>
+                                        <th className="py-3 px-4 text-center">MİKTAR</th>
+                                        <th className="py-3 px-4 text-right">B.FİYATI</th>
+                                        <th className="py-3 px-4 text-right">TUTAR</th>
+                                        <th className="py-3 px-4"></th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {items.map((item, idx) => (
+                                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                            <td className="py-4 px-4">
+                                                <span className={`text-[9px] font-black uppercase py-1 px-2 rounded tracking-widest ${
+                                                    item.type === 'PART' ? 'bg-indigo-50 text-indigo-700' : 
+                                                    item.type === 'LABOR' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                                                }`}>
+                                                    {item.type === 'PART' ? 'PARÇA' : item.type === 'LABOR' ? 'İŞÇİLİK' : 'FASON'}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 text-sm font-bold text-slate-800">{item.name}</td>
+                                            <td className="py-4 px-4 text-center text-sm font-semibold text-slate-600">{item.quantity}</td>
+                                            <td className="py-4 px-4 text-right text-sm font-medium text-slate-500">{item.unitPrice.toLocaleString()} ₺</td>
+                                            <td className="py-4 px-4 text-right text-sm font-black text-slate-900">{item.total.toLocaleString()} ₺</td>
+                                            <td className="py-4 px-4 text-right"><span className="text-red-400 hover:text-red-600 cursor-pointer text-xl">×</span></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
-                        {/* TIMELINE */}
-                        <div className={`rounded-xl border p-6 space-y-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${bgMain} ${borderCard}`}>
-                            <h4 className={`text-[11px] font-bold uppercase tracking-wider text-center ${textMuted}`}>İşlem Bazlı Akış</h4>
-                            <div className="space-y-8 relative ml-3">
-                                <div className={`absolute left-[7px] top-2 bottom-2 w-[1px] ${borderDivider}`}></div>
-                                {[
-                                    {label: 'Kayıt Kabul', date: service.createdAt},
-                                    {label: 'Operasyon Başlatıldı', date: service.startTime},
-                                    {label: 'Bakım Bitiş', date: service.endTime}
-                                ].map((step, i) => (
-                                    <div key={i} className="flex gap-4 items-start relative z-10">
-                                        <div className={`w-4 h-4 rounded-full border-4 ${isLight ? 'border-[#F7F8FA]' : 'border-[#020617]'} ${step.date ? 'bg-[#2563EB] shadow-[0_0_10px_rgba(37,99,235,0.2)]' : (isLight ? 'bg-[#D1D5DB]' : 'bg-slate-800')}`}></div>
-                                        <div className="flex flex-col">
-                                            <span className={`text-[13px] font-semibold ${step.date ? textMain : textMuted}`}>{step.label}</span>
-                                            <span className={`text-[11px] mt-0.5 ${textMuted}`}>{step.date ? new Date(step.date).toLocaleTimeString('tr-TR') : 'Bekleniyor...'}</span>
-                                        </div>
-                                    </div>
-                                ))}
+                        {/* Toplam Matrisi */}
+                        <div className="bg-slate-50 border-t border-slate-200 p-6">
+                            <div className="flex flex-col gap-2 items-end">
+                                <div className="flex justify-between w-64 text-sm font-bold text-slate-500">
+                                    <span>Ara Toplam</span>
+                                    <span>{totalAmount.toLocaleString()} ₺</span>
+                                </div>
+                                <div className="flex justify-between w-64 text-sm font-bold text-slate-500">
+                                    <span>KDV (%20)</span>
+                                    <span>{taxAmount.toLocaleString()} ₺</span>
+                                </div>
+                                <div className="w-64 h-px bg-slate-300 my-1" />
+                                <div className="flex justify-between w-64 text-lg font-black text-slate-900">
+                                    <span>GENEL TOPLAM</span>
+                                    <span className="text-indigo-600">{finalAmount.toLocaleString()} ₺</span>
+                                </div>
                             </div>
                         </div>
-
-                        <div className={`p-4 rounded-xl border flex items-start gap-4 ${bgMuted} ${borderCard}`}>
-                            <Info size={18} className="text-[#B54708] shrink-0 mt-0.5" />
-                            <p className="text-[11px] font-medium text-[#4B5563] leading-relaxed italic">Atölye işlemleri bittikten sonra "Ödemeyi Al" adımına geçilebilir. Tüm parçalar otomatik düşülecektir.</p>
-                        </div>
-                    </div>
+                    </EnterpriseCard>
                 </div>
             </div>
         </div>
+    );
+}
+
+function BrandWhatsappIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+        </svg>
     );
 }
