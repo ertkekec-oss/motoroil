@@ -1,295 +1,196 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useApp } from '@/contexts/AppContext';
-import { useRouter } from 'next/navigation';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useModal } from '@/contexts/ModalContext';
+import React, { useState, useEffect } from "react";
 import { 
-    Wrench, 
-    Calendar, 
-    CheckCircle2, 
-    Clock, 
-    Search, 
-    TrendingUp,
-    Play,
-    Plus,
-    ChevronRight,
-    Activity,
-    Users
-} from 'lucide-react';
+    EnterpriseSectionHeader, 
+    EnterpriseButton, 
+    EnterpriseCard, 
+    EnterpriseInput 
+} from "@/components/ui/enterprise";
+import { 
+    IconActivity, 
+    IconWrench, 
+    IconPlus, 
+    IconSearch, 
+    IconCalendar, 
+    IconUsers,
+    IconCheck
+} from "@/components/icons/PremiumIcons";
+import { useRouter } from "next/navigation";
 
-export default function ServiceDashboard() {
-    const { currentUser, hasFeature } = useApp();
+// --- KANBAN CONFIG ---
+const WORKFLOW_STAGES = [
+    { id: 'PENDING', label: 'Randevu / Beklemede', color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400', border: 'border-slate-200' },
+    { id: 'IN_PROGRESS', label: 'Liftte / İşlemde', color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400', border: 'border-indigo-200' },
+    { id: 'WAITING_APPROVAL', label: 'Onay Bekliyor', color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400', border: 'border-amber-200' },
+    { id: 'WAITING_PART', label: 'Parça/Fason', color: 'bg-purple-50 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400', border: 'border-purple-200' },
+    { id: 'READY', label: 'Hazır / Faturalanacak', color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400', border: 'border-emerald-200' }
+];
+
+export default function ServiceV2Dashboard() {
     const router = useRouter();
-    const { theme } = useTheme();
-    const { showSuccess, showError } = useModal();
-    const isLight = theme === 'light';
+    const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
+    const [orders, setOrders] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const [activeTab, setActiveTab] = useState<'active' | 'scheduled' | 'performance'>('active');
-    const [allServices, setAllServices] = useState<any[]>([]);
-    const [technicians, setTechnicians] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-
+    // Mock Fetching for UI scaffolding
     useEffect(() => {
-        if (!hasFeature('service_desk') && currentUser !== null) {
-            router.push('/billing?upsell=service_desk');
-        }
-    }, [hasFeature, currentUser, router]);
-
-    const fetchData = async () => {
-        setIsLoading(true);
-        try {
-            const [sRes, tRes] = await Promise.all([
-                fetch('/api/services'),
-                fetch('/api/staff')
+        setTimeout(() => {
+            setOrders([
+                { id: 'SRO-1001', asset: { primaryIdentifier: '34ABC123', brand: 'BMW', model: 'M3' }, customer: { name: 'Ahmet Yılmaz' }, status: 'IN_PROGRESS', technician: 'Yalçın Usta', complaint: 'Yağ Kaçağı Var', totalAmount: '0.00' },
+                { id: 'SRO-1002', asset: { primaryIdentifier: '06XYZ99', brand: 'Honda', model: 'Civic' }, customer: { name: 'Veli Demir' }, status: 'WAITING_APPROVAL', technician: 'Ahmet Usta', complaint: 'Şanzıman Vuruyor', totalAmount: '14500.00' },
+                { id: 'SRO-1003', asset: { primaryIdentifier: 'ABC-MAC-BOOK', brand: 'Apple', model: 'MacBook Pro' }, customer: { name: 'Ayşe Kaya' }, status: 'PENDING', technician: 'Bekliyor', complaint: 'Ekran Çizildi', totalAmount: '0.00' },
+                { id: 'SRO-1004', asset: { primaryIdentifier: '34DEF456', brand: 'Yamaha', model: 'MT-07' }, customer: { name: 'Mehmet Han' }, status: 'READY', technician: 'Yalçın Usta', complaint: 'Periyodik Bakım', totalAmount: '3500.00' },
             ]);
-            const sData = await sRes.json();
-            const tData = await tRes.json();
-            
-            if (sData.success) setAllServices(sData.services || []);
-            if (tData.success) setTechnicians(tData.staff.filter((s: any) => s.type === 'service' || s.role === 'service' || !s.role));
-        } catch (error) { 
-            console.error(error); 
-        } finally { 
-            setIsLoading(false); 
-        }
-    };
-
-    useEffect(() => {
-        fetchData();
-        const intv = setInterval(fetchData, 60000);
-        return () => clearInterval(intv);
+            setIsLoading(false);
+        }, 800);
     }, []);
 
-    const handleUpdateStatus = async (jobId: string, newStatus: string) => {
-        try {
-            const payload: any = { status: newStatus };
-            if (newStatus === 'İşlemde') payload.startTime = new Date().toISOString();
-            if (newStatus === 'Tamamlandı') payload.endTime = new Date().toISOString();
-
-            const res = await fetch(`/api/services/${jobId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess('Durum Güncellendi', `İş emri #${jobId.slice(-6)} artık ${newStatus}.`);
-                fetchData();
-            }
-        } catch (error) { 
-            showError('Hata', 'Güncelleme sırasında bir hata oluştu.'); 
-        }
-    };
-
-    const filteredServices = allServices.filter(s => {
-        const matchesSearch = s.customer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                             s.plate?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             s.id.includes(searchQuery);
-        if (!matchesSearch) return false;
-        
-        if (activeTab === 'active') return s.status !== 'Teslim Edildi' && s.status !== 'İptal Edildi' && !s.appointmentDate;
-        if (activeTab === 'scheduled') return s.status === 'Beklemede' && s.appointmentDate;
-        return true;
-    });
-
-    // Theme Variables (Enterprise Light Mode Refinement)
-    const bgApp = isLight ? 'bg-[#F7F8FA]' : 'bg-[#020617]';
-    const bgMain = isLight ? 'bg-[#FFFFFF]' : 'bg-[#0f172a]';
-    const bgMuted = isLight ? 'bg-[#F4F6F8]' : 'bg-slate-900/50';
-    const bgHover = isLight ? 'hover:bg-[#ECEFF3]' : 'hover:bg-white/[0.04]';
-    const borderMain = isLight ? 'border-[#E1E5EA]' : 'border-slate-800';
-    const borderMuted = isLight ? 'border-[#EEF1F4]' : 'border-slate-900';
-    const borderCard = isLight ? 'border-[#D9DEE5]' : 'border-slate-800';
-    const textMain = isLight ? 'text-[#111827]' : 'text-slate-100';
-    const textSecondary = isLight ? 'text-[#4B5563]' : 'text-slate-400';
-    const textMuted = isLight ? 'text-[#9CA3AF]' : 'text-slate-500';
+    const groupedOrders = WORKFLOW_STAGES.map(stage => ({
+        ...stage,
+        items: orders.filter(o => o.status === stage.id)
+    }));
 
     return (
-        <div className={`min-h-screen ${bgApp} p-6 font-sans transition-colors duration-300`}>
-            <div className="max-w-[1400px] mx-auto space-y-6">
-                
-                {/* HEADER */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h1 className={`text-xl font-semibold tracking-tight ${textMain}`}>Atölye Yönetimi</h1>
-                        <p className={`text-sm ${textSecondary}`}>Servis süreçleri ve teknisyen verimlilik kontrolü.</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="relative">
-                            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-                            <input 
-                                type="text"
-                                placeholder="Plaka veya isim ara..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className={`h-9 w-64 pl-9 pr-4 rounded-lg border text-sm transition-all focus:ring-2 focus:ring-[#2563EB]/20 outline-none ${bgMain} ${isLight ? 'border-[#D6DAE1]' : borderMain} ${textMain}`}
-                            />
+        <div className="max-w-[1700px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40">
+            <EnterpriseSectionHeader 
+                title="SERVİS HİZMETLERİ V2" 
+                subtitle="Otonom Cihaz Karnesi • Kanban İş Akışı • Envanter Otomasyonu"
+                icon={<IconWrench />}
+                rightElement={
+                    <div className="flex gap-3 relative z-20">
+                        <div className="flex bg-white shadow-sm ring-1 ring-slate-200 rounded-xl p-1 overflow-hidden shrink-0">
+                            <button onClick={() => setViewMode('KANBAN')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'KANBAN' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>KANBAN PANO</button>
+                            <button onClick={() => setViewMode('LIST')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'LIST' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>LİSTE GÖRÜNÜMÜ</button>
                         </div>
-                        <button 
-                            onClick={() => router.push('/service/new')}
-                            className="h-9 px-4 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-medium flex items-center gap-2 transition-colors"
-                        >
-                            <Plus className="w-4 h-4" /> Yeni Kabul
-                        </button>
+                        <EnterpriseButton variant="primary" className="flex items-center gap-2 bg-slate-900 border-none rounded-xl" onClick={() => router.push('/service/new')}>
+                            <IconPlus className="w-4 h-4" /> YENİ SERVİS KABUL
+                        </EnterpriseButton>
                     </div>
-                </div>
+                } 
+            />
 
-                {/* KPI BOXES */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                        { label: 'Aktif Atölye', value: allServices.filter(s => s.status === 'İşlemde').length, icon: <Activity className="w-4 h-4" /> },
-                        { label: 'Bekleyen Kabul', value: allServices.filter(s => s.status === 'Beklemede' && !s.appointmentDate).length, icon: <Clock className="w-4 h-4" /> },
-                        { label: 'Gelecek Randevu', value: allServices.filter(s => s.appointmentDate).length, icon: <Calendar className="w-4 h-4" /> },
-                        { label: 'Bugün Tamamlanan', value: allServices.filter(s => s.status === 'Tamamlandı').length, icon: <CheckCircle2 className="w-4 h-4" /> },
-                    ].map((stat, i) => (
-                        <div key={i} className={`p-4 rounded-xl border shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${bgMain} ${borderCard}`}>
-                            <div className="flex items-center justify-between mb-2">
-                                <span className={`text-[11px] font-semibold uppercase tracking-wider ${textSecondary}`}>{stat.label}</span>
-                                <div className={textMuted}>{stat.icon}</div>
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <EnterpriseCard className="p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Atölye Doluluğu</p>
+                    <div className="flex items-baseline gap-2 mt-2">
+                        <h3 className="text-3xl font-black text-slate-900 dark:text-white">12</h3>
+                        <span className="text-sm font-bold text-gray-400">/ 15 Kapasite</span>
+                    </div>
+                </EnterpriseCard>
+                <EnterpriseCard className="p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform border-l-4 border-amber-400">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Onay Bekleyen Maliyet</p>
+                    <div className="flex items-baseline gap-2 mt-2">
+                        <h3 className="text-3xl font-black text-amber-600">14.500<span className="text-sm">₺</span></h3>
+                    </div>
+                </EnterpriseCard>
+                <EnterpriseCard className="p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform border-l-4 border-emerald-400">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Faturaya Hazır</p>
+                    <div className="flex items-baseline gap-2 mt-2">
+                        <h3 className="text-3xl font-black text-emerald-600">3.500<span className="text-sm">₺</span></h3>
+                    </div>
+                </EnterpriseCard>
+                <EnterpriseCard className="p-6 relative overflow-hidden bg-indigo-50 dark:bg-indigo-900/20 !border-indigo-200">
+                    <p className="text-[10px] text-indigo-600 font-bold uppercase tracking-widest">Aktif Teknisyenler</p>
+                    <div className="flex -space-x-3 mt-4">
+                        <div className="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm ring-2 ring-white z-20">AU</div>
+                        <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm ring-2 ring-white z-10">YU</div>
+                        <div className="w-10 h-10 rounded-full border border-dashed border-indigo-300 flex items-center justify-center text-indigo-400 text-xs font-bold">+2</div>
+                    </div>
+                </EnterpriseCard>
+            </div>
+
+            {/* Main Area */}
+            {isLoading ? (
+                <div className="h-64 flex items-center justify-center text-gray-400 font-bold uppercase text-xs animate-pulse">
+                    Veriler Yükleniyor...
+                </div>
+            ) : viewMode === 'KANBAN' ? (
+                <div className="flex gap-4 overflow-x-auto pb-8 custom-scroll snap-x">
+                    {groupedOrders.map(stage => (
+                        <div key={stage.id} className="min-w-[320px] max-w-[320px] shrink-0 flex flex-col snap-start">
+                            <div className={`px-4 py-3 rounded-t-2xl font-black text-xs uppercase tracking-wider flex justify-between items-center ${stage.color}`}>
+                                {stage.label}
+                                <span className="px-2 py-0.5 rounded bg-white/50 text-slate-800 text-[10px]">{stage.items.length}</span>
                             </div>
-                            <div className={`text-2xl font-semibold ${textMain}`}>{stat.value}</div>
+                            <div className="bg-slate-50 dark:bg-[#1e293b]/50 p-3 rounded-b-2xl border-x border-b border-slate-200 dark:border-white/5 min-h-[400px] flex flex-col gap-3">
+                                {stage.items.length === 0 ? (
+                                    <div className="h-24 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-xs font-bold text-slate-400">BOŞ</div>
+                                ) : (
+                                    stage.items.map(order => (
+                                        <div key={order.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-slate-100 hover:shadow-md transition-shadow cursor-pointer group" onClick={() => router.push(`/service/${order.id}`)}>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 rounded">{order.id}</span>
+                                                <span className="text-[10px] font-black text-slate-900">{order.asset.brand} {order.asset.model}</span>
+                                            </div>
+                                            <h4 className="font-black text-xl text-indigo-600 dark:text-indigo-400 mb-0.5 tracking-tight group-hover:text-indigo-700">{order.asset.primaryIdentifier}</h4>
+                                            <p className="text-xs text-slate-600 font-medium mb-4 max-w-full truncate">{order.customer.name}</p>
+                                            
+                                            <div className="bg-slate-50 p-2 rounded-lg text-xs font-medium text-slate-600 line-clamp-2 mb-3 h-10">
+                                                {order.complaint}
+                                            </div>
+
+                                            <div className="flex justify-between items-end border-t border-slate-100 pt-3">
+                                                <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase">
+                                                    <IconActivity className="w-3 h-3 text-slate-400" />
+                                                    {order.technician}
+                                                </div>
+                                                {Number(order.totalAmount) > 0 && (
+                                                    <div className="text-sm font-black text-emerald-600">{Number(order.totalAmount).toLocaleString('tr-TR')} ₺</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
-
-                {/* TABS */}
-                <div className={`flex items-center gap-1 border-b ${isLight ? 'border-[#ECEFF3]' : 'border-slate-800'}`}>
-                    <button 
-                        onClick={() => setActiveTab('active')}
-                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-[2px] ${activeTab === 'active' ? 'border-[#2563EB] text-[#2563EB]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-                    >
-                        Aktif İşler
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('scheduled')}
-                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-[2px] ${activeTab === 'scheduled' ? 'border-[#2563EB] text-[#2563EB]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-                    >
-                        Randevular
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('performance')}
-                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-[2px] ${activeTab === 'performance' ? 'border-[#2563EB] text-[#2563EB]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-                    >
-                        Verimlilik
-                    </button>
-                </div>
-
-                {/* CONTENT AREA */}
-                <div className={`min-h-[500px] rounded-xl border shadow-[0_1px_2px_rgba(16,24,40,0.04)] overflow-hidden ${bgMain} ${borderCard}`}>
-                    {activeTab === 'performance' ? (
-                        <PerformancePanel isLight={isLight} technicians={technicians} allServices={allServices} textMain={textMain} textSecondary={textSecondary} textMuted={textMuted} bgMuted={bgMuted} borderMain={borderMain} />
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm border-collapse">
-                                <thead>
-                                    <tr className={`${bgMuted} border-b ${borderMain}`}>
-                                        <th className={`px-6 py-3 font-medium text-[11px] uppercase tracking-wider ${textSecondary}`}>Durum</th>
-                                        <th className={`px-6 py-3 font-medium text-[11px] uppercase tracking-wider ${textSecondary}`}>Müşteri / Araç</th>
-                                        <th className={`px-6 py-3 font-medium text-[11px] uppercase tracking-wider ${textSecondary}`}>Teknisyen</th>
-                                        <th className={`px-6 py-3 font-medium text-[11px] uppercase tracking-wider ${textSecondary}`}>Giriş Tarihi</th>
-                                        <th className={`px-6 py-3 font-medium text-[11px] uppercase tracking-wider text-right ${textSecondary}`}>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody className={`divide-y ${borderMuted}`}>
-                                    {filteredServices.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={5} className="px-6 py-20 text-center text-slate-400 italic">Kayıt bulunamadı.</td>
-                                        </tr>
-                                    ) : filteredServices.map((s) => (
-                                        <tr key={s.id} className={`${bgHover} transition-colors group`}>
-                                            <td className="px-6 py-4">
-                                                <StatusBadge status={s.status} />
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col">
-                                                    <span className={`font-semibold ${textMain}`}>{s.customer?.name || 'Bilinmeyen Müşteri'}</span>
-                                                    <span className={`text-xs flex items-center gap-2 ${textSecondary}`}>
-                                                        {s.plate || 'ÜRÜN'} • {s.vehicleBrand || '-'}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {s.technician?.name ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold uppercase ${isLight ? 'bg-[#E9EDF2] text-[#4B5563]' : 'bg-slate-700 text-slate-500'}`}>
-                                                            {s.technician.name[0]}
-                                                        </div>
-                                                        <span className={textMain}>{s.technician.name}</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400 italic">Atanmadı</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={textSecondary}>{new Date(s.createdAt).toLocaleDateString('tr-TR')}</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <div className="flex justify-end items-center gap-2 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    {s.status === 'Beklemede' && (
-                                                        <button onClick={() => handleUpdateStatus(s.id, 'İşlemde')} title="Başlat" className={`p-1.5 rounded-md ${isLight ? 'text-[#027A48] hover:bg-[#ECFDF3]' : 'text-emerald-500 hover:bg-emerald-500/10'}`}><Play className="w-4 h-4 fill-current" /></button>
-                                                    )}
-                                                    {s.status === 'İşlemde' && (
-                                                        <button onClick={() => handleUpdateStatus(s.id, 'Tamamlandı')} title="Bitir" className={`p-1.5 rounded-md ${isLight ? 'text-[#175CD3] hover:bg-[#EFF8FF]' : 'text-blue-500 hover:bg-blue-500/10'}`}><CheckCircle2 className="w-4 h-4" /></button>
-                                                    )}
-                                                    <button onClick={() => router.push(`/service/${s.id}`)} className={`p-1.5 rounded-md ${isLight ? 'text-[#4B5563] hover:bg-[#ECEFF3]' : 'text-slate-400 hover:bg-slate-800'}`}><ChevronRight className="w-4 h-4" /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function StatusBadge({ status }: { status: string }) {
-    const config: any = {
-        'Beklemede': 'bg-[#FFFAEB] text-[#B54708] border-[#FFFAEB] dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
-        'İşlemde': 'bg-[#EFF8FF] text-[#175CD3] border-[#EFF8FF] dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-        'Tamamlandı': 'bg-[#ECFDF3] text-[#027A48] border-[#ECFDF3] dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
-    };
-    return (
-        <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase border ${config[status] || 'bg-slate-100 text-slate-600'}`}>
-            {status}
-        </span>
-    );
-}
-
-function PerformancePanel({ isLight, technicians, allServices, textMain, textSecondary, textMuted, bgMuted, borderMain }: any) {
-    return (
-        <div className="p-8 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                    <h3 className={`text-sm font-semibold ${textMain}`}>Teknisyen Performans Listesi</h3>
-                    <div className="space-y-3">
-                        {technicians.length === 0 ? <p className={textMuted}>Personel verisi yok.</p> : technicians.map((tech: any) => {
-                            const completed = allServices.filter((s: any) => s.technicianId === tech.id && s.status === 'Tamamlandı').length;
-                            const active = allServices.filter((s: any) => s.technicianId === tech.id && s.status === 'İşlemde').length;
-                            return (
-                                <div key={tech.id} className={`p-4 rounded-lg border flex justify-between items-center ${bgMuted} ${isLight ? 'border-[#E1E5EA]' : borderMain}`}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-xs uppercase">{tech.name[0]}</div>
-                                        <div><div className={`font-semibold ${textMain}`}>{tech.name}</div><div className={`text-[11px] font-medium uppercase tracking-wider text-[#175CD3]`}>{active} AKTİF İŞ</div></div>
-                                    </div>
-                                    <div className="text-right"><div className={`text-sm font-bold ${textMain}`}>{completed} BİTEN</div><div className={`text-[10px] ${textSecondary}`}>PUAN: 4.8</div></div>
-                                </div>
-                            );
-                        })}
+            ) : (
+                <EnterpriseCard className="p-0 overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 flex gap-4">
+                        <EnterpriseInput
+                            placeholder="Plaka, Müşteri veya İş Emri No..."
+                            icon={<IconSearch />}
+                            className="max-w-md bg-white"
+                        />
                     </div>
-                </div>
-                <div className={`p-6 rounded-xl border flex flex-col items-center justify-center text-center ${bgMuted} ${isLight ? 'border-[#E1E5EA]' : borderMain}`}>
-                    <TrendingUp className="w-12 h-12 text-[#2563EB] mb-4" />
-                    <h3 className={`font-bold ${textMain}`}>Haftalık Verimlilik Artışı</h3>
-                    <p className={`text-xs mt-2 max-w-[250px] ${textSecondary}`}>Operasyonel hız son 7 günde %12 artış gösterdi. Ortalama servis süresi 114 dakikaya düştü.</p>
-                </div>
-            </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-slate-200 dark:border-white/10 text-[10px] uppercase font-bold text-slate-500 bg-slate-50 dark:bg-slate-800">
+                                    <th className="py-4 px-6">İş Emri</th>
+                                    <th className="py-4 px-6">Cihaz / Araç</th>
+                                    <th className="py-4 px-6">Müşteri</th>
+                                    <th className="py-4 px-6">Teknisyen</th>
+                                    <th className="py-4 px-6">Durum</th>
+                                    <th className="py-4 px-6 text-right">Tutar</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                {orders.map(order => (
+                                    <tr key={order.id} className="hover:bg-slate-50/50 cursor-pointer" onClick={() => router.push(`/service/${order.id}`)}>
+                                        <td className="py-4 px-6 text-xs font-bold text-slate-600">{order.id}</td>
+                                        <td className="py-4 px-6">
+                                            <div className="font-black text-indigo-600 text-sm tracking-wide">{order.asset.primaryIdentifier}</div>
+                                            <div className="text-[10px] font-medium text-slate-500 uppercase">{order.asset.brand} {order.asset.model}</div>
+                                        </td>
+                                        <td className="py-4 px-6 text-sm font-medium text-slate-700">{order.customer.name}</td>
+                                        <td className="py-4 px-6 text-xs text-slate-500 font-bold">{order.technician}</td>
+                                        <td className="py-4 px-6">
+                                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${WORKFLOW_STAGES.find(s => s.id === order.status)?.color}`}>
+                                                {WORKFLOW_STAGES.find(s => s.id === order.status)?.label}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-6 text-right font-black text-slate-900">{Number(order.totalAmount).toLocaleString('tr-TR')} ₺</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </EnterpriseCard>
+            )}
         </div>
     );
 }

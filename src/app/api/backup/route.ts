@@ -18,7 +18,7 @@ export async function GET() {
             purchaseInvoices,
             users,
             settings,
-            serviceRecords,
+            serviceOrders,
             kasalar,
 
             // New Modules
@@ -64,7 +64,7 @@ export async function GET() {
             prisma.purchaseInvoice.findMany(),
             prisma.user.findMany(),
             prisma.appSettings.findMany(),
-            prisma.serviceRecord.findMany(),
+            prisma.serviceOrder.findMany(),
             prisma.kasa.findMany(),
 
             prisma.staff.findMany(),
@@ -112,7 +112,7 @@ export async function GET() {
                 purchaseInvoices,
                 users,
                 settings,
-                serviceRecords,
+                serviceOrders,
                 kasalar,
 
                 staff,

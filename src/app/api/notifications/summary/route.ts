@@ -54,7 +54,7 @@ export async function GET() {
         // 5. Servis Uyarıları (Service Warnings)
         // Active jobs or upcoming maintenance
         // @ts-ignore
-        const activeServices = await prisma.serviceRecord.findMany({
+        const activeServices = await prisma.serviceOrder.findMany({
             where: {
                 status: { notIn: ['Tamamlandı', 'Cancelled'] }
             },

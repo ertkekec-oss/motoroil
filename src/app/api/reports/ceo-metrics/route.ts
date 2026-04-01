@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
 
         // 4. Service Desk WIP (Serviste Bekleyen Cihaz Maliyeti/Değeri)
         // Pending services
-        const pendingServices = await (prisma as any).serviceRecord.findMany({
+        const pendingServices = await (prisma as any).serviceOrder.findMany({
             where: {
                 company: { tenantId },
                 status: { notIn: ['Completed', 'Tamamlandı', 'İptal', 'Cancelled'] }
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
 
         // D. Overdue Services
         // Check services older than 7 days and not completed
-        const overdueServices = await (prisma as any).serviceRecord.count({
+        const overdueServices = await (prisma as any).serviceOrder.count({
             where: {
                 company: { tenantId },
                 status: { notIn: ['Completed', 'Tamamlandı', 'İptal'] },

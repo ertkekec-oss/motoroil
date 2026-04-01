@@ -4,7 +4,7 @@ import { getSession } from './auth';
 // List of models that require strict Tenant isolation
 const operationalModels = [
     'product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order',
-    'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan',
+    'salesinvoice', 'purchaseinvoice', 'serviceorder', 'customerasset', 'serviceorderitem', 'globaltask', 'quote', 'paymentplan',
     'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
     'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'company', 'branch',
     'notification', 'staff', 'user', 'tenant', 'subscription', 'warranty', 'securityevent',
@@ -57,7 +57,7 @@ const prismaClientSingleton = () => {
                 balance: { needs: { balance: true }, compute(customer: any) { return Number(customer.balance); } },
                 points: { needs: { points: true }, compute(customer: any) { return Number(customer.points); } },
             },
-            serviceRecord: {
+            serviceOrder: {
                 totalAmount: { needs: { totalAmount: true }, compute(record: any) { return Number(record.totalAmount); } },
             },
             check: {
@@ -171,7 +171,7 @@ const prismaClientSingleton = () => {
                                     target.product = { company: { tenantId: effectiveTenantId } };
                                 } else if ([
                                     'product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order', 'salesinvoice', 'purchaseinvoice',
-                                    'servicerecord', 'quote', 'paymentplan', 'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
+                                    'serviceorder', 'customerasset', 'serviceorderitem', 'globaltask', 'quote', 'paymentplan', 'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
                                     'journal', 'account', 'coupon', 'suspendedsale', 'branch', 'securityevent',
                                     'appsettings', 'campaign', 'expense', 'marketplaceconfig', 'marketplacesettlement',
                                     'marketplaceorderfinance', 'marketplaceproductmap', 'marketplaceproductpnl',

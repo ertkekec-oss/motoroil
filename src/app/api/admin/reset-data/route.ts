@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
                 // 5. Sales & Purchases
                 await tx.salesInvoice.deleteMany({});
-                await tx.serviceRecord.deleteMany({});
+                await tx.serviceOrder.deleteMany({});
                 await tx.quote.deleteMany({});
                 await tx.order.deleteMany({});
                 await tx.suspendedSale.deleteMany({});
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
                 if (options.pos) {
                     // POS requires deleting linked child records first
                     await tx.salesInvoice.deleteMany({});
-                    await tx.serviceRecord.deleteMany({});
+                    await tx.serviceOrder.deleteMany({});
                     await tx.suspendedSale.deleteMany({});
                     await tx.quote.deleteMany({});
                     await tx.transaction.deleteMany({ where: { type: 'Sales' } });
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
                 if (options.customers) {
                     // 1. Delete all records linking to customers first
                     await tx.salesInvoice.deleteMany({});
-                    await tx.serviceRecord.deleteMany({});
+                    await tx.serviceOrder.deleteMany({});
                     await tx.warranty.deleteMany({});
                     await tx.coupon.deleteMany({});
                     await tx.quote.deleteMany({});

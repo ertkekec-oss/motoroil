@@ -136,7 +136,9 @@ model Company {
   sellerPaymentProfile       SellerPaymentProfile?
   sellerTrustEvents          SellerTrustEvent[]
   sellerTrustScore           SellerTrustScore?
-  serviceRecords             ServiceRecord[]
+  customerAssets             CustomerAsset[]
+  serviceOrders              ServiceOrder[]
+  globalTasks                GlobalTask[]
   smartPricingRules          SmartPricingRule[]
   staff                      Staff[]
   staffTargets               StaffTarget[]
@@ -411,6 +413,7 @@ model Product {
   stocks                            Stock[]
   movements                         StockMovement[]
   MarketplaceProductDailyPnl        MarketplaceProductDailyPnl[]
+  ServiceOrderItem                  ServiceOrderItem[]
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -641,7 +644,8 @@ model Customer {
   salesOrders         SalesOrder[]
   visits              SalesVisit[]
   salesXOpportunities SalesXOpportunity[]
-  services            ServiceRecord[]
+  serviceOrders       ServiceOrder[]
+  customerAssets      CustomerAsset[]
   transactions        Transaction[]
   warranties          Warranty[]
 
@@ -836,43 +840,128 @@ model AccountReconciliationStatus {
   @@index([health])
 }
 
-model ServiceRecord {
-  id               String    @id @default(cuid())
-  customerId       String
-  plate            String?
-  km               Int?
-  nextKm           Int?
-  nextDate         DateTime?
-  vehicleBrand     String?
-  vehicleSerial    String?
-  vehicleType      String?   @default("Motosiklet")
-  checklist        Json?
-  notes            String?
-  status           String    @default("Beklemede")
-  totalAmount      Decimal   @db.Decimal(10, 2)
-  subTotal         Decimal?  @db.Decimal(10, 2)
-  taxTotal         Decimal?  @db.Decimal(10, 2)
-  items            Json
-  appointmentDate  DateTime?
-  startTime        DateTime?
-  endTime          DateTime?
-  technicianId     String?
-  technician       Staff?    @relation("TechnicianRecords", fields: [technicianId], references: [id])
-  photos           Json?
-  customerApproved Boolean   @default(false)
-  branch           String?   @default("Merkez")
-  deletedAt        DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  companyId        String?
-  company          Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customer         Customer  @relation(fields: [customerId], references: [id])
+model CustomerAsset {
+  id                  String         @id @default(cuid())
+  companyId           String
+  customerId          String
+  assetType           String         @default("VEHICLE") // e.g. VEHICLE, APPLIANCE, ELECTRONICS, MACHINERY
+  primaryIdentifier   String // e.g. Plate, SerialNumber
+  secondaryIdentifier String? // e.g. Chassis/VIN, MAC Address
+  brand               String?
+  model               String?
+  productionYear      Int?
+  metadata            Json? // Flexible JSON for type-specific data (km, engine type, color, etc.)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  company             Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer            Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  serviceOrders       ServiceOrder[]
 
-  @@index([customerId])
-  @@index([plate])
-  @@index([nextDate])
-  @@index([status])
+  @@unique([companyId, primaryIdentifier])
   @@index([companyId])
+  @@index([customerId])
+  @@index([primaryIdentifier])
+}
+
+model ServiceOrder {
+  id              String  @id @default(cuid())
+  companyId       String
+  customerId      String
+  assetId         String?
+  status          String  @default("PENDING") // PENDING, IN_PROGRESS, WAITING_APPROVAL, WAITING_PART, QUALITY_CONTROL, READY, COMPLETED, CANCELLED
+  complaint       String? @db.Text
+  technicianNotes String? @db.Text
+  totalAmount     Decimal @default(0) @db.Decimal(10, 2)
+  subTotal        Decimal @default(0) @db.Decimal(10, 2)
+  taxTotal        Decimal @default(0) @db.Decimal(10, 2)
+  isUnderWarranty Boolean @default(false)
+
+  // Tracking
+  currentKm_or_Use  Int? // Snapshot at the time of service
+  nextMaintenanceAt DateTime?
+  nextKm_or_Use     Int?
+
+  // Timestamps
+  appointmentDate DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  branch          String  @default("Merkez")
+  linkedInvoiceId String?
+
+  company  Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  asset    CustomerAsset?     @relation(fields: [assetId], references: [id])
+  items    ServiceOrderItem[]
+  tasks    GlobalTask[]
+
+  @@index([companyId])
+  @@index([customerId])
+  @@index([assetId])
+  @@index([status])
+}
+
+model ServiceOrderItem {
+  id                String   @id @default(cuid())
+  serviceOrderId    String
+  productId         String? // Can be null if it's purely labor not tracked as product
+  name              String
+  type              String   @default("PART") // PART, LABOR, OUTSOURCED
+  quantity          Decimal  @default(1) @db.Decimal(10, 2)
+  unitPrice         Decimal  @db.Decimal(10, 2)
+  totalPrice        Decimal  @db.Decimal(10, 2)
+  unitCost          Decimal? @db.Decimal(10, 2) // Extracted from inventory layer for P&L tracking
+  isWarrantyCovered Boolean  @default(false)
+  technicianId      String? // Allows different technicians per labor item
+
+  serviceOrder ServiceOrder @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  product      Product?     @relation(fields: [productId], references: [id])
+  technician   Staff?       @relation(fields: [technicianId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([serviceOrderId])
+  @@index([productId])
+  @@index([technicianId])
+}
+
+model GlobalTask {
+  id          String  @id @default(cuid())
+  companyId   String
+  title       String
+  description String? @db.Text
+  type        String // MEETING, CALL, SERVICE_APPOINTMENT, PAYMENT_DUE, TASK
+  status      String  @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
+  priority    String  @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+
+  // Time and Scheduling
+  startTime DateTime?
+  endTime   DateTime?
+  isAllDay  Boolean   @default(false)
+  dueDate   DateTime?
+
+  // Ownership & Target
+  assigneeId   String?
+  assignedRole String? // "FINANCE", "TECHNICIAN" array/enum string if assigned to a group
+
+  // Polymorphic Relation
+  relatedEntityType String? // "Customer", "ServiceOrder", "Invoice", "SalesVisit"
+  relatedEntityId   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignee     Staff?        @relation("AssignedGlobalTasks", fields: [assigneeId], references: [id])
+  serviceOrder ServiceOrder? @relation(fields: [relatedEntityId], references: [id], map: "GlobalTask_ServiceOrder") // Explicit relation for ServiceOrder type
+
+  @@index([companyId])
+  @@index([assigneeId])
+  @@index([relatedEntityType, relatedEntityId])
+  @@index([startTime, endTime])
 }
 
 model CustomerDocument {
@@ -1185,7 +1274,8 @@ model Staff {
   targets                StaffTarget[]
   targetAssignments      TargetAssignment[]
   tasks                  StaffTask[]
-  serviceRecords         ServiceRecord[]           @relation("TechnicianRecords")
+  assignedGlobalTasks    GlobalTask[]              @relation("AssignedGlobalTasks")
+  serviceOrderItems      ServiceOrderItem[]
 
   @@index([tenantId])
   @@index([companyId])
