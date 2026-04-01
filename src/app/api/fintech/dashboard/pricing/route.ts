@@ -58,7 +58,9 @@ export async function GET(req: Request) {
         }
 
         const pricingData = pnlRecords.map((pnl: any) => {
-            const current = Number(pnl.grossRevenue) || (Number(pnl.product?.price) > 0 ? Number(pnl.product.price) : 1000);
+            const saleCount = Number(pnl.saleCount) || 1;
+            const avgUnitPrice = (Number(pnl.grossRevenue) > 0 && saleCount > 0) ? (Number(pnl.grossRevenue) / saleCount) : 0;
+            const current = avgUnitPrice > 0 ? avgUnitPrice : (Number(pnl.product?.price) > 0 ? Number(pnl.product.price) : 1000);
             const buy = Number(pnl.product?.buyPrice) > 0 ? Number(pnl.product.buyPrice) : (current * 0.75); // simulate 25% margin if unknown
             const grossMargin = pnl.profitMargin ? Number(pnl.profitMargin) : (((current - buy) / current) * 100);
 
