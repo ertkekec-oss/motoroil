@@ -111,11 +111,7 @@ export default function Sidebar() {
             '/customers': { perm: 'customer_view', feature: 'current_accounts' },
             '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
             '/inventory': { perm: 'inventory_view', feature: 'inventory' },
-            '/service': { 
-                perm: 'service_view', 
-                feature: 'service_desk',
-                customCheck: () => isSystemAdmin || currentUser?.type === 'service'
-            },
+
             '/sales': { perm: 'sales_archive', feature: 'sales' },
             '/sales/revenue-intelligence': { perm: 'sales_archive', feature: 'sales' },
             '/campaigns': { perm: 'settings_manage', feature: 'sales' },
@@ -278,7 +274,7 @@ export default function Sidebar() {
                         ]
                     },
                     { name: 'Teklifler', href: '/offers', icon: FileText },
-                    { name: 'TechOPs', href: '/service', icon: Wrench },
+
                     {
                         name: 'SalesX',
                         icon: Map,
