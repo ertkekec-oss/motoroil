@@ -16,6 +16,7 @@ import {
     IconFileText,
     IconSettings,
     IconCornerUpRight
+} from "@/components/icons/PremiumIcons";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 
