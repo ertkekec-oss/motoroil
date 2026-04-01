@@ -258,13 +258,13 @@ export default function ServiceOrderDetailPage() {
                                 <p className="text-lg font-black text-slate-900 tracking-tight">Hizmet Kaydı <span className="text-indigo-600">(Maliyet & Kâr)</span></p>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                <button onClick={() => openAddItemModal('OUTSOURCED')} className="text-[11px] font-black uppercase tracking-widest text-amber-600 bg-white ring-1 ring-amber-200 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md hover:bg-amber-50 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                <button onClick={() => openAddItemModal('OUTSOURCED')} className="text-[11px] font-black uppercase tracking-widest text-amber-600 bg-white ring-1 ring-amber-200 px-4 py-2.5 rounded-lg shadow-sm hover:shadow-md hover:bg-amber-50 transition-all flex items-center gap-2">
                                     + FASON (DIŞ)
                                 </button>
-                                <button onClick={() => openAddItemModal('LABOR')} className="text-[11px] font-black uppercase tracking-widest text-emerald-600 bg-white ring-1 ring-emerald-200 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md hover:bg-emerald-50 hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                                    <IconUsers className="w-3.5 h-3.5" /> + PERSONEL KOTASI
+                                <button onClick={() => openAddItemModal('LABOR')} className="text-[11px] font-black uppercase tracking-widest text-emerald-600 bg-white ring-1 ring-emerald-200 px-4 py-2.5 rounded-lg shadow-sm hover:shadow-md hover:bg-emerald-50 transition-all flex items-center gap-2">
+                                    <IconUsers className="w-3.5 h-3.5" /> + İŞÇİLİK EKLE
                                 </button>
-                                <button onClick={() => openAddItemModal('PART')} className="text-[11px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-600 text-white px-4 py-2.5 rounded-xl shadow-[0_5px_15px_rgba(79,70,229,0.2)] hover:shadow-[0_8px_20px_rgba(79,70,229,0.3)] hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                <button onClick={() => openAddItemModal('PART')} className="text-[11px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-2.5 rounded-lg shadow-sm hover:bg-indigo-100 transition-all flex items-center gap-2">
                                     <IconActivity className="w-3.5 h-3.5" /> + STOK / YEDEK PARÇA
                                 </button>
                             </div>
@@ -356,59 +356,63 @@ export default function ServiceOrderDetailPage() {
             </div>
 
             {/* FASON/İŞÇİLİK/PARÇA EKLEME MODALI */}
+
             {isItemModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300 p-4">
-                    <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300 ring-1 ring-slate-200">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 blur-3xl -translate-y-1/2 translate-x-1/2 opacity-20" style={{ backgroundColor: itemModalType === 'PART' ? '#4f46e5' : itemModalType === 'LABOR' ? '#10b981' : '#f59e0b'}} />
-                            <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2 relative z-10">
-                                {itemModalType === 'PART' ? <IconActivity className="text-indigo-600"/> : itemModalType === 'LABOR' ? <IconUsers className="text-emerald-600"/> : <IconSettings className="text-amber-600"/>}
-                                {itemModalType === 'PART' ? 'STOK / PARÇA EKLE' : itemModalType === 'LABOR' ? 'İŞÇİLİK / PRESTİJ' : 'FASON GİDER EKLE'}
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+                        <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
+                            <h2 className="text-sm font-black text-slate-800 tracking-tight flex items-center gap-2">
+                                {itemModalType === 'PART' ? <IconActivity className="w-4 h-4 text-indigo-600"/> : itemModalType === 'LABOR' ? <IconUsers className="w-4 h-4 text-emerald-600"/> : <IconSettings className="w-4 h-4 text-amber-600"/>}
+                                {itemModalType === 'PART' ? 'STOK / YEDEK PARÇA' : itemModalType === 'LABOR' ? 'İŞÇİLİK EKLE' : 'FASON / DIŞ HİZMET'}
                             </h2>
-                            <button onClick={() => setIsItemModalOpen(false)} className="w-8 h-8 rounded-full bg-slate-200/50 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-300 hover:text-slate-800 transition-colors relative z-10">×</button>
+                            <button onClick={() => setIsItemModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors p-1"><IconCheck className="w-5 h-5 hidden" /> ✕ </button>
                         </div>
-                        <div className="p-6 space-y-5 bg-white">
+                        <div className="p-5 space-y-4 bg-white">
                             <div>
-                                <label className="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Hizmet / Parça Adı</label>
-                                <input type="text" className="w-full bg-white border-none ring-1 ring-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 shadow-sm outline-none" placeholder={itemModalType === 'PART' ? 'Örn: Fren Balatası (S)' : 'Örn: Motor İndirme İşçiliği'} value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} />
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1.5">Hizmet / Parça Adı</label>
+                                <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" placeholder={itemModalType === 'PART' ? 'Örn: Fren Balatası (S)' : 'Örn: Motor İndirme İşçiliği'} value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} />
                             </div>
 
                             {itemModalType === 'LABOR' && (
-                                <div className="animate-in slide-in-from-top-2">
-                                    <label className="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Hangi Personel Yaptı? (HR Verimi İçin)</label>
-                                    <select className="w-full bg-white border-none ring-1 ring-emerald-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 shadow-sm outline-none cursor-pointer" value={itemForm.technicianId} onChange={e => setItemForm({...itemForm, technicianId: e.target.value})}>
-                                        <option value="">-- Atama Yapılmayacak / Şirket Kârı --</option>
-                                        {staffList.map(s => <option key={s.id} value={s.id}>{s.name} ({s.status || 'Personel'})</option>)}
+                                <div>
+                                    <label className="block text-[11px] font-bold text-slate-600 mb-1.5 flex justify-between">
+                                        <span>İşlemi Yapan Teknisyen (/ Usta)</span>
+                                        <span className="text-[9px] text-emerald-600">(Maliyet Merkezi / İK Performans)</span>
+                                    </label>
+                                    <select className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all cursor-pointer" value={itemForm.technicianId} onChange={e => setItemForm({...itemForm, technicianId: e.target.value})}>
+                                        <option value="">-- Atama Yok --</option>
+                                        {staffList.map(s => <option key={s.id} value={s.id}>{s.name} ({s.role || 'Personel'})</option>)}
                                     </select>
-                                    <p className="text-[9px] font-bold text-emerald-600/80 uppercase mt-2 flex items-center gap-1"><IconCheck className="w-3 h-3"/>*Seçilen personelin HR Departmanı Prim Kotasına işlenir.</p>
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Miktar / Saat</label>
-                                    <input type="number" min="1" className="w-full bg-white border-none ring-1 ring-slate-200 rounded-xl px-4 py-3 text-sm font-black text-slate-900 text-center focus:ring-2 focus:ring-indigo-500 shadow-sm outline-none" value={itemForm.quantity} onChange={e => setItemForm({...itemForm, quantity: Number(e.target.value)})} />
+                                    <label className="block text-[11px] font-bold text-slate-600 mb-1.5">Miktar / Saat</label>
+                                    <input type="number" min="1" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-800 text-center focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all" value={itemForm.quantity} onChange={e => setItemForm({...itemForm, quantity: Number(e.target.value)})} />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Birim Fiyatı (₺)</label>
-                                    <input type="number" className="w-full bg-white border-none ring-1 ring-slate-200 rounded-xl px-4 py-3 text-sm font-black text-slate-900 text-right focus:ring-2 focus:ring-indigo-500 shadow-sm outline-none" value={itemForm.unitPrice} onChange={e => setItemForm({...itemForm, unitPrice: Number(e.target.value)})} />
+                                    <label className="block text-[11px] font-bold text-slate-600 mb-1.5">Birim Fiyatı (₺)</label>
+                                    <input type="number" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-900 text-right focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all" value={itemForm.unitPrice} onChange={e => setItemForm({...itemForm, unitPrice: Number(e.target.value)})} />
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 ring-1 ring-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2">
-                                <div className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${itemForm.isWarrantyCovered ? 'bg-emerald-500 text-white shadow-md' : 'bg-white ring-1 ring-slate-300'}`}>
-                                    {itemForm.isWarrantyCovered && <IconCheck className="w-4 h-4" />}
+                            <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors mt-1 group">
+                                <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${itemForm.isWarrantyCovered ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-300 group-hover:border-slate-400'}`}>
+                                    {itemForm.isWarrantyCovered && <IconCheck className="w-3.5 h-3.5" />}
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-sm font-black text-slate-800 tracking-tight">Ücretsiz! (Garanti Kapsamı)</p>
-                                    <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Müşteriye 0₺ Yansır, İç Maliyet Yazılır</p>
+                                    <p className="text-[13px] font-bold text-slate-700">Garanti Kapsamında (Bedelsiz)</p>
+                                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Müşteriye tutar yansıtılmaz, stok düşülür.</p>
                                 </div>
                                 <input type="checkbox" className="hidden" checked={itemForm.isWarrantyCovered} onChange={e => setItemForm({...itemForm, isWarrantyCovered: e.target.checked})} />
                             </label>
 
-                            <button onClick={saveItem} disabled={isSavingItem} className="w-full mt-4 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl transition-all flex items-center justify-center shadow-xl shadow-slate-900/20 disabled:opacity-50">
-                                {isSavingItem ? 'KAYDEDİLİYOR...' : 'REÇETEYE ONAYLA (+)'}
-                            </button>
+                            <div className="pt-2">
+                                <button onClick={saveItem} disabled={isSavingItem} className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-bold text-sm py-2.5 rounded-lg transition-all flex items-center justify-center disabled:opacity-50 shadow-sm">
+                                    {isSavingItem ? 'KAYDEDİLİYOR...' : 'REÇETEYE ONAYLA (+)'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -416,6 +420,7 @@ export default function ServiceOrderDetailPage() {
         </div>
     );
 }
+
 function BrandWhatsappIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
