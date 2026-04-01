@@ -98,6 +98,11 @@ export default function ServiceOrderDetailPage() {
         const prod = products.find(p => p.id === productId);
         if (!prod) return;
         
+        let initialPrice = Number(prod.price || 0);
+        if (initialPrice === 0 && prod.prices && prod.prices.length > 0) {
+            initialPrice = Number(prod.prices[0].price || 0);
+        }
+
         const existingIndex = partQueue.findIndex(p => p.productId === productId);
         if (existingIndex >= 0) {
             // increment qty
@@ -110,7 +115,7 @@ export default function ServiceOrderDetailPage() {
                 productId: prod.id,
                 name: prod.name,
                 quantity: 1,
-                unitPrice: Number(prod.price || 0),
+                unitPrice: initialPrice,
                 isWarrantyCovered: false
             }]);
         }
@@ -132,9 +137,9 @@ export default function ServiceOrderDetailPage() {
             }
             setIsSavingItem(true);
             try {
-                // Paralel kayıt atılıyor
-                await Promise.all(partQueue.map(p => 
-                    fetch(`/api/service-v2/${params.id}/items`, {
+                // Sırayla (Sequential) kayıt atılıyor ki veritabanı "transaction" kilitlenmesi yaşanmasın
+                for (const p of partQueue) {
+                    const res = await fetch(`/api/service-v2/${params.id}/items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
@@ -145,8 +150,9 @@ export default function ServiceOrderDetailPage() {
                             productId: p.productId, 
                             isWarrantyCovered: p.isWarrantyCovered 
                         })
-                    })
-                ));
+                    });
+                    if (!res.ok) throw new Error("Parça eklenemedi.");
+                }
                 setIsItemModalOpen(false);
                 fetchData();
             } finally {
@@ -282,10 +288,15 @@ export default function ServiceOrderDetailPage() {
             {/* Header / Seri & Müşteri */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between border-b border-slate-200 pb-5 mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
-                        İŞ EMRİ #{orderData.id.slice(0,8).toUpperCase()}
-                    </h1>
-                    <div className="flex flex-wrap items-center gap-3 mt-2 text-[13px] font-semibold text-slate-500">
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => router.push('/service')} className="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-colors shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
+                            İŞ EMRİ #{orderData.id.slice(0,8).toUpperCase()}
+                        </h1>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 mt-2 pl-14 text-[13px] font-semibold text-slate-500">
                         <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 uppercase tracking-widest text-[10px]">{orderData.asset?.brand || 'MARKA YOK'} {orderData.asset?.model || ''}</span>
                         <span>Ref: <strong className="text-slate-700">{orderData.asset?.primaryIdentifier}</strong></span>
                         <span className="hidden sm:inline text-slate-300">•</span>

@@ -40,7 +40,7 @@ export default function NewServiceIntakePage() {
             .then(data => {
                 if(data.success) {
                     setCustomers(data.customers || []);
-                    if(data.customers.length > 0) setCustomerId(data.customers[0].id);
+                    // Removed auto-selection of the first customer to prevent accidental wrong assignments
                 }
             })
             .catch(() => {});
