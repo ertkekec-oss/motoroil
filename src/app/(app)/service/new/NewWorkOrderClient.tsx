@@ -115,7 +115,7 @@ function NewWorkOrderContent() {
                 const newAsset = await res.json();
                 setAssets([newAsset, ...assets]);
                 setAssetId(newAsset.id);
-                setShowNewAssetForm(false);
+                setAssetTab('registered');
             }
         } catch (e) {
             console.error(e);
@@ -251,8 +251,8 @@ function NewWorkOrderContent() {
                 </div>
             </div>
 
-            <div className="flex-1 p-4 sm:p-6 lg:p-10 max-w-[1000px] mx-auto w-full">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[20px] sm:rounded-[24px] shadow-sm p-4 sm:p-8">
+            <div className="flex-1 p-4 sm:p-6 lg:p-10 max-w-[1400px] mx-auto w-full">
+                <div className="space-y-8">
                     {step === 1 && (
                         <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
                             <div>
