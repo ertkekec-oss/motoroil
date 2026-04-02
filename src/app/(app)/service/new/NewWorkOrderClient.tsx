@@ -572,13 +572,27 @@ function NewWorkOrderContent() {
                             </div>
 
                             <div className="p-6 flex-1 flex flex-col">
+                                <div className="mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                                    <label className="text-[11px] font-bold tracking-widest uppercase text-slate-500 mb-2 block">Cihaz / Varlık Türü (Karne Şablonu)</label>
+                                    <select 
+                                        value={selectedAssetType} 
+                                        onChange={e => { 
+                                            setSelectedAssetType(e.target.value); 
+                                            // Only reset fields if we are changing type manually
+                                            setDynamicFields({}); 
+                                        }} 
+                                        className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[10px] text-[13px] font-bold focus:border-indigo-500 outline-none shadow-sm"
+                                    >
+                                        <option value="">Standart (Genel Cihaz / Taşıt)</option>
+                                        {(appSettings?.asset_types_schema || []).map((t:any) => (
+                                            <option key={t.id} value={t.name}>{t.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
                                     {(() => {
-                                        const schema = appSettings?.asset_types_schema?.find((t:any) => t.name === selectedAssetType || t.id === selectedAssetType) || 
-                                                       appSettings?.asset_types_schema?.find((t:any) => 
-                                                           (assetBrand || '').toLowerCase().includes(t.name.toLowerCase()) || 
-                                                           (selectedAssetType === 'VEHICLE' && t.name.toLowerCase() === 'diğer')
-                                                       );
+                                        const schema = appSettings?.asset_types_schema?.find((t:any) => t.name === selectedAssetType || t.id === selectedAssetType);
                                         
                                         if (schema && schema.fields && schema.fields.length > 0) {
                                             return schema.fields.map((f:any) => (
