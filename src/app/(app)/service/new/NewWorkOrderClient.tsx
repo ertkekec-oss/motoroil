@@ -101,19 +101,35 @@ function NewWorkOrderContent() {
             setCurrentKm(selected.metadata?.currentKm?.toString() || '');
             setProductionYear(selected.productionYear?.toString() || '');
             setChassisNo(selected.secondaryIdentifier || '');
+            
+            // Populate dynamic fields and type from the asset's metadata if present
+            if (selected.metadata) {
+                const { type, currentKm, ...rest } = selected.metadata;
+                if (type) setSelectedAssetType(type);
+                setDynamicFields(rest || {});
+            }
+            if (selected.brand) {
+                setAssetBrand(selected.brand);
+            }
         } else {
             setCurrentKm(''); setProductionYear(''); setChassisNo('');
+            // Optional: reset dynamic fields on deselection, but we might keep them if user is creating a new one
         }
     }, [assetId, assets]);
 
 
     const handleCreateAsset = async () => {
-        if (!primaryIdentifier) return;
+        const idToSave = primaryIdentifier || Object.values(dynamicFields)[0];
+        if (!idToSave) return showError("Eksik", "Tanıtıcı kod veya ilgili cihaz karnesi girilmelidir.");
         try {
             const res = await fetch(`/api/customers/${customerId}/assets`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ primaryIdentifier, brand: assetBrand })
+                body: JSON.stringify({ 
+                    primaryIdentifier: idToSave, 
+                    brand: assetBrand || selectedAssetType, 
+                    metadata: { type: selectedAssetType, ...dynamicFields }
+                })
             });
             if (res.ok) {
                 const newAsset = await res.json();
@@ -163,7 +179,7 @@ function NewWorkOrderContent() {
             secondaryIdentifier: type === 'warranty' ? item.invoiceNo : null,
             brand: type === 'warranty' ? item.productName : item.productName,
             model: 'Otomatik Kayıt',
-            metadata: { sourceId: item.id, sourceType: type }
+            metadata: { sourceId: item.id, sourceType: type, type: selectedAssetType }
         };
 
         setSubmitting(true);
@@ -205,6 +221,8 @@ function NewWorkOrderContent() {
 
         setSubmitting(true);
         try {
+            // Eğer seçilen asset'in dinamik fieldları varsa gönderelim.
+            const finalDynamic = Object.keys(dynamicFields).length > 0 ? dynamicFields : undefined;
             const payload = {
                 customerId,
                 assetId: assetId || undefined,
@@ -213,7 +231,8 @@ function NewWorkOrderContent() {
                 status: 'PENDING',
                 currentKm,
                 chassisNo,
-                productionYear
+                productionYear,
+                dynamicMetadata: finalDynamic
             };
 
             const res = await fetch('/api/services/work-orders', {
@@ -380,10 +399,10 @@ function NewWorkOrderContent() {
 
                                     {assetTab === 'external' && (
                                         <div className="mb-6 p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 <div>
                                                     <label className="text-xs font-bold text-slate-500 mb-1.5 block">Cihaz / Taşıt Türü</label>
-                                                    <select value={selectedAssetType} onChange={e => setSelectedAssetType(e.target.value)} className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none">
+                                                    <select value={selectedAssetType} onChange={e => { setSelectedAssetType(e.target.value); setDynamicFields({}); }} className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none">
                                                         <option value="">Seçiniz...</option>
                                                         {(appSettings?.asset_types_schema || []).map((t:any) => (
                                                             <option key={t.id} value={t.name}>{t.name}</option>
@@ -392,17 +411,40 @@ function NewWorkOrderContent() {
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Marka/Model / Ürün Adı</label>
+                                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Marka / Cihaz Adı</label>
                                                     <input type="text" value={assetBrand} onChange={e => setAssetBrand(e.target.value)} placeholder="Örn: Beko, Kuba, Honda..." className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none" />
                                                 </div>
-                                                <div>
-                                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Seri No / Plaka / Şase No</label>
-                                                    <input type="text" value={primaryIdentifier} onChange={e => setPrimaryIdentifier(e.target.value)} placeholder="Zorunlu identifier..." className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none" />
-                                                </div>
+                                                {(() => {
+                                                    const schema = appSettings?.asset_types_schema?.find((t:any) => t.name === selectedAssetType || t.id === selectedAssetType);
+                                                    if (schema && schema.fields && schema.fields.length > 0) {
+                                                        return schema.fields.map((f:any) => (
+                                                            <div key={f.id}>
+                                                                <label className="text-xs font-bold text-slate-500 mb-1.5 block flex justify-between">
+                                                                    {f.label}
+                                                                </label>
+                                                                <input 
+                                                                    type="text" 
+                                                                    value={dynamicFields[f.id] || ''} 
+                                                                    onChange={e => setDynamicFields({...dynamicFields, [f.id]: e.target.value})} 
+                                                                    placeholder={f.label + "..."} 
+                                                                    className="w-full h-10 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none" 
+                                                                />
+                                                            </div>
+                                                        ));
+                                                    } else if (selectedAssetType) {
+                                                        return (
+                                                            <div>
+                                                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Seri No / Plaka / Tanıtıcı</label>
+                                                                <input type="text" value={primaryIdentifier} onChange={e => setPrimaryIdentifier(e.target.value)} placeholder="Zorunlu identifier..." className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none" />
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })()}
                                             </div>
                                             <div className="flex justify-end gap-3 pt-2">
                                                 <button onClick={() => setAssetTab('registered')} className="px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700">İptal</button>
-                                                <button onClick={handleCreateAsset} disabled={!primaryIdentifier || !assetBrand} className="px-5 py-2 rounded-lg text-xs font-bold bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white hover:bg-emerald-600 shadow-sm transition-colors">Cihaz Sicili Oluştur & Seç</button>
+                                                <button onClick={handleCreateAsset} disabled={!(primaryIdentifier || Object.keys(dynamicFields).length > 0) || !assetBrand} className="px-5 py-2 rounded-lg text-xs font-bold bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white hover:bg-emerald-600 shadow-sm transition-colors">Cihaz Sicili Oluştur & Seç</button>
                                             </div>
                                         </div>
                                     )}
