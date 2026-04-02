@@ -266,11 +266,11 @@ export default function FieldSalesAgentDashboard() {
                     <h2 className="text-xs font-black text-white/40 uppercase tracking-widest mb-3">HIZLI ERİŞİM</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {[
-                            { icon: '💳', label: 'Sıcak Satış', desc: 'Mobil POS Terminali', path: '/terminal', accent: 'from-emerald-600 to-green-700', featured: true },
                             { icon: '🗺️', label: 'Rotalarım', desc: 'Aktif saha rotaları', path: '/field-mobile/routes', accent: 'from-blue-600 to-blue-700', featured: true },
                             { icon: '📈', label: 'SalesX', desc: 'Yapay zeka asistanı', path: '/field-mobile/intelligence', accent: null },
-                            { icon: '🏢', label: 'Müşteriler', desc: 'Ağ ve portföy', path: '/customers', accent: null },
-                            { icon: '📍', label: 'Ziyaretler', desc: 'Geçmiş kayıtlar', path: '/field-sales/admin/live', accent: null },
+                            { icon: '🏢', label: 'Müşteriler', desc: 'Ağ ve portföy', path: '/field-mobile/customers', accent: null },
+                            { icon: '⏳', label: 'Ziyaretler', desc: 'Geçmiş kayıtlar', path: '/field-mobile/visits', accent: null },
+                            { icon: '🧾', label: 'Masraflarım', desc: 'Harcama girişi', path: '/field-mobile/expenses', accent: null },
                             { icon: '📊', label: 'Dashboard', desc: 'Personel portali', path: '/staff/me', accent: null },
                         ].map((card) => (
                             <div
