@@ -30,9 +30,13 @@ export async function PATCH(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { status } = body;
+        const { status, nextKm_or_Use, nextMaintenanceAt } = body;
 
-        const updateData: any = { status };
+        const updateData: any = {};
+        if (status) updateData.status = status;
+        if (nextKm_or_Use !== undefined) updateData.nextKm_or_Use = nextKm_or_Use;
+        if (nextMaintenanceAt !== undefined) updateData.nextMaintenanceAt = nextMaintenanceAt;
+
         if (status === 'IN_PROGRESS') {
             updateData.startedAt = new Date();
         } else if (status === 'COMPLETED') {

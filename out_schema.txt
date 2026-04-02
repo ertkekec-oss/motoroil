@@ -1,0 +1,63 @@
+model ServiceOrder {
+  id              String  @id @default(cuid())
+  companyId       String
+  customerId      String
+  assetId         String?
+  status          String  @default("PENDING") // PENDING, IN_PROGRESS, WAITING_APPROVAL, WAITING_PART, QUALITY_CONTROL, READY, COMPLETED, CANCELLED
+  complaint       String? @db.Text
+  technicianNotes String? @db.Text
+  totalAmount     Decimal @default(0) @db.Decimal(10, 2)
+  subTotal        Decimal @default(0) @db.Decimal(10, 2)
+  taxTotal        Decimal @default(0) @db.Decimal(10, 2)
+  isUnderWarranty Boolean @default(false)
+
+  // Tracking
+  currentKm_or_Use  Int? // Snapshot at the time of service
+  nextMaintenanceAt DateTime?
+  nextKm_or_Use     Int?
+
+  // Timestamps
+  appointmentDate DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  branch          String  @default("Merkez")
+  linkedInvoiceId String?
+
+  company  Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  asset    CustomerAsset?     @relation(fields: [assetId], references: [id])
+  items    ServiceOrderItem[]
+  tasks    GlobalTask[]
+
+  @@index([companyId])
+  @@index([customerId])
+  @@index([assetId])
+  @@index([status])
+}
+==============
+model CustomerAsset {
+  id                  String         @id @default(cuid())
+  companyId           String
+  customerId          String
+  assetType           String         @default("VEHICLE") // e.g. VEHICLE, APPLIANCE, ELECTRONICS, MACHINERY
+  primaryIdentifier   String // e.g. Plate, SerialNumber
+  secondaryIdentifier String? // e.g. Chassis/VIN, MAC Address
+  brand               String?
+  model               String?
+  productionYear      Int?
+  metadata            Json? // Flexible JSON for type-specific data (km, engine type, color, etc.)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  company             Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer            Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  serviceOrders       ServiceOrder[]
+
+  @@unique([companyId, primaryIdentifier])
+  @@index([companyId])
+  @@index([customerId])
+  @@index([primaryIdentifier])
+}

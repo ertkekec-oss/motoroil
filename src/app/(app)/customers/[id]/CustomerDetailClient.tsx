@@ -996,8 +996,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 {assets.map(a => (
                                                     <div key={a.id} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl flex justify-between items-center hover:border-emerald-500/30 transition-all">
                                                         <div className="min-w-0 pr-4">
-                                                            <div className="font-bold text-[13px] text-slate-900 dark:text-white truncate">{a.primaryIdentifier}</div>
-                                                            <div className="text-[11px] text-slate-500 mt-1 truncate">{a.brand || 'Diğer'} {a.model ? ` - ${a.model}` : ''}</div>
+                                                            <div className="font-bold text-[13px] text-slate-900 dark:text-white truncate">{a.primaryIdentifier} {a.secondaryIdentifier ? `(${a.secondaryIdentifier})` : ''}</div>
+                                                            <div className="text-[11px] text-slate-500 mt-1 truncate">
+                                                                {a.brand || 'Diğer'} {a.model ? ` - ${a.model}` : ''}
+                                                                {a.productionYear ? ` • Model: ${a.productionYear}` : ''}
+                                                                {a.metadata?.currentKm ? ` • KM: ${a.metadata.currentKm.toLocaleString()}` : ''}
+                                                            </div>
                                                         </div>
                                                         <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-bold uppercase whitespace-nowrap shrink-0">Cihaz Sicili</span>
                                                     </div>

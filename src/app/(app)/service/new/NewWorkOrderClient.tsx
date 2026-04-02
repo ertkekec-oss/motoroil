@@ -33,6 +33,9 @@ function NewWorkOrderContent() {
     const [complaint, setComplaint] = useState<string>('');
     const [assetBrand, setAssetBrand] = useState('Diğer');
     const [primaryIdentifier, setPrimaryIdentifier] = useState(''); // e.g. Plate or Serial No
+    const [currentKm, setCurrentKm] = useState<string>('');
+    const [productionYear, setProductionYear] = useState<string>('');
+    const [chassisNo, setChassisNo] = useState<string>('');
     
     // Remote data
     const [assets, setAssets] = useState<any[]>([]);
@@ -87,6 +90,17 @@ function NewWorkOrderContent() {
         if (assetTab === 'warranties' && warranties.length === 0) fetchExtraData('warranties');
         if (assetTab === 'purchases' && purchases.length === 0) fetchExtraData('purchases');
     }, [assetTab, customerId]);
+
+    useEffect(() => {
+        const selected = assets.find(a => a.id === assetId);
+        if (selected) {
+            setCurrentKm(selected.metadata?.currentKm?.toString() || '');
+            setProductionYear(selected.productionYear?.toString() || '');
+            setChassisNo(selected.secondaryIdentifier || '');
+        } else {
+            setCurrentKm(''); setProductionYear(''); setChassisNo('');
+        }
+    }, [assetId, assets]);
 
 
     const handleCreateAsset = async () => {
@@ -192,7 +206,10 @@ function NewWorkOrderContent() {
                 assetId: assetId || undefined,
                 complaint,
                 branch: activeBranchName,
-                status: 'PENDING'
+                status: 'PENDING',
+                currentKm,
+                chassisNo,
+                productionYear
             };
 
             const res = await fetch('/api/services/work-orders', {
@@ -506,6 +523,22 @@ function NewWorkOrderContent() {
                                 <h3 className="text-[13px] sm:text-[14px] font-bold text-slate-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
                                     <FileText className="w-4 h-4 text-blue-500" /> Servis Ön Bilgileri & Şikayet
                                 </h3>
+                                
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Servise Geliş KM</label>
+                                    <input type="number" value={currentKm} onChange={e => setCurrentKm(e.target.value)} placeholder="Araç KM'si..." className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Şase No (VIN)</label>
+                                    <input type="text" value={chassisNo} onChange={e => setChassisNo(e.target.value)} placeholder="Şase numarası..." className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Model Yılı</label>
+                                    <input type="number" value={productionYear} onChange={e => setProductionYear(e.target.value)} placeholder="Örn: 2021" className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                                </div>
+                            </div>
+
                                 <textarea
                                     value={complaint}
                                     onChange={e => setComplaint(e.target.value)}

@@ -24,6 +24,8 @@ export default function ServiceDetailClient({ id }: { id: string }) {
     const router = useRouter();
 
     const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+    const [nextKm, setNextKm] = useState<string>('');
+    const [nextDate, setNextDate] = useState<string>('');
     const [productModalOpen, setProductModalOpen] = useState(false);
     const [productSearch, setProductSearch] = useState('');
     const [paymentMethod, setPaymentMethod] = useState<'cash'|'cc'|'iban'|'account'>('cash');
@@ -221,24 +223,46 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                             
                             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6">
                                 <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
-                                    <Shield className="w-4 h-4" /> Cihaz Bilgisi
+                                    <Shield className="w-4 h-4" /> Cihaz Bilgisi & Araç Karnesi
                                 </h3>
                                 {order.asset ? (
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 flex items-center justify-center">
-                                            <Wrench className="w-6 h-6" />
-                                        </div>
-                                        <div>
-                                            <div className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                                {order.asset.brand} <span className="text-sm text-slate-400">{order.asset.primaryIdentifier}</span>
+                                    <div className="flex flex-col gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 flex items-center justify-center shrink-0">
+                                                <Wrench className="w-6 h-6" />
                                             </div>
-                                            <div className="text-sm font-medium text-slate-500">{order.asset.model || ''}</div>
+                                            <div>
+                                                <div className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                                    {order.asset.brand} <span className="text-sm text-slate-400">{order.asset.primaryIdentifier}</span>
+                                                </div>
+                                                <div className="text-sm font-medium text-slate-500">
+                                                    {order.asset.model || 'Model Belirtilmemiş'} {order.asset.productionYear ? ` • ${order.asset.productionYear}` : ''} {order.asset.secondaryIdentifier ? ` • Şase: ${order.asset.secondaryIdentifier}` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* Karne Özeti */}
+                                        <div className="grid grid-cols-2 gap-4 mt-2 p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-white/5 rounded-xl">
+                                            <div>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Geliş KM</div>
+                                                <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{order.currentKm_or_Use ? `${order.currentKm_or_Use.toLocaleString()} KM` : 'Belirtilmedi'}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sonraki Servis KM</div>
+                                                <div className="text-[13px] font-bold text-emerald-600 dark:text-emerald-400">{order.nextKm_or_Use ? `${order.nextKm_or_Use.toLocaleString()} KM` : 'Belirlenmedi'}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sonraki Servis Tarihi</div>
+                                                <div className="text-[13px] font-bold text-emerald-600 dark:text-emerald-400">{order.nextMaintenanceAt ? new Date(order.nextMaintenanceAt).toLocaleDateString('tr-TR') : 'Belirlenmedi'}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Servise Geliş Tarihi</div>
+                                                <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 ) : (
                                     <span className="text-sm font-medium text-slate-500">Cihaz belirtilmemiş.</span>
                                 )}
-                            </div>
                         </div>
                         
                         <div className="lg:col-span-1 space-y-6">
