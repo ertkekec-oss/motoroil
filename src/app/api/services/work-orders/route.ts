@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { customerId, assetId, complaint, branch, status, currentKm, chassisNo, productionYear } = body;
+        const { customerId, assetId, complaint, branch, status, currentKm, chassisNo, productionYear, dynamicMetadata } = body;
 
         const customer = await prisma.customer.findUnique({
             where: { id: customerId }
@@ -26,7 +26,8 @@ export async function POST(request: Request) {
                         productionYear: productionYear ? Number(productionYear) : undefined,
                         metadata: {
                             ...meta,
-                            currentKm: currentKm || meta.currentKm
+                            currentKm: currentKm || meta.currentKm,
+                            ...(dynamicMetadata || {})
                         }
                     }
                 });

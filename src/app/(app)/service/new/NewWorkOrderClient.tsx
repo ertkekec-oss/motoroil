@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { useModal } from '@/contexts/ModalContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import { ChevronLeft, Check, Shield, Search, User, FileText, Wrench, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ function NewWorkOrderContent() {
     const { activeBranchName, activeTenantId } = useApp();
     const { customers } = useCRM();
     const { showSuccess, showError } = useModal();
+    const { appSettings } = useSettings();
 
     const initialCustomerId = searchParams.get('customerId');
     const initialCustomerName = searchParams.get('customerName');
@@ -36,6 +38,8 @@ function NewWorkOrderContent() {
     const [currentKm, setCurrentKm] = useState<string>('');
     const [productionYear, setProductionYear] = useState<string>('');
     const [chassisNo, setChassisNo] = useState<string>('');
+    const [selectedAssetType, setSelectedAssetType] = useState<string>('');
+    const [dynamicFields, setDynamicFields] = useState<Record<string, string>>({});
     
     // Remote data
     const [assets, setAssets] = useState<any[]>([]);
