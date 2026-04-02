@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
-import { Wrench, Check, Circle, Activity, CreditCard, PenTool, LayoutDashboard, Calendar, Download, MoreHorizontal, AlertCircle, CheckCircle2, Navigation, FileText } from 'lucide-react';
 
 export default function ServiceDashboardClient() {
     const router = useRouter();
-    const { activeBranchName, activeTenantId } = useApp();
+    const { activeBranchName, activeTenantId, hasPermission } = useApp();
 
     const [stats, setStats] = useState<any>({
         pending: 0,
@@ -18,6 +17,9 @@ export default function ServiceDashboardClient() {
         recentOrders: []
     });
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('ALL'); 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
 
     useEffect(() => {
         fetchDashboardData();
@@ -38,264 +40,273 @@ export default function ServiceDashboardClient() {
         }
     };
 
-    const waitingApproval = (stats.recentOrders || []).filter((o:any) => o.status === 'WAITING_APPROVAL').slice(0, 5);
-    const recentActivities = (stats.recentOrders || []).slice(0, 6); // Just as a mockup for the timeline
+    const expectedRevenue = (stats.recentOrders || [])
+        .filter((o:any) => o.status === 'WAITING_APPROVAL')
+        .reduce((sum: number, o:any) => sum + (Number(o.totalAmount) || 0), 0);
+
+    const filteredOrders = useMemo(() => {
+        return (stats.recentOrders || []).filter((o: any) => {
+            const matchesTab = activeTab === 'ALL' ? true : o.status === activeTab;
+            const matchesStatusFilter = statusFilter === '' ? true : o.status === statusFilter;
+            const searchTermLower = searchTerm.toLowerCase();
+            const matchesSearch = searchTerm === '' || 
+                (o.asset?.primaryIdentifier || '').toLowerCase().includes(searchTermLower) ||
+                (o.customer?.name || '').toLowerCase().includes(searchTermLower) || 
+                (o.asset?.brand || '').toLowerCase().includes(searchTermLower) ||
+                (o.id || '').toLowerCase().includes(searchTermLower);
+            
+            return matchesTab && matchesStatusFilter && matchesSearch;
+        });
+    }, [stats.recentOrders, activeTab, searchTerm, statusFilter]);
 
     const renderStatusBadge = (status: string) => {
         switch (status) {
             case 'PENDING':
-                return <span className="px-3 py-1 rounded-full text-[12px] font-bold bg-slate-100 text-slate-600">Bekliyor</span>;
+                return (
+                    <div className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+                        <div className="w-1 h-1 rounded-full mr-1.5 bg-slate-500"></div> Bekliyor
+                    </div>
+                );
             case 'WAITING_APPROVAL':
-                return <span className="px-3 py-1 rounded-full text-[12px] font-bold bg-amber-500 text-white">Onayda</span>;
+                return (
+                    <div className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                        <div className="w-1 h-1 rounded-full mr-1.5 bg-amber-500"></div> Onayda
+                    </div>
+                );
             case 'IN_PROGRESS':
-                return <span className="px-3 py-1 rounded-full text-[12px] font-bold bg-blue-500 text-white">İşlemde</span>;
+                return (
+                    <div className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20">
+                        <div className="w-1 h-1 rounded-full mr-1.5 bg-blue-500 animate-pulse"></div> İşlemde
+                    </div>
+                );
             case 'COMPLETED':
-                return <span className="px-3 py-1 rounded-full text-[12px] font-bold bg-emerald-500 text-white">Tamamlandı</span>;
+                return (
+                    <div className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                        <div className="w-1 h-1 rounded-full mr-1.5 bg-emerald-500"></div> Tamamlandı
+                    </div>
+                );
             default:
-                return <span className="px-3 py-1 rounded-full text-[12px] font-bold bg-slate-100 text-slate-600">{status}</span>;
+                return (
+                    <div className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+                        {status}
+                    </div>
+                );
         }
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1220] p-4 sm:p-6 lg:p-8 w-full max-w-[1600px] mx-auto gap-6 lg:gap-8 font-sans">
-            
-            {/* Minimal Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Servis İş Emirleri</h1>
-                    <p className="text-[13px] text-slate-500 mt-1 font-medium">Toplam {stats.recentOrders?.length || 0} aktif operasyon yürütülüyor.</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-colors shadow-sm">
-                        <Calendar className="w-4 h-4 text-slate-400" />
-                        Bu Hafta
-                    </button>
-                    <Link href="/service/new" className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-xl text-[13px] font-bold hover:bg-blue-700 transition-colors shadow-sm">
-                        + Yeni Kayıt
-                    </Link>
-                </div>
-            </div>
-
-            {/* Top Widget Row (Matching Image 1) */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans dark:bg-[#0f172a]">
+            {/* Same wrapper style as Staff HR page */}
+            <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8">
+                <div className="animate-fade-in relative">
                 
-                {/* 1. Finance / Big Sparkline Box (Col Span 1) */}
-                <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-100 dark:border-white/5 flex flex-col justify-between">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            <CreditCard className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                            <div>
-                                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white leading-none">Finansal Özet</h3>
-                                <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">GÜNCEL DURUM</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Inner pastel card */}
-                    <div className="bg-[#FFF8E6] dark:bg-amber-500/10 rounded-2xl p-5 mt-2 flex-1 flex flex-col justify-end relative overflow-hidden">
-                        {/* Mock bezier curve SVG imitating the reference */}
-                        <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none" viewBox="0 0 100 100">
-                            <path d="M0,50 Q25,80 50,40 T100,50 L100,100 L0,100 Z" fill="none" stroke="#F59E0B" strokeWidth="2" />
-                            <path d="M0,50 Q25,80 50,40 T100,50" fill="none" stroke="#F59E0B" strokeWidth="3" />
-                        </svg>
-
-                        <div className="relative z-10 pt-16">
-                            <h4 className="text-[14px] font-bold text-amber-900 dark:text-amber-500 mb-1">Onaylanan Tutar</h4>
-                            <div className="flex items-end gap-2">
-                                <span className="text-3xl font-black text-amber-600 dark:text-amber-400">₺{loading ? '...' : (stats.totalRevenue).toLocaleString('tr-TR')}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 2. Stacked Mini-Stats (Col Span 1) */}
-                <div className="flex flex-col gap-4">
-                    {/* Pink Card */}
-                    <div className="bg-[#FFEBEF] dark:bg-rose-500/10 rounded-[20px] p-5 flex flex-col justify-center flex-1">
-                        <h4 className="text-[14px] font-bold text-slate-800 dark:text-rose-200 mb-4">Onay Bekleyenler</h4>
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-white/60 dark:bg-rose-500/20 flex items-center justify-center shrink-0">
-                                <FileText className="w-6 h-6 text-rose-500" />
-                            </div>
-                            <div>
-                                <div className="text-2xl font-black text-slate-900 dark:text-rose-400 leading-none">{stats.pending} Adet</div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* Indigo/Purple Card */}
-                    <div className="bg-[#EBEFFF] dark:bg-indigo-500/10 rounded-[20px] p-5 flex flex-col justify-center flex-1">
-                        <h4 className="text-[14px] font-bold text-slate-800 dark:text-indigo-200 mb-4">İşlemde Olanlar</h4>
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-white/60 dark:bg-indigo-500/20 flex items-center justify-center shrink-0">
-                                <PenTool className="w-6 h-6 text-indigo-500" />
-                            </div>
-                            <div>
-                                <div className="text-2xl font-black text-slate-900 dark:text-indigo-400 leading-none">{stats.inProgress} Adet</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 3. Recent Activities (Timeline) (Col Span 1) */}
-                <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-100 dark:border-white/5 flex flex-col h-full overflow-hidden">
-                    <div className="flex items-center gap-2 mb-6">
-                        <Activity className="w-5 h-5 text-amber-500" />
-                        <div>
-                            <h3 className="text-[15px] font-bold text-slate-900 dark:text-white leading-none">Son İşlemler</h3>
-                        </div>
-                    </div>
-                    
-                    <div className="relative flex-1 px-2">
-                        {/* Vertical line */}
-                        <div className="absolute left-[5.5px] top-2 bottom-0 w-[2px] bg-slate-100 dark:bg-slate-800"></div>
+                    {/* --- HEADER (STICKY) --- */}
+                    <div className="sticky top-0 z-40 bg-slate-50/95 dark:bg-[#0f172a]/95 backdrop-blur-md pb-4 pt-4 mb-6 border-b border-slate-200 dark:border-white/5 space-y-4">
                         
-                        <div className="space-y-5 relative z-10">
-                            {recentActivities.map((o:any, i:number) => {
-                                const colors = ['border-purple-400', 'border-emerald-400', 'border-amber-400', 'border-blue-400', 'border-rose-400'];
-                                const dotColor = colors[i % colors.length];
-                                
-                                return (
-                                    <div key={i} className="flex gap-4 items-start pt-1">
-                                        <div className={`w-3 h-3 rounded-full bg-white dark:bg-slate-900 border-[2.5px] ${dotColor} mt-1 shrink-0`}></div>
-                                        <div>
-                                            <p className="text-[12px] font-semibold text-slate-700 dark:text-slate-300 leading-snug">
-                                                {o.asset?.primaryIdentifier} kaydı açıldı. Müşteri: <span className="font-bold">{o.customer?.name}</span>
-                                            </p>
-                                            <p className="text-[10px] text-slate-400 font-medium mt-1">{new Date(o.createdAt).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}</p>
+                        {/* TOP ACTIONS & COMPACT METRICS */}
+                        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                            {/* Compact Metrics */}
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-[14px]">🔧</div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aktif İşler</div>
+                                        <div className="text-[16px] font-black leading-none text-slate-900 dark:text-white mt-0.5">{stats.pending + stats.inProgress}</div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">📄</div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Müşteri Onayı</div>
+                                        <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">
+                                            {stats.recentOrders.filter((o:any)=>o.status === 'WAITING_APPROVAL').length}
                                         </div>
                                     </div>
-                                )
-                            })}
-                            {!loading && recentActivities.length === 0 && (
-                                <p className="text-[12px] text-slate-400">Henüz işlem yok.</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                                </div>
 
-                {/* 4. Task Checkboxes (John's Issue style) (Col Span 1) */}
-                <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-100 dark:border-white/5 flex flex-col h-full">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2">
-                            <AlertCircle className="w-5 h-5 text-rose-500" />
-                            <div>
-                                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white leading-none">Onay Bekleyenler</h3>
-                            </div>
-                        </div>
-                        <button className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg text-[11px] font-bold">+ Yeni</button>
-                    </div>
-
-                    <div className="space-y-4 flex-1 overflow-y-auto pr-1">
-                        {waitingApproval.map((o:any, i:number) => (
-                            <div key={i} className="flex justify-between items-center bg-white dark:bg-slate-900 group">
-                                <div className="flex items-start gap-3">
-                                    <div className="w-0.5 h-6 rounded-full bg-indigo-500 shrink-0 mt-0.5"></div>
-                                    <div className="w-4 h-4 rounded border-2 border-slate-300 dark:border-slate-600 mt-1 shrink-0"></div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300 line-clamp-1">{o.asset?.brand || 'Model Belirtilmemiş'}</span>
-                                        <span className="text-[11px] text-slate-400 font-medium">{o.asset?.primaryIdentifier}</span>
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-[14px]">💰</div>
+                                    <div>
+                                        <div className="flex items-center gap-3">
+                                            <div>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kapanan Tutar</div>
+                                                <div className="text-[14px] font-black leading-none text-emerald-600 dark:text-emerald-400 mt-0.5">{Number(stats.totalRevenue).toLocaleString('tr-TR')}₺</div>
+                                            </div>
+                                            <div className="w-[1px] h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+                                            <div className="hidden sm:block">
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bekleyen Tutar</div>
+                                                <div className="text-[14px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{expectedRevenue.toLocaleString('tr-TR')}₺</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex gap-2 items-center">
-                                    <span className="text-[10px] font-bold text-indigo-500 uppercase">Onaylat</span>
-                                    <button className="w-6 h-6 rounded-md bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
-                                        <MoreHorizontal className="w-3 h-3" />
-                                    </button>
-                                </div>
                             </div>
-                        ))}
-                         {!loading && waitingApproval.length === 0 && (
-                            <p className="text-[12px] text-slate-400 text-center py-4">Tüm onaylar tamam.</p>
-                        )}
+
+                            {/* Quick Actions */}
+                            <div className="flex items-center gap-2">
+                                <Link href="/service/new" className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap">
+                                    <span>+</span> Kayıt Aç
+                                </Link>
+                                <button className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm">
+                                    Dışa Aktar
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* GROUPED NAVIGATION & FILTERS */}
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2">
+                            <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll pb-1">
+                                {[
+                                    { group: 'SERVİS', items: [
+                                        { id: 'ALL', label: 'Tüm Servis Listesi' }
+                                    ]},
+                                    { group: 'BEKLEYENLER', items: [
+                                        { id: 'PENDING', label: 'Yeni Triyaj' }, 
+                                        { id: 'WAITING_APPROVAL', label: 'Onay Bekleyenler' }
+                                    ]},
+                                    { group: 'OPERASYON', items: [
+                                        { id: 'IN_PROGRESS', label: 'İşlemde Olanlar' }
+                                    ]},
+                                ].map((grp, i) => (
+                                    <div key={grp.group} className="flex items-center gap-3">
+                                        {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
+                                        <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                            {grp.items.map(tab => (
+                                                <button
+                                                    key={tab.id}
+                                                    onClick={() => setActiveTab(tab.id)}
+                                                    className={activeTab === tab.id
+                                                        ? "px-3 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
+                                                        : "px-3 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
+                                                    }
+                                                >
+                                                    {tab.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Quick Search & Filters */}
+                            <div className="flex items-center gap-2 border-t sm:border-0 border-slate-200 dark:border-white/5 pt-3 sm:pt-0">
+                                <div className="relative w-full sm:w-[220px]">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        placeholder="Cihaz, No veya Müşteri..."
+                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-[8px] h-[36px] pl-9 pr-3 text-[12px] font-semibold outline-none focus:border-blue-500 shadow-sm transition-all text-slate-900 dark:text-white"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                                <select
+                                    className="h-[36px] px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold rounded-[8px] text-[12px] outline-none focus:border-blue-500 shadow-sm transition-colors w-max"
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    value={statusFilter}
+                                >
+                                    <option value="">Tüm Gelişmiş Filtreler</option>
+                                    <option value="COMPLETED">Sadece Tamamlananlar</option>
+                                    <option value="CANCELLED">İptal Edilenler</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-            </div>
-
-
-            {/* Table Section (Matching Image 2) */}
-            <div className="bg-white dark:bg-slate-900 rounded-[28px] p-6 sm:p-8 shadow-[0_2px_15px_-4px_rgba(0,0,0,0.03)] border border-slate-100 dark:border-white/5">
-                <div className="flex justify-between items-center mb-8">
-                    <div className="flex items-center gap-3">
-                        <LayoutDashboard className="w-6 h-6 text-blue-600 dark:text-blue-500" />
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Aktif İş Emirleri</h2>
-                    </div>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[13px] font-bold text-blue-600 dark:text-blue-400 hover:bg-slate-100 transition-colors">
-                        <Download className="w-4 h-4" /> Export
-                    </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left min-w-[800px] border-separate border-spacing-y-3">
-                        <thead>
-                            <tr className="bg-slate-50/80 dark:bg-slate-800/50 rounded-xl overflow-hidden">
-                                <th className="px-6 py-4 text-[13px] font-bold text-slate-800 dark:text-slate-300 first:rounded-l-xl last:rounded-r-xl w-16">#</th>
-                                <th className="px-6 py-4 text-[13px] font-bold text-slate-800 dark:text-slate-300">Cihaz Bilgisi</th>
-                                <th className="px-6 py-4 text-[13px] font-bold text-slate-800 dark:text-slate-300">Müşteri</th>
-                                <th className="px-6 py-4 text-[13px] font-bold text-slate-800 dark:text-slate-300">Durum</th>
-                                <th className="px-6 py-4 text-[13px] font-bold text-slate-800 dark:text-slate-300">Tarih</th>
-                                <th className="px-6 py-4 text-[13px] font-bold text-slate-800 dark:text-slate-300 first:rounded-l-xl last:rounded-r-xl">Tutar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <tr><td colSpan={6} className="py-8 text-center text-sm font-medium text-slate-500">Yükleniyor...</td></tr>
-                            ) : stats.recentOrders.length === 0 ? (
-                                <tr><td colSpan={6} className="py-8 text-center text-sm font-medium text-slate-500">İş emri bulunamadı.</td></tr>
-                            ) : (
-                                stats.recentOrders.map((o:any, index:number) => {
-                                    // Make alternate rows have the light gray background pill effect as requested
-                                    const isAlternate = index % 2 === 1;
-                                    const rowClass = isAlternate ? "bg-slate-50 dark:bg-slate-800/30" : "bg-white dark:bg-transparent";
-
-                                    return (
-                                        <tr key={o.id} onClick={() => router.push(`/service/${o.id}`)} className={`cursor-pointer group hover:opacity-80 transition-opacity ${rowClass}`}>
-                                            <td className="px-6 py-4 rounded-l-2xl">
-                                                <span className="text-[14px] font-black text-slate-900 dark:text-white">{index + 1}</span>
+                    {/* --- LIST TAB (OPERASYON TABLOSU) --- */}
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm overflow-hidden flex flex-col">
+                        <div className="overflow-auto min-h-[500px] custom-scroll">
+                            <table className="w-full text-left border-collapse min-w-[900px]">
+                                <thead className="bg-slate-50 dark:bg-[#1e293b] text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 z-20">
+                                    <tr>
+                                        <th className="px-4 py-3 pl-6 font-bold w-[40px] border-b border-slate-200 dark:border-white/5">
+                                            <input type="checkbox" className="w-4 h-4 rounded appearance-none border border-slate-300 dark:border-white/10 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer" />
+                                        </th>
+                                        <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">Kayıt No</th>
+                                        <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">Müşteri & Cihaz</th>
+                                        <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5">Durum</th>
+                                        <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5 text-right">Tutar</th>
+                                        <th className="px-4 py-3 font-bold border-b border-slate-200 dark:border-white/5 text-right pr-6">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan={6} className="p-16 text-center">
+                                                <div className="flex flex-col items-center justify-center gap-4">
+                                                    <div className="w-16 h-16 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center animate-pulse"></div>
+                                                    <div className="text-slate-500 font-medium">Veriler yükleniyor...</div>
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                                        <Wrench className="w-5 h-5 text-indigo-500" />
+                                        </tr>
+                                    ) : filteredOrders.length > 0 ? filteredOrders.map((o:any) => (
+                                        <tr key={o.id} onClick={() => router.push(`/service/${o.id}`)} className="hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 transition-colors h-[48px] group cursor-pointer">
+                                            <td className="px-4 py-2 pl-6 align-middle" onClick={e => e.stopPropagation()}>
+                                                <input type="checkbox" className="w-4 h-4 rounded appearance-none border border-slate-300 dark:border-white/10 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer opacity-50 group-hover:opacity-100" />
+                                            </td>
+                                            <td className="px-4 py-2 align-middle">
+                                                <div className="flex flex-col gap-1 items-start">
+                                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#334155]/50 text-[10px] font-bold tracking-wider text-slate-600 dark:text-slate-400 uppercase border border-slate-200 dark:border-white/5 whitespace-nowrap">
+                                                        #{o.id.substring(o.id.length - 6).toUpperCase()}
+                                                    </span>
+                                                    <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase whitespace-nowrap">
+                                                        {new Date(o.createdAt).toLocaleDateString('tr-TR')}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-2 align-middle">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#334155]/50 border border-slate-200 dark:border-white/5 flex items-center justify-center text-[12px] font-black text-blue-600 dark:text-blue-400">
+                                                        🔧
                                                     </div>
                                                     <div>
-                                                        <p className="text-[14px] font-extrabold text-slate-900 dark:text-white leading-snug">{o.asset?.brand || 'Modelleme Yok'}</p>
-                                                        <p className="text-[12px] text-slate-500 font-medium">{o.asset?.primaryIdentifier}</p>
+                                                        <div className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
+                                                            {o.customer?.name || 'Bilinmiyor'}
+                                                        </div>
+                                                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                                            {o.asset?.brand || 'Modelleme Yok'} • {o.asset?.primaryIdentifier}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-[13px] font-semibold text-slate-600 dark:text-slate-400">
-                                                {o.customer?.name}
-                                            </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-4 py-2 align-middle">
                                                 {renderStatusBadge(o.status)}
                                             </td>
-                                            <td className="px-6 py-4 text-[13px] font-semibold text-slate-500">
-                                                {new Date(o.createdAt).toLocaleDateString('tr-TR')}
+                                            <td className="px-4 py-2 align-middle text-right">
+                                                <div className="text-[13px] font-black text-slate-900 dark:text-white">
+                                                    {Number(o.totalAmount || 0).toLocaleString('tr-TR')} ₺
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 rounded-r-2xl">
-                                                <span className="text-[14px] font-bold text-slate-900 dark:text-white">{Number(o.totalAmount || 0).toLocaleString('tr-TR')} ₺</span>
+                                            <td className="px-4 py-2 pr-6 align-middle text-right">
+                                                <div className="flex items-center justify-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={(e) => { e.stopPropagation(); router.push(`/service/${o.id}`); }} className="w-7 h-7 rounded-md text-slate-500 dark:text-slate-400 hover:bg-blue-50 border hover:border-blue-200 border-transparent hover:text-blue-600 transition-all flex items-center justify-center font-bold" title="Detay">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-                
-                {/* Pagination mockup */}
-                {!loading && stats.recentOrders.length > 0 && (
-                    <div className="flex justify-between items-center mt-8 border-t border-slate-100 dark:border-white/5 pt-6">
-                        <span className="text-[13px] font-medium text-slate-500">Öğeler görüntüleniyor: {stats.recentOrders.length}</span>
-                        <div className="flex gap-1 items-center">
-                            <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">&lt;</button>
-                            <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-600 text-white font-bold text-[13px]">1</button>
-                            <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 font-bold text-[13px] hover:bg-slate-100 transition-colors">2</button>
-                            <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">&gt;</button>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan={6} className="p-16 text-center">
+                                                <div className="flex flex-col items-center justify-center gap-4">
+                                                    <div className="w-16 h-16 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-full flex items-center justify-center text-2xl text-slate-400">📄</div>
+                                                    <div className="text-slate-500 dark:text-slate-400 font-medium">Bu kriterlere uygun iş emri bulunamadı.</div>
+                                                    <Link href="/service/new" className="px-5 py-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[12px] text-[13px] hover:bg-slate-50 transition-colors shadow-sm">
+                                                        + Yeni Kayıt Aç
+                                                    </Link>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                )}
+
+                </div>
             </div>
         </div>
     );
