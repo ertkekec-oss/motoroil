@@ -14,6 +14,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Müşteri bulunamadı.' }, { status: 404 });
         }
 
+        const typeFromPayload = body.selectedAssetType;
+
         // Cihaza ait verileri güncelle (varsa)
         if (assetId) {
             try {
@@ -26,6 +28,7 @@ export async function POST(request: Request) {
                         productionYear: productionYear ? Number(productionYear) : undefined,
                         metadata: {
                             ...meta,
+                            ...(typeFromPayload ? { type: typeFromPayload } : {}),
                             currentKm: currentKm || meta.currentKm,
                             ...(dynamicMetadata || {})
                         }

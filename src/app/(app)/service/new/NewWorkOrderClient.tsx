@@ -227,7 +227,8 @@ function NewWorkOrderContent() {
                 currentKm,
                 chassisNo,
                 productionYear,
-                dynamicMetadata: finalDynamic
+                dynamicMetadata: finalDynamic,
+                selectedAssetType
             };
 
             const res = await fetch('/api/services/work-orders', {

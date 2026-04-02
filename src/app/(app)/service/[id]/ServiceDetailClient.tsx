@@ -287,34 +287,46 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 mt-2 p-4 bg-slate-50/50 dark:bg-[#0f172a] border border-slate-200/60 dark:border-white/5 rounded-[12px]">
-                                        {order.dynamicMetadata && Object.keys(order.dynamicMetadata).length > 0 ? (
-                                            Object.entries(order.dynamicMetadata).map(([key, value]) => {
-                                                const schemaType = order.asset?.metadata?.type;
-                                                const schema = appSettings?.asset_types_schema?.find((t:any) => t.name === schemaType || t.id === schemaType);
-                                                const fieldLabel = schema?.fields?.find((f:any) => f.id === key)?.label || key;
-                                                return (
-                                                    <div key={key}>
-                                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{fieldLabel}</div>
-                                                        <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{String(value) || '-'}</div>
-                                                    </div>
-                                                );
-                                            })
-                                        ) : (
-                                            <>
-                                                <div>
+                                        {(() => {
+                                            const rawMeta = order.asset?.metadata;
+                                            const meta = typeof rawMeta === 'string' ? JSON.parse(rawMeta) : (rawMeta || {});
+                                            const dynamicKeys = Object.keys(meta).filter(k => !['currentKm', 'type', 'sourceId', 'sourceType'].includes(k));
+                                            
+                                            const items = [
+                                                <div key="currentKm">
                                                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Geliş KM / Tüketim</div>
                                                     <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{order.currentKm_or_Use ? `${order.currentKm_or_Use.toLocaleString()}` : 'Belirtilmedi'}</div>
-                                                </div>
-                                                <div>
+                                                </div>,
+                                                <div key="chassisNo">
                                                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Şase No / Özel Kod</div>
-                                                    <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{order.chassisNo || 'Belirtilmedi'}</div>
+                                                    <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{order.asset?.secondaryIdentifier ? order.asset.secondaryIdentifier : 'Belirtilmedi'}</div>
                                                 </div>
-                                            </>
-                                        )}
-                                        <div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Servise Geliş Tarihi</div>
-                                            <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</div>
-                                        </div>
+                                            ];
+
+                                            if (dynamicKeys.length > 0) {
+                                                const schemaType = meta.type;
+                                                const schema = appSettings?.asset_types_schema?.find((t:any) => t.name === schemaType || t.id === schemaType);
+                                                
+                                                dynamicKeys.forEach(key => {
+                                                    const fieldLabel = schema?.fields?.find((f:any) => f.id === key)?.label || key;
+                                                    items.push(
+                                                        <div key={key}>
+                                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{fieldLabel}</div>
+                                                            <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{String(meta[key]) || '-'}</div>
+                                                        </div>
+                                                    );
+                                                });
+                                            }
+
+                                            items.push(
+                                                <div key="createdAt">
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Servise Geliş Tarihi</div>
+                                                    <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</div>
+                                                </div>
+                                            );
+                                            
+                                            return items;
+                                        })()}
                                     </div>
 
                                     {(order.nextKm_or_Use || order.nextMaintenanceAt) && (
