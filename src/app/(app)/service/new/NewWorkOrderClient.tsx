@@ -380,7 +380,17 @@ function NewWorkOrderContent() {
 
                                     {assetTab === 'external' && (
                                         <div className="mb-6 p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Cihaz / Taşıt Türü</label>
+                                                    <select value={selectedAssetType} onChange={e => setSelectedAssetType(e.target.value)} className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none">
+                                                        <option value="">Seçiniz...</option>
+                                                        {(appSettings?.asset_types_schema || []).map((t:any) => (
+                                                            <option key={t.id} value={t.name}>{t.name}</option>
+                                                        ))}
+                                                        <option value="VEHICLE">Kayıtsız (Genel)</option>
+                                                    </select>
+                                                </div>
                                                 <div>
                                                     <label className="text-xs font-bold text-slate-500 mb-1.5 block">Marka/Model / Ürün Adı</label>
                                                     <input type="text" value={assetBrand} onChange={e => setAssetBrand(e.target.value)} placeholder="Örn: Beko, Kuba, Honda..." className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-emerald-500/50 outline-none" />
@@ -529,18 +539,46 @@ function NewWorkOrderContent() {
                                 </h3>
                                 
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                                <div>
-                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Servise Geliş KM</label>
-                                    <input type="number" value={currentKm} onChange={e => setCurrentKm(e.target.value)} placeholder="Araç KM'si..." className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Şase No (VIN)</label>
-                                    <input type="text" value={chassisNo} onChange={e => setChassisNo(e.target.value)} placeholder="Şase numarası..." className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Model Yılı</label>
-                                    <input type="number" value={productionYear} onChange={e => setProductionYear(e.target.value)} placeholder="Örn: 2021" className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
-                                </div>
+                                {(() => {
+                                    const schema = appSettings?.asset_types_schema?.find((t:any) => t.name === selectedAssetType || t.id === selectedAssetType) || 
+                                                   appSettings?.asset_types_schema?.find((t:any) => 
+                                                       (assetBrand || '').toLowerCase().includes(t.name.toLowerCase()) || 
+                                                       (selectedAssetType === 'VEHICLE' && t.name.toLowerCase() === 'diğer')
+                                                   );
+                                    
+                                    if (schema && schema.fields && schema.fields.length > 0) {
+                                        return schema.fields.map((f:any) => (
+                                            <div key={f.id}>
+                                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">{f.label}</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={dynamicFields[f.id] || ''} 
+                                                    onChange={e => setDynamicFields({...dynamicFields, [f.id]: e.target.value})} 
+                                                    placeholder={f.label + " giriniz..."} 
+                                                    className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" 
+                                                />
+                                            </div>
+                                        ));
+                                    } else {
+                                        // Default fallback if no dynamic schema is found
+                                        return (
+                                            <>
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Servise Geliş KM</label>
+                                                    <input type="number" value={currentKm} onChange={e => setCurrentKm(e.target.value)} placeholder="Araç KM'si..." className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Şase No (VIN)</label>
+                                                    <input type="text" value={chassisNo} onChange={e => setChassisNo(e.target.value)} placeholder="Şase numarası..." className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-bold text-slate-500 mb-1.5 block">Model Yılı</label>
+                                                    <input type="number" value={productionYear} onChange={e => setProductionYear(e.target.value)} placeholder="Örn: 2021" className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none" />
+                                                </div>
+                                            </>
+                                        );
+                                    }
+                                })()}
                             </div>
 
                                 <textarea
