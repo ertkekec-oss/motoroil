@@ -254,11 +254,11 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                 {/* TABS REMOVED */}
             </div>
 
-            <div className="flex-1 p-4 sm:p-6 lg:p-10 max-w-[1400px] mx-auto w-full space-y-8">
+            <div className="flex-1 p-3 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full space-y-4">
                 {/* 1. DETAILS */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:p-5 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="lg:col-span-2 space-y-4">
+                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5">
                             <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
                                 <FileText className="w-4 h-4" /> Şikayet & İstekler
                             </h3>
@@ -267,7 +267,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                             </p>
                         </div>
                         
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6">
+                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5">
                             <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
                                 <Shield className="w-4 h-4" /> Cihaz Bilgisi & Araç Karnesi
                             </h3>
@@ -286,7 +286,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4 mt-2 p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-white/5 rounded-xl">
+                                    <div className="grid grid-cols-2 gap-4 mt-2 p-4 bg-slate-50/50 dark:bg-[#0f172a] border border-slate-200/60 dark:border-white/5 rounded-[12px]">
                                         {order.dynamicMetadata && Object.keys(order.dynamicMetadata).length > 0 ? (
                                             Object.entries(order.dynamicMetadata).map(([key, value]) => {
                                                 const schemaType = order.asset?.metadata?.type;
@@ -318,7 +318,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                     </div>
 
                                     {(order.nextKm_or_Use || order.nextMaintenanceAt) && (
-                                        <div className="mt-3 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl flex flex-wrap gap-6 items-center">
+                                        <div className="mt-3 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl flex flex-wrap gap-4 sm:p-5 items-center">
                                             <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-500">
                                                 <CheckCircle className="w-5 h-5" />
                                                 <span className="text-[12px] font-black uppercase tracking-widest">Sonraki Bakım Hedefleri</span>
@@ -345,7 +345,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                         </div>
 
                         {/* TEKNİK SERVİS NOTLARI */}
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6">
+                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5">
                             <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
                                 <FileText className="w-4 h-4" /> Teknik Servis Notları (Uzman Yorumu)
                             </h3>
@@ -353,7 +353,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                 value={technicianNotes}
                                 onChange={e => setTechnicianNotes(e.target.value)}
                                 placeholder="Teknisyenin müdahale detayları, teşhisi veya müşteriye uyarıları..."
-                                className="w-full min-h-[120px] p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/50 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-y"
+                                className="w-full min-h-[120px] p-4 rounded-[12px] border border-slate-200/60 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30 text-[13px] focus:ring-2 focus:ring-emerald-500/50 outline-none resize-y font-medium text-slate-700 dark:text-slate-300"
                             />
                             <div className="flex justify-end mt-3">
                                 <button onClick={handleSaveNotes} disabled={savingNotes} className="px-5 py-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-xs rounded-xl hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors disabled:opacity-50">
@@ -363,8 +363,8 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                         </div>
                     </div>
                     
-                    <div className="lg:col-span-1 space-y-6">
-                        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-6 flex flex-col justify-between">
+                    <div className="lg:col-span-1 space-y-4">
+                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5 flex flex-col justify-between">
                             <h3 className="text-[12px] font-black tracking-widest text-slate-500 uppercase mb-4">Finansal Özet</h3>
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -397,9 +397,9 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                 </div>
 
                 {/* 2. PARTS SECTION */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-4 sm:p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50 dark:bg-white/[0.02]">
+                        <h3 className="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wide">
                             <Package className="w-5 h-5 text-blue-500" /> Kullanılan Yedek Parçalar & Ürün Satışı
                         </h3>
                         <button onClick={() => setProductModalOpen(true)} className="w-full sm:w-auto h-[36px] px-4 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/20">
@@ -407,7 +407,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                         </button>
                     </div>
 
-                    <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30">
@@ -442,14 +442,14 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                 </div>
 
                 {/* 3. LABOR SECTION */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm p-4 sm:p-6 lg:p-8 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 dark:border-white/5 pb-4">
-                        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50 dark:bg-white/[0.02]">
+                        <h3 className="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wide">
                             <Clock className="w-5 h-5 text-amber-500" /> Uygulanan İşçilikler
                         </h3>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3 mb-8 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-[16px] border border-slate-200 dark:border-white/10">
+                    <div className="flex flex-col sm:flex-row gap-3 m-4 sm:m-5 bg-slate-50/50 dark:bg-slate-800/20 p-3 rounded-[12px] border border-slate-200/60 dark:border-white/5">
                         <div className="flex-1">
                             <label className="text-xs font-bold text-slate-500 mb-1.5 block">İşçilik / Hizmet Seçin (Ayarlardaki Tarifeler)</label>
                             <select 
@@ -486,7 +486,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                         </div>
                     </div>
                     
-                    <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30">
@@ -523,7 +523,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
 
             {productModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-                    <div className="w-full max-w-2xl bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95">
+                    <div className="w-full max-w-2xl bg-white dark:bg-[#0f172a] rounded-[16px] p-4 sm:p-5 border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2"><ScanLine className="text-indigo-500" /> Katalogdan Parça Seçimi</h3>
                             <button onClick={() => setProductModalOpen(false)} className="w-8 h-8 flex justify-center items-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"><span className="font-bold">✕</span></button>
@@ -566,7 +566,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
             {/* CHECKOUT MODAL (TAMAMLA) */}
             {checkoutModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-                    <div className="w-full max-w-lg bg-white dark:bg-[#0f172a] rounded-[24px] p-6 sm:p-8 border border-slate-200 dark:border-white/10 shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+                    <div className="w-full max-w-lg bg-white dark:bg-[#0f172a] rounded-[16px] p-4 sm:p-5 sm:p-8 border border-slate-200 dark:border-white/10 shadow-2xl animate-in fade-in slide-in-from-bottom-4">
                         <div className="text-center mb-6">
                             <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center rounded-full mx-auto mb-4">
                                 <CheckCircle className="w-8 h-8" />
