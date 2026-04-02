@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
-import { Wrench, ShieldCheck, HardHat, FileText, ChevronRight, Activity, Search, MapPin, Sparkles, Zap, Clock, Power, CheckCircle2 } from 'lucide-react';
+import { Wrench, Search, Clock, FileText, CheckCircle2, ChevronRight, Activity, Filter, Settings2 } from 'lucide-react';
 
 export default function ServiceDashboardClient() {
     const router = useRouter();
-    const { activeBranchName, activeTenantId, hasPermission } = useApp();
+    const { activeBranchName, activeTenantId } = useApp();
 
     const [stats, setStats] = useState<any>({
         pending: 0,
@@ -18,18 +18,15 @@ export default function ServiceDashboardClient() {
         recentOrders: []
     });
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('ALL');
 
     useEffect(() => {
         fetchDashboardData();
-        // Set up real-time pulse simulation
-        const interval = setInterval(() => {
-            fetchDashboardData(true);
-        }, 15000);
-        return () => clearInterval(interval);
     }, [activeBranchName, activeTenantId]);
 
-    const fetchDashboardData = async (silent = false) => {
-        if (!silent) setLoading(true);
+    const fetchDashboardData = async () => {
+        setLoading(true);
         try {
             const res = await fetch(`/api/services/dashboard?branch=${activeBranchName}&tenantId=${activeTenantId || ''}`);
             if (res.ok) {
@@ -39,209 +36,213 @@ export default function ServiceDashboardClient() {
         } catch (error) {
             console.error('Failed to fetch dashboard data', error);
         } finally {
-            if (!silent) setLoading(false);
+            setLoading(false);
         }
     };
 
-    const getStatusIndex = (status: string) => {
-        if (status === 'PENDING') return 1;
-        if (status === 'WAITING_APPROVAL') return 2;
-        if (status === 'IN_PROGRESS') return 3;
-        if (status === 'COMPLETED') return 4;
-        return 0; // Cancelled or other
+    // Filter Logic
+    const filteredOrders = (stats.recentOrders || []).filter((o: any) => {
+        const matchesStatus = statusFilter === 'ALL' || o.status === statusFilter;
+        const matchesSearch = searchTerm === '' || 
+            (o.asset?.primaryIdentifier || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (o.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+            (o.asset?.brand || '').toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesStatus && matchesSearch;
+    });
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'PENDING':
+                return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 whitespace-nowrap"><Clock className="w-3 h-3" /> Triyaj / Bekliyor</span>;
+            case 'WAITING_APPROVAL':
+                return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-500 border border-amber-200 dark:border-amber-500/20 whitespace-nowrap"><FileText className="w-3 h-3" /> Onay Bekleniyor</span>;
+            case 'IN_PROGRESS':
+                return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-500 border border-blue-200 dark:border-blue-500/20 whitespace-nowrap"><Wrench className="w-3 h-3" /> İşlemde</span>;
+            case 'COMPLETED':
+                return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-500 border border-emerald-200 dark:border-emerald-500/20 whitespace-nowrap"><CheckCircle2 className="w-3 h-3" /> Tamamlandı</span>;
+            default:
+                return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 whitespace-nowrap">{status}</span>;
+        }
     };
-
-    const renderSubwayPipeline = (status: string) => {
-        const currentIdx = getStatusIndex(status);
-        const nodes = [
-            { id: 1, label: 'Kabul' },
-            { id: 2, label: 'Onay' },
-            { id: 3, label: 'Atölye' },
-            { id: 4, label: 'Hazır' },
-        ];
-
-        return (
-            <div className="flex items-center w-full max-w-sm ml-auto">
-                {nodes.map((node, index) => {
-                    const isActive = currentIdx === node.id;
-                    const isPast = currentIdx > node.id;
-                    const isFuture = currentIdx < node.id;
-                    const isCancelled = currentIdx === 0;
-
-                    let dotColor = 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700';
-                    let labelColor = 'text-slate-400 dark:text-slate-600';
-                    
-                    if (isCancelled) {
-                        dotColor = 'bg-rose-500/20 border-rose-500';
-                        labelColor = 'text-rose-500/50';
-                    } else if (isActive) {
-                        if (node.id === 1) dotColor = 'bg-blue-500 border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.6)]';
-                        if (node.id === 2) dotColor = 'bg-amber-500 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.6)] animate-pulse';
-                        if (node.id === 3) dotColor = 'bg-indigo-500 border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.6)]';
-                        if (node.id === 4) dotColor = 'bg-emerald-500 border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.7)]';
-                        labelColor = 'text-slate-900 dark:text-white font-bold';
-                    } else if (isPast) {
-                        dotColor = 'bg-emerald-400 border-emerald-500';
-                        labelColor = 'text-slate-500 dark:text-slate-400';
-                    }
-
-                    return (
-                        <React.Fragment key={node.id}>
-                            <div className="relative flex flex-col items-center justify-center flex-1">
-                                <div className={`w-3.5 h-3.5 rounded-full border-[2px] z-10 transition-all duration-500 ${dotColor}`} />
-                                <span className={`absolute top-5 text-[10px] uppercase tracking-widest transition-colors duration-300 ${labelColor} whitespace-nowrap`}>{node.label}</span>
-                            </div>
-                            {index < nodes.length - 1 && (
-                                <div className={`flex-1 h-0.5 -mx-4 z-0 transition-colors duration-500 ${isPast && !isCancelled ? 'bg-emerald-500/30' : 'bg-slate-200 dark:bg-slate-800'}`} />
-                            )}
-                        </React.Fragment>
-                    );
-                })}
-            </div>
-        );
-    };
-
-    const activeTotalCount = stats.pending + stats.inProgress;
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#06090F] selection:bg-indigo-500/20">
-            {/* Minimal Borderless Header Area (Bento Style Edge) */}
-            <div className="flex-shrink-0 border-b border-slate-200/50 dark:border-white/[0.03] bg-white/50 dark:bg-[#06090F]/80 backdrop-blur-3xl z-10 sticky top-0">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 px-4 sm:px-6 lg:px-10 py-4 lg:py-0 lg:h-20 max-w-[1600px] mx-auto">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-[18px] bg-gradient-to-br from-[#0F172A] to-[#1E293B] shadow-lg shadow-black/10 flex items-center justify-center border border-white/[0.05] shrink-0 overflow-hidden relative">
-                            <div className="absolute inset-0 bg-indigo-500/10 blur-xl"></div>
-                            <HardHat className="w-6 h-6 text-indigo-400 relative z-10" />
+        <div className="flex flex-col min-h-screen bg-slate-50/50 dark:bg-slate-950">
+            {/* Extremely Compact Header */}
+            <div className="sticky top-0 z-20 bg-white/80 dark:bg-[#0B1220]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
+                <div className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-w-[1600px] mx-auto">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                            <Wrench className="w-4 h-4 text-white" />
                         </div>
-                        <div className="flex flex-col min-w-0">
-                            <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-none truncate flex items-center gap-3">
-                                Operation Center & AI
-                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> LIVE</span>
+                        <div>
+                            <h1 className="text-[16px] font-black tracking-tight text-slate-900 dark:text-white leading-none flex items-center gap-2">
+                                Servis Masası
+                                <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] uppercase font-bold tracking-wider border border-blue-500/20">Pro</span>
                             </h1>
-                            <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5 truncate">
-                                Gelişmiş Atölye ve Verimlilik Paneli
-                            </span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3 w-full lg:w-auto">
-                        <Link href="/service/new"
-                            className="h-10 px-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[14px] font-bold text-[13px] flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-lg w-full sm:w-auto shrink-0"
-                        >
-                            <Zap className="w-4 h-4" />
-                            Yeni Servis Kaydı
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="relative w-full sm:w-[260px]">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Cihaz, Plaka veya Müşteri Ara..." 
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                                className="w-full h-9 pl-9 pr-3 rounded-lg bg-slate-100 dark:bg-slate-900 border border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 text-[13px] font-medium transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                            />
+                        </div>
+                        <Link href="/service/new" className="h-9 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[13px] font-bold rounded-lg flex items-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shrink-0 shadow-sm">
+                            <span>+</span>
+                            <span className="hidden sm:inline">Yeni Servis</span>
                         </Link>
                     </div>
                 </div>
             </div>
 
-            {/* Bento Grid Content */}
-            <div className="p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 flex-1 w-full max-w-[1600px] mx-auto">
+            <div className="p-4 sm:p-6 w-full max-w-[1600px] mx-auto space-y-6">
                 
-                {/* 1. Bento Top Heroes */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Hero Widget: Command AI */}
-                    <div className="lg:col-span-2 rounded-[28px] bg-gradient-to-br from-slate-900 via-[#111827] to-[#1e1b4b] border border-white/10 p-8 sm:p-10 relative overflow-hidden flex flex-col justify-between shadow-2xl shadow-indigo-900/20 group">
-                        {/* Glows */}
-                        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"></div>
-                        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/4"></div>
-                        
-                        <div className="relative z-10 flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
-                                <Sparkles className="w-5 h-5 text-indigo-300" />
-                            </div>
-                            <span className="text-[12px] font-black text-indigo-300 uppercase tracking-[0.2em]">Artificial Intelligence Summary</span>
+                {/* Ultra Compact Stat Row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-white dark:bg-[#0B1220] rounded-xl border border-slate-200 dark:border-white/5 p-4 flex flex-col justify-between shadow-sm">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Clock className="w-4 h-4 text-slate-400" />
+                            <span className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Açık Kapasite</span>
                         </div>
-                        
-                        <div className="relative z-10 max-w-2xl">
-                            {loading ? (
-                                <h2 className="text-3xl sm:text-4xl font-extrabold text-white/50 tracking-tight leading-tight">Yapay zeka verileri analiz ediyor...</h2>
-                            ) : (
-                                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                                    Şu an atölyenizde <span className="text-indigo-400">{activeTotalCount} aktif cihaz</span> bulunuyor. 
-                                    {stats.pending > 0 && <span> <b className="text-amber-400">{stats.pending} cihaz</b> için müşteri onayı bekleniyor.</span>}
-                                    {stats.inProgress > 0 && <span> Ustaların masasında <b className="text-emerald-400">{stats.inProgress} iş</b> devam ediyor.</span>}
-                                </h2>
-                            )}
-                            <p className="text-slate-400 text-base sm:text-lg font-medium mt-6 line-clamp-2">
-                                Operayonel yoğunluk normal seviyelerde. Onay bekleyen işlemleri hızlandırmak için WhatsApp üzerinden müşterilere dijital onay formunu tekrar iletebilirsiniz.
-                            </p>
-                        </div>
+                        <div className="text-2xl font-black text-slate-900 dark:text-white leading-none">{stats.pending} <span className="text-[13px] font-semibold text-slate-400 ml-1">Kayıt</span></div>
                     </div>
-
-                    {/* Financial Widget */}
-                    <div className="rounded-[28px] bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/[0.05] p-8 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-blue-500/30 transition-colors">
-                        <div className="absolute -right-6 -top-6 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-colors"></div>
-                        <div>
-                            <div className="flex justify-between items-start mb-2">
-                                <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest"><Activity className="w-4 h-4 inline-block mr-1 -mt-0.5 text-emerald-500" /> Tahmini Bekleyen Ciro</span>
-                            </div>
-                            <div className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mt-4">
-                                {loading ? '...' : (Number(stats.totalRevenue) / 1000).toFixed(1)}<span className="text-2xl text-slate-400 ml-1">K ₺</span>
-                            </div>
+                    <div className="bg-white dark:bg-[#0B1220] rounded-xl border border-slate-200 dark:border-white/5 p-4 flex flex-col justify-between shadow-sm">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Wrench className="w-4 h-4 text-blue-500" />
+                            <span className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Aktif İşlemde</span>
                         </div>
-
-                        <div className="mt-8">
-                            <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-2">
-                                <span>Kapanan (+{stats.completed})</span>
-                                <span>İşlemde ({stats.inProgress})</span>
-                            </div>
-                            <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
-                                <div className="h-full bg-emerald-500" style={{ width: `${(stats.completed / (activeTotalCount + stats.completed || 1)) * 100}%` }}></div>
-                                <div className="h-full bg-indigo-500" style={{ width: `${(stats.inProgress / (activeTotalCount + stats.completed || 1)) * 100}%` }}></div>
-                            </div>
+                        <div className="text-2xl font-black text-blue-600 dark:text-blue-400 leading-none">{stats.inProgress} <span className="text-[13px] font-semibold text-blue-400/60 ml-1">Cihaz</span></div>
+                    </div>
+                    <div className="bg-white dark:bg-[#0B1220] rounded-xl border border-slate-200 dark:border-white/5 p-4 flex flex-col justify-between shadow-sm">
+                        <div className="flex items-center gap-2 mb-3">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                            <span className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tamamlanan</span>
+                        </div>
+                        <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 leading-none">{stats.completed} <span className="text-[13px] font-semibold text-emerald-400/60 ml-1">işlem</span></div>
+                    </div>
+                    <div className="bg-white dark:bg-[#0B1220] rounded-xl border border-slate-200 dark:border-white/5 p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
+                        <div className="absolute right-0 bottom-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl translate-x-1/3 translate-y-1/3"></div>
+                        <div className="flex items-center gap-2 mb-3 relative z-10">
+                            <Activity className="w-4 h-4 text-slate-400" />
+                            <span className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Toplam Limit</span>
+                        </div>
+                        <div className="text-2xl font-black text-slate-900 dark:text-white leading-none relative z-10">
+                            {Number(stats.totalRevenue).toLocaleString('tr-TR')} <span className="text-[16px] text-slate-400">₺</span>
                         </div>
                     </div>
                 </div>
 
-                {/* 2. Metro Pipeline Section (Non-Classic Table) */}
-                <div className="mt-8 sm:mt-12">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                            <Power className="w-5 h-5 text-indigo-500" /> Canlı Operasyon Hattı
-                        </h3>
-                        <Link href="/service/work-orders" className="h-9 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-[12px] font-bold text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Tümünü İncele</Link>
+                {/* Filter & Data Grid Wrapper */}
+                <div className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-xl shadow-sm flex flex-col">
+                    {/* Toolbar */}
+                    <div className="border-b border-slate-100 dark:border-white/5 p-3 flex items-center justify-between gap-4 overflow-x-auto">
+                        <div className="flex items-center gap-2">
+                            <Filter className="w-4 h-4 text-slate-400" />
+                            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-900/50 rounded-lg">
+                                {['ALL', 'PENDING', 'WAITING_APPROVAL', 'IN_PROGRESS', 'COMPLETED'].map(status => (
+                                    <button 
+                                        key={status}
+                                        onClick={() => setStatusFilter(status)}
+                                        className={`px-3 py-1.5 rounded-md text-[12px] font-bold transition-all whitespace-nowrap ${statusFilter === status ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                    >
+                                        {status === 'ALL' ? 'Tümü' : 
+                                         status === 'PENDING' ? 'Bekliyor' : 
+                                         status === 'WAITING_APPROVAL' ? 'Onayda' : 
+                                         status === 'IN_PROGRESS' ? 'İşlemde' : 'Biten'}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button className="h-8 px-3 rounded-lg border border-slate-200 dark:border-white/10 text-[12px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                <Settings2 className="w-3.5 h-3.5" /> Görünüm
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
-                        {loading && (
-                            <div className="h-32 rounded-[24px] bg-slate-50 dark:bg-[#0B1220] border border-slate-200 dark:border-white/[0.05] animate-pulse"></div>
-                        )}
-                        {!loading && stats.recentOrders.length === 0 && (
-                            <div className="h-40 rounded-[28px] border-2 border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center justify-center text-slate-500 gap-3">
-                                <Clock className="w-8 h-8 opacity-50" />
-                                <span className="text-sm font-bold tracking-wide">Aktif servis işlemi bulunmuyor.</span>
-                            </div>
-                        )}
-                        {!loading && stats.recentOrders.map((o:any) => (
-                            <div key={o.id} onClick={() => router.push(`/service/${o.id}`)} className="group bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/[0.05] rounded-[24px] p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-8 cursor-pointer hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.5)] hover:border-indigo-500/20 hover:scale-[1.005] transition-all duration-300 relative overflow-hidden">
-                                
-                                {/* Background Highlight on hover */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/[0.01] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-
-                                {/* Asset Info Side */}
-                                <div className="flex items-center gap-5 relative z-10 min-w-0">
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 flex items-center justify-center shrink-0">
-                                        <Wrench className="w-6 h-6 text-indigo-400" />
-                                    </div>
-                                    <div className="flex flex-col min-w-0">
-                                        <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate pb-1">
-                                            {o.asset?.primaryIdentifier || 'Kayıtsız Ürün'} {o.asset?.brand ? `• ${o.asset.brand}` : ''}
-                                        </h4>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">{o.customer?.name}</span>
-                                            <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></div>
-                                            <span className="text-[12px] font-bold text-indigo-500">{Number(o.totalAmount || 0).toLocaleString('tr-TR')} ₺</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Pipeline Subway Side */}
-                                <div className="w-full lg:w-2/5 shrink-0 relative z-10 pt-4 lg:pt-0 border-t border-slate-100 dark:border-white/5 lg:border-0">
-                                    {renderSubwayPipeline(o.status)}
-                                </div>
-                            </div>
-                        ))}
+                    {/* Dense Data Table (Highest Efficiency) */}
+                    <div className="overflow-x-auto w-full">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20">
+                                    <th className="px-4 py-3 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Kayıt No</th>
+                                    <th className="px-4 py-3 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Cihaz / Taşıt</th>
+                                    <th className="px-4 py-3 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Müşteri</th>
+                                    <th className="px-4 py-3 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tarih</th>
+                                    <th className="px-4 py-3 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Statü</th>
+                                    <th className="px-4 py-3 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Tutar</th>
+                                    <th className="px-4 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                {loading && [...Array(5)].map((_, i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td className="px-4 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-16"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-32 mb-1"></div><div className="h-3 bg-slate-100 dark:bg-slate-800/50 rounded w-20"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-24"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-24"></div></td>
+                                        <td className="px-4 py-4"><div className="h-6 bg-slate-200 dark:bg-slate-800 rounded-md w-24 mx-auto"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-16 ml-auto"></div></td>
+                                        <td className="px-4 py-4"><div className="h-8 bg-slate-200 dark:bg-slate-800 rounded-lg w-8 ml-auto"></div></td>
+                                    </tr>
+                                ))}
+                                {!loading && filteredOrders.length === 0 && (
+                                    <tr>
+                                        <td colSpan={7} className="px-4 py-12 text-center">
+                                            <div className="flex flex-col items-center justify-center text-slate-400 gap-2">
+                                                <Search className="w-8 h-8 opacity-50" />
+                                                <span className="text-[13px] font-medium">Bu kriterlere uygun kayıt bulunamadı.</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                                {!loading && filteredOrders.map((o: any) => (
+                                    <tr 
+                                        key={o.id} 
+                                        onClick={() => router.push(`/service/${o.id}`)}
+                                        className="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
+                                    >
+                                        <td className="px-4 py-3">
+                                            <span className="text-[13px] font-bold text-slate-500 dark:text-slate-400">#{o.id.substring(o.id.length - 6).toUpperCase()}</span>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                                    <Wrench className="w-4 h-4 text-slate-500" />
+                                                </div>
+                                                <div className="flex flex-col min-w-0 max-w-[200px] sm:max-w-[300px]">
+                                                    <span className="text-[13px] font-black text-slate-900 dark:text-white truncate">{o.asset?.primaryIdentifier || 'Kayıtsız'}</span>
+                                                    <span className="text-[11px] font-bold text-slate-500 truncate">{o.asset?.brand || 'Model Girtilmemiş'}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300 truncate block max-w-[150px]">{o.customer?.name}</span>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <span className="text-[12px] font-semibold text-slate-500">{new Date(o.createdAt).toLocaleDateString('tr-TR')}</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            {getStatusBadge(o.status)}
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                            <span className="text-[13px] font-black text-slate-900 dark:text-white">{Number(o.totalAmount || 0).toLocaleString('tr-TR')} ₺</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                            <button className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors ml-auto opacity-0 group-hover:opacity-100">
+                                                <ChevronRight className="w-4 h-4 text-slate-500" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
