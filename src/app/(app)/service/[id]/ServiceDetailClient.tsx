@@ -25,7 +25,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
     const [newItemQty, setNewItemQty] = useState(1);
     const [newItemPrice, setNewItemPrice] = useState(0);
     const { products } = useInventory();
-    const { serviceSettings } = useSettings();
+    const { serviceSettings, appSettings } = useSettings();
     const router = useRouter();
 
     const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
@@ -287,23 +287,57 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 mt-2 p-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-white/5 rounded-xl">
-                                        <div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Geliş KM</div>
-                                            <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{order.currentKm_or_Use ? `${order.currentKm_or_Use.toLocaleString()} KM` : 'Belirtilmedi'}</div>
-                                        </div>
-                                        <div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sonraki Servis KM</div>
-                                            <div className="text-[13px] font-bold text-emerald-600 dark:text-emerald-400">{order.nextKm_or_Use ? `${order.nextKm_or_Use.toLocaleString()} KM` : 'Belirlenmedi'}</div>
-                                        </div>
-                                        <div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sonraki Servis Tarihi</div>
-                                            <div className="text-[13px] font-bold text-emerald-600 dark:text-emerald-400">{order.nextMaintenanceAt ? new Date(order.nextMaintenanceAt).toLocaleDateString('tr-TR') : 'Belirlenmedi'}</div>
-                                        </div>
+                                        {order.dynamicMetadata && Object.keys(order.dynamicMetadata).length > 0 ? (
+                                            Object.entries(order.dynamicMetadata).map(([key, value]) => {
+                                                const schemaType = order.asset?.metadata?.type;
+                                                const schema = appSettings?.asset_types_schema?.find((t:any) => t.name === schemaType || t.id === schemaType);
+                                                const fieldLabel = schema?.fields?.find((f:any) => f.id === key)?.label || key;
+                                                return (
+                                                    <div key={key}>
+                                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{fieldLabel}</div>
+                                                        <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{String(value) || '-'}</div>
+                                                    </div>
+                                                );
+                                            })
+                                        ) : (
+                                            <>
+                                                <div>
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Geliş KM / Tüketim</div>
+                                                    <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{order.currentKm_or_Use ? `${order.currentKm_or_Use.toLocaleString()}` : 'Belirtilmedi'}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Şase No / Özel Kod</div>
+                                                    <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{order.chassisNo || 'Belirtilmedi'}</div>
+                                                </div>
+                                            </>
+                                        )}
                                         <div>
                                             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Servise Geliş Tarihi</div>
                                             <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</div>
                                         </div>
                                     </div>
+
+                                    {(order.nextKm_or_Use || order.nextMaintenanceAt) && (
+                                        <div className="mt-3 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl flex flex-wrap gap-6 items-center">
+                                            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-500">
+                                                <CheckCircle className="w-5 h-5" />
+                                                <span className="text-[12px] font-black uppercase tracking-widest">Sonraki Bakım Hedefleri</span>
+                                            </div>
+                                            <div className="w-[1px] h-6 bg-emerald-200 dark:bg-emerald-500/20 hidden sm:block"></div>
+                                            {order.nextKm_or_Use && (
+                                                <div>
+                                                    <div className="text-[9px] font-bold text-emerald-600/70 dark:text-emerald-400/80 uppercase tracking-wider mb-1">Sonraki KM / Periyot</div>
+                                                    <div className="text-[13px] font-bold text-emerald-800 dark:text-emerald-400">{Number(order.nextKm_or_Use).toLocaleString()}</div>
+                                                </div>
+                                            )}
+                                            {order.nextMaintenanceAt && (
+                                                <div>
+                                                    <div className="text-[9px] font-bold text-emerald-600/70 dark:text-emerald-400/80 uppercase tracking-wider mb-1">Sonraki Servis Tarihi</div>
+                                                    <div className="text-[13px] font-bold text-emerald-800 dark:text-emerald-400">{new Date(order.nextMaintenanceAt).toLocaleDateString('tr-TR')}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <span className="text-sm font-medium text-slate-500">Cihaz belirtilmemiş.</span>
@@ -584,6 +618,17 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                             </button>
                         </div>
 
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2">Sonraki Servis KM (Opsiyonel)</label>
+                                <input type="number" value={nextKm} onChange={e => setNextKm(e.target.value)} className="w-full h-12 px-4 rounded-[12px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[13px] font-bold focus:border-emerald-500 outline-none" placeholder="Örn: 15000" />
+                            </div>
+                            <div>
+                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2">Sonraki Servis Tarihi (Opsiyonel)</label>
+                                <input type="date" value={nextDate} onChange={e => setNextDate(e.target.value)} className="w-full h-12 px-4 rounded-[12px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[13px] font-bold focus:border-emerald-500 outline-none" />
+                            </div>
+                        </div>
+
                         <div className="flex gap-3">
                             <button disabled={isFinishing} onClick={() => setCheckoutModalOpen(false)} className="w-[120px] h-14 rounded-xl font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Vazgeç</button>
                             <button
@@ -595,7 +640,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                         const resStatus = await fetch(`/api/services/work-orders/${id}`, {
                                             method: 'PATCH',
                                             headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ status: 'COMPLETED' })
+                                            body: JSON.stringify({ status: 'COMPLETED', nextKm_or_Use: nextKm ? Number(nextKm) : undefined, nextMaintenanceAt: nextDate ? new Date(nextDate).toISOString() : undefined })
                                         });
 
                                         if (!resStatus.ok) throw new Error("İş emri güncellenirken hata oluştu.");
