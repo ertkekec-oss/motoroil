@@ -8,18 +8,24 @@ export default function FieldPlannerClient() {
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
     const [unplanned, setUnplanned] = useState<any[]>([
-        { id: 'wo-1', code: 'WO-1001', priority: 'Yüksek', title: 'Dahili Filtre Bakımı & Yağ Değişimi', duration: '45dk', loc: 'Kozyatağı' },
-        { id: 'wo-2', code: 'WO-1002', priority: 'Normal', title: 'Akü Değişimi & Şarj Kontrolü', duration: '30dk', loc: 'Bostancı' },
-        { id: 'wo-3', code: 'WO-1003', priority: 'Düşük', title: 'Periyodik Yıllık Bakım', duration: '120dk', loc: 'Ataşehir' },
-        { id: 'wo-4', code: 'WO-1004', priority: 'Yüksek', title: 'Motor Arıza Tespiti (OBD)', duration: '60dk', loc: 'Maltepe' },
-        { id: 'wo-5', code: 'WO-1005', priority: 'Normal', title: 'Fren Balata Değişimi', duration: '45dk', loc: 'Kadıköy' }
+        { id: 'wo-1', code: 'WO-1001', priority: 'Yüksek', title: 'Dahili Filtre Bakımı & Yağ Değişimi', duration: '45dk', durationMins: 45, loc: 'Kozyatağı', coords: { lat: 40.9730, lng: 29.1000 } },
+        { id: 'wo-2', code: 'WO-1002', priority: 'Normal', title: 'Akü Değişimi & Şarj Kontrolü', duration: '30dk', durationMins: 30, loc: 'Bostancı', coords: { lat: 40.9530, lng: 29.1000 } },
+        { id: 'wo-3', code: 'WO-1003', priority: 'Düşük', title: 'Periyodik Yıllık Bakım', duration: '120dk', durationMins: 120, loc: 'Ataşehir', coords: { lat: 40.9840, lng: 29.1100 } },
+        { id: 'wo-4', code: 'WO-1004', priority: 'Yüksek', title: 'Motor Arıza Tespiti (OBD)', duration: '60dk', durationMins: 60, loc: 'Maltepe', coords: { lat: 40.9320, lng: 29.1310 } },
+        { id: 'wo-5', code: 'WO-1005', priority: 'Normal', title: 'Fren Balata Değişimi', duration: '45dk', durationMins: 45, loc: 'Kadıköy', coords: { lat: 40.9900, lng: 29.0200 } }
     ]);
 
     const [technicians, setTechnicians] = useState<any[]>([
-        { id: 'tech-1', name: 'Ahmet Yılmaz', jobs: [] },
-        { id: 'tech-2', name: 'Mehmet Demir', jobs: [] },
-        { id: 'tech-3', name: 'Ali Veli', jobs: [] }
+        { id: 'tech-1', name: 'Ahmet Yılmaz', jobs: [], isVisible: true, activeZone: 'Kadıköy-Ataşehir' },
+        { id: 'tech-2', name: 'Mehmet Demir', jobs: [], isVisible: true, activeZone: 'Maltepe-Kartal' },
+        { id: 'tech-3', name: 'Ali Veli', jobs: [], isVisible: true, activeZone: 'Genel Dağıtım' }
     ]);
+
+    const [optimizationRules, setOptimizationRules] = useState({
+        mesafeKisitlamasi: true,
+        deneyimEslesmesi: true,
+        performansOnceligi: false
+    });
 
     const [viewMode, setViewMode] = useState<'KANBAN' | 'GANTT' | 'MAP'>('KANBAN');
     const [showTemplates, setShowTemplates] = useState(false);
@@ -27,6 +33,35 @@ export default function FieldPlannerClient() {
     const [showTeamsModal, setShowTeamsModal] = useState(false);
     const [showRulesModal, setShowRulesModal] = useState(false);
     const [showNewApptModal, setShowNewApptModal] = useState(false);
+
+    const runOptimization = (templateType: 'STANDARD' | 'EMERGENCY') => {
+        // Simple client-side auto-routing algorithm simulation
+        let newUnplanned = [...unplanned];
+        let newTechs = JSON.parse(JSON.stringify(technicians)); // deep copy
+
+        // Sort unplanned jobs by priority if EMERGENCY template
+        if (templateType === 'EMERGENCY') {
+            newUnplanned.sort((a, b) => (a.priority === 'Yüksek' ? -1 : 1));
+        }
+
+        // Extremely simplified "Greedy" load balancing across available specific technicians
+        while (newUnplanned.length > 0) {
+            const job = newUnplanned.shift();
+            // Find tech with lowest total duration
+            let bestTech = newTechs.reduce((min: any, t: any) => {
+                const totalDur = t.jobs.reduce((sum: number, j: any) => sum + (j.durationMins || 30), 0);
+                const minDur = min.jobs.reduce((sum: number, j: any) => sum + (j.durationMins || 30), 0);
+                return totalDur < minDur ? t : min;
+            }, newTechs[0]);
+
+            bestTech.jobs.push(job);
+        }
+
+        setUnplanned([]);
+        setTechnicians(newTechs);
+        setShowOptimizeModal(false);
+        setShowTemplates(false);
+    };
 
     // DRAG & DROP HANDLERS (Native HTML5)
     // ... [existing logic remains] ...
@@ -207,7 +242,7 @@ export default function FieldPlannerClient() {
                                     {technicians.map((tech) => (
                                         <div 
                                             key={tech.id} 
-                                            className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[14px] p-4 flex flex-col shadow-sm transition-colors"
+                                            className={`bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[14px] p-4 flex flex-col shadow-sm transition-colors ${!tech.isVisible ? 'hidden' : ''}`}
                                             onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('bg-orange-50', 'dark:bg-orange-500/10'); }}
                                             onDragLeave={(e) => { e.currentTarget.classList.remove('bg-orange-50', 'dark:bg-orange-500/10'); }}
                                             onDrop={(e) => {
@@ -265,20 +300,110 @@ export default function FieldPlannerClient() {
                             )}
 
                             {viewMode === 'GANTT' && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/50 p-6 text-center animate-in zoom-in-95 duration-300">
-                                    <Clock className="w-12 h-12 text-slate-300 mb-4" />
-                                    <h3 className="text-lg font-black text-slate-700 dark:text-slate-200">Zaman Çizelgesi (Gantt) Hazırlanıyor</h3>
-                                    <p className="text-[13px] text-slate-500 max-w-[400px] mt-2">Bu görünümde personellerin görev süreleri saatlere göre harita blokları halinde dizilecektir.</p>
+                                <div className="p-6 flex flex-col gap-4 animate-in fade-in duration-300 min-w-[800px]">
+                                    {technicians.filter(t => t.isVisible).map(tech => (
+                                        <div key={tech.id} className="relative bg-white dark:bg-[#0f172a] rounded-[16px] border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-700 dark:text-slate-300 text-[10px]">
+                                                        {tech.name.charAt(0)}
+                                                    </div>
+                                                    <span className="font-bold text-[13px] dark:text-white uppercase tracking-wider">{tech.name}</span>
+                                                </div>
+                                                <span className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded font-mono font-bold">
+                                                    Toplam Yük: {tech.jobs.reduce((acc: number, j: any) => acc + (j.durationMins || 60), 0)} dk
+                                                </span>
+                                            </div>
+                                            
+                                            {/* GANTT TIMELINE BAR */}
+                                            <div className="relative h-16 bg-slate-50 dark:bg-slate-800/30 rounded-xl flex items-center overflow-x-auto custom-scroll p-2 gap-2 border border-slate-100 dark:border-white/5">
+                                                {tech.jobs.map((job: any) => (
+                                                    <div key={job.id} 
+                                                         className={`h-full rounded-lg px-3 py-1.5 flex flex-col justify-center shrink-0 cursor-pointer hover:opacity-80 transition-opacity border ${job.priority === 'Yüksek' ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-500/10 dark:border-rose-500/20' : job.priority === 'Normal' ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-500/10 dark:border-blue-500/20' : 'bg-white border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200'} shadow-sm`}
+                                                         style={{ width: `${Math.max((job.durationMins || 60) * 3, 80)}px` }} 
+                                                    >
+                                                        <span className="text-[10px] font-black truncate block tracking-wider uppercase mb-0.5">{job.code}</span>
+                                                        <span className="text-[9px] truncate block opacity-70 mb-0.5">{job.title}</span>
+                                                        <span className="text-[10px] font-mono font-bold mt-auto truncate block">{job.durationMins} dk</span>
+                                                    </div>
+                                                ))}
+                                                {tech.jobs.length === 0 && <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest pl-4">Planlanmış iş emri yok.</span>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {technicians.filter(t => t.isVisible).length === 0 && (
+                                        <div className="py-20 text-center text-slate-400 font-bold text-[12px] uppercase tracking-widest">
+                                            Lütfen 'Ekipler' menüsünden en az bir teknisyen seçin.
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
                             {viewMode === 'MAP' && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[url('/bg-dots.svg')] dark:bg-[url('/bg-dots-dark.svg')] bg-[length:24px_24px] p-6 text-center animate-in zoom-in-95 duration-300">
-                                    <div className="absolute inset-0 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-[1px]"></div>
-                                    <div className="relative z-10 flex flex-col items-center">
-                                        <Map className="w-12 h-12 text-orange-400 mb-4" />
-                                        <h3 className="text-lg font-black text-slate-700 dark:text-slate-200">Entegre Harita Görüntüsü</h3>
-                                        <p className="text-[13px] text-slate-500 max-w-[400px] mt-2">Google Maps / Mapbox entegrasyonu tamamlandığında dağıtım rotaları burada simüle edilecektir.</p>
+                                <div className="relative p-6 flex flex-col animate-in fade-in duration-300 min-h-[600px] h-full">
+                                    <div className="absolute top-10 w-full text-center z-20 pointer-events-none">
+                                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/80 backdrop-blur-sm text-white rounded-full text-[11px] font-bold tracking-widest uppercase shadow-lg">
+                                            <Map className="w-3 h-3 text-orange-400" /> İstanbul Anadolu Yakası Simülasyonu
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 relative bg-[#e2e8f0] dark:bg-[#1e293b] rounded-[24px] border border-slate-300 dark:border-white/10 overflow-hidden shadow-inner">
+                                        {/* Harita Grid Arkaplanı */}
+                                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 dark:opacity-5"></div>
+                                        
+                                        {/* Unplanned (Bekleyen İşler) as Gray Pins */}
+                                        {unplanned.map(job => {
+                                            if(!job.coords) return null;
+                                            const left = Math.max(5, Math.min(95, ((job.coords.lng - 28.98) / 0.17) * 100));
+                                            const bottom = Math.max(5, Math.min(95, ((job.coords.lat - 40.90) / 0.12) * 100));
+                                            return (
+                                                <div key={job.id} 
+                                                     className="absolute w-5 h-5 rounded-full bg-slate-400 border-[3px] border-white dark:border-slate-800 shadow-md transform -translate-x-1/2 translate-y-1/2 flex items-center justify-center cursor-help group transition-transform hover:scale-125 z-20 animate-pulse" 
+                                                     style={{ left: `${left}%`, bottom: `${bottom}%` }}>
+                                                    <div className="hidden group-hover:block absolute bottom-full mb-3 bg-slate-900 text-white text-[11px] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl z-50">
+                                                        <span className="text-orange-400">{job.code}</span> - {job.loc}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                        
+                                        {/* Technicians Jobs (Atanmış İşler) as Colored Route Nodes */}
+                                        {technicians.filter(t=>t.isVisible).map((tech, tIndex) => {
+                                            const colors = ['bg-orange-500', 'bg-blue-500', 'bg-emerald-500', 'bg-purple-500'];
+                                            const color = colors[tIndex % colors.length];
+                                            
+                                            // Optional SVG Lines for Route path
+                                            const pathD = tech.jobs.map((job: any, index: number) => {
+                                                if(!job.coords) return '';
+                                                const left = Math.max(5, Math.min(95, ((job.coords.lng - 28.98) / 0.17) * 100));
+                                                // Inverse bottom for SVG Y coordinate (which is from top)
+                                                const top = 100 - Math.max(5, Math.min(95, ((job.coords.lat - 40.90) / 0.12) * 100));
+                                                return `${index === 0 ? 'M' : 'L'} ${left} ${top}`;
+                                            }).join(' ');
+
+                                            return (
+                                                <div key={tech.id} className="absolute inset-0">
+                                                    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-40" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                                        <path d={pathD} fill="none" stroke="currentColor" className={`text-${color.split('-')[1]}-500`} strokeWidth="0.5" strokeDasharray="1,1" />
+                                                    </svg>
+                                                    {tech.jobs.map((job: any, jIndex: number) => {
+                                                        if(!job.coords) return null;
+                                                        const left = Math.max(5, Math.min(95, ((job.coords.lng - 28.98) / 0.17) * 100));
+                                                        const bottom = Math.max(5, Math.min(95, ((job.coords.lat - 40.90) / 0.12) * 100));
+                                                        return (
+                                                            <div key={job.id} 
+                                                                 className={`absolute w-7 h-7 rounded-full ${color} text-white shadow-[0_0_15px_rgba(0,0,0,0.2)] text-[10px] font-black border-[3px] border-white dark:border-slate-800 transform -translate-x-1/2 translate-y-1/2 flex items-center justify-center cursor-help group transition-transform hover:scale-125 z-30`} 
+                                                                 style={{ left: `${left}%`, bottom: `${bottom}%` }}>
+                                                                {jIndex + 1}
+                                                                <div className="hidden group-hover:block absolute bottom-full mb-3 bg-slate-900 text-white text-[11px] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl z-50">
+                                                                    <div className="text-[9px] text-slate-400 uppercase tracking-widest">{tech.name} - #{jIndex + 1} Hedef</div>
+                                                                    {job.loc} <span className="opacity-70 font-normal">({job.durationMins}dk)</span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -293,13 +418,13 @@ export default function FieldPlannerClient() {
                     <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[500px] p-6 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
                         <h2 className="text-xl font-black mb-4 dark:text-white">Otomatik Dağıtım Kuralları</h2>
                         <div className="space-y-3">
-                            <div className="p-4 border border-slate-200 dark:border-white/10 rounded-xl hover:border-orange-500 cursor-pointer transition-colors bg-slate-50 dark:bg-slate-800/50">
+                            <div onClick={() => runOptimization('STANDARD')} className="p-4 border border-slate-200 dark:border-white/10 rounded-xl hover:border-orange-500 cursor-pointer transition-colors bg-slate-50 dark:bg-slate-800/50">
                                 <h4 className="font-bold text-[14px] dark:text-slate-200 mb-1">Standart Periyodik Bakım Dağılımı</h4>
-                                <p className="text-[12px] text-slate-500">Mevcut 3 teknisyeni bölgelere göre (%33) eş paylaştırır.</p>
+                                <p className="text-[12px] text-slate-500">Kalan işleri mevcut teknisyenlere tahmini süreye göre eş paylaştırır.</p>
                             </div>
-                            <div className="p-4 border border-slate-200 dark:border-white/10 rounded-xl hover:border-orange-500 cursor-pointer transition-colors bg-slate-50 dark:bg-slate-800/50">
+                            <div onClick={() => runOptimization('EMERGENCY')} className="p-4 border border-slate-200 dark:border-white/10 rounded-xl hover:border-orange-500 cursor-pointer transition-colors bg-slate-50 dark:bg-slate-800/50">
                                 <h4 className="font-bold text-[14px] dark:text-slate-200 mb-1">Acil Müdahale Düzeni</h4>
-                                <p className="text-[12px] text-slate-500">Yüksek öncelikli işleri sadece "Usta" seviye personele atar.</p>
+                                <p className="text-[12px] text-slate-500">Yüksek öncelikli işleri önceleyecek şekilde hızlı dağıtım yapar.</p>
                             </div>
                         </div>
                         <button onClick={() => setShowTemplates(false)} className="mt-6 w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white rounded-xl font-bold">Kapat</button>
@@ -327,9 +452,26 @@ export default function FieldPlannerClient() {
                         <p className="text-[13px] text-slate-500 mb-4">Pano üzerinde görünecek personelleri buradan yönetebilirsiniz.</p>
                         <div className="space-y-2 mb-6">
                             {technicians.map(t => (
-                                <div key={t.id} className="flex items-center justify-between p-3 border border-slate-100 dark:border-white/5 rounded-lg">
-                                    <span className="font-bold text-[13px] dark:text-slate-200">{t.name}</span>
-                                    <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Aktif Sahada</span>
+                                <div key={t.id} className="flex items-center justify-between p-3 border border-slate-100 dark:border-white/5 rounded-lg hover:border-orange-500/50 transition-colors">
+                                    <label className="flex items-center justify-between w-full cursor-pointer">
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-[13px] dark:text-slate-200">{t.name}</span>
+                                            <span className="text-[10px] text-slate-500">{t.activeZone}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${t.isVisible ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                                                {t.isVisible ? 'Sahada' : 'Gizli'}
+                                            </span>
+                                            <input 
+                                                type="checkbox" 
+                                                checked={t.isVisible} 
+                                                onChange={(e) => {
+                                                    setTechnicians(prev => prev.map(p => p.id === t.id ? {...p, isVisible: e.target.checked} : p))
+                                                }} 
+                                                className="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer"
+                                            />
+                                        </div>
+                                    </label>
                                 </div>
                             ))}
                         </div>
@@ -343,18 +485,40 @@ export default function FieldPlannerClient() {
                     <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[500px] p-6 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
                         <h2 className="text-xl font-black mb-4 dark:text-white">Planlama Kuralları</h2>
                         <div className="space-y-4 mb-6">
-                            <label className="flex items-start gap-3">
-                                <input type="checkbox" className="mt-1" defaultChecked />
+                            <label className="flex items-start gap-3 cursor-pointer group">
+                                <input 
+                                    type="checkbox" 
+                                    checked={optimizationRules.mesafeKisitlamasi} 
+                                    onChange={(e) => setOptimizationRules({...optimizationRules, mesafeKisitlamasi: e.target.checked})}
+                                    className="mt-1 w-4 h-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer" 
+                                />
                                 <div>
-                                    <p className="font-bold text-[13px] dark:text-slate-200">Mesafe Limitasyonu</p>
+                                    <p className="font-bold text-[13px] dark:text-slate-200 group-hover:text-orange-500 transition-colors">Mesafe Limitasyonu</p>
                                     <p className="text-[11px] text-slate-500">Personeller günlük 50km rotanın üzerine çıkamaz.</p>
                                 </div>
                             </label>
-                            <label className="flex items-start gap-3">
-                                <input type="checkbox" className="mt-1" defaultChecked />
+                            <label className="flex items-start gap-3 cursor-pointer group">
+                                <input 
+                                    type="checkbox" 
+                                    checked={optimizationRules.deneyimEslesmesi} 
+                                    onChange={(e) => setOptimizationRules({...optimizationRules, deneyimEslesmesi: e.target.checked})}
+                                    className="mt-1 w-4 h-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer" 
+                                />
                                 <div>
-                                    <p className="font-bold text-[13px] dark:text-slate-200">Deneyim Eşleştirmesi</p>
+                                    <p className="font-bold text-[13px] dark:text-slate-200 group-hover:text-orange-500 transition-colors">Deneyim Eşleştirmesi</p>
                                     <p className="text-[11px] text-slate-500">Ağır hasar işleri sadece 5+ yıl kıdemli ustalara atanır.</p>
+                                </div>
+                            </label>
+                            <label className="flex items-start gap-3 cursor-pointer group">
+                                <input 
+                                    type="checkbox" 
+                                    checked={optimizationRules.performansOnceligi} 
+                                    onChange={(e) => setOptimizationRules({...optimizationRules, performansOnceligi: e.target.checked})}
+                                    className="mt-1 w-4 h-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer" 
+                                />
+                                <div>
+                                    <p className="font-bold text-[13px] dark:text-slate-200 group-hover:text-orange-500 transition-colors">Yük Dengelemesi (Eşit Dağılım)</p>
+                                    <p className="text-[11px] text-slate-500">İşleri öncelikle mesafe / uzmanlığa değil, teknisyen toplam dolu saatine göre eş paylaştırır.</p>
                                 </div>
                             </label>
                         </div>
