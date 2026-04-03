@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Calendar, Filter, Users, Map, Clock, ArrowRight, Settings2, Plus, PenTool, LayoutDashboard } from 'lucide-react';
+import { Calendar, Filter, Users, Map, Clock, ArrowRight, Settings2, Plus, PenTool, LayoutDashboard, Activity, CalendarCheck, PlusSquare } from 'lucide-react';
+import Link from 'next/link';
 
 export default function FieldPlannerClient() {
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -20,7 +21,14 @@ export default function FieldPlannerClient() {
         { id: 'tech-3', name: 'Ali Veli', jobs: [] }
     ]);
 
+    const [viewMode, setViewMode] = useState<'KANBAN' | 'GANTT' | 'MAP'>('KANBAN');
+    const [showTemplates, setShowTemplates] = useState(false);
+    const [showOptimizeModal, setShowOptimizeModal] = useState(false);
+    const [showTeamsModal, setShowTeamsModal] = useState(false);
+    const [showRulesModal, setShowRulesModal] = useState(false);
+
     // DRAG & DROP HANDLERS (Native HTML5)
+    // ... [existing logic remains] ...
     const handleDragStart = (e: React.DragEvent, jobId: string, sourceTechId: string | null = null) => {
         e.dataTransfer.setData('jobId', jobId);
         e.dataTransfer.setData('sourceTechId', sourceTechId || 'unplanned');
@@ -103,11 +111,18 @@ export default function FieldPlannerClient() {
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <button className="h-[36px] sm:h-[40px] px-4 sm:px-6 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-orange-600 dark:text-orange-400 hover:bg-slate-50 rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-sm">
+                            <Link href="/service/calendar" className="h-[36px] sm:h-[40px] px-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-sm">
+                                <CalendarCheck className="w-4 h-4 text-emerald-500" /> Servis Randevuları
+                            </Link>
+                            <Link href="/service/new" className="h-[36px] sm:h-[40px] px-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-sm">
+                                <PlusSquare className="w-4 h-4 text-blue-500" /> Yeni Randevu
+                            </Link>
+                            <div className="w-[1px] h-8 bg-slate-200 dark:bg-white/10 mx-2 hidden sm:block"></div>
+                            <button onClick={() => setShowTemplates(true)} className="h-[36px] sm:h-[40px] px-4 sm:px-6 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-orange-600 dark:text-orange-400 hover:bg-slate-50 rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-sm">
                                 <LayoutDashboard className="w-4 h-4" /> Şablonlar
                             </button>
-                            <button className="h-[36px] sm:h-[40px] px-4 sm:px-6 bg-orange-600 hover:bg-orange-700 text-white rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm">
-                                <Plus className="w-4 h-4" /> Optimze Et
+                            <button onClick={() => setShowOptimizeModal(true)} className="h-[36px] sm:h-[40px] px-4 sm:px-6 bg-orange-600 hover:bg-orange-700 text-white rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm">
+                                <Activity className="w-4 h-4" /> Optimize Et
                             </button>
                         </div>
                     </div>
@@ -168,86 +183,184 @@ export default function FieldPlannerClient() {
 
                     {/* SAĞ KOLONLAR: TEKNİSYEN TAKVİMİ / GANTT */}
                     <div className="lg:col-span-3 h-[calc(100vh-180px)] bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col overflow-hidden">
-                        <div className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-                            <div className="flex gap-4">
-                                <button className="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-orange-500 transition-colors">Zaman Çizelgesi (Gantt)</button>
-                                <button className="text-[11px] font-black uppercase tracking-widest text-orange-600 border-b-2 border-orange-500 pb-1">Teknisyen & Rota Haritası</button>
+                        <div className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 overflow-x-auto custom-scroll">
+                            <div className="flex gap-4 shrink-0">
+                                <button onClick={() => setViewMode('KANBAN')} className={`text-[11px] font-black uppercase tracking-widest pb-1 transition-colors ${viewMode === 'KANBAN' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-slate-400 hover:text-orange-500'}`}>Teknisyen (Kanban)</button>
+                                <button onClick={() => setViewMode('GANTT')} className={`text-[11px] font-black uppercase tracking-widest pb-1 transition-colors ${viewMode === 'GANTT' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-slate-400 hover:text-orange-500'}`}>Zaman Çizelgesi (Gantt)</button>
+                                <button onClick={() => setViewMode('MAP')} className={`text-[11px] font-black uppercase tracking-widest pb-1 transition-colors ${viewMode === 'MAP' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-slate-400 hover:text-orange-500'}`}>Rota Haritası</button>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <button className="flex items-center gap-1.5 text-[10px] font-bold bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400">
+                            <div className="flex items-center gap-3 shrink-0 ml-4">
+                                <button onClick={() => setShowTeamsModal(true)} className="flex items-center gap-1.5 text-[10px] font-bold bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:border-orange-500/50 transition-colors">
                                     <Users className="w-3 h-3" /> Ekipler
                                 </button>
-                                <button className="flex items-center gap-1.5 text-[10px] font-bold bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400">
+                                <button onClick={() => setShowRulesModal(true)} className="flex items-center gap-1.5 text-[10px] font-bold bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:border-orange-500/50 transition-colors">
                                     <Settings2 className="w-3 h-3" /> Kurallar
                                 </button>
                             </div>
                         </div>
 
+                        {/* DİNAMİK İÇERİK ALANI */}
                         <div className="flex-1 overflow-x-auto overflow-y-auto custom-scroll relative bg-slate-50 dark:bg-slate-900">
-                            {/* KANBAN/LANE PANOSU (GERÇEK DND) */}
-                            <div className="p-6 flex flex-col gap-6 min-w-[700px]">
-                                {technicians.map((tech) => (
-                                    <div 
-                                        key={tech.id} 
-                                        className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[14px] p-4 flex flex-col shadow-sm"
-                                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('bg-orange-50', 'dark:bg-orange-500/10'); }}
-                                        onDragLeave={(e) => { e.currentTarget.classList.remove('bg-orange-50', 'dark:bg-orange-500/10'); }}
-                                        onDrop={(e) => {
-                                            e.preventDefault();
-                                            e.currentTarget.classList.remove('bg-orange-50', 'dark:bg-orange-500/10');
-                                            handleDrop(e, tech.id);
-                                        }}
-                                    >
-                                        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-white/5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-700 dark:text-slate-300">
-                                                    {tech.name.charAt(0)}
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-[13px] font-bold text-slate-800 dark:text-white uppercase tracking-wider">{tech.name}</h3>
-                                                    <p className="text-[10px] text-slate-500">Kapasite: %{(tech.jobs.length * 20)} Kullanılıyor</p>
-                                                </div>
-                                            </div>
-                                            <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">{tech.jobs.length} Görev</span>
-                                        </div>
-                                        
-                                        <div className="flex gap-3 min-h-[100px] overflow-x-auto pb-2 custom-scroll items-start">
-                                            {tech.jobs.length === 0 ? (
-                                                <div className="w-full h-[100px] border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl flex items-center justify-center text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                                                    Buraya İş Emri Sürükleyin
-                                                </div>
-                                            ) : (
-                                                tech.jobs.map((job) => (
-                                                    <div 
-                                                        key={job.id} 
-                                                        draggable
-                                                        onDragStart={(e) => handleDragStart(e, job.id, tech.id)}
-                                                        className="w-[240px] shrink-0 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-xl p-3 cursor-grab hover:border-orange-500/50 transition-colors"
-                                                    >
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">{job.code}</span>
-                                                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${job.priority === 'Yüksek' ? 'text-rose-600 bg-rose-50 dark:bg-rose-500/10' : 'text-blue-600 bg-blue-50 dark:bg-blue-500/10'}`}>
-                                                                {job.priority}
-                                                            </span>
-                                                        </div>
-                                                        <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-2 leading-tight line-clamp-2">{job.title}</h4>
-                                                        <div className="flex items-center justify-between mt-auto">
-                                                            <div className="text-[9px] font-medium text-slate-500 flex items-center gap-1">
-                                                                <Map className="w-3 h-3" /> {job.loc}
-                                                            </div>
-                                                            <div className="font-mono text-[9px] font-bold text-slate-500">{job.duration}</div>
-                                                        </div>
+                            {viewMode === 'KANBAN' && (
+                                <div className="p-6 flex flex-col gap-6 min-w-[700px] animate-in fade-in duration-300">
+                                    {technicians.map((tech) => (
+                                        <div 
+                                            key={tech.id} 
+                                            className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[14px] p-4 flex flex-col shadow-sm transition-colors"
+                                            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('bg-orange-50', 'dark:bg-orange-500/10'); }}
+                                            onDragLeave={(e) => { e.currentTarget.classList.remove('bg-orange-50', 'dark:bg-orange-500/10'); }}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.remove('bg-orange-50', 'dark:bg-orange-500/10');
+                                                handleDrop(e, tech.id);
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-white/5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-700 dark:text-slate-300">
+                                                        {tech.name.charAt(0)}
                                                     </div>
-                                                ))
-                                            )}
+                                                    <div>
+                                                        <h3 className="text-[13px] font-bold text-slate-800 dark:text-white uppercase tracking-wider">{tech.name}</h3>
+                                                        <p className="text-[10px] text-slate-500">Kapasite: %{(tech.jobs.length * 20)} Kullanılıyor</p>
+                                                    </div>
+                                                </div>
+                                                <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">{tech.jobs.length} Görev</span>
+                                            </div>
+                                            
+                                            <div className="flex gap-3 min-h-[100px] overflow-x-auto pb-2 custom-scroll items-start">
+                                                {tech.jobs.length === 0 ? (
+                                                    <div className="w-full h-[100px] border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl flex items-center justify-center text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center px-4">
+                                                        Sürükle & Bırak ile İş Emri Atayın
+                                                    </div>
+                                                ) : (
+                                                    tech.jobs.map((job: any) => (
+                                                        <div 
+                                                            key={job.id} 
+                                                            draggable
+                                                            onDragStart={(e) => handleDragStart(e, job.id, tech.id)}
+                                                            className="w-[240px] shrink-0 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-xl p-3 cursor-grab hover:border-orange-500/50 transition-colors active:cursor-grabbing"
+                                                        >
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">{job.code}</span>
+                                                                <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${job.priority === 'Yüksek' ? 'text-rose-600 bg-rose-50 dark:bg-rose-500/10' : job.priority === 'Normal' ? 'text-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'text-slate-600 bg-slate-100 dark:bg-slate-700'}`}>
+                                                                    {job.priority}
+                                                                </span>
+                                                            </div>
+                                                            <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-2 leading-tight line-clamp-2">{job.title}</h4>
+                                                            <div className="flex items-center justify-between mt-auto">
+                                                                <div className="text-[9px] font-medium text-slate-500 flex items-center gap-1">
+                                                                    <Map className="w-3 h-3" /> {job.loc}
+                                                                </div>
+                                                                <div className="font-mono text-[9px] font-bold text-slate-500">{job.duration}</div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
                                         </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {viewMode === 'GANTT' && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/50 p-6 text-center animate-in zoom-in-95 duration-300">
+                                    <Clock className="w-12 h-12 text-slate-300 mb-4" />
+                                    <h3 className="text-lg font-black text-slate-700 dark:text-slate-200">Zaman Çizelgesi (Gantt) Hazırlanıyor</h3>
+                                    <p className="text-[13px] text-slate-500 max-w-[400px] mt-2">Bu görünümde personellerin görev süreleri saatlere göre harita blokları halinde dizilecektir.</p>
+                                </div>
+                            )}
+
+                            {viewMode === 'MAP' && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[url('/bg-dots.svg')] dark:bg-[url('/bg-dots-dark.svg')] bg-[length:24px_24px] p-6 text-center animate-in zoom-in-95 duration-300">
+                                    <div className="absolute inset-0 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-[1px]"></div>
+                                    <div className="relative z-10 flex flex-col items-center">
+                                        <Map className="w-12 h-12 text-orange-400 mb-4" />
+                                        <h3 className="text-lg font-black text-slate-700 dark:text-slate-200">Entegre Harita Görüntüsü</h3>
+                                        <p className="text-[13px] text-slate-500 max-w-[400px] mt-2">Google Maps / Mapbox entegrasyonu tamamlandığında dağıtım rotaları burada simüle edilecektir.</p>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* MODALS */}
+            {showTemplates && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={() => setShowTemplates(false)}>
+                    <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[500px] p-6 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                        <h2 className="text-xl font-black mb-4 dark:text-white">Planlama Şablonları</h2>
+                        <div className="space-y-3">
+                            <div className="p-4 border border-slate-200 dark:border-white/10 rounded-xl hover:border-orange-500 cursor-pointer transition-colors bg-slate-50 dark:bg-slate-800/50">
+                                <h4 className="font-bold text-[14px] dark:text-slate-200 mb-1">Standart Periyodik Bakım Dağılımı</h4>
+                                <p className="text-[12px] text-slate-500">Mevcut 3 teknisyeni bölgelere göre (%33) eş paylaştırır.</p>
+                            </div>
+                            <div className="p-4 border border-slate-200 dark:border-white/10 rounded-xl hover:border-orange-500 cursor-pointer transition-colors bg-slate-50 dark:bg-slate-800/50">
+                                <h4 className="font-bold text-[14px] dark:text-slate-200 mb-1">Acil Müdahale Düzeni</h4>
+                                <p className="text-[12px] text-slate-500">Yüksek öncelikli işleri sadece "Usta" seviye personele atar.</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setShowTemplates(false)} className="mt-6 w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white rounded-xl font-bold">Kapat</button>
+                    </div>
+                </div>
+            )}
+
+            {showOptimizeModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={() => setShowOptimizeModal(false)}>
+                    <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[400px] p-6 text-center animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                        <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Activity className="w-8 h-8 animate-pulse" />
+                        </div>
+                        <h2 className="text-xl font-black mb-2 dark:text-white">Yapay Zeka Optimizasyonu</h2>
+                        <p className="text-[13px] text-slate-500 mb-6">Sisteme girilen adres lokasyonları, tahmini süreler ve teknisyen yetkinlikleri baz alınarak rota optimizasyonu hesaplanacaktır.</p>
+                        <button onClick={() => setShowOptimizeModal(false)} className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20">Optimizasyonu Başlat</button>
+                    </div>
+                </div>
+            )}
+
+            {showTeamsModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={() => setShowTeamsModal(false)}>
+                    <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[500px] p-6 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                        <h2 className="text-xl font-black mb-4 dark:text-white">Ekip & Personel Yönetimi</h2>
+                        <p className="text-[13px] text-slate-500 mb-4">Pano üzerinde görünecek personelleri buradan yönetebilirsiniz.</p>
+                        <div className="space-y-2 mb-6">
+                            {technicians.map(t => (
+                                <div key={t.id} className="flex items-center justify-between p-3 border border-slate-100 dark:border-white/5 rounded-lg">
+                                    <span className="font-bold text-[13px] dark:text-slate-200">{t.name}</span>
+                                    <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Aktif Sahada</span>
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={() => setShowTeamsModal(false)} className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white rounded-xl font-bold">Kapat</button>
+                    </div>
+                </div>
+            )}
+
+            {showRulesModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={() => setShowRulesModal(false)}>
+                    <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[500px] p-6 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                        <h2 className="text-xl font-black mb-4 dark:text-white">Planlama Kuralları</h2>
+                        <div className="space-y-4 mb-6">
+                            <label className="flex items-start gap-3">
+                                <input type="checkbox" className="mt-1" defaultChecked />
+                                <div>
+                                    <p className="font-bold text-[13px] dark:text-slate-200">Mesafe Limitasyonu</p>
+                                    <p className="text-[11px] text-slate-500">Personeller günlük 50km rotanın üzerine çıkamaz.</p>
+                                </div>
+                            </label>
+                            <label className="flex items-start gap-3">
+                                <input type="checkbox" className="mt-1" defaultChecked />
+                                <div>
+                                    <p className="font-bold text-[13px] dark:text-slate-200">Deneyim Eşleştirmesi</p>
+                                    <p className="text-[11px] text-slate-500">Ağır hasar işleri sadece 5+ yıl kıdemli ustalara atanır.</p>
+                                </div>
+                            </label>
+                        </div>
+                        <button onClick={() => setShowRulesModal(false)} className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white rounded-xl font-bold">Kaydet & Kapat</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
