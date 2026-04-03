@@ -18,6 +18,7 @@ export default function ServiceCalendarPage() {
     const [view, setView] = useState<'MONTH' | 'WEEK' | 'DAY'>('WEEK');
     const [events, setEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showNewApptModal, setShowNewApptModal] = useState(false);
 
     const fetchEvents = async () => {
         setLoading(true);
@@ -117,7 +118,7 @@ export default function ServiceCalendarPage() {
                                 </button>
                             ))}
                         </div>
-                        <EnterpriseButton variant="primary" className="flex items-center gap-2 bg-slate-900 border-none rounded-xl">
+                        <EnterpriseButton variant="primary" className="flex items-center gap-2 bg-slate-900 border-none rounded-xl" onClick={() => setShowNewApptModal(true)}>
                             <IconPlus className="w-4 h-4" /> YENİ RANDEVU
                         </EnterpriseButton>
                     </div>
@@ -210,6 +211,40 @@ export default function ServiceCalendarPage() {
                                     </div>
                                 );
                             })}
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showNewApptModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={() => setShowNewApptModal(false)}>
+                    <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[500px] p-6 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-black dark:text-white">Hızlı Servis Randevusu</h2>
+                            <button onClick={() => setShowNewApptModal(false)} className="w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-white">✕</button>
+                        </div>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Müşteri / Firma</label>
+                                <input type="text" placeholder="Müşteri ara..." className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-bold outline-none" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Tarih</label>
+                                    <input type="date" className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-bold outline-none" />
+                                </div>
+                                <div>
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Saat</label>
+                                    <input type="time" className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-bold outline-none" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Şikayet / Talep</label>
+                                <textarea placeholder="Örn: Yıllık Periyodik Bakım..." className="w-full h-24 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-bold outline-none resize-none"></textarea>
+                            </div>
+                        </div>
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => setShowNewApptModal(false)} className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white rounded-xl font-bold">İptal</button>
+                            <button onClick={() => { setShowNewApptModal(false); /* Fake save */ }} className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold">Randevu Oluştur</button>
                         </div>
                     </div>
                 </div>
