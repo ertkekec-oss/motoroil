@@ -320,36 +320,33 @@ export default function ServiceDetailClient({ id }: { id: string }) {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1220]">
-            <div className="flex-shrink-0 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#0B1220] z-10 sticky top-0 px-4 sm:px-6 py-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 w-full sm:w-auto">
-                        <Link href="/service" className="w-10 h-10 flex items-center justify-center rounded-[12px] bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shrink-0">
+        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans dark:bg-[#0f172a]">
+            {/* HER YERDE GEÇERLİ EN ÜST STRATEJİ / BAŞLIK BANDI */}
+            <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8">
+                <div className="flex-shrink-0 bg-transparent z-10 sticky top-0 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                        <Link href="/service" className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm shrink-0">
                             <ChevronLeft className="w-5 h-5" />
                         </Link>
-                        <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shrink-0 shadow-lg shadow-slate-900/20">
-                            <Wrench className="w-5 h-5 text-white" />
-                        </div>
                         <div className="flex flex-col min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                                <h1 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none truncate">
+                                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-none truncate">
                                     {order.customer?.name}
                                 </h1>
-                                <span className={`px-2 py-0.5 rounded-[6px] text-[9px] sm:text-[10px] font-black uppercase border shrink-0 ${getStatusTheme(order.status)}`}>
+                                <span className={`px-2 py-0.5 rounded-[6px] text-[10px] font-black uppercase tracking-wider shrink-0 border ${getStatusTheme(order.status)}`}>
                                     {order.status}
                                 </span>
                             </div>
-                            <span className="text-[11px] sm:text-[12px] font-medium text-slate-500 mt-1 truncate block">
-                                <span className="hidden sm:inline">{order.customer?.phone} | {order.customer?.email}</span>
-                                <span className="inline sm:hidden">{order.customer?.phone || 'Telefon Kaydı Yok'}</span>
+                            <span className="text-[11px] sm:text-[12px] font-bold tracking-widest uppercase text-slate-500 mt-1.5 truncate block">
+                                Servis İşlem Detayı {order.customer?.phone ? `• ${order.customer.phone}` : ''}
                             </span>
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto bg-slate-50 sm:bg-transparent dark:bg-slate-800/50 sm:dark:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-transparent border-slate-100 dark:border-white/5">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto bg-white sm:bg-transparent dark:bg-[#1e293b] sm:dark:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-transparent border-slate-200 dark:border-white/5">
                         <div className="flex flex-col items-start sm:items-end mr-2 sm:mr-4">
-                            <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Ödenecek Tutar</span>
-                            <span className="text-[14px] sm:text-[16px] font-black text-emerald-600 dark:text-emerald-400 leading-none">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Ödenecek Tutar</span>
+                            <span className="text-[16px] sm:text-[20px] font-black text-emerald-600 dark:text-emerald-400 leading-none tracking-tight">
                                 {Number(order.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                             </span>
                         </div>
@@ -357,42 +354,47 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                             <button
                                 onClick={() => handleUpdateStatus('IN_PROGRESS')}
                                 disabled={order.status === 'IN_PROGRESS'}
-                                className="h-[32px] sm:h-[36px] px-3 sm:px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[11px] sm:text-[12px] flex items-center justify-center transition-colors shadow-sm disabled:opacity-50"
+                                className="h-[36px] sm:h-[40px] px-4 sm:px-6 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-blue-600 dark:text-blue-400 hover:bg-slate-50 rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest transition-all shadow-sm disabled:opacity-50"
                             >
                                 İşleme Al
                             </button>
                             <button
                                 onClick={() => setCheckoutModalOpen(true)}
                                 disabled={order.status === 'COMPLETED'}
-                                className="h-[32px] sm:h-[36px] px-3 sm:px-4 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 rounded-[8px] font-bold text-[11px] sm:text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+                                className="h-[36px] sm:h-[40px] px-4 sm:px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50"
                             >
-                                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Tamamla
+                                <CheckCircle className="w-4 h-4" /> Tamamla
                             </button>
                         </div>
                     </div>
                 </div>
 
-                
-                {/* TABS REMOVED */}
-            </div>
-
-            <div className="flex-1 p-3 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full space-y-4">
-                {/* 1. DETAILS */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:p-5 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="lg:col-span-2 space-y-4">
-                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5">
-                            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
-                                <FileText className="w-4 h-4" /> Şikayet & İstekler
-                            </h3>
-                            <p className="text-[14px] font-semibold text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                                {order.complaint || 'Belirtilmedi'}
-                            </p>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in duration-500">
+                    <div className="lg:col-span-8 space-y-6">
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-all duration-500">
+                            <div className="flex items-center gap-3 p-6 border-b border-slate-100 dark:border-slate-800">
+                                <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center text-lg"><FileText className="w-5 h-5"/></div>
+                                <div>
+                                    <h3 className="text-[15px] font-black text-slate-900 dark:text-white leading-none">Şikayet & İstekler</h3>
+                                    <p className="text-[11px] font-bold text-slate-500 mt-1 tracking-widest uppercase">Müşterinin problemleri</p>
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                <p className="text-[14px] font-semibold text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
+                                    {order.complaint || 'Belirtilmedi'}
+                                </p>
+                            </div>
                         </div>
                         
-                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5">
-                            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
-                                <Shield className="w-4 h-4" /> Cihaz Bilgisi & Araç Karnesi
-                            </h3>
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-all duration-500">
+                            <div className="flex items-center gap-3 p-6 border-b border-slate-100 dark:border-slate-800">
+                                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-lg"><Shield className="w-5 h-5"/></div>
+                                <div>
+                                    <h3 className="text-[15px] font-black text-slate-900 dark:text-white leading-none">Cihaz Bilgisi & Araç Karnesi</h3>
+                                    <p className="text-[11px] font-bold text-slate-500 mt-1 tracking-widest uppercase">Servis nesnesi detayları</p>
+                                </div>
+                            </div>
+                            <div className="p-6">
                             {order.asset ? (
                                 <div className="flex flex-col gap-4">
                                     <div className="flex items-center gap-4">
@@ -475,15 +477,19 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                 </div>
                             ) : (
                                 <span className="text-sm font-medium text-slate-500">Cihaz belirtilmemiş.</span>
-                            )}
+                            </div>
                         </div>
 
-                        
                         {/* 4. MEDYA & İMZA EKRANI */}
-                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5 mb-4 mt-4">
-                            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
-                                <Camera className="w-4 h-4" /> Medya & Müşteri Onayı (Sign-on-Glass)
-                            </h3>
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-all duration-500">
+                            <div className="flex items-center gap-3 p-6 border-b border-slate-100 dark:border-slate-800">
+                                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg"><Camera className="w-5 h-5"/></div>
+                                <div>
+                                    <h3 className="text-[15px] font-black text-slate-900 dark:text-white leading-none">Medya & Müşteri Onayı</h3>
+                                    <p className="text-[11px] font-bold text-slate-500 mt-1 tracking-widest uppercase">Sign-on-Glass</p>
+                                </div>
+                            </div>
+                            <div className="p-6">
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
@@ -547,15 +553,19 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                             <div className="flex justify-end mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
                                 <button onClick={handleSaveMedia} disabled={savingMedia} className="px-6 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors flex items-center gap-2">
                                     <Save className="w-4 h-4" /> {savingMedia ? 'Kaydediliyor...' : 'Medya ve İmzayı Kaydet'}
-                                </button>
                             </div>
                         </div>
 
-{/* TEKNİK SERVİS NOTLARI */}
-                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5">
-                            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
-                                <FileText className="w-4 h-4" /> Teknik Servis Notları (Uzman Yorumu)
-                            </h3>
+                        {/* TEKNİK SERVİS NOTLARI */}
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-all duration-500">
+                            <div className="flex items-center gap-3 p-6 border-b border-slate-100 dark:border-slate-800">
+                                <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-500 flex items-center justify-center text-lg"><FileText className="w-5 h-5"/></div>
+                                <div>
+                                    <h3 className="text-[15px] font-black text-slate-900 dark:text-white leading-none">Teknik Servis Notları (Uzman Yorumu)</h3>
+                                    <p className="text-[11px] font-bold text-slate-500 mt-1 tracking-widest uppercase">Teşhis ve Uyarılar</p>
+                                </div>
+                            </div>
+                            <div className="p-6">
                             <textarea
                                 value={technicianNotes}
                                 onChange={e => setTechnicianNotes(e.target.value)}
@@ -567,166 +577,176 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                     {savingNotes ? 'Kaydediliyor...' : 'Notları Kaydet'}
                                 </button>
                             </div>
+                            </div>
                         </div>
+
+                        {/* 2. PARTS SECTION */}
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-all duration-500">
+                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg"><Package className="w-5 h-5"/></div>
+                                    <div>
+                                        <h3 className="text-[15px] font-black text-slate-900 dark:text-white leading-none">Yedek Parçalar & Ürün Satışı</h3>
+                                        <p className="text-[11px] font-bold text-slate-500 mt-1 tracking-widest uppercase">Kullanılan Stoklar</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setProductModalOpen(true)} className="h-[40px] px-5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-indigo-600 dark:text-indigo-400 rounded-[10px] text-[11px] uppercase tracking-widest font-bold flex items-center justify-center gap-2 transition-all hover:bg-slate-50 shadow-sm shrink-0">
+                                    <ScanLine className="w-4 h-4" /> BARKOD EŞLEŞTİR / KATALOG
+                                </button>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30">
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap">Açıklama</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-right">Miktar</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-right">B. Fiyat</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-right">Toplam</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-center">İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                        {parts.length === 0 ? (
+                                            <tr><td colSpan={5} className="py-12 text-center text-[13px] font-bold text-slate-400">Henüz yedek parça kaydı bulunmuyor.</td></tr>
+                                        ) : (
+                                            parts.map((item: any) => (
+                                                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                                                    <td className="py-4 px-6 text-[13px] font-black text-slate-900 dark:text-white">{item.name}</td>
+                                                    <td className="py-4 px-6 text-[13px] font-bold text-slate-600 dark:text-slate-400 text-right">{Number(item.quantity)}</td>
+                                                    <td className="py-4 px-6 text-[13px] font-bold text-slate-600 dark:text-slate-400 text-right">{Number(item.unitPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                    <td className="py-4 px-6 text-[13px] font-black text-emerald-600 dark:text-emerald-400 text-right">{Number(item.totalPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                    <td className="py-4 px-6 text-center">
+                                                        <button onClick={() => handleDeleteItem(item.id)} className="w-8 h-8 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center mx-auto transition-all">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* 3. LABOR SECTION */}
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-all duration-500">
+                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg"><Clock className="w-5 h-5"/></div>
+                                    <div>
+                                        <h3 className="text-[15px] font-black text-slate-900 dark:text-white leading-none">Uygulanan İşçilikler</h3>
+                                        <p className="text-[11px] font-bold text-slate-500 mt-1 tracking-widest uppercase">Zaman ve Süreç Maliyetleri</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-4 m-6 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-[16px] border border-slate-200 dark:border-white/5">
+                                <div className="flex-1">
+                                    <label className="text-[11px] font-bold text-slate-500 mb-2 block uppercase tracking-widest">İşçilik / Hizmet Seçin</label>
+                                    <select 
+                                        value={newItemName} 
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            setNewItemName(val);
+                                            if(serviceSettings && serviceSettings[val] !== undefined) {
+                                                setNewItemPrice(Number(serviceSettings[val]));
+                                            }
+                                        }} 
+                                        className="w-full h-[48px] px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] text-[13px] font-bold focus:ring-2 focus:ring-blue-500/50 outline-none text-slate-900 dark:text-white"
+                                    >
+                                        <option value="">Bir İşçilik/Hizmet Seçiniz...</option>
+                                        {(serviceSettings ? Object.keys(serviceSettings) : []).map(tariffName => (
+                                            <option key={tariffName} value={tariffName}>{tariffName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="w-1/3 sm:w-24">
+                                        <label className="text-[11px] font-bold text-slate-500 mb-2 block uppercase tracking-widest">Miktar</label>
+                                        <input type="number" min="1" value={newItemQty} onChange={e => setNewItemQty(Number(e.target.value))} className="w-full h-[48px] px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] text-[14px] font-black focus:ring-2 focus:ring-blue-500/50 outline-none text-center text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div className="w-2/3 sm:w-32">
+                                        <label className="text-[11px] font-bold text-slate-500 mb-2 block uppercase tracking-widest">Birim Fiyat (₺)</label>
+                                        <input type="number" min="0" value={newItemPrice} onChange={e => setNewItemPrice(Number(e.target.value))} className="w-full h-[48px] px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-800/80 text-[14px] font-black outline-none text-right cursor-not-allowed text-slate-500" readOnly title="Ayarlardan Gelen Sabit Tarife" />
+                                    </div>
+                                </div>
+                                <div className="w-full sm:w-36 flex items-end mt-2 sm:mt-0">
+                                    <button disabled={!newItemName} onClick={() => handleAddItem('LABOR')} className="w-full h-[48px] bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-[12px] uppercase tracking-widest font-black flex justify-center items-center gap-2 transition-all shadow-sm">
+                                        <Plus className="w-4 h-4" /> Ekle
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div className="overflow-x-auto border-t border-slate-100 dark:border-slate-800">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30">
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap">Açıklama</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-right">Miktar</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-right">B. Fiyat</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-right">Toplam</th>
+                                            <th className="py-4 px-6 font-bold whitespace-nowrap text-center">İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                        {labor.length === 0 ? (
+                                            <tr><td colSpan={5} className="py-12 text-center text-[13px] font-bold text-slate-400">Henüz işçilik kayıt eklenmemiş.</td></tr>
+                                        ) : (
+                                            labor.map((item: any) => (
+                                                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                                                    <td className="py-4 px-6 text-[13px] font-black text-slate-900 dark:text-white">{item.name}</td>
+                                                    <td className="py-4 px-6 text-[13px] font-bold text-slate-600 dark:text-slate-400 text-right">{Number(item.quantity)}</td>
+                                                    <td className="py-4 px-6 text-[13px] font-bold text-slate-600 dark:text-slate-400 text-right">{Number(item.unitPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                    <td className="py-4 px-6 text-[13px] font-black text-amber-600 dark:text-amber-400 text-right">{Number(item.totalPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                    <td className="py-4 px-6 text-center">
+                                                        <button onClick={() => handleDeleteItem(item.id)} className="w-8 h-8 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center mx-auto transition-all">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                     </div>
                     
-                    <div className="lg:col-span-1 space-y-4">
-                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5 flex flex-col justify-between">
-                            <h3 className="text-[12px] font-black tracking-widest text-slate-500 uppercase mb-4">Finansal Özet</h3>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-400">
-                                    <span>Yedek Parça</span>
+                    {/* SAĞ KOLON (col-span-4) - Mizan ve Finansallar */}
+                    <div className="lg:col-span-4 h-max lg:sticky lg:top-24 space-y-6">
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-[20px] shadow-sm p-6 flex flex-col justify-between transition-all duration-500">
+                            <h3 className="text-[12px] font-black tracking-widest text-slate-500 uppercase mb-6">Finansal Özet</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center text-[13px] font-bold text-slate-600 dark:text-slate-400">
+                                    <span>Yedek Parça Tutarı</span>
                                     <span>{Number(parts.reduce((s:number, p:any) => s + Number(p.totalPrice), 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
                                 </div>
-                                <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-400">
-                                    <span>İşçilik</span>
+                                <div className="flex justify-between items-center text-[13px] font-bold text-slate-600 dark:text-slate-400">
+                                    <span>İşçilik Tutarı</span>
                                     <span>{Number(labor.reduce((s:number, l:any) => s + Number(l.totalPrice), 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
                                 </div>
-                                <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-2"></div>
-                                <div className="flex justify-between items-center text-[18px] font-black text-slate-900 dark:text-white">
+                                <div className="h-px w-full bg-slate-200 dark:bg-slate-800 my-4"></div>
+                                <div className="flex justify-between items-center text-[20px] font-black text-slate-900 dark:text-white">
                                     <span>GENEL TOPLAM</span>
-                                    <span className="text-blue-600 dark:text-blue-500">{Number(order.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                    <span className="text-emerald-600 dark:text-emerald-400">{Number(order.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
                                 </div>
                                 
-                                <div className="pt-4 mt-2 border-t border-slate-100 dark:border-white/5">
-                                    <button onClick={handleSendProposal} className="w-full py-3.5 bg-[#25D366] hover:bg-[#1ebd5a] active:scale-[0.98] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm">
+                                <div className="pt-6 mt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <button onClick={handleSendProposal} className="w-full h-[48px] bg-[#25D366] hover:bg-[#1ebd5a] active:scale-[0.98] text-white rounded-[14px] font-black text-[13px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-sm">
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                                        Müşteriye Teklif Gönder
+                                        Müşteriye Gönder
                                     </button>
-                                    <button onClick={handleVerbalApproval} className="w-full mt-3 py-3 bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-700 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 transition-all border border-slate-200 shadow-sm">
+                                    <button onClick={handleVerbalApproval} className="w-full mt-3 h-[48px] bg-slate-50 dark:bg-[#0f172a] hover:bg-slate-100 dark:hover:bg-slate-800/80 active:scale-[0.98] text-slate-700 dark:text-slate-300 rounded-[14px] font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border border-slate-200 dark:border-white/5 shadow-sm">
                                         <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                        Müşteriden Sözlü Onay Alındı
+                                        Müşteri Sözlü Onay
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* 2. PARTS SECTION */}
-                <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50 dark:bg-white/[0.02]">
-                        <h3 className="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wide">
-                            <Package className="w-5 h-5 text-blue-500" /> Kullanılan Yedek Parçalar & Ürün Satışı
-                        </h3>
-                        <button onClick={() => setProductModalOpen(true)} className="w-full sm:w-auto h-[36px] px-4 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors border border-indigo-200 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/20">
-                            <ScanLine className="w-4 h-4" /> Barkod / Katalogdan Seç
-                        </button>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30">
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap">Açıklama</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-right">Miktar</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-right">B. Fiyat</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-right">Toplam</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">İşlem</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                                {parts.length === 0 ? (
-                                    <tr><td colSpan={5} className="py-8 text-center text-sm font-medium text-slate-500">Henüz yedek parça kayıt eklenmemiş.</td></tr>
-                                ) : (
-                                    parts.map((item: any) => (
-                                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                            <td className="py-3 px-4 text-sm font-semibold text-slate-900 dark:text-white">{item.name}</td>
-                                            <td className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">{Number(item.quantity)}</td>
-                                            <td className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">{Number(item.unitPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                            <td className="py-3 px-4 text-sm font-bold text-blue-600 dark:text-blue-400 text-right">{Number(item.totalPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                            <td className="py-3 px-4 text-center">
-                                                <button onClick={() => handleDeleteItem(item.id)} className="w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center mx-auto transition-colors">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {/* 3. LABOR SECTION */}
-                <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50 dark:bg-white/[0.02]">
-                        <h3 className="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wide">
-                            <Clock className="w-5 h-5 text-amber-500" /> Uygulanan İşçilikler
-                        </h3>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-3 m-4 sm:m-5 bg-slate-50/50 dark:bg-slate-800/20 p-3 rounded-[12px] border border-slate-200/60 dark:border-white/5">
-                        <div className="flex-1">
-                            <label className="text-xs font-bold text-slate-500 mb-1.5 block">İşçilik / Hizmet Seçin (Ayarlardaki Tarifeler)</label>
-                            <select 
-                                value={newItemName} 
-                                onChange={e => {
-                                    const val = e.target.value;
-                                    setNewItemName(val);
-                                    if(serviceSettings && serviceSettings[val] !== undefined) {
-                                        setNewItemPrice(Number(serviceSettings[val]));
-                                    }
-                                }} 
-                                className="w-full h-[44px] sm:h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-[13px] font-medium focus:ring-2 focus:ring-blue-500/50 outline-none"
-                            >
-                                <option value="">Bir İşçilik/Hizmet Seçiniz...</option>
-                                {(serviceSettings ? Object.keys(serviceSettings) : []).map(tariffName => (
-                                    <option key={tariffName} value={tariffName}>{tariffName}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex gap-3">
-                            <div className="w-1/3 sm:w-20">
-                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Miktar</label>
-                                <input type="number" min="1" value={newItemQty} onChange={e => setNewItemQty(Number(e.target.value))} className="w-full h-[44px] sm:h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-[13px] font-bold focus:ring-2 focus:ring-blue-500/50 outline-none text-center" />
-                            </div>
-                            <div className="w-2/3 sm:w-32">
-                                <label className="text-xs font-bold text-slate-500 mb-1.5 block">Birim Fiyat (₺)</label>
-                                <input type="number" min="0" value={newItemPrice} onChange={e => setNewItemPrice(Number(e.target.value))} className="w-full h-[44px] sm:h-10 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-800/50 text-[13px] font-bold outline-none text-right cursor-not-allowed" readOnly title="Ayarlardan Gelen Sabit Tarife" />
-                            </div>
-                        </div>
-                        <div className="w-full sm:w-32 flex items-end mt-2 sm:mt-0">
-                            <button disabled={!newItemName} onClick={() => handleAddItem('LABOR')} className="w-full h-[44px] sm:h-10 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed border border-amber-200 dark:border-amber-500/20 rounded-[10px] sm:rounded-lg text-sm sm:text-xs font-bold flex justify-center items-center gap-1.5 transition-colors">
-                                <Plus className="w-5 h-5 sm:w-4 sm:h-4" /> İşçilik Ekle
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30">
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap">Açıklama</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-right">Miktar</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-right">B. Fiyat</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-right">Toplam</th>
-                                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">İşlem</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                                {labor.length === 0 ? (
-                                    <tr><td colSpan={5} className="py-8 text-center text-sm font-medium text-slate-500">Henüz işçilik kayıt eklenmemiş.</td></tr>
-                                ) : (
-                                    labor.map((item: any) => (
-                                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                            <td className="py-3 px-4 text-sm font-semibold text-slate-900 dark:text-white">{item.name}</td>
-                                            <td className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">{Number(item.quantity)}</td>
-                                            <td className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">{Number(item.unitPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                            <td className="py-3 px-4 text-sm font-bold text-amber-600 dark:text-amber-400 text-right">{Number(item.totalPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                            <td className="py-3 px-4 text-center">
-                                                <button onClick={() => handleDeleteItem(item.id)} className="w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center mx-auto transition-colors">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
 
             {productModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
