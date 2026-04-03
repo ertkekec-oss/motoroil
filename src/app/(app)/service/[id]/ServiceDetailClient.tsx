@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 import { useInventory } from '@/contexts/InventoryContext';
@@ -8,10 +8,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useRouter } from 'next/navigation';
 
 import { useModal } from '@/contexts/ModalContext';
-import { ChevronLeft, Camera, Image as ImageIcon, PenTool, Eraser } from 'lucide-react';
-import { useRef } from 'react';
-import { useRef } from 'react';
-
+import { ChevronLeft, Save, Plus, Trash2, Shield, Wrench, Package, Truck, User, Clock, CheckCircle, ScanLine, ShoppingCart, FileText, Camera, Image as ImageIcon, PenTool, Eraser } from 'lucide-react';
 
 export default function ServiceDetailClient({ id }: { id: string }) {
     const { showError, showSuccess } = useModal();
