@@ -10,25 +10,14 @@ import {
 import { 
     IconCalendar, 
     IconPlus, 
-    IconActivity, 
-    IconCreditCard, 
     IconWrench,
-    IconUsers
 } from "@/components/icons/PremiumIcons";
 
-export default function UnifiedCalendarPage() {
+export default function ServiceCalendarPage() {
     const { activeTenantId } = useApp();
     const [view, setView] = useState<'MONTH' | 'WEEK' | 'DAY'>('WEEK');
     const [events, setEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // Filters
-    const [filters, setFilters] = useState({
-        SERVICE: true,
-        FINANCE: true,
-        CRM: true,
-        HR: true
-    });
 
     const fetchEvents = async () => {
         setLoading(true);
@@ -38,7 +27,8 @@ export default function UnifiedCalendarPage() {
             });
             if (res.ok) {
                 const data = await res.json();
-                setEvents(data);
+                // Filter specifically for service orders
+                setEvents(data.filter((e: any) => e.type === 'SERVICE'));
             }
         } catch (e) {
             console.error(e);
@@ -66,22 +56,12 @@ export default function UnifiedCalendarPage() {
 
     const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 
-    const getTypeColor = (type: string) => {
-        switch (type) {
-            case 'SERVICE': return 'bg-emerald-50 border-emerald-200 text-emerald-700';
-            case 'FINANCE': return 'bg-rose-50 border-rose-200 text-rose-700';
-            case 'CRM': return 'bg-indigo-50 border-indigo-200 text-indigo-700';
-            default: return 'bg-amber-50 border-amber-200 text-amber-700';
-        }
+    const getTypeColor = () => {
+        return 'bg-emerald-50 border-emerald-200 text-emerald-700';
     };
 
-    const getTypeIcon = (type: string) => {
-        switch (type) {
-            case 'SERVICE': return <IconWrench className="w-3 h-3" />;
-            case 'FINANCE': return <IconCreditCard className="w-3 h-3" />;
-            case 'CRM': return <IconUsers className="w-3 h-3" />;
-            default: return <IconActivity className="w-3 h-3" />;
-        }
+    const getTypeIcon = () => {
+        return <IconWrench className="w-3 h-3" />;
     };
 
     const handleDragStart = (e: React.DragEvent, id: string) => {
@@ -119,23 +99,14 @@ export default function UnifiedCalendarPage() {
         }
     };
 
-    // Derived states
-    const filteredEvents = events.filter(e => {
-        if (e.type === 'SERVICE' && !filters.SERVICE) return false;
-        if (e.type === 'FINANCE' && !filters.FINANCE) return false;
-        if (e.type === 'CRM' && !filters.CRM) return false;
-        // if type doesn't match above, default to HR if it's general tasks, etc. But for now just allow.
-        return true;
-    });
-
-    const unassignedEvents = filteredEvents.filter(e => !e.date);
-    const scheduledEvents = filteredEvents.filter(e => !!e.date);
+    const unassignedEvents = events.filter(e => !e.date);
+    const scheduledEvents = events.filter(e => !!e.date);
 
     return (
         <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-700 pb-40">
             <EnterpriseSectionHeader 
-                title="GLOBAL TAKVİM & GÖREV KULESİ" 
-                subtitle="Finans, Servis, CRM ve Personel Görev Merkezi • Sürükle-Bırak Planlama"
+                title="SERVİS RANDEVULARI" 
+                subtitle="Saha ve Atölye Servis İş Emirleri Planlaması • Sürükle-Bırak Takvim"
                 icon={<IconCalendar />}
                 rightElement={
                     <div className="flex gap-3 relative z-20">
@@ -147,51 +118,36 @@ export default function UnifiedCalendarPage() {
                             ))}
                         </div>
                         <EnterpriseButton variant="primary" className="flex items-center gap-2 bg-slate-900 border-none rounded-xl">
-                            <IconPlus className="w-4 h-4" /> YENİ GÖREV / RANDEVU
+                            <IconPlus className="w-4 h-4" /> YENİ RANDEVU
                         </EnterpriseButton>
                     </div>
                 } 
             />
 
             {loading ? (
-                <div className="py-20 text-center text-slate-500 font-medium">Takvim Yükleniyor...</div>
+                <div className="py-20 text-center text-slate-500 font-medium">Randevular Yükleniyor...</div>
             ) : (
                 <div className="flex gap-6">
-                    {/* Left Pane (Filters & Backlog) */}
+                    {/* Left Pane (Backlog) */}
                     <div className="w-72 shrink-0 space-y-6">
-                        <EnterpriseCard className="p-5 font-sans">
-                            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4">Takvimler (Roller)</h3>
-                            <div className="space-y-3">
-                                <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked={filters.SERVICE} onChange={e => setFilters(prev => ({...prev, SERVICE: e.target.checked}))} className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500" />
-                                    <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">Teknik Servis (Randevular)</span>
-                                </label>
-                                <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked={filters.FINANCE} onChange={e => setFilters(prev => ({...prev, FINANCE: e.target.checked}))} className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500" />
-                                    <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">Finans (Çek, Borç, Vade)</span>
-                                </label>
-                                <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked={filters.CRM} onChange={e => setFilters(prev => ({...prev, CRM: e.target.checked}))} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
-                                    <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">CRM / Müşteri Görüşmesi</span>
-                                </label>
-                            </div>
-                        </EnterpriseCard>
-
                         <EnterpriseCard className="p-5 font-sans flex flex-col h-[500px]">
-                            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4">Atama Bekleyenler</h3>
+                            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center justify-between">
+                                Atama Bekleyenler
+                                <span className="text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{unassignedEvents.length}</span>
+                            </h3>
                             <div className="flex-1 overflow-y-auto custom-scroll -mr-2 pr-2 space-y-3">
                                 {unassignedEvents.length === 0 ? (
-                                    <div className="text-xs text-slate-400 font-medium text-center py-10">Tüm görevler planlanmış.</div>
+                                    <div className="text-xs text-slate-400 font-medium text-center py-10">Tüm randevular planlanmış.</div>
                                 ) : (
                                     unassignedEvents.map(ev => (
                                         <div 
                                             key={ev.id} 
                                             draggable 
                                             onDragStart={(e) => handleDragStart(e, ev.id)}
-                                            className={`p-3 rounded-xl border border-dashed text-xs cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${getTypeColor(ev.type)}`}
+                                            className={`p-3 rounded-[14px] border border-dashed text-xs cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${getTypeColor()}`}
                                         >
                                             <div className="flex justify-between items-start mb-2">
-                                                {getTypeIcon(ev.type)}
+                                                {getTypeIcon()}
                                                 <span className="font-bold text-[9px] uppercase tracking-wider bg-white/50 px-1.5 rounded text-inherit">PLANLA</span>
                                             </div>
                                             <p className="font-black mb-1 line-clamp-2">{ev.title}</p>
@@ -204,14 +160,14 @@ export default function UnifiedCalendarPage() {
                     </div>
 
                     {/* Main Calendar Area (Weekly View) */}
-                    <div className="flex-1 bg-white dark:bg-[#1e293b] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-slate-200/80 p-0 overflow-hidden font-sans flex flex-col h-[800px]">
-                        <div className="grid grid-cols-6 border-b border-slate-200 bg-slate-50/50">
+                    <div className="flex-1 bg-white dark:bg-[#1e293b] rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-200 dark:border-white/5 p-0 overflow-hidden font-sans flex flex-col h-[800px]">
+                        <div className="grid grid-cols-6 border-b border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50">
                             {weekDates.map((date, i) => {
                                 const isToday = date.toDateString() === new Date().toDateString();
                                 return (
-                                    <div key={i} className="py-4 text-center border-r border-slate-200/60 last:border-r-0">
+                                    <div key={i} className="py-4 text-center border-r border-slate-200/60 dark:border-white/5 last:border-r-0">
                                         <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-1">{days[i]}</span>
-                                        <span className={`text-xl font-black ${isToday ? 'text-indigo-600 bg-indigo-50 w-8 h-8 rounded-full inline-flex items-center justify-center -ml-4 -mr-4' : 'text-slate-700'}`}>
+                                        <span className={`text-xl font-black ${isToday ? 'text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 w-8 h-8 rounded-full inline-flex items-center justify-center -ml-4 -mr-4' : 'text-slate-700 dark:text-slate-300'}`}>
                                             {date.getDate()}
                                         </span>
                                     </div>
@@ -219,9 +175,8 @@ export default function UnifiedCalendarPage() {
                             })}
                         </div>
                         
-                        <div className="flex-1 grid grid-cols-6 relative bg-slate-50/20">
+                        <div className="flex-1 grid grid-cols-6 relative bg-slate-50/20 dark:bg-slate-900/20">
                             {weekDates.map((date, colIndex) => {
-                                // Find events for this specific date
                                 const dayEvents = scheduledEvents.filter(e => {
                                     const eDate = new Date(e.date);
                                     return eDate.getDate() === date.getDate() && eDate.getMonth() === date.getMonth();
@@ -230,23 +185,22 @@ export default function UnifiedCalendarPage() {
                                 return (
                                     <div 
                                         key={colIndex} 
-                                        className="border-r border-slate-200/50 h-full p-2 space-y-2 transition-colors relative"
+                                        className="border-r border-slate-200/50 dark:border-white/5 h-full p-2 space-y-2 transition-colors relative"
                                         onDragOver={handleDragOver}
                                         onDragLeave={handleDragLeave}
                                         onDrop={(e) => handleDrop(e, date)}
                                     >
-                                        {/* Drop Zone Indication */}
-                                        <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity drop-zone-overlay bg-blue-50/20 border-2 border-blue-200 border-dashed rounded-lg m-1" />
+                                        <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity drop-zone-overlay bg-blue-50/20 border-2 border-blue-200 border-dashed rounded-[16px] m-1" />
                                         
                                         {dayEvents.map(ev => (
                                             <div 
                                                 key={ev.id} 
                                                 draggable 
                                                 onDragStart={(e) => handleDragStart(e, ev.id)}
-                                                className={`p-3 rounded-xl border text-xs cursor-grab hover:shadow-md transition-all ${getTypeColor(ev.type)}`}
+                                                className={`p-3 rounded-[14px] border text-xs cursor-grab hover:shadow-md transition-all ${getTypeColor()}`}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
-                                                    {getTypeIcon(ev.type)}
+                                                    {getTypeIcon()}
                                                     <span className="font-bold text-[9px] uppercase tracking-wider bg-white/50 px-1.5 rounded">{new Date(ev.date).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
                                                 </div>
                                                 <p className="font-black mb-1 leading-tight line-clamp-2">{ev.title}</p>

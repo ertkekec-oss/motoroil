@@ -44,14 +44,14 @@ export function MobileNav() {
     } else if (role.includes('SAHA')) {
         navItems = [
             { path: '/field-mobile/routes', icon: <Route className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Rota' },
-            { path: '/field-mobile/intelligence', icon: <TrendingUp className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'SalesX' },
+            { path: '/field-mobile/intelligence', icon: <TrendingUp className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Saha Servis' },
             { path: '/field-mobile/customers', icon: <Building2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Cari' },
-            { path: '/calendar', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Takvim' },
+            { path: '/field-sales/today', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Program' },
             { path: '/staff/me', icon: <UserCircle2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Profil' }
         ];
     } else if (role.includes('SERVIS') || role.includes('TEKNISYEN') || role.includes('SERVICE')) {
         navItems = [
-            { path: '/calendar', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Ajanda' },
+            { path: '/service/calendar', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Ajanda' },
             { path: '/service', icon: <Wrench className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Servis' },
             { path: '/tasks', icon: <CheckSquare className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'İşlem' },
             { path: '/staff/me', icon: <UserCircle2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Profil' }
@@ -59,7 +59,6 @@ export function MobileNav() {
     } else {
         navItems = [
             { path: '/staff/me', icon: <UserCircle2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Portal' },
-            { path: '/calendar', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Takvim' },
             { path: '/tasks', icon: <CheckSquare className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Görev' },
             { path: '/notifications', icon: <Bell className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Bildirim' }
         ];

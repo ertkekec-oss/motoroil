@@ -65,9 +65,9 @@ export default function Sidebar() {
             'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
             'inventory-parent': ['/inventory', '/inventory/warehouses', '/inventory/manufacturing', '/inventory/boms'],
-            'service-parent': ['/service', '/service/work-orders', '/service/new'],
+            'service-parent': ['/service', '/service/work-orders', '/service/new', '/service/calendar'],
             'staff-parent': ['/staff', '/staff/performance'],
-            'calendar-parent': ['/calendar', '/tasks']
+            'tasks-parent': ['/tasks']
         };
 
         setOpenSections(prev => {
@@ -132,8 +132,12 @@ export default function Sidebar() {
             '/settings/pricing': { perm: 'settings_manage' },
             '/staff': { perm: 'staff_manage', feature: 'team_management' },
             '/staff/performance': { perm: 'staff_manage', feature: 'team_management' },
-            '/calendar': { perm: 'field_sales_access' },
+            '/service/calendar': { perm: 'pos_access' },
             '/tasks': { perm: 'field_sales_access' },
+            '/field-sales/today': { perm: 'field_sales_access', feature: 'field_sales' },
+            '/field-sales/routes': { perm: 'field_sales_access', feature: 'field_sales' },
+            '/field-sales/visits': { perm: 'field_sales_access', feature: 'field_sales' },
+            '/field-sales/campaigns': { perm: 'field_sales_access', feature: 'field_sales' },
             '/advisor': { perm: 'finance_view', feature: 'accountant' },
             '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
             '/staff/pdks': { perm: 'staff_manage' },
@@ -223,13 +227,12 @@ export default function Sidebar() {
                 items: [
                     { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
                     {
-                        name: 'Görev & Takvim',
+                        name: 'Görev Merkezi',
                         icon: Clock,
                         isParent: true,
-                        id: 'calendar-parent',
+                        id: 'tasks-parent',
                         subItems: [
-                            { name: 'Global Takvim', href: '/calendar' },
-                            { name: 'Görev Merkezi', href: '/tasks' },
+                            { name: 'Görev Kulesi', href: '/tasks' },
                         ]
                     },
                     {
@@ -296,20 +299,23 @@ export default function Sidebar() {
                             { name: 'Servis Dashboard', href: '/service' },
                             { name: 'İş Emirleri', href: '/service/work-orders' },
                             { name: 'Yeni İş Emri', href: '/service/new' },
+                            { name: 'Servis Randevuları', href: '/service/calendar' },
                         ]
                     },
                     { name: 'Teklifler', href: '/offers', icon: FileText },
 
                     {
-                        name: 'SalesX',
+                        name: 'Saha Servis',
                         icon: Map,
                         isParent: true,
                         id: 'field-sales-parent',
                         subItems: [
-                            { name: 'Saha Yönetimi', href: '/field-sales/admin/routes' },
-                            { name: 'Rota & Müşteri', href: '/field-sales' },
-                            { name: 'AI Zeka & Rota', href: '/field-sales/intelligence' },
+                            { name: 'Saha Planlaması', href: '/field-sales/admin/routes' },
                             { name: 'Canlı Takip', href: '/field-sales/admin/live' },
+                            { name: 'Saha Kampanyaları', href: '/field-sales/campaigns' },
+                            { name: 'Bugünün Rotası', href: '/field-sales/today' },
+                            { name: 'Rotalarım', href: '/field-sales/routes' },
+                            { name: 'Müşteriler & Ziyaretler', href: '/field-sales/visits' },
                         ]
                     },
                     {
