@@ -291,7 +291,7 @@ export default function FieldPlannerClient() {
             {showTemplates && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={() => setShowTemplates(false)}>
                     <div className="bg-white dark:bg-[#0f172a] rounded-[24px] shadow-2xl w-full max-w-[500px] p-6 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-                        <h2 className="text-xl font-black mb-4 dark:text-white">Planlama Şablonları</h2>
+                        <h2 className="text-xl font-black mb-4 dark:text-white">Otomatik Dağıtım Kuralları</h2>
                         <div className="space-y-3">
                             <div className="p-4 border border-slate-200 dark:border-white/10 rounded-xl hover:border-orange-500 cursor-pointer transition-colors bg-slate-50 dark:bg-slate-800/50">
                                 <h4 className="font-bold text-[14px] dark:text-slate-200 mb-1">Standart Periyodik Bakım Dağılımı</h4>
