@@ -881,6 +881,10 @@ model ServiceOrder {
   nextMaintenanceAt DateTime?
   nextKm_or_Use     Int?
 
+  // Location Tracking
+  checkInLocation   Json?
+  checkOutLocation  Json?
+
   // Timestamps
   appointmentDate DateTime?
   startedAt       DateTime?

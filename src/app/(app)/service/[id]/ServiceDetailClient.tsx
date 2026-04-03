@@ -62,15 +62,30 @@ export default function ServiceDetailClient({ id }: { id: string }) {
             setLoading(false);
         }
     };
+    const getGPSLocation = (): Promise<any> => {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) return resolve(null);
+            navigator.geolocation.getCurrentPosition(
+                (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: new Date().toISOString() }),
+                () => resolve(null),
+                { timeout: 7000, enableHighAccuracy: true }
+            );
+        });
+    };
 
     const handleUpdateStatus = async (newStatus: string) => {
         try {
+            let payload: any = { status: newStatus };
+            if (newStatus === 'IN_PROGRESS') {
+                const loc = await getGPSLocation();
+                if (loc) payload.checkInLocation = loc;
+            }
+
             const res = await fetch(`/api/services/work-orders/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
+                body: JSON.stringify(payload)
             });
-
             if (res.ok) {
                 showSuccess("Başarılı", "Durum güncellendi.");
                 fetchOrder();
@@ -829,10 +844,16 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                     setIsFinishing(true);
                                     try {
                                         // 1. Mark Order Completed
+                                        const loc = await getGPSLocation();
                                         const resStatus = await fetch(`/api/services/work-orders/${id}`, {
                                             method: 'PATCH',
                                             headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ status: 'COMPLETED', nextKm_or_Use: nextKm ? Number(nextKm) : undefined, nextMaintenanceAt: nextDate ? new Date(nextDate).toISOString() : undefined })
+                                            body: JSON.stringify({ 
+                                                status: 'COMPLETED', 
+                                                nextKm_or_Use: nextKm ? Number(nextKm) : undefined, 
+                                                nextMaintenanceAt: nextDate ? new Date(nextDate).toISOString() : undefined,
+                                                checkOutLocation: loc || undefined
+                                            })
                                         });
 
                                         if (!resStatus.ok) throw new Error("İş emri güncellenirken hata oluştu.");
