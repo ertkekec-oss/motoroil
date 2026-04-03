@@ -8,7 +8,9 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useRouter } from 'next/navigation';
 
 import { useModal } from '@/contexts/ModalContext';
-import { ChevronLeft, Save, Plus, Trash2, Shield, Wrench, Package, Truck, User, Clock, CheckCircle, ScanLine, ShoppingCart, FileText } from 'lucide-react';
+import { ChevronLeft, Camera, Image as ImageIcon, PenTool, Eraser } from 'lucide-react';
+import { useRef } from 'react';
+import { useRef } from 'react';
 
 
 export default function ServiceDetailClient({ id }: { id: string }) {
@@ -35,6 +37,11 @@ export default function ServiceDetailClient({ id }: { id: string }) {
     const [productSearch, setProductSearch] = useState('');
     const [paymentMethod, setPaymentMethod] = useState<'cash'|'cc'|'iban'|'account'>('cash');
     const [isFinishing, setIsFinishing] = useState(false);
+    const [attachments, setAttachments] = useState<string[]>([]);
+    const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [savingMedia, setSavingMedia] = useState(false);
 
 
     useEffect(() => {
@@ -124,6 +131,109 @@ export default function ServiceDetailClient({ id }: { id: string }) {
             }
         } catch (e) {
             showError("Hata", "Bağlantı hatası.");
+        }
+    };
+
+
+    const handleFileUpload = (e) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        const newAtts = [...attachments];
+        for (let file of files) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                if (ev.target?.result) {
+                    newAtts.push(ev.target.result);
+                    setAttachments([...newAtts]);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const startDrawing = (e) => {
+        setIsDrawing(true);
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#0f172a';
+        
+        const rect = canvas.getBoundingClientRect();
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        if(e.touches && e.touches.length > 0) {
+           clientX = e.touches[0].clientX;
+           clientY = e.touches[0].clientY;
+        }
+        ctx.beginPath();
+        ctx.moveTo(clientX - rect.left, clientY - rect.top);
+    };
+
+    const draw = (e) => {
+        if (!isDrawing) return;
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        if(e.touches && e.touches.length > 0) {
+           clientX = e.touches[0].clientX;
+           clientY = e.touches[0].clientY;
+        }
+        ctx.lineTo(clientX - rect.left, clientY - rect.top);
+        ctx.stroke();
+    };
+
+    const stopDrawing = () => {
+        setIsDrawing(false);
+    };
+
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setSignatureUrl(null);
+    };
+
+    const handleSaveMedia = async () => {
+        setSavingMedia(true);
+        try {
+            let currentSigUrl = signatureUrl;
+            const canvas = canvasRef.current;
+            if (canvas && !currentSigUrl) {
+                const blank = document.createElement('canvas');
+                blank.width = canvas.width;
+                blank.height = canvas.height;
+                if(canvas.toDataURL() !== blank.toDataURL()) {
+                    currentSigUrl = canvas.toDataURL('image/png');
+                    setSignatureUrl(currentSigUrl);
+                }
+            }
+
+            const res = await fetch(`/api/services/work-orders/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ attachments, digitalSignature: currentSigUrl })
+            });
+
+            if (res.ok) {
+                showSuccess("Başarılı", "Medya ve imza kaydedildi.");
+                fetchOrder();
+            } else {
+                showError("Hata", "Medya kaydı başarısız.");
+            }
+        } catch (e) {
+            showError("Hata", "Bağlantı hatası.");
+        } finally {
+            setSavingMedia(false);
         }
     };
 
@@ -356,7 +466,80 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                             )}
                         </div>
 
-                        {/* TEKNİK SERVİS NOTLARI */}
+                        
+                        {/* 4. MEDYA & İMZA EKRANI */}
+                        <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5 mb-4 mt-4">
+                            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
+                                <Camera className="w-4 h-4" /> Medya & Müşteri Onayı (Sign-on-Glass)
+                            </h3>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <div className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Öncesi / Sonrası Görseller</div>
+                                    <div className="flex flex-wrap gap-3">
+                                        {attachments.map((att, idx) => (
+                                            <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 group">
+                                                <img src={att} className="w-full h-full object-cover" />
+                                                <div 
+                                                    onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
+                                                    className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <label className="w-20 h-20 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 rounded-xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-slate-400 hover:text-blue-500">
+                                            <Camera className="w-6 h-6 mb-1" />
+                                            <span className="text-[9px] font-bold uppercase">Fotoğraf</span>
+                                            <input type="file" multiple accept="image/*" capture="environment" className="hidden" onChange={handleFileUpload} />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1"><PenTool className="w-3.5 h-3.5 text-blue-500" /> Müşteri Dijital İmza</div>
+                                        {signatureUrl && <div className="text-[10px] font-black text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">İmzalandı</div>}
+                                    </div>
+                                    
+                                    {!signatureUrl ? (
+                                        <div className="relative">
+                                            <canvas 
+                                                ref={canvasRef}
+                                                width={320}
+                                                height={140}
+                                                className="w-full border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-200/90 rounded-xl touch-none cursor-crosshair"
+                                                onMouseDown={startDrawing}
+                                                onMouseMove={draw}
+                                                onMouseUp={stopDrawing}
+                                                onMouseLeave={stopDrawing}
+                                                onTouchStart={startDrawing}
+                                                onTouchMove={draw}
+                                                onTouchEnd={stopDrawing}
+                                            />
+                                            <button onClick={clearCanvas} className="absolute right-2 top-2 p-1.5 bg-white shadow-sm rounded-lg text-slate-400 hover:text-red-500 transition-colors">
+                                                <Eraser className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="relative border-2 border-slate-200 dark:border-white/10 bg-white rounded-xl p-2 h-[140px] flex items-center justify-center">
+                                            <img src={signatureUrl} alt="Müşteri İmzası" className="max-h-full max-w-full opacity-80" />
+                                            <button onClick={clearCanvas} className="absolute right-2 top-2 p-1.5 bg-slate-100 shadow-sm rounded-lg text-slate-500 hover:text-red-500 transition-colors">
+                                                <Eraser className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
+                                <button onClick={handleSaveMedia} disabled={savingMedia} className="px-6 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors flex items-center gap-2">
+                                    <Save className="w-4 h-4" /> {savingMedia ? 'Kaydediliyor...' : 'Medya ve İmzayı Kaydet'}
+                                </button>
+                            </div>
+                        </div>
+
+{/* TEKNİK SERVİS NOTLARI */}
                         <div className="bg-white dark:bg-[#0B1220] border border-slate-200/60 dark:border-white/5 rounded-[16px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-4 sm:p-5">
                             <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
                                 <FileText className="w-4 h-4" /> Teknik Servis Notları (Uzman Yorumu)

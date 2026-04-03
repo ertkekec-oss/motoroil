@@ -30,13 +30,15 @@ export async function PATCH(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { status, nextKm_or_Use, nextMaintenanceAt, technicianNotes } = body;
+        const { status, nextKm_or_Use, nextMaintenanceAt, technicianNotes, attachments, digitalSignature } = body;
 
         const updateData: any = {};
         if (status) updateData.status = status;
         if (nextKm_or_Use !== undefined) updateData.nextKm_or_Use = nextKm_or_Use;
         if (nextMaintenanceAt !== undefined) updateData.nextMaintenanceAt = nextMaintenanceAt;
         if (technicianNotes !== undefined) updateData.technicianNotes = technicianNotes;
+        if (attachments !== undefined) updateData.attachments = attachments;
+        if (digitalSignature !== undefined) updateData.digitalSignature = digitalSignature;
 
         if (status === 'IN_PROGRESS') {
             updateData.startedAt = new Date();

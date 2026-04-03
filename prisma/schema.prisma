@@ -889,6 +889,10 @@ model ServiceOrder {
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
 
+  // Media & Approval
+  attachments      Json?
+  digitalSignature String?  @db.Text
+  
   branch          String  @default("Merkez")
   linkedInvoiceId String?
 
