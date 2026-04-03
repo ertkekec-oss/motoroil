@@ -154,8 +154,9 @@ export default function ServiceDetailClient({ id }: { id: string }) {
         for (let file of files) {
             const reader = new FileReader();
             reader.onload = (ev) => {
-                if (ev.target?.result) {
-                    newAtts.push(ev.target.result);
+                const res = ev.target?.result;
+                if (res && typeof res === 'string') {
+                    newAtts.push(res);
                     setAttachments([...newAtts]);
                 }
             };
@@ -477,6 +478,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                 </div>
                             ) : (
                                 <span className="text-sm font-medium text-slate-500">Cihaz belirtilmemiş.</span>
+                            )}
                             </div>
                         </div>
 
@@ -553,6 +555,8 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                             <div className="flex justify-end mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
                                 <button onClick={handleSaveMedia} disabled={savingMedia} className="px-6 py-2.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors flex items-center gap-2">
                                     <Save className="w-4 h-4" /> {savingMedia ? 'Kaydediliyor...' : 'Medya ve İmzayı Kaydet'}
+                                </button>
+                            </div>
                             </div>
                         </div>
 
@@ -747,6 +751,7 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                         </div>
                     </div>
                 </div>
+            </div>
 
             {productModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
@@ -935,6 +940,6 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                     </div>
                 </div>
             )}
-</div>
+        </div>
     );
 }
