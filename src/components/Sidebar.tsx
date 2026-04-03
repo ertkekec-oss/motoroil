@@ -66,7 +66,8 @@ export default function Sidebar() {
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
             'inventory-parent': ['/inventory', '/inventory/warehouses', '/inventory/manufacturing', '/inventory/boms'],
             'service-parent': ['/service', '/service/work-orders', '/service/new'],
-            'staff-parent': ['/staff', '/staff/performance']
+            'staff-parent': ['/staff', '/staff/performance'],
+            'calendar-parent': ['/calendar', '/tasks']
         };
 
         setOpenSections(prev => {
@@ -131,6 +132,8 @@ export default function Sidebar() {
             '/settings/pricing': { perm: 'settings_manage' },
             '/staff': { perm: 'staff_manage', feature: 'team_management' },
             '/staff/performance': { perm: 'staff_manage', feature: 'team_management' },
+            '/calendar': { perm: 'field_sales_access' },
+            '/tasks': { perm: 'field_sales_access' },
             '/advisor': { perm: 'finance_view', feature: 'accountant' },
             '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
             '/staff/pdks': { perm: 'staff_manage' },
@@ -219,6 +222,16 @@ export default function Sidebar() {
                 group: "Operasyonlar",
                 items: [
                     { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
+                    {
+                        name: 'Görev & Takvim',
+                        icon: Clock,
+                        isParent: true,
+                        id: 'calendar-parent',
+                        subItems: [
+                            { name: 'Global Takvim', href: '/calendar' },
+                            { name: 'Görev Merkezi', href: '/tasks' },
+                        ]
+                    },
                     {
                         name: 'İmzalar',
                         icon: PenTool,
