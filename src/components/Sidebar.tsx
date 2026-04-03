@@ -65,7 +65,7 @@ export default function Sidebar() {
             'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
             'inventory-parent': ['/inventory', '/inventory/warehouses', '/inventory/manufacturing', '/inventory/boms'],
-            'service-parent': ['/service', '/service/work-orders', '/service/new', '/service/calendar'],
+            'service-parent': ['/service', '/service/work-orders', '/service/new', '/service/calendar', '/service/field/routes', '/service/field/campaigns', '/service/field/live', '/service/field/today', '/service/field/my-routes', '/service/field/visits'],
             'staff-parent': ['/staff', '/staff/performance'],
             'tasks-parent': ['/tasks']
         };
@@ -134,10 +134,6 @@ export default function Sidebar() {
             '/staff/performance': { perm: 'staff_manage', feature: 'team_management' },
             '/service/calendar': { perm: 'pos_access' },
             '/tasks': { perm: 'field_sales_access' },
-            '/field-sales/today': { perm: 'field_sales_access', feature: 'field_sales' },
-            '/field-sales/routes': { perm: 'field_sales_access', feature: 'field_sales' },
-            '/field-sales/visits': { perm: 'field_sales_access', feature: 'field_sales' },
-            '/field-sales/campaigns': { perm: 'field_sales_access', feature: 'field_sales' },
             '/advisor': { perm: 'finance_view', feature: 'accountant' },
             '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
             '/staff/pdks': { perm: 'staff_manage' },
@@ -300,22 +296,27 @@ export default function Sidebar() {
                             { name: 'İş Emirleri', href: '/service/work-orders' },
                             { name: 'Yeni İş Emri', href: '/service/new' },
                             { name: 'Servis Randevuları', href: '/service/calendar' },
+                            { name: 'SAHA SERVİS', href: '' },
+                            { name: 'Saha Planlaması', href: '/service/field/routes' },
+                            { name: 'Saha Kampanyaları', href: '/service/field/campaigns' },
+                            { name: 'Canlı Takip', href: '/service/field/live' },
+                            { name: 'Bugünün Rotası', href: '/service/field/today' },
+                            { name: 'Rotalarım', href: '/service/field/my-routes' },
+                            { name: 'Müşteriler & Ziyaretler', href: '/service/field/visits' },
                         ]
                     },
                     { name: 'Teklifler', href: '/offers', icon: FileText },
 
                     {
-                        name: 'Saha Servis',
+                        name: 'SalesX',
                         icon: Map,
                         isParent: true,
                         id: 'field-sales-parent',
                         subItems: [
-                            { name: 'Saha Planlaması', href: '/field-sales/admin/routes' },
+                            { name: 'Saha Yönetimi', href: '/field-sales/admin/routes' },
+                            { name: 'Rota & Müşteri', href: '/field-sales' },
+                            { name: 'AI Zeka & Rota', href: '/field-sales/intelligence' },
                             { name: 'Canlı Takip', href: '/field-sales/admin/live' },
-                            { name: 'Saha Kampanyaları', href: '/field-sales/campaigns' },
-                            { name: 'Bugünün Rotası', href: '/field-sales/today' },
-                            { name: 'Rotalarım', href: '/field-sales/routes' },
-                            { name: 'Müşteriler & Ziyaretler', href: '/field-sales/visits' },
                         ]
                     },
                     {
