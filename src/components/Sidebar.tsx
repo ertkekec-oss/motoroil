@@ -65,7 +65,7 @@ export default function Sidebar() {
             'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
             'inventory-parent': ['/inventory', '/inventory/warehouses', '/inventory/manufacturing', '/inventory/boms'],
-            'service-parent': ['/service', '/service/work-orders', '/service/new', '/service/calendar', '/service/field/routes', '/service/field/campaigns', '/service/field/live', '/service/field/today', '/service/field/my-routes', '/service/field/visits'],
+            'service-parent': ['/service', '/service/work-orders', '/service/new', '/service/calendar', '/service/field/planner', '/service/field/dashboard'],
             'staff-parent': ['/staff', '/staff/performance'],
             'tasks-parent': ['/tasks']
         };
@@ -297,12 +297,8 @@ export default function Sidebar() {
                             { name: 'Yeni İş Emri', href: '/service/new' },
                             { name: 'Servis Randevuları', href: '/service/calendar' },
                             { name: 'SAHA SERVİS', href: '' },
-                            { name: 'Saha Planlaması', href: '/service/field/routes' },
-                            { name: 'Saha Kampanyaları', href: '/service/field/campaigns' },
-                            { name: 'Canlı Takip', href: '/service/field/live' },
-                            { name: 'Bugünün Rotası', href: '/service/field/today' },
-                            { name: 'Rotalarım', href: '/service/field/my-routes' },
-                            { name: 'Müşteriler & Ziyaretler', href: '/service/field/visits' },
+                            { name: 'Saha Planlama Panosu', href: '/service/field/planner' },
+                            { name: 'Servis Saha Paneli', href: '/service/field/dashboard' },
                         ]
                     },
                     { name: 'Teklifler', href: '/offers', icon: FileText },
