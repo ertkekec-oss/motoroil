@@ -6,8 +6,13 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/useResponsive';
-import { Route, TrendingUp, Building2, LayoutGrid, UserCircle2, Receipt, History } from 'lucide-react';
+import { 
+    Route, TrendingUp, Building2, LayoutGrid, UserCircle2, 
+    Receipt, History, BarChart3, Users, Settings, Wrench, 
+    CheckSquare, CalendarDays, Bell
+} from 'lucide-react';
 import Link from 'next/link';
 
 interface NavItem {
@@ -21,33 +26,59 @@ export function MobileNav() {
     const pathname = usePathname();
     const router = useRouter();
     const isMobile = useIsMobile();
+    const { user } = useAuth();
 
     if (!isMobile) return null;
 
-    const navItems: NavItem[] = [
-        { path: '/field-mobile/routes', icon: <Route className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Rotalarım' },
-        { path: '/field-mobile/intelligence', icon: <TrendingUp className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'SalesX' },
-        { path: '/field-mobile/customers', icon: <Building2 className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Müşteriler' },
-        { path: '/field-mobile/visits', icon: <History className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Ziyaretler' },
-        { path: '/field-mobile/expenses', icon: <Receipt className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Masraflar' },
-        { path: '/staff/me', icon: <LayoutGrid className="w-[18px] h-[18px] mb-1" strokeWidth={2.5} />, label: 'Portal' },
-    ];
+    let navItems: NavItem[] = [];
+    const role = user?.role?.toUpperCase() || '';
+
+    if (role === 'SUPER_ADMIN' || role === 'PLATFORM_ADMIN' || role === 'ADMIN') {
+        navItems = [
+            { path: '/desktop', icon: <LayoutGrid className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Özet' },
+            { path: '/reports/ceo', icon: <BarChart3 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Rapor' },
+            { path: '/staff', icon: <Users className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Ekip' },
+            { path: '/settings', icon: <Settings className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Ayar' },
+            { path: '/staff/me', icon: <UserCircle2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Profil' }
+        ];
+    } else if (role.includes('SAHA')) {
+        navItems = [
+            { path: '/field-mobile/routes', icon: <Route className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Rota' },
+            { path: '/field-mobile/intelligence', icon: <TrendingUp className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'SalesX' },
+            { path: '/field-mobile/customers', icon: <Building2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Cari' },
+            { path: '/calendar', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Takvim' },
+            { path: '/staff/me', icon: <UserCircle2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Profil' }
+        ];
+    } else if (role.includes('SERVIS') || role.includes('TEKNISYEN') || role.includes('SERVICE')) {
+        navItems = [
+            { path: '/calendar', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Ajanda' },
+            { path: '/service', icon: <Wrench className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Servis' },
+            { path: '/tasks', icon: <CheckSquare className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'İşlem' },
+            { path: '/staff/me', icon: <UserCircle2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Profil' }
+        ];
+    } else {
+        navItems = [
+            { path: '/staff/me', icon: <UserCircle2 className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Portal' },
+            { path: '/calendar', icon: <CalendarDays className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Takvim' },
+            { path: '/tasks', icon: <CheckSquare className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Görev' },
+            { path: '/notifications', icon: <Bell className="w-[20px] h-[20px] mb-1" strokeWidth={2} />, label: 'Bildirim' }
+        ];
+    }
 
     return (
         <nav
+            className="md:hidden bg-white/90 dark:bg-[#0b0f19]/90 border-t border-slate-200 dark:border-white/5 backdrop-blur-xl"
             style={{
                 position: 'fixed',
                 bottom: 0,
                 left: 0,
                 right: 0,
-                background: '#0b0f19', // More corporate, serious dark theme matching Enterprise Profile
-                borderTop: '1px solid rgba(255, 255, 255, 0.05)',
                 display: 'flex',
                 justifyContent: 'space-evenly',
                 paddingBottom: 'env(safe-area-inset-bottom)',
                 zIndex: 1000,
                 height: '64px',
-                boxShadow: '0 -8px 24px rgba(0,0,0,0.5)',
+                boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
             }}
         >
             {navItems.map((item) => {
@@ -64,7 +95,7 @@ export function MobileNav() {
                             flex: 1,
                             background: 'transparent',
                             border: 'none',
-                            color: isActive ? '#3b82f6' : '#64748b',
+                            color: isActive ? '#4f46e5' : '#64748b',
                             cursor: 'pointer',
                             position: 'relative',
                             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',

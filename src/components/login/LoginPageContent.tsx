@@ -186,10 +186,10 @@ export default function LoginPageContent() {
 
     useEffect(() => {
         if (!isLoading && isAuthenticated && user) {
-            if (user.role && user.role.toUpperCase().includes('SAHA')) {
-                router.push('/staff/me');
-            } else {
+            if (user.role && (user.role.toUpperCase() === 'SUPER_ADMIN' || user.role.toUpperCase() === 'PLATFORM_ADMIN')) {
                 router.push('/desktop');
+            } else {
+                router.push('/staff/me');
             }
         }
     }, [isLoading, isAuthenticated, user, router]);
