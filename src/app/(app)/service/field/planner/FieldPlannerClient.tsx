@@ -34,6 +34,20 @@ export default function FieldPlannerClient() {
     const [showRulesModal, setShowRulesModal] = useState(false);
     const [showNewApptModal, setShowNewApptModal] = useState(false);
 
+    // Mock Müşteri Listesi ve Combobox State'leri
+    const mockCustomers = [
+        { id: 1, name: 'Özlem Otomotiv', phone: '0532 111 2233', city: 'İstanbul', district: 'Kadıköy' },
+        { id: 2, name: 'Kozyatağı Yedek Parça', phone: '0533 222 3344', city: 'İstanbul', district: 'Kozyatağı' },
+        { id: 3, name: 'Sultanahmet Motor', phone: '0534 333 4455', city: 'İstanbul', district: 'Fatih' },
+        { id: 4, name: 'Ahmet Lojistik A.Ş.', phone: '0535 444 5566', city: 'İstanbul', district: 'Maltepe' },
+        { id: 5, name: 'Bostancı Oto Sanayi', phone: '0536 555 6677', city: 'İstanbul', district: 'Bostancı' },
+    ];
+    const [customerSearch, setCustomerSearch] = useState('');
+    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+    const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
+
+    const filteredCustomers = mockCustomers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()));
+
     const runOptimization = (templateType: 'STANDARD' | 'EMERGENCY') => {
         // Simple client-side auto-routing algorithm simulation
         let newUnplanned = [...unplanned];
@@ -479,9 +493,59 @@ export default function FieldPlannerClient() {
                             <button onClick={() => setShowNewApptModal(false)} className="w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-white">✕</button>
                         </div>
                         <div className="space-y-4">
-                            <div>
+                            <div className="relative">
                                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Müşteri / Firma</label>
-                                <input type="text" placeholder="Müşteri ara..." className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-bold outline-none" />
+                                <div className="relative">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Müşteri ara..." 
+                                        value={selectedCustomer ? selectedCustomer.name : customerSearch}
+                                        onChange={(e) => {
+                                            setCustomerSearch(e.target.value);
+                                            setSelectedCustomer(null);
+                                            setIsCustomerListOpen(true);
+                                        }}
+                                        onFocus={() => setIsCustomerListOpen(true)}
+                                        className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-bold outline-none focus:border-blue-500 dark:focus:border-blue-500/50 transition-colors" 
+                                    />
+                                    {selectedCustomer && (
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedCustomer(null);
+                                                setCustomerSearch('');
+                                            }}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white flex items-center justify-center w-6 h-6 bg-slate-100 dark:bg-slate-800 rounded-full"
+                                        >✕</button>
+                                    )}
+                                </div>
+                                {isCustomerListOpen && !selectedCustomer && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setIsCustomerListOpen(false)}></div>
+                                        <div className="absolute top-[calc(100%+4px)] left-0 w-full max-h-[200px] overflow-y-auto custom-scroll bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-20">
+                                            {filteredCustomers.length === 0 ? (
+                                                <div className="p-4 text-center text-slate-500 text-[12px]">Sonuç bulunamadı.</div>
+                                            ) : (
+                                                filteredCustomers.map(cust => (
+                                                    <div 
+                                                        key={cust.id} 
+                                                        onClick={() => {
+                                                            setSelectedCustomer(cust);
+                                                            setIsCustomerListOpen(false);
+                                                        }}
+                                                        className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b border-slate-100 dark:border-slate-700 last:border-b-0 transition-colors"
+                                                    >
+                                                        <div className="font-bold text-[13px] dark:text-slate-200">{cust.name}</div>
+                                                        <div className="text-[11px] text-slate-500 flex gap-2 mt-0.5">
+                                                            <span>{cust.district}, {cust.city}</span>
+                                                            <span className="opacity-50">•</span>
+                                                            <span>{cust.phone}</span>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
