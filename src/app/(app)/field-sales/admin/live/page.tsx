@@ -3,12 +3,13 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { MapPin } from 'lucide-react';
 
 // Default center: Turkey
 const DEFAULT_CENTER = [39.925533, 32.866287] as [number, number];
 const DEFAULT_ZOOM = 6;
 
-export default function LiveFieldTrackingPage() {
+export default function LiveFieldTrackingPage({ isEmbedded }: { isEmbedded?: boolean }) {
     const { theme } = useTheme();
     const isLight = theme === 'light';
     const [data, setData] = useState<any>(null);
@@ -283,22 +284,38 @@ export default function LiveFieldTrackingPage() {
             `}</style>
 
             {/* Header */}
-            <div className="flex justify-between items-center px-8 pt-8 pb-4">
-                <div>
-                    <h1 className="text-3xl font-black tracking-tight mb-1">🛰️ Canlı Saha Takibi</h1>
-                    <p className="text-gray-500 text-sm">Gerçek zamanlı konum ve ziyaret durumu</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
-                        <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">Canlı · 30s</span>
+            {!isEmbedded && (
+                <div className={`${isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-white/5'} border-b mb-6 sticky top-0 z-20`}>
+                    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-[14px] bg-green-600 text-white shadow-lg shadow-green-500/20 shrink-0">
+                                    <MapPin className="w-6 h-6" />
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <h1 className={`text-xl sm:text-2xl font-black tracking-tight ${textMain} leading-none mb-1.5 truncate`}>
+                                        Canlı Saha Takibi
+                                    </h1>
+                                    <span className={`text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase ${textMuted} truncate block`}>
+                                        {active.length} Personel sahada aktif
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="hidden sm:flex items-center gap-3">
+                            <span className="flex items-center gap-2 text-xs font-bold text-green-500 bg-green-50 dark:bg-green-500/10 px-3 py-1.5 rounded-lg">
+                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                Canlı Veri Akışı
+                            </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
-            {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-4 px-8 mb-6">
-                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 text-center">
+            <div className={isEmbedded ? "h-full w-full" : "max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8"}>
+                {/* Stats Row */}
+                <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 ${isEmbedded ? '' : 'px-0'}`}>
+                    <div className={`${bgSurface} ${borderColor} shadow-sm border rounded-[20px] p-5 text-center`}>
                     <div className="text-3xl font-black text-green-400">{active.length}</div>
                     <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">Aktif Ziyaret</div>
                 </div>

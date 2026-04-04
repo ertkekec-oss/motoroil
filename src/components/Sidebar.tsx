@@ -304,16 +304,9 @@ export default function Sidebar() {
                     { name: 'Teklifler', href: '/offers', icon: FileText },
 
                     {
-                        name: 'SalesX',
+                        name: 'SalesX Saha Paneli',
                         icon: Map,
-                        isParent: true,
-                        id: 'field-sales-parent',
-                        subItems: [
-                            { name: 'Saha Yönetimi', href: '/field-sales/admin/routes' },
-                            { name: 'Rota & Müşteri', href: '/field-sales' },
-                            { name: 'AI Zeka & Rota', href: '/field-sales/intelligence' },
-                            { name: 'Canlı Takip', href: '/field-sales/admin/live' },
-                        ]
+                        href: '/field-sales',
                     },
                     {
                         name: 'İnsan Kaynakları',

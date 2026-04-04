@@ -7,7 +7,7 @@ import { useModal } from '@/contexts/ModalContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Map, Settings, Target, ChevronLeft, ChevronRight, Plus, MapPin, Search, X, Edit2, Info, Users, CheckCircle2, Circle, Trash2, Calendar, Check } from 'lucide-react';
 
-export default function AdminRoutesPage() {
+export default function AdminRoutesPage({ isEmbedded }: { isEmbedded?: boolean }) {
     const { isAuthenticated, isLoading, user: currentUser } = useAuth();
     const { showError, showSuccess, showConfirm } = useModal();
     const router = useRouter();
@@ -304,10 +304,11 @@ export default function AdminRoutesPage() {
     );
 
     return (
-        <div data-pos-theme={theme} className={`${isLight ? 'bg-slate-50' : 'bg-[#0f172a]'} min-h-screen pb-6 w-full font-sans transition-colors duration-300`}>
+        <div data-pos-theme={!isEmbedded ? theme : undefined} className={`${isEmbedded ? 'w-full h-full' : `${isLight ? 'bg-slate-50' : 'bg-[#0f172a]'} min-h-screen pb-6 w-full font-sans transition-colors duration-300`}`}>
             {/* HER YERDE GEÇERLİ EN ÜST STRATEJİ / BAŞLIK BANDI */}
-            <div className="max-w-[1600px] mx-auto pt-6 px-4 sm:px-6 lg:px-8">
+            <div className={isEmbedded ? '' : 'max-w-[1600px] mx-auto pt-6 px-4 sm:px-6 lg:px-8'}>
                 <div className="flex-shrink-0 mb-6 flex flex-wrap items-center justify-between gap-4">
+                    {!isEmbedded && (
                     <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                         <div className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold border shadow-sm shrink-0 ${isLight ? 'bg-blue-600 text-white border-blue-500/10' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
                             <Map className="w-5 h-5" />
@@ -333,6 +334,8 @@ export default function AdminRoutesPage() {
                             </span>
                         </div>
                     </div>
+                    )}
+                    {isEmbedded && <div className="flex-1"></div>}
 
                     <div className={`flex flex-wrap items-center justify-end gap-3 p-2 rounded-xl xl:rounded-none border xl:border-transparent ${isLight ? 'bg-white xl:bg-transparent border-slate-200' : 'bg-[#1e293b] xl:bg-transparent border-white/5'}`}>
                         {/* Aktif Tarih / Hafta */}

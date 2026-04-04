@@ -4,11 +4,11 @@ import React from 'react';
 import { EnterprisePageShell, EnterpriseCard, EnterpriseSectionHeader, EnterpriseEmptyState } from '@/components/ui/enterprise';
 import { Sparkles, Map, TrendingUp, Users, Activity } from 'lucide-react';
 
-export default function FieldSalesIntelligencePage() {
+export default function FieldSalesIntelligencePage({ isEmbedded }: { isEmbedded?: boolean }) {
     return (
         <EnterprisePageShell
-            title="Saha Satış Zekası & Otonom Rota (AI)"
-            description="Müşteri satın alma alışkanlıkları, ziyaret önerileri ve bölge bazlı ciro tahminleme servisi."
+            title={isEmbedded ? undefined : "Saha Satış Zekası & Otonom Rota (AI)"}
+            description={isEmbedded ? undefined : "Müşteri satın alma alışkanlıkları, ziyaret önerileri ve bölge bazlı ciro tahminleme servisi."}
         >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <EnterpriseCard className="p-6 flex items-center gap-4">
