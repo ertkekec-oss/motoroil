@@ -271,19 +271,43 @@ export default function EditCampaign(props: { params: Promise<{ id: string }> })
                     <h4 className="font-bold text-slate-800 dark:text-white mb-4">Görünürlük ve Stack Kuralları</h4>
                 </div>
 
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Kanal</label>
-                    <select
-                        value={formData.channels[0]}
-                        onChange={e => setFormData({ ...formData, channels: [e.target.value] })}
-                        className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-900/50 outline-none focus:ring-2 focus:ring-indigo-500/50"
-                    >
-                        <option value="GLOBAL">Global (Tüm Kanallar)</option>
-                        <option value="POS">POS Terminal (Saha)</option>
-                        <option value="HUB">Periodya Hub (B2B)</option>
-                        <option value="SALES_REP">Saha Satış Temsilcisi</option>
-                        <option value="B2B">Bayi Ağı Siparişleri</option>
-                    </select>
+                <div className="col-span-1 md:col-span-2">
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Geçerli Olacağı Kanallar (Omni-Channel)</label>
+                    <div className="flex flex-wrap gap-3">
+                        {[
+                            { value: 'GLOBAL', label: 'Global (Tüm Kanallar)', desc: 'Her yerde aktif' },
+                            { value: 'POS', label: 'Terminal', desc: 'Mağaza içi POS cihazı' },
+                            { value: 'HUB', label: 'Periodya Hub', desc: 'B2C E-Ticaret' },
+                            { value: 'SALES_REP', label: 'SalesX', desc: 'Saha Satış Ağı' },
+                            { value: 'B2B', label: 'Dealer Network', desc: 'Bayi Ağı' },
+                            { value: 'SERVICE', label: 'Servis', desc: 'Teknik Servis Paneli' }
+                        ].map((ch) => (
+                            <label key={ch.value} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${formData.channels.includes(ch.value) ? 'border-indigo-500 bg-indigo-50/30 dark:bg-indigo-900/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-300'}`}>
+                                <div className="mt-0.5">
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                                        checked={formData.channels.includes(ch.value)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                if (ch.value === 'GLOBAL') {
+                                                    setFormData({ ...formData, channels: ['GLOBAL'] });
+                                                } else {
+                                                    setFormData({ ...formData, channels: [...formData.channels.filter(c => c !== 'GLOBAL'), ch.value] });
+                                                }
+                                            } else {
+                                                setFormData({ ...formData, channels: formData.channels.filter(c => c !== ch.value) });
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 leading-tight">{ch.label}</span>
+                                    <span className="text-[11px] text-slate-500 font-medium">{ch.desc}</span>
+                                </div>
+                            </label>
+                        ))}
+                    </div>
                 </div>
 
                 <div>
