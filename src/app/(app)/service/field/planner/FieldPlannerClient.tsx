@@ -687,7 +687,7 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
             if (job.coords && job.coords.lat && job.coords.lng) {
                 const grayIcon = L.divIcon({
                     className: '',
-                    html: `<div style="width:16px;height:16px;border-radius:50%;background:#94a3b8;border:2px solid #fff;box-shadow:0 0 10px rgba(0,0,0,0.3); animation:ping 2s infinite"></div>`,
+                    html: `<div style="width:16px;height:16px;border-radius:50%;background:#94a3b8;border:2px solid #fff;box-shadow:0 0 10px rgba(0,0,0,0.3); animation:myping 2s infinite"></div>`,
                     iconAnchor: [8, 8]
                 });
                 const m = L.marker([job.coords.lat, job.coords.lng], { icon: grayIcon })
@@ -745,7 +745,7 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
     return (
         <div className="w-full h-full relative z-[1]">
             <style>{`
-                @keyframes ping {
+                @keyframes myping {
                     0% { transform: scale(1); opacity: 1; }
                     50% { transform: scale(1.5); opacity: 0.5; }
                     100% { transform: scale(1); opacity: 1; }

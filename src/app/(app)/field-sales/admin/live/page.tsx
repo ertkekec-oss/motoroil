@@ -69,7 +69,7 @@ export default function LiveFieldTrackingPage() {
     };
 
     useEffect(() => {
-        if (mapRef.current || !mapContainerRef.current) return;
+        if (loading || mapRef.current || !mapContainerRef.current) return;
 
         let isMounted = true;
         let resizeObserver: ResizeObserver | null = null;
@@ -153,7 +153,7 @@ export default function LiveFieldTrackingPage() {
                 existingScript.removeEventListener('load', initL);
             }
         };
-    }, []);
+    }, [loading]);
 
     // Update markers when data changes
     useEffect(() => {
@@ -176,7 +176,7 @@ export default function LiveFieldTrackingPage() {
                         width:16px;height:16px;border-radius:50%;
                         background:#22c55e;border:3px solid #fff;
                         box-shadow:0 0 0 4px rgba(34,197,94,0.4);
-                        animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;
+                        animation:myping 1.5s cubic-bezier(0,0,0.2,1) infinite;
                     "></div>`,
                     iconAnchor: [8, 8]
                 });
@@ -264,7 +264,8 @@ export default function LiveFieldTrackingPage() {
         <div className="min-h-screen bg-[#0f111a] text-white">
             {/* CSS for ping animation */}
             <style>{`
-                @keyframes ping {
+                @keyframes myping {
+                    0% { transform: scale(1); opacity: 1; }
                     75%, 100% { transform: scale(2); opacity: 0; }
                 }
                 .leaflet-popup-content-wrapper {
