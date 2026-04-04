@@ -341,69 +341,13 @@ export default function FieldPlannerClient() {
 
                             {viewMode === 'MAP' && (
                                 <div className="relative p-6 flex flex-col animate-in fade-in duration-300 min-h-[600px] h-full">
-                                    <div className="absolute top-10 w-full text-center z-20 pointer-events-none">
+                                    <div className="absolute top-10 w-full text-center z-[1000] pointer-events-none">
                                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/80 backdrop-blur-sm text-white rounded-full text-[11px] font-bold tracking-widest uppercase shadow-lg">
-                                            <Map className="w-3 h-3 text-orange-400" /> İstanbul Anadolu Yakası Simülasyonu
+                                            <Map className="w-3 h-3 text-orange-400" /> Tam Zamanlı Açık Harita (OSM)
                                         </div>
                                     </div>
                                     <div className="flex-1 relative bg-[#e2e8f0] dark:bg-[#1e293b] rounded-[24px] border border-slate-300 dark:border-white/10 overflow-hidden shadow-inner">
-                                        {/* Harita Grid Arkaplanı */}
-                                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 dark:opacity-5"></div>
-                                        
-                                        {/* Unplanned (Bekleyen İşler) as Gray Pins */}
-                                        {unplanned.map(job => {
-                                            if(!job.coords) return null;
-                                            const left = Math.max(5, Math.min(95, ((job.coords.lng - 28.98) / 0.17) * 100));
-                                            const bottom = Math.max(5, Math.min(95, ((job.coords.lat - 40.90) / 0.12) * 100));
-                                            return (
-                                                <div key={job.id} 
-                                                     className="absolute w-5 h-5 rounded-full bg-slate-400 border-[3px] border-white dark:border-slate-800 shadow-md transform -translate-x-1/2 translate-y-1/2 flex items-center justify-center cursor-help group transition-transform hover:scale-125 z-20 animate-pulse" 
-                                                     style={{ left: `${left}%`, bottom: `${bottom}%` }}>
-                                                    <div className="hidden group-hover:block absolute bottom-full mb-3 bg-slate-900 text-white text-[11px] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl z-50">
-                                                        <span className="text-orange-400">{job.code}</span> - {job.loc}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                        
-                                        {/* Technicians Jobs (Atanmış İşler) as Colored Route Nodes */}
-                                        {technicians.filter(t=>t.isVisible).map((tech, tIndex) => {
-                                            const colors = ['bg-orange-500', 'bg-blue-500', 'bg-emerald-500', 'bg-purple-500'];
-                                            const color = colors[tIndex % colors.length];
-                                            
-                                            // Optional SVG Lines for Route path
-                                            const pathD = tech.jobs.map((job: any, index: number) => {
-                                                if(!job.coords) return '';
-                                                const left = Math.max(5, Math.min(95, ((job.coords.lng - 28.98) / 0.17) * 100));
-                                                // Inverse bottom for SVG Y coordinate (which is from top)
-                                                const top = 100 - Math.max(5, Math.min(95, ((job.coords.lat - 40.90) / 0.12) * 100));
-                                                return `${index === 0 ? 'M' : 'L'} ${left} ${top}`;
-                                            }).join(' ');
-
-                                            return (
-                                                <div key={tech.id} className="absolute inset-0">
-                                                    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-40" preserveAspectRatio="none" viewBox="0 0 100 100">
-                                                        <path d={pathD} fill="none" stroke="currentColor" className={`text-${color.split('-')[1]}-500`} strokeWidth="0.5" strokeDasharray="1,1" />
-                                                    </svg>
-                                                    {tech.jobs.map((job: any, jIndex: number) => {
-                                                        if(!job.coords) return null;
-                                                        const left = Math.max(5, Math.min(95, ((job.coords.lng - 28.98) / 0.17) * 100));
-                                                        const bottom = Math.max(5, Math.min(95, ((job.coords.lat - 40.90) / 0.12) * 100));
-                                                        return (
-                                                            <div key={job.id} 
-                                                                 className={`absolute w-7 h-7 rounded-full ${color} text-white shadow-[0_0_15px_rgba(0,0,0,0.2)] text-[10px] font-black border-[3px] border-white dark:border-slate-800 transform -translate-x-1/2 translate-y-1/2 flex items-center justify-center cursor-help group transition-transform hover:scale-125 z-30`} 
-                                                                 style={{ left: `${left}%`, bottom: `${bottom}%` }}>
-                                                                {jIndex + 1}
-                                                                <div className="hidden group-hover:block absolute bottom-full mb-3 bg-slate-900 text-white text-[11px] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl z-50">
-                                                                    <div className="text-[9px] text-slate-400 uppercase tracking-widest">{tech.name} - #{jIndex + 1} Hedef</div>
-                                                                    {job.loc} <span className="opacity-70 font-normal">({job.durationMins}dk)</span>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            );
-                                        })}
+                                        <LeafletPlannerMap technicians={technicians} unplanned={unplanned} />
                                     </div>
                                 </div>
                             )}
@@ -561,6 +505,146 @@ export default function FieldPlannerClient() {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unplanned: any[] }) {
+    const mapRef = React.useRef<any>(null);
+    const mapContainerRef = React.useRef<HTMLDivElement>(null);
+    const markersRef = React.useRef<any[]>([]);
+
+    React.useEffect(() => {
+        if (mapRef.current || !mapContainerRef.current) return;
+
+        // Dynamically load Leaflet from CDN
+        if (!document.querySelector('link[href*="leaflet@1.9.4/dist/leaflet.css"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            document.head.appendChild(link);
+        }
+
+        const initMap = () => {
+            const L = (window as any).L;
+            if (!L) return;
+            const map = L.map(mapContainerRef.current!, {
+                center: [40.9500, 29.0500],
+                zoom: 12,
+                zoomControl: true,
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19,
+            }).addTo(map);
+
+            mapRef.current = map;
+            renderMarkers();
+        };
+
+        if (!(window as any).L) {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.onload = initMap;
+            document.head.appendChild(script);
+        } else {
+            initMap();
+        }
+
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
+        };
+    }, []);
+
+    const renderMarkers = () => {
+        if (!mapRef.current) return;
+        const L = (window as any).L;
+        if (!L) return;
+
+        // Clear old markers
+        markersRef.current.forEach(m => m.remove());
+        markersRef.current = [];
+
+        const bounds: [number, number][] = [];
+
+        // 1. Unplanned jobs (Gray markers)
+        unplanned.forEach(job => {
+            if (job.coords && job.coords.lat && job.coords.lng) {
+                const grayIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="width:16px;height:16px;border-radius:50%;background:#94a3b8;border:2px solid #fff;box-shadow:0 0 10px rgba(0,0,0,0.3); animation:ping 2s infinite"></div>`,
+                    iconAnchor: [8, 8]
+                });
+                const m = L.marker([job.coords.lat, job.coords.lng], { icon: grayIcon })
+                    .addTo(mapRef.current)
+                    .bindPopup(`<div style="font-family:sans-serif;font-size:12px;color:black"><b>${job.code}</b><br>${job.title}<br>${job.loc}</div>`);
+                markersRef.current.push(m);
+                bounds.push([job.coords.lat, job.coords.lng]);
+            }
+        });
+
+        // 2. Technicians and their routes
+        technicians.filter(t => t.isVisible).forEach((tech, tIndex) => {
+            const colorsHex = ['#f97316', '#3b82f6', '#10b981', '#a855f7'];
+            const color = colorsHex[tIndex % colorsHex.length];
+            const routePoints: [number, number][] = [];
+
+            tech.jobs.forEach((job: any, jIndex: number) => {
+                if (job.coords && job.coords.lat && job.coords.lng) {
+                    routePoints.push([job.coords.lat, job.coords.lng]);
+                    bounds.push([job.coords.lat, job.coords.lng]);
+
+                    const colorIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="width:24px;height:24px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:10px">${jIndex + 1}</div>`,
+                        iconAnchor: [12, 12]
+                    });
+                    const m = L.marker([job.coords.lat, job.coords.lng], { icon: colorIcon })
+                        .addTo(mapRef.current)
+                        .bindPopup(`<div style="font-family:sans-serif;font-size:12px;color:black"><b>[${tech.name}] Hedef #${jIndex + 1}</b><br>${job.code} - ${job.loc}<br>${job.durationMins}dk</div>`);
+                    markersRef.current.push(m);
+                }
+            });
+
+            // Draw route line
+            if (routePoints.length > 1) {
+                const line = L.polyline(routePoints, {
+                    color: color,
+                    weight: 3,
+                    dashArray: '8 6',
+                    opacity: 0.7
+                }).addTo(mapRef.current);
+                markersRef.current.push(line);
+            }
+        });
+
+        if (bounds.length > 0) {
+            mapRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+        }
+    };
+
+    React.useEffect(() => {
+        renderMarkers();
+    }, [technicians, unplanned]);
+
+    return (
+        <div className="w-full h-full relative" style={{ zIndex: 1 }}>
+            <style>{`
+                @keyframes ping {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.5); opacity: 0.5; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+                .leaflet-popup-content-wrapper {
+                    border-radius: 10px !important;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+                }
+            `}</style>
+            <div ref={mapContainerRef} style={{ width: '100%', height: '100%', borderRadius: '24px' }} />
         </div>
     );
 }
