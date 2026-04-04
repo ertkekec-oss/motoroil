@@ -3,17 +3,26 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authorize } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
 
+        const { searchParams } = new URL(request.url);
+        const channel = searchParams.get('channel');
+
+        const whereClause: any = {
+            tenantId: (auth as any).user.tenantId,
+            companyId: (auth as any).user.companyId,
+            deletedAt: null
+        };
+
+        if (channel) {
+            whereClause.channels = { has: channel };
+        }
+
         const campaigns = await prisma.campaign.findMany({
-            where: {
-                tenantId: (auth as any).user.tenantId,
-                companyId: (auth as any).user.companyId,
-                deletedAt: null
-            },
+            where: whereClause,
             orderBy: { createdAt: 'desc' }
         });
         return NextResponse.json(campaigns);

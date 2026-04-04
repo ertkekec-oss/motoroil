@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     LayoutDashboard, Gift, MapPin, Navigation, Map, Users, Star, 
     TrendingUp, Clock, CalendarDays, CheckCircle2, ChevronRight, Activity, ChevronDown,
-    Wrench, Settings as ConfigIcon, ListTodo, Search
+    Wrench, Settings as ConfigIcon, ListTodo, Search, Plus
 } from 'lucide-react';
 
 type TabType = 'dashboard' | 'campaigns' | 'live' | 'today' | 'my-routes' | 'visits';
@@ -21,13 +21,15 @@ export default function FieldDashboardClient() {
     });
     const [statsLoading, setStatsLoading] = useState(true);
     const [tasks, setTasks] = useState<any[]>([]);
+    const [campaigns, setCampaigns] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchDashboardStats = async () => {
             try {
-                // Sadece servis verilerini (görevler, iş emirleri) çeker
-                const [tasksRes] = await Promise.all([
-                    fetch('/api/workflow/tasks')
+                // Sadece servis verilerini (görevler, iş emirleri, servis kampanyaları) çeker
+                const [tasksRes, campaignsRes] = await Promise.all([
+                    fetch('/api/workflow/tasks'),
+                    fetch('/api/campaigns?channel=SERVICE')
                 ]);
                 
                 let activeRoutes = 3;
@@ -35,6 +37,11 @@ export default function FieldDashboardClient() {
                 if (tasksRes.ok) {
                     activeTasks = await tasksRes.json();
                     setTasks(Array.isArray(activeTasks) ? activeTasks : []);
+                }
+                
+                if (campaignsRes.ok) {
+                    const campData = await campaignsRes.json();
+                    setCampaigns(Array.isArray(campData) ? campData.filter((c:any) => c.status === 'ACTIVE' || c.isActive) : []);
                 }
 
                 setKpiStats({
@@ -92,7 +99,7 @@ export default function FieldDashboardClient() {
             {[
                 { title: 'Aktif Servis Aracı', value: statsLoading ? '...' : kpiStats.activeVehicles.toString(), sub: 'Saha Operasyonunda', icon: Navigation, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
                 { title: 'Günlük Servis Hedefi', value: statsLoading ? '...' : kpiStats.dailyTarget.toString(), sub: `Tamamlanan İş Emri: ${kpiStats.completedTarget}`, icon: Wrench, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-500/10' },
-                { title: 'Servis Kampanyaları', value: statsLoading ? '...' : `2`, sub: 'Aktif Bakım Paketleri', icon: Gift, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
+                { title: 'Servis Kampanyaları', value: statsLoading ? '...' : campaigns.length.toString(), sub: 'Aktif Bakım Paketleri', icon: Gift, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
                 { title: 'Geciken İş Emri', value: statsLoading ? '...' : kpiStats.delayedTasks.toString(), sub: 'Kritik Operasyon Uyarısı', icon: Clock, color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-500/10' },
             ].map((kpi, i) => (
                 <div key={i} className="bg-white dark:bg-[#1e293b] rounded-[20px] p-5 shadow-sm border border-slate-200 dark:border-white/5 relative overflow-hidden group">
@@ -211,18 +218,20 @@ export default function FieldDashboardClient() {
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {[
-                                    { title: 'Kışa Hazırlık Bakım Paketi', desc: 'Filtreler, Antifriz ve Lastik basınç kontrolünde %20 anında Servis indirimi.', stat: 'Aktif', color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' },
-                                    { title: 'Yıllık Genel Konfor Servisi', desc: 'Silecek değişimi ve klima gazı dolumunda hediye OBD-II hata taraması.', stat: 'Aktif', color: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' }
-                                ].map((cmp, i) => (
+                                {campaigns.length > 0 ? campaigns.map((cmp: any, i: number) => (
                                     <div key={i} className="p-5 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-indigo-500/50 transition-colors bg-slate-50/50 dark:bg-[#0f172a]/50">
-                                        <div className={`px-3 py-1 inline-flex text-[11px] font-black uppercase tracking-widest rounded-lg mb-3 ${cmp.color}`}>
-                                            {cmp.stat}
+                                        <div className={`px-3 py-1 inline-flex text-[11px] font-black uppercase tracking-widest rounded-lg mb-3 bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400`}>
+                                            {cmp.discountRate ? `%${cmp.discountRate} İndirim` : 'Aktif'}
                                         </div>
-                                        <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200 mb-2 leading-tight">{cmp.title}</h3>
-                                        <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{cmp.desc}</p>
+                                        <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200 mb-2 leading-tight">{cmp.name}</h3>
+                                        <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-3">{cmp.description || 'Bu kampanya için detaylı açıklama girilmemiştir.'}</p>
                                     </div>
-                                ))}
+                                )) : (
+                                    <div className="col-span-full py-10 flex flex-col items-center justify-center text-slate-400 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
+                                        <Gift className="w-10 h-10 mb-3 opacity-30" />
+                                        <p className="text-[14px] font-medium">Şu an aktif bir servis kampanyası bulunmuyor.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

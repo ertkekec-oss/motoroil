@@ -7641,6 +7641,7 @@ enum CampaignChannel {
   HUB
   MANUAL
   GLOBAL
+  SERVICE
 }
 
 enum CampaignStackingRule {
