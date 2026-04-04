@@ -634,6 +634,7 @@ export default function AdminRoutesPage() {
                             )}
                         </div>
                     </div>
+                    </div>
                 </div>
 
             </div>
