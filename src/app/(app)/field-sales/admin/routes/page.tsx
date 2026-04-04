@@ -304,11 +304,11 @@ export default function AdminRoutesPage() {
     );
 
     return (
-        <div data-pos-theme={theme} className={`${isLight ? 'bg-slate-50' : 'bg-[#0f172a]'} min-h-screen pb-16 w-full font-sans transition-colors duration-300`}>
+        <div data-pos-theme={theme} className={`${isLight ? 'bg-slate-50' : 'bg-[#0f172a]'} min-h-screen pb-6 w-full font-sans transition-colors duration-300`}>
             {/* HER YERDE GEÇERLİ EN ÜST STRATEJİ / BAŞLIK BANDI */}
-            <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8">
-                <div className="flex-shrink-0 bg-transparent z-10 sticky top-0 mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
+            <div className="max-w-[1600px] mx-auto pt-6 px-4 sm:px-6 lg:px-8">
+                <div className="flex-shrink-0 mb-6 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full xl:w-auto">
                         <div className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold border shadow-sm shrink-0 ${isLight ? 'bg-blue-600 text-white border-blue-500/10' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
                             <Map className="w-5 h-5" />
                         </div>
@@ -334,9 +334,9 @@ export default function AdminRoutesPage() {
                         </div>
                     </div>
 
-                    <div className={`flex flex-wrap items-center justify-between lg:justify-end gap-3 w-full lg:w-auto p-3 lg:p-0 rounded-xl lg:rounded-none border lg:border-transparent ${isLight ? 'bg-white lg:bg-transparent border-slate-200' : 'bg-[#1e293b] lg:bg-transparent border-white/5'}`}>
+                    <div className={`flex flex-wrap items-center justify-between w-full xl:w-auto p-3 xl:p-0 rounded-xl xl:rounded-none border xl:border-transparent ${isLight ? 'bg-white xl:bg-transparent border-slate-200' : 'bg-[#1e293b] xl:bg-transparent border-white/5'}`}>
                         {/* Aktif Tarih / Hafta */}
-                        <div className="flex flex-col items-start sm:items-end mr-0 sm:mr-4">
+                        <div className="flex flex-col items-start xl:items-end mr-0 xl:mr-4">
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Aktif Hafta</span>
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setCurrentDate(addDays(currentDate, -7))} className={`text-slate-400 hover:text-blue-500 transition-colors`}>
@@ -351,11 +351,11 @@ export default function AdminRoutesPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 xl:mt-0 mt-3">
                             {(currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') && (
                                 <button
                                     onClick={() => router.push('/field-sales/admin/config')}
-                                    className={`h-[36px] sm:h-[40px] px-4 border text-[11px] sm:text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm rounded-[10px] flex items-center gap-2 ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'}`}
+                                    className={`h-[36px] sm:h-[40px] px-3 sm:px-4 border text-[11px] sm:text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm rounded-[10px] flex items-center gap-2 ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'}`}
                                 >
                                     <Settings size={14} /> Saha Ayarları
                                 </button>
@@ -363,12 +363,12 @@ export default function AdminRoutesPage() {
 
                             <a
                                 href="/settings?tab=campaigns"
-                                className={`h-[36px] sm:h-[40px] px-4 border text-[11px] sm:text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm rounded-[10px] flex items-center gap-2 ${isLight ? 'bg-white border-slate-200 text-blue-600 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-blue-400 hover:bg-white/5'}`}
+                                className={`h-[36px] sm:h-[40px] px-3 sm:px-4 border text-[11px] sm:text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm rounded-[10px] flex items-center gap-2 ${isLight ? 'bg-white border-slate-200 text-blue-600 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-blue-400 hover:bg-white/5'}`}
                             >
                                 <Target size={14} /> Kampanya Seç
                             </a>
 
-                            <div className={`w-[1px] h-8 mx-2 hidden sm:block ${isLight ? 'bg-slate-200' : 'bg-white/10'}`}></div>
+                            <div className={`w-[1px] h-8 mx-2 hidden xl:block ${isLight ? 'bg-slate-200' : 'bg-white/10'}`}></div>
 
                             <button
                                 onClick={() => setShowCreateTemplateModal(true)}
@@ -403,10 +403,10 @@ export default function AdminRoutesPage() {
                 )}
 
                 {/* BOARD ALANI */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 mt-8">
+                <div className="flex flex-col lg:flex-row gap-6 animate-in fade-in slide-in-from-bottom-4 mt-6">
 
                     {/* SOL KOLON: ŞABLONLAR */}
-                    <div className={`lg:col-span-1 h-[calc(100vh-180px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-colors ${isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-white/5'}`}>
+                    <div className={`w-full lg:w-[320px] shrink-0 h-[calc(100vh-160px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-colors ${isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-white/5'}`}>
                         <div className={`p-4 border-b flex items-center justify-between ${isLight ? 'border-slate-100 bg-slate-50' : 'border-white/5 bg-slate-800/50'}`}>
                             <div className="flex items-center gap-2">
                                 <span className={`text-[10px] font-black tracking-widest uppercase ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Rota Şablonları</span>
@@ -473,7 +473,7 @@ export default function AdminRoutesPage() {
                     </div>
 
                     {/* SAĞ KOLON: TEKNİSYEN TAKVİMİ / KANBAN MANTIĞI */}
-                    <div className={`lg:col-span-3 flex-1 h-[calc(100vh-180px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden ${bgCard}`}>
+                    <div className={`flex-1 min-w-0 h-[calc(100vh-160px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden ${bgCard}`}>
                         <div className={`p-4 border-b flex items-center justify-between overflow-x-auto custom-scroll ${isLight ? 'border-slate-100 bg-slate-50' : 'border-white/5 bg-slate-800/50'}`}>
                             <div className="flex gap-4 shrink-0">
                                 <button className={`text-[11px] font-black uppercase tracking-widest pb-1 transition-colors ${isLight ? 'text-blue-600 border-b-2 border-blue-500' : 'text-blue-500 border-b-2 border-blue-400'}`}>Satış Personeli (Ajanda)</button>
