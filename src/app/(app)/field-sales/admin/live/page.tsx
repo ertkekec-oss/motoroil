@@ -74,11 +74,11 @@ export default function LiveFieldTrackingPage() {
         let isMounted = true;
         let resizeObserver: ResizeObserver | null = null;
 
-        // Dynamically load Leaflet from reliable CDN securely (switched to jsdelivr to avoid ad-blocker/CORS blocks)
-        if (!document.querySelector('link[href*="leaflet.min.css"]')) {
+        // Dynamically load Leaflet from reliable CDN securely (switched to local hosting to avoid ad-blocker/CORS blocks)
+        if (!document.querySelector('link[href*="leaflet.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css';
+            link.href = '/leaflet/leaflet.css';
             link.onload = () => {
                 if (mapRef.current && isMounted) {
                     mapRef.current.invalidateSize();
@@ -126,12 +126,12 @@ export default function LiveFieldTrackingPage() {
         };
 
         if (!(window as any).L) {
-            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            const existingScript = document.querySelector('script[src*="leaflet.js"]');
             if (existingScript) {
                 existingScript.addEventListener('load', initL);
             } else {
                 const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js';
+                script.src = '/leaflet/leaflet.js';
                 script.onload = initL;
                 document.head.appendChild(script);
             }
@@ -148,7 +148,7 @@ export default function LiveFieldTrackingPage() {
                 mapRef.current.remove();
                 mapRef.current = null;
             }
-            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            const existingScript = document.querySelector('script[src*="leaflet.js"]');
             if (existingScript) {
                 existingScript.removeEventListener('load', initL);
             }

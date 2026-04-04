@@ -585,10 +585,10 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
         let resizeObserver: ResizeObserver | null = null;
 
         // 1. Dynamically load Leaflet CSS if not present
-        if (!document.querySelector('link[href*="leaflet.min.css"]')) {
+        if (!document.querySelector('link[href*="leaflet.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css';
+            link.href = '/leaflet/leaflet.css';
             link.onload = () => {
                 if (mapRef.current && isMounted) {
                     mapRef.current.invalidateSize();
@@ -640,12 +640,12 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
 
         // 2. Dynamically load Leaflet JS
         if (!(window as any).L) {
-            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            const existingScript = document.querySelector('script[src*="leaflet.js"]');
             if (existingScript) {
                 existingScript.addEventListener('load', initMap);
             } else {
                 const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js';
+                script.src = '/leaflet/leaflet.js';
                 script.onload = initMap;
                 document.head.appendChild(script);
             }
@@ -664,7 +664,7 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
                 mapRef.current = null;
             }
             
-            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            const existingScript = document.querySelector('script[src*="leaflet.js"]');
             if (existingScript) {
                existingScript.removeEventListener('load', initMap);
             }
