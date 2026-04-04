@@ -71,11 +71,11 @@ export default function LiveFieldTrackingPage() {
     useEffect(() => {
         if (mapRef.current || !mapContainerRef.current) return;
 
-        // Dynamically load Leaflet from CDN securely
-        if (!document.querySelector('link[href*="leaflet@1.9.4/dist/leaflet.css"]')) {
+        // Dynamically load Leaflet from reliable CDN securely
+        if (!document.querySelector('link[href*="leaflet"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
             document.head.appendChild(link);
         }
 
@@ -101,7 +101,7 @@ export default function LiveFieldTrackingPage() {
 
         if (!(window as any).L) {
             const script = document.createElement('script');
-            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
             script.onload = initL;
             document.head.appendChild(script);
         } else {
