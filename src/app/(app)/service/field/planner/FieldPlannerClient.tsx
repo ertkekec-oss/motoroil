@@ -34,19 +34,31 @@ export default function FieldPlannerClient() {
     const [showRulesModal, setShowRulesModal] = useState(false);
     const [showNewApptModal, setShowNewApptModal] = useState(false);
 
-    // Mock Müşteri Listesi ve Combobox State'leri
-    const mockCustomers = [
-        { id: 1, name: 'Özlem Otomotiv', phone: '0532 111 2233', city: 'İstanbul', district: 'Kadıköy' },
-        { id: 2, name: 'Kozyatağı Yedek Parça', phone: '0533 222 3344', city: 'İstanbul', district: 'Kozyatağı' },
-        { id: 3, name: 'Sultanahmet Motor', phone: '0534 333 4455', city: 'İstanbul', district: 'Fatih' },
-        { id: 4, name: 'Ahmet Lojistik A.Ş.', phone: '0535 444 5566', city: 'İstanbul', district: 'Maltepe' },
-        { id: 5, name: 'Bostancı Oto Sanayi', phone: '0536 555 6677', city: 'İstanbul', district: 'Bostancı' },
-    ];
-    const [customerSearch, setCustomerSearch] = useState('');
-    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-    const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
+    const [realCustomers, setRealCustomers] = useState<any[]>([]);
+    const [customerLoading, setCustomerLoading] = useState(false);
 
-    const filteredCustomers = mockCustomers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()));
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            if (customerSearch.length < 2) {
+                setRealCustomers([]);
+                return;
+            }
+            setCustomerLoading(true);
+            try {
+                const res = await fetch(`/api/customers?search=${encodeURIComponent(customerSearch)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setRealCustomers(data.customers || []);
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setCustomerLoading(false);
+            }
+        };
+        const timeoutId = setTimeout(fetchCustomers, 300);
+        return () => clearTimeout(timeoutId);
+    }, [customerSearch]);
 
     const runOptimization = (templateType: 'STANDARD' | 'EMERGENCY') => {
         // Simple client-side auto-routing algorithm simulation
@@ -522,10 +534,12 @@ export default function FieldPlannerClient() {
                                     <>
                                         <div className="fixed inset-0 z-10" onClick={() => setIsCustomerListOpen(false)}></div>
                                         <div className="absolute top-[calc(100%+4px)] left-0 w-full max-h-[200px] overflow-y-auto custom-scroll bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-20">
-                                            {filteredCustomers.length === 0 ? (
+                                            {customerLoading ? (
+                                                <div className="p-4 text-center text-slate-500 text-[12px]">Aranıyor...</div>
+                                            ) : realCustomers.length === 0 ? (
                                                 <div className="p-4 text-center text-slate-500 text-[12px]">Sonuç bulunamadı.</div>
                                             ) : (
-                                                filteredCustomers.map(cust => (
+                                                realCustomers.map(cust => (
                                                     <div 
                                                         key={cust.id} 
                                                         onClick={() => {
@@ -536,9 +550,9 @@ export default function FieldPlannerClient() {
                                                     >
                                                         <div className="font-bold text-[13px] dark:text-slate-200">{cust.name}</div>
                                                         <div className="text-[11px] text-slate-500 flex gap-2 mt-0.5">
-                                                            <span>{cust.district}, {cust.city}</span>
+                                                            <span>{cust.district || '-'}, {cust.city || '-'}</span>
                                                             <span className="opacity-50">•</span>
-                                                            <span>{cust.phone}</span>
+                                                            <span>{cust.phone || '-'}</span>
                                                         </div>
                                                     </div>
                                                 ))
