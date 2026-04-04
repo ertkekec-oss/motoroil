@@ -403,7 +403,7 @@ export default function AdminRoutesPage() {
                 )}
 
                 {/* BOARD ALANI */}
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_3.5fr] gap-6 animate-in fade-in slide-in-from-bottom-4 mt-8">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 mt-8">
 
                     {/* SOL KOLON: ŞABLONLAR */}
                     <div className={`lg:col-span-1 h-[calc(100vh-180px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-colors ${isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-white/5'}`}>
@@ -429,16 +429,6 @@ export default function AdminRoutesPage() {
                         </div>
 
                         <div className={`flex-1 overflow-y-auto custom-scroll p-3 space-y-3 ${isLight ? 'bg-slate-50/50' : 'bg-slate-900/20'}`}>
-                            <div className="flex justify-between items-center mb-5">
-                                <h3 className={`text-[16px] font-semibold ${textMain}`}>Rota Şablonları</h3>
-                                <button
-                                    onClick={() => setShowCreateTemplateModal(true)}
-                                    className={`text-[12px] font-semibold px-3 py-1.5 rounded-[8px] transition-all border ${isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'}`}
-                                >
-                                    + Yeni
-                                </button>
-                            </div>
-
                             {templates.map(template => (
                                 <div
                                     key={template.id}
@@ -483,7 +473,7 @@ export default function AdminRoutesPage() {
                     </div>
 
                     {/* SAĞ KOLON: TEKNİSYEN TAKVİMİ / KANBAN MANTIĞI */}
-                    <div className={`lg:col-span-1 flex-1 h-[calc(100vh-180px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden ${bgCard}`}>
+                    <div className={`lg:col-span-3 flex-1 h-[calc(100vh-180px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden ${bgCard}`}>
                         <div className={`p-4 border-b flex items-center justify-between overflow-x-auto custom-scroll ${isLight ? 'border-slate-100 bg-slate-50' : 'border-white/5 bg-slate-800/50'}`}>
                             <div className="flex gap-4 shrink-0">
                                 <button className={`text-[11px] font-black uppercase tracking-widest pb-1 transition-colors ${isLight ? 'text-blue-600 border-b-2 border-blue-500' : 'text-blue-500 border-b-2 border-blue-400'}`}>Satış Personeli (Ajanda)</button>
