@@ -2,8 +2,6 @@ import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { WorkflowTaskStatus, WorkflowTaskPriority, WorkflowTaskType } from "@prisma/client";
-
 export default async function TaskListPage({ searchParams }: { searchParams: Promise<{ status?: string, priority?: string, type?: string }> }) {
     const session: any = await getSession();
     if (!session || !session.tenantId) return notFound();
@@ -62,7 +60,14 @@ export default async function TaskListPage({ searchParams }: { searchParams: Pro
                             </select>
                             <select name="type" defaultValue={type || ''} onChange={(e) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] text-sm">
                                 <option value="">Tüm Tipler</option>
-                                {Object.values(WorkflowTaskType).map(t => (
+                                {[
+                                    'RECON_DISPUTE',
+                                    'SIGNATURE_REVIEW',
+                                    'SIGNATURE_REJECTED',
+                                    'MAIL_FAILURE',
+                                    'OTP_FAILURE',
+                                    'SYSTEM_ALERT'
+                                ].map(t => (
                                     <option key={t} value={t}>{t}</option>
                                 ))}
                             </select>
