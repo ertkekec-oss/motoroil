@@ -581,18 +581,34 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
     React.useEffect(() => {
         if (mapRef.current || !mapContainerRef.current) return;
 
-        // Dynamically load Leaflet from reliable CDN
-        if (!document.querySelector('link[href*="leaflet"]')) {
+        let isMounted = true;
+        let resizeObserver: ResizeObserver | null = null;
+
+        // 1. Dynamically load Leaflet CSS if not present
+        if (!document.querySelector('link[href*="leaflet.min.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+            link.onload = () => {
+                if (mapRef.current && isMounted) {
+                    mapRef.current.invalidateSize();
+                }
+            };
             document.head.appendChild(link);
         }
 
         const initMap = () => {
+            if (!isMounted || !mapContainerRef.current) return;
+            
             const L = (window as any).L;
             if (!L) return;
-            const map = L.map(mapContainerRef.current!, {
+
+            // Prevent re-initialization on the same node
+            if ((mapContainerRef.current as any)._leaflet_id) {
+                return;
+            }
+
+            const map = L.map(mapContainerRef.current, {
                 center: [40.9500, 29.0500],
                 zoom: 12,
                 zoomControl: true,
@@ -606,23 +622,51 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
             mapRef.current = map;
             renderMarkers();
             
-            // Fix for Leaflet grid rendering issues when container sizes change dynamically
-            setTimeout(() => { if (mapRef.current) mapRef.current.invalidateSize(); }, 300);
+            // Force resize a few times to cover animation timings
+            setTimeout(() => { if (mapRef.current && isMounted) mapRef.current.invalidateSize(); }, 100);
+            setTimeout(() => { if (mapRef.current && isMounted) mapRef.current.invalidateSize(); }, 300);
+            setTimeout(() => { if (mapRef.current && isMounted) mapRef.current.invalidateSize(); }, 800);
+
+            // Add ResizeObserver to handle any container changes
+            if (typeof ResizeObserver !== 'undefined') {
+                resizeObserver = new ResizeObserver(() => {
+                    if (mapRef.current && isMounted) {
+                        mapRef.current.invalidateSize();
+                    }
+                });
+                resizeObserver.observe(mapContainerRef.current);
+            }
         };
 
+        // 2. Dynamically load Leaflet JS
         if (!(window as any).L) {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
-            script.onload = initMap;
-            document.head.appendChild(script);
+            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            if (existingScript) {
+                existingScript.addEventListener('load', initMap);
+            } else {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+                script.onload = initMap;
+                document.head.appendChild(script);
+            }
         } else {
-            initMap();
+            // Give it a tiny tick for the DOM to settle
+            setTimeout(initMap, 50);
         }
 
         return () => {
+            isMounted = false;
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
             if (mapRef.current) {
                 mapRef.current.remove();
                 mapRef.current = null;
+            }
+            
+            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            if (existingScript) {
+               existingScript.removeEventListener('load', initMap);
             }
         };
     }, []);
@@ -699,7 +743,7 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
     }, [technicians, unplanned]);
 
     return (
-        <div className="w-full h-full relative" style={{ zIndex: 1 }}>
+        <div className="w-full h-full relative z-[1]">
             <style>{`
                 @keyframes ping {
                     0% { transform: scale(1); opacity: 1; }
