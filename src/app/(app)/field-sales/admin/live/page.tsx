@@ -2,12 +2,15 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // Default center: Turkey
 const DEFAULT_CENTER = [39.925533, 32.866287] as [number, number];
 const DEFAULT_ZOOM = 6;
 
 export default function LiveFieldTrackingPage() {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const mapRef = useRef<any>(null);
@@ -251,17 +254,22 @@ export default function LiveFieldTrackingPage() {
     }, []);
 
     if (loading && !data) return (
-        <div className="p-12 text-white/50 animate-pulse text-center">
-            <div className="text-4xl mb-3">🛰️</div>
-            <div>Saha takibi yükleniyor...</div>
+        <div className={`flex flex-col items-center justify-center p-12 animate-pulse text-center min-h-screen ${isLight ? 'bg-slate-50 text-slate-400' : 'bg-[#0f172a] text-white/50'}`}>
+            <div className="text-4xl mb-4">🛰️</div>
+            <div className="font-bold text-[13px] uppercase tracking-widest">Saha takibi yükleniyor...</div>
         </div>
     );
 
     const active = data?.activeVisits || [];
     const recent = data?.recentVisits || [];
 
+    const textMain = isLight ? 'text-slate-800' : 'text-white';
+    const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
+    const bgSurface = isLight ? 'bg-white' : 'bg-[#1e293b]';
+    const borderColor = isLight ? 'border-slate-200' : 'border-white/5';
+
     return (
-        <div className="min-h-screen bg-[#0f111a] text-white">
+        <div data-pos-theme={theme} className={`min-h-screen transition-colors duration-300 w-full ${isLight ? 'bg-slate-50 text-slate-800' : 'bg-[#0f172a] text-white'}`}>
             {/* CSS for ping animation */}
             <style>{`
                 @keyframes myping {
@@ -306,90 +314,95 @@ export default function LiveFieldTrackingPage() {
                 </div>
             </div>
 
-            {/* Main: Map + Sidebar */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-8 pb-10">
-                {/* Map */}
-                <div className="lg:col-span-2">
-                    <div className="bg-[#161b22] border border-white/5 rounded-3xl overflow-hidden" style={{ height: '520px' }}>
-                        <div ref={mapContainerRef} style={{ width: '100%', height: '100%', borderRadius: '24px' }} />
+                {/* Main: Map + Sidebar */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Map */}
+                    <div className="lg:col-span-2 flex flex-col">
+                        <div className={`border rounded-[24px] overflow-hidden flex-1 shadow-sm relative min-h-[500px] lg:min-h-[600px] ${bgSurface} ${borderColor}`}>
+                            <div ref={mapContainerRef} className="absolute inset-0 z-0 bg-transparent" />
+                        </div>
+                        {/* Map legend */}
+                        <div className={`flex gap-6 mt-4 px-2 text-[11px] font-black uppercase tracking-widest ${textMuted}`}>
+                            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Aktif saha personeli</span>
+                            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block" /> Müşteri konumu</span>
+                            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-gray-500 inline-block" /> Tamamlanan ziyaret</span>
+                        </div>
                     </div>
-                    {/* Map legend */}
-                    <div className="flex gap-5 mt-3 px-2 text-[11px] text-gray-500 font-medium">
-                        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Aktif saha personeli</span>
-                        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block" /> Müşteri konumu</span>
-                        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-500 inline-block" /> Tamamlanan ziyaret</span>
-                    </div>
-                </div>
 
-                {/* Sidebar: Active + Recent */}
-                <div className="flex flex-col gap-4 max-h-[560px] overflow-y-auto">
-                    {/* Active */}
-                    <div>
-                        <h2 className="text-xs font-black text-white/40 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-ping inline-block" />
-                            Şu An Sahada ({active.length})
-                        </h2>
-                        {active.length === 0 && (
-                            <div className="text-center text-gray-600 py-8 border border-dashed border-white/5 rounded-2xl text-sm">
-                                Aktif ziyaret yok
-                            </div>
-                        )}
-                        {active.map((visit: any) => {
-                            const dur = Math.floor((Date.now() - new Date(visit.checkInTime).getTime()) / 60000);
-                            return (
-                                <div key={visit.id} className={`bg-[#161b22] border rounded-2xl p-4 mb-3 ${visit.isOutOfRange ? 'border-red-500/30' : 'border-blue-500/20'}`}>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center text-base">👤</div>
-                                        <div>
-                                            <div className="font-black text-sm text-white">{visit.staff?.name}</div>
-                                            <div className="text-[10px] text-gray-500">{dur} dk önce girdi</div>
-                                        </div>
-                                        {visit.isOutOfRange && (
-                                            <div className="ml-auto text-[9px] font-black text-red-400 bg-red-500/10 px-2 py-1 rounded-lg">⚠️ KONUM DIŞI</div>
-                                        )}
-                                    </div>
-                                    <div className="bg-black/30 rounded-xl p-3">
-                                        <div className="text-[10px] text-gray-500 mb-1">MÜŞTERİ</div>
-                                        <div className="text-sm font-bold">{visit.customer?.name}</div>
-                                        <div className="text-xs text-gray-500">{visit.customer?.district}, {visit.customer?.city}</div>
-                                        {visit.distanceMeters !== null && (
-                                            <div className={`text-[10px] mt-1 font-bold ${visit.isOutOfRange ? 'text-red-400' : 'text-green-400'}`}>
-                                                {visit.isOutOfRange ? '⚠️' : '✅'} {visit.distanceMeters}m uzaklıkta giriş
-                                            </div>
-                                        )}
-                                        {!visit.staffLat && (
-                                            <div className="text-[10px] mt-1 text-gray-600">📍 Konum paylaşılmadı</div>
-                                        )}
-                                    </div>
+                    {/* Sidebar: Active + Recent */}
+                    <div className="flex flex-col gap-8 lg:max-h-[650px] overflow-y-auto custom-scrollbar pr-2 pb-6">
+                        {/* Active */}
+                        <div>
+                            <h2 className={`text-[11px] font-black uppercase tracking-widest mb-4 flex items-center gap-2 ${textMuted}`}>
+                                <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping inline-block" />
+                                Şu An Sahada ({active.length})
+                            </h2>
+                            {active.length === 0 && (
+                                <div className={`text-center py-10 border-2 border-dashed rounded-[20px] text-[12px] font-bold uppercase tracking-widest ${isLight ? 'border-slate-200 text-slate-400' : 'border-slate-700 text-slate-500'}`}>
+                                    Aktif ziyaret yok
                                 </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Recent */}
-                    <div>
-                        <h2 className="text-xs font-black text-white/40 uppercase tracking-widest mb-3">Son Hareketler</h2>
-                        <div className="space-y-3">
-                            {recent.map((visit: any) => {
-                                const orderTotal = (visit.orders || []).reduce((s: number, o: any) => s + Number(o.totalAmount || 0), 0);
-                                const collectTotal = (visit.transactions || []).reduce((s: number, t: any) => s + Number(t.amount || 0), 0);
+                            )}
+                            {active.map((visit: any) => {
+                                const dur = Math.floor((Date.now() - new Date(visit.checkInTime).getTime()) / 60000);
                                 return (
-                                    <div key={visit.id} className="bg-[#161b22] border border-white/5 rounded-xl p-3">
-                                        <div className="text-xs font-black text-white mb-0.5">{visit.staff?.name}</div>
-                                        <div className="text-[11px] text-blue-400">{visit.customer?.name}</div>
-                                        <div className="text-[10px] text-gray-600 mb-1">
-                                            {new Date(visit.checkOutTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                    <div key={visit.id} className={`border rounded-[20px] p-5 mb-4 shadow-sm transition-all hover:scale-[1.01] ${bgSurface} ${visit.isOutOfRange ? (isLight ? 'border-red-300' : 'border-red-500/40') : borderColor}`}>
+                                        <div className="flex items-center gap-4 mb-4">
+                                            <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center text-xl shadow-sm ${isLight ? 'bg-blue-100 text-blue-600' : 'bg-blue-600/20 text-blue-400'}`}>👤</div>
+                                            <div>
+                                                <div className={`font-black text-[15px] ${textMain}`}>{visit.staff?.name}</div>
+                                                <div className={`text-[11px] font-semibold mt-0.5 uppercase tracking-wide ${textMuted}`}>{dur} dk önce girdi</div>
+                                            </div>
+                                            {visit.isOutOfRange && (
+                                                <div className={`ml-auto text-[10px] font-black px-2.5 py-1.5 rounded-lg border uppercase tracking-widest ${isLight ? 'text-red-600 bg-red-50 border-red-200' : 'text-red-400 bg-red-500/10 border-red-500/20'}`}>Konum Dışı</div>
+                                            )}
                                         </div>
-                                        <div className="flex gap-2">
-                                            {orderTotal > 0 && <span className="bg-green-500/10 text-green-500 text-[9px] font-black px-2 py-0.5 rounded">🛒 ₺{orderTotal.toLocaleString()}</span>}
-                                            {collectTotal > 0 && <span className="bg-amber-500/10 text-amber-500 text-[9px] font-black px-2 py-0.5 rounded">💰 ₺{collectTotal.toLocaleString()}</span>}
+                                        <div className={`rounded-[16px] p-4 border ${isLight ? 'bg-slate-50 border-slate-100' : 'bg-slate-800/40 border-slate-700'}`}>
+                                            <div className={`text-[10px] font-bold tracking-widest uppercase mb-1.5 ${textMuted}`}>Müşteri</div>
+                                            <div className={`text-sm font-bold ${textMain}`}>{visit.customer?.name}</div>
+                                            <div className={`text-xs mt-0.5 ${textMuted}`}>{visit.customer?.district}, {visit.customer?.city}</div>
+                                            {visit.distanceMeters !== null && (
+                                                <div className={`text-[11px] mt-2 font-bold flex items-center gap-1 ${visit.isOutOfRange ? 'text-red-500' : 'text-green-500'}`}>
+                                                    {visit.isOutOfRange ? '⚠️' : '✅'} {visit.distanceMeters}m uzaklıkta giriş
+                                                </div>
+                                            )}
+                                            {!visit.staffLat && (
+                                                <div className={`text-[10px] mt-2 ${textMuted}`}>📍 Konum paylaşılmadı</div>
+                                            )}
                                         </div>
                                     </div>
                                 );
                             })}
-                            {recent.length === 0 && (
-                                <div className="text-gray-600 text-center py-6 text-sm italic">Henüz hareket yok</div>
-                            )}
+                        </div>
+
+                        {/* Recent */}
+                        <div>
+                            <h2 className={`text-[11px] font-black uppercase tracking-widest mb-4 flex items-center gap-2 ${textMuted}`}>
+                                Son Hareketler
+                            </h2>
+                            <div className="space-y-4">
+                                {recent.map((visit: any) => {
+                                    const orderTotal = (visit.orders || []).reduce((s: number, o: any) => s + Number(o.totalAmount || 0), 0);
+                                    const collectTotal = (visit.transactions || []).reduce((s: number, t: any) => s + Number(t.amount || 0), 0);
+                                    return (
+                                        <div key={visit.id} className={`border rounded-[16px] p-4 shadow-sm transition-all hover:scale-[1.01] ${bgSurface} ${borderColor}`}>
+                                            <div className={`text-[13px] font-black mb-1 ${textMain}`}>{visit.staff?.name}</div>
+                                            <div className={`text-[12px] font-semibold ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>{visit.customer?.name}</div>
+                                            <div className={`text-[10px] font-bold mt-1.5 tracking-widest uppercase ${textMuted}`}>
+                                                {new Date(visit.checkOutTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {orderTotal > 0 && <span className={`border text-[10px] font-black tracking-widest px-2.5 py-1 rounded-lg ${isLight ? 'bg-green-50 border-green-200 text-green-700' : 'bg-green-500/10 border-green-500/20 text-green-400'}`}>🛒 ₺{orderTotal.toLocaleString('tr-TR')}</span>}
+                                                {collectTotal > 0 && <span className={`border text-[10px] font-black tracking-widest px-2.5 py-1 rounded-lg ${isLight ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>💰 ₺{collectTotal.toLocaleString('tr-TR')}</span>}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                {recent.length === 0 && (
+                                    <div className={`text-center py-8 border-2 border-dashed rounded-[20px] text-[12px] font-bold uppercase tracking-widest ${isLight ? 'border-slate-200 text-slate-400' : 'border-slate-700 text-slate-500'}`}>
+                                        Henüz hareket yok
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
