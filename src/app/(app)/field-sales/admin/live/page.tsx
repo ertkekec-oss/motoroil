@@ -71,18 +71,33 @@ export default function LiveFieldTrackingPage() {
     useEffect(() => {
         if (mapRef.current || !mapContainerRef.current) return;
 
-        // Dynamically load Leaflet from reliable CDN securely
-        if (!document.querySelector('link[href*="leaflet"]')) {
+        let isMounted = true;
+        let resizeObserver: ResizeObserver | null = null;
+
+        // Dynamically load Leaflet from reliable CDN securely (switched to jsdelivr to avoid ad-blocker/CORS blocks)
+        if (!document.querySelector('link[href*="leaflet.min.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+            link.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css';
+            link.onload = () => {
+                if (mapRef.current && isMounted) {
+                    mapRef.current.invalidateSize();
+                }
+            };
             document.head.appendChild(link);
         }
 
         const initL = () => {
+            if (!isMounted || !mapContainerRef.current) return;
+            
             const L = (window as any).L;
             if (!L) return;
-            const map = L.map(mapContainerRef.current!, {
+
+            if ((mapContainerRef.current as any)._leaflet_id) {
+                return;
+            }
+
+            const map = L.map(mapContainerRef.current, {
                 center: DEFAULT_CENTER,
                 zoom: DEFAULT_ZOOM,
                 zoomControl: true,
@@ -96,22 +111,46 @@ export default function LiveFieldTrackingPage() {
             mapRef.current = map;
             
             // Fix for maps rendering gray/blank incorrectly inside grid/flex layouts
-            setTimeout(() => { if (mapRef.current) mapRef.current.invalidateSize(); }, 300);
+            setTimeout(() => { if (mapRef.current && isMounted) mapRef.current.invalidateSize(); }, 100);
+            setTimeout(() => { if (mapRef.current && isMounted) mapRef.current.invalidateSize(); }, 300);
+            setTimeout(() => { if (mapRef.current && isMounted) mapRef.current.invalidateSize(); }, 800);
+
+            if (typeof ResizeObserver !== 'undefined') {
+                resizeObserver = new ResizeObserver(() => {
+                    if (mapRef.current && isMounted) {
+                        mapRef.current.invalidateSize();
+                    }
+                });
+                resizeObserver.observe(mapContainerRef.current);
+            }
         };
 
         if (!(window as any).L) {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
-            script.onload = initL;
-            document.head.appendChild(script);
+            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            if (existingScript) {
+                existingScript.addEventListener('load', initL);
+            } else {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js';
+                script.onload = initL;
+                document.head.appendChild(script);
+            }
         } else {
-            initL();
+            setTimeout(initL, 50);
         }
 
         return () => {
+            isMounted = false;
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
             if (mapRef.current) {
                 mapRef.current.remove();
                 mapRef.current = null;
+            }
+            const existingScript = document.querySelector('script[src*="leaflet.min.js"]');
+            if (existingScript) {
+                existingScript.removeEventListener('load', initL);
             }
         };
     }, []);

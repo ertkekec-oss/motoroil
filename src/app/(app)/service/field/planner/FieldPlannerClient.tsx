@@ -588,7 +588,7 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
         if (!document.querySelector('link[href*="leaflet.min.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+            link.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css';
             link.onload = () => {
                 if (mapRef.current && isMounted) {
                     mapRef.current.invalidateSize();
@@ -645,7 +645,7 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
                 existingScript.addEventListener('load', initMap);
             } else {
                 const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+                script.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js';
                 script.onload = initMap;
                 document.head.appendChild(script);
             }
