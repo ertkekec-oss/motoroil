@@ -605,6 +605,9 @@ function LeafletPlannerMap({ technicians, unplanned }: { technicians: any[], unp
 
             mapRef.current = map;
             renderMarkers();
+            
+            // Fix for Leaflet grid rendering issues when container sizes change dynamically
+            setTimeout(() => { if (mapRef.current) mapRef.current.invalidateSize(); }, 300);
         };
 
         if (!(window as any).L) {

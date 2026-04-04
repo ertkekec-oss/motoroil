@@ -68,20 +68,20 @@ export default function LiveFieldTrackingPage() {
         }
     };
 
-    // Init Leaflet map (CDN — no npm install needed)
     useEffect(() => {
         if (mapRef.current || !mapContainerRef.current) return;
 
-        // Dynamically load Leaflet from CDN
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        document.head.appendChild(link);
+        // Dynamically load Leaflet from CDN securely
+        if (!document.querySelector('link[href*="leaflet@1.9.4/dist/leaflet.css"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            document.head.appendChild(link);
+        }
 
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.onload = () => {
+        const initL = () => {
             const L = (window as any).L;
+            if (!L) return;
             const map = L.map(mapContainerRef.current!, {
                 center: DEFAULT_CENTER,
                 zoom: DEFAULT_ZOOM,
@@ -94,8 +94,26 @@ export default function LiveFieldTrackingPage() {
             }).addTo(map);
 
             mapRef.current = map;
+            
+            // Fix for maps rendering gray/blank incorrectly inside grid/flex layouts
+            setTimeout(() => { if (mapRef.current) mapRef.current.invalidateSize(); }, 300);
         };
-        document.head.appendChild(script);
+
+        if (!(window as any).L) {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.onload = initL;
+            document.head.appendChild(script);
+        } else {
+            initL();
+        }
+
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
+        };
     }, []);
 
     // Update markers when data changes
