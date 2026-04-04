@@ -8,6 +8,7 @@ import { useModal } from '@/contexts/ModalContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { ChevronLeft, Check, Shield, Search, User, FileText, Plus, X } from 'lucide-react';
 import Link from 'next/link';
+import CustomerCreateModal from '@/components/modals/CustomerCreateModal';
 
 function NewWorkOrderContent() {
     const router = useRouter();
@@ -26,9 +27,8 @@ function NewWorkOrderContent() {
     const [customerId, setCustomerId] = useState<string>(initialCustomerId || '');
     const [customerName, setCustomerName] = useState<string>(initialCustomerName || '');
     const [searchQuery, setSearchQuery] = useState('');
-    const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
+    const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
     const [newCustomerName, setNewCustomerName] = useState('');
-    const [newCustomerPhone, setNewCustomerPhone] = useState('');
     
     const [assetId, setAssetId] = useState<string>('');
     const [complaint, setComplaint] = useState<string>('');
@@ -139,35 +139,7 @@ function NewWorkOrderContent() {
         }
     };
 
-    const handleCreateCustomer = async () => {
-        if (!newCustomerName) return;
-        setSubmitting(true);
-        try {
-            const res = await fetch('/api/customers', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newCustomerName, phone: newCustomerPhone, branch: activeBranchName })
-            });
-            const data = await res.json();
-            if (data.success && data.customer) { 
-                const id = data.customer.id || data.id;
-                if (id) {
-                    setCustomerId(id);
-                    setCustomerName(newCustomerName);
-                    setShowNewCustomerForm(false);
-                    setAssetTab('registered');
-                    showSuccess("Başarılı", "Müşteri oluşturuldu.");
-                }
-            } else {
-                showError("Hata", data.error || "Müşteri oluşturulamadı.");
-            }
-        } catch (e) {
-            console.error(e);
-            showError("Hata", "Müşteri oluşturulamadı.");
-        } finally {
-            setSubmitting(false);
-        }
-    };
+
 
     const handleAutoCreateAndSelectAsset = async (item: any, type: 'warranty' | 'purchase') => {
         const payload = {
@@ -317,24 +289,6 @@ function NewWorkOrderContent() {
                                         </button>
                                     )}
                                 </div>
-                            ) : showNewCustomerForm ? (
-                                <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-xl border border-slate-200 dark:border-white/10 space-y-4">
-                                    <div className="flex justify-between items-center">
-                                        <h4 className="text-[13px] font-bold text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2"><Plus className="w-4 h-4"/> Hızlı Kayıt</h4>
-                                        <button onClick={() => setShowNewCustomerForm(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><X className="w-4 h-4"/></button>
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 tracking-wider">Ad Soyad / Unvan *</label>
-                                        <input type="text" value={newCustomerName} onChange={e => setNewCustomerName(e.target.value)} className="w-full h-11 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[10px] text-[13px] font-bold focus:border-blue-500 outline-none transition-all shadow-sm" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 tracking-wider">Telefon Numarası</label>
-                                        <input type="text" value={newCustomerPhone} onChange={e => setNewCustomerPhone(e.target.value)} className="w-full h-11 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[10px] text-[13px] font-bold focus:border-blue-500 outline-none transition-all shadow-sm" />
-                                    </div>
-                                    <button onClick={handleCreateCustomer} disabled={submitting || !newCustomerName} className="w-full h-11 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[10px] font-bold text-[12px] uppercase tracking-widest disabled:opacity-50 transition-colors shadow-sm mt-2">
-                                        {submitting ? 'KAYDEDİLİYOR...' : 'KAYDET VE SEÇ'}
-                                    </button>
-                                </div>
                             ) : (
                                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 relative">
                                     <div className="flex-1 relative">
@@ -369,7 +323,7 @@ function NewWorkOrderContent() {
                                                 ) : (
                                                     <div className="px-4 py-6 text-center">
                                                         <p className="text-[12px] font-bold text-slate-500 mb-3 uppercase tracking-wider">KAYIT BULUNAMADI</p>
-                                                        <button onClick={() => { setShowNewCustomerForm(true); setNewCustomerName(searchQuery); }} className="h-10 px-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-[10px] text-[11px] font-bold uppercase tracking-widest transition-colors w-full">
+                                                        <button onClick={() => { setIsCustomerModalOpen(true); setNewCustomerName(searchQuery); }} className="h-10 px-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-[10px] text-[11px] font-bold uppercase tracking-widest transition-colors w-full">
                                                             + YENİ MÜŞTERİ EKLE
                                                         </button>
                                                     </div>
@@ -377,7 +331,7 @@ function NewWorkOrderContent() {
                                             </div>
                                         )}
                                     </div>
-                                    <button onClick={() => setShowNewCustomerForm(true)} className="h-11 px-5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-[10px] font-bold text-[11px] uppercase tracking-widest shrink-0 hover:bg-slate-50 transition-all shadow-sm shrink-0">
+                                    <button onClick={() => { setIsCustomerModalOpen(true); setNewCustomerName(searchQuery); }} className="h-11 px-5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-[10px] font-bold text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm shrink-0">
                                         + YENİ
                                     </button>
                                 </div>
@@ -639,6 +593,18 @@ function NewWorkOrderContent() {
 
                 </div>
             </div>
+            
+            <CustomerCreateModal 
+                isOpen={isCustomerModalOpen} 
+                onClose={() => setIsCustomerModalOpen(false)} 
+                initialName={newCustomerName}
+                onSuccess={(data) => {
+                    setCustomerId(data.id);
+                    setCustomerName(data.name);
+                    setAssetTab('registered');
+                    setIsCustomerModalOpen(false);
+                }}
+            />
         </div>
     );
 }
