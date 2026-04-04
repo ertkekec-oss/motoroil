@@ -307,8 +307,8 @@ export default function AdminRoutesPage() {
         <div data-pos-theme={theme} className={`${isLight ? 'bg-slate-50' : 'bg-[#0f172a]'} min-h-screen pb-6 w-full font-sans transition-colors duration-300`}>
             {/* HER YERDE GEÇERLİ EN ÜST STRATEJİ / BAŞLIK BANDI */}
             <div className="max-w-[1600px] mx-auto pt-6 px-4 sm:px-6 lg:px-8">
-                <div className="flex-shrink-0 mb-6 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full xl:w-auto">
+                <div className="flex-shrink-0 mb-6 flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                         <div className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold border shadow-sm shrink-0 ${isLight ? 'bg-blue-600 text-white border-blue-500/10' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
                             <Map className="w-5 h-5" />
                         </div>
@@ -334,9 +334,9 @@ export default function AdminRoutesPage() {
                         </div>
                     </div>
 
-                    <div className={`flex flex-wrap items-center justify-between w-full xl:w-auto p-3 xl:p-0 rounded-xl xl:rounded-none border xl:border-transparent ${isLight ? 'bg-white xl:bg-transparent border-slate-200' : 'bg-[#1e293b] xl:bg-transparent border-white/5'}`}>
+                    <div className={`flex flex-wrap items-center justify-end gap-3 p-2 rounded-xl xl:rounded-none border xl:border-transparent ${isLight ? 'bg-white xl:bg-transparent border-slate-200' : 'bg-[#1e293b] xl:bg-transparent border-white/5'}`}>
                         {/* Aktif Tarih / Hafta */}
-                        <div className="flex flex-col items-start xl:items-end mr-0 xl:mr-4">
+                        <div className="flex flex-col items-end mr-4">
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Aktif Hafta</span>
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setCurrentDate(addDays(currentDate, -7))} className={`text-slate-400 hover:text-blue-500 transition-colors`}>
@@ -351,7 +351,7 @@ export default function AdminRoutesPage() {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 xl:mt-0 mt-3">
+                        <div className="flex flex-wrap items-center gap-2">
                             {(currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') && (
                                 <button
                                     onClick={() => router.push('/field-sales/admin/config')}
@@ -403,10 +403,10 @@ export default function AdminRoutesPage() {
                 )}
 
                 {/* BOARD ALANI */}
-                <div className="flex flex-col lg:flex-row gap-6 animate-in fade-in slide-in-from-bottom-4 mt-6">
+                <div className="flex flex-row gap-6 animate-in fade-in slide-in-from-bottom-4 mt-6 items-start">
 
                     {/* SOL KOLON: ŞABLONLAR */}
-                    <div className={`w-full lg:w-[320px] shrink-0 h-[calc(100vh-160px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-colors ${isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-white/5'}`}>
+                    <div className={`w-[320px] shrink-0 h-[calc(100vh-160px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-colors ${isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-white/5'}`}>
                         <div className={`p-4 border-b flex items-center justify-between ${isLight ? 'border-slate-100 bg-slate-50' : 'border-white/5 bg-slate-800/50'}`}>
                             <div className="flex items-center gap-2">
                                 <span className={`text-[10px] font-black tracking-widest uppercase ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Rota Şablonları</span>
