@@ -20,8 +20,46 @@ export default function ServiceCalendarPage() {
     const [loading, setLoading] = useState(true);
     const [showNewApptModal, setShowNewApptModal] = useState(false);
     
+    const [customerSearch, setCustomerSearch] = useState('');
+    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+    const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
+    
     const [realCustomers, setRealCustomers] = useState<any[]>([]);
     const [customerLoading, setCustomerLoading] = useState(false);
+    const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
+    const [newCustomerName, setNewCustomerName] = useState('');
+    const [newCustomerPhone, setNewCustomerPhone] = useState('');
+    const [isSavingCustomer, setIsSavingCustomer] = useState(false);
+
+    const handleCreateCustomer = async () => {
+        if (!newCustomerName.trim()) return;
+        setIsSavingCustomer(true);
+        try {
+            const res = await fetch('/api/customers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: newCustomerName,
+                    type: 'INDIVIDUAL',
+                    phone: newCustomerPhone,
+                    status: 'ACTIVE'
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const newCustomer = data.customer || data;
+                setSelectedCustomer(newCustomer);
+                setIsCreatingCustomer(false);
+                setIsCustomerListOpen(false);
+                setNewCustomerName('');
+                setNewCustomerPhone('');
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsSavingCustomer(false);
+        }
+    };
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -277,29 +315,61 @@ export default function ServiceCalendarPage() {
                                 {isCustomerListOpen && !selectedCustomer && (
                                     <>
                                         <div className="fixed inset-0 z-10" onClick={() => setIsCustomerListOpen(false)}></div>
-                                        <div className="absolute top-[calc(100%+4px)] left-0 w-full max-h-[200px] overflow-y-auto custom-scroll bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-20">
-                                            {customerLoading ? (
-                                                <div className="p-4 text-center text-slate-500 text-[12px]">Aranıyor...</div>
-                                            ) : realCustomers.length === 0 ? (
-                                                <div className="p-4 text-center text-slate-500 text-[12px]">Sonuç bulunamadı.</div>
-                                            ) : (
-                                                realCustomers.map(cust => (
-                                                    <div 
-                                                        key={cust.id} 
-                                                        onClick={() => {
-                                                            setSelectedCustomer(cust);
-                                                            setIsCustomerListOpen(false);
-                                                        }}
-                                                        className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b border-slate-100 dark:border-slate-700 last:border-b-0 transition-colors"
-                                                    >
-                                                        <div className="font-bold text-[13px] dark:text-slate-200">{cust.name}</div>
-                                                        <div className="text-[11px] text-slate-500 flex gap-2 mt-0.5">
-                                                            <span>{cust.district || '-'}, {cust.city || '-'}</span>
-                                                            <span className="opacity-50">•</span>
-                                                            <span>{cust.phone || '-'}</span>
+                                        <div className="absolute top-[calc(100%+4px)] left-0 w-full max-h-[300px] overflow-y-auto custom-scroll bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-20">
+                                            {isCreatingCustomer ? (
+                                                <div className="p-4 bg-slate-50 dark:bg-slate-800/80">
+                                                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">Yeni Hızlı Cari Oluştur</h4>
+                                                    <div className="space-y-3">
+                                                        <div>
+                                                            <input type="text" placeholder="Ad Soyad / Ünvan" value={newCustomerName} onChange={e => setNewCustomerName(e.target.value)} className="w-full h-9 px-3 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500" />
+                                                        </div>
+                                                        <div>
+                                                            <input type="text" placeholder="Telefon Numarası" value={newCustomerPhone} onChange={e => setNewCustomerPhone(e.target.value)} className="w-full h-9 px-3 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500" />
+                                                        </div>
+                                                        <div className="flex gap-2 pt-1">
+                                                            <button onClick={() => setIsCreatingCustomer(false)} className="flex-1 h-8 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">İptal</button>
+                                                            <button onClick={handleCreateCustomer} disabled={isSavingCustomer || !newCustomerName.trim()} className="flex-1 h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm disabled:opacity-50">
+                                                                {isSavingCustomer ? 'Kaydediliyor...' : 'Kaydet ve Seç'}
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                ))
+                                                </div>
+                                            ) : (
+                                                customerLoading ? (
+                                                    <div className="p-4 text-center text-slate-500 text-[12px]">Aranıyor...</div>
+                                                ) : realCustomers.length === 0 ? (
+                                                    <div className="p-5 text-center">
+                                                        <div className="text-slate-500 text-[12px] mb-3">"{customerSearch}" adına kayıtlı cari bulunamadı.</div>
+                                                        <button onClick={() => { setIsCreatingCustomer(true); setNewCustomerName(customerSearch); }} className="px-4 py-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg border border-indigo-100 dark:border-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors">
+                                                            + Yeni Müşteri/Firma Ekle
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        {realCustomers.map(cust => (
+                                                            <div 
+                                                                key={cust.id} 
+                                                                onClick={() => {
+                                                                    setSelectedCustomer(cust);
+                                                                    setIsCustomerListOpen(false);
+                                                                }}
+                                                                className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b border-slate-100 dark:border-slate-700 last:border-b-0 transition-colors"
+                                                            >
+                                                                <div className="font-bold text-[13px] dark:text-slate-200">{cust.name}</div>
+                                                                <div className="text-[11px] text-slate-500 flex gap-2 mt-0.5">
+                                                                    <span>{cust.district || '-'}, {cust.city || '-'}</span>
+                                                                    <span className="opacity-50">•</span>
+                                                                    <span>{cust.phone || '-'}</span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700 text-center">
+                                                            <button onClick={() => { setIsCreatingCustomer(true); setNewCustomerName(customerSearch); }} className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                                                + Listede yok mu? Yeni Ekle
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                )
                                             )}
                                         </div>
                                     </>
