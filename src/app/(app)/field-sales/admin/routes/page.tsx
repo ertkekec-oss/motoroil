@@ -470,7 +470,7 @@ export default function AdminRoutesPage() {
                                 )}
                             </div>
                         </div>
-                    </div>
+
 
                     {/* SAĞ KOLON: TEKNİSYEN TAKVİMİ / KANBAN MANTIĞI */}
                     <div className={`flex-1 min-w-0 h-[calc(100vh-160px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden ${bgCard}`}>
