@@ -304,72 +304,79 @@ export default function AdminRoutesPage() {
     );
 
     return (
-        <div data-pos-theme={theme} className={`${bgPage} font-sans transition-colors duration-300 p-8`}>
-            <div className="max-w-[1600px] mx-auto space-y-8">
-
-                {/* HEADER (Premium Header Strip) */}
-                <header className="flex flex-col gap-1">
-                    <h1 className={`text-[30px] font-bold tracking-tight flex items-center gap-3 ${textMain}`}>
-                        {/* Soft subtle icon representation */}
-                        <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center ${isLight ? 'bg-blue-50 text-blue-600' : 'bg-blue-500/10 text-blue-400'}`}>
-                            <Map size={20} strokeWidth={2.5} />
+        <div data-pos-theme={theme} className={`${isLight ? 'bg-slate-50' : 'bg-[#0f172a]'} min-h-screen pb-16 w-full font-sans transition-colors duration-300`}>
+            {/* HER YERDE GEÇERLİ EN ÜST STRATEJİ / BAŞLIK BANDI */}
+            <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8">
+                <div className="flex-shrink-0 bg-transparent z-10 sticky top-0 mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                        <div className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold border shadow-sm shrink-0 ${isLight ? 'bg-blue-600 text-white border-blue-500/10' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
+                            <Map className="w-5 h-5" />
                         </div>
-                        Saha Planlama Panosu
-                    </h1>
-                    <div className="flex items-center gap-3 mt-1 ml-14">
-                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[12px] font-semibold ${isLight ? 'bg-white border-slate-200 text-slate-600 shadow-sm' : 'bg-white/5 border-white/10 text-slate-300'}`}>
-                            <Circle size={8} className="fill-blue-500 text-blue-500" />
-                            <span>{routes.length} Rota</span>
-                        </div>
-                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[12px] font-semibold ${isLight ? 'bg-white border-slate-200 text-slate-600 shadow-sm' : 'bg-white/5 border-white/10 text-slate-300'}`}>
-                            <Circle size={8} className="fill-emerald-500 text-emerald-500" />
-                            <span>{templates.length} Şablon</span>
-                        </div>
-                    </div>
-                </header>
-
-                {/* ACTION BAR (Horizontal Control Bar) */}
-                <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 p-4 rounded-[16px] border shadow-sm ${bgCard}`}>
-                    <div className="flex flex-wrap items-center gap-3">
-                        {/* Ayarlar & Talepler (Sadece Admin) */}
-                        {(currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') && (
-                            <button
-                                onClick={() => router.push('/field-sales/admin/config')}
-                                className={`h-10 px-4 rounded-[12px] border text-[13px] font-semibold transition-all flex items-center gap-2 ${isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-transparent border-white/10 text-slate-300 hover:bg-white/5 hover:border-white/20'}`}
-                            >
-                                <Settings size={16} /> Saha Ayarları
-                            </button>
-                        )}
-
-                        {/* Kampanya Oluştur Linki - Primary but blue/soft instead of orange */}
-                        <a
-                            href="/settings?tab=campaigns"
-                            className={`h-10 px-4 rounded-[12px] border text-[13px] font-semibold transition-all flex items-center gap-2 ${isLight ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' : 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20'}`}
-                        >
-                            <Target size={16} /> Kampanya Oluştur
-                        </a>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-4">
-                        {/* Month Navigator (Segmented) */}
-                        <div className={`flex items-center p-1 rounded-[12px] border shadow-sm ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#1e293b] border-white/5'}`}>
-                            <button onClick={() => setCurrentDate(addDays(currentDate, -7))} className={`w-8 h-8 flex items-center justify-center rounded-[8px] transition-all ${isLight ? 'hover:bg-white text-slate-600' : 'hover:bg-slate-800 text-slate-400'}`}>
-                                <ChevronLeft size={16} />
-                            </button>
-                            <div className={`px-4 text-[13px] font-bold uppercase tracking-wide ${textMain}`}>
-                                {weekStart.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}
+                        <div className="flex flex-col min-w-0">
+                            <div className="flex items-center gap-3 flex-wrap">
+                                <h1 className={`text-xl sm:text-2xl font-black tracking-tight leading-none truncate ${textMain}`}>
+                                    Saha Planlama Panosu
+                                </h1>
+                                <div className="flex items-center gap-2">
+                                    <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-widest ${isLight ? 'bg-white border-slate-200 text-slate-600 shadow-sm' : 'bg-[#1e293b] border-white/10 text-slate-300'}`}>
+                                        <Circle className="w-2 h-2 fill-blue-500 text-blue-500" />
+                                        <span>{routes.length} Rota</span>
+                                    </div>
+                                    <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-widest ${isLight ? 'bg-white border-slate-200 text-slate-600 shadow-sm' : 'bg-[#1e293b] border-white/10 text-slate-300'}`}>
+                                        <Circle className="w-2 h-2 fill-emerald-500 text-emerald-500" />
+                                        <span>{templates.length} Şablon</span>
+                                    </div>
+                                </div>
                             </div>
-                            <button onClick={() => setCurrentDate(addDays(currentDate, 7))} className={`w-8 h-8 flex items-center justify-center rounded-[8px] transition-all ${isLight ? 'hover:bg-white text-slate-600' : 'hover:bg-slate-800 text-slate-400'}`}>
-                                <ChevronRight size={16} />
-                            </button>
+                            <span className={`text-[11px] sm:text-[12px] font-bold tracking-widest uppercase mt-1.5 truncate block ${textMuted}`}>
+                                Satış Personeli Rota Atama ve Şablon Yönetimi
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className={`flex flex-wrap items-center justify-between lg:justify-end gap-3 w-full lg:w-auto p-3 lg:p-0 rounded-xl lg:rounded-none border lg:border-transparent ${isLight ? 'bg-white lg:bg-transparent border-slate-200' : 'bg-[#1e293b] lg:bg-transparent border-white/5'}`}>
+                        {/* Aktif Tarih / Hafta */}
+                        <div className="flex flex-col items-start sm:items-end mr-0 sm:mr-4">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Aktif Hafta</span>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setCurrentDate(addDays(currentDate, -7))} className={`text-slate-400 hover:text-blue-500 transition-colors`}>
+                                    <ChevronLeft size={16} strokeWidth={3} />
+                                </button>
+                                <span className={`text-[14px] font-black leading-none ${textMain}`}>
+                                    {weekStart.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' }).toUpperCase()}
+                                </span>
+                                <button onClick={() => setCurrentDate(addDays(currentDate, 7))} className={`text-slate-400 hover:text-blue-500 transition-colors`}>
+                                    <ChevronRight size={16} strokeWidth={3} />
+                                </button>
+                            </div>
                         </div>
 
-                        <button
-                            onClick={() => setShowCreateTemplateModal(true)}
-                            className={`h-10 px-5 rounded-[12px] text-[13px] font-bold transition-all shadow-sm flex items-center gap-2 ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
-                        >
-                            <Plus size={16} strokeWidth={2.5} /> Yeni Şablon
-                        </button>
+                        <div className="flex items-center gap-2">
+                            {(currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') && (
+                                <button
+                                    onClick={() => router.push('/field-sales/admin/config')}
+                                    className={`h-[36px] sm:h-[40px] px-4 border text-[11px] sm:text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm rounded-[10px] flex items-center gap-2 ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-slate-300 hover:bg-white/5'}`}
+                                >
+                                    <Settings size={14} /> Saha Ayarları
+                                </button>
+                            )}
+
+                            <a
+                                href="/settings?tab=campaigns"
+                                className={`h-[36px] sm:h-[40px] px-4 border text-[11px] sm:text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm rounded-[10px] flex items-center gap-2 ${isLight ? 'bg-white border-slate-200 text-blue-600 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-blue-400 hover:bg-white/5'}`}
+                            >
+                                <Target size={14} /> Kampanya Seç
+                            </a>
+
+                            <div className={`w-[1px] h-8 mx-2 hidden sm:block ${isLight ? 'bg-slate-200' : 'bg-white/10'}`}></div>
+
+                            <button
+                                onClick={() => setShowCreateTemplateModal(true)}
+                                className={`h-[36px] sm:h-[40px] px-4 sm:px-6 rounded-[10px] text-[11px] sm:text-[12px] font-bold uppercase tracking-widest transition-all shadow-sm flex items-center justify-center gap-2 ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                            >
+                                <Plus size={14} strokeWidth={3} /> Yeni Şablon
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -395,11 +402,33 @@ export default function AdminRoutesPage() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 xl:grid-cols-[3fr_9fr] gap-8 items-start">
+                {/* BOARD ALANI */}
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_3.5fr] gap-6 animate-in fade-in slide-in-from-bottom-4 mt-8">
 
-                    {/* Left Panel - Templates */}
-                    <div className="space-y-6">
-                        <div className={`rounded-[20px] border shadow-sm p-5 sm:p-6 ${bgCard}`}>
+                    {/* SOL KOLON: ŞABLONLAR */}
+                    <div className={`lg:col-span-1 h-[calc(100vh-180px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden transition-colors ${isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-white/5'}`}>
+                        <div className={`p-4 border-b flex items-center justify-between ${isLight ? 'border-slate-100 bg-slate-50' : 'border-white/5 bg-slate-800/50'}`}>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-[10px] font-black tracking-widest uppercase ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Rota Şablonları</span>
+                                <span className={`px-1.5 py-0.5 mt-[-1px] rounded-full text-[9px] font-bold ${isLight ? 'bg-slate-200 text-slate-600' : 'bg-slate-700 text-slate-300'}`}>{templates.length}</span>
+                            </div>
+                            <button
+                                onClick={() => setShowCreateTemplateModal(true)}
+                                className={`text-[10px] font-bold px-2.5 py-1 rounded-md transition-all border ${isLight ? 'bg-white border-slate-200 text-blue-600 hover:bg-slate-50' : 'bg-[#0f172a] border-white/10 text-blue-400 hover:bg-white/10'}`}
+                            >
+                                + YENİ
+                            </button>
+                        </div>
+
+                        {/* Info banner right inside the sticky zone */}
+                        <div className={`p-3 m-3 mb-0 rounded-xl border flex items-start gap-2 shadow-sm ${isLight ? 'bg-blue-50 border-blue-100' : 'bg-blue-500/5 border-blue-500/10'}`}>
+                            <Info size={14} className={`shrink-0 mt-0.5 ${isLight ? 'text-blue-500' : 'text-blue-400'}`} />
+                            <p className={`text-[10px] font-semibold uppercase tracking-wider ${isLight ? 'text-blue-800' : 'text-blue-300'}`}>
+                                Şablonu sağdaki takvime personelin üstüne <strong className="font-black">sürükleyip bırakarak</strong> atama yapın.
+                            </p>
+                        </div>
+
+                        <div className={`flex-1 overflow-y-auto custom-scroll p-3 space-y-3 ${isLight ? 'bg-slate-50/50' : 'bg-slate-900/20'}`}>
                             <div className="flex justify-between items-center mb-5">
                                 <h3 className={`text-[16px] font-semibold ${textMain}`}>Rota Şablonları</h3>
                                 <button
@@ -410,14 +439,13 @@ export default function AdminRoutesPage() {
                                 </button>
                             </div>
 
-                            <div className="space-y-3">
-                                {templates.map(template => (
-                                    <div
-                                        key={template.id}
-                                        draggable
-                                        onDragStart={(e) => { e.dataTransfer.setData('templateId', template.id); }}
-                                        className={`p-4 rounded-[14px] border transition-all group flex items-start justify-between gap-3 cursor-grab hover:scale-[1.01] hover:shadow-sm ${isLight ? 'bg-slate-50 border-slate-200 hover:border-blue-400 hover:bg-white' : 'bg-white/[0.02] border-white/5 hover:border-blue-500/40 hover:bg-white/[0.04]'}`}
-                                    >
+                            {templates.map(template => (
+                                <div
+                                    key={template.id}
+                                    draggable
+                                    onDragStart={(e) => { e.dataTransfer.setData('templateId', template.id); }}
+                                    className={`p-3 rounded-xl border transition-colors group flex items-start justify-between gap-3 cursor-grab hover:scale-[1.01] shadow-sm active:cursor-grabbing ${isLight ? 'bg-white border-slate-200 hover:border-blue-400' : 'bg-[#0f172a] border-white/10 hover:border-blue-500/50'}`}
+                                >
                                         <div className="flex-1 min-w-0">
                                             <div className={`font-semibold text-[14px] truncate transition-colors ${isLight ? 'group-hover:text-blue-600 text-slate-800' : 'group-hover:text-blue-400 text-slate-200'}`}>
                                                 {template.name}
@@ -452,22 +480,21 @@ export default function AdminRoutesPage() {
                                 )}
                             </div>
                         </div>
-
-                        {/* Info Card */}
-                        <div className={`p-5 rounded-[16px] border flex items-start gap-4 ${isLight ? 'bg-blue-50 border-blue-100' : 'bg-blue-500/5 border-blue-500/10'}`}>
-                            <Info size={18} className={`shrink-0 mt-0.5 ${isLight ? 'text-blue-500' : 'text-blue-400'}`} />
-                            <p className={`text-[12px] leading-relaxed font-medium ${isLight ? 'text-blue-800' : 'text-blue-200/70'}`}>
-                                Soldaki rota şablonunu, sağdaki takvimde bir personelin kutucuğuna <strong className="font-bold">sürükleyip bırakarak</strong> hızlı atama yapabilirsiniz.
-                            </p>
-                        </div>
                     </div>
 
-                    {/* Right Panel - Weekly Board */}
-                    <div className={`rounded-[24px] border shadow-sm flex flex-col overflow-hidden ${bgCard}`}>
+                    {/* SAĞ KOLON: TEKNİSYEN TAKVİMİ / KANBAN MANTIĞI */}
+                    <div className={`lg:col-span-1 flex-1 h-[calc(100vh-180px)] border rounded-[20px] shadow-sm flex flex-col overflow-hidden ${bgCard}`}>
+                        <div className={`p-4 border-b flex items-center justify-between overflow-x-auto custom-scroll ${isLight ? 'border-slate-100 bg-slate-50' : 'border-white/5 bg-slate-800/50'}`}>
+                            <div className="flex gap-4 shrink-0">
+                                <button className={`text-[11px] font-black uppercase tracking-widest pb-1 transition-colors ${isLight ? 'text-blue-600 border-b-2 border-blue-500' : 'text-blue-500 border-b-2 border-blue-400'}`}>Satış Personeli (Ajanda)</button>
+                            </div>
+                        </div>
 
-                        {/* Day Headers */}
-                        <div className={`grid grid-cols-8 border-b ${borderColor}`}>
-                            <div className={`p-4 flex flex-col items-center justify-center border-r ${borderColor} ${isLight ? 'bg-slate-50' : 'bg-white/[0.02]'}`}>
+                        {/* Weekly Board Content (Scrollable) */}
+                        <div className="flex-1 overflow-y-auto custom-scroll relative">
+                            {/* Day Headers (Sticky) */}
+                            <div className={`sticky top-0 z-[5] grid grid-cols-8 border-b ${borderColor}`}>
+                                <div className={`p-3 flex flex-col items-center justify-center border-r backdrop-blur-md ${borderColor} ${isLight ? 'bg-slate-50/90' : 'bg-slate-800/90'}`}>
                                 <Calendar size={20} className={textMuted} />
                             </div>
                             {weekDays.map((day, idx) => (
