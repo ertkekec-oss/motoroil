@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug, CalendarDays
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -133,6 +133,7 @@ export default function Sidebar() {
             '/staff': { perm: 'staff_manage', feature: 'team_management' },
             '/staff/performance': { perm: 'staff_manage', feature: 'team_management' },
             '/service/calendar': { perm: 'pos_access' },
+            '/global-calendar': { perm: 'pos_access' },
             '/tasks': { perm: 'field_sales_access' },
             '/advisor': { perm: 'finance_view', feature: 'accountant' },
             '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
@@ -221,6 +222,7 @@ export default function Sidebar() {
             {
                 group: "Operasyonlar",
                 items: [
+                    { name: 'Global Takvim', href: '/global-calendar', icon: CalendarDays },
                     { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
                     {
                         name: 'Görev Merkezi',
