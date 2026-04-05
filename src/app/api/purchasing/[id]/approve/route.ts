@@ -11,8 +11,13 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         const { id } = await context.params;
         const body = await request.json().catch(() => ({}));
-        let { skipStockUpdate = false, skipFinanceUpdate = false, pricingConfig = {}, originalSalesInvoiceNo } = body;
+        let { skipStockUpdate = false, skipFinanceUpdate = false, pricingConfig = {}, originalSalesInvoiceNo, isExpense, customDueDate, notes, matchedWaybillId } = body;
         const companyId = session.user?.companyId || (session as any).companyId;
+
+        // EĞER MASRAF OLARAK İŞARETLENDİYSE, STOKLARA İŞLENMESİNİ ENGELLİYORUZ
+        if (isExpense) {
+            skipStockUpdate = true;
+        }
         let relatedDespatches: string[] = [];
 
         // 1. Try to find the invoice locally
@@ -253,7 +258,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                         totalAmount: Number(header.PayableAmount || header.TaxInclusiveAmount || header.InvoiceAmount || 0),
                         items: localItems as any,
                         status: 'Bekliyor',
-                        description: 'Nilvera Sisteminden Aktarıldı'
+                        description: isExpense ? `[GİDER/MASRAF] ${notes || 'Nilvera Sisteminden Aktarıldı'}` : (notes || 'Nilvera Sisteminden Aktarıldı'),
+                        dueDate: customDueDate ? new Date(customDueDate) : (header.IssueDate ? new Date(header.IssueDate) : new Date())
                     },
                     include: { supplier: true }
                 });
@@ -291,10 +297,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         }
 
         const resultTransaction = await prisma.$transaction(async (tx) => {
-            // A. Mark as Approved
+            // A. Mark as Approved and Apply Settings
             const updatedInvoice = await tx.purchaseInvoice.update({
                 where: { id: invoice!.id },
-                data: { status: 'Onaylandı' }
+                data: { 
+                    status: 'Onaylandı',
+                    description: isExpense ? `[GİDER/MASRAF] ${notes || invoice!.description}` : (notes || invoice!.description),
+                    dueDate: customDueDate ? new Date(customDueDate) : invoice!.dueDate
+                }
             });
 
             // B. Update Stocks & Record Movements

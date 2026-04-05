@@ -537,20 +537,17 @@ export default function SalesPage() {
                 }
 
                 const proceedToConfirm = async (origInvNo?: string) => {
-                    if (newItems.length > 0) {
-                        setIncomingPricingData({
-                            isOpen: true,
-                            invoiceId: id,
-                            documentType,
-                            newItems,
-                            skipStock,
-                            skipFinance,
-                            originalSalesInvoiceNo: origInvNo
-                        });
-                        setIsProcessingAction(null);
-                        return; // Wait for modal
-                    }
-                    await confirmPurchaseInvoiceWithPricing(id, skipStock, skipFinance, {}, origInvNo);
+                    setIncomingPricingData({
+                        isOpen: true,
+                        invoiceId: id,
+                        documentType,
+                        newItems,
+                        allItems: preflightData.items || [], // NEW
+                        skipStock,
+                        skipFinance,
+                        originalSalesInvoiceNo: origInvNo
+                    });
+                    setIsProcessingAction(null);
                 };
 
                 if (preflightData.isReturnInvoice) {
@@ -612,13 +609,21 @@ export default function SalesPage() {
         });
     };
 
-    const confirmPurchaseInvoiceWithPricing = async (id: string, skipStock: boolean, skipFinance: boolean, pricingConfig: Record<string, number>, originalSalesInvoiceNo?: string) => {
+    const confirmPurchaseInvoiceWithPricing = async (id: string, skipStock: boolean, skipFinance: boolean, pricingConfig: Record<string, number>, originalSalesInvoiceNo?: string, settings?: any) => {
         setIsProcessingAction(id);
         try {
+            const bodyPayload = { 
+                skipStockUpdate: skipStock, 
+                skipFinanceUpdate: skipFinance, 
+                pricingConfig, 
+                originalSalesInvoiceNo,
+                ...settings
+            };
+
             const res = await apiFetch(`/api/purchasing/${id}/approve`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ skipStockUpdate: skipStock, skipFinanceUpdate: skipFinance, pricingConfig, originalSalesInvoiceNo })
+                body: JSON.stringify(bodyPayload)
             });
             const data = await res.json();
             if (data.success) {
@@ -1291,14 +1296,17 @@ export default function SalesPage() {
                 invoiceId={incomingPricingData.invoiceId}
                 documentType={incomingPricingData.documentType}
                 newItems={incomingPricingData.newItems}
+                allItems={incomingPricingData.allItems || []}
                 posTheme={theme}
-                onConfirm={async (pricingConfig) => {
+                onConfirm={async (pricingConfig, settings) => {
+                    const finalSettings = settings || {};
                     await confirmPurchaseInvoiceWithPricing(
                         incomingPricingData.invoiceId, 
                         incomingPricingData.skipStock, 
                         incomingPricingData.skipFinance, 
                         pricingConfig,
-                        incomingPricingData.originalSalesInvoiceNo
+                        incomingPricingData.originalSalesInvoiceNo,
+                        finalSettings
                     );
                 }}
             />
