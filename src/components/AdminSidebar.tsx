@@ -190,6 +190,20 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
             />
           </NavGroup>
         )}
+
+        {isSuper && (
+          <NavGroup
+            title="WEBSİTE & İÇERİK"
+            icon={Library}
+            groupKey="website_main"
+          >
+            <NavItem
+              href="/admin/website"
+              icon={LayoutDashboard}
+              label="Websitesi Yöneticisi"
+            />
+          </NavGroup>
+        )}
       </div>
 
       {/* B2B GLOBAL - Sabit başlık */}
