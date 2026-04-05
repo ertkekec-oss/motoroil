@@ -1,17 +1,20 @@
-import { NextResponse } from 'next/response';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions';
-import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { authorize } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.companyId) {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        const user = (auth as any).user;
+        const companyId = user.companyId || user.tenantId;
+
+        if (!companyId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const assignments = await prisma.assetAssignment.findMany({
-            where: { companyId: session.user.companyId },
+            where: { companyId },
             include: {
                 asset: true,
                 staff: true
@@ -28,8 +31,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.companyId) {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        const user = (auth as any).user;
+        const companyId = user.companyId || user.tenantId;
+
+        if (!companyId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -55,7 +62,7 @@ export async function POST(request: Request) {
         // Yeni zimmet oluştur
         const newAssignment = await prisma.assetAssignment.create({
             data: {
-                companyId: session.user.companyId,
+                companyId,
                 assetId,
                 staffId,
                 notes,

@@ -1,17 +1,20 @@
-import { NextResponse } from 'next/response';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions';
-import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
+import { authorize } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.companyId) {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        const user = (auth as any).user;
+        const companyId = user.companyId || user.tenantId;
+
+        if (!companyId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const maintenances = await prisma.assetMaintenance.findMany({
-            where: { companyId: session.user.companyId },
+            where: { companyId },
             include: { asset: true },
             orderBy: { maintenanceDate: 'desc' }
         });
@@ -25,8 +28,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.companyId) {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        const user = (auth as any).user;
+        const companyId = user.companyId || user.tenantId;
+
+        if (!companyId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -44,7 +51,7 @@ export async function POST(request: Request) {
         const result = await prisma.$transaction(async (tx) => {
             const maintenance = await tx.assetMaintenance.create({
                 data: {
-                    companyId: session.user.companyId,
+                    companyId,
                     assetId,
                     maintenanceDate: maintenanceDate ? new Date(maintenanceDate) : new Date(),
                     type: type || 'REPAIR',
@@ -59,7 +66,7 @@ export async function POST(request: Request) {
                 const due = new Date(nextMaintenanceDate);
                 await tx.globalTask.create({
                     data: {
-                        companyId: session.user.companyId,
+                        companyId,
                         title: `Yaklaşan Bakım/Periyot: ${asset.name}`,
                         description: `Varlık: ${asset.name} (SN: ${asset.serialNumber})\nTür: ${type}\nGeçmiş Bakım Notu: ${description}`,
                         type: 'TASK',
