@@ -14,7 +14,8 @@ import {
     Plus,
     X,
     Server,
-    Users
+    Users,
+    Globe
 } from 'lucide-react';
 
 export default function ModernLanding() {
