@@ -158,10 +158,16 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                 actions={
                     <>
                         <Link 
-                            href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&amount=${Math.abs(supplier.balance)}`}
+                            href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&amount=${balance > 0 ? balance : ''}`}
                             className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
                         >
                             💸 Ödeme Çıkışı
+                        </Link>
+                        <Link 
+                            href={`/payment?amount=${balance < 0 ? Math.abs(balance) : ''}&title=Tahsilat-${encodeURIComponent(val(supplier.name))}&ref=SUP-${supplier.id}&type=collection`}
+                            className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
+                        >
+                            <span>+</span> Tahsilat Girişi
                         </Link>
                         <button
                             onClick={() => setIsPurchaseModalOpen(true)}

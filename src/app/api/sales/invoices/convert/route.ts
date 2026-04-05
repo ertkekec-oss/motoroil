@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user.user || auth.user;
+
     try {
         const body = await request.json();
         const { orderId, customerId, invoiceNo, taxNumber, taxOffice, address, phone, name, isFormal, status, description, items: customItems, discount, createWayslip, cancelPreviousPayment } = body;
@@ -14,46 +19,67 @@ export async function POST(request: Request) {
         if (!order) {
             return NextResponse.json({ success: false, error: 'Sipariş bulunamadı.' }, { status: 404 });
         }
+        
+        // Security Check: Tenant isolation
+        if (order.companyId !== session.companyId && session.tenantId !== 'PLATFORM_ADMIN') {
+            const company = await prisma.company.findFirst({ where: { tenantId: session.tenantId } });
+            if (!company || company.id !== order.companyId) {
+                return NextResponse.json({ error: 'Yetkisiz işlem.' }, { status: 403 });
+            }
+        }
 
         // 2. Create the SalesInvoice
         const result = await prisma.$transaction(async (tx) => {
             const itemsToUse = customItems || (typeof order.items === 'string' ? JSON.parse(order.items) : order.items);
 
-            // Calculate Totals based on items (Net -> OTV -> VAT)
-            const subtotal = itemsToUse.reduce((acc: number, it: any) => acc + (Number(it.qty || 1) * Number(it.price || 0)), 0);
-            const totalOtv = itemsToUse.reduce((acc: number, it: any) => {
-                const lineNet = Number(it.qty || 1) * Number(it.price || 0);
-                if (it.otvType === 'Birim Başına') return acc + (Number(it.otv || 0) * Number(it.qty || 1));
-                return acc + (lineNet * (Number(it.otv || 0) / 100));
-            }, 0);
-
-            // VAT is calculated on (Net + OTV)
-            const totalVat = itemsToUse.reduce((acc: number, it: any) => {
-                const lineNet = Number(it.qty || 1) * Number(it.price || 0);
-                let lineOtv = lineNet * (Number(it.otv || 0) / 100);
-                if (it.otvType === 'Birim Başına') lineOtv = Number(it.otv || 0) * Number(it.qty || 1);
-                const vatRate = it.vat !== undefined ? Number(it.vat) : 20;
-                return acc + (lineNet + lineOtv) * (vatRate / 100);
-            }, 0);
-
-            // OIV is calculated on (Net + OTV)
-            const totalOiv = itemsToUse.reduce((acc: number, it: any) => {
-                const lineNet = Number(it.qty || 1) * Number(it.price || 0);
-                let lineOtv = lineNet * (Number(it.otv || 0) / 100);
-                if (it.otvType === 'Birim Başına') lineOtv = Number(it.otv || 0) * Number(it.qty || 1);
-                return acc + (lineNet + lineOtv) * (Number(it.oiv || 0) / 100);
-            }, 0);
+            const rawSubtotal = itemsToUse.reduce((acc: number, it: any) => acc + (Number(it.qty || 1) * Number(it.price || 0)), 0);
 
             let discAmount = 0;
             if (discount) {
                 if (discount.type === 'percent') {
-                    discAmount = subtotal * (Number(discount.value) / 100);
+                    discAmount = rawSubtotal * (Number(discount.value) / 100);
                 } else {
                     discAmount = Number(discount.value);
                 }
             }
 
-            const grandTotal = subtotal + totalOtv + totalVat + totalOiv - discAmount;
+            // Calculate Discount Ratio
+            let discountRatio = rawSubtotal > 0 ? (discAmount / rawSubtotal) : 0;
+            if (discountRatio > 1) discountRatio = 1;
+
+            const subtotal = rawSubtotal - discAmount;
+
+            // Calculate Taxes with discounted net logic
+            const totalOtv = itemsToUse.reduce((acc: number, it: any) => {
+                let lineNet = Number(it.qty || 1) * Number(it.price || 0);
+                lineNet = lineNet * (1 - discountRatio); // Discounted Base
+                
+                if (it.otvType === 'Birim Başına') return acc + (Number(it.otv || 0) * Number(it.qty || 1));
+                return acc + (lineNet * (Number(it.otv || 0) / 100));
+            }, 0);
+
+            const totalVat = itemsToUse.reduce((acc: number, it: any) => {
+                let lineNet = Number(it.qty || 1) * Number(it.price || 0);
+                lineNet = lineNet * (1 - discountRatio); // Discounted Base
+                
+                let lineOtv = lineNet * (Number(it.otv || 0) / 100);
+                if (it.otvType === 'Birim Başına') lineOtv = Number(it.otv || 0) * Number(it.qty || 1);
+                
+                const vatRate = it.vat !== undefined ? Number(it.vat) : 20;
+                return acc + (lineNet + lineOtv) * (vatRate / 100);
+            }, 0);
+
+            const totalOiv = itemsToUse.reduce((acc: number, it: any) => {
+                let lineNet = Number(it.qty || 1) * Number(it.price || 0);
+                lineNet = lineNet * (1 - discountRatio); // Discounted Base
+                
+                let lineOtv = lineNet * (Number(it.otv || 0) / 100);
+                if (it.otvType === 'Birim Başına') lineOtv = Number(it.otv || 0) * Number(it.qty || 1);
+                
+                return acc + (lineNet + lineOtv) * (Number(it.oiv || 0) / 100);
+            }, 0);
+
+            const grandTotal = subtotal + totalOtv + totalVat + totalOiv;
 
             // Check if an existing draft/proforma invoice exists for this order
             const existingDraft = await tx.salesInvoice.findFirst({

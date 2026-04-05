@@ -77,16 +77,18 @@ function POSContent() {
     return Number(product.price || 0);
   }, [priceMap]);
 
-  // --- EFFECTS ---
-
   // CSS Fix & Theme Sync
   useEffect(() => {
     if (theme === 'light') {
       document.body.style.background = '#F7F9FB'; // Updated to specific SaaS neutral bg
       document.body.style.color = '#0F172A';
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     } else {
       document.body.style.background = 'var(--bg-deep)';
       document.body.style.color = 'var(--text-main)';
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     }
     document.body.style.fontFamily = "'Outfit', 'Inter', sans-serif";
 
@@ -94,6 +96,7 @@ function POSContent() {
     return () => {
       document.body.style.background = 'var(--bg-deep)';
       document.body.style.color = 'var(--text-main)';
+      // Let ThemeContext restore normal class behavior
     };
   }, [theme]);
 

@@ -644,15 +644,29 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const triggerInvoiceConversion = async (invoiceData: any) => {
         const paidAmount = Number(selectedOrder?.paidAmount || 0);
         
-        // Calculate total of new invoice
-        let newSubtotal = 0;
+                // Calculate total of new invoice
+        const rawSubtotal = invoiceItems.reduce((acc, it) => acc + (Number(it.qty || 1) * Number(it.price || 0)), 0);
+        
+        let discAmount = 0;
+        if (discountType === 'percent') {
+            discAmount = rawSubtotal * (discountValue / 100);
+        } else {
+            discAmount = discountValue;
+        }
+
+        let discountRatio = rawSubtotal > 0 ? (discAmount / rawSubtotal) : 0;
+        if (discountRatio > 1) discountRatio = 1;
+
+        let newSubtotal = rawSubtotal - discAmount;
         let newTotalOtv = 0;
         let newTotalOiv = 0;
         let newTotalVat = 0;
 
         invoiceItems.forEach(it => {
             const lineQty = Number(it.qty || 1);
-            const lineNet = lineQty * Number(it.price || 0);
+            let lineNet = lineQty * Number(it.price || 0);
+            lineNet = lineNet * (1 - discountRatio);
+
             let lineOtv = 0;
             if (it.otvType === 'Yüzdesel') {
                 lineOtv = lineNet * (Number(it.otv || 0) / 100);
@@ -663,17 +677,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             newTotalOtv += lineOtv;
             newTotalOiv += matrah * (Number(it.oiv || 0) / 100);
             newTotalVat += matrah * (Number(it.vat || 20) / 100);
-            newSubtotal += lineNet;
         });
 
-        let discAmount = 0;
-        if (discountType === 'percent') {
-            discAmount = newSubtotal * (discountValue / 100);
-        } else {
-            discAmount = discountValue;
-        }
-
-        const newTotalAmount = newSubtotal + newTotalOtv + newTotalOiv + newTotalVat - discAmount;
+        const newTotalAmount = newSubtotal + newTotalOtv + newTotalOiv + newTotalVat;
 
         if (invoiceData.isInstallment) {
             if (paidAmount > 0) {
@@ -915,19 +921,19 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 actions={
                     <>
                         <Link 
-                            href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
+                            href={`/payment?amount=${balance > 0 ? balance : ''}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
                             className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                         >
                             <span>+</span> Tahsilat Al
                         </Link>
                         <Link 
-                            href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
+                            href={`/payment?amount=${balance < 0 ? Math.abs(balance) : ''}&type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
                             className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden sm:flex"
                         >
                             Ödeme Yap
                         </Link>
                         <Link 
-                            href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
+                            href={`/terminal?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
                             className="h-[36px] px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm hidden md:flex"
                         >
                             Satış Yap (POS)
@@ -2892,7 +2898,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </EnterpriseCard>
                 </div>
             )}
-\n            {/* CHECK / SENET ADD MODAL */}
+            {/* CHECK / SENET ADD MODAL */}
             {checkAddModalOpen && (
                 <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[6000] flex items-center justify-center p-4 animate-in fade-in duration-200">
                     <EnterpriseCard className="w-full max-w-xl animate-in zoom-in-95 duration-200 shadow-2xl border-emerald-500/30 text-left">
@@ -3022,7 +3028,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </EnterpriseCard>
                 </div>
             )}
-\n            {/* OTP COMPLIANCE MODAL */}
+            {/* OTP COMPLIANCE MODAL */}
             {otpModalOpen && (
                 <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[6000] flex items-center justify-center p-4 animate-in fade-in duration-200">
                     <EnterpriseCard className="w-full max-w-lg animate-in zoom-in-95 duration-200 shadow-2xl border-amber-500/30 text-left">
@@ -3091,7 +3097,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         </div>
                     </EnterpriseCard>
                 </div>
-            )}\n
+            )}
+            {/* STATEMENT MODAL */}
+            <StatementModal
+                isOpen={statementOpen}
+                onClose={() => setStatementOpen(false)}
+                title={`${statementType === 'summary' ? 'Özet' : 'Detaylı'} Ekstre`}
+                entity={customer}
+                transactions={historyList}
+                type={statementType}
+                entityType="CUSTOMER"
+            />
         </div >
     );
 }

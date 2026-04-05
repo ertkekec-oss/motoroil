@@ -360,7 +360,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                             padding: 40px;
                         }
                 .statement-modal-container {
-                    width: 100 %;
+                    width: 100%;
                     max-width: 1000px;
                     height: 95vh;
                     background: #0f111a;
@@ -373,7 +373,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                 }
                 .statement-toolbar {
             padding: 24px 32px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0 %, rgba(37, 99, 235, 0.02) 100 %);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: space-between;
@@ -425,7 +425,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
     display: block;
 }
                 .paper-document {
-    width: 95 %;
+    width: 95%;
     max-width: 820px;
     background: white;
     color: #0f172a;
@@ -466,7 +466,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                 .card-value.credit { color: #10b981; }
                 .card-status { font-size: 11px; font-weight: 800; color: #3b82f6; margin-top: 8px; letter-spacing: 0.5px; }
 
-                .doc-table { width: 100 %; border-collapse: collapse; font-size: 13px; }
+                .doc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
                 .doc-table th { padding: 16px 12px; text-align: left; border-bottom: 2px solid #0f172a; font-weight: 800; font-size: 11px; color: #64748b; letter-spacing: 0.5px; }
                 .doc-table td { padding: 16px 12px; border-bottom: 1px solid #f1f5f9; }
                 .date-cell { color: #64748b; font-weight: 600; font-size: 12px; }
@@ -496,10 +496,10 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
     html, body { height: auto!important; overflow: visible!important; background: white!important; }
     body * { visibility: hidden; }
         .statement-modal-overlay, .statement-modal-overlay *, #printable-area, #printable-area * { visibility: visible; }
-            .statement-modal-overlay { position: absolute!important; top: 0!important; left: 0!important; width: 100 % !important; height: auto!important; background: white!important;  padding: 0!important; margin: 0!important; display: block!important; }
-                    .statement-modal-container { position: static!important; width: 100 % !important; height: auto!important; background: white!important; border: none!important; box-shadow: none!important; display: block!important; }
+            .statement-modal-overlay { position: absolute!important; top: 0!important; left: 0!important; width: 100% !important; height: auto!important; background: white!important;  padding: 0!important; margin: 0!important; display: block!important; }
+                    .statement-modal-container { position: static!important; width: 100% !important; height: auto!important; background: white!important; border: none!important; box-shadow: none!important; display: block!important; }
                     .document-scroller { position: static!important; height: auto!important; overflow: visible!important; background: white!important; padding: 0!important; margin: 0!important; display: block!important; }
-                    .paper-document { width: 100 % !important; max-width: none!important; padding: 0!important; margin: 0!important; box-shadow: none!important; border: none!important; height: auto!important; min-height: 0!important; }
+                    .paper-document { width: 100% !important; max-width: none!important; padding: 0!important; margin: 0!important; box-shadow: none!important; border: none!important; height: auto!important; min-height: 0!important; }
                     .no-print { display: none!important; height: 0!important; width: 0!important; }
 
                     /* Expand all groups for print view */

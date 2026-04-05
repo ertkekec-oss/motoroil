@@ -29,44 +29,7 @@ export default function LiveFieldTrackingPage({ isEmbedded }: { isEmbedded?: boo
             }
         } catch (err) {
             console.error(err);
-            // MOCK DATA FOR DEMONSTRATION PURPOSES (Since backend doesn't have live-status endpoint yet)
-            setData({
-                activeVisits: [
-                    {
-                        id: 'v1',
-                        staffLat: 40.9900, staffLng: 29.0200,
-                        checkInTime: new Date(Date.now() - 15 * 60000).toISOString(),
-                        isOutOfRange: false,
-                        distanceMeters: 15,
-                        staff: { name: 'Ahmet Yılmaz' },
-                        customer: { name: 'Özlem Otomotiv', lat: 40.9902, lng: 29.0205, city: 'İstanbul', district: 'Kadıköy' }
-                    },
-                    {
-                        id: 'v2',
-                        staffLat: 40.9730, staffLng: 29.1000,
-                        checkInTime: new Date(Date.now() - 45 * 60000).toISOString(),
-                        isOutOfRange: true,
-                        distanceMeters: 450,
-                        staff: { name: 'Mehmet Demir' },
-                        customer: { name: 'Kozyatağı Yedek Parça', lat: 40.9750, lng: 29.1050, city: 'İstanbul', district: 'Kozyatağı' }
-                    }
-                ],
-                recentVisits: [
-                    {
-                        id: 'v3',
-                        checkOutLocation: { lat: 41.0082, lng: 28.9784 },
-                        checkOutTime: new Date(Date.now() - 120 * 60000).toISOString(),
-                        staff: { name: 'Ali Veli' },
-                        customer: { name: 'Sultanahmet Motor' },
-                        orders: [{ totalAmount: 15000 }],
-                        transactions: [{ amount: 5000 }]
-                    }
-                ],
-                stats: {
-                    todayVisitsCount: 14,
-                    totalRevenue: 85400
-                }
-            });
+            setData({ activeVisits: [], recentVisits: [], stats: { todayVisitsCount: 0, totalRevenue: 0 } });
         } finally {
             setLoading(false);
         }

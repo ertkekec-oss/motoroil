@@ -114,7 +114,7 @@ export async function POST(request: Request) {
             newBalance = Number(newBalance) + numAmount;
 
             // Find a valid Kasa ID to satisfy relation (Tenant Scoped)
-            const defaultKasa = await prisma.kasa.findFirst({
+            let defaultKasa = await prisma.kasa.findFirst({
                 where: {
                     isActive: true, // Prefer active
                     companyId: company.id // Strict Tenant Isolation
@@ -122,7 +122,15 @@ export async function POST(request: Request) {
             });
 
             if (!defaultKasa) {
-                return NextResponse.json({ success: false, error: 'Sistemde kayıtlı kasa bulunamadı.' }, { status: 400 });
+                defaultKasa = await prisma.kasa.create({
+                    data: {
+                        companyId: company.id,
+                        name: 'Merkez Kasa',
+                        type: 'CASH',
+                        balance: 0,
+                        isActive: true
+                    }
+                });
             }
 
             await prisma.$transaction([

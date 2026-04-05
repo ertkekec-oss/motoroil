@@ -1,21 +1,13 @@
 import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import pdf from 'pdf-parse';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        let pdf: any;
-        try {
-            const pdfParseModule = await import('pdf-parse');
-            pdf = (pdfParseModule as any).default || pdfParseModule;
-        } catch (loaderErr) {
-            console.error("Failed to load pdf-parse:", loaderErr);
-            return NextResponse.json({ success: false, error: 'Sunucuda PDF okuyucu eklentisi bulunamadı.' }, { status: 500 });
-        }
-        
         const session: any = await getSession();
         if (!session) return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });
 

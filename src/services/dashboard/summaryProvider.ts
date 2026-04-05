@@ -189,65 +189,46 @@ export class PrismaSummaryProvider implements IDashboardSummaryProvider {
             } catch { }
         }
 
+        // 7. Cash Details
+        const kasalar = await prisma.kasa.findMany({ where: baseCompanyGuard });
+        let creditCard = 0, cash = 0, wire = 0;
+        for (const k of kasalar) {
+            if (k.type === "Nakit") cash += Number(k.balance || 0);
+            else if (k.type === "Kredi Kartı" || (k.type || "").includes("POS")) creditCard += Number(k.balance || 0);
+            else if (k.type === "Banka" || k.type === "Havale") wire += Number(k.balance || 0);
+        }
+
+        // 8. Stock Health
+        const totalSku = await prisma.product.count({ where: baseCompanyGuard });
+        const lowStock = await prisma.product.count({ where: { ...baseCompanyGuard, stock: { lte: 5 } } });
+        const overStock = await prisma.product.count({ where: { ...baseCompanyGuard, stock: { gte: 100 } } });
+
+        // 9. Staff
+        const currentStaffCount = await prisma.user.count({ where: { ...baseCompanyGuard, role: { notIn: ["B2B_CUSTOMER", "GUEST", "USER"] } } });
+
         return {
             gmvTotal,
             rfqActive: activeRfqs,
             escrowPending,
             collectedThisMonth,
-            rfqTrend: [12, 14, 11, 18, 16, 23, activeRfqs || 19],
-            boostClicks: 4000,
-            boostDeltaPct: 13,
-            reconciliation: { matched: 65, pending: 25, disputed: 10 },
-            dailyTxCount: dailyTxCount || 182,
+            rfqTrend: [0, 0, 0, 0, 0, 0, activeRfqs || 0],
+            boostClicks: 0,
+            boostDeltaPct: 0,
+            reconciliation: { matched: 0, pending: 0, disputed: 0 },
+            dailyTxCount: dailyTxCount || 0,
             setup: {
                 hasCompanyProfile,
                 hasAnyProduct,
                 hasAnyRFQ,
                 hasAtLeastOneOrder
             },
-            // TODO: Ledger Source of Truth (Cash details currently stubbed)
-            cashDetails: {
-                creditCard: 125400,
-                cash: 14500,
-                wire: 45000
-            },
-            // TODO: Filtered queries from inventory + shipment tables
-            stockHealth: {
-                totalSku: 1420,
-                lowStock: 24,
-                overStock: 112,
-                inShipment: 45,
-                noShipment: 1375
-            },
-            invoiceStatus: {
-                incoming: 28,
-                outgoing: 145,
-                pending: 12
-            },
-            // TODO: Filtered queries from service_records table
-            serviceDesk: {
-                enteredToday: 8,
-                currentlyInService: 23
-            },
-            // TODO: Filtered queries from attendance + staff tables
-            pdksRules: {
-                currentStaffCount: 124,
-                checkedInCount: 118,
-                notCheckedInCount: 6,
-                lateCount: 3
-            },
-            // TODO: Filtered from Fintech Control Tower Autopilot
-            autonomous: {
-                updatedProducts: 142,
-                avgMarginChange: 2.4,
-                riskyDeviation: 3
-            },
-            // TODO: Filtered Event Summary (Tenant Isolations)
-            notificationsApp: {
-                pendingApprovals: 14,
-                newNotifications: 8,
-                criticalAlerts: 2
-            }
+            cashDetails: { creditCard, cash, wire },
+            stockHealth: { totalSku, lowStock, overStock, inShipment: 0, noShipment: totalSku - lowStock - overStock },
+            invoiceStatus: { incoming: 0, outgoing: 0, pending: 0 },
+            serviceDesk: { enteredToday: 0, currentlyInService: 0 },
+            pdksRules: { currentStaffCount, checkedInCount: 0, notCheckedInCount: 0, lateCount: 0 },
+            autonomous: { updatedProducts: 0, avgMarginChange: 0, riskyDeviation: 0 },
+            notificationsApp: { pendingApprovals: 0, newNotifications: 0, criticalAlerts: 0 }
         };
     }
 }

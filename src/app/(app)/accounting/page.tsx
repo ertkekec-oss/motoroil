@@ -240,7 +240,21 @@ export default function AccountingPage() {
                             </button>
                         </>
                     )}
-                    <button className="h-[40px] px-5 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-[12px] font-semibold text-[13px] transition-all flex items-center gap-2">
+                    <button 
+                        onClick={() => {
+                            const csvContent = "data:text/csv;charset=utf-8,\uFEFF"
+                                + "Tarih,Açıklama,Tip,Tutar,Kasa/Durum\n" 
+                                + (transactions || []).map((t: any) => `${new Date(t.date).toLocaleDateString('tr-TR')},"${(t.description || '').replace(/"/g, '""')}",${t.type},${t.amount},${t.kasaId || '-'}`).join("\n");
+                            const encodedUri = encodeURI(csvContent);
+                            const link = document.createElement("a");
+                            link.setAttribute("href", encodedUri);
+                            link.setAttribute("download", `finansal_hareketler_${new Date().toISOString().split('T')[0]}.csv`);
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }}
+                        className="h-[40px] px-5 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-[12px] font-semibold text-[13px] transition-all flex items-center gap-2"
+                    >
                         Dışa Aktar
                     </button>
                 </div>

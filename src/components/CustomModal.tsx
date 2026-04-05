@@ -62,22 +62,22 @@ export default function CustomModal({
         wide: 'max-w-[1200px]'
     };
 
-    const btnBaseStyles = "min-h-[52px] px-6 rounded-xl font-bold text-[15px] transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer outline-none whitespace-nowrap";
+    const btnBaseStyles = "min-h-[52px] px-6 rounded-2xl font-bold text-[15px] transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer outline-none whitespace-nowrap shadow-sm";
     const btnPrimary = type === 'error'
-        ? "bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white border border-rose-700"
-        : "bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white dark:bg-white dark:hover:bg-slate-100 dark:active:bg-slate-200 dark:text-slate-900";
-    const btnSecondary = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm";
+        ? "bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white border-none shadow-rose-500/20"
+        : "bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white dark:bg-white dark:hover:bg-slate-100 dark:active:bg-slate-200 dark:text-slate-900 border-none shadow-slate-900/20 dark:shadow-white/20";
+    const btnSecondary = "bg-slate-100 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 border-none";
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-md animate-fade-in" onClick={onClose}>
             <div
-                className={`w-full ${sizeClasses[size]} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-2xl p-6 sm:p-10 animate-in relative flex flex-col items-center text-center`}
+                className={`w-full ${sizeClasses[size]} bg-white dark:bg-slate-900 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] border border-white/20 dark:border-white/5 rounded-[24px] p-6 sm:p-10 animate-in relative flex flex-col items-center text-center backdrop-blur-xl`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-5 right-5 w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    className="absolute top-5 right-5 w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     aria-label="Kapat"
                 >
                     <X strokeWidth={2} className="w-5 h-5" />
@@ -85,7 +85,7 @@ export default function CustomModal({
 
                 {/* Icon Area */}
                 <div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-sm ${current.bg} ${current.border} border-2`}
+                    className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-sm ${current.bg} border border-black/5 dark:border-white/5`}
                 >
                     <IconComponent className={`w-7 h-7 ${current.iconColor}`} strokeWidth={2.5} />
                 </div>
@@ -100,7 +100,7 @@ export default function CustomModal({
                         {content}
                     </div>
                 ) : (
-                    <p className="text-[15px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed mb-10 max-w-[95%] mx-auto">
+                    <p className="whitespace-pre-wrap text-[15px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed mb-10 max-w-[95%] mx-auto">
                         {message}
                     </p>
                 )}
@@ -131,7 +131,7 @@ export default function CustomModal({
                             }
                         }}
                         disabled={isProcessing}
-                        className={`flex-1 ${btnBaseStyles} ${btnPrimary} shadow-sm`}
+                        className={`flex-1 ${btnBaseStyles} ${btnPrimary}`}
                     >
                         {isProcessing ? (
                             <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
