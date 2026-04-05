@@ -42,6 +42,7 @@ export function IncomingInvoicePricingModal({
     
     // YENİ: Fatura Kabul Ayarları (Masraf, İrsaliye, Vade, Not)
     const [isExpense, setIsExpense] = useState(false);
+    const [isAsset, setIsAsset] = useState(false);
     const [customDueDate, setCustomDueDate] = useState('');
     const [notes, setNotes] = useState('');
     const [matchedWaybillId, setMatchedWaybillId] = useState('');
@@ -86,6 +87,7 @@ export function IncomingInvoicePricingModal({
 
             const settings = {
                 isExpense,
+                isAsset,
                 customDueDate: customDueDate || undefined,
                 notes: notes || undefined,
                 matchedWaybillId: matchedWaybillId || undefined
@@ -137,15 +139,32 @@ export function IncomingInvoicePricingModal({
                                         type="checkbox" 
                                         checked={isExpense}
                                         onChange={e => setIsExpense(e.target.checked)}
-                                        className="mt-1 w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                                        className="mt-1 w-4 h-4 rounded text-rose-600 focus:ring-rose-500"
                                     />
                                     <div>
                                         <div className={`text-[13px] font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>Masraf Olarak İşle</div>
                                         <div className={`text-[11px] mt-0.5 leading-relaxed ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-                                            Bunu seçerseniz ürünler depoya <br/>stok olarak sayılmaz.
+                                            Ürünler depoya stok girmez.
                                         </div>
                                     </div>
                                 </label>
+                                
+                                {isExpense && (
+                                    <label className="flex items-start gap-3 cursor-pointer mt-4 pt-4 border-t border-rose-200/50 dark:border-rose-500/20">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={isAsset}
+                                            onChange={e => setIsAsset(e.target.checked)}
+                                            className="mt-1 w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <div>
+                                            <div className={`text-[13px] font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>Demirbaş Kütüğüne Ekle</div>
+                                            <div className={`text-[11px] mt-0.5 leading-relaxed ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                Satırları şirket varlığı (Zimmet) olarak kaydet.
+                                            </div>
+                                        </div>
+                                    </label>
+                                )}
                             </div>
 
                             {/* Vade Tarihi */}

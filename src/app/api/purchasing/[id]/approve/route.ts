@@ -11,7 +11,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         const { id } = await context.params;
         const body = await request.json().catch(() => ({}));
-        let { skipStockUpdate = false, skipFinanceUpdate = false, pricingConfig = {}, originalSalesInvoiceNo, isExpense, customDueDate, notes, matchedWaybillId } = body;
+        let { skipStockUpdate = false, skipFinanceUpdate = false, pricingConfig = {}, originalSalesInvoiceNo, isExpense, isAsset, customDueDate, notes, matchedWaybillId } = body;
         const companyId = session.user?.companyId || (session as any).companyId;
 
         // EĞER MASRAF OLARAK İŞARETLENDİYSE, STOKLARA İŞLENMESİNİ ENGELLİYORUZ
@@ -342,6 +342,28 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     }
                 }
             }
+
+            if (isAsset) {
+                for (const item of items) {
+                    const itemName = String(item.name || 'Bilinmeyen Demirbaş');
+                    const qty = Number(item.qty || 1);
+                    
+                    for (let i = 0; i < qty; i++) {
+                        await (tx as any).asset.create({
+                            data: {
+                                companyId,
+                                branch: String(branch),
+                                name: qty > 1 ? `${itemName} (${i + 1}/${qty})` : itemName,
+                                purchaseDate: invoice!.invoiceDate || new Date(),
+                                purchasePrice: item.price !== null && item.price !== undefined ? Number(item.price) : 0,
+                                depreciation: 0,
+                                status: "ACTIVE"
+                            }
+                        });
+                    }
+                }
+            }
+
 
             let transaction = null;
             if (!skipFinanceUpdate) {
