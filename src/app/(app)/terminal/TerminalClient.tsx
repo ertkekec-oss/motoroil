@@ -218,6 +218,12 @@ export default function TerminalClient() {
                 try { conds = JSON.parse(conds); } catch (e) { conds = {}; }
             }
 
+            if (conds.couponCode && typeof conds.couponCode === 'string' && conds.couponCode.trim() !== '') {
+                if (!discountCode || discountCode.trim().toUpperCase() !== conds.couponCode.trim().toUpperCase()) {
+                    return false;
+                }
+            }
+
             if ((camp.type === 'payment_method_discount' || camp.type === 'loyalty_points') && paymentMode) {
                 if (conds.paymentMethod && conds.paymentMethod !== '' && conds.paymentMethod !== paymentMode) {
                     return false;
@@ -225,7 +231,7 @@ export default function TerminalClient() {
             }
             return true;
         });
-    }, [campaigns, selectedCustomer, customers, paymentMode]);
+    }, [campaigns, selectedCustomer, customers, paymentMode, discountCode]);
 
     const { computedCampaignDiscount, computedPromoItems, computedEarnedPoints } = useMemo(() => {
         let disc = 0;
