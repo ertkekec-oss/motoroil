@@ -14,18 +14,18 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
     }
 
     return (
-        <div className="w-full overflow-x-auto overflow-y-auto max-h-[calc(100vh-250px)] relative bg-surface dark:bg-[#0B1220] rounded-2xl border border-default dark:border-white/5 shadow-enterprise">
+        <div className="w-full overflow-x-auto overflow-y-auto max-h-[calc(100vh-250px)] relative bg-white dark:bg-[#0f172a] rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10">
             <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 bg-surface-secondary dark:bg-slate-900 border-b border-default dark:border-white/10 z-10">
+                <thead className="sticky top-0 bg-slate-50/80 backdrop-blur-md dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 z-10">
                     <tr>
-                        <th className="py-3 px-4 text-xs font-bold text-text-secondary dark:text-slate-400 uppercase tracking-widest w-[40%]">Ürün</th>
-                        <th className="py-3 px-4 text-xs font-bold text-text-secondary dark:text-slate-400 uppercase tracking-widest w-[15%] text-center">Birim Fiyat</th>
-                        <th className="py-3 px-4 text-xs font-bold text-text-secondary dark:text-slate-400 uppercase tracking-widest w-[20%] text-center">Adet</th>
-                        <th className="py-3 px-4 text-xs font-bold text-text-secondary dark:text-slate-400 uppercase tracking-widest w-[15%] text-right">Ara Toplam</th>
-                        <th className="py-3 px-4 text-xs font-bold text-text-secondary dark:text-slate-400 uppercase tracking-widest w-[10%] text-center">Sil</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[40%]">Ürün</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[15%] text-center">Birim Fiyat</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[20%] text-center">Adet</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[15%] text-right">Ara Toplam</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[10%] text-center">Sil</th>
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-border-divider dark:divide-white/5">
+                <tbody className="divide-y divide-slate-50 dark:divide-white/5">
                     {cart?.map((item, idx) => (
                         <tr key={idx} className="hover:bg-surface-tertiary dark:hover:bg-white/5 transition-colors group">
                             <td className="py-4 px-4 min-w-[200px]">

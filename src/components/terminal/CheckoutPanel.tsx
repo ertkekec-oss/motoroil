@@ -9,19 +9,19 @@ export default function CheckoutPanel({
 }: any) {
 
     return (
-        <div className="w-full bg-surface-secondary dark:bg-[#0f172a] rounded-2xl flex flex-col flex-1 min-h-0 overflow-hidden shadow-enterprise">
-            <h2 className="text-[10px] font-black opacity-40 py-4 tracking-widest text-center shrink-0 uppercase">SATIŞ ÖZETİ</h2>
+        <div className="w-full bg-white dark:bg-[#0f172a] rounded-2xl p-4 lg:p-5 flex flex-col flex-1 min-h-0 overflow-hidden shadow-sm border border-slate-200/60 dark:border-white/10">
+            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 pb-4 tracking-widest text-center shrink-0 uppercase">SATIŞ ÖZETİ</h2>
 
-            <div className="flex-1 overflow-y-auto px-4 lg:px-6 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex-1 overflow-y-auto space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {/* Customer Select */}
                 <div>
-                    <label className="text-[10px] font-bold opacity-40 block mb-1.5 uppercase tracking-widest">Müşteri / Cari</label>
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-1.5 uppercase tracking-widest px-1">Müşteri / Cari</label>
                     <div
                         onClick={() => setIsCustomerModalOpen(true)}
-                        className="flex justify-between items-center bg-surface dark:bg-slate-900/50 p-3 lg:p-4 rounded-[14px] cursor-pointer hover:shadow-md transition-all shadow-sm group"
+                        className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-3 lg:p-4 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-full bg-white shadow-sm dark:bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
                                 {selectedCustomer === 'Perakende Müşteri' ? <User size={16} /> : selectedCustomer.charAt(0)}
                             </div>
                             <span className="font-bold text-[13px] truncate max-w-[180px] text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
@@ -29,9 +29,9 @@ export default function CheckoutPanel({
                             </span>
                         </div>
                         <div className="flex flex-col items-end">
-                            <div className="text-[9px] text-primary/60 font-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">SEÇ</div>
+                            <div className="text-[9px] text-indigo-600/60 font-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">SEÇ</div>
                             {activePriceListName && (
-                                <div className="text-[9px] text-indigo-600 mt-1 bg-indigo-50 px-2 py-0.5 rounded-md uppercase font-bold dark:bg-indigo-500/20 dark:text-indigo-300">
+                                <div className="text-[9px] text-indigo-600 mt-1 bg-white shadow-sm px-2 py-0.5 rounded-md uppercase font-bold dark:bg-indigo-500/20 dark:text-indigo-300">
                                     {activePriceListName}
                                 </div>
                             )}
@@ -40,7 +40,7 @@ export default function CheckoutPanel({
                 </div>
 
                 {/* Totals */}
-                <div className="space-y-3 bg-surface dark:bg-slate-900/40 p-4 rounded-[14px] shadow-sm">
+                <div className="space-y-3 bg-slate-50 dark:bg-slate-900/40 p-4 rounded-xl">
                     <div className="flex justify-between text-xs font-medium text-slate-500">
                         <span>Ara Toplam</span>
                         <span>₺{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
@@ -55,10 +55,9 @@ export default function CheckoutPanel({
                         <span>KDV Hariç Tutar</span>
                         <span>₺{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="flex justify-between items-center pt-3 mt-1 relative">
-                        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent"></div>
-                        <span className="font-bold text-[13px] text-text-primary dark:text-slate-200 mt-1">GENEL TOPLAM</span>
-                        <span className="text-2xl lg:text-3xl font-black text-state-alert-text dark:text-rose-400 tracking-tight mt-1">₺{finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <div className="flex justify-between items-center pt-3 mt-1 border-t border-slate-200 dark:border-white/5">
+                        <span className="font-bold text-[13px] text-slate-800 dark:text-slate-200 mt-1">GENEL TOPLAM</span>
+                        <span className="text-2xl lg:text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight mt-1">₺{finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                 </div>
 
@@ -94,13 +93,13 @@ export default function CheckoutPanel({
 
                 {/* Payment Methods */}
                 <div>
-                    <label className="text-[10px] font-bold opacity-40 block mb-1.5 uppercase tracking-widest">ÖDEME YÖNTEMİ</label>
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-1.5 uppercase tracking-widest px-1">ÖDEME YÖNTEMİ</label>
                     <div className="grid grid-cols-2 gap-2">
                         <button
                             onClick={() => setPaymentMode('cash')}
                             className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'cash'
                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
-                                : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
+                                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <Banknote size={14} /> Nakit
@@ -109,7 +108,7 @@ export default function CheckoutPanel({
                             onClick={() => setPaymentMode('card')}
                             className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'card'
                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
-                                : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
+                                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <CreditCard size={14} /> Kredi Kartı
@@ -118,7 +117,7 @@ export default function CheckoutPanel({
                             onClick={() => setPaymentMode('transfer')}
                             className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'transfer'
                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
-                                : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
+                                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <Landmark size={14} /> Havale
@@ -127,10 +126,10 @@ export default function CheckoutPanel({
                             disabled={selectedCustomer === 'Perakende Müşteri'}
                             onClick={() => setPaymentMode('account')}
                             className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${selectedCustomer === 'Perakende Müşteri'
-                                ? 'bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-700 cursor-not-allowed shadow-none'
+                                ? 'bg-slate-50/50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-700 cursor-not-allowed'
                                 : paymentMode === 'account'
                                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
-                                    : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
+                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                             title={selectedCustomer === 'Perakende Müşteri' ? 'Müşteri seçilmeli' : ''}
                         >
@@ -141,7 +140,7 @@ export default function CheckoutPanel({
             </div>
 
             {/* Action Buttons */}
-            <div className="pt-4 mt-4 border-t border-slate-200 dark:border-white/10 shrink-0 space-y-3">
+            <div className="pt-4 mt-4 border-t border-slate-200/60 dark:border-white/5 shrink-0 space-y-3">
                 <button
                     onClick={handleSuspend}
                     disabled={isProcessing || cart.length === 0}

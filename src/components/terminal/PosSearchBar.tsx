@@ -7,8 +7,8 @@ export const PosSearchBar = forwardRef<HTMLInputElement, any>((props: any, ref) 
 
     // Virtual search wrapper with enterprise padding and focus ring
     return (
-        <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2 bg-surface dark:bg-[#0f172a] border border-default dark:border-white/10 p-2 rounded-2xl relative items-center min-w-[300px] overflow-visible shadow-enterprise focus-within:ring-4 focus-within:ring-primary/15 transition-all">
-            <Search size={24} className="ml-4 text-text-muted shrink-0" />
+        <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2 bg-white dark:bg-[#0f172a] border border-slate-200/60 shadow-sm dark:border-white/10 p-2 rounded-2xl relative items-center min-w-[300px] overflow-visible focus-within:ring-4 focus-within:ring-indigo-500/15 focus-within:border-indigo-500/30 transition-all">
+            <Search size={24} className="ml-4 text-slate-400 shrink-0" />
             <input
                 ref={ref}
                 type="text"
