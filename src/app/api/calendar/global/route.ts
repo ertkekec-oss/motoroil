@@ -131,3 +131,42 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ success: false, error: e.message }, { status: 500 });
     }
 }
+
+export async function POST(req: NextRequest) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user.user || auth.user;
+    
+    try {
+        const tenantId = session.tenantId;
+        const company = await prisma.company.findFirst({ where: { tenantId } });
+        
+        if (!company && tenantId !== 'PLATFORM_ADMIN') {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
+        const body = await req.json();
+        const { title, description, priority, type, startTime, endTime, isAllDay, dueDate, assigneeId } = body;
+
+        const task = await prisma.globalTask.create({
+            data: {
+                companyId: company?.id || 'PLATFORM',
+                title,
+                description,
+                priority: priority || 'MEDIUM',
+                type: type || 'TASK',
+                startTime: startTime ? new Date(startTime) : null,
+                endTime: endTime ? new Date(endTime) : null,
+                isAllDay: !!isAllDay,
+                dueDate: dueDate ? new Date(dueDate) : null,
+                assigneeId: assigneeId || null,
+                status: 'PENDING'
+            }
+        });
+
+        return NextResponse.json({ success: true, task });
+    } catch (e: any) {
+        console.error("Global calendar create API error:", e);
+        return NextResponse.json({ success: false, error: e.message }, { status: 500 });
+    }
+}
