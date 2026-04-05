@@ -599,39 +599,50 @@ export default function TerminalClient() {
 
             {/* EXTRAS MODAL (Discount, Coupon, Ref) */}
             {showExtrasModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-                    <div className="w-full max-w-md bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95">
-                        <h3 className="text-lg font-black tracking-tight mb-5">Sipariş Ekstraları</h3>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-md bg-white dark:bg-[#0B1220] rounded-[24px] p-6 lg:p-8 shadow-2xl shadow-indigo-900/10 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-[17px] font-black tracking-tight text-slate-900 dark:text-white">Ekstra & İndirimler</h3>
+                            <button onClick={() => setShowExtrasModal(false)} className="opacity-50 hover:opacity-100 p-2 -mr-2 transition-opacity">✕</button>
+                        </div>
 
                         <div className="space-y-4">
-                            <div>
-                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Sepet İndirimi (₺)</label>
+                            <div className="bg-slate-50/50 dark:bg-white/[0.02] p-4 rounded-2xl">
+                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-widest pl-1">Sepet İndirimi (₺)</label>
                                 <div className="relative">
-                                    <Tag className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
-                                    <input type="number" min="0" value={appliedDiscount || ''} onChange={e => setAppliedDiscount(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0.00" />
+                                    <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <input type="number" min="0" value={appliedDiscount || ''} onChange={e => setAppliedDiscount(Number(e.target.value))} className="w-full pl-11 pr-4 py-3 bg-white dark:bg-[#0f172a] shadow-sm rounded-xl font-bold text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all border-none" placeholder="0.00" />
                                 </div>
                             </div>
-                            <div>
-                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Kupon Kodu</label>
-                                <input type="text" value={discountCode} onChange={e => setDiscountCode(e.target.value)} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 uppercase" placeholder="KOD GİRİN" />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Puan Kullan ({customer?.points || 0} Kullanılabilir)</label>
-                                <div className="relative">
-                                    <Gift className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
-                                    <input type="number" max={customer?.points || 0} min="0" value={pointsToUse || ''} onChange={e => setPointsToUse(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0" />
+
+                            <div className="bg-slate-50/50 dark:bg-white/[0.02] p-4 rounded-2xl">
+                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-widest pl-1">Kupon Kodu</label>
+                                <div className="relative flex gap-2">
+                                    <input type="text" value={discountCode} onChange={e => setDiscountCode(e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-[#0f172a] shadow-sm rounded-xl font-bold text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 uppercase transition-all border-none" placeholder="KOD GİRİN" />
                                 </div>
                             </div>
-                            <div>
-                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Sipariş Notu / Referans</label>
+
+                            <div className="bg-slate-50/50 dark:bg-white/[0.02] p-4 rounded-2xl">
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Puan Kullan</label>
+                                    <span className="text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 px-2 py-0.5 rounded-full">{customer?.points || 0} Kullanılabilir</span>
+                                </div>
                                 <div className="relative">
-                                    <FileText className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
-                                    <input type="text" value={referenceNote} onChange={e => setReferenceNote(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="Örn: Evrak No, Sipariş No, Masa No vb." />
+                                    <Gift className="absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-500" size={18} />
+                                    <input type="number" max={customer?.points || 0} min="0" value={pointsToUse || ''} onChange={e => setPointsToUse(Number(e.target.value))} className="w-full pl-11 pr-4 py-3 bg-white dark:bg-[#0f172a] shadow-sm rounded-xl font-bold text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500/20 transition-all border-none" placeholder="0" />
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-50/50 dark:bg-white/[0.02] p-4 rounded-2xl">
+                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-widest pl-1">Sipariş Notu / Referans</label>
+                                <div className="relative">
+                                    <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <input type="text" value={referenceNote} onChange={e => setReferenceNote(e.target.value)} className="w-full pl-11 pr-4 py-3 bg-white dark:bg-[#0f172a] shadow-sm rounded-xl font-bold text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all border-none" placeholder="Belge, plaka veya masa no..." />
                                 </div>
                             </div>
                         </div>
 
-                        <button onClick={() => setShowExtrasModal(false)} className="mt-6 w-full h-12 rounded-xl font-bold bg-primary text-white hover:bg-primary-hover shadow-enterprise transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary">EKLE VE KAPAT</button>
+                        <button onClick={() => setShowExtrasModal(false)} className="mt-8 w-full py-4 text-sm rounded-xl font-bold bg-slate-900 dark:bg-indigo-600 text-white hover:bg-slate-800 dark:hover:bg-indigo-500 shadow-md shadow-slate-900/10 dark:shadow-indigo-500/20 transition-all focus:ring-4 focus:ring-slate-900/10 dark:focus:ring-indigo-500/10">ONAYLA</button>
                     </div>
                 </div>
             )}
