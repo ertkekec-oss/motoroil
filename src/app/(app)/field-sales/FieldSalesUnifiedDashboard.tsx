@@ -35,7 +35,7 @@ export default function FieldSalesUnifiedDashboard() {
                 const [targetsRes, routesRes, campaignsRes] = await Promise.all([
                     fetch('/api/staff/targets?mine=true'),
                     fetch('/api/field-sales/routes?mine=true'),
-                    fetch('/api/campaigns'),
+                    fetch('/api/campaigns?channel=SALES_REP'),
                 ]);
 
                 if (targetsRes.ok) {

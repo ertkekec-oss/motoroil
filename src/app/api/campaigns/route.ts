@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         };
 
         if (channel) {
-            whereClause.channels = { has: channel };
+            whereClause.channels = { hasSome: [channel, 'GLOBAL'] };
         }
 
         const campaigns = await prisma.campaign.findMany({

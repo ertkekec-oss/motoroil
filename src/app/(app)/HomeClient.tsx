@@ -244,9 +244,10 @@ function POSContent() {
     const cmap: any = { 'cash': 'cash', 'card': 'card_single', 'transfer': 'transfer' };
     const targetMode = cmap[paymentMode];
 
-    const activeCampaigns = (campaigns || []).filter(c =>
-      c.isActive && c.type === 'payment_method_discount' && c.conditions.paymentMethod === targetMode
-    );
+    const activeCampaigns = (campaigns || []).filter((c: any) => {
+      const isPosOrGlobal = !c.channels || c.channels.includes('POS') || c.channels.includes('GLOBAL');
+      return c.isActive && c.type === 'payment_method_discount' && c.conditions?.paymentMethod === targetMode && isPosOrGlobal;
+    });
 
     if (activeCampaigns.length === 0) return 0;
     let totalDiscount = 0;
