@@ -2,6 +2,8 @@ import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import TasksFilter from "./TasksFilter";
+
 export default async function TaskListPage({ searchParams }: { searchParams: Promise<{ status?: string, priority?: string, type?: string }> }) {
     const session: any = await getSession();
     if (!session || !session.tenantId) return notFound();
@@ -43,36 +45,7 @@ export default async function TaskListPage({ searchParams }: { searchParams: Pro
 
                     <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden mb-8">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex gap-4 bg-slate-50 dark:bg-[#0f172a]">
-                            <form method="GET" className="flex gap-4 items-center">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Filtreler:</span>
-                                <select name="status" defaultValue={status || ''} onChange={(e: any) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] text-sm">
-                                    <option value="">Tüm Durumlar</option>
-                                    <option value="OPEN">Açık</option>
-                                    <option value="IN_PROGRESS">Devam Ediyor</option>
-                                    <option value="COMPLETED">Tamamlandı</option>
-                                    <option value="CANCELLED">İptal</option>
-                                </select>
-                                <select name="priority" defaultValue={priority || ''} onChange={(e: any) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] text-sm">
-                                    <option value="">Tüm Öncelikler</option>
-                                    <option value="CRITICAL">Kritik</option>
-                                    <option value="HIGH">Yüksek</option>
-                                    <option value="MEDIUM">Orta</option>
-                                    <option value="LOW">Düşük</option>
-                                </select>
-                                <select name="type" defaultValue={type || ''} onChange={(e: any) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] text-sm">
-                                    <option value="">Tüm Tipler</option>
-                                    {[
-                                        'RECON_DISPUTE',
-                                        'SIGNATURE_REVIEW',
-                                        'SIGNATURE_REJECTED',
-                                        'MAIL_FAILURE',
-                                        'OTP_FAILURE',
-                                        'SYSTEM_ALERT'
-                                    ].map(t => (
-                                        <option key={t} value={t}>{t}</option>
-                                    ))}
-                                </select>
-                            </form>
+                            <TasksFilter initialStatus={status} initialPriority={priority} initialType={type} />
                         </div>
 
                         <div className="overflow-x-auto">
