@@ -98,27 +98,27 @@ export default function CheckoutPanel({
                     <div className="grid grid-cols-2 gap-2">
                         <button
                             onClick={() => setPaymentMode('cash')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-[#0f172a] ${paymentMode === 'cash'
-                                ? 'bg-primary text-white shadow-md shadow-primary/20 dark:bg-indigo-500'
-                                : 'bg-surface dark:bg-slate-800 text-text-secondary dark:text-slate-300 shadow-sm hover:shadow-md'
+                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'cash'
+                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
+                                : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <Banknote size={14} /> Nakit
                         </button>
                         <button
                             onClick={() => setPaymentMode('card')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-[#0f172a] ${paymentMode === 'card'
-                                ? 'bg-primary text-white shadow-md shadow-primary/20 dark:bg-indigo-500'
-                                : 'bg-surface dark:bg-slate-800 text-text-secondary dark:text-slate-300 shadow-sm hover:shadow-md'
+                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'card'
+                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
+                                : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <CreditCard size={14} /> Kredi Kartı
                         </button>
                         <button
                             onClick={() => setPaymentMode('transfer')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-[#0f172a] ${paymentMode === 'transfer'
-                                ? 'bg-primary text-white shadow-md shadow-primary/20 dark:bg-indigo-500'
-                                : 'bg-surface dark:bg-slate-800 text-text-secondary dark:text-slate-300 shadow-sm hover:shadow-md'
+                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'transfer'
+                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
+                                : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <Landmark size={14} /> Havale
@@ -126,11 +126,11 @@ export default function CheckoutPanel({
                         <button
                             disabled={selectedCustomer === 'Perakende Müşteri'}
                             onClick={() => setPaymentMode('account')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-[#0f172a] ${selectedCustomer === 'Perakende Müşteri'
-                                ? 'bg-sidebar-bg/50 dark:bg-slate-900/50 text-text-disabled/50 dark:text-slate-700 cursor-not-allowed'
+                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${selectedCustomer === 'Perakende Müşteri'
+                                ? 'bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-700 cursor-not-allowed shadow-none'
                                 : paymentMode === 'account'
-                                    ? 'bg-primary text-white shadow-md shadow-primary/20 dark:bg-indigo-500'
-                                    : 'bg-surface dark:bg-slate-800 text-text-secondary dark:text-slate-300 shadow-sm hover:shadow-md'
+                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
+                                    : 'bg-surface dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700'
                                 }`}
                             title={selectedCustomer === 'Perakende Müşteri' ? 'Müşteri seçilmeli' : ''}
                         >
@@ -145,19 +145,19 @@ export default function CheckoutPanel({
                 <button
                     onClick={handleSuspend}
                     disabled={isProcessing || cart.length === 0}
-                    className="w-full h-12 rounded-xl font-bold border-2 border-amber-500/20 text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-sm flex items-center justify-center gap-2 transition-all"
+                    className={`w-full h-12 rounded-xl font-bold border-2 border-amber-500/20 text-sm flex items-center justify-center gap-2 transition-all ${cart.length === 0 ? 'bg-slate-50 text-slate-400 border-transparent dark:bg-slate-900 dark:text-slate-600' : 'text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 shadow-sm'}`}
                 >
                     <Clock size={16} /> BEKLEMEYE AL
                 </button>
                 <button
                     onClick={handleFinalize}
                     disabled={isProcessing || cart.length === 0}
-                    className={`w-full h-16 rounded-xl font-bold text-[15px] flex items-center justify-center gap-3 transition-all shadow-md focus:ring-4 focus:ring-offset-2 focus:ring-state-alert-text/50 dark:focus:ring-offset-[#0f172a] disabled:opacity-50 disabled:cursor-not-allowed ${cart.length > 0
+                    className={`w-full h-16 rounded-xl font-bold text-[15px] flex items-center justify-center gap-3 transition-all shadow-md focus:ring-4 focus:ring-offset-2 focus:ring-indigo-600/50 dark:focus:ring-offset-[#0f172a] disabled:cursor-not-allowed ${cart.length > 0
                         ? (!isOnline
-                            ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20'
-                            : 'bg-state-alert-text hover:bg-rose-700 text-white shadow-state-alert-text/20'
+                            ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/30'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30'
                         )
-                        : 'bg-action-secondary-bg dark:bg-slate-800 text-text-disabled dark:text-slate-500 shadow-none'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 shadow-none'
                         }`}
                 >
                     {isProcessing ? (

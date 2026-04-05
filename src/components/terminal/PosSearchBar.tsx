@@ -35,11 +35,11 @@ export const PosSearchBar = forwardRef<HTMLInputElement, any>((props: any, ref) 
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
-                <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-surface dark:bg-[#0f172a] border border-default dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[350px] overflow-y-auto">
+                <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] z-[100] animate-in fade-in slide-in-from-top-2 duration-200 max-h-[350px] overflow-y-auto">
                     {filteredProducts?.map((p: any) => (
-                        <div key={p.id} onClick={() => addToCart(p)} className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors group">
+                        <div key={p.id} onClick={() => addToCart(p)} className="p-4 border-b last:border-b-0 border-slate-100 dark:border-white/5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors group">
                             <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shadow-sm">
                                     <Search size={18} />
                                 </div>
                                 <div>
