@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
-import { Sparkles, TrendingUp, AlertTriangle } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Sparkles, PackagePlus } from 'lucide-react';
 
-export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItems: any[], onAddSuggested: (prod: any) => void }) {
+export default function AiCashierPanel({ cartItems, onAddSuggested, allProducts = [] }: { cartItems: any[], onAddSuggested: (prod: any) => void, allProducts?: any[] }) {
     const isAiEnabled = process.env.NEXT_PUBLIC_POS_AI_CASHIER !== 'false';
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    if (!isAiEnabled) return null;
+    // AI Heuristic: Find products related to the cart's latest item, or random "bestsellers"
+    const suggestedProducts = useMemo(() => {
+        if (!cartItems || cartItems.length === 0 || !allProducts || allProducts.length === 0) return [];
+        
+        const cartIds = new Set(cartItems.map(i => i.id));
+        const lastItem = cartItems[cartItems.length - 1];
+        const categoryId = lastItem.categoryId;
 
-    // Simulate heuristics
-    const latestItems = cartItems.slice(-3);
-    const hasDrinks = latestItems.some(i => i.categoryId === 'drinks' || i.name.toLowerCase().includes('cola'));
+        // Try to find products in the same category that are NOT in the cart
+        let candidates = allProducts.filter(p => p.categoryId === categoryId && !cartIds.has(p.id));
+
+        // If no items in same category, just pick some other random items not in cart
+        if (candidates.length === 0) {
+            candidates = allProducts.filter(p => !cartIds.has(p.id));
+        }
+
+        // Return up to 2 suggestions
+        return candidates.slice(0, 2);
+    }, [cartItems, allProducts]);
+
+
+    if (!isAiEnabled) return null;
 
     return (
         <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-4 shadow-sm mb-4 transition-all overflow-hidden duration-300">
@@ -27,20 +44,37 @@ export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItem
 
             {!isCollapsed && (
                 <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2">
-                    <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl justify-center">
-                        {cartItems.length > 0 ? (
-                            <div className="flex flex-col items-center gap-2">
-                                <div className="flex gap-1 mb-1">
-                                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                                </div>
-                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Sepet Analiz Ediliyor</span>
-                            </div>
-                        ) : (
+                    {cartItems.length === 0 ? (
+                        <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl justify-center">
                             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Öneri İçin Ürün Ekleyin</span>
-                        )}
-                    </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {suggestedProducts.length > 0 ? suggestedProducts.map(prod => (
+                                <div key={prod.id} className="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 rounded-xl transition-colors border border-slate-100 dark:border-white/5">
+                                    <div className="flex items-center gap-3 overflow-hidden">
+                                        <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
+                                            <PackagePlus size={14} />
+                                        </div>
+                                        <div className="truncate pr-2">
+                                            <p className="text-[10px] font-bold text-indigo-500 mb-0.5 uppercase tracking-widest">Birlikte Alınan</p>
+                                            <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{prod.name}</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onAddSuggested(prod); }}
+                                        className="shrink-0 px-3 py-1.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-colors rounded-lg text-[11px] font-black tracking-widest shadow-sm"
+                                    >
+                                        EKLE
+                                    </button>
+                                </div>
+                            )) : (
+                                <div className="col-span-1 md:col-span-2 flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl justify-center">
+                                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Uygun Öneri Bulunamadı</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

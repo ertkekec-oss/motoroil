@@ -475,7 +475,7 @@ export default function TerminalClient() {
                         />
                     </div>
 
-                    <AiCashierPanel cartItems={cart} onAddSuggested={addToCart} />
+                    <AiCashierPanel cartItems={cart} onAddSuggested={addToCart} allProducts={products} />
 
                     <div className="flex-1 min-h-0 overflow-y-auto mt-2">
                         <CartTable cart={cart} setCart={setCart} getPrice={getPrice} />
