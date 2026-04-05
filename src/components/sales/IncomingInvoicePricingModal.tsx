@@ -114,10 +114,11 @@ export function IncomingInvoicePricingModal({
                             <thead className={`border-b ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-800/50 border-white/5'}`}>
                                 <tr>
                                     <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Ürün</th>
-                                    <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Alış (KDV Hariç)</th>
+                                    <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Miktar</th>
+                                    <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Alış (Birim / H)</th>
                                     <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>KDV</th>
                                     <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Fiyat Stratejisi</th>
-                                    <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Değer</th>
+                                    <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Marj/Değer</th>
                                     <th className={`px-4 py-4 text-xs font-bold uppercase tracking-wider text-right ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Nihai Satış Fiyatı</th>
                                 </tr>
                             </thead>
@@ -131,6 +132,9 @@ export function IncomingInvoicePricingModal({
                                             <td className="px-4 py-4">
                                                 <div className={`font-semibold text-sm ${isLight ? 'text-slate-900' : 'text-white'}`}>{item.productName}</div>
                                                 <div className={`text-xs mt-0.5 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>{item.productCode}</div>
+                                            </td>
+                                            <td className={`px-4 py-4 font-bold text-sm ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                                                {item.qty || 1} Adet
                                             </td>
                                             <td className={`px-4 py-4 font-medium text-sm ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
                                                 {item.buyPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
