@@ -154,7 +154,9 @@ export async function POST(request: Request) {
                 customerCategoryStr = customerRec?.customerClass || null;
             }
 
-            const activeCampaigns = companyId ? await tx.campaign.findMany({
+            const channel = body.channel || 'POS';
+
+            const allCampaigns = companyId ? await tx.campaign.findMany({
                 where: {
                     companyId: companyId,
                     isActive: true,
@@ -162,6 +164,11 @@ export async function POST(request: Request) {
                     type: { in: ['buy_x_get_free', 'buy_x_get_discount', 'loyalty_points'] }
                 }
             }) : [];
+
+            // KANAL BAZLI UYGULAMA FİLTRESİ
+            const activeCampaigns = allCampaigns.filter((c: any) => 
+                !c.channels || c.channels.length === 0 || c.channels.includes(channel) || c.channels.includes("GLOBAL")
+            );
 
             let dynamicEarnedPoints = earnedPoints ? Number(earnedPoints) : 0;
 

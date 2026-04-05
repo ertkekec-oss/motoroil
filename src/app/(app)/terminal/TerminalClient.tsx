@@ -207,6 +207,9 @@ export default function TerminalClient() {
         const custClass = customerRec?.customerClass || null;
 
         return active.filter((camp: any) => {
+            const isPosOrGlobal = !camp.channels || camp.channels.length === 0 || camp.channels.includes('POS') || camp.channels.includes('GLOBAL');
+            if (!isPosOrGlobal) return false;
+
             const isIsolated = camp.targetCustomerCategoryIds && camp.targetCustomerCategoryIds.length > 0;
             if (isIsolated && (!custClass || !camp.targetCustomerCategoryIds.includes(custClass))) return false;
 
