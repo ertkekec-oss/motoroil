@@ -20,6 +20,14 @@ import {
 export default function ModernLanding() {
     const [annual, setAnnual] = useState(true);
     const [openFaq, setOpenFaq] = useState<number | null>(0);
+    const [scrolled, setScrolled] = useState(false);
+
+    React.useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const handleScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const faqs = [
         { q: "Sisteme giriş ve kurulum ne kadar sürer?", a: "Standart paketlerde hesap açılışı anında gerçekleşir. Veri aktarımı ve ekibinizin eğitimi dahil tam entegrasyon süreci ortalama 48 saat sürmektedir." },
@@ -34,7 +42,7 @@ export default function ModernLanding() {
             <div className="w-[80%] bg-white shadow-[0_0_50px_rgba(0,0,0,0.05)] rounded-2xl overflow-hidden flex flex-col relative">
                 
                 {/* 1. HEADER */}
-                <header className="w-full flex items-center justify-between px-10 py-6 border-b border-slate-100 bg-white sticky top-0 z-50">
+                <header className={`w-full flex items-center justify-between px-10 py-6 border-b transition-all duration-300 sticky top-0 z-50 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-slate-200' : 'bg-white border-slate-100'}`}>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
                             P
