@@ -7,10 +7,26 @@ import {
     Wrench, Settings as ConfigIcon, ListTodo, Search, Plus
 } from 'lucide-react';
 
+import { useApp } from '@/contexts/AppContext';
+
 type TabType = 'dashboard' | 'campaigns' | 'live' | 'today' | 'my-routes' | 'visits';
 
 export default function FieldDashboardClient() {
-    const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+    const { currentUser } = useApp();
+    const isAdmin = ['SUPER_ADMIN', 'PLATFORM_ADMIN', 'ADMIN', 'SYSTEM_ADMIN', 'COMPANY_MANAGER'].includes(currentUser?.role || '');
+
+    const allTabs = [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, adminOnly: true },
+        { id: 'campaigns', label: 'Saha Kampanyaları', icon: Gift, adminOnly: true },
+        { id: 'live', label: 'Canlı Takip', icon: Activity, adminOnly: true },
+        { id: 'visits', label: 'Müşteriler & Ziyaretler', icon: Users, adminOnly: true },
+        { id: 'today', label: 'Bugünün Rotası', icon: Navigation, adminOnly: false },
+        { id: 'my-routes', label: 'Rotalarım', icon: Map, adminOnly: false }
+    ] as const;
+
+    const tabs = allTabs.filter(t => !t.adminOnly || isAdmin);
+
+    const [activeTab, setActiveTab] = useState<TabType>(isAdmin ? 'dashboard' : 'today');
 
     const [kpiStats, setKpiStats] = useState({
         activeVehicles: 0,
@@ -22,6 +38,7 @@ export default function FieldDashboardClient() {
     const [statsLoading, setStatsLoading] = useState(true);
     const [tasks, setTasks] = useState<any[]>([]);
     const [campaigns, setCampaigns] = useState<any[]>([]);
+    const [activeStaff, setActiveStaff] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchDashboardStats = async () => {
@@ -43,6 +60,14 @@ export default function FieldDashboardClient() {
                     const campData = await campaignsRes.json();
                     setCampaigns(Array.isArray(campData) ? campData.filter((c:any) => c.status === 'ACTIVE' || c.isActive) : []);
                 }
+                
+                if (isAdmin) {
+                    const staffRes = await fetch('/api/staff');
+                    if (staffRes.ok) {
+                        const staffData = await staffRes.json();
+                        setActiveStaff(Array.isArray(staffData) ? staffData : []);
+                    }
+                }
 
                 setKpiStats({
                     activeVehicles: activeRoutes,
@@ -60,14 +85,7 @@ export default function FieldDashboardClient() {
         fetchDashboardStats();
     }, []);
 
-    const tabs = [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'campaigns', label: 'Saha Kampanyaları', icon: Gift },
-        { id: 'live', label: 'Canlı Takip', icon: Activity },
-        { id: 'today', label: 'Bugünün Rotası', icon: Navigation },
-        { id: 'my-routes', label: 'Rotalarım', icon: Map },
-        { id: 'visits', label: 'Müşteriler & Ziyaretler', icon: Users }
-    ] as const;
+
 
     // Ortak Tab Stili (Yüksek Kontrast, Soft Kenarlar)
     const renderTabs = () => (
@@ -245,20 +263,24 @@ export default function FieldDashboardClient() {
                                     <p className="text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Sahadaki Servis Ekipleri</p>
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scroll">
-                                    {['Ali Kemal (Tamir Aracı #1)', 'Ozan G. (Bakım Aracı #2)', 'Mehmet Y. (Hızlı Servis)'].map((tech, i) => (
+                                    {activeStaff.length > 0 ? activeStaff.slice(0, 5).map((tech, i) => (
                                         <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer border border-transparent hover:border-blue-200 dark:hover:border-blue-800/30 transition-all">
                                             <div className="relative">
                                                 <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
                                                     <Wrench className="w-4 h-4 text-slate-500" />
                                                 </div>
-                                                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-[#1e293b] rounded-full"></div>
+                                                {tech.isActive !== false && <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-[#1e293b] rounded-full"></div>}
                                             </div>
                                             <div>
-                                                <h4 className="text-[13px] font-bold text-slate-700 dark:text-slate-300">{tech}</h4>
-                                                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">Sahada (Rota Üzerinde)</p>
+                                                <h4 className="text-[13px] font-bold text-slate-700 dark:text-slate-300">{tech.name || tech.firstName} {tech.lastName}</h4>
+                                                <p className={`text-[11px] font-bold ${tech.isActive !== false ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
+                                                    {tech.isActive !== false ? 'Sahada (Aktif)' : 'Beklemede'}
+                                                </p>
                                             </div>
                                         </div>
-                                    ))}
+                                    )) : (
+                                        <div className="p-4 text-center text-slate-400 text-[12px] font-bold">Sahada aktif personel bulunmuyor</div>
+                                    )}
                                 </div>
                             </div>
                             <div className="lg:col-span-3 bg-slate-100 dark:bg-slate-900 rounded-[20px] border border-slate-200 dark:border-white/10 flex items-center justify-center relative overflow-hidden">
@@ -331,13 +353,17 @@ export default function FieldDashboardClient() {
                             <div>
                                 <h2 className="text-xl font-black text-indigo-900 dark:text-indigo-100 tracking-tight">Müşteriler & Servis Geçmişi</h2>
                                 <p className="text-[13px] font-medium text-indigo-700/70 dark:text-indigo-300 mt-2 max-w-md leading-relaxed">
-                                    Servis departmanının saha ziyaretlerini analiz edin, tamamlanmış formları görün ve 
-                                    müşteri cari listelerinde arama yapın.
+                                    Servis departmanının saha ziyaretlerini analiz edin. Tamamlanmış: {tasks.filter(t => t.status === 'COMPLETED').length} adet saha operasyonu mevcuttur.
                                 </p>
                             </div>
-                            <button className="shrink-0 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 text-white font-bold text-[13px] transition-colors flex items-center gap-2">
-                                <Search className="w-4 h-4" /> Tüm Ziyaret Geçmişi
-                            </button>
+                            <div className="flex flex-col gap-3">
+                                <a href="/customers" className="shrink-0 px-6 py-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-white/50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-center font-bold text-[13px] hover:border-indigo-400 transition-colors">
+                                    Tüm Müşteri Kartları
+                                </a>
+                                <a href="/service/field/planner" className="shrink-0 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 text-white text-center font-bold text-[13px] transition-colors flex justify-center items-center gap-2">
+                                    <Map className="w-4 h-4" /> Saha Planlama Pano Verileri
+                                </a>
+                            </div>
                         </div>
                     )}
                 </div>
