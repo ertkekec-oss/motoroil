@@ -1,4 +1,4 @@
-import LoginPageContent from '@/components/login/LoginPageContent';
+import ModernLanding from '@/components/landing/ModernLanding';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -27,6 +27,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    // Render the Login/Landing Content for the root '/' route
-    return <LoginPageContent />;
+    return <ModernLanding />;
 }
