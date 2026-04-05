@@ -153,6 +153,7 @@ model Company {
   transactions               Transaction[]
   trustScoreRecalcJobs       TrustScoreRecalcJob[]
   users                      UserCompanyAccess[]
+  assets                     Asset[]
   MarketplaceProductDailyPnl MarketplaceProductDailyPnl[]
 
   @@unique([tenantId, vkn])
@@ -1284,6 +1285,7 @@ model Staff {
   tasks                  StaffTask[]
   assignedGlobalTasks    GlobalTask[]              @relation("AssignedGlobalTasks")
   serviceOrderItems      ServiceOrderItem[]
+  assetAssignments       AssetAssignment[]
 
   @@index([tenantId])
   @@index([companyId])
@@ -9342,4 +9344,75 @@ model AdvanceDeduction {
 
   @@index([staffId])
   @@index([period])
+}
+
+// -------------------------------------------------------------
+// Demirbaş & Zimmet Modülü (Asset Management)
+// -------------------------------------------------------------
+
+model Asset {
+  id              String            @id @default(cuid())
+  companyId       String
+  branch          String?
+  name            String
+  category        String            @default("Elektronik")
+  serialNumber    String?
+  barcode         String?           @unique
+  purchaseDate    DateTime?
+  purchasePrice   Float?
+  depreciation    Float?
+  status          String            @default("ACTIVE")
+  assignedTo      String?
+
+  company         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignments     AssetAssignment[]
+  maintenances    AssetMaintenance[]
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([companyId])
+}
+
+model AssetAssignment {
+  id              String            @id @default(cuid())
+  companyId       String
+  assetId         String
+  staffId         String
+  assignedAt      DateTime          @default(now())
+  returnedAt      DateTime?
+  status          String            @default("ACTIVE")
+  notes           String?
+  signatureDocId  String?
+  isSigned        Boolean           @default(false)
+
+  asset           Asset             @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  staff           Staff             @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([companyId])
+  @@index([assetId])
+  @@index([staffId])
+}
+
+model AssetMaintenance {
+  id              String            @id @default(cuid())
+  companyId       String
+  assetId         String
+  maintenanceDate DateTime          @default(now())
+  type            String            @default("REPAIR")
+  cost            Float             @default(0)
+  description     String?
+  supplierId      String?
+  invoiceRef      String?
+
+  asset           Asset             @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([companyId])
+  @@index([assetId])
 }

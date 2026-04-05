@@ -65,6 +65,7 @@ export default function Sidebar() {
             'campaigns-parent': ['/campaigns', '/campaigns/create', '/campaigns/active', '/campaigns/scheduled', '/campaigns/history', '/campaigns/analytics'],
             'sales-parent': ['/sales', '/sales/revenue-intelligence'],
             'inventory-parent': ['/inventory', '/inventory/warehouses', '/inventory/manufacturing', '/inventory/boms'],
+            'assets-parent': ['/assets', '/assets/assignments', '/assets/maintenance'],
             'service-parent': ['/service', '/service/work-orders', '/service/new', '/service/calendar', '/service/field/planner', '/service/field/dashboard'],
             'staff-parent': ['/staff', '/staff/performance'],
             'tasks-parent': ['/tasks']
@@ -113,6 +114,10 @@ export default function Sidebar() {
             '/customers': { perm: 'customer_view', feature: 'current_accounts' },
             '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
             '/inventory': { perm: 'inventory_view', feature: 'inventory' },
+            '/assets': { perm: 'inventory_view' },
+            '/assets/assignments': { perm: 'staff_manage' },
+            '/assets/maintenance': { perm: 'finance_view' },
+
 
             '/sales': { perm: 'sales_archive', feature: 'sales' },
             '/sales/revenue-intelligence': { perm: 'sales_archive', feature: 'sales' },
@@ -286,6 +291,17 @@ export default function Sidebar() {
                             { name: 'Envanter Genel', href: '/inventory' },
                             { name: 'Depo & Stoklar', href: '/inventory/warehouses' },
                             { name: 'Üretim Kontrol Merkezi', href: '/inventory/manufacturing' },
+                        ]
+                    },
+                    {
+                        name: 'Varlık ve Demirbaş',
+                        icon: Library,
+                        isParent: true,
+                        id: 'assets-parent',
+                        subItems: [
+                            { name: 'Demirbaş Listesi', href: '/assets' },
+                            { name: 'Zimmet Merkezi', href: '/assets/assignments' },
+                            { name: 'Bakım ve Masraflar', href: '/assets/maintenance' },
                         ]
                     },
                     {
