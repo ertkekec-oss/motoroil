@@ -580,7 +580,7 @@ export default function FieldPlannerClient() {
                                                         </div>
                                                     </>
                                                 )
-                                            )}
+                                            }
                                         </div>
                                     </>
                                 )}
