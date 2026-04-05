@@ -5,7 +5,8 @@ import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { formatCurrency } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Search, Plus, QrCode, Laptop, AlertCircle, RefreshCcw, DollarSign } from 'lucide-react';
+import { Search, Plus, QrCode, Laptop, AlertCircle, RefreshCcw, DollarSign, ScanLine } from 'lucide-react';
+import Link from 'next/link';
 import Pagination from '@/components/Pagination';
 
 const ITEMS_PER_PAGE = 10;
@@ -168,6 +169,13 @@ export default function AssetsPage() {
                         >
                             <RefreshCcw className="w-4 h-4" />
                         </button>
+                        <Link
+                            href="/assets/audits"
+                            className="h-[36px] px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
+                        >
+                            <ScanLine className="w-4 h-4" />
+                            FİZİKSEL SAYIM BAŞLAT
+                        </Link>
                         <button
                             onClick={() => setIsAddModalOpen(true)}
                             className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm whitespace-nowrap"
@@ -250,13 +258,29 @@ export default function AssetsPage() {
                                             <div className={`font-semibold text-[14px] ${textValueClass}`}>
                                                 {formatCurrency(Number(asset.purchasePrice))}
                                             </div>
-                                            <div className="text-[11px] opacity-70">
-                                                Alış: {new Date(asset.purchaseDate).toLocaleDateString('tr-TR')}
+                                            <div className="flex flex-col gap-0.5 mt-1">
+                                                <div className="text-[11px] opacity-70">
+                                                    Alış: {new Date(asset.purchaseDate).toLocaleDateString('tr-TR')}
+                                                </div>
+                                                {/* Amortisman Hesaplama (%20 Yıllık Düşüş) */}
+                                                {(() => {
+                                                    const yearsDiff = (new Date().getTime() - new Date(asset.purchaseDate).getTime()) / (1000 * 60 * 60 * 24 * 365);
+                                                    let currentValue = Number(asset.purchasePrice) - (Number(asset.purchasePrice) * 0.20 * yearsDiff);
+                                                    if (currentValue < 0) currentValue = 0;
+                                                    const depreciationAmount = Number(asset.purchasePrice) - currentValue;
+                                                    
+                                                    return (
+                                                        <div className="text-[10px] text-rose-500 font-bold mt-1 border-t border-rose-500/20 pt-1 inline-block">
+                                                            -{formatCurrency(depreciationAmount)} (Kayıp)
+                                                        </div>
+                                                    )
+                                                })()}
                                             </div>
                                         </td>
                                         <td className="px-5 py-3 align-middle text-[12px] font-semibold text-slate-600 dark:text-slate-400 text-right">
-                                           {/* Details coming soon */}
-                                           <button className="px-4 py-1.5 h-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[6px] font-bold text-[11px] transition-all whitespace-nowrap shadow-sm">Seçenekler</button>
+                                           <Link href="/assets/audits" className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[6px] font-bold text-[11px] transition-all whitespace-nowrap shadow-sm">
+                                              Sayıma Git
+                                           </Link>
                                         </td>
                                     </tr>
                                 );
@@ -322,10 +346,12 @@ export default function AssetsPage() {
                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm z-[9999]">
                     <div className={`w-full max-w-[340px] rounded-[24px] shadow-2xl animate-in fade-in zoom-in-95 ${cardClass}`}>
                         <div className="p-8 flex flex-col items-center justify-center text-center">
-                            <div className="w-48 h-48 bg-white border-2 border-slate-200 rounded-[12px] flex items-center justify-center mb-4">
-                                {/* In a real implementation we would render QRCode canvas here using qrcode.react */}
-                                <QrCode className="w-16 h-16 text-slate-300"/>
-                                <span className="absolute text-[10px] text-slate-400 font-bold max-w-[150px]">Karekod Oluşturuldu</span>
+                            <div className="w-48 h-48 bg-white border-2 border-slate-200 rounded-[12px] flex items-center justify-center mb-4 p-2 relative overflow-hidden">
+                                <img 
+                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(selectedQr.barcode)}`} 
+                                    alt="Asset QR" 
+                                    className="w-full h-full object-contain"
+                                />
                             </div>
                             <h3 className={`font-bold text-[16px] mb-1 ${textValueClass}`}>{selectedQr.name}</h3>
                             <div className={`font-mono text-[13px] px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-md tracking-widest ${textLabelClass}`}>
