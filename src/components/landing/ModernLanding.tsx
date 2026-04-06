@@ -94,7 +94,7 @@ export default function ModernLanding() {
     return (
         <div className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
             
-            <LoginSpotlight isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} />
+            <LoginHoloModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} />
 
             {/* Faint Background Geometry Block (Approximation for the Hero Left) */}
             <div className="absolute top-10 -left-64 w-[500px] h-[500px] bg-white rounded-[100px] rotate-45 opacity-40 z-0"></div>
@@ -224,9 +224,9 @@ export default function ModernLanding() {
                             {Array.from({length: 16}).map((_, i) => <div key={i} className="bg-[#0E1528] rounded-[2px]" />)}
                         </div>
 
-                        {/* Main Subject Card (Holo Login Concept) */}
-                        <div className="w-[85%] max-w-[420px] relative z-20 flex justify-center items-center h-[500px]">
-                            <Login3DHoloCard />
+                        {/* Main Subject Card (Rounded Arches) */}
+                        <div className="w-[85%] max-w-[420px] bg-white rounded-t-[120px] rounded-b-[40px] p-1.5 pb-0 shadow-[0_30px_60px_rgba(0,0,0,0.05)] relative z-20">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" alt="Business Professional" className="w-full h-[500px] object-cover rounded-t-[115px] rounded-b-[38px] grayscale-[0.3]" />
                         </div>
 
                         {/* Floating Card 1: Trustpilot (Top Right) */}
@@ -349,25 +349,16 @@ export default function ModernLanding() {
                                 </div>
                             </div>
 
-                            {/* Concept 2: Inline Bento Widget Login */}
-                            <div className="md:col-span-4 h-[240px] rounded-md bg-[#0E1528] p-6 flex flex-col justify-center shadow-lg relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#2563EB] rounded-full blur-[60px] opacity-20"></div>
-                                <h3 className="text-white text-xl font-bold mb-1">Sisteme Dön</h3>
-                                <p className="text-slate-400 text-[12px] mb-4">Hemen aktif seansınıza devam edin.</p>
-                                
-                                <form className="space-y-3 z-10" onSubmit={e => e.preventDefault()}>
-                                    <div className="flex bg-white/10 rounded border border-white/10 focus-within:border-[#2563EB] transition-colors p-1">
-                                        <input type="email" placeholder="E-posta" className="bg-transparent text-white text-sm outline-none px-3 py-1.5 w-full placeholder:text-slate-500" />
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <input type="password" placeholder="Şifre" className="bg-white/10 rounded border border-white/10 text-white text-sm outline-none px-4 py-2 w-full placeholder:text-slate-500 focus-within:border-[#2563EB] transition-colors" />
-                                        <button className="bg-[#2563EB] hover:bg-blue-600 transition-colors text-white rounded px-4 font-bold flex items-center justify-center">
-                                            <ArrowRight className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </form>
-                                <div className="absolute bottom-2 right-4 text-[9px] uppercase tracking-widest text-[#2563EB] font-bold opacity-60">
-                                    Konsept 2: Bento Kutu
+                            {/* Bottom Left: Cyan Card */}
+                            <div className="md:col-span-4 h-[240px] rounded-md bg-[#BCEBFA] p-6 flex flex-col justify-between shadow-sm">
+                                <div className="flex -space-x-2">
+                                    <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                                    <img src="https://i.pravatar.cc/100?img=5" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                                    <img src="https://i.pravatar.cc/100?img=6" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                                </div>
+                                <div>
+                                    <h3 className="text-[#0E1528] text-[42px] font-medium leading-none mb-2">30x</h3>
+                                    <p className="text-[#0E1528]/80 text-[14px] font-medium italic leading-snug">Zaman tasarrufu sağlayan kusursuz altyapı.</p>
                                 </div>
                             </div>
 
