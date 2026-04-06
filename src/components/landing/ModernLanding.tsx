@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-    Search, Moon, Sun, Play, ArrowUpRight, Check, Star, Facebook, Twitter, Instagram, Linkedin,
+    Search, Moon, Sun, Play, ArrowUpRight, ArrowRight, Zap, Check, Star, Facebook, Twitter, Instagram, Linkedin,
     Bot, Activity, PieChart, Users, Shield, Headphones, Target, Cloud, Box, Database, ShoppingBag, Layout
 } from 'lucide-react';
 
@@ -605,45 +605,50 @@ export default function ModernLanding() {
                     <p className="text-slate-500 font-medium">Büyüme hızınıza ayak uyduran paketler.</p>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8">
+                <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 max-w-[1050px] mx-auto mt-8">
                     {/* Basic */}
-                    <div className="bg-white border border-slate-200 rounded-[32px] p-10 flex flex-col shadow-sm">
-                        <h3 className="text-2xl font-bold text-[#0E1528] mb-2">Başlangıç</h3>
-                        <p className="text-slate-500 text-sm font-medium mb-8">Küçük işletmeler için pazar yeri.</p>
-                        <div className="mb-8 font-black text-[#0E1528] text-4xl">₺990<span className="text-sm text-slate-500 font-semibold">/ay</span></div>
-                        <button className="w-full py-4 rounded-xl font-bold border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-colors mb-10">14 Gün Deneyin</button>
-                        <ul className="space-y-4 text-slate-600 font-medium">
-                            <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> Sınırlı Pazar Yeri</li>
-                            <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> Stok Takibi</li>
-                            <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> E-Fatura</li>
+                    <div className="bg-white border border-slate-200 rounded-[12px] p-8 lg:p-10 flex flex-col shadow-sm">
+                        <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Başlangıç</h3>
+                        <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.</p>
+                        <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺990<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
+                        <button className="w-full py-3.5 rounded-lg font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırlı Pazar Yeri</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Stok Takibi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>E-Fatura Kesimi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Standart Destek</li>
                         </ul>
                     </div>
 
-                    {/* Pro (Highlighted) */}
-                    <div className="bg-[#2563EB] text-white rounded-[32px] p-10 flex flex-col shadow-2xl relative transform lg:-translate-y-4 border-4 border-blue-400/30">
-                        <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#B4F23B] text-[#0E1528] font-black uppercase text-xs px-4 py-2 rounded-full shadow-lg">📈 En Popüler</div>
-                        <h3 className="text-2xl font-bold mb-2 mt-2">Profesyonel</h3>
-                        <p className="text-blue-200 text-sm font-medium mb-8">E-Ticarette büyüyenler için.</p>
-                        <div className="mb-8 font-black text-4xl">₺2,490<span className="text-sm text-blue-300 font-semibold">/ay</span></div>
-                        <button className="w-full py-4 rounded-xl font-bold bg-white text-blue-600 hover:bg-slate-50 transition-colors mb-10 shadow-lg">14 Gün Deneyin</button>
-                        <ul className="space-y-4 font-medium">
-                            <li className="flex gap-3"><Check className="w-5 h-5 shrink-0"/> Sınırsız Pazar Yeri</li>
-                            <li className="flex gap-3"><Check className="w-5 h-5 shrink-0"/> Çoklu Depo Yönetimi</li>
-                            <li className="flex gap-3"><Check className="w-5 h-5 shrink-0"/> Kargo Entegrasyonu</li>
-                            <li className="flex gap-3"><Check className="w-5 h-5 shrink-0"/> Detaylı Raporlama</li>
+                    {/* Pro */}
+                    <div className="bg-white border-2 border-[#2563EB] rounded-[12px] p-8 lg:p-10 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#2563EB] text-white font-bold text-[11px] tracking-widest uppercase px-4 py-1.5 rounded-[6px] flex items-center gap-1.5 whitespace-nowrap"><Zap className="w-3 h-3 fill-white stroke-white"/> EN POPÜLER</div>
+                        <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Profesyonel</h3>
+                        <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">E-ticarette sağlam adımlar atmak isteyen profesyoneller için tam kontrol.</p>
+                        <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺2,490<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
+                        <button className="w-full py-3.5 rounded-lg font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Pazar Yeri</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Çoklu Depo Yönetimi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Kargo Entegrasyonu</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Öncelikli Destek</li>
                         </ul>
                     </div>
 
                     {/* Enterprise */}
-                    <div className="bg-white border border-slate-200 rounded-[32px] p-10 flex flex-col shadow-sm">
-                        <h3 className="text-2xl font-bold text-[#0E1528] mb-2">Kurumsal</h3>
-                        <p className="text-slate-500 text-sm font-medium mb-8">Özel sunucu ihtiyaçları için.</p>
-                        <div className="mb-8 font-black text-[#0E1528] text-4xl">Özel<span className="text-sm text-slate-500 font-semibold">/yıllık</span></div>
-                        <button className="w-full py-4 rounded-xl font-bold border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-colors mb-10">İletişime Geçin</button>
-                        <ul className="space-y-4 text-slate-600 font-medium">
-                            <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> VDS Sunucu</li>
-                            <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> Sıfırdan Veri Aktarımı</li>
-                            <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> Özel Eğitim & SLA</li>
+                    <div className="bg-white border border-slate-200 rounded-[12px] p-8 lg:p-10 flex flex-col shadow-sm">
+                        <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Kurumsal</h3>
+                        <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Kendi altyapınızda özel sunucu ihtiyaçlarıyla sınırları kaldıran kapasite.</p>
+                        <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">Özel<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/yıllık</span></div>
+                        <button className="w-full py-3.5 rounded-lg font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
+                        <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>VDS Sunucu Yönetimi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sıfırdan Veri Aktarımı</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Bayi Ağı (B2B) Desteği</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Özel Eğitim & SLA</li>
                         </ul>
                     </div>
                 </div>
