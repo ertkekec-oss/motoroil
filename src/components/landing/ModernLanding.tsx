@@ -651,63 +651,103 @@ export default function ModernLanding() {
                 </div>
             </section>
 
-            {/* --- 8. FOOTER (image_6.png) --- */}
-            <footer className="bg-[#0b0c10] text-slate-400 pt-24 pb-12 mt-10 rounded-t-[40px]">
+            {/* --- 8. FOOTER (Exsit Redesign) --- */}
+            <footer className="bg-[#000000] text-slate-400 pt-24 pb-8 mt-10">
                 <div className="max-w-[1300px] mx-auto px-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-20">
-                        {/* 1. Column - Brand */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20 text-[13px]">
+                        
+                        {/* 1. Column - Brand & Subscribe (Span 4) */}
+                        <div className="lg:col-span-4 lg:pr-10">
+                            {/* Logo */}
+                            <div className="flex items-center gap-2 mb-10">
+                                 <div className="flex gap-1 items-center">
+                                     <div className="w-[18px] h-[22px] bg-blue-600 rounded-sm skew-x-[-15deg]"></div>
+                                     <div className="w-[8px] h-[22px] bg-white rounded-sm skew-x-[-15deg]"></div>
+                                 </div>
+                                <span className="text-[22px] font-bold tracking-tight text-white ml-2">Periodya</span>
+                            </div>
+                            
+                            {/* Subscribe */}
+                            <div className="bg-[#111111] rounded-xl flex items-center p-1.5 border border-white/5 mb-6">
+                                <div className="pl-3 pr-2">
+                                    <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                </div>
+                                <input type="email" placeholder="Email Address" className="bg-transparent border-none text-white text-[13px] px-2 py-2 flex-1 focus:outline-none placeholder-slate-500" />
+                                <button className="bg-[#2563EB] text-white text-[13px] font-bold px-6 py-2.5 rounded-lg hover:bg-blue-500 transition-colors">Sign Up &nbsp;&gt;</button>
+                            </div>
+                            <p className="text-slate-500 text-[12px] font-medium tracking-wide">By subscribing, you're accept <span className="text-white font-bold cursor-pointer hover:underline">Privacy Policy</span></p>
+                        </div>
+
+                        {/* 2. Column - My account (Span 2) */}
                         <div className="lg:col-span-2">
-                            <div className="flex items-center gap-2 mb-8">
-                                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-xl">P</div>
-                                <span className="text-2xl font-bold text-white tracking-tight">Periodya</span>
+                            <h4 className="text-white font-bold text-[17px] mb-8">My account</h4>
+                            <ul className="space-y-4 font-medium text-slate-400">
+                                <li><a href="#" className="hover:text-white transition-colors">Forum Support</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Help & FAQ</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Pricing and plans</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Cookies Policy</a></li>
+                            </ul>
+                        </div>
+
+                        {/* 3. Column - Service (Span 3) */}
+                        <div className="lg:col-span-3">
+                            <h4 className="text-white font-bold text-[17px] mb-8">Service</h4>
+                            <ul className="space-y-4 font-medium text-slate-400">
+                                <li><a href="#" className="hover:text-white transition-colors">It Consultation</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Cloud Services</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">AI Machine Learning</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Data Security</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Software Development</a></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Cyber Security</a></li>
+                            </ul>
+                        </div>
+
+                        {/* 4. Column - Locations & Contact (Span 3) */}
+                        <div className="lg:col-span-3">
+                            <h4 className="text-white font-bold text-[17px] mb-6">Locations</h4>
+                            <div className="flex gap-4 mb-10 text-slate-400 font-medium leading-relaxed">
+                                <div className="mt-1 shrink-0">
+                                    <svg className="w-[18px] h-[18px] text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                </div>
+                                <p className="text-[13px]">55 Main Street, 2nd block Melbourne,<br/> Australia</p>
                             </div>
-                            <div className="space-y-4 font-semibold text-lg text-white mb-10">
-                                <p>0850 123 45 67</p>
-                                <p>merhaba@periodya.com</p>
-                            </div>
-                            <div>
-                                <h4 className="text-white font-bold mb-4">E-Bültene Abone Olun</h4>
-                                <div className="flex bg-white/5 rounded-lg border border-white/10 p-1">
-                                    <input type="email" placeholder="E-posta adresi" className="bg-transparent border-none text-white px-4 py-2 w-full focus:outline-none" />
-                                    <button className="bg-blue-600 text-white px-6 py-2 rounded-md font-bold hover:bg-blue-700 transition-colors">Gönder</button>
+
+                            <h4 className="text-white font-bold text-[17px] mb-6">Contact</h4>
+                            <div className="space-y-5 text-slate-400 font-medium">
+                                <a href="mailto:support@gmail.com" className="hover:text-white transition-colors flex items-center text-[13px]">support@gmail.com</a>
+                                <div className="flex items-center gap-3 text-white text-[19px] tracking-tight font-bold">
+                                    <svg className="w-[20px] h-[20px] text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                    +880 (123) 456 88
                                 </div>
                             </div>
                         </div>
-
-                        {/* Menus */}
-                        <div>
-                            <h4 className="text-white font-bold text-lg mb-6">Navigasyon</h4>
-                            <ul className="space-y-4 font-medium">
-                                <li><a href="#" className="hover:text-white transition-colors">Özellikler</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Pazar Yerleri</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Fiyatlandırma</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="text-white font-bold text-lg mb-6">Destek</h4>
-                            <ul className="space-y-4 font-medium">
-                                <li><a href="#" className="hover:text-white transition-colors">Yardım Merkezi</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">S.S.S.</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="text-white font-bold text-lg mb-6">Şirket</h4>
-                            <ul className="space-y-4 font-medium">
-                                <li><a href="#" className="hover:text-white transition-colors">Hakkımızda</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Kariyer</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">İletişim</a></li>
-                            </ul>
-                        </div>
                     </div>
 
-                    <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <p className="font-medium text-sm">© {new Date().getFullYear()} Periodya Yazılım. Tüm hakları saklıdır.</p>
-                        <div className="flex gap-4">
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all"><Facebook className="w-4 h-4"/></a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all"><Twitter className="w-4 h-4"/></a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all"><Instagram className="w-4 h-4"/></a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all"><Linkedin className="w-4 h-4"/></a>
+                    {/* Bottom Bar */}
+                    <div className="border-t border-slate-800 border-dashed pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-6 text-[12.5px] font-medium relative">
+                        <p className="text-slate-400">© 2026 <span className="text-white hover:text-blue-600 transition-colors cursor-pointer">Periodya</span> - IT Services. All rights reserved.</p>
+                        
+                        <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 items-center">
+                            <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Facebook className="w-2.5 h-2.5 text-white fill-white"/></div> Facebook
+                            </a>
+                            <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Twitter className="w-2.5 h-2.5 text-white fill-white"/></div> Twitter
+                            </a>
+                            <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Instagram className="w-2.5 h-2.5 text-white"/></div> Instagram
+                            </a>
+                            <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Linkedin className="w-2.5 h-2.5 text-white fill-white"/></div> Pinterest
+                            </a>
+                        </div>
+
+                        {/* Target scroll to top arrow absolute positioned to right */}
+                        <div className="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-8 lg:-right-16 hidden md:block">
+                             <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="w-[38px] h-[38px] bg-[#2563EB] hover:bg-blue-500 rounded-full flex justify-center items-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)] transition-all">
+                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                             </button>
                         </div>
                     </div>
                 </div>
