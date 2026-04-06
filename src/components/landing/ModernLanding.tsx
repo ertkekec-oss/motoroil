@@ -6,6 +6,7 @@ import {
     Search, Moon, Sun, Play, ArrowUpRight, ArrowRight, Zap, Check, Star, Facebook, Twitter, Instagram, Linkedin,
     Bot, Activity, PieChart, Users, Shield, Headphones, Target, Cloud, Box, Database, ShoppingBag, Layout
 } from 'lucide-react';
+import LoginSpotlight from './LoginSpotlight';
 
 const platformTabs = [
     {
@@ -80,6 +81,7 @@ export default function ModernLanding() {
     const [theme, setTheme] = useState('light');
     const [activeTab, setActiveTab] = useState(0);
     const [activeIntegrationTab, setActiveIntegrationTab] = useState(0);
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -91,7 +93,7 @@ export default function ModernLanding() {
     return (
         <div className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
             
-            
+            <LoginSpotlight isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} />
 
             {/* Faint Background Geometry Block (Approximation for the Hero Left) */}
             <div className="absolute top-10 -left-64 w-[500px] h-[500px] bg-white rounded-[100px] rotate-45 opacity-40 z-0"></div>
@@ -144,6 +146,9 @@ export default function ModernLanding() {
 
                         {/* Right Actions */}
                         <div className="flex items-center gap-4">
+                            <button onClick={() => setIsLoginOpen(true)} className="text-[13px] font-bold text-slate-500 hover:text-[#0E1528] transition-colors hidden sm:block">
+                                Giriş Yap
+                            </button>
                             <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-sm hover:bg-blue-600 transition-colors shadow-md">
                                 Ücretsiz Dene
                             </Link>
