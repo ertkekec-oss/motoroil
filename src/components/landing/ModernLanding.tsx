@@ -18,7 +18,7 @@ export default function ModernLanding() {
     }, []);
 
     return (
-        <div style={{ zoom: 0.75 }} className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
+        <div className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
             
             {/* --- GLOBAL BACKGROUND DOTS --- */}
             <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#d1d5db 1px, transparent 1px)', backgroundSize: '24px 24px', opacity: 0.5 }}></div>
@@ -74,8 +74,8 @@ export default function ModernLanding() {
                             Online program is now available
                         </div>
                         
-                        <h1 className="text-4xl md:text-[48px] font-bold tracking-tight leading-[1.05] text-[#0E1528] mb-6">
-                            Periodya ile E-Ticaret ve Muhasebede <br/>
+                        <h1 className="text-3xl md:text-5xl lg:text-5xl font-black tracking-tight leading-tight text-[#0E1528] mb-6 max-w-lg">
+                            Periodya ile E-Ticaret ve Muhasebede <br className="hidden md:block"/>
                             <span className="text-[#2563EB]">Üstün</span> Sonuçlar
                         </h1>
                         
@@ -208,8 +208,8 @@ export default function ModernLanding() {
                             <img src="https://i.pravatar.cc/100?img=6" className="w-12 h-12 rounded-full border-2 border-[#A8F0FF]" alt="User" />
                         </div>
                         <div>
-                            <h3 className="text-[#0E1528] text-[48px] font-bold leading-none mb-2">10x</h3>
-                            <p className="text-[#0E1528]/80 text-lg font-medium italic leading-tight">Zaman tasarrufu sağlayan kusursuz entegrasyon altyapısı.</p>
+                            <h3 className="text-[#0E1528] text-5xl md:text-6xl font-black leading-none mb-2">10x</h3>
+                            <p className="text-[#0E1528]/80 text-base md:text-lg font-medium italic leading-tight">Zaman tasarrufu sağlayan kusursuz entegrasyon altyapısı.</p>
                         </div>
                     </div>
 
@@ -270,7 +270,7 @@ export default function ModernLanding() {
 
                     {/* Right Content */}
                     <div className="lg:pl-10">
-                        <h2 className="text-3xl md:text-[42px] font-bold text-[#0E1528] leading-[1.05] mb-6">
+                        <h2 className="text-3xl md:text-4xl font-black text-[#0E1528] leading-tight mb-6">
                             Periodya ile Operasyonel Verimliliğinizi %50 Artırın.
                         </h2>
                         <p className="text-[#0E1528]/70 text-lg font-medium leading-relaxed mb-12">
@@ -279,8 +279,8 @@ export default function ModernLanding() {
 
                         <div className="space-y-10">
                             {/* Stat 1 */}
-                            <div className="flex gap-8 items-start">
-                                <h3 className="text-[54px] font-bold text-[#0E1528] leading-none whitespace-nowrap">5.2m</h3>
+                            <div className="flex gap-6 items-start">
+                                <h3 className="text-4xl md:text-5xl font-black text-[#0E1528] leading-none whitespace-nowrap">5.2m</h3>
                                 <div>
                                     <p className="text-[#0E1528]/70 font-medium mb-3">Ortak başarı vizyonumuzda bize güvenen işletmeler üzerinden geçen başarılı işlem hacmi.</p>
                                     <Link href="#" className="text-[#0E1528] font-bold text-sm flex items-center gap-1 hover:text-blue-600">Read more <ArrowUpRight className="w-3 h-3" /></Link>
@@ -288,8 +288,8 @@ export default function ModernLanding() {
                             </div>
                             
                             {/* Stat 2 */}
-                            <div className="flex gap-8 items-start">
-                                <h3 className="text-[54px] font-bold text-[#0E1528] leading-none whitespace-nowrap">3.1k</h3>
+                            <div className="flex gap-6 items-start">
+                                <h3 className="text-4xl md:text-5xl font-black text-[#0E1528] leading-none whitespace-nowrap">3.1k</h3>
                                 <div>
                                     <p className="text-[#0E1528]/70 font-medium mb-3">Türkiye çapında kesintisiz hizmet alan ve operasyonlarını yöneten aktif e-ticaret mağazası.</p>
                                     <Link href="#" className="text-[#0E1528] font-bold text-sm flex items-center gap-1 hover:text-blue-600">Read more <ArrowUpRight className="w-3 h-3" /></Link>
@@ -309,7 +309,7 @@ export default function ModernLanding() {
                     
                     {/* Left Content */}
                     <div>
-                        <h2 className="text-3xl md:text-[38px] font-bold text-[#0E1528] leading-[1.05] mb-6">
+                        <h2 className="text-3xl md:text-4xl font-black text-[#0E1528] leading-tight mb-6">
                             Operasyonlarınızı Anlayın, Müşterilerinizi Mutlu Edin
                         </h2>
                         <p className="text-[#0E1528]/70 text-lg font-medium leading-relaxed mb-8">
@@ -344,16 +344,16 @@ export default function ModernLanding() {
             {/* --- 7. PRICING --- */}
             <section className="py-32 max-w-[1300px] mx-auto px-6">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-[#0E1528] mb-4">Esnek Fiyatlandırma</h2>
+                    <h2 className="text-2xl md:text-3xl font-black text-[#0E1528] mb-4">Esnek Fiyatlandırma</h2>
                     <p className="text-slate-500 font-medium">Büyüme hızınıza ayak uyduran paketler.</p>
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Basic */}
                     <div className="bg-white border border-slate-200 rounded-[32px] p-10 flex flex-col shadow-sm">
-                        <h3 className="text-[28px] font-bold text-[#0E1528] mb-2">Başlangıç</h3>
-                        <p className="text-slate-500 font-medium mb-8">Küçük işletmeler için pazar yeri.</p>
-                        <div className="mb-8 font-black text-[#0E1528] text-5xl">₺990<span className="text-lg text-slate-500 font-semibold">/ay</span></div>
+                        <h3 className="text-2xl font-bold text-[#0E1528] mb-2">Başlangıç</h3>
+                        <p className="text-slate-500 text-sm font-medium mb-8">Küçük işletmeler için pazar yeri.</p>
+                        <div className="mb-8 font-black text-[#0E1528] text-4xl">₺990<span className="text-sm text-slate-500 font-semibold">/ay</span></div>
                         <button className="w-full py-4 rounded-xl font-bold border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-colors mb-10">14 Gün Deneyin</button>
                         <ul className="space-y-4 text-slate-600 font-medium">
                             <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> Sınırlı Pazar Yeri</li>
@@ -365,9 +365,9 @@ export default function ModernLanding() {
                     {/* Pro (Highlighted) */}
                     <div className="bg-[#2563EB] text-white rounded-[32px] p-10 flex flex-col shadow-2xl relative transform lg:-translate-y-4 border-4 border-blue-400/30">
                         <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#B4F23B] text-[#0E1528] font-black uppercase text-xs px-4 py-2 rounded-full shadow-lg">📈 En Popüler</div>
-                        <h3 className="text-[28px] font-bold mb-2">Profesyonel</h3>
-                        <p className="text-blue-200 font-medium mb-8">E-Ticarette büyüyenler için.</p>
-                        <div className="mb-8 font-black text-5xl">₺2,490<span className="text-lg text-blue-300 font-semibold">/ay</span></div>
+                        <h3 className="text-2xl font-bold mb-2 mt-2">Profesyonel</h3>
+                        <p className="text-blue-200 text-sm font-medium mb-8">E-Ticarette büyüyenler için.</p>
+                        <div className="mb-8 font-black text-4xl">₺2,490<span className="text-sm text-blue-300 font-semibold">/ay</span></div>
                         <button className="w-full py-4 rounded-xl font-bold bg-white text-blue-600 hover:bg-slate-50 transition-colors mb-10 shadow-lg">14 Gün Deneyin</button>
                         <ul className="space-y-4 font-medium">
                             <li className="flex gap-3"><Check className="w-5 h-5 shrink-0"/> Sınırsız Pazar Yeri</li>
@@ -379,9 +379,9 @@ export default function ModernLanding() {
 
                     {/* Enterprise */}
                     <div className="bg-white border border-slate-200 rounded-[32px] p-10 flex flex-col shadow-sm">
-                        <h3 className="text-[28px] font-bold text-[#0E1528] mb-2">Kurumsal</h3>
-                        <p className="text-slate-500 font-medium mb-8">Özel sunucu ihtiyaçları için.</p>
-                        <div className="mb-8 font-black text-[#0E1528] text-5xl">Özel<span className="text-lg text-slate-500 font-semibold">/yıllık</span></div>
+                        <h3 className="text-2xl font-bold text-[#0E1528] mb-2">Kurumsal</h3>
+                        <p className="text-slate-500 text-sm font-medium mb-8">Özel sunucu ihtiyaçları için.</p>
+                        <div className="mb-8 font-black text-[#0E1528] text-4xl">Özel<span className="text-sm text-slate-500 font-semibold">/yıllık</span></div>
                         <button className="w-full py-4 rounded-xl font-bold border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-colors mb-10">İletişime Geçin</button>
                         <ul className="space-y-4 text-slate-600 font-medium">
                             <li className="flex gap-3"><Check className="w-5 h-5 text-blue-600 shrink-0"/> VDS Sunucu</li>
