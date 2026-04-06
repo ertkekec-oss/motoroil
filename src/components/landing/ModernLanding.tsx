@@ -32,31 +32,43 @@ const platformTabs = [
 
 const integrationItems = [
     {
+        title: "Başlarken",
+        contentTitle: "150,000+ Şirketin Güvendiği ERP",
+        descLine1: "",
+        descLine2: "Büyük hacimli e-ticaret siteleri Periodya ile çalışıyor — sizin de işinize yarayacak.",
+        logos: ["Trendyol", "Hepsiburada", "Akbank", "Garanti", "Gittigidiyor"]
+    },
+    {
         title: "E-Ticaret",
+        contentTitle: "E-Ticaret Çözümleri",
         descLine1: "Tüm pazaryeri satışlarınızı ve stoklarınızı tek bir merkezden kolayca yönetin.",
         descLine2: "Siparişten kargoya, faturalandırmadan müşteri ilişkilerine kadar tam entegrasyon.",
         logos: ["Trendyol", "Hepsiburada", "N11", "Çiçeksepeti", "Amazon", "PttAVM", "Shopify"]
     },
     {
         title: "Banka",
+        contentTitle: "Banka Çözümleri",
         descLine1: "Türkiye'nin önde gelen tüm bankalarıyla direkt API üzerinden çalışarak hesaplarınızı anında izleyin.",
         descLine2: "Hesap hareketleri, otomatik virman ve bakiye mutabakatı artık saniyeler içinde.",
         logos: ["Garanti BBVA", "Akbank", "İş Bankası", "Yapı Kredi", "Ziraat Bankası", "QNB Finans"]
     },
     {
         title: "E-Fatura",
+        contentTitle: "E-Fatura Çözümleri",
         descLine1: "Gelir İdaresi Başkanlığı onaylı operatörlerle saniyeler içinde e-fatura ve e-arşiv kesin.",
         descLine2: "Maliyetlerinizi düşürün ve muhasebe süreçlerinizi dijitalin hızıyla kusursuzlaştırın.",
         logos: ["QNB eFinans", "Digital Planet", "Sovos", "Uyumsoft", "GİB Portal", "Türkkep"]
     },
     {
         title: "Ödeme",
+        contentTitle: "Ödeme Çözümleri",
         descLine1: "B2B ve B2C müşterilerinizden dilediğiniz kredi kartıyla 7/24 güvenli online tahsilat yapın.",
         descLine2: "Düşük komisyon oranları ve ertesi gün sanal POS aktarımıyla nakit akışınızı koruyun.",
         logos: ["PayTR", "İyzico", "Param", "Ozan", "Sipay", "Moka"]
     },
     {
         title: "Yazarkasa POS",
+        contentTitle: "Yazarkasa POS Çözümleri",
         descLine1: "Mağazadaki fiziksel satışlarınızı ERP sisteminizle anlık senkronize eden akıllı altyapı.",
         descLine2: "Yeni nesil ÖKC (Ödeme Kaydedici Cihaz) entegrasyonuyla stok ve maliye bildirim problemlerine son verin.",
         logos: ["Beko", "Ingenico", "Profilo", "Hugin", "Vera", "Paygo"]
@@ -264,25 +276,18 @@ export default function ModernLanding() {
             </section>
 
             {/* --- 3. DYNAMIC INTEGRATIONS TABS --- */}
-            <section className="pt-4 pb-12 md:pt-4 md:pb-16 max-w-[1050px] mx-auto px-6 relative z-10 w-full">
+            <section className="pt-4 pb-12 md:pt-4 md:pb-16 max-w-[1200px] mx-auto px-6 relative z-10 w-full text-center">
                 
-                {/* Header Pattern with Button */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
-                    <div>
-                        <h2 className="text-xl md:text-2xl lg:text-3xl text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
-                            <span className="font-extrabold">Sıradışı Bir Entegrasyon</span> <span className="font-light">Ağı</span>
-                        </h2>
-                        <p className="text-slate-500 font-medium text-[15px]">Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.</p>
-                    </div>
-                    <div className="mt-2 md:mt-0 shrink-0">
-                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
-                            Tüm Entegrasyonlar <ArrowUpRight className="w-4 h-4"/>
-                        </Link>
-                    </div>
+                {/* Header Pattern Centered */}
+                <div className="mb-10">
+                    <h2 className="text-3xl md:text-4xl lg:text-[42px] text-[#0E1528] leading-[1.1] mb-4 tracking-tight">
+                        <span className="font-extrabold">Sıradışı Bir Entegrasyon</span> <span className="font-light">Ağı</span>
+                    </h2>
+                    <p className="text-slate-500 font-medium text-[16px]">Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.</p>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-6">
+                <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3 mb-8">
                     {integrationItems.map((item, idx) => (
                         <button 
                             key={idx}
@@ -300,7 +305,7 @@ export default function ModernLanding() {
 
                 {/* Tab Content Box */}
                 <div className="bg-white border border-slate-200 rounded-[24px] p-10 shadow-sm min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <h3 className="text-2xl font-bold text-[#0E1528] mb-3">{integrationItems[activeIntegrationTab].title} Çözümleri</h3>
+                    <h3 className="text-2xl md:text-3xl font-bold text-[#0E1528] mb-4 tracking-tight">{integrationItems[activeIntegrationTab].contentTitle}</h3>
                     <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-1">
                         {integrationItems[activeIntegrationTab].descLine1}
                     </p>
