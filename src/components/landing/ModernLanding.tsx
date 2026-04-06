@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
     Search, Moon, Sun, Play, ArrowUpRight, Check, Star, Facebook, Twitter, Instagram, Linkedin,
-    Bot, Activity, PieChart, Users, Shield, Headphones, Target, Cloud
+    Bot, Activity, PieChart, Users, Shield, Headphones, Target, Cloud, Box, Database, ShoppingBag, Layout
 } from 'lucide-react';
 
 const platformTabs = [
@@ -407,44 +407,93 @@ export default function ModernLanding() {
                 </div>
             </section>
 
-            {/* --- 6. FEATURE / VIDEO SECTION (image_6.png layout) --- */}
-            <section className="py-24 z-10 relative">
-                {/* Yellowish full-width background box */}
-                <div className="absolute inset-0 bg-[#FAFAEE] border-y border-[#F3F4E6] -z-10"></div>
-                
-                <div className="max-w-[1300px] mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center py-20">
+            {/* --- 6. INTEGRATION / WHY CHOOSE US SECTION (Exsit Redesign) --- */}
+            <section className="py-24 lg:py-32 bg-white relative z-10 w-full overflow-hidden">
+                <div className="max-w-[1300px] mx-auto px-6 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
                     
-                    {/* Left Content */}
-                    <div>
-                        <h2 className="text-3xl md:text-4xl font-black text-[#0E1528] leading-tight mb-6">
-                            Operasyonlarınızı Anlayın, Müşterilerinizi Mutlu Edin
-                        </h2>
-                        <p className="text-[#0E1528]/70 text-lg font-medium leading-relaxed mb-8">
-                            İster yeni bir şirket olun, ister köklü bir kurum; Periodya modern e-ticaret operasyonlarınız üzerinde size tam bağımsızlık tanır.
-                        </p>
+                    {/* Left Column (Image & Floating Integration Nodes) */}
+                    <div className="relative flex justify-center">
+                        {/* Background faint circle overlay behind image */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-slate-50 rounded-full -z-10"></div>
 
-                        <div className="flex flex-wrap gap-4">
-                            {[
-                                "Bulut Tabanlı Altyapı", "E-Fatura Entegrasyonu", 
-                                "Otomatik Stok Güncelleme", "Hızlı Sipariş İşleme", "Kusursuz Veri Mimarisi"
-                            ].map((f, i) => (
-                                <div key={i} className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2.5 rounded-full text-sm font-semibold text-[#0E1528] shadow-sm">
-                                    <Check className="w-4 h-4 text-slate-800" /> {f}
-                                </div>
-                            ))}
+                        {/* Main Photography Card */}
+                        <div className="w-[85%] max-w-[420px] rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] relative z-20">
+                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Team meeting" className="w-full h-[550px] object-cover" />
+                        </div>
+
+                        {/* Floating Node 1: Red/Pink (Top Left) */}
+                        <div className="absolute top-10 -left-2 lg:-left-6 w-20 h-20 bg-white rounded-2xl shadow-xl flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
+                             <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500">
+                                 <Layout strokeWidth={2} className="w-5 h-5"/>
+                             </div>
+                        </div>
+
+                        {/* Floating Node 2: Black Logo Box (Top Right) */}
+                        <div className="absolute top-12 -right-4 lg:right-6 w-[88px] h-[88px] bg-white rounded-2xl shadow-xl flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
+                             <div className="w-12 h-12 bg-[#0E1528] rounded-xl flex items-center justify-center text-white">
+                                 <Box strokeWidth={2} className="w-6 h-6"/>
+                             </div>
+                        </div>
+
+                        {/* Floating Node 3: Outline Icon Box (Middle Left) */}
+                        <div className="absolute top-1/2 -translate-y-1/2 left-2 lg:-left-4 w-24 h-24 bg-white rounded-[20px] shadow-[0_15px_40px_rgba(0,0,0,0.1)] flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
+                             <Activity strokeWidth={1.5} className="w-10 h-10 text-[#0E1528]"/>
+                        </div>
+
+                        {/* Floating Node 4: Colorful Polygon/Layer (Bottom Right) */}
+                        <div className="absolute bottom-20 -right-6 lg:-right-4 w-28 h-28 bg-white rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
+                             <div className="grid grid-cols-2 grid-rows-2 gap-1 w-12 h-12 rotate-45">
+                                 <div className="bg-orange-500 rounded-sm"></div>
+                                 <div className="bg-sky-500 rounded-sm"></div>
+                                 <div className="bg-rose-500 rounded-sm"></div>
+                                 <div className="bg-teal-400 rounded-sm"></div>
+                             </div>
                         </div>
                     </div>
 
-                    {/* Right Video Image */}
-                    <div className="relative rounded-[24px] overflow-hidden shadow-2xl cursor-pointer group">
-                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=80" alt="Students/Startup team" className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-700" />
+                    {/* Right Column (Content) */}
+                    <div className="lg:pl-8">
+                        <div className="inline-block px-5 py-1.5 bg-[#2563EB] shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-white font-bold text-[10px] uppercase tracking-wide rounded-full mb-8">
+                            Neden Bizi Seçmelisiniz
+                        </div>
                         
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.2)] group-hover:scale-110 transition-transform">
-                                <Play className="w-8 h-8 fill-[#0E1528] text-[#0E1528] ml-2" />
+                        <h2 className="text-[38px] md:text-[46px] text-[#0E1528] leading-[1.1] tracking-tight mb-8">
+                            <span className="font-bold">Periodya</span> <span className="font-light">operasyonlarınızı optimize ederek ekibinizin performansını artırır ve</span> <span className="font-bold">Büyümeyi hızlandırır.</span>
+                        </h2>
+                        
+                        <p className="text-slate-500 font-medium text-[13px] md:text-sm leading-relaxed mb-12 max-w-[480px]">
+                            Günümüz rekabetçi e-ticaret pazarında, etkin ve düşük maliyetli yazılım çözümlerine olan talep hiç bu kadar kritik olmamıştı. Sizi bir adım öne taşıyoruz.
+                        </p>
+
+                        <div className="grid sm:grid-cols-2 gap-6 mb-12">
+                            {/* Card 1 */}
+                            <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-2xl border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
+                                <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">Uzmanlık & Özelleştirme</h4>
+                                <p className="text-slate-400 text-[12px] font-medium leading-relaxed">
+                                    Ekibimiz size özel tasarlanmış tam teşekküllü donanımlar ve büyüme planları sunar.
+                                </p>
+                            </div>
+                            
+                            {/* Card 2 */}
+                            <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-2xl border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
+                                <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">Kesintisiz Entegrasyon</h4>
+                                <p className="text-slate-400 text-[12px] font-medium leading-relaxed">
+                                    Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Huge Number Row */}
+                        <div className="flex items-center gap-6 pt-4 border-t border-slate-100">
+                            <div className="text-[64px] md:text-[76px] text-[#2563EB] font-light leading-none tracking-tight">
+                                1.3m
+                            </div>
+                            <div className="text-sm font-bold text-[#0E1528] leading-relaxed max-w-[150px]">
+                                Yıllık ortalama işlenen başarılı paket hacmi.
                             </div>
                         </div>
                     </div>
+
                 </div>
             </section>
 
