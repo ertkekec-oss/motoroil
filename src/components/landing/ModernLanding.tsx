@@ -74,7 +74,7 @@ export default function ModernLanding() {
                             Online program is now available
                         </div>
                         
-                        <h1 className="text-5xl md:text-[68px] font-bold tracking-tight leading-[1.05] text-[#0E1528] mb-6">
+                        <h1 className="text-4xl md:text-[48px] font-bold tracking-tight leading-[1.05] text-[#0E1528] mb-6">
                             Periodya ile E-Ticaret ve Muhasebede <br/>
                             <span className="text-[#2563EB]">Üstün</span> Sonuçlar
                         </h1>
@@ -166,7 +166,7 @@ export default function ModernLanding() {
                 {/* Section Header */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12">
                     <div className="max-w-xl">
-                        <h2 className="text-3xl md:text-5xl font-bold text-[#0E1528] leading-[1.1] mb-2">
+                        <h2 className="text-2xl md:text-4xl font-bold text-[#0E1528] leading-[1.1] mb-2">
                             Kusursuz entegrasyon ile <br/>operasyonlarınızı <span className="text-[#0E1528]">hızlandırın</span>
                         </h2>
                         <p className="text-slate-500 font-medium">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
@@ -208,7 +208,7 @@ export default function ModernLanding() {
                             <img src="https://i.pravatar.cc/100?img=6" className="w-12 h-12 rounded-full border-2 border-[#A8F0FF]" alt="User" />
                         </div>
                         <div>
-                            <h3 className="text-[#0E1528] text-[64px] font-bold leading-none mb-2">10x</h3>
+                            <h3 className="text-[#0E1528] text-[48px] font-bold leading-none mb-2">10x</h3>
                             <p className="text-[#0E1528]/80 text-lg font-medium italic leading-tight">Zaman tasarrufu sağlayan kusursuz entegrasyon altyapısı.</p>
                         </div>
                     </div>
@@ -270,7 +270,7 @@ export default function ModernLanding() {
 
                     {/* Right Content */}
                     <div className="lg:pl-10">
-                        <h2 className="text-4xl md:text-[54px] font-bold text-[#0E1528] leading-[1.05] mb-6">
+                        <h2 className="text-3xl md:text-[42px] font-bold text-[#0E1528] leading-[1.05] mb-6">
                             Periodya ile Operasyonel Verimliliğinizi %50 Artırın.
                         </h2>
                         <p className="text-[#0E1528]/70 text-lg font-medium leading-relaxed mb-12">
@@ -309,7 +309,7 @@ export default function ModernLanding() {
                     
                     {/* Left Content */}
                     <div>
-                        <h2 className="text-[44px] font-bold text-[#0E1528] leading-[1.05] mb-6">
+                        <h2 className="text-3xl md:text-[38px] font-bold text-[#0E1528] leading-[1.05] mb-6">
                             Operasyonlarınızı Anlayın, Müşterilerinizi Mutlu Edin
                         </h2>
                         <p className="text-[#0E1528]/70 text-lg font-medium leading-relaxed mb-8">
@@ -344,7 +344,7 @@ export default function ModernLanding() {
             {/* --- 7. PRICING --- */}
             <section className="py-32 max-w-[1300px] mx-auto px-6">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-[#0E1528] mb-4">Esnek Fiyatlandırma</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-[#0E1528] mb-4">Esnek Fiyatlandırma</h2>
                     <p className="text-slate-500 font-medium">Büyüme hızınıza ayak uyduran paketler.</p>
                 </div>
 
