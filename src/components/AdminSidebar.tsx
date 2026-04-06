@@ -205,6 +205,17 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
           </NavGroup>
         )}
       </div>
+      {/* 3. PARTİ YAZILIMLAR */}
+      {isSuper && (
+        <div className="space-y-1 mb-6">
+          <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            3. PARTİ YAZILIMLAR & APİ
+            <Zap className="w-4 h-4 text-indigo-500" />
+          </div>
+          <NavItem href="/admin/integrations" icon={Network} label="Entegrasyon Merkezi (Hub)" />
+        </div>
+      )}
+
 
       {/* B2B GLOBAL - Sabit başlık */}
       <div className="space-y-1 mb-6">
@@ -239,11 +250,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                 icon={ArrowRightLeft}
                 label="Ödeme Kontrolü"
               />
-              <NavItem
-                href="/admin/payments-escrow/providers"
-                icon={CreditCard}
-                label="Ödeme Sağlayıcıları"
-              />
+              
               <NavItem
                 href="/admin/payments-escrow/audit"
                 icon={ShieldCheck}
@@ -336,11 +343,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
               icon={HardDrive}
               groupKey="system"
             >
-              <NavItem
-                href="/admin/integrations"
-                icon={Server}
-                label="Entegrasyon Merkezi (Yeni)"
-              />
+              
               <NavItem
                 href="/admin/ops/fintech"
                 icon={DatabaseZap}
@@ -412,11 +415,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
               icon={FileText}
               label="Şablonlar"
             />
-            <NavItem
-              href="/admin/signatures/providers"
-              icon={Server}
-              label="Sağlayıcılar"
-            />
+            
             <NavItem
               href="/admin/signatures/policies"
               icon={ShieldCheck}
@@ -513,11 +512,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
               icon={DatabaseZap}
               label="Global Kategoriler"
             />
-            <NavItem
-              href="/admin/settings/mail"
-              icon={Mail}
-              label="Mail Ayarları (Global)"
-            />
+            
             <NavItem
               href="/admin/settings/payroll"
               icon={Settings}

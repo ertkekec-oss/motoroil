@@ -62,7 +62,7 @@ const APP_STORE_ITEMS = [
         description: 'İmza zarflarında OTP (Tek Kullanımlık Şifre) doğrulaması ve tüm BA/BS Finansal Mutabakat onaylamaları için SMS servis ağı.',
         icon: <MessageSquare className="w-8 h-8 text-blue-500" />,
         color: 'blue',
-        isNative: false, // route to old
+        isNative: true,
         legacyUrl: '/admin/signatures/providers/netgsm'
     },
     {
@@ -73,7 +73,7 @@ const APP_STORE_ITEMS = [
         description: 'Tüm sistem maillerini (Faturalar, Uyarılar, Sistem Kayıtları) yöneten ana çıkış kapısı. Google Workspace veya Microsoft 365 kullanmanız önerilir.',
         icon: <Mail className="w-8 h-8 text-rose-500" />,
         color: 'rose',
-        isNative: false, // route to old
+        isNative: true,
         legacyUrl: '/admin/settings/mail'
     }
 ];
@@ -268,6 +268,43 @@ export default function IntegrationsHub() {
                                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-500"></div>
                                  </label>
                              </div>
+
+                             
+                             {activeModal.category === 'EMAIL' && (
+                                 <div className="space-y-4">
+                                     <EnterpriseInput 
+                                        label="SMTP Email Adresi" 
+                                        required 
+                                        value={formData.credentials?.email || ''}
+                                        onChange={(e: any) => setFormData({...formData, credentials: {...formData.credentials, email: e.target.value}})}
+                                     />
+                                     <EnterpriseInput 
+                                        label="Uygulama Şifresi (App Password)" 
+                                        type="password"
+                                        required 
+                                        value={formData.credentials?.password || ''}
+                                        onChange={(e: any) => setFormData({...formData, credentials: {...formData.credentials, password: e.target.value}})}
+                                     />
+                                 </div>
+                             )}
+
+                             {activeModal.category === 'SMS' && (
+                                 <div className="space-y-4">
+                                     <EnterpriseInput 
+                                        label="Kullanıcı Adı (Usercode)" 
+                                        required 
+                                        value={formData.credentials?.usercode || ''}
+                                        onChange={(e: any) => setFormData({...formData, credentials: {...formData.credentials, usercode: e.target.value}})}
+                                     />
+                                     <EnterpriseInput 
+                                        label="API Şifresi (Password)" 
+                                        type="password"
+                                        required 
+                                        value={formData.credentials?.password || ''}
+                                        onChange={(e: any) => setFormData({...formData, credentials: {...formData.credentials, password: e.target.value}})}
+                                     />
+                                 </div>
+                             )}
 
                              {activeModal.category === 'SHIPPING' && (
                                  <div className="flex items-center justify-between p-4 rounded-xl bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20">
