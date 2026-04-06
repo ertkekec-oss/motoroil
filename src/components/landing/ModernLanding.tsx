@@ -7,9 +7,33 @@ import {
     Bot, Activity, PieChart, Users, Shield, Headphones, Target, Cloud
 } from 'lucide-react';
 
+const platformTabs = [
+    {
+        title: "Kişiselleştirilmiş Çözüm", 
+        desc: "İşletmenizin spesifik ihtiyaçlarına ve hedeflerine uyacak şekilde teknolojimizi tamamen size özel hale getiriyoruz.", 
+        image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        title: "Öncü Teknoloji",
+        desc: "Sektördeki en son standartlarla inşa edilmiş entegrasyon sistemimiz sayesinde sınır tanımaz bir e-ticaret hızı sunar.",
+        image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        title: "Keşif ve Analiz",
+        desc: "Karmaşık verilerinizi sezgisel grafiklerle okuyun. Günlük kar zarar durumunuzu ve stratejilerinizi hızla analiz edin.",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        title: "Dağıtım ve Destek",
+        desc: "Mükemmel sonuçları garanti eden kişiselleştirilmiş teknoloji optimizasyonu ve daima arkanızda duran 7/24 uzman desteği.",
+        image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80"
+    }
+];
+
 export default function ModernLanding() {
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState('light');
+    const [activeTab, setActiveTab] = useState(0);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -278,52 +302,106 @@ export default function ModernLanding() {
                 </div>
             </section>
 
-            {/* --- 5. DATA / STATS SECTION (image_5.png layout) --- */}
-            <section className="py-24 max-w-[1300px] mx-auto px-6 z-10 relative">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* --- 5. INTERACTIVE PLATFORM SECTION (Exsit Redesign) --- */}
+            <section className="py-32 max-w-[1300px] mx-auto px-6 z-10 relative">
+                <div className="grid lg:grid-cols-2 gap-20 items-center">
                     
-                    {/* Left Photo & Arrow */}
-                    <div className="relative">
-                        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80" alt="Team checking laptop" className="rounded-[32px] w-full shadow-2xl" />
-                        
-                        <div className="absolute -bottom-16 left-20 hidden md:flex items-center gap-2">
-                             {/* Hand-drawn arrow up-left SVG */}
-                            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-600 rotate-180">
-                                <path d="M10 90C30 80 50 40 70 10M70 10L50 15M70 10L75 30" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            <span className="font-['Caveat',cursive] text-blue-600 font-bold text-[20px] leading-tight">
-                                An Efficient Path to <br/>enterprise Growth
-                            </span>
+                    {/* Left Column (Accordion) */}
+                    <div className="lg:pr-10">
+                        <div className="inline-block px-4 py-1.5 bg-white shadow-sm font-bold text-blue-600 text-[10px] uppercase rounded-full mb-6">
+                            Tech Solution
+                        </div>
+                        <h2 className="text-4xl lg:text-[46px] text-[#0E1528] leading-[1.1] tracking-tight mb-6">
+                            <span className="font-light">The</span> <span className="font-bold">CompletePlatform</span><span className="font-light">To</span><br/>
+                            <span className="font-bold">PowerYourOperations</span>
+                        </h2>
+                        <p className="text-slate-500 font-medium text-sm leading-relaxed mb-10 max-w-[420px]">
+                            In today's competitive business, the demand for efficient and cost-effective IT solutions has never been more critical.
+                        </p>
+
+                        {/* Tabs list */}
+                        <div className="space-y-3">
+                             {platformTabs.map((tab, idx) => {
+                                 const isActive = activeTab === idx;
+                                 return (
+                                     <div key={idx} 
+                                        className={`cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden shadow-sm ${isActive ? 'bg-white shadow-[0_20px_40px_rgba(0,0,0,0.06)] border-l-[3px] border-blue-600 pt-6 px-6 pb-6 mt-4' : 'p-4 pl-6 border-l-[3px] border-transparent hover:bg-white/40'}`}
+                                        onClick={() => setActiveTab(idx)}
+                                     >
+                                         <h3 className={`text-lg transition-colors font-bold ${isActive ? 'text-blue-600 mb-3' : 'text-[#0E1528]'}`}>
+                                             {tab.title}
+                                         </h3>
+                                         {isActive && (
+                                             <p className="text-slate-500 text-[13px] font-medium leading-relaxed">
+                                                 {tab.desc}
+                                             </p>
+                                         )}
+                                     </div>
+                                 )
+                             })}
                         </div>
                     </div>
 
-                    {/* Right Content */}
-                    <div className="lg:pl-10">
-                        <h2 className="text-3xl md:text-4xl font-black text-[#0E1528] leading-tight mb-6">
-                            Periodya ile Operasyonel Verimliliğinizi %50 Artırın.
-                        </h2>
-                        <p className="text-[#0E1528]/70 text-lg font-medium leading-relaxed mb-12">
-                            Odak noktamız sadece özellikler sunmak değil, kullanıcı faydası yaratmaktır: şirketinizin tüm süreçlerinde size tam kontrol sağlıyoruz. Bu, tüm e-ticaret markaları için devrim niteliğinde.
-                        </p>
+                    {/* Right Column (Dynamic Image + Floating UI) */}
+                    <div className="relative pt-10 flex justify-end">
+                        {/* Background subtle curve graphic (SVG or just gray circle overlay) */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white rounded-full -z-10 opacity-40 shadow-2xl"></div>
 
-                        <div className="space-y-10">
-                            {/* Stat 1 */}
-                            <div className="flex gap-6 items-start">
-                                <h3 className="text-4xl md:text-5xl font-black text-[#0E1528] leading-none whitespace-nowrap">5.2m</h3>
-                                <div>
-                                    <p className="text-[#0E1528]/70 font-medium mb-3">Ortak başarı vizyonumuzda bize güvenen işletmeler üzerinden geçen başarılı işlem hacmi.</p>
-                                    <Link href="#" className="text-[#0E1528] font-bold text-sm flex items-center gap-1 hover:text-blue-600">Read more <ArrowUpRight className="w-3 h-3" /></Link>
-                                </div>
+                        {/* Main Image Container */}
+                        <div className="w-[90%] max-w-[600px] bg-white p-2.5 rounded-[24px] shadow-[0_30px_60px_rgba(0,0,0,0.07)] relative z-20 transition-all duration-500">
+                            <img src={platformTabs[activeTab].image} alt="Platform view" className="w-full aspect-[4/3] object-cover rounded-[18px]" />
+                        </div>
+
+                        {/* Top Right Floating Badge */}
+                        <div className="absolute top-6 -right-2 lg:-right-8 bg-white rounded-2xl shadow-xl flex items-center p-3 gap-6 border border-slate-100 z-30">
+                            <div>
+                                <div className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">Your balance</div>
+                                <div className="text-lg font-black text-[#0E1528] tracking-tight">$1,000</div>
                             </div>
-                            
-                            {/* Stat 2 */}
-                            <div className="flex gap-6 items-start">
-                                <h3 className="text-4xl md:text-5xl font-black text-[#0E1528] leading-none whitespace-nowrap">3.1k</h3>
-                                <div>
-                                    <p className="text-[#0E1528]/70 font-medium mb-3">Türkiye çapında kesintisiz hizmet alan ve operasyonlarını yöneten aktif e-ticaret mağazası.</p>
-                                    <Link href="#" className="text-[#0E1528] font-bold text-sm flex items-center gap-1 hover:text-blue-600">Read more <ArrowUpRight className="w-3 h-3" /></Link>
-                                </div>
+                            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-sm border border-slate-100">
+                                <img src="https://flagcdn.com/w40/us.png" alt="USA Flag" className="w-full h-full object-cover" />
                             </div>
+                        </div>
+
+                        {/* Bottom Left Floating Bar Chart */}
+                        <div className="absolute -bottom-10 -left-6 lg:-left-16 bg-white rounded-2xl p-5 shadow-2xl z-30 w-[240px] border border-slate-50">
+                             <div className="flex justify-between items-center mb-6">
+                                 <div className="flex gap-3 items-center">
+                                     <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex justify-center items-center"><Activity className="w-4 h-4"/></div>
+                                     <div>
+                                          <div className="text-[11px] font-bold text-[#0E1528] leading-tight">Usability testing</div>
+                                          <div className="text-[9px] font-semibold text-slate-500">12 products</div>
+                                     </div>
+                                 </div>
+                                 <div className="text-[8px] text-slate-400 font-bold">● ● ●</div>
+                             </div>
+                             {/* Mini CSS Bar Chart */}
+                             <div className="flex items-end justify-between h-14 w-full px-1">
+                                <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '40%'}}></div>
+                                <div className="w-[12px] bg-blue-600 rounded-t-[3px]" style={{height: '75%'}}></div>
+                                <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '30%'}}></div>
+                                <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '85%'}}></div>
+                                <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '50%'}}></div>
+                                <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '65%'}}></div>
+                                <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '45%'}}></div>
+                                <div className="w-[12px] bg-slate-200 rounded-t-[3px]" style={{height: '25%'}}></div>
+                             </div>
+                        </div>
+
+                        {/* Bottom Right Floating Pie Chart */}
+                        <div className="absolute bottom-2 -right-4 lg:-right-10 bg-white rounded-2xl p-4 shadow-2xl z-30 w-[140px] border border-slate-50">
+                             <div className="text-[9px] font-bold text-[#0E1528] mb-3 flex justify-between">
+                                 <span>Your Pie Chart</span>
+                                 <span className="text-slate-400 text-[8px]">Monthly ▾</span>
+                             </div>
+                             <div className="flex justify-center mb-4">
+                                 <div className="w-[60px] h-[60px] rounded-full border-[10px] border-blue-600" style={{ borderRightColor: '#0E1528', rotate: '45deg' }}></div>
+                             </div>
+                             <div className="flex justify-around text-[9px] font-bold text-slate-500 pt-1 border-t border-slate-100">
+                                 <div><span className="text-blue-600 text-xs">●</span> 65%</div>
+                                 <div className="border-l border-slate-200"></div>
+                                 <div><span className="text-[#0E1528] text-xs">●</span> 35%</div>
+                             </div>
                         </div>
                     </div>
                 </div>
