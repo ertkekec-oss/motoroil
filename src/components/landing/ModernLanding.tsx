@@ -144,7 +144,7 @@ export default function ModernLanding() {
 
                         {/* Right Actions */}
                         <div className="flex items-center gap-4">
-                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-md hover:bg-blue-600 transition-colors shadow-md">
+                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-sm hover:bg-blue-600 transition-colors shadow-md">
                                 Ücretsiz Dene
                             </Link>
                         </div>
@@ -185,7 +185,7 @@ export default function ModernLanding() {
                         </p>
                         
                         <div className="flex flex-wrap items-center gap-6 relative">
-                            <Link href="/register" className="px-8 py-3.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-md shadow-[0_15px_30px_rgba(37,99,235,0.25)] hover:-translate-y-1 transition-transform">
+                            <Link href="/register" className="px-8 py-3.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-sm shadow-[0_15px_30px_rgba(37,99,235,0.25)] hover:-translate-y-1 transition-transform">
                                 Ücretsiz Başla
                             </Link>
                             
@@ -224,7 +224,7 @@ export default function ModernLanding() {
                         </div>
 
                         {/* Floating Card 1: Trustpilot (Top Right) */}
-                        <div className="absolute top-10 -right-2 lg:-right-8 bg-white rounded-2xl p-4 px-5 shadow-[0_20px_40px_rgba(0,0,0,0.06)] z-30 flex flex-col items-center gap-1.5 border border-slate-100">
+                        <div className="absolute top-10 -right-2 lg:-right-8 bg-white rounded-md p-4 px-5 shadow-[0_20px_40px_rgba(0,0,0,0.06)] z-30 flex flex-col items-center gap-1.5 border border-slate-100">
                             <div className="absolute -top-3 right-4 bg-[#00b67a] text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
                                 4.9 <Star className="w-2.5 h-2.5 fill-white" />
                             </div>
@@ -261,7 +261,7 @@ export default function ModernLanding() {
                         </div>
 
                         {/* Floating Card 3: Experience Blue Box (Bottom Right) */}
-                        <div className="absolute -bottom-6 -right-6 lg:-right-4 bg-[#2563EB] text-white rounded-[24px] rounded-tl-none p-6 md:p-8 shadow-[0_20px_40px_rgba(37,99,235,0.4)] z-20 w-40 md:w-48 outline outline-4 outline-[#F4F7FF]">
+                        <div className="absolute -bottom-6 -right-6 lg:-right-4 bg-[#2563EB] text-white rounded-md rounded-tl-none p-6 md:p-8 shadow-[0_20px_40px_rgba(37,99,235,0.4)] z-20 w-40 md:w-48 outline outline-4 outline-[#F4F7FF]">
                             <div className="text-4xl md:text-5xl font-black mb-2 leading-none">8+</div>
                             <div className="text-[10px] md:text-xs font-semibold leading-tight text-white/90">Yıllık Sektör<br/>Tecrübesi</div>
                         </div>
@@ -292,7 +292,7 @@ export default function ModernLanding() {
                         <button 
                             key={idx}
                             onClick={() => setActiveIntegrationTab(idx)}
-                            className={`px-5 py-2.5 rounded-md font-bold text-[14px] transition-all duration-300 ${
+                            className={`px-5 py-2.5 rounded-sm font-bold text-[14px] transition-all duration-300 ${
                                 activeIntegrationTab === idx 
                                 ? "bg-[#2563EB] text-white shadow-md" 
                                 : "bg-white text-slate-500 hover:bg-slate-50 hover:text-[#0E1528] border border-slate-200"
@@ -315,7 +315,7 @@ export default function ModernLanding() {
                                 <p className="text-slate-500 font-medium text-[15px]">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
                             </div>
                             <div className="mt-4 md:mt-0 shrink-0">
-                                <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                                <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-sm flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
                                     Tüm Yorumlar <ArrowUpRight className="w-4 h-4"/>
                                 </Link>
                             </div>
@@ -325,7 +325,7 @@ export default function ModernLanding() {
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-[1050px] mx-auto">
                             
                             {/* Top Left: Wide Image Card */}
-                            <div className="md:col-span-8 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
+                            <div className="md:col-span-8 h-[240px] rounded-md overflow-hidden relative shadow-sm">
                                 <img src="https://images.unsplash.com/photo-1542596594-649edbc13630?auto=format&fit=crop&w=800&q=80" alt="User Smiling" className="w-full h-full object-cover" />
                                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                                     <h3 className="text-white text-xl font-bold mb-1">E-Ticaret Yönetimi</h3>
@@ -335,7 +335,7 @@ export default function ModernLanding() {
                             </div>
 
                             {/* Top Right: Vertical Info Card */}
-                            <div className="md:col-span-4 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
+                            <div className="md:col-span-4 h-[240px] rounded-md overflow-hidden relative shadow-sm">
                                 <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Focus" className="w-full h-full object-cover" />
                                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3E2723]/90 to-transparent p-6">
                                     <h3 className="text-white text-4xl font-bold mb-1">%98.2</h3>
@@ -344,7 +344,7 @@ export default function ModernLanding() {
                             </div>
 
                             {/* Bottom Left: Cyan Card */}
-                            <div className="md:col-span-4 h-[240px] rounded-[16px] bg-[#BCEBFA] p-6 flex flex-col justify-between shadow-sm">
+                            <div className="md:col-span-4 h-[240px] rounded-md bg-[#BCEBFA] p-6 flex flex-col justify-between shadow-sm">
                                 <div className="flex -space-x-2">
                                     <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
                                     <img src="https://i.pravatar.cc/100?img=5" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
@@ -357,7 +357,7 @@ export default function ModernLanding() {
                             </div>
 
                             {/* Bottom Right: Gray Testimonial Card */}
-                            <div className="md:col-span-8 h-[240px] rounded-[16px] bg-[#F0F2F4] p-6 flex flex-col justify-between shadow-sm">
+                            <div className="md:col-span-8 h-[240px] rounded-md bg-[#F0F2F4] p-6 flex flex-col justify-between shadow-sm">
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="flex items-center gap-2 text-[#0E1528]">
                                         <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center"><Check className="w-3 h-3 text-white"/></div>
@@ -392,7 +392,7 @@ export default function ModernLanding() {
                         </div>
                     </div>
                 ) : (
-                    <div className="bg-white border border-slate-200 rounded-[24px] p-10 shadow-sm min-h-[250px] flex flex-col items-center justify-center text-center max-w-[1050px] mx-auto">
+                    <div className="bg-white border border-slate-200 rounded-md p-10 shadow-sm min-h-[250px] flex flex-col items-center justify-center text-center max-w-[1050px] mx-auto">
                         <h3 className="text-2xl md:text-3xl font-bold text-[#0E1528] mb-4 tracking-tight">{integrationItems[activeIntegrationTab].contentTitle}</h3>
                         <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-1">
                             {integrationItems[activeIntegrationTab].descLine1}
@@ -435,7 +435,7 @@ export default function ModernLanding() {
                                  const isActive = activeTab === idx;
                                  return (
                                      <div key={idx} 
-                                        className={`cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden shadow-sm ${isActive ? 'bg-white shadow-[0_20px_40px_rgba(0,0,0,0.06)] border-l-[3px] border-blue-600 pt-6 px-6 pb-6 mt-4' : 'p-4 pl-6 border-l-[3px] border-transparent hover:bg-white/40'}`}
+                                        className={`cursor-pointer transition-all duration-300 rounded-md overflow-hidden shadow-sm ${isActive ? 'bg-white shadow-[0_20px_40px_rgba(0,0,0,0.06)] border-l-[3px] border-blue-600 pt-6 px-6 pb-6 mt-4' : 'p-4 pl-6 border-l-[3px] border-transparent hover:bg-white/40'}`}
                                         onClick={() => setActiveTab(idx)}
                                      >
                                          <h3 className={`text-lg transition-colors font-bold ${isActive ? 'text-blue-600 mb-3' : 'text-[#0E1528]'}`}>
@@ -458,12 +458,12 @@ export default function ModernLanding() {
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white rounded-full -z-10 opacity-40 shadow-2xl"></div>
 
                         {/* Main Image Container */}
-                        <div className="w-[90%] max-w-[600px] bg-white p-2.5 rounded-[24px] shadow-[0_30px_60px_rgba(0,0,0,0.07)] relative z-20 transition-all duration-500">
+                        <div className="w-[90%] max-w-[600px] bg-white p-2.5 rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.07)] relative z-20 transition-all duration-500">
                             <img src={platformTabs[activeTab].image} alt="Platform view" className="w-full aspect-[4/3] object-cover rounded-[18px]" />
                         </div>
 
                         {/* Top Right Floating Badge */}
-                        <div className="absolute top-6 -right-2 lg:-right-8 bg-white rounded-2xl shadow-xl flex items-center p-3 gap-6 border border-slate-100 z-30">
+                        <div className="absolute top-6 -right-2 lg:-right-8 bg-white rounded-md shadow-xl flex items-center p-3 gap-6 border border-slate-100 z-30">
                             <div>
                                 <div className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">Your balance</div>
                                 <div className="text-lg font-black text-[#0E1528] tracking-tight">$1,000</div>
@@ -474,7 +474,7 @@ export default function ModernLanding() {
                         </div>
 
                         {/* Bottom Left Floating Bar Chart */}
-                        <div className="absolute -bottom-10 -left-6 lg:-left-16 bg-white rounded-2xl p-5 shadow-2xl z-30 w-[240px] border border-slate-50">
+                        <div className="absolute -bottom-10 -left-6 lg:-left-16 bg-white rounded-md p-5 shadow-2xl z-30 w-[240px] border border-slate-50">
                              <div className="flex justify-between items-center mb-6">
                                  <div className="flex gap-3 items-center">
                                      <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex justify-center items-center"><Activity className="w-4 h-4"/></div>
@@ -499,7 +499,7 @@ export default function ModernLanding() {
                         </div>
 
                         {/* Bottom Right Floating Pie Chart */}
-                        <div className="absolute bottom-2 -right-4 lg:-right-10 bg-white rounded-2xl p-4 shadow-2xl z-30 w-[140px] border border-slate-50">
+                        <div className="absolute bottom-2 -right-4 lg:-right-10 bg-white rounded-md p-4 shadow-2xl z-30 w-[140px] border border-slate-50">
                              <div className="text-[9px] font-bold text-[#0E1528] mb-3 flex justify-between">
                                  <span>Your Pie Chart</span>
                                  <span className="text-slate-400 text-[8px]">Monthly ▾</span>
@@ -532,14 +532,14 @@ export default function ModernLanding() {
                         </div>
 
                         {/* Floating Node 1: Red/Pink (Top Left) */}
-                        <div className="absolute top-10 -left-2 lg:-left-6 w-20 h-20 bg-white rounded-2xl shadow-xl flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
+                        <div className="absolute top-10 -left-2 lg:-left-6 w-20 h-20 bg-white rounded-md shadow-xl flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
                              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500">
                                  <Layout strokeWidth={2} className="w-5 h-5"/>
                              </div>
                         </div>
 
                         {/* Floating Node 2: Black Logo Box (Top Right) */}
-                        <div className="absolute top-12 -right-4 lg:right-6 w-[88px] h-[88px] bg-white rounded-2xl shadow-xl flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
+                        <div className="absolute top-12 -right-4 lg:right-6 w-[88px] h-[88px] bg-white rounded-md shadow-xl flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
                              <div className="w-12 h-12 bg-[#0E1528] rounded-xl flex items-center justify-center text-white">
                                  <Box strokeWidth={2} className="w-6 h-6"/>
                              </div>
@@ -551,7 +551,7 @@ export default function ModernLanding() {
                         </div>
 
                         {/* Floating Node 4: Colorful Polygon/Layer (Bottom Right) */}
-                        <div className="absolute bottom-20 -right-6 lg:-right-4 w-28 h-28 bg-white rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
+                        <div className="absolute bottom-20 -right-6 lg:-right-4 w-28 h-28 bg-white rounded-md shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex items-center justify-center z-30 transition-transform duration-500 hover:scale-110">
                              <div className="grid grid-cols-2 grid-rows-2 gap-1 w-12 h-12 rotate-45">
                                  <div className="bg-orange-500 rounded-sm"></div>
                                  <div className="bg-sky-500 rounded-sm"></div>
@@ -577,7 +577,7 @@ export default function ModernLanding() {
 
                         <div className="grid sm:grid-cols-2 gap-6 mb-12">
                             {/* Card 1 */}
-                            <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-2xl border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
+                            <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-md border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
                                 <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">Uzmanlık & Özelleştirme</h4>
                                 <p className="text-slate-400 text-[12px] font-medium leading-relaxed">
                                     Ekibimiz size özel tasarlanmış tam teşekküllü donanımlar ve büyüme planları sunar.
@@ -585,7 +585,7 @@ export default function ModernLanding() {
                             </div>
                             
                             {/* Card 2 */}
-                            <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-2xl border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
+                            <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-md border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
                                 <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">Kesintisiz Entegrasyon</h4>
                                 <p className="text-slate-400 text-[12px] font-medium leading-relaxed">
                                     Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir.
@@ -617,58 +617,58 @@ export default function ModernLanding() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Card 1 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">01</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Bot className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Bot className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">YZ Destekli Analiz</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ön muhasebenizde yapay zekanın hızını ve kusursuzluğunu hissedin.</p>
                     </div>
                     {/* Card 2 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">02</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><PieChart className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><PieChart className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Derin İçgörüler</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Pazar yerlerindeki satış trendlerinizi anlık ve net raporlarla takip edin.</p>
                     </div>
                     {/* Card 3 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">03</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Activity className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Activity className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Stratejik Kararlar</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Gerçek verilere dayalı altyapımızla doğru zamanda en iyi ticaret kararını alın.</p>
                     </div>
                     {/* Card 4 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">04</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Users className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Users className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">İşbirliği Araçları</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ekibinizle aynı panelde uyum içerisinde rolleri dağıtarak çalışın.</p>
                     </div>
                     {/* Card 5 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">05</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Shield className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Shield className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Veri Koruması</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">KVKK standartlarına tam uyumlu yüksek şifrelemelerle verilerinizi koruyun.</p>
                     </div>
                     {/* Card 6 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">06</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Headphones className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Headphones className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">7/24 Teknik Destek</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Uzman kadromuzla mağazanızın operasyonlarında asla yarı yolda kalmayın.</p>
                     </div>
                     {/* Card 7 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">07</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Target className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Target className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Gelişmiş Cari CRM</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Tüm tedarikçi ağınızı tek bir listede puanınıza göre otonom olarak yönetin.</p>
                     </div>
                     {/* Card 8 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">08</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Cloud className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Cloud className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Premium Bulut</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Sunucu veya kurulum olmadan güvenle anında her cihazdan işinize erişin.</p>
                     </div>
@@ -688,7 +688,7 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Başlangıç</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺990<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-sm font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırlı Pazar Yeri</li>
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Stok Takibi</li>
@@ -704,7 +704,7 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Profesyonel</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">E-ticarette sağlam adımlar atmak isteyen profesyoneller için tam kontrol.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺2,490<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-sm font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Pazar Yeri</li>
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Çoklu Depo Yönetimi</li>
@@ -719,7 +719,7 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Kurumsal</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Kendi altyapınızda özel sunucu ihtiyaçlarıyla sınırları kaldıran kapasite.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">Özel<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/yıllık</span></div>
-                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-sm font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>VDS Sunucu Yönetimi</li>
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sıfırdan Veri Aktarımı</li>
@@ -753,7 +753,7 @@ export default function ModernLanding() {
                                     <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                 </div>
                                 <input type="email" placeholder="Email Address" className="bg-transparent border-none text-white text-[13px] px-2 py-2 flex-1 focus:outline-none placeholder-slate-500" />
-                                <button className="bg-[#2563EB] text-white text-[13px] font-bold px-6 py-2.5 rounded-md hover:bg-blue-500 transition-colors">Sign Up &nbsp;&gt;</button>
+                                <button className="bg-[#2563EB] text-white text-[13px] font-bold px-6 py-2.5 rounded-sm hover:bg-blue-500 transition-colors">Sign Up &nbsp;&gt;</button>
                             </div>
                             <p className="text-slate-500 text-[12px] font-medium tracking-wide">By subscribing, you're accept <span className="text-white font-bold cursor-pointer hover:underline">Privacy Policy</span></p>
                         </div>
@@ -825,7 +825,7 @@ export default function ModernLanding() {
 
                         {/* Target scroll to top arrow absolute positioned to right */}
                         <div className="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-8 lg:-right-16 hidden md:block">
-                             <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="w-[38px] h-[38px] bg-[#2563EB] hover:bg-blue-500 rounded-md flex justify-center items-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)] transition-all">
+                             <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="w-[38px] h-[38px] bg-[#2563EB] hover:bg-blue-500 rounded-sm flex justify-center items-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)] transition-all">
                                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                              </button>
                         </div>
