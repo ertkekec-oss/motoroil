@@ -1,0 +1,16 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mThe model "CmsPage" cannot be defined because a model with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:9424[0m
+[1;94m   | [0m
+[1;94m9423 | [0m
+[1;94m9424 | [0mmodel [1;91mCmsPage[0m {
+[1;94m   | [0m
+
+Validation Error Count: 1
+[Context: validate]
+
+Prisma CLI Version : 5.22.0

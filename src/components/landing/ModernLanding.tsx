@@ -77,7 +77,13 @@ const integrationItems = [
     }
 ];
 
-export default function ModernLanding() {
+export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
+    const heroContent = cmsData?.sections?.find((s: any) => s.type === 'HERO')?.content;
+    const heroTitle = heroContent?.title || '<span class="font-light">E-Ticaret</span> <span class="font-bold">ve</span><br/><span class="font-bold">Ön Muhasebede</span><br/><span class="font-bold text-[#2563EB]">Üstün</span> <span class="font-light whitespace-nowrap">Sonuçlar</span>';
+    const heroSubtitle = heroContent?.subtitle || 'Günümüzün rekabetçi ticaretinde, etkin ve düşük maliyetli yazılım çözümlerine olan ihtiyaç hiç bu kadar kritik olmamıştı.';
+    const heroBtnText = heroContent?.primaryBtnText || 'Ücretsiz Başla';
+    const visualUrl = heroContent?.visualUrl || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80';
+
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState('light');
     const [activeTab, setActiveTab] = useState(0);
@@ -180,19 +186,19 @@ export default function ModernLanding() {
                     
                     {/* Left Column Text */}
                     <div className="col-span-12 lg:col-span-7">
-                        <h1 className="text-5xl md:text-[64px] lg:text-[72px] text-[#0E1528] leading-[1.1] tracking-tight mb-8">
-                            <span className="font-light">E-Ticaret</span> <span className="font-bold">ve</span><br/>
-                            <span className="font-bold">Ön Muhasebede</span><br/>
-                            <span className="font-bold text-[#2563EB]">Üstün</span> <span className="font-light whitespace-nowrap">Sonuçlar</span>
-                        </h1>
+                        <h1 
+                            className="text-5xl md:text-[64px] lg:text-[72px] text-[#0E1528] leading-[1.1] tracking-tight mb-8"
+                            dangerouslySetInnerHTML={{ __html: heroTitle }}
+                        ></h1>
                         
-                        <p className="text-slate-500 text-base md:text-lg mb-12 max-w-[480px] font-medium leading-relaxed">
-                            Günümüzün rekabetçi ticaretinde, etkin ve düşük maliyetli yazılım çözümlerine olan ihtiyaç hiç bu kadar kritik olmamıştı.
-                        </p>
+                        <p 
+                            className="text-slate-500 text-base md:text-lg mb-12 max-w-[480px] font-medium leading-relaxed" 
+                            dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+                        ></p>
                         
                         <div className="flex flex-wrap items-center gap-6 relative">
                             <Link href="/register" className="px-8 py-3.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-sm shadow-[0_15px_30px_rgba(37,99,235,0.25)] hover:-translate-y-1 transition-transform">
-                                Ücretsiz Başla
+                                {heroBtnText}
                             </Link>
                             
                             <div className="flex items-center gap-3">
@@ -226,7 +232,7 @@ export default function ModernLanding() {
 
                         {/* Main Subject Card (Rounded Arches) */}
                         <div className="w-[85%] max-w-[420px] bg-white rounded-t-[120px] rounded-b-[40px] p-1.5 pb-0 shadow-[0_30px_60px_rgba(0,0,0,0.05)] relative z-20">
-                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" alt="Business Professional" className="w-full h-[500px] object-cover rounded-t-[115px] rounded-b-[38px] grayscale-[0.3]" />
+                            <img src={visualUrl} alt="Hero Visual" className="w-full h-[500px] object-cover rounded-t-[115px] rounded-b-[38px] grayscale-[0.3]" />
                         </div>
 
                         {/* Floating Card 1: Trustpilot (Top Right) */}

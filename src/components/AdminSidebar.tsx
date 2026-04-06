@@ -337,9 +337,9 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
               groupKey="system"
             >
               <NavItem
-                href="/admin/ops/gateways"
+                href="/admin/integrations"
                 icon={Server}
-                label="Ödeme Altyapıları (Gateway)"
+                label="Entegrasyon Merkezi (Yeni)"
               />
               <NavItem
                 href="/admin/ops/fintech"

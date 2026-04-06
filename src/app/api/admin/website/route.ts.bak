@@ -60,7 +60,7 @@ export async function GET() {
                                 type: 'BANNER',
                                 order: 0,
                                 content: {
-                                    text: 'Periodya Enterprise ile tanışın. <strong>E-Ticaret ve Ön Muhasebe yönetiminizi tek ekrandan yapın!</strong> 👆',
+                                    text: 'Use AI to <strong>talk to your data</strong> and move from insights to action faster. 👆',
                                     linkText: 'Read the blog.',
                                     linkUrl: '#'
                                 }
@@ -69,14 +69,14 @@ export async function GET() {
                                 type: 'HERO',
                                 order: 1,
                                 content: {
-                                    title: 'E-Ticaret ve <br />Ön Muhasebede <br /><span class="text-[#2563EB]">Üstün</span> Sonuçlar',
-                                    subtitle: 'Günümüzün rekabetçi ticaretinde, etkin ve düşük maliyetli yazılım çözümlerine olan ihtiyaç hiç bu kadar kritik olmamıştı.',
+                                    title: 'Modern BI software for agencies <br />that need answers now',
+                                    subtitle: 'Empower your entire team to easily see, share and act on data — without the cost or complexity of legacy BI software.',
                                     badgeText: '⭐ 4.4 | G2 ✨ 4.6 | CAPTERRA',
                                     reviewsText: 'based on 1,000+ reviews',
-                                    primaryBtnText: 'Ücretsiz Başla',
+                                    primaryBtnText: 'Try It Free',
                                     secondaryBtnText: 'Book a Demo',
                                     noteText: 'No card required',
-                                    visualUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
+                                    visualUrl: 'https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png',
                                     showFloatingCard: true,
                                     floatingCardTitle: 'Explore Features'
                                 }
@@ -169,7 +169,7 @@ export async function GET() {
                                 order: 7,
                                 content: {
                                     title: 'Make better decisions, together, faster',
-                                    primaryBtnText: 'Ücretsiz Başla',
+                                    primaryBtnText: 'Try It Free',
                                     secondaryBtnText: 'Book a Demo'
                                 }
                             }

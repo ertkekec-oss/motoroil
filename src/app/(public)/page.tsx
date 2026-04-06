@@ -1,5 +1,6 @@
 import ModernLanding from '@/components/landing/ModernLanding';
 import { Metadata } from 'next';
+import { prisma } from '@/lib/prisma';
 
 export const metadata: Metadata = {
     title: "Periodya Enterprise | Türkiye'nin En Kapsamlı ERP Yazılımı",
@@ -8,8 +9,8 @@ export const metadata: Metadata = {
         canonical: "https://www.periodya.com/",
     },
     openGraph: {
-        title: "Periodya Enterprise ERP - İşletmenizi Geleceğe Taşıyın",
-        description: "Finans, Stok, Satış ve Saha Operasyonları tek bir platformda. Periodya ile kurumsal kaynaklarınızı akıllıca yönetin.",
+        title: "periodya.com | Enterprise ERP",
+        description: "Finans, Stok, Satış ve Saha Operasyonları tek bir platformda.",
         url: "https://www.periodya.com/",
         siteName: "Periodya",
         locale: "tr_TR",
@@ -17,8 +18,6 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Periodya Enterprise ERP",
-        description: "İşletme management için modern ve güçlü ERP çözümü.",
     },
     robots: {
         index: true,
@@ -26,6 +25,22 @@ export const metadata: Metadata = {
     }
 };
 
-export default function Page() {
-    return <ModernLanding />;
+export const revalidate = 60; // 1 minute ISR
+
+export default async function Page() {
+    // Fetch CMS settings if available
+    let cmsData = null;
+    try {
+        const page = await (prisma as any).cmsPage.findUnique({
+            where: { slug: 'index' },
+            include: { sections: { orderBy: { order: 'asc' } } }
+        });
+        if (page?.isActive) {
+            cmsData = page;
+        }
+    } catch (e) {
+        console.error("Failed to load CMS data", e);
+    }
+
+    return <ModernLanding cmsData={cmsData} />;
 }

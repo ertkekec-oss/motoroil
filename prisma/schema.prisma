@@ -9416,3 +9416,31 @@ model AssetMaintenance {
   @@index([companyId])
   @@index([assetId])
 }
+
+// ==========================================
+// CMS & LANDING PAGE ARCHITECTURE
+// ==========================================
+
+model CmsSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model SystemIntegration {
+  id              String   @id @default(cuid())
+  category        String
+  providerCode    String
+  name            String
+  isActive        Boolean  @default(false)
+  isGlobalDefault Boolean  @default(false)
+  credentials     Json
+  settings        Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([category, providerCode])
+}
