@@ -18,7 +18,7 @@ export default function ModernLanding() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
+        <div style={{ zoom: 0.75 }} className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
             
             {/* --- GLOBAL BACKGROUND DOTS --- */}
             <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#d1d5db 1px, transparent 1px)', backgroundSize: '24px 24px', opacity: 0.5 }}></div>
