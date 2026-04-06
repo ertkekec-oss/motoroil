@@ -30,10 +30,44 @@ const platformTabs = [
     }
 ];
 
+const integrationItems = [
+    {
+        title: "E-Ticaret",
+        descLine1: "Tüm pazaryeri satışlarınızı ve stoklarınızı tek bir merkezden kolayca yönetin.",
+        descLine2: "Siparişten kargoya, faturalandırmadan müşteri ilişkilerine kadar tam entegrasyon.",
+        logos: ["Trendyol", "Hepsiburada", "N11", "Çiçeksepeti", "Amazon", "PttAVM", "Shopify"]
+    },
+    {
+        title: "Banka",
+        descLine1: "Türkiye'nin önde gelen tüm bankalarıyla direkt API üzerinden çalışarak hesaplarınızı anında izleyin.",
+        descLine2: "Hesap hareketleri, otomatik virman ve bakiye mutabakatı artık saniyeler içinde.",
+        logos: ["Garanti BBVA", "Akbank", "İş Bankası", "Yapı Kredi", "Ziraat Bankası", "QNB Finans"]
+    },
+    {
+        title: "E-Fatura",
+        descLine1: "Gelir İdaresi Başkanlığı onaylı operatörlerle saniyeler içinde e-fatura ve e-arşiv kesin.",
+        descLine2: "Maliyetlerinizi düşürün ve muhasebe süreçlerinizi dijitalin hızıyla kusursuzlaştırın.",
+        logos: ["QNB eFinans", "Digital Planet", "Sovos", "Uyumsoft", "GİB Portal", "Türkkep"]
+    },
+    {
+        title: "Ödeme",
+        descLine1: "B2B ve B2C müşterilerinizden dilediğiniz kredi kartıyla 7/24 güvenli online tahsilat yapın.",
+        descLine2: "Düşük komisyon oranları ve ertesi gün sanal POS aktarımıyla nakit akışınızı koruyun.",
+        logos: ["PayTR", "İyzico", "Param", "Ozan", "Sipay", "Moka"]
+    },
+    {
+        title: "Yazarkasa POS",
+        descLine1: "Mağazadaki fiziksel satışlarınızı ERP sisteminizle anlık senkronize eden akıllı altyapı.",
+        descLine2: "Yeni nesil ÖKC (Ödeme Kaydedici Cihaz) entegrasyonuyla stok ve maliye bildirim problemlerine son verin.",
+        logos: ["Beko", "Ingenico", "Profilo", "Hugin", "Vera", "Paygo"]
+    }
+];
+
 export default function ModernLanding() {
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState('light');
     const [activeTab, setActiveTab] = useState(0);
+    const [activeIntegrationTab, setActiveIntegrationTab] = useState(0);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -229,20 +263,47 @@ export default function ModernLanding() {
                 </div>
             </section>
 
-            {/* --- 3. SOCIAL PROOF (image_1.png) --- */}
-            <section className="py-12 md:py-16 max-w-[1000px] mx-auto px-6 text-center relative z-10">
-                {/* Right faint 3D geometric shape */}
-                <div className="absolute right-[-20%] top-[-50%] w-[400px] h-[400px] opacity-[0.15] bg-blue-200 rotate-12 rounded-[60px] pointer-events-none"></div>
+            {/* --- 3. DYNAMIC INTEGRATIONS TABS --- */}
+            <section className="py-12 md:py-16 max-w-[1050px] mx-auto px-6 relative z-10 w-full">
+                <div className="text-center mb-10">
+                    <h2 className="text-3xl md:text-5xl font-black text-[#0E1528] mb-4">Sıradışı Bir <span className="text-blue-600">Entegrasyon</span> Ağı</h2>
+                    <p className="text-slate-500 font-medium text-[16px]">Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.</p>
+                </div>
 
-                <h2 className="text-3xl md:text-4xl font-bold text-[#0E1528] mb-3">150,000+ Şirketin Güvendiği ERP</h2>
-                <p className="text-slate-500 mb-14 font-medium">Büyük hacimli e-ticaret siteleri Periodya ile çalışıyor — sizin de işinize yarayacak.</p>
-                
-                <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16">
-                    <span className="font-black text-2xl lg:text-3xl text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">Trendyol</span>
-                    <span className="font-black text-2xl lg:text-3xl text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">Hepsiburada</span>
-                    <span className="font-black text-2xl lg:text-3xl text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">Akbank</span>
-                    <span className="font-black text-2xl lg:text-3xl text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">Garanti</span>
-                    <span className="font-black text-2xl lg:text-3xl text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">Gittigidiyor</span>
+                {/* Tabs */}
+                <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                    {integrationItems.map((item, idx) => (
+                        <button 
+                            key={idx}
+                            onClick={() => setActiveIntegrationTab(idx)}
+                            className={`px-6 py-2.5 rounded-full font-bold text-[14px] transition-all duration-300 ${
+                                activeIntegrationTab === idx 
+                                ? "bg-[#2563EB] text-white shadow-md scale-105" 
+                                : "bg-white text-slate-500 hover:bg-slate-50 hover:text-[#0E1528] border border-slate-200"
+                            }`}
+                        >
+                            {item.title}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Tab Content Box */}
+                <div className="bg-white border border-slate-200 rounded-[24px] p-10 shadow-sm min-h-[300px] flex flex-col items-center justify-center text-center">
+                    <h3 className="text-2xl font-bold text-[#0E1528] mb-4">{integrationItems[activeIntegrationTab].title} Çözümleri</h3>
+                    <p className="text-slate-500 text-[15px] font-medium leading-[1.6] max-w-2xl mx-auto mb-2">
+                        {integrationItems[activeIntegrationTab].descLine1}
+                    </p>
+                    <p className="text-slate-500 text-[15px] font-medium leading-[1.6] max-w-2xl mx-auto mb-12">
+                        {integrationItems[activeIntegrationTab].descLine2}
+                    </p>
+
+                    <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6">
+                        {integrationItems[activeIntegrationTab].logos.map((logo, i) => (
+                            <span key={i} className="font-black text-2xl lg:text-[28px] tracking-tight text-slate-400 hover:text-[#0E1528] hover:scale-105 transition-all cursor-default">
+                                {logo}
+                            </span>
+                        ))}
+                    </div>
                 </div>
             </section>
 
