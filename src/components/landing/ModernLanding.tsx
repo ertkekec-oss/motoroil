@@ -132,7 +132,7 @@ export default function ModernLanding() {
 
                         {/* Right Actions */}
                         <div className="flex items-center gap-4">
-                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-full hover:bg-blue-600 transition-colors shadow-md">
+                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-md hover:bg-blue-600 transition-colors shadow-md">
                                 Ücretsiz Dene
                             </Link>
                         </div>
@@ -173,7 +173,7 @@ export default function ModernLanding() {
                         </p>
                         
                         <div className="flex flex-wrap items-center gap-6 relative">
-                            <Link href="/register" className="px-8 py-3.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-full shadow-[0_15px_30px_rgba(37,99,235,0.25)] hover:-translate-y-1 transition-transform">
+                            <Link href="/register" className="px-8 py-3.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-md shadow-[0_15px_30px_rgba(37,99,235,0.25)] hover:-translate-y-1 transition-transform">
                                 Ücretsiz Başla
                             </Link>
                             
@@ -264,18 +264,18 @@ export default function ModernLanding() {
             </section>
 
             {/* --- 3. DYNAMIC INTEGRATIONS TABS --- */}
-            <section className="py-12 md:py-16 max-w-[1050px] mx-auto px-6 relative z-10 w-full">
+            <section className="pt-4 pb-12 md:pt-4 md:pb-16 max-w-[1050px] mx-auto px-6 relative z-10 w-full">
                 
                 {/* Header Pattern with Button */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
                     <div>
-                        <h2 className="text-2xl md:text-3xl lg:text-[40px] font-bold text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
-                            Sıradışı bir <span className="text-blue-600">entegrasyon</span> ağı
+                        <h2 className="text-xl md:text-2xl lg:text-3xl text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
+                            <span className="font-extrabold">Sıradışı Bir Entegrasyon</span> <span className="font-light">Ağı</span>
                         </h2>
                         <p className="text-slate-500 font-medium text-[15px]">Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.</p>
                     </div>
                     <div className="mt-2 md:mt-0 shrink-0">
-                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
                             Tüm Entegrasyonlar <ArrowUpRight className="w-4 h-4"/>
                         </Link>
                     </div>
@@ -287,7 +287,7 @@ export default function ModernLanding() {
                         <button 
                             key={idx}
                             onClick={() => setActiveIntegrationTab(idx)}
-                            className={`px-5 py-2.5 rounded-[12px] font-bold text-[14px] transition-all duration-300 ${
+                            className={`px-5 py-2.5 rounded-md font-bold text-[14px] transition-all duration-300 ${
                                 activeIntegrationTab === idx 
                                 ? "bg-[#2563EB] text-white shadow-md" 
                                 : "bg-white text-slate-500 hover:bg-slate-50 hover:text-[#0E1528] border border-slate-200"
@@ -330,7 +330,7 @@ export default function ModernLanding() {
                         <p className="text-slate-500 font-medium text-[15px]">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
                     </div>
                     <div className="mt-6 md:mt-0 shrink-0">
-                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
                             Tüm Yorumlar <ArrowUpRight className="w-4 h-4"/>
                         </Link>
                     </div>
@@ -683,7 +683,7 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Başlangıç</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺990<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-lg font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırlı Pazar Yeri</li>
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Stok Takibi</li>
@@ -699,7 +699,7 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Profesyonel</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">E-ticarette sağlam adımlar atmak isteyen profesyoneller için tam kontrol.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺2,490<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-lg font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Pazar Yeri</li>
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Çoklu Depo Yönetimi</li>
@@ -714,7 +714,7 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Kurumsal</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Kendi altyapınızda özel sunucu ihtiyaçlarıyla sınırları kaldıran kapasite.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">Özel<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/yıllık</span></div>
-                        <button className="w-full py-3.5 rounded-lg font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>VDS Sunucu Yönetimi</li>
                             <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sıfırdan Veri Aktarımı</li>
@@ -748,7 +748,7 @@ export default function ModernLanding() {
                                     <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                 </div>
                                 <input type="email" placeholder="Email Address" className="bg-transparent border-none text-white text-[13px] px-2 py-2 flex-1 focus:outline-none placeholder-slate-500" />
-                                <button className="bg-[#2563EB] text-white text-[13px] font-bold px-6 py-2.5 rounded-lg hover:bg-blue-500 transition-colors">Sign Up &nbsp;&gt;</button>
+                                <button className="bg-[#2563EB] text-white text-[13px] font-bold px-6 py-2.5 rounded-md hover:bg-blue-500 transition-colors">Sign Up &nbsp;&gt;</button>
                             </div>
                             <p className="text-slate-500 text-[12px] font-medium tracking-wide">By subscribing, you're accept <span className="text-white font-bold cursor-pointer hover:underline">Privacy Policy</span></p>
                         </div>
@@ -820,7 +820,7 @@ export default function ModernLanding() {
 
                         {/* Target scroll to top arrow absolute positioned to right */}
                         <div className="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-8 lg:-right-16 hidden md:block">
-                             <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="w-[38px] h-[38px] bg-[#2563EB] hover:bg-blue-500 rounded-full flex justify-center items-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)] transition-all">
+                             <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="w-[38px] h-[38px] bg-[#2563EB] hover:bg-blue-500 rounded-md flex justify-center items-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)] transition-all">
                                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                              </button>
                         </div>
