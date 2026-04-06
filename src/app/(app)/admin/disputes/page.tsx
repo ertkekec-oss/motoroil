@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from 'next/link';
 import { Scale, AlertCircle, Package, Truck, Filter, ShieldAlert, ArrowRight } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default function DisputeQueuePage() {
     const [disputes, setDisputes] = useState<any[]>([]);

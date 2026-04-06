@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { ShieldAlert, Activity, Calendar, RefreshCw, Search, Clock, Fingerprint, Database, User, Server, Eye, AlertCircle } from 'lucide-react';
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 interface AuditLog {
     id: string;

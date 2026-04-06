@@ -1,0 +1,612 @@
+[
+  {
+    "path": "audit-logs/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 262
+  },
+  {
+    "path": "b2b/dealer-orders/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 339
+  },
+  {
+    "path": "b2b/policies/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 215
+  },
+  {
+    "path": "b2b/refunds/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 327
+  },
+  {
+    "path": "b2b/settings/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 22
+  },
+  {
+    "path": "catalog/brands/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 12
+  },
+  {
+    "path": "companies/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 73
+  },
+  {
+    "path": "contracts/audit/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 45
+  },
+  {
+    "path": "contracts/policies/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 52
+  },
+  {
+    "path": "contracts/providers/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 55
+  },
+  {
+    "path": "dashboard/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 371
+  },
+  {
+    "path": "disputes/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 206
+  },
+  {
+    "path": "disputes/[ticketId]/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 267
+  },
+  {
+    "path": "growth/audit/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 141
+  },
+  {
+    "path": "growth/billing-health/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 259
+  },
+  {
+    "path": "growth/boost-rules/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 324
+  },
+  {
+    "path": "growth/revenue/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 177
+  },
+  {
+    "path": "growth/subscriptions/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 205
+  },
+  {
+    "path": "health/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 105
+  },
+  {
+    "path": "help/knowledge-base/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 249
+  },
+  {
+    "path": "integrations/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 386
+  },
+  {
+    "path": "logs/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 145
+  },
+  {
+    "path": "marketplace/ops/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 10
+  },
+  {
+    "path": "network-growth/actions/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 72
+  },
+  {
+    "path": "network-growth/triggers/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 73
+  },
+  {
+    "path": "ops/fintech/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 12
+  },
+  {
+    "path": "ops/gateways/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 327
+  },
+  {
+    "path": "ops/ledgers/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 365
+  },
+  {
+    "path": "ops/limits/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 12
+  },
+  {
+    "path": "ops/orders/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 244
+  },
+  {
+    "path": "ops/payments/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 109
+  },
+  {
+    "path": "ops/providers/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 115
+  },
+  {
+    "path": "ops/shipments/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 202
+  },
+  {
+    "path": "page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 7
+  },
+  {
+    "path": "payments-escrow/audit/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 132
+  },
+  {
+    "path": "payments-escrow/commissions/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 311
+  },
+  {
+    "path": "payments-escrow/policies/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 256
+  },
+  {
+    "path": "payments-escrow/providers/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 157
+  },
+  {
+    "path": "payouts/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 233
+  },
+  {
+    "path": "plans/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 433
+  },
+  {
+    "path": "platform-doctor/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 200
+  },
+  {
+    "path": "platform-finance/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 349
+  },
+  {
+    "path": "products/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 106
+  },
+  {
+    "path": "sales-radar/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 116
+  },
+  {
+    "path": "security/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 190
+  },
+  {
+    "path": "settings/categories/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 168
+  },
+  {
+    "path": "settings/onboarding/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 195
+  },
+  {
+    "path": "settings/payroll/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 244
+  },
+  {
+    "path": "support/analytics/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 180
+  },
+  {
+    "path": "support/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 136
+  },
+  {
+    "path": "support/tickets/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 228
+  },
+  {
+    "path": "support/tickets/[id]/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 159
+  },
+  {
+    "path": "support/[id]/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 219
+  },
+  {
+    "path": "system/doctor/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 216
+  },
+  {
+    "path": "tenants/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 394
+  },
+  {
+    "path": "tenants/[id]/help/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 47
+  },
+  {
+    "path": "tenants/[id]/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 577
+  },
+  {
+    "path": "trade-ledger/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 86
+  },
+  {
+    "path": "transactions/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": false,
+    "hasSecurityIssue": false,
+    "lines": 80
+  },
+  {
+    "path": "trust-monitor/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": false,
+    "hasMockData": false,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 115
+  },
+  {
+    "path": "website/page.tsx",
+    "isPage": true,
+    "hasEnterpriseDesign": true,
+    "hasMockData": true,
+    "hasTodos": false,
+    "hasDataFetch": true,
+    "hasSecurityIssue": false,
+    "lines": 1847
+  }
+]

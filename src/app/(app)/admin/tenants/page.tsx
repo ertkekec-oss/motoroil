@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useModal } from '@/contexts/ModalContext';
 import { Users, Plus, Search, Filter, Cpu, Play, Trash2, ArrowRight, Zap, RefreshCw, Layers, ShieldAlert, BarChart3, Database, AlertCircle } from 'lucide-react';
+import { EnterprisePageShell, EnterpriseCard } from '@/components/ui/enterprise';
 
 export default function TenantsPage() {
     const { showSuccess, showError, showConfirm } = useModal();
@@ -133,35 +134,24 @@ export default function TenantsPage() {
     };
 
     return (
-        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16">
-            <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-                            <Users className="w-6 h-6 text-indigo-500" />
-                            Müşteri Yönetimi (Tenants)
-                        </h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                            Platformdaki tüm müşteri hesaplarını (Tenant), lisans paketlerini ve risk durumlarını yönetin.
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setShowAutomationPanel(!showAutomationPanel)}
-                            className={`p-2.5 rounded-xl transition-all shadow-sm border ${showAutomationPanel ? 'bg-amber-100 border-amber-200 text-amber-700 dark:bg-amber-900/40 dark:border-amber-500/30 dark:text-amber-400' : 'bg-white border-slate-200 text-slate-500 hover:text-amber-600 hover:border-amber-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:text-amber-400 dark:hover:border-amber-500/50'}`}
-                            title="Otomasyon & Growth Konsolu"
-                        >
-                            <Cpu className="w-5 h-5" />
-                        </button>
-                        <button onClick={() => fetchTenants(pagination.page)} className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm">
-                            <RefreshCw className="w-5 h-5" />
-                        </button>
-                        <Link href="/admin/tenants/new" className="bg-slate-900 dark:bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 dark:hover:bg-indigo-700 transition shadow-sm flex items-center gap-2">
-                            <Plus className="w-4 h-4" /> Manuel Ekle
-                        </Link>
-                    </div>
+        <EnterprisePageShell
+            title="Müşteri Yönetimi (Tenants)"
+            description="Platformdaki tüm müşteri hesaplarını (Tenant), lisans paketlerini ve risk durumlarını yönetin."
+            actions={
+                <div className="flex items-center gap-3">
+                    <button onClick={() => setShowAutomationPanel(!showAutomationPanel)} className={`p-2.5 rounded-xl transition-all shadow-sm border ${showAutomationPanel ? 'bg-amber-100 border-amber-200 text-amber-700 dark:bg-amber-900/40 dark:border-amber-500/30 dark:text-amber-400' : 'bg-white border-slate-200 text-slate-500 hover:text-amber-600 hover:border-amber-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:text-amber-400 dark:hover:border-amber-500/50'}`} title="Otomasyon & Growth Konsolu">
+                        <Cpu className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => fetchTenants(pagination.page)} className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm">
+                        <RefreshCw className="w-5 h-5" />
+                    </button>
+                    <Link href="/admin/tenants/new" className="bg-slate-900 dark:bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 dark:hover:bg-indigo-700 transition shadow-sm flex items-center gap-2">
+                        <Plus className="w-4 h-4" /> Manuel Ekle
+                    </Link>
                 </div>
+            }
+        >
+                
 
                 {/* Automation Console Panel */}
                 {showAutomationPanel && (
@@ -386,8 +376,7 @@ export default function TenantsPage() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </EnterprisePageShell>
     );
 }
 

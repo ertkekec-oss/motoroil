@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ProductStatus } from "@prisma/client";
 import ProductModerationClient from "./ProductModerationClient";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export const dynamic = "force-dynamic";
 
@@ -25,17 +26,13 @@ export default async function AdminProductsPage(props: { searchParams: Promise<a
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
-            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
-                <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                            <span className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">🛡️</span>
-                            Ürün Moderasyonu
-                        </h1>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2 ml-14">Tedarikçiler tarafından gönderilen ürünleri inceleyin ve onaylayın.</p>
-                    </div>
-                </div>
+        <div className="w-full">
+            <EnterprisePageShell
+            title="Ürün Moderasyonu"
+            description="Tedarikçiler tarafından gönderilen ürünleri inceleyin ve onaylayın."
+        >
+            <div className="space-y-6">
+                
 
                 {/* Tabs */}
                 <div className="flex gap-4 border-b border-slate-200 dark:border-white/10">
@@ -100,6 +97,7 @@ export default async function AdminProductsPage(props: { searchParams: Promise<a
                     </div>
                 </div>
             </div>
+            </EnterprisePageShell>
         </div>
     );
 }

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import ForceReleaseLedgerButton from "./ForceReleaseLedgerButton";
 import { Search, Filter, HardDrive, ReceiptText, Banknote, ShieldAlert, BadgeInfo } from 'lucide-react';
+import { EnterprisePageShell } from '@/components/ui/enterprise';
 
 function formatDateTR(d: Date | null | undefined) {
     if (!d) return "-";
@@ -148,16 +149,14 @@ export default async function LedgersAuditPage({
     });
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 font-sans focus:outline-none w-full pb-16">
-            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
+        <div className="w-full">
+            <EnterprisePageShell
+            title="Sistem Defteri (Finans & Ledger Denetimi)"
+            description="Ledger, Komisyon ve Escrow Payout Matrisi"
+        >
+            <div className="space-y-6">
                 {/* Header */}
-                <div className="border-b border-slate-200 dark:border-white/10 pb-6">
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <HardDrive className="w-7 h-7 text-indigo-500 dark:text-emerald-500" />
-                        Finans & Ledger Denetimi (Ops)
-                    </h1>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2 ml-10">Ledger, Komisyon ve Escrow Payout Matrisi</p>
-                </div>
+                
 
                 {/* KPI Strip */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -354,6 +353,7 @@ export default async function LedgersAuditPage({
                     </div>
                 </div>
             </div>
+            </EnterprisePageShell>
         </div>
     );
 }

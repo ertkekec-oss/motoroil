@@ -3,19 +3,13 @@ import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { ShieldCheck, AlertTriangle, AlertCircle, Activity, Zap, Play, RefreshCw, Server, Globe, Database, Terminal } from 'lucide-react';
+import { EnterprisePageShell, EnterpriseCard } from '@/components/ui/enterprise';
 
 export const metadata = {
     title: 'Platform Doctor - Self Healing Diagnostics',
 };
 
-const DIAGNOSTICS_MODULES = [
-    { name: 'Gateway (PayTR)', icon: <Server className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />, status: 'HEALTHY' },
-    { name: 'E-Fatura (Nilvera)', icon: <Globe className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />, status: 'HEALTHY' },
-    { name: 'Sanal Pos (Iyzico)', icon: <Server className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />, status: 'WARNING' },
-    { name: 'Kargo (Yurtiçi)', icon: <Globe className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />, status: 'HEALTHY' },
-    { name: 'Sync Engine', icon: <Database className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />, status: 'HEALTHY' },
-    { name: 'Cache Layer', icon: <Activity className="w-5 h-5 text-orange-500 dark:text-orange-400" />, status: 'WARNING' },
-];
+// Dynamic integration check logic replacing hardcoded DIAGNOSTICS_MODULES
 
 export default async function PlatformDoctorDashboard() {
     const session = await getSession();
@@ -35,26 +29,19 @@ export default async function PlatformDoctorDashboard() {
     const healthScore = Math.max(0, 100 - (activeIssues * 8));
 
     return (
-        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16">
-            <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
+        <EnterprisePageShell
+            title="Platform Doctor (Sistem Sağlığı)"
+            description="Ağır sistem sağlığı, otonom hata tespiti ve self-healing runbook yönetim merkezi."
+            actions={
+                <button className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition-all flex items-center gap-2 shadow-sm focus:ring-2 focus:ring-indigo-500/50">
+                    <RefreshCw className="w-4 h-4" /> Manuel Tarama Başlat
+                </button>
+            }
+        >
+            <div>
                 
                 {/* Header */}
-                <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                            <Activity className="w-8 h-8 text-indigo-600 dark:text-indigo-500" />
-                            Platform Doctor (Sistem Sağlığı)
-                        </h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                            Ağır sistem sağlığı, otonom hata tespiti ve self-healing runbook yönetim merkezi.
-                        </p>
-                    </div>
-                    <div className="flex gap-2">
-                        <button className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition-all flex items-center gap-2 shadow-sm focus:ring-2 focus:ring-indigo-500/50">
-                            <RefreshCw className="w-4 h-4" /> Manuel Tarama Başlat
-                        </button>
-                    </div>
-                </div>
+                
 
                 {/* Top Metrics Map */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -210,6 +197,6 @@ export default async function PlatformDoctorDashboard() {
                     </div>
                 </div>
             </div>
-        </div>
+            </EnterprisePageShell>
     );
 }

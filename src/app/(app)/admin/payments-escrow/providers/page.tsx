@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { ShieldCheck, Activity, RefreshCw, ServerCrash, CreditCard } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default function ProvidersPage() {
     const { showSuccess, showError, showWarning } = useModal();

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CompanyStatus, CompanyType } from "@prisma/client";
 import CompanyAdminClient from "./CompanyAdminClient";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export const dynamic = "force-dynamic";
 
@@ -10,17 +11,13 @@ export default async function AdminCompaniesPage() {
     });
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
-            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
-                <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                            <span className="p-2 bg-indigo-100 dark:bg-blue-500/10 rounded-lg">🏢</span>
-                            Firma Yönetimi
-                        </h1>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2 ml-14">Platform aktörlerini, rollerini ve erişim durumlarını yönetin.</p>
-                    </div>
-                </div>
+        <div className="w-full">
+            <EnterprisePageShell
+            title="Firma Yönetimi"
+            description="Platform aktörlerini, rollerini ve erişim durumlarını yönetin."
+        >
+            <div className="space-y-6">
+                
 
                 <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden flex flex-col shadow-sm">
                     <div className="overflow-auto flex-1 relative">
@@ -67,6 +64,7 @@ export default async function AdminCompaniesPage() {
                     </div>
                 </div>
             </div>
+            </EnterprisePageShell>
         </div>
     );
 }

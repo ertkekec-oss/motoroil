@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { FileText, Settings, AlertTriangle, ShieldCheck, Save, Clock, Percent } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default function PoliciesPage() {
     const { showSuccess, showError, showWarning } = useModal();

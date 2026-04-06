@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ShieldCheck, Filter, AlertCircle, FileText, Calendar, Database } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default function AuditPage() {
     const [logs, setLogs] = useState<any[]>([]);

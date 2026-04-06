@@ -343,6 +343,7 @@ export default async function PlatformFinancePage() {
           </div>
         </div>
       </div>
-    </div>
-  );
+            </EnterprisePageShell>
+        </div>
+    );
 }

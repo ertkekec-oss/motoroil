@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { Percent, Plus, Save, Archive, Edit2, AlertCircle, X, Check, Search, Filter } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default function CommissionsPage() {
     const { showSuccess, showError, showPrompt } = useModal();

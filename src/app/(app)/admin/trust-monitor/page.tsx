@@ -109,6 +109,6 @@ export default async function TrustMonitorPage() {
                     </div>
                 </div>
             </div>
-        </div>
+            </EnterprisePageShell>
     );
 }

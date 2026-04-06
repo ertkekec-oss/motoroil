@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
+import { EnterprisePageShell, EnterpriseCard } from "@/components/ui/enterprise";
 
 export default function ExecutiveDashboard() {
     const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
@@ -69,27 +70,19 @@ export default function ExecutiveDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
-            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
-                {/* Header Section */}
-                <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                            <span className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">⚙️</span>
-                            Enterprise Command Center
-                        </h1>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2 ml-14">
-                            Platform Kontrol Merkezi, Finansal Bütünlük ve Risk Telemetrisi
-                        </p>
-                    </div>
-
-                    <div className="flex bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden p-1 shrink-0">
-                        <button onClick={() => setRange('today')} className={`px-4 py-1.5 text-[11px] uppercase tracking-widest font-black rounded-lg transition-colors ${range === 'today' ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm' : 'bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}>Bugün</button>
-                        <button onClick={() => setRange('7d')} className={`px-4 py-1.5 text-[11px] uppercase tracking-widest font-black rounded-lg transition-colors ${range === '7d' ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm' : 'bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}>7 Gün</button>
-                        <button onClick={() => setRange('30d')} className={`px-4 py-1.5 text-[11px] uppercase tracking-widest font-black rounded-lg transition-colors ${range === '30d' ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm' : 'bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}>30 Gün</button>
-                    </div>
+        <EnterprisePageShell
+            title="Enterprise Command Center"
+            description="Platform Kontrol Merkezi, Finansal Bütünlük ve Risk Telemetrisi"
+            actions={
+                <div className="flex bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden p-1 shrink-0">
+                    <button onClick={() => setRange('today')} className={`px-4 py-1.5 text-[11px] uppercase tracking-widest font-black rounded-lg transition-colors ${range === 'today' ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm' : 'bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}>Bugün</button>
+                    <button onClick={() => setRange('7d')} className={`px-4 py-1.5 text-[11px] uppercase tracking-widest font-black rounded-lg transition-colors ${range === '7d' ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm' : 'bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}>7 Gün</button>
+                    <button onClick={() => setRange('30d')} className={`px-4 py-1.5 text-[11px] uppercase tracking-widest font-black rounded-lg transition-colors ${range === '30d' ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm' : 'bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'}`}>30 Gün</button>
                 </div>
-
+            }
+        >
+            <div className="space-y-6">
+                {/* Header Section */}
                 {loading && !data && (
                     <div className="bg-white dark:bg-[#1e293b] p-12 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-center items-center h-64">
                         <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-slate-900 dark:border-t-emerald-500 rounded-full animate-spin mb-4"></div>

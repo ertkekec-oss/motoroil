@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { ShieldAlert, Mic, Plus, Trash2, Info, AlertTriangle, Loader2 } from 'lucide-react';
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default function SecuritySettingsPage() {
     const [words, setWords] = useState<string[]>([]);

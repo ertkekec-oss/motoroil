@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Terminal, DownloadCloud, Trash2, Activity, Zap, Server, ShieldAlert } from 'lucide-react';
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default function AdminLogs() {
     const logs = [
