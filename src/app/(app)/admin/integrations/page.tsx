@@ -164,7 +164,6 @@ export default function IntegrationsHub() {
         <EnterprisePageShell
             title="Entegrasyon Hub (Switchboard)"
             description="Periodya ağınızın tüm dış dünya (Ödeme, Kargo, İletişim, Vergi vb.) bağlarını güvenle tek noktadan yönetin."
-            icon={<Zap className="text-amber-500 w-6 h-6" />}
         >
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 relative">
                 
@@ -183,7 +182,7 @@ export default function IntegrationsHub() {
                         <EnterpriseCard key={item.id} className="flex flex-col h-full relative overflow-hidden group">
                             {/* App Card Visual Header */}
                             <div className="flex items-start justify-between mb-6">
-                                <div className={\`w-16 h-16 rounded-2xl flex items-center justify-center bg-\${item.color}-50 dark:bg-\${item.color}-500/10 border border-\${item.color}-100 dark:border-\${item.color}-500/20 shadow-sm\`}>
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center bg-${item.color}-50 dark:bg-${item.color}-500/10 border border-${item.color}-100 dark:border-${item.color}-500/20 shadow-sm`}>
                                     {item.icon}
                                 </div>
                                 <div className="flex flex-col items-end">
