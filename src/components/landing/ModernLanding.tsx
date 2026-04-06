@@ -231,7 +231,7 @@ export default function ModernLanding() {
             </section>
 
             {/* --- 3. SOCIAL PROOF (image_1.png) --- */}
-            <section className="py-24 max-w-[1000px] mx-auto px-6 text-center relative z-10">
+            <section className="py-12 md:py-16 max-w-[1000px] mx-auto px-6 text-center relative z-10">
                 {/* Right faint 3D geometric shape */}
                 <div className="absolute right-[-20%] top-[-50%] w-[400px] h-[400px] opacity-[0.15] bg-blue-200 rotate-12 rounded-[60px] pointer-events-none"></div>
 
@@ -248,7 +248,7 @@ export default function ModernLanding() {
             </section>
 
             {/* --- 4. TESTIMONIAL BENTO GRID (image_3&4 layout adapted) --- */}
-            <section className="py-24 max-w-[1300px] mx-auto px-6 relative z-10">
+            <section className="py-12 md:py-16 max-w-[1300px] mx-auto px-6 relative z-10">
                 
                 {/* Section Header */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12 max-w-[1050px] mx-auto">
@@ -337,7 +337,7 @@ export default function ModernLanding() {
             </section>
 
             {/* --- 5. INTERACTIVE PLATFORM SECTION (Exsit Redesign) --- */}
-            <section className="py-32 max-w-[1300px] mx-auto px-6 z-10 relative">
+            <section className="py-16 md:py-20 max-w-[1300px] mx-auto px-6 z-10 relative">
                 <div className="grid lg:grid-cols-2 gap-20 items-center">
                     
                     {/* Left Column (Accordion) */}
@@ -442,7 +442,7 @@ export default function ModernLanding() {
             </section>
 
             {/* --- 6. INTEGRATION / WHY CHOOSE US SECTION (Exsit Redesign) --- */}
-            <section className="py-24 lg:py-32 bg-white relative z-10 w-full overflow-hidden">
+            <section className="py-16 lg:py-20 bg-white relative z-10 w-full overflow-hidden">
                 <div className="max-w-[1300px] mx-auto px-6 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
                     
                     {/* Left Column (Image & Floating Integration Nodes) */}
@@ -531,8 +531,7 @@ export default function ModernLanding() {
                 </div>
             </section>
 
-            {/* --- NEW 8-CARD FLEX GRID (Makes Us Different) --- */}
-            <section className="py-24 max-w-[1300px] mx-auto px-6 relative z-10">
+            {/* --- NEW 8-CARD FLEX GRID (Makes Us Different) --- */}            <section className="pt-8 pb-16 md:pb-20 max-w-[1300px] mx-auto px-6 relative z-10">
                 <div className="text-center mb-16 max-w-2xl mx-auto">
                     <h2 className="text-3xl md:text-5xl font-black text-[#0E1528] mb-4">
                         Bizi <span className="text-blue-600">Farklı Kılan</span> Özellikler.
@@ -601,7 +600,7 @@ export default function ModernLanding() {
             </section>
 
             {/* --- 7. PRICING --- */}
-            <section className="py-32 max-w-[1300px] mx-auto px-6">
+            <section className="py-16 md:py-24 max-w-[1300px] mx-auto px-6">
                 <div className="text-center mb-16">
                     <h2 className="text-2xl md:text-3xl font-black text-[#0E1528] mb-4">Esnek Fiyatlandırma</h2>
                     <p className="text-slate-500 font-medium">Büyüme hızınıza ayak uyduran paketler.</p>
