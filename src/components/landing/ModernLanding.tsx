@@ -180,70 +180,70 @@ export default function ModernLanding() {
                 </div>
 
                 {/* Bento Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-[1050px] mx-auto">
                     
                     {/* Top Left: Wide Image Card */}
-                    <div className="md:col-span-8 h-[320px] rounded-[32px] overflow-hidden relative shadow-lg">
+                    <div className="md:col-span-8 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
                         <img src="https://images.unsplash.com/photo-1542596594-649edbc13630?auto=format&fit=crop&w=800&q=80" alt="User Smiling" className="w-full h-full object-cover" />
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                            <h3 className="text-white text-3xl font-bold mb-1">E-Ticaret Yönetimi</h3>
-                            <p className="text-white/80 text-sm font-medium">Entegrasyon, Depo, Fatura</p>
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                            <h3 className="text-white text-xl font-bold mb-1">E-Ticaret Yönetimi</h3>
+                            <p className="text-white/80 text-[13px] font-medium">Entegrasyon, Depo, Fatura</p>
                         </div>
-                        <div className="absolute bottom-8 right-8 bg-black/50 backdrop-blur text-white px-4 py-1.5 rounded-full text-sm font-bold">1 / 3</div>
+                        <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-bold">1 / 3</div>
                     </div>
 
                     {/* Top Right: Vertical Info Card */}
-                    <div className="md:col-span-4 h-[320px] rounded-[32px] overflow-hidden relative shadow-lg">
+                    <div className="md:col-span-4 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
                         <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Focus" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/10 flex flex-col justify-end p-8">
-                            <h3 className="text-white text-5xl font-bold mb-2">%98.2</h3>
-                            <p className="text-white/90 text-sm font-medium leading-relaxed">Kullanıcılarımız Periodya entegrasyonu sayesinde süreçlerini iyileştirdi.</p>
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3E2723]/90 to-transparent p-6">
+                            <h3 className="text-white text-4xl font-bold mb-1">%98.2</h3>
+                            <p className="text-white/80 text-[13px] font-medium leading-tight">En iyi ve güvenilir geri bildirimler bizi tam olarak anlayan müşterilerimizden gelir.</p>
                         </div>
                     </div>
 
                     {/* Bottom Left: Cyan Card */}
-                    <div className="md:col-span-5 h-[320px] rounded-[32px] bg-[#A8F0FF] p-8 flex flex-col justify-between shadow-lg">
+                    <div className="md:col-span-4 h-[240px] rounded-[16px] bg-[#BCEBFA] p-6 flex flex-col justify-between shadow-sm">
                         <div className="flex -space-x-2">
-                            <img src="https://i.pravatar.cc/100?img=4" className="w-12 h-12 rounded-full border-2 border-[#A8F0FF]" alt="User" />
-                            <img src="https://i.pravatar.cc/100?img=5" className="w-12 h-12 rounded-full border-2 border-[#A8F0FF]" alt="User" />
-                            <img src="https://i.pravatar.cc/100?img=6" className="w-12 h-12 rounded-full border-2 border-[#A8F0FF]" alt="User" />
+                            <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                            <img src="https://i.pravatar.cc/100?img=5" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                            <img src="https://i.pravatar.cc/100?img=6" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
                         </div>
                         <div>
-                            <h3 className="text-[#0E1528] text-5xl md:text-6xl font-black leading-none mb-2">10x</h3>
-                            <p className="text-[#0E1528]/80 text-base md:text-lg font-medium italic leading-tight">Zaman tasarrufu sağlayan kusursuz entegrasyon altyapısı.</p>
+                            <h3 className="text-[#0E1528] text-[42px] font-medium leading-none mb-2">30x</h3>
+                            <p className="text-[#0E1528]/80 text-[14px] font-medium italic leading-snug">Zaman tasarrufu sağlayan kusursuz altyapı.</p>
                         </div>
                     </div>
 
                     {/* Bottom Right: Gray Testimonial Card */}
-                    <div className="md:col-span-7 h-[320px] rounded-[32px] bg-[#EAECEF] p-10 flex flex-col justify-between shadow-sm border border-slate-200">
-                        <div className="flex justify-between items-center mb-4">
+                    <div className="md:col-span-8 h-[240px] rounded-[16px] bg-[#F0F2F4] p-6 flex flex-col justify-between shadow-sm">
+                        <div className="flex justify-between items-start mb-2">
                             <div className="flex items-center gap-2 text-[#0E1528]">
-                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center"><Check className="w-4 h-4 text-white"/></div>
-                                <span className="font-black text-xl">ABC KİMYA</span>
+                                <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center"><Check className="w-3 h-3 text-white"/></div>
+                                <span className="font-extrabold text-[15px] uppercase tracking-wide">Periodya</span>
                             </div>
-                            <div className="flex items-center gap-1 bg-white px-3 py-1 rounded-full shadow-sm text-slate-300">
-                                <div className="w-2 h-2 rounded-full bg-slate-400"></div><div className="w-2 h-2 rounded-full bg-slate-400"></div>
+                            <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm text-slate-300">
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
                             </div>
                         </div>
                         
-                        <p className="text-[#0E1528] text-[22px] font-medium italic leading-relaxed mb-6">
-                            "Tüm pazar yerlerini tek bir yerden yönetmek harika. Stoklarımız artık hiç karışmıyor. Operasyonel yükümüz inanılmaz hafifledi."
+                        <p className="text-[#0E1528] text-[15px] font-medium leading-relaxed mb-4 italic pr-6">
+                            "Tüm pazar yerlerini tek bir yerden yönetmek harika. Stoklarımız artık hiç karışmıyor. Ekip her zaman duyarlı ve müşteri memnuniyetini gerçekten önemsiyor."
                         </p>
                         
                         <div className="flex justify-between items-end">
-                            <div className="flex items-center gap-3">
-                                <img src="https://i.pravatar.cc/100?img=7" className="w-12 h-12 rounded-full" alt="Ahmet Y." />
+                            <div className="flex items-center gap-2">
+                                <img src="https://i.pravatar.cc/100?img=7" className="w-8 h-8 rounded-full" alt="Ahmet Y." />
                                 <div>
-                                    <h4 className="font-bold text-[#0E1528]">Ahmet Y.</h4>
-                                    <p className="text-xs font-semibold text-slate-500">Şirket Sahibi</p>
+                                    <h4 className="font-bold text-[#0E1528] text-[13px] leading-none mb-0.5">Ahmet Y.</h4>
+                                    <p className="text-[10px] font-semibold text-slate-500 leading-none">Şirket Sahibi</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <h3 className="text-[40px] font-bold text-[#0E1528] leading-none mb-1">4.9</h3>
+                                <h3 className="text-3xl font-medium text-[#0E1528] leading-none mb-1">4.5</h3>
                                 <div className="flex gap-0.5 text-orange-500 justify-end mb-1">
-                                    <Star className="w-4 h-4 fill-orange-500" /><Star className="w-4 h-4 fill-orange-500" /><Star className="w-4 h-4 fill-orange-500" /><Star className="w-4 h-4 fill-orange-500" /><Star className="w-4 h-4 fill-orange-500" />
+                                    <Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 text-slate-300 fill-slate-300" />
                                 </div>
-                                <p className="text-xs text-slate-500 font-semibold">(10k+ Yorum)</p>
+                                <p className="text-[10px] text-slate-500 font-semibold">(2.3k+ Reviews)</p>
                             </div>
                         </div>
                     </div>
