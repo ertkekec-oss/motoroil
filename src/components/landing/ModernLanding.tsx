@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-    Search, Moon, Sun, Play, ArrowUpRight, Check, Star, Facebook, Twitter, Instagram, Linkedin
+    Search, Moon, Sun, Play, ArrowUpRight, Check, Star, Facebook, Twitter, Instagram, Linkedin,
+    Bot, Activity, PieChart, Users, Shield, Headphones, Target, Cloud
 } from 'lucide-react';
 
 export default function ModernLanding() {
@@ -337,6 +338,75 @@ export default function ModernLanding() {
                                 <Play className="w-8 h-8 fill-[#0E1528] text-[#0E1528] ml-2" />
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* --- NEW 8-CARD FLEX GRID (Makes Us Different) --- */}
+            <section className="py-24 max-w-[1300px] mx-auto px-6 relative z-10">
+                <div className="text-center mb-16 max-w-2xl mx-auto">
+                    <h2 className="text-3xl md:text-5xl font-black text-[#0E1528] mb-4">
+                        Bizi <span className="text-blue-600">Farklı Kılan</span> Özellikler.
+                    </h2>
+                    <p className="text-slate-500 font-medium leading-relaxed">Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Card 1 */}
+                    <div className="bg-[#f4f9ff] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#dee9f9] pointer-events-none select-none">01</span>
+                        <div className="mb-6 z-10"><Bot className="w-9 h-9 text-[#5c8af0]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">YZ Destekli Analiz</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ön muhasebenizde yapay zekanın hızını ve kusursuzluğunu hissedin.</p>
+                    </div>
+                    {/* Card 2 */}
+                    <div className="bg-[#fff9f0] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#f7eadd] pointer-events-none select-none">02</span>
+                        <div className="mb-6 z-10"><PieChart className="w-9 h-9 text-[#fc9d36]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Derin İçgörüler</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Pazar yerlerindeki satış trendlerinizi anlık ve net raporlarla takip edin.</p>
+                    </div>
+                    {/* Card 3 */}
+                    <div className="bg-[#f0fff9] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#dbf5eb] pointer-events-none select-none">03</span>
+                        <div className="mb-6 z-10"><Activity className="w-9 h-9 text-[#30b583]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Stratejik Kararlar</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Gerçek verilere dayalı altyapımızla doğru zamanda en iyi ticaret kararını alın.</p>
+                    </div>
+                    {/* Card 4 */}
+                    <div className="bg-[#f9f4ff] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#efe1ff] pointer-events-none select-none">04</span>
+                        <div className="mb-6 z-10"><Users className="w-9 h-9 text-[#a75ff5]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">İşbirliği Araçları</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ekibinizle aynı panelde uyum içerisinde rolleri dağıtarak çalışın.</p>
+                    </div>
+                    {/* Card 5 */}
+                    <div className="bg-[#fff0f4] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#f9dce4] pointer-events-none select-none">05</span>
+                        <div className="mb-6 z-10"><Shield className="w-9 h-9 text-[#e8517e]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Veri Koruması</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">KVKK standartlarına tam uyumlu yüksek şifrelemelerle verilerinizi koruyun.</p>
+                    </div>
+                    {/* Card 6 */}
+                    <div className="bg-[#eef9f4] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#d0ede0] pointer-events-none select-none">06</span>
+                        <div className="mb-6 z-10"><Headphones className="w-9 h-9 text-[#2bae77]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">7/24 Teknik Destek</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Uzman kadromuzla mağazanızın operasyonlarında asla yarı yolda kalmayın.</p>
+                    </div>
+                    {/* Card 7 */}
+                    <div className="bg-[#f4f2ea] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#eadac6] pointer-events-none select-none">07</span>
+                        <div className="mb-6 z-10"><Target className="w-9 h-9 text-[#b28b5e]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Gelişmiş Cari CRM</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Tüm tedarikçi ağınızı tek bir listede puanınıza göre otonom olarak yönetin.</p>
+                    </div>
+                    {/* Card 8 */}
+                    <div className="bg-[#f0f4f8] rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:-translate-y-1 transition duration-300">
+                        <span className="absolute top-4 right-4 text-5xl font-black text-[#dde5ee] pointer-events-none select-none">08</span>
+                        <div className="mb-6 z-10"><Cloud className="w-9 h-9 text-[#51769d]" strokeWidth={1.5} /></div>
+                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Premium Bulut</h3>
+                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Sunucu veya kurulum olmadan güvenle anında her cihazdan işinize erişin.</p>
                     </div>
                 </div>
             </section>
