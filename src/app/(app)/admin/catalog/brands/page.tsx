@@ -25,7 +25,7 @@ export default function BrandsPage() {
             });
             if (res.ok) {
                 setBrands(brands.map(b => b.name === name ? {...b, approved: !currentStatus} : b));
-                showSuccess("Başarılı", \`Marka durumu güncellendi: \${name}\`);
+                showSuccess("Başarılı", `Marka durumu güncellendi: ${name}`);
             } else {
                 showError("Hata", "Marka güncellenemedi.");
             }
@@ -56,7 +56,7 @@ export default function BrandsPage() {
                                 <tr key={i} className="hover:bg-slate-50 dark:hover:bg-white/5">
                                     <td className="px-5 py-4 font-bold flex items-center gap-2"><Tag className="w-4 h-4 text-slate-400"/> {b.name}</td>
                                     <td className="px-5 py-4 text-center">
-                                        <span className={\`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded \${b.approved ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}\`}>
+                                        <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded ${b.approved ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                                             {b.approved ? 'ONAYLI' : 'YASAKLI'}
                                         </span>
                                     </td>

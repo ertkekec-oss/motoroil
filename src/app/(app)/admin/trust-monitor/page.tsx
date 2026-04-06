@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export default async function TrustMonitorPage() {
     const session = await getSession();
@@ -8,9 +9,6 @@ export default async function TrustMonitorPage() {
         return redirect("/login");
     }
 
-    // Fetch all trust profiles with associated company basic info (if matching by tenantId)
-    // Actually we can just fetch company and include trust profile if relation exists, but company schema might not have it directly. 
-    // We'll fetch profiles and then companies to map them safely, or just show tenantId if company not mapped.
     const trustProfiles = await prisma.companyTrustProfile.findMany({
         orderBy: { overallScore: 'desc' },
         take: 50
@@ -26,21 +24,10 @@ export default async function TrustMonitorPage() {
     companies.forEach(c => companyMap.set(c.tenantId, c.name));
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
-            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
-                {/* Header Section */}
-                <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                            <span className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">🧠</span>
-                            Güven Monitörü (Trust Monitor)
-                        </h1>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-2 ml-14">
-                            Platformdaki tüm firmaların Network İtibar skorları ve algoritmik değerlendirmeleri.
-                        </p>
-                    </div>
-                </div>
-
+        <EnterprisePageShell 
+            title="Güven Monitörü (Trust Monitor)" 
+            description="Platformdaki tüm firmaların Network İtibar skorları ve algoritmik değerlendirmeleri."
+        >
                 <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden mb-8">
                     <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
@@ -108,7 +95,6 @@ export default async function TrustMonitorPage() {
                         )}
                     </div>
                 </div>
-            </div>
-            </EnterprisePageShell>
+        </EnterprisePageShell>
     );
 }
