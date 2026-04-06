@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseButton, EnterpriseSectionHeader } from '@/components/ui/enterprise';
+import { LayoutGrid, Search, PenTool, LayoutDashboard, Settings2, Webhook, Brush, Plus, Zap, Copy, PlusCircle } from 'lucide-react';
 
 export default function WebsiteManagerPage() {
     const { showSuccess, showError, showConfirm, showPrompt } = useModal();
@@ -350,7 +352,7 @@ export default function WebsiteManagerPage() {
             </div>
 
             {/* Content Area */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="">
                 {activeTab === 'general' && (
                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div className="space-y-6">
