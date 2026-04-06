@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-    Search, Moon, Sun, Play, ArrowUpRight, Check, Star 
+    Search, Moon, Sun, Play, ArrowUpRight, Check, Star, Facebook, Twitter, Instagram, Linkedin
 } from 'lucide-react';
 
 export default function ModernLanding() {
