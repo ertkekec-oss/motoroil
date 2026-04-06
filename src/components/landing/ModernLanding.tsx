@@ -304,112 +304,112 @@ export default function ModernLanding() {
                 </div>
 
                 {/* Tab Content Box */}
-                <div className="bg-white border border-slate-200 rounded-[24px] p-10 shadow-sm min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <h3 className="text-2xl md:text-3xl font-bold text-[#0E1528] mb-4 tracking-tight">{integrationItems[activeIntegrationTab].contentTitle}</h3>
-                    <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-1">
-                        {integrationItems[activeIntegrationTab].descLine1}
-                    </p>
-                    <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-10">
-                        {integrationItems[activeIntegrationTab].descLine2}
-                    </p>
-
-                    <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6">
-                        {integrationItems[activeIntegrationTab].logos.map((logo, i) => (
-                            <span key={i} className="font-extrabold text-xl lg:text-[22px] tracking-tight text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">
-                                {logo}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* --- 4. TESTIMONIAL BENTO GRID (image_3&4 layout adapted) --- */}
-            <section className="py-12 md:py-16 max-w-[1300px] mx-auto px-6 relative z-10">
-                
-                {/* Section Header */}
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12 max-w-[1050px] mx-auto">
-                    <div>
-                        <h2 className="text-2xl md:text-3xl lg:text-[40px] font-bold text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
-                            Kusursuz entegrasyon ile operasyonlarınızı hızlandırın
-                        </h2>
-                        <p className="text-slate-500 font-medium text-[15px]">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
-                    </div>
-                    <div className="mt-6 md:mt-0 shrink-0">
-                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
-                            Tüm Yorumlar <ArrowUpRight className="w-4 h-4"/>
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Bento Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-[1050px] mx-auto">
-                    
-                    {/* Top Left: Wide Image Card */}
-                    <div className="md:col-span-8 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1542596594-649edbc13630?auto=format&fit=crop&w=800&q=80" alt="User Smiling" className="w-full h-full object-cover" />
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                            <h3 className="text-white text-xl font-bold mb-1">E-Ticaret Yönetimi</h3>
-                            <p className="text-white/80 text-[13px] font-medium">Entegrasyon, Depo, Fatura</p>
-                        </div>
-                        <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-bold">1 / 3</div>
-                    </div>
-
-                    {/* Top Right: Vertical Info Card */}
-                    <div className="md:col-span-4 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Focus" className="w-full h-full object-cover" />
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3E2723]/90 to-transparent p-6">
-                            <h3 className="text-white text-4xl font-bold mb-1">%98.2</h3>
-                            <p className="text-white/80 text-[13px] font-medium leading-tight">En iyi ve güvenilir geri bildirimler bizi tam olarak anlayan müşterilerimizden gelir.</p>
-                        </div>
-                    </div>
-
-                    {/* Bottom Left: Cyan Card */}
-                    <div className="md:col-span-4 h-[240px] rounded-[16px] bg-[#BCEBFA] p-6 flex flex-col justify-between shadow-sm">
-                        <div className="flex -space-x-2">
-                            <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
-                            <img src="https://i.pravatar.cc/100?img=5" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
-                            <img src="https://i.pravatar.cc/100?img=6" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
-                        </div>
-                        <div>
-                            <h3 className="text-[#0E1528] text-[42px] font-medium leading-none mb-2">30x</h3>
-                            <p className="text-[#0E1528]/80 text-[14px] font-medium italic leading-snug">Zaman tasarrufu sağlayan kusursuz altyapı.</p>
-                        </div>
-                    </div>
-
-                    {/* Bottom Right: Gray Testimonial Card */}
-                    <div className="md:col-span-8 h-[240px] rounded-[16px] bg-[#F0F2F4] p-6 flex flex-col justify-between shadow-sm">
-                        <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-2 text-[#0E1528]">
-                                <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center"><Check className="w-3 h-3 text-white"/></div>
-                                <span className="font-extrabold text-[15px] uppercase tracking-wide">Periodya</span>
+                {activeIntegrationTab === 0 ? (
+                    <div className="w-full text-left mt-8">
+                        {/* Section Header */}
+                        <div className="flex flex-col md:flex-row justify-between items-end mb-8 max-w-[1050px] mx-auto">
+                            <div>
+                                <h2 className="text-2xl md:text-3xl lg:text-[40px] font-bold text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
+                                    Kusursuz entegrasyon ile operasyonlarınızı hızlandırın
+                                </h2>
+                                <p className="text-slate-500 font-medium text-[15px]">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
                             </div>
-                            <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm text-slate-300">
-                                <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+                            <div className="mt-4 md:mt-0 shrink-0">
+                                <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                                    Tüm Yorumlar <ArrowUpRight className="w-4 h-4"/>
+                                </Link>
                             </div>
                         </div>
-                        
-                        <p className="text-[#0E1528] text-[15px] font-medium leading-relaxed mb-4 italic pr-6">
-                            "Tüm pazar yerlerini tek bir yerden yönetmek harika. Stoklarımız artık hiç karışmıyor. Ekip her zaman duyarlı ve müşteri memnuniyetini gerçekten önemsiyor."
-                        </p>
-                        
-                        <div className="flex justify-between items-end">
-                            <div className="flex items-center gap-2">
-                                <img src="https://i.pravatar.cc/100?img=7" className="w-8 h-8 rounded-full" alt="Ahmet Y." />
+
+                        {/* Bento Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-[1050px] mx-auto">
+                            
+                            {/* Top Left: Wide Image Card */}
+                            <div className="md:col-span-8 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1542596594-649edbc13630?auto=format&fit=crop&w=800&q=80" alt="User Smiling" className="w-full h-full object-cover" />
+                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                                    <h3 className="text-white text-xl font-bold mb-1">E-Ticaret Yönetimi</h3>
+                                    <p className="text-white/80 text-[13px] font-medium">Entegrasyon, Depo, Fatura</p>
+                                </div>
+                                <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-bold">1 / 3</div>
+                            </div>
+
+                            {/* Top Right: Vertical Info Card */}
+                            <div className="md:col-span-4 h-[240px] rounded-[16px] overflow-hidden relative shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Focus" className="w-full h-full object-cover" />
+                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3E2723]/90 to-transparent p-6">
+                                    <h3 className="text-white text-4xl font-bold mb-1">%98.2</h3>
+                                    <p className="text-white/80 text-[13px] font-medium leading-tight">En iyi ve güvenilir geri bildirimler bizi tam olarak anlayan müşterilerimizden gelir.</p>
+                                </div>
+                            </div>
+
+                            {/* Bottom Left: Cyan Card */}
+                            <div className="md:col-span-4 h-[240px] rounded-[16px] bg-[#BCEBFA] p-6 flex flex-col justify-between shadow-sm">
+                                <div className="flex -space-x-2">
+                                    <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                                    <img src="https://i.pravatar.cc/100?img=5" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                                    <img src="https://i.pravatar.cc/100?img=6" className="w-8 h-8 rounded-full border border-[#A8F0FF]" alt="User" />
+                                </div>
                                 <div>
-                                    <h4 className="font-bold text-[#0E1528] text-[13px] leading-none mb-0.5">Ahmet Y.</h4>
-                                    <p className="text-[10px] font-semibold text-slate-500 leading-none">Şirket Sahibi</p>
+                                    <h3 className="text-[#0E1528] text-[42px] font-medium leading-none mb-2">30x</h3>
+                                    <p className="text-[#0E1528]/80 text-[14px] font-medium italic leading-snug">Zaman tasarrufu sağlayan kusursuz altyapı.</p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <h3 className="text-3xl font-medium text-[#0E1528] leading-none mb-1">4.5</h3>
-                                <div className="flex gap-0.5 text-orange-500 justify-end mb-1">
-                                    <Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 text-slate-300 fill-slate-300" />
+
+                            {/* Bottom Right: Gray Testimonial Card */}
+                            <div className="md:col-span-8 h-[240px] rounded-[16px] bg-[#F0F2F4] p-6 flex flex-col justify-between shadow-sm">
+                                <div className="flex justify-between items-start mb-2">
+                                    <div className="flex items-center gap-2 text-[#0E1528]">
+                                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center"><Check className="w-3 h-3 text-white"/></div>
+                                        <span className="font-extrabold text-[15px] uppercase tracking-wide">Periodya</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm text-slate-300">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+                                    </div>
                                 </div>
-                                <p className="text-[10px] text-slate-500 font-semibold">(2.3k+ Reviews)</p>
+                                
+                                <p className="text-[#0E1528] text-[15px] font-medium leading-relaxed mb-4 italic pr-6">
+                                    "Tüm pazar yerlerini tek bir yerden yönetmek harika. Stoklarımız artık hiç karışmıyor. Ekip her zaman duyarlı ve müşteri memnuniyetini gerçekten önemsiyor."
+                                </p>
+                                
+                                <div className="flex justify-between items-end">
+                                    <div className="flex items-center gap-2">
+                                        <img src="https://i.pravatar.cc/100?img=7" className="w-8 h-8 rounded-full" alt="Ahmet Y." />
+                                        <div>
+                                            <h4 className="font-bold text-[#0E1528] text-[13px] leading-none mb-0.5">Ahmet Y.</h4>
+                                            <p className="text-[10px] font-semibold text-slate-500 leading-none">Şirket Sahibi</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <h3 className="text-3xl font-medium text-[#0E1528] leading-none mb-1">4.5</h3>
+                                        <div className="flex gap-0.5 text-orange-500 justify-end mb-1">
+                                            <Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 fill-orange-500" /><Star className="w-3 h-3 text-slate-300 fill-slate-300" />
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 font-semibold">(2.3k+ Reviews)</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="bg-white border border-slate-200 rounded-[24px] p-10 shadow-sm min-h-[250px] flex flex-col items-center justify-center text-center max-w-[1050px] mx-auto">
+                        <h3 className="text-2xl md:text-3xl font-bold text-[#0E1528] mb-4 tracking-tight">{integrationItems[activeIntegrationTab].contentTitle}</h3>
+                        <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-1">
+                            {integrationItems[activeIntegrationTab].descLine1}
+                        </p>
+                        <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-10">
+                            {integrationItems[activeIntegrationTab].descLine2}
+                        </p>
+
+                        <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6">
+                            {integrationItems[activeIntegrationTab].logos.map((logo, i) => (
+                                <span key={i} className="font-extrabold text-xl lg:text-[22px] tracking-tight text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">
+                                    {logo}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </section>
 
             {/* --- 5. INTERACTIVE PLATFORM SECTION (Exsit Redesign) --- */}
