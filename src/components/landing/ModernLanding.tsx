@@ -45,8 +45,7 @@ export default function ModernLanding() {
     return (
         <div className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
             
-            {/* --- GLOBAL BACKGROUND DOTS --- */}
-            <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#d1d5db 1px, transparent 1px)', backgroundSize: '24px 24px', opacity: 0.5 }}></div>
+            
 
             {/* Faint Background Geometry Block (Approximation for the Hero Left) */}
             <div className="absolute top-10 -left-64 w-[500px] h-[500px] bg-white rounded-[100px] rotate-45 opacity-40 z-0"></div>
