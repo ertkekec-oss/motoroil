@@ -251,15 +251,15 @@ export default function ModernLanding() {
             <section className="py-24 max-w-[1300px] mx-auto px-6 relative z-10">
                 
                 {/* Section Header */}
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-                    <div className="max-w-xl">
-                        <h2 className="text-2xl md:text-4xl font-bold text-[#0E1528] leading-[1.1] mb-2">
-                            Kusursuz entegrasyon ile <br/>operasyonlarınızı <span className="text-[#0E1528]">hızlandırın</span>
+                <div className="flex flex-col md:flex-row justify-between items-end mb-12 max-w-[1050px] mx-auto">
+                    <div>
+                        <h2 className="text-2xl md:text-3xl lg:text-[40px] font-bold text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
+                            Kusursuz entegrasyon ile operasyonlarınızı hızlandırın
                         </h2>
-                        <p className="text-slate-500 font-medium">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
+                        <p className="text-slate-500 font-medium text-[15px]">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
                     </div>
-                    <div className="mt-6 md:mt-0">
-                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-lg flex items-center gap-2">
+                    <div className="mt-6 md:mt-0 shrink-0">
+                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
                             Tüm Yorumlar <ArrowUpRight className="w-4 h-4"/>
                         </Link>
                     </div>
