@@ -51,46 +51,80 @@ export default function ModernLanding() {
             {/* Faint Background Geometry Block (Approximation for the Hero Left) */}
             <div className="absolute top-10 -left-64 w-[500px] h-[500px] bg-white rounded-[100px] rotate-45 opacity-40 z-0"></div>
             
-            {/* --- 1. HEADER --- */}
-            <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#F4F7FF]/90 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'}`}>
-                <div className="max-w-[1300px] mx-auto px-6 flex items-center justify-between">
-                    {/* Logo */}
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-[10px] flex items-center justify-center text-white font-black text-lg md:text-xl shadow-lg">
-                            P
-                        </div>
-                        <span className="text-xl md:text-2xl font-bold tracking-tight text-[#0E1528]">Periodya</span>
+            {/* --- 1. HEADER (Exsit Redesign) --- */}
+            <header className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-sm transition-all duration-300">
+                <style>{`
+                  @keyframes marquee {
+                    0% { transform: translateX(0%); }
+                    100% { transform: translateX(-50%); }
+                  }
+                  .animate-marquee-infinite {
+                    display: flex;
+                    width: max-content;
+                    animation: marquee 35s linear infinite;
+                  }
+                  .animate-marquee-infinite:hover {
+                    animation-play-state: paused;
+                  }
+                `}</style>
+                
+                {/* Top Notification Bar */}
+                <div className="bg-[#2563EB] text-white py-2.5 hidden sm:flex justify-center items-center">
+                    <div className="bg-white/10 px-6 py-1 rounded-full text-[11px] font-medium tracking-wide">
+                        Yeni: Periodya'nın baştan aşağı yenilenen kullanıcı arayüzü ile tanışın! Operasyonlarınız çok daha güçlü.
                     </div>
+                </div>
 
-                    {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center gap-8 font-semibold text-[15px] text-[#0E1528]">
-                        <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Demo <span className="text-xs">▼</span></Link>
-                        <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Özellikler <span className="text-xs">▼</span></Link>
-                        <Link href="#" className="hover:text-blue-600 transition-colors">Pazar Yerleri</Link>
-                        <Link href="#" className="hover:text-blue-600 transition-colors">Hakkımızda</Link>
-                        <Link href="#" className="hover:text-blue-600 transition-colors">İletişim</Link>
-                    </nav>
+                {/* Main Navbar */}
+                <div className={`transition-colors duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md' : 'bg-white'} border-b border-slate-100`}>
+                    <div className="max-w-[1400px] mx-auto px-6 h-[76px] flex items-center justify-between">
+                        {/* Logo */}
+                        <div className="flex items-center gap-2">
+                             <div className="flex gap-1 items-center">
+                                 {/* Mimicking the slanted 'SS' logo of Sasstech using basic shapes */}
+                                 <div className="w-[18px] h-[22px] bg-blue-600 rounded-sm skew-x-[-15deg]"></div>
+                                 <div className="w-[8px] h-[22px] bg-[#0E1528] rounded-sm skew-x-[-15deg]"></div>
+                             </div>
+                            <span className="text-[22px] font-bold tracking-tight text-[#0E1528] ml-1">Periodya</span>
+                        </div>
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-4 border-l border-slate-300/30 pl-4">
-                        <button className="text-[#0E1528] hover:text-blue-600 transition-colors hidden sm:block p-2">
-                            <Search className="w-5 h-5" />
-                        </button>
-                        <button 
-                            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
-                            className="flex items-center gap-2 text-[#0E1528] font-semibold text-sm mr-4"
-                        >
-                            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />} <span className="hidden sm:inline">Dark</span>
-                        </button>
-                        <Link href="/register" className="px-6 py-2.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
-                            Ücretsiz Dene
-                        </Link>
+                        {/* Desktop Navigation */}
+                        <nav className="hidden lg:flex items-center gap-8 font-semibold text-[14px] text-slate-700">
+                            <Link href="#" className="text-blue-600 flex items-center gap-1 transition-colors">Ana Sayfa <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Özellikler <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Modüller <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Blog <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors">İletişim</Link>
+                        </nav>
+
+                        {/* Right Actions */}
+                        <div className="flex items-center gap-4">
+                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-full hover:bg-blue-600 transition-colors shadow-md">
+                                Ücretsiz Dene
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom Ticker/Marquee Bar */}
+                <div className="bg-white border-b border-slate-100 py-3.5 overflow-hidden flex whitespace-nowrap">
+                    <div className="animate-marquee-infinite text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                        {/* We loop 3 times to ensure infinite scroll fills the screen */}
+                        {[1,2,3].map((set) => (
+                            <div key={set} className="flex items-center gap-14 px-7">
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> BAŞARI İÇİN MÜKEMMEL ÇÖZÜM</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> E-TİCARET OPERASYONLARINDA MÜKEMMELLİK</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> MARKANIZI PERİODYA İLE YÜKSELTİN</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> İŞ HEDEFLERİNİZE ULAŞACAK TEKNOLOJİ</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> GÜÇLÜ PAZAR YERİ VARLIĞI</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </header>
 
             {/* --- 2. HERO SECTION (Exsit Redesign) --- */}
-            <section className="pt-40 lg:pt-48 pb-32 max-w-[1300px] mx-auto px-6 relative z-10">
+            <section className="pt-56 lg:pt-64 pb-32 max-w-[1300px] mx-auto px-6 relative z-10">
                 <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
                     
                     {/* Left Column Text */}
