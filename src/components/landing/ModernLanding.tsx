@@ -6,8 +6,8 @@ import {
     Search, Moon, Sun, Play, ArrowUpRight, ArrowRight, Zap, Check, Star, Facebook, Twitter, Instagram, Linkedin,
     Bot, Activity, PieChart, Users, Shield, Headphones, Target, Cloud, Box, Database, ShoppingBag, Layout
 } from 'lucide-react';
-import LoginSpotlight from './LoginSpotlight';
-import Login3DHoloCard from './Login3DHoloCard';
+import LoginHoloModal from './LoginHoloModal';
+
 
 const platformTabs = [
     {
