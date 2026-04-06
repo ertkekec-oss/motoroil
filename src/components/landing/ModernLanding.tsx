@@ -265,20 +265,31 @@ export default function ModernLanding() {
 
             {/* --- 3. DYNAMIC INTEGRATIONS TABS --- */}
             <section className="py-12 md:py-16 max-w-[1050px] mx-auto px-6 relative z-10 w-full">
-                <div className="text-center mb-10">
-                    <h2 className="text-3xl md:text-5xl font-black text-[#0E1528] mb-4">Sıradışı Bir <span className="text-blue-600">Entegrasyon</span> Ağı</h2>
-                    <p className="text-slate-500 font-medium text-[16px]">Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.</p>
+                
+                {/* Header Pattern with Button */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+                    <div>
+                        <h2 className="text-2xl md:text-3xl lg:text-[40px] font-bold text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
+                            Sıradışı bir <span className="text-blue-600">entegrasyon</span> ağı
+                        </h2>
+                        <p className="text-slate-500 font-medium text-[15px]">Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.</p>
+                    </div>
+                    <div className="mt-2 md:mt-0 shrink-0">
+                        <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                            Tüm Entegrasyonlar <ArrowUpRight className="w-4 h-4"/>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-6">
                     {integrationItems.map((item, idx) => (
                         <button 
                             key={idx}
                             onClick={() => setActiveIntegrationTab(idx)}
-                            className={`px-6 py-2.5 rounded-full font-bold text-[14px] transition-all duration-300 ${
+                            className={`px-5 py-2.5 rounded-[12px] font-bold text-[14px] transition-all duration-300 ${
                                 activeIntegrationTab === idx 
-                                ? "bg-[#2563EB] text-white shadow-md scale-105" 
+                                ? "bg-[#2563EB] text-white shadow-md" 
                                 : "bg-white text-slate-500 hover:bg-slate-50 hover:text-[#0E1528] border border-slate-200"
                             }`}
                         >
@@ -288,18 +299,18 @@ export default function ModernLanding() {
                 </div>
 
                 {/* Tab Content Box */}
-                <div className="bg-white border border-slate-200 rounded-[24px] p-10 shadow-sm min-h-[300px] flex flex-col items-center justify-center text-center">
-                    <h3 className="text-2xl font-bold text-[#0E1528] mb-4">{integrationItems[activeIntegrationTab].title} Çözümleri</h3>
-                    <p className="text-slate-500 text-[15px] font-medium leading-[1.6] max-w-2xl mx-auto mb-2">
+                <div className="bg-white border border-slate-200 rounded-[24px] p-10 shadow-sm min-h-[250px] flex flex-col items-center justify-center text-center">
+                    <h3 className="text-2xl font-bold text-[#0E1528] mb-3">{integrationItems[activeIntegrationTab].title} Çözümleri</h3>
+                    <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-1">
                         {integrationItems[activeIntegrationTab].descLine1}
                     </p>
-                    <p className="text-slate-500 text-[15px] font-medium leading-[1.6] max-w-2xl mx-auto mb-12">
+                    <p className="text-slate-500 text-[14px] font-medium leading-[1.6] max-w-2xl mx-auto mb-10">
                         {integrationItems[activeIntegrationTab].descLine2}
                     </p>
 
                     <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6">
                         {integrationItems[activeIntegrationTab].logos.map((logo, i) => (
-                            <span key={i} className="font-black text-2xl lg:text-[28px] tracking-tight text-slate-400 hover:text-[#0E1528] hover:scale-105 transition-all cursor-default">
+                            <span key={i} className="font-extrabold text-xl lg:text-[22px] tracking-tight text-slate-400 hover:text-[#0E1528] transition-colors cursor-default">
                                 {logo}
                             </span>
                         ))}
