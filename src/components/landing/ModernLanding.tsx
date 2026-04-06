@@ -65,82 +65,110 @@ export default function ModernLanding() {
                 </div>
             </header>
 
-            {/* --- 2. HERO SECTION (image_0.png) --- */}
-            <section className="pt-40 lg:pt-48 pb-20 max-w-[1300px] mx-auto px-6 relative z-10">
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* --- 2. HERO SECTION (Exsit Redesign) --- */}
+            <section className="pt-40 lg:pt-48 pb-32 max-w-[1300px] mx-auto px-6 relative z-10">
+                <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
                     
-                    {/* Left Column */}
-                    <div className="max-w-xl pr-4">
-                        <div className="inline-block px-4 py-1.5 rounded-full bg-white text-blue-600 font-semibold text-xs border border-blue-100 mb-6 shadow-sm">
-                            Online program is now available
-                        </div>
-                        
-                        <h1 className="text-3xl md:text-5xl lg:text-5xl font-black tracking-tight leading-tight text-[#0E1528] mb-6 max-w-lg">
-                            Periodya ile E-Ticaret ve Muhasebede <br className="hidden md:block"/>
-                            <span className="text-[#2563EB]">Üstün</span> Sonuçlar
+                    {/* Left Column Text */}
+                    <div className="col-span-12 lg:col-span-7">
+                        <h1 className="text-5xl md:text-[64px] lg:text-[72px] text-[#0E1528] leading-[1.1] tracking-tight mb-8">
+                            <span className="font-light">E-Ticaret</span> <span className="font-bold">ve</span><br/>
+                            <span className="font-bold">Ön Muhasebede</span><br/>
+                            <span className="font-bold text-[#2563EB]">Üstün</span> <span className="font-light whitespace-nowrap">Sonuçlar</span>
                         </h1>
                         
-                        <p className="text-lg text-slate-600 font-medium leading-relaxed mb-8 pr-10">
-                            Pazar yerleri ve ön muhasebenizi tek panelden, yorulmadan yönetin. Dönüşüm yolculuğunuza bizimle başlayın.
+                        <p className="text-slate-500 text-base md:text-lg mb-12 max-w-[480px] font-medium leading-relaxed">
+                            Günümüzün rekabetçi ticaretinde, etkin ve düşük maliyetli yazılım çözümlerine olan ihtiyaç hiç bu kadar kritik olmamıştı.
                         </p>
                         
-                        <div className="flex flex-wrap items-center gap-4 relative">
-                            <Link href="/register" className="px-8 py-4 bg-[#2563EB] text-white text-[15px] font-bold rounded-xl shadow-[0_10px_20px_rgba(37,99,235,0.2)] flex items-center gap-2 hover:-translate-y-1 transition-transform">
-                                14 Gün Ücretsiz Dene <ArrowUpRight className="w-4 h-4"/>
-                            </Link>
-                            <Link href="#demo" className="px-8 py-4 bg-[#0E1528] text-white text-[15px] font-bold rounded-xl flex items-center gap-2 hover:-translate-y-1 transition-transform shadow-[0_10px_20px_rgba(14,21,40,0.2)]">
-                                Detayları İncele <ArrowUpRight className="w-4 h-4"/>
+                        <div className="flex flex-wrap items-center gap-6 relative">
+                            <Link href="/register" className="px-8 py-3.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-full shadow-[0_15px_30px_rgba(37,99,235,0.25)] hover:-translate-y-1 transition-transform">
+                                Ücretsiz Başla
                             </Link>
                             
-                            {/* Blue Hand-Drawn Arrow & Text */}
-                            <div className="absolute -bottom-20 left-10 hidden sm:flex items-center gap-2 -rotate-6">
-                                {/* Hand-drawn curved arrow SVG pointing to button */}
-                                <svg width="50" height="50" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-600">
-                                    <path d="M90 90C70 80 50 40 30 10M30 10L50 15M30 10L25 30" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                            <div className="flex items-center gap-3">
+                                <div className="flex -space-x-3">
+                                    <img src="https://i.pravatar.cc/100?img=1" className="w-10 h-10 rounded-full border-[3px] border-[#F4F7FF] relative z-30" alt="User" />
+                                    <img src="https://i.pravatar.cc/100?img=2" className="w-10 h-10 rounded-full border-[3px] border-[#F4F7FF] relative z-20" alt="User" />
+                                    <img src="https://i.pravatar.cc/100?img=3" className="w-10 h-10 rounded-full border-[3px] border-[#F4F7FF] relative z-10" alt="User" />
+                                </div>
+                                <div className="flex flex-col justify-center">
+                                    <div className="font-black text-[#0E1528] text-sm leading-none mb-1">2.3M+</div>
+                                    <div className="text-[10px] whitespace-nowrap font-bold text-slate-500 leading-none">5000+ Müşteri Yorumu</div>
+                                </div>
+                            </div>
+
+                            {/* Blue decorative element floating near bottom */}
+                            <div className="absolute -bottom-8 right-20 hidden md:block select-none pointer-events-none opacity-40">
+                                <svg width="30" height="30" viewBox="0 0 100 100" fill="none" stroke="#2563EB" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M50 10 L50 90 M10 50 L90 50 M25 25 L75 75 M25 75 L75 25" />
                                 </svg>
-                                <span className="font-['Caveat',cursive] text-blue-600 font-bold text-lg rotate-6 mt-10">
-                                    Building Enterprise Growth: <br/>An Efficient Blueprint
-                                </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column (Hero Image & Overlays) */}
-                    <div className="relative mt-20 lg:mt-0 pl-10">
-                        {/* Green floating cube icon */}
-                        <div className="absolute top-1/4 -left-6 z-20 w-12 h-12 bg-[#B4F23B] rounded-xl flex items-center justify-center shadow-lg">
-                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    {/* Right Column (Complex Image Composition) */}
+                    <div className="col-span-12 lg:col-span-5 relative mt-24 lg:mt-0 flex justify-center lg:justify-end pr-4">
+                        
+                        {/* Faint Background Geometric Grid (Top Right) */}
+                        <div className="absolute top-[-30px] -right-4 w-48 h-48 grid grid-cols-4 grid-rows-4 gap-3 opacity-[0.03] z-0">
+                            {Array.from({length: 16}).map((_, i) => <div key={i} className="bg-[#0E1528] rounded-[2px]" />)}
                         </div>
 
-                        {/* Top Right Floating Box */}
-                        <div className="absolute -top-6 right-6 z-20 bg-white rounded-2xl p-3 px-5 shadow-[0_15px_30px_rgba(0,0,0,0.08)] flex items-center gap-4">
-                            <div className="flex -space-x-3">
-                                <img src="https://i.pravatar.cc/100?img=1" className="w-10 h-10 rounded-full border-2 border-white relative z-30" alt="User" />
-                                <img src="https://i.pravatar.cc/100?img=2" className="w-10 h-10 rounded-full border-2 border-white relative z-20" alt="User" />
-                                <img src="https://i.pravatar.cc/100?img=3" className="w-10 h-10 rounded-full border-2 border-white relative z-10" alt="User" />
+                        {/* Main Subject Card (Rounded Arches) */}
+                        <div className="w-[85%] max-w-[420px] bg-white rounded-t-[120px] rounded-b-[40px] p-1.5 pb-0 shadow-[0_30px_60px_rgba(0,0,0,0.05)] relative z-20">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" alt="Business Professional" className="w-full h-[500px] object-cover rounded-t-[115px] rounded-b-[38px] grayscale-[0.3]" />
+                        </div>
+
+                        {/* Floating Card 1: Trustpilot (Top Right) */}
+                        <div className="absolute top-10 -right-2 lg:-right-8 bg-white rounded-2xl p-4 px-5 shadow-[0_20px_40px_rgba(0,0,0,0.06)] z-30 flex flex-col items-center gap-1.5 border border-slate-100">
+                            <div className="absolute -top-3 right-4 bg-[#00b67a] text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
+                                4.9 <Star className="w-2.5 h-2.5 fill-white" />
                             </div>
-                            <div>
-                                <p className="text-xl font-bold text-[#0E1528] leading-tight">150,000+</p>
-                                <p className="text-xs text-slate-500 font-medium whitespace-nowrap">Aktif Kullanıcı</p>
+                            <div className="flex gap-0.5 mt-2">
+                                <div className="w-5 h-5 bg-[#00b67a] flex items-center justify-center rounded-[2px]"><Star className="w-3 h-3 text-white fill-white"/></div>
+                                <div className="w-5 h-5 bg-[#00b67a] flex items-center justify-center rounded-[2px]"><Star className="w-3 h-3 text-white fill-white"/></div>
+                                <div className="w-5 h-5 bg-[#00b67a] flex items-center justify-center rounded-[2px]"><Star className="w-3 h-3 text-white fill-white"/></div>
+                                <div className="w-5 h-5 bg-[#00b67a] flex items-center justify-center rounded-[2px]"><Star className="w-3 h-3 text-white fill-white"/></div>
+                                <div className="w-5 h-5 bg-slate-200 flex items-center justify-center rounded-[2px]"><Star className="w-3 h-3 text-white fill-white"/></div>
+                            </div>
+                            <div className="font-bold text-[#0E1528] text-[13px] flex items-center gap-1 mt-0.5">
+                                Trust pilot <Check className="w-3.5 h-3.5 text-white bg-blue-600 rounded-full p-0.5" />
                             </div>
                         </div>
 
-                        {/* Main Image Base */}
-                        <div className="rounded-3xl overflow-hidden aspect-[4/4] relative shadow-2xl">
-                            <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1200&q=80" alt="İş İnsanı" className="w-full h-full object-cover" />
-                            
-                            {/* Dark gradient for text visibility at bottom */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-
-                            {/* White Pills Bottom Left inside image */}
-                            <div className="absolute bottom-8 left-8 flex flex-col gap-3 items-start">
-                                <div className="bg-white backdrop-blur-md px-5 py-2.5 rounded-full text-slate-800 text-sm font-bold shadow-lg">Stok Takibi</div>
-                                <div className="bg-white backdrop-blur-md px-5 py-2.5 rounded-full text-slate-800 text-sm font-bold shadow-lg">Ön Muhasebe</div>
-                                <div className="bg-white backdrop-blur-md px-5 py-2.5 rounded-full text-slate-800 text-sm font-bold shadow-lg">Sipariş Yönetimi</div>
+                        {/* Floating Card 2: Daily Revenue (Bottom Left) */}
+                        <div className="absolute bottom-12 -left-6 lg:left-[-60px] bg-white/95 backdrop-blur-md rounded-[20px] p-5 shadow-[0_30px_60px_rgba(0,0,0,0.12)] z-30 w-[260px] border border-white">
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <div className="text-[9px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Günlük Ciro</div>
+                                    <div className="text-[20px] font-black text-[#0E1528] tracking-tight leading-none">₺48,200.00</div>
+                                </div>
+                                <div className="w-12 h-12 rounded-full border-[3px] border-pink-100 flex items-center justify-center bg-white shadow-inner">
+                                    <div className="w-9 h-9 rounded-full bg-pink-50 flex items-center justify-center">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8517e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-4 text-[10px] font-bold text-slate-400">
+                                <span className="text-[#0E1528]">Günlük</span>
+                                <span className="hover:text-[#0E1528] cursor-pointer transition-colors">Haftalık</span>
+                                <span className="hover:text-[#0E1528] cursor-pointer transition-colors">Aylık</span>
                             </div>
                         </div>
+
+                        {/* Floating Card 3: Experience Blue Box (Bottom Right) */}
+                        <div className="absolute -bottom-6 -right-6 lg:-right-4 bg-[#2563EB] text-white rounded-[24px] rounded-tl-none p-6 md:p-8 shadow-[0_20px_40px_rgba(37,99,235,0.4)] z-20 w-40 md:w-48 outline outline-4 outline-[#F4F7FF]">
+                            <div className="text-4xl md:text-5xl font-black mb-2 leading-none">8+</div>
+                            <div className="text-[10px] md:text-xs font-semibold leading-tight text-white/90">Yıllık Sektör<br/>Tecrübesi</div>
+                        </div>
+
+                        {/* Setting gear icon floating right */}
+                        <div className="absolute top-[35%] -right-16 hidden lg:flex w-10 h-10 bg-blue-600 rounded drop-shadow-xl text-white items-center justify-center z-10">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        </div>
+
                     </div>
-
                 </div>
             </section>
 
