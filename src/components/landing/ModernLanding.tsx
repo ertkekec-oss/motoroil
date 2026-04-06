@@ -89,7 +89,7 @@ export default function ModernLanding() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-[#006CFF] selection:text-white overflow-x-hidden relative">
+        <div className="min-h-screen bg-[#F4F7FF] font-sans text-[#0E1528] selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
             
             
 
@@ -114,7 +114,7 @@ export default function ModernLanding() {
                 `}</style>
                 
                 {/* Top Notification Bar */}
-                <div className="bg-[#006CFF] text-white py-2.5 hidden sm:flex justify-center items-center">
+                <div className="bg-[#2563EB] text-white py-2.5 hidden sm:flex justify-center items-center">
                     <div className="bg-white/10 px-6 py-1 rounded-full text-[11px] font-medium tracking-wide">
                         Yeni: Periodya'nın baştan aşağı yenilenen kullanıcı arayüzü ile tanışın! Operasyonlarınız çok daha güçlü.
                     </div>
@@ -127,7 +127,7 @@ export default function ModernLanding() {
                         <div className="flex items-center gap-2">
                              <div className="flex gap-1 items-center">
                                  {/* Mimicking the slanted 'SS' logo of Sasstech using basic shapes */}
-                                 <div className="w-[18px] h-[22px] bg-[#006CFF] rounded-sm skew-x-[-15deg]"></div>
+                                 <div className="w-[18px] h-[22px] bg-blue-600 rounded-sm skew-x-[-15deg]"></div>
                                  <div className="w-[8px] h-[22px] bg-[#0E1528] rounded-sm skew-x-[-15deg]"></div>
                              </div>
                             <span className="text-[22px] font-bold tracking-tight text-[#0E1528] ml-1">Periodya</span>
@@ -135,16 +135,16 @@ export default function ModernLanding() {
 
                         {/* Desktop Navigation */}
                         <nav className="hidden lg:flex items-center gap-8 font-semibold text-[14px] text-slate-700">
-                            <Link href="#" className="text-[#006CFF] flex items-center gap-1 transition-colors">Ana Sayfa <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-[#006CFF] transition-colors flex items-center gap-1">Özellikler <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-[#006CFF] transition-colors flex items-center gap-1">Modüller <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-[#006CFF] transition-colors flex items-center gap-1">Blog <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-[#006CFF] transition-colors">İletişim</Link>
+                            <Link href="#" className="text-blue-600 flex items-center gap-1 transition-colors">Ana Sayfa <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Özellikler <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Modüller <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Blog <span className="text-[10px] font-black">▼</span></Link>
+                            <Link href="#" className="hover:text-blue-600 transition-colors">İletişim</Link>
                         </nav>
 
                         {/* Right Actions */}
                         <div className="flex items-center gap-4">
-                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-md hover:bg-[#006CFF] transition-colors shadow-md">
+                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-md hover:bg-blue-600 transition-colors shadow-md">
                                 Ücretsiz Dene
                             </Link>
                         </div>
@@ -157,11 +157,11 @@ export default function ModernLanding() {
                         {/* We loop 3 times to ensure infinite scroll fills the screen */}
                         {[1,2,3].map((set) => (
                             <div key={set} className="flex items-center gap-14 px-7">
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-[#006CFF] stroke-[2.5px]"/> BAŞARI İÇİN MÜKEMMEL ÇÖZÜM</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-[#006CFF] stroke-[2.5px]"/> E-TİCARET OPERASYONLARINDA MÜKEMMELLİK</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-[#006CFF] stroke-[2.5px]"/> MARKANIZI PERİODYA İLE YÜKSELTİN</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-[#006CFF] stroke-[2.5px]"/> İŞ HEDEFLERİNİZE ULAŞACAK TEKNOLOJİ</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-[#006CFF] stroke-[2.5px]"/> GÜÇLÜ PAZAR YERİ VARLIĞI</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> BAŞARI İÇİN MÜKEMMEL ÇÖZÜM</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> E-TİCARET OPERASYONLARINDA MÜKEMMELLİK</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> MARKANIZI PERİODYA İLE YÜKSELTİN</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> İŞ HEDEFLERİNİZE ULAŞACAK TEKNOLOJİ</span>
+                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> GÜÇLÜ PAZAR YERİ VARLIĞI</span>
                             </div>
                         ))}
                     </div>
@@ -177,7 +177,7 @@ export default function ModernLanding() {
                         <h1 className="text-5xl md:text-[64px] lg:text-[72px] text-[#0E1528] leading-[1.1] tracking-tight mb-8">
                             <span className="font-light">E-Ticaret</span> <span className="font-bold">ve</span><br/>
                             <span className="font-bold">Ön Muhasebede</span><br/>
-                            <span className="font-bold text-[#006CFF]">Üstün</span> <span className="font-light whitespace-nowrap">Sonuçlar</span>
+                            <span className="font-bold text-[#2563EB]">Üstün</span> <span className="font-light whitespace-nowrap">Sonuçlar</span>
                         </h1>
                         
                         <p className="text-slate-500 text-base md:text-lg mb-12 max-w-[480px] font-medium leading-relaxed">
@@ -185,7 +185,7 @@ export default function ModernLanding() {
                         </p>
                         
                         <div className="flex flex-wrap items-center gap-6 relative">
-                            <Link href="/register" className="px-8 py-3.5 bg-[#84E164] text-[#0E1528] text-[15px] font-extrabold rounded-md shadow-[0_15px_30px_rgba(132,225,100,0.3)] hover:bg-[#6BCC4E] hover:-translate-y-1 transition-all">
+                            <Link href="/register" className="px-8 py-3.5 bg-[#2563EB] text-white text-[15px] font-bold rounded-md shadow-[0_15px_30px_rgba(37,99,235,0.25)] hover:-translate-y-1 transition-transform">
                                 Ücretsiz Başla
                             </Link>
                             
@@ -203,7 +203,7 @@ export default function ModernLanding() {
 
                             {/* Blue decorative element floating near bottom */}
                             <div className="absolute -bottom-8 right-20 hidden md:block select-none pointer-events-none opacity-40">
-                                <svg width="30" height="30" viewBox="0 0 100 100" fill="none" stroke="#006CFF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                <svg width="30" height="30" viewBox="0 0 100 100" fill="none" stroke="#2563EB" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M50 10 L50 90 M10 50 L90 50 M25 25 L75 75 M25 75 L75 25" />
                                 </svg>
                             </div>
@@ -236,7 +236,7 @@ export default function ModernLanding() {
                                 <div className="w-5 h-5 bg-slate-200 flex items-center justify-center rounded-[2px]"><Star className="w-3 h-3 text-white fill-white"/></div>
                             </div>
                             <div className="font-bold text-[#0E1528] text-[13px] flex items-center gap-1 mt-0.5">
-                                Trust pilot <Check className="w-3.5 h-3.5 text-white bg-[#006CFF] rounded-full p-0.5" />
+                                Trust pilot <Check className="w-3.5 h-3.5 text-white bg-blue-600 rounded-full p-0.5" />
                             </div>
                         </div>
 
@@ -261,13 +261,13 @@ export default function ModernLanding() {
                         </div>
 
                         {/* Floating Card 3: Experience Blue Box (Bottom Right) */}
-                        <div className="absolute -bottom-6 -right-6 lg:-right-4 bg-[#006CFF] text-white rounded-[24px] rounded-tl-none p-6 md:p-8 shadow-[0_20px_40px_rgba(37,99,235,0.4)] z-20 w-40 md:w-48 outline outline-4 outline-[#F4F7FF]">
+                        <div className="absolute -bottom-6 -right-6 lg:-right-4 bg-[#2563EB] text-white rounded-[24px] rounded-tl-none p-6 md:p-8 shadow-[0_20px_40px_rgba(37,99,235,0.4)] z-20 w-40 md:w-48 outline outline-4 outline-[#F4F7FF]">
                             <div className="text-4xl md:text-5xl font-black mb-2 leading-none">8+</div>
                             <div className="text-[10px] md:text-xs font-semibold leading-tight text-white/90">Yıllık Sektör<br/>Tecrübesi</div>
                         </div>
 
                         {/* Setting gear icon floating right */}
-                        <div className="absolute top-[35%] -right-16 hidden lg:flex w-10 h-10 bg-[#006CFF] rounded drop-shadow-xl text-white items-center justify-center z-10">
+                        <div className="absolute top-[35%] -right-16 hidden lg:flex w-10 h-10 bg-blue-600 rounded drop-shadow-xl text-white items-center justify-center z-10">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         </div>
 
@@ -294,7 +294,7 @@ export default function ModernLanding() {
                             onClick={() => setActiveIntegrationTab(idx)}
                             className={`px-5 py-2.5 rounded-md font-bold text-[14px] transition-all duration-300 ${
                                 activeIntegrationTab === idx 
-                                ? "bg-[#006CFF] text-white shadow-md" 
+                                ? "bg-[#2563EB] text-white shadow-md" 
                                 : "bg-white text-slate-500 hover:bg-slate-50 hover:text-[#0E1528] border border-slate-200"
                             }`}
                         >
@@ -315,7 +315,7 @@ export default function ModernLanding() {
                                 <p className="text-slate-500 font-medium text-[15px]">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
                             </div>
                             <div className="mt-4 md:mt-0 shrink-0">
-                                <Link href="#" className="px-6 py-3 bg-[#006CFF] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-[#0058D1] transition-colors">
+                                <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
                                     Tüm Yorumlar <ArrowUpRight className="w-4 h-4"/>
                                 </Link>
                             </div>
@@ -360,7 +360,7 @@ export default function ModernLanding() {
                             <div className="md:col-span-8 h-[240px] rounded-[16px] bg-[#F0F2F4] p-6 flex flex-col justify-between shadow-sm">
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="flex items-center gap-2 text-[#0E1528]">
-                                        <div className="w-6 h-6 rounded-full bg-[#84E164] flex items-center justify-center"><Check className="w-3 h-3 text-[#0E1528] stroke-[3]"/></div>
+                                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center"><Check className="w-3 h-3 text-white"/></div>
                                         <span className="font-extrabold text-[15px] uppercase tracking-wide">Periodya</span>
                                     </div>
                                     <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm text-slate-300">
@@ -418,11 +418,11 @@ export default function ModernLanding() {
                     
                     {/* Left Column (Accordion) */}
                     <div className="lg:pr-10">
-                        <div className="inline-block px-4 py-1.5 bg-white shadow-sm font-bold text-[#006CFF] text-[10px] uppercase rounded-full mb-6">
+                        <div className="inline-block px-4 py-1.5 bg-white shadow-sm font-bold text-blue-600 text-[10px] uppercase rounded-full mb-6">
                             Tech Solution
                         </div>
                         <h2 className="text-4xl lg:text-[46px] text-[#0E1528] leading-[1.1] tracking-tight mb-6">
-                            <span className="font-light">The</span> <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#006CFF] to-[#84E164]">CompletePlatform</span><span className="font-light">To</span><br/>
+                            <span className="font-light">The</span> <span className="font-bold">CompletePlatform</span><span className="font-light">To</span><br/>
                             <span className="font-bold">PowerYourOperations</span>
                         </h2>
                         <p className="text-slate-500 font-medium text-sm leading-relaxed mb-10 max-w-[420px]">
@@ -435,10 +435,10 @@ export default function ModernLanding() {
                                  const isActive = activeTab === idx;
                                  return (
                                      <div key={idx} 
-                                        className={`cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden shadow-sm ${isActive ? 'bg-white shadow-[0_20px_40px_rgba(0,0,0,0.06)] border-l-[3px] border-[#006CFF] pt-6 px-6 pb-6 mt-4' : 'p-4 pl-6 border-l-[3px] border-transparent hover:bg-white/40'}`}
+                                        className={`cursor-pointer transition-all duration-300 rounded-2xl overflow-hidden shadow-sm ${isActive ? 'bg-white shadow-[0_20px_40px_rgba(0,0,0,0.06)] border-l-[3px] border-blue-600 pt-6 px-6 pb-6 mt-4' : 'p-4 pl-6 border-l-[3px] border-transparent hover:bg-white/40'}`}
                                         onClick={() => setActiveTab(idx)}
                                      >
-                                         <h3 className={`text-lg transition-colors font-bold ${isActive ? 'text-[#006CFF] mb-3' : 'text-[#0E1528]'}`}>
+                                         <h3 className={`text-lg transition-colors font-bold ${isActive ? 'text-blue-600 mb-3' : 'text-[#0E1528]'}`}>
                                              {tab.title}
                                          </h3>
                                          {isActive && (
@@ -488,7 +488,7 @@ export default function ModernLanding() {
                              {/* Mini CSS Bar Chart */}
                              <div className="flex items-end justify-between h-14 w-full px-1">
                                 <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '40%'}}></div>
-                                <div className="w-[12px] bg-[#006CFF] rounded-t-[3px]" style={{height: '75%'}}></div>
+                                <div className="w-[12px] bg-blue-600 rounded-t-[3px]" style={{height: '75%'}}></div>
                                 <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '30%'}}></div>
                                 <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '85%'}}></div>
                                 <div className="w-[12px] bg-[#0E1528] rounded-t-[3px]" style={{height: '50%'}}></div>
@@ -505,10 +505,10 @@ export default function ModernLanding() {
                                  <span className="text-slate-400 text-[8px]">Monthly ▾</span>
                              </div>
                              <div className="flex justify-center mb-4">
-                                 <div className="w-[60px] h-[60px] rounded-full border-[10px] border-[#006CFF]" style={{ borderRightColor: '#0E1528', rotate: '45deg' }}></div>
+                                 <div className="w-[60px] h-[60px] rounded-full border-[10px] border-blue-600" style={{ borderRightColor: '#0E1528', rotate: '45deg' }}></div>
                              </div>
                              <div className="flex justify-around text-[9px] font-bold text-slate-500 pt-1 border-t border-slate-100">
-                                 <div><span className="text-[#006CFF] text-xs">●</span> 65%</div>
+                                 <div><span className="text-blue-600 text-xs">●</span> 65%</div>
                                  <div className="border-l border-slate-200"></div>
                                  <div><span className="text-[#0E1528] text-xs">●</span> 35%</div>
                              </div>
@@ -563,7 +563,7 @@ export default function ModernLanding() {
 
                     {/* Right Column (Content) */}
                     <div className="lg:pl-8">
-                        <div className="inline-block px-5 py-1.5 bg-[#006CFF] shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-white font-bold text-[10px] uppercase tracking-wide rounded-full mb-8">
+                        <div className="inline-block px-5 py-1.5 bg-[#2563EB] shadow-[0_10px_20px_rgba(37,99,235,0.3)] text-white font-bold text-[10px] uppercase tracking-wide rounded-full mb-8">
                             Neden Bizi Seçmelisiniz
                         </div>
                         
@@ -595,7 +595,7 @@ export default function ModernLanding() {
 
                         {/* Huge Number Row */}
                         <div className="flex items-center gap-6 pt-4 border-t border-slate-100">
-                            <div className="text-[64px] md:text-[76px] text-[#006CFF] font-light leading-none tracking-tight">
+                            <div className="text-[64px] md:text-[76px] text-[#2563EB] font-light leading-none tracking-tight">
                                 1.3m
                             </div>
                             <div className="text-sm font-bold text-[#0E1528] leading-relaxed max-w-[150px]">
@@ -610,7 +610,7 @@ export default function ModernLanding() {
             {/* --- NEW 8-CARD FLEX GRID (Makes Us Different) --- */}            <section className="pt-8 pb-16 md:pb-20 max-w-[1300px] mx-auto px-6 relative z-10">
                 <div className="text-center mb-16 max-w-2xl mx-auto">
                     <h2 className="text-3xl md:text-5xl font-black text-[#0E1528] mb-4">
-                        Bizi <span className="text-[#006CFF]">Farklı Kılan</span> Özellikler.
+                        Bizi <span className="text-blue-600">Farklı Kılan</span> Özellikler.
                     </h2>
                     <p className="text-slate-500 font-medium leading-relaxed">Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.</p>
                 </div>
@@ -619,56 +619,56 @@ export default function ModernLanding() {
                     {/* Card 1 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">01</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Bot className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Bot className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">YZ Destekli Analiz</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ön muhasebenizde yapay zekanın hızını ve kusursuzluğunu hissedin.</p>
                     </div>
                     {/* Card 2 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">02</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><PieChart className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><PieChart className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Derin İçgörüler</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Pazar yerlerindeki satış trendlerinizi anlık ve net raporlarla takip edin.</p>
                     </div>
                     {/* Card 3 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">03</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Activity className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Activity className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Stratejik Kararlar</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Gerçek verilere dayalı altyapımızla doğru zamanda en iyi ticaret kararını alın.</p>
                     </div>
                     {/* Card 4 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">04</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Users className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Users className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">İşbirliği Araçları</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ekibinizle aynı panelde uyum içerisinde rolleri dağıtarak çalışın.</p>
                     </div>
                     {/* Card 5 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">05</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Shield className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Shield className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Veri Koruması</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">KVKK standartlarına tam uyumlu yüksek şifrelemelerle verilerinizi koruyun.</p>
                     </div>
                     {/* Card 6 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">06</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Headphones className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Headphones className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">7/24 Teknik Destek</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Uzman kadromuzla mağazanızın operasyonlarında asla yarı yolda kalmayın.</p>
                     </div>
                     {/* Card 7 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">07</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Target className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Target className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Gelişmiş Cari CRM</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Tüm tedarikçi ağınızı tek bir listede puanınıza göre otonom olarak yönetin.</p>
                     </div>
                     {/* Card 8 */}
                     <div className="bg-white border border-slate-100 shadow-sm rounded-[24px] p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">08</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Cloud className="w-8 h-8 text-[#006CFF]" strokeWidth={1.5} /></div>
+                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-2xl"><Cloud className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
                         <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Premium Bulut</h3>
                         <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Sunucu veya kurulum olmadan güvenle anında her cihazdan işinize erişin.</p>
                     </div>
@@ -688,29 +688,29 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Başlangıç</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺990<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-md font-bold bg-[#006CFF] text-white hover:bg-[#0058D1] transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırlı Pazar Yeri</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Stok Takibi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>E-Fatura Kesimi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Standart Destek</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırlı Pazar Yeri</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Stok Takibi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>E-Fatura Kesimi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Standart Destek</li>
                         </ul>
                     </div>
 
                     {/* Pro */}
-                    <div className="bg-white border-2 border-[#006CFF] rounded-[12px] p-8 lg:p-10 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#006CFF] text-white font-bold text-[11px] tracking-widest uppercase px-4 py-1.5 rounded-[6px] flex items-center gap-1.5 whitespace-nowrap"><Zap className="w-3 h-3 fill-white stroke-white"/> EN POPÜLER</div>
+                    <div className="bg-white border-2 border-[#2563EB] rounded-[12px] p-8 lg:p-10 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#2563EB] text-white font-bold text-[11px] tracking-widest uppercase px-4 py-1.5 rounded-[6px] flex items-center gap-1.5 whitespace-nowrap"><Zap className="w-3 h-3 fill-white stroke-white"/> EN POPÜLER</div>
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Profesyonel</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">E-ticarette sağlam adımlar atmak isteyen profesyoneller için tam kontrol.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺2,490<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-md font-extrabold bg-[#84E164] text-[#0E1528] hover:bg-[#6BCC4E] transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Pazar Yeri</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Çoklu Depo Yönetimi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Kargo Entegrasyonu</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Öncelikli Destek</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Pazar Yeri</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Çoklu Depo Yönetimi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Kargo Entegrasyonu</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Öncelikli Destek</li>
                         </ul>
                     </div>
 
@@ -719,13 +719,13 @@ export default function ModernLanding() {
                         <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Kurumsal</h3>
                         <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Kendi altyapınızda özel sunucu ihtiyaçlarıyla sınırları kaldıran kapasite.</p>
                         <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">Özel<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/yıllık</span></div>
-                        <button className="w-full py-3.5 rounded-md font-bold bg-[#006CFF] text-white hover:bg-[#0058D1] transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
+                        <button className="w-full py-3.5 rounded-md font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
                         <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>VDS Sunucu Yönetimi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sıfırdan Veri Aktarımı</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Bayi Ağı (B2B) Desteği</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#006CFF] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Özel Eğitim & SLA</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>VDS Sunucu Yönetimi</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sıfırdan Veri Aktarımı</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Bayi Ağı (B2B) Desteği</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
+                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Özel Eğitim & SLA</li>
                         </ul>
                     </div>
                 </div>
@@ -741,7 +741,7 @@ export default function ModernLanding() {
                             {/* Logo */}
                             <div className="flex items-center gap-2 mb-10">
                                  <div className="flex gap-1 items-center">
-                                     <div className="w-[18px] h-[22px] bg-[#006CFF] rounded-sm skew-x-[-15deg]"></div>
+                                     <div className="w-[18px] h-[22px] bg-blue-600 rounded-sm skew-x-[-15deg]"></div>
                                      <div className="w-[8px] h-[22px] bg-white rounded-sm skew-x-[-15deg]"></div>
                                  </div>
                                 <span className="text-[22px] font-bold tracking-tight text-white ml-2">Periodya</span>
@@ -753,7 +753,7 @@ export default function ModernLanding() {
                                     <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                 </div>
                                 <input type="email" placeholder="Email Address" className="bg-transparent border-none text-white text-[13px] px-2 py-2 flex-1 focus:outline-none placeholder-slate-500" />
-                                <button className="bg-[#006CFF] text-white text-[13px] font-bold px-6 py-2.5 rounded-md hover:bg-[#0058D1] transition-colors">Sign Up &nbsp;&gt;</button>
+                                <button className="bg-[#2563EB] text-white text-[13px] font-bold px-6 py-2.5 rounded-md hover:bg-blue-500 transition-colors">Sign Up &nbsp;&gt;</button>
                             </div>
                             <p className="text-slate-500 text-[12px] font-medium tracking-wide">By subscribing, you're accept <span className="text-white font-bold cursor-pointer hover:underline">Privacy Policy</span></p>
                         </div>
@@ -788,7 +788,7 @@ export default function ModernLanding() {
                             <h4 className="text-white font-bold text-[17px] mb-6">Locations</h4>
                             <div className="flex gap-4 mb-10 text-slate-400 font-medium leading-relaxed">
                                 <div className="mt-1 shrink-0">
-                                    <svg className="w-[18px] h-[18px] text-[#006CFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    <svg className="w-[18px] h-[18px] text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 </div>
                                 <p className="text-[13px]">55 Main Street, 2nd block Melbourne,<br/> Australia</p>
                             </div>
@@ -797,7 +797,7 @@ export default function ModernLanding() {
                             <div className="space-y-5 text-slate-400 font-medium">
                                 <a href="mailto:support@gmail.com" className="hover:text-white transition-colors flex items-center text-[13px]">support@gmail.com</a>
                                 <div className="flex items-center gap-3 text-white text-[19px] tracking-tight font-bold">
-                                    <svg className="w-[20px] h-[20px] text-[#006CFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                    <svg className="w-[20px] h-[20px] text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                                     +880 (123) 456 88
                                 </div>
                             </div>
@@ -806,26 +806,26 @@ export default function ModernLanding() {
 
                     {/* Bottom Bar */}
                     <div className="border-t border-slate-800 border-dashed pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-6 text-[12.5px] font-medium relative">
-                        <p className="text-slate-400">© 2026 <span className="text-white hover:text-[#006CFF] transition-colors cursor-pointer">Periodya</span> - IT Services. All rights reserved.</p>
+                        <p className="text-slate-400">© 2026 <span className="text-white hover:text-blue-600 transition-colors cursor-pointer">Periodya</span> - IT Services. All rights reserved.</p>
                         
                         <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 items-center">
                             <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
-                                <div className="w-[18px] h-[18px] rounded-full bg-[#006CFF] flex items-center justify-center"><Facebook className="w-2.5 h-2.5 text-white fill-white"/></div> Facebook
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Facebook className="w-2.5 h-2.5 text-white fill-white"/></div> Facebook
                             </a>
                             <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
-                                <div className="w-[18px] h-[18px] rounded-full bg-[#006CFF] flex items-center justify-center"><Twitter className="w-2.5 h-2.5 text-white fill-white"/></div> Twitter
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Twitter className="w-2.5 h-2.5 text-white fill-white"/></div> Twitter
                             </a>
                             <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
-                                <div className="w-[18px] h-[18px] rounded-full bg-[#006CFF] flex items-center justify-center"><Instagram className="w-2.5 h-2.5 text-white"/></div> Instagram
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Instagram className="w-2.5 h-2.5 text-white"/></div> Instagram
                             </a>
                             <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">
-                                <div className="w-[18px] h-[18px] rounded-full bg-[#006CFF] flex items-center justify-center"><Linkedin className="w-2.5 h-2.5 text-white fill-white"/></div> Pinterest
+                                <div className="w-[18px] h-[18px] rounded-full bg-[#2563EB] flex items-center justify-center"><Linkedin className="w-2.5 h-2.5 text-white fill-white"/></div> Pinterest
                             </a>
                         </div>
 
                         {/* Target scroll to top arrow absolute positioned to right */}
                         <div className="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-8 lg:-right-16 hidden md:block">
-                             <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="w-[38px] h-[38px] bg-[#006CFF] hover:bg-[#0058D1] rounded-md flex justify-center items-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)] transition-all">
+                             <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="w-[38px] h-[38px] bg-[#2563EB] hover:bg-blue-500 rounded-md flex justify-center items-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)] transition-all">
                                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                              </button>
                         </div>
