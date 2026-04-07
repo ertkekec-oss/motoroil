@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
-import { EnterprisePageShell, EnterpriseCard } from '@/components/ui/enterprise';
 
 export default function AdminPlans() {
     const { showSuccess, showError, showConfirm } = useModal();
@@ -147,20 +146,128 @@ export default function AdminPlans() {
     };
 
     return (
-        <EnterprisePageShell
-            title="Paketler & Fiyatlandırma"
-            description="Abonelik planlarını ve fiyatlarını yönetin."
-            actions={
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="flex justify-between items-end">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900">Paketler & Fiyatlandırma</h1>
+                    <p className="text-slate-500 text-sm">Abonelik planlarını ve fiyatlarını yönetin.</p>
+                </div>
                 <button
                     onClick={() => setShowModal(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm active:scale-95"
                 >
                     + Yeni Paket Ekle
                 </button>
-            }
-        >
-        
-            
+            </div>
+
+            {loading ? (
+                <div className="p-12 text-center text-slate-400 font-medium">Veriler yükleniyor...</div>
+            ) : (
+                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Plan Adı</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Fiyat</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Periyot</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Aktif Üyeler</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Metrikler (Limit)</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Modül Yetkileri</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Durum</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider"> İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {plans?.map((plan) => (
+                                <tr key={plan.id} className="hover:bg-slate-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="font-bold text-slate-900">{plan.name}</div>
+                                        <div className="text-[11px] text-slate-400 truncate max-w-[150px]">{plan.description}</div>
+                                    </td>
+                                    <td className="px-6 py-4 text-slate-700 font-bold">
+                                        {plan.price === 0 ? <span className="text-emerald-600">Ücretsiz</span> : `₺${plan.price.toLocaleString()}`}
+                                    </td>
+                                    <td className="px-6 py-4 text-slate-500 text-sm">{plan.interval === 'MONTHLY' ? 'Aylık' : 'Yıllık'}</td>
+                                    <td className="px-6 py-4">
+                                        <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">
+                                            {plan.members || 0}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-[10px] text-slate-500 font-mono leading-relaxed">
+                                        <div className="space-y-0.5">
+                                            {Array.isArray(plan.limits) ? (
+                                                plan.limits?.map((l: any, i: number) => (
+                                                    <div key={i} className="flex gap-2">
+                                                        <span className="text-slate-400 uppercase w-8">{l.resource.substring(0, 3)}:</span>
+                                                        <span className="font-bold">{l.limit === -1 ? '∞' : l.limit}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <>
+                                                    <span className="text-slate-400">DOC:</span> {plan.limits?.monthly_documents}<br />
+                                                    <span className="text-slate-400">USR:</span> {plan.limits?.users}<br />
+                                                    <span className="text-slate-400">BRN:</span> {plan.limits?.branches || 1}
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                                            {plan.features?.length > 0 ? plan.features
+                                                .filter((f: any) => {
+                                                    const fId = typeof f === 'string' ? f : (f.id || f.key);
+                                                    return availableFeatures.some(af => af.id === fId || af.key === fId);
+                                                })
+                                                .map((f: any, i: number) => (
+                                                    <span key={i} className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-blue-100 whitespace-nowrap">
+                                                        {typeof f === 'string' ? f : (f.name || f.key || 'Limit')}
+                                                    </span>
+                                                )) : (
+                                                <span className="text-[9px] text-slate-300 italic">Standart Özellikler</span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${plan.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                                            {plan.isActive ? 'AKTİF' : 'PASİF'}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex gap-2 justify-end">
+                                            <button
+                                                onClick={() => handleEdit(plan)}
+                                                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(plan.id)}
+                                                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {showModal && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4  animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full p-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[95vh] border border-slate-200">
+                        <div className="flex justify-between items-start mb-8">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                                    {editingPlanId ? 'Paketi Düzenle' : 'Yeni Abonelik Paketi'}
+                                </h3>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Standard</span>
+                                    <p className="text-xs text-slate-500 font-medium">E-fatura & E-arşiv & E-irsaliye her zaman dahildir.</p>
+                                </div>
+                            </div>
                             <button onClick={() => { setShowModal(false); setEditingPlanId(null); }} className="bg-slate-50 p-2 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
