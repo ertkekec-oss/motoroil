@@ -9,7 +9,7 @@ import {
 import LoginHoloModal from './LoginHoloModal';
 
 
-const platformTabs = [
+const initialPlatformTabs = [
     {
         title: "Kişiselleştirilmiş Çözüm", 
         desc: "İşletmenizin spesifik ihtiyaçlarına ve hedeflerine uyacak şekilde teknolojimizi tamamen size özel hale getiriyoruz.", 
@@ -32,7 +32,7 @@ const platformTabs = [
     }
 ];
 
-const integrationItems = [
+const initialIntegrationItems = [
     {
         title: "Başlarken",
         contentTitle: "150,000+ Şirketin Güvendiği ERP",
@@ -78,7 +78,18 @@ const integrationItems = [
 ];
 
 export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
-    const heroContent = cmsData?.sections?.find((s: any) => s.type === 'HERO')?.content;
+    // Dinamik İçerikler Çekiliyor
+    const dbHero = cmsData?.sections?.find((s: any) => s.type === 'MODERN_HERO')?.content;
+    const dbTabs = cmsData?.sections?.find((s: any) => s.type === 'MODERN_TABS')?.content?.items;
+    const dbIntegrations = cmsData?.sections?.find((s: any) => s.type === 'MODERN_INTEGRATIONS')?.content?.items;
+    
+    // Eski hero desteği ya da fallback
+    const fallbackHero = cmsData?.sections?.find((s: any) => s.type === 'HERO')?.content;
+    const heroContent = dbHero || fallbackHero;
+    
+    const platformTabs = dbTabs?.length > 0 ? dbTabs : initialPlatformTabs;
+    const integrationItems = dbIntegrations?.length > 0 ? dbIntegrations : initialIntegrationItems;
+
     const heroTitle = heroContent?.title || '<span class="font-light">E-Ticaret</span> <span class="font-bold">ve</span><br/><span class="font-bold">Ön Muhasebede</span><br/><span class="font-bold text-[#2563EB]">Üstün</span> <span class="font-light whitespace-nowrap">Sonuçlar</span>';
     const heroSubtitle = heroContent?.subtitle || 'Günümüzün rekabetçi ticaretinde, etkin ve düşük maliyetli yazılım çözümlerine olan ihtiyaç hiç bu kadar kritik olmamıştı.';
     const heroBtnText = heroContent?.primaryBtnText || 'Ücretsiz Başla';
