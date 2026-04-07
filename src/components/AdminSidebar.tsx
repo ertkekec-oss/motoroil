@@ -28,6 +28,7 @@ import {
   Mail,
   PenTool,
   Handshake,
+  Zap,
 } from "lucide-react";
 
 export function AdminSidebar({ userRole }: { userRole: string }) {
