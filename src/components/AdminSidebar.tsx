@@ -193,6 +193,29 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
         )}
 
 
+        {isSuper && (
+          <NavGroup
+            title="İÇERİK & CMS (V2)"
+            icon={Library}
+            groupKey="cms_main"
+          >
+            <NavItem
+              href="/admin/cms"
+              icon={LayoutDashboard}
+              label="İçerik Stüdyosu"
+            />
+            <NavItem
+              href="/admin/cms/segments"
+              icon={Users}
+              label="Kitle ve Segmentler"
+            />
+            <NavItem
+              href="/admin/cms/ab-tests"
+              icon={Activity}
+              label="A/B Test ve Analiz"
+            />
+          </NavGroup>
+        )}
       </div>
       {/* 3. PARTİ YAZILIMLAR */}
       {isSuper && (
