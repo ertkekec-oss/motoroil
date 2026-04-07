@@ -3,8 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
-import { EnterprisePageShell, EnterpriseCard, EnterpriseButton, EnterpriseSectionHeader } from '@/components/ui/enterprise';
-import { LayoutGrid, Search, PenTool, LayoutDashboard, Settings2, Webhook, Brush, Plus, Zap, Copy, PlusCircle } from 'lucide-react';
 
 export default function WebsiteManagerPage() {
     const { showSuccess, showError, showConfirm, showPrompt } = useModal();
@@ -32,7 +30,7 @@ export default function WebsiteManagerPage() {
                     let width = img.width;
                     let height = img.height;
 
-                    // Maksimum geni┼şli─şi 1920px olarak belirleyelim (Performans i├ğin)
+                    // Maksimum genişliği 1920px olarak belirleyelim (Performans için)
                     const MAX_WIDTH = 1920;
                     if (width > MAX_WIDTH) {
                         height = Math.round((height * MAX_WIDTH) / width);
@@ -45,7 +43,7 @@ export default function WebsiteManagerPage() {
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
                         ctx.drawImage(img, 0, 0, width, height);
-                        // Kaliteyi %80 olarak ayarlayal─▒m
+                        // Kaliteyi %80 olarak ayarlayalım
                         const resizedUrl = canvas.toDataURL('image/jpeg', 0.82);
                         setUploading(false);
                         onSuccess(resizedUrl);
@@ -56,14 +54,14 @@ export default function WebsiteManagerPage() {
                 };
                 img.onerror = () => {
                     setUploading(false);
-                    showError("Hata", "G├Ârsel i┼şlenirken hata olu┼ştu.");
+                    showError("Hata", "Görsel işlenirken hata oluştu.");
                 };
                 img.src = reader.result;
             }
         };
         reader.onerror = () => {
             setUploading(false);
-            showError("Hata", "Dosya okuma hatas─▒ olu┼ştu.");
+            showError("Hata", "Dosya okuma hatası oluştu.");
         };
 
         reader.readAsDataURL(file);
@@ -116,7 +114,7 @@ export default function WebsiteManagerPage() {
             setData(json);
             if (json.settings) setSettings(json.settings);
 
-            // E─şer daha ├Ânce bir sayfa se├ğiliyse onu bul, yoksa ilk sayfay─▒ se├ğ
+            // Eğer daha önce bir sayfa seçiliyse onu bul, yoksa ilk sayfayı seç
             if (selectedPage) {
                 const refreshed = json.pages.find((p: any) => p.id === selectedPage.id);
                 if (refreshed) setSelectedPage(refreshed);
@@ -147,7 +145,7 @@ export default function WebsiteManagerPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
             });
-            if (res.ok) showSuccess('Ba┼şar─▒l─▒', 'Ayarlar kaydedildi!');
+            if (res.ok) showSuccess('Başarılı', 'Ayarlar kaydedildi!');
         } catch (error) {
             console.error(error);
         } finally {
@@ -163,7 +161,7 @@ export default function WebsiteManagerPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data.menus)
             });
-            if (res.ok) showSuccess('Ba┼şar─▒l─▒', 'Men├╝ler kaydedildi!');
+            if (res.ok) showSuccess('Başarılı', 'Menüler kaydedildi!');
         } catch (error) {
             console.error(error);
         } finally {
@@ -172,7 +170,7 @@ export default function WebsiteManagerPage() {
     };
 
     const createPage = async () => {
-        showPrompt('Yeni Sayfa', 'Sayfa Ba┼şl─▒─ş─▒:', (title) => {
+        showPrompt('Yeni Sayfa', 'Sayfa Başlığı:', (title) => {
             if (!title) return;
             showPrompt('Yeni Sayfa', 'Sayfa URL (Slug):', async (slug) => {
                 if (!slug) return;
@@ -197,18 +195,18 @@ export default function WebsiteManagerPage() {
     };
 
     const deletePage = async (id: string) => {
-        showConfirm('Sayfay─▒ Sil', 'Bu sayfay─▒ silmek istedi─şinize emin misiniz?', async () => {
+        showConfirm('Sayfayı Sil', 'Bu sayfayı silmek istediğinize emin misiniz?', async () => {
             setSaving(true);
             try {
                 const res = await fetch(`/api/admin/website/pages/${id}`, { method: 'DELETE' });
                 if (res.ok) {
                     if (selectedPage?.id === id) setSelectedPage(null);
-                    showSuccess('Ba┼şar─▒l─▒', 'Sayfa silindi.');
+                    showSuccess('Başarılı', 'Sayfa silindi.');
                     fetchCmsData();
                 }
             } catch (error) {
                 console.error(error);
-                showError('Hata', 'Silme s─▒ras─▒nda hata olu┼ştu.');
+                showError('Hata', 'Silme sırasında hata oluştu.');
             } finally {
                 setSaving(false);
             }
@@ -225,7 +223,7 @@ export default function WebsiteManagerPage() {
                 body: JSON.stringify(selectedPage)
             });
 
-            // Ayr─▒ca logoyu (ve di─şer genel ayarlar─▒) da kaydet
+            // Ayrıca logoyu (ve diğer genel ayarları) da kaydet
             await fetch('/api/admin/website', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -233,7 +231,7 @@ export default function WebsiteManagerPage() {
             });
 
             if (res.ok) {
-                showSuccess('Ba┼şar─▒l─▒', 'De─şi┼şiklikler ba┼şar─▒yla kaydedildi!');
+                showSuccess('Başarılı', 'Değişiklikler başarıyla kaydedildi!');
                 fetchCmsData();
             }
         } catch (error) {
@@ -250,11 +248,11 @@ export default function WebsiteManagerPage() {
             order: (selectedPage.sections?.length || 0) + 1,
             isActive: true, // Default to true
             content: {
-                title: 'Yeni B├Âl├╝m',
-                subtitle: 'Buraya bir a├ğ─▒klama yaz─▒n',
+                title: 'Yeni Bölüm',
+                subtitle: 'Buraya bir açıklama yazın',
                 items: [
-                    { title: '├ûzellik 1', desc: 'A├ğ─▒klama 1', icon: 'Ô£¿' },
-                    { title: '├ûzellik 2', desc: 'A├ğ─▒klama 2', icon: '­şÜÇ' }
+                    { title: 'Özellik 1', desc: 'Açıklama 1', icon: '✨' },
+                    { title: 'Özellik 2', desc: 'Açıklama 2', icon: '🚀' }
                 ]
             }
         };
@@ -311,13 +309,15 @@ export default function WebsiteManagerPage() {
         );
     };
 
-    if (loading) return <div className="p-8">Y├╝kleniyor...</div>;
+    if (loading) return <div className="p-8">Yükleniyor...</div>;
 
     return (
-        <EnterprisePageShell
-            title="Website Yönetimi (Gelişmiş CMS)"
-            description="Landing page ve kurumsal sayfaları dinamik olarak yönetin."
-            actions={
+        <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-800">Website Yönetimi (CMS)</h1>
+                    <p className="text-sm text-slate-500">Landing page ve kurumsal sayfaları dinamik olarak yönetin.</p>
+                </div>
                 <div className="flex gap-2">
                     <button
                         onClick={() => activeTab === 'general' ? saveSettings() : savePage()}
@@ -330,16 +330,14 @@ export default function WebsiteManagerPage() {
                         Önizle ↗
                     </a>
                 </div>
-            }
-        >
-            <div className="space-y-6 animate-in fade-in duration-500">
+            </div>
 
             {/* Tabs */}
             <div className="flex border-b border-slate-200">
                 {[
-                    { id: 'general', label: 'Genel Ayarlar', icon: 'ÔÜÖ´©Å' },
-                    { id: 'pages', label: 'Sayfa ├£reticisi', icon: '­şôä' },
-                    { id: 'menus', label: 'Men├╝ Y├Ânetimi', icon: '­şıö' }
+                    { id: 'general', label: 'Genel Ayarlar', icon: '⚙️' },
+                    { id: 'pages', label: 'Sayfa Üreticisi', icon: '📄' },
+                    { id: 'menus', label: 'Menü Yönetimi', icon: '🍔' }
                 ]?.map(tab => (
                     <button
                         key={tab.id}
@@ -352,13 +350,13 @@ export default function WebsiteManagerPage() {
             </div>
 
             {/* Content Area */}
-            <div className="">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 {activeTab === 'general' && (
                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div className="space-y-6">
-                            <h3 className="font-bold text-slate-800 border-b pb-2">G├Âr├╝n├╝m ve Marka</h3>
+                            <h3 className="font-bold text-slate-800 border-b pb-2">Görünüm ve Marka</h3>
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Site Ba┼şl─▒─ş─▒</label>
+                                <label className="block text-sm font-bold text-slate-700 mb-2">Site Başlığı</label>
                                 <input
                                     type="text"
                                     className="w-full border border-slate-200 rounded-lg p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 transition text-slate-900"
@@ -378,12 +376,12 @@ export default function WebsiteManagerPage() {
                                             onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
                                         />
                                         <label className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-3 rounded-lg border border-slate-200 cursor-pointer transition flex items-center gap-2 font-bold text-sm">
-                                            {uploading ? 'Ôîø' : '­şôü Y├£KLE'}
+                                            {uploading ? '⌛' : '📁 YÜKLE'}
                                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setSettings({ ...settings, logoUrl: url }))} />
                                         </label>
                                         {settings.logoUrl && <img src={settings.logoUrl} alt="Logo" className="h-12 w-12 object-contain border rounded-lg p-1 bg-white" />}
                                     </div>
-                                    <p className="text-[10px] text-slate-400 italic">Manuel URL girebilir veya dosya y├╝kleyebilirsiniz.</p>
+                                    <p className="text-[10px] text-slate-400 italic">Manuel URL girebilir veya dosya yükleyebilirsiniz.</p>
                                 </div>
                             </div>
                             <div>
@@ -402,7 +400,7 @@ export default function WebsiteManagerPage() {
                         </div>
 
                         <div className="space-y-6">
-                            <h3 className="font-bold text-slate-800 border-b pb-2">─░leti┼şim ve Footer</h3>
+                            <h3 className="font-bold text-slate-800 border-b pb-2">İletişim ve Footer</h3>
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Destek WhatsApp No</label>
                                 <input
@@ -414,7 +412,7 @@ export default function WebsiteManagerPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">─░leti┼şim E-posta</label>
+                                <label className="block text-sm font-bold text-slate-700 mb-2">İletişim E-posta</label>
                                 <input
                                     type="email"
                                     className="w-full border border-slate-200 rounded-lg p-3 bg-slate-50 text-slate-900"
@@ -440,12 +438,12 @@ export default function WebsiteManagerPage() {
                         <div className="bg-slate-50 border-b border-slate-200 p-6">
                             <div className="max-w-7xl mx-auto">
                                 <div className="flex justify-between items-center mb-4">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">S─░TE SAYFALARI</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">SİTE SAYFALARI</p>
                                     <button
                                         onClick={createPage}
                                         className="text-blue-600 font-black text-[10px] uppercase hover:underline"
                                     >
-                                        + Yeni Sayfa Olu┼ştur
+                                        + Yeni Sayfa Oluştur
                                     </button>
                                 </div>
                                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200">
@@ -455,14 +453,14 @@ export default function WebsiteManagerPage() {
                                                 onClick={() => setSelectedPage(p)}
                                                 className={`px-6 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap shadow-sm ${selectedPage?.id === p.id ? 'bg-blue-600 text-white shadow-blue-100' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
                                             >
-                                                {p.slug === 'index' ? '­şÅá' : p.slug === 'login' ? '­şöÉ' : p.slug === 'register' ? '­şÜÇ' : '­şôä'} {p.title}
+                                                {p.slug === 'index' ? '🏠' : p.slug === 'login' ? '🔐' : p.slug === 'register' ? '🚀' : '📄'} {p.title}
                                             </button>
                                             {p.slug !== 'index' && p.slug !== 'login' && p.slug !== 'register' && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); deletePage(p.id); }}
                                                     className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-[10px] items-center justify-center hidden group-hover:flex shadow-sm"
                                                 >
-                                                    Ô£ò
+                                                    ✕
                                                 </button>
                                             )}
                                         </div>
@@ -475,15 +473,15 @@ export default function WebsiteManagerPage() {
                         <div className="flex-1 bg-slate-50/30">
                             {!selectedPage ? (
                                 <div className="p-20 flex flex-col items-center justify-center text-slate-400 gap-4">
-                                    <div className="text-6xl animate-bounce">­şôä</div>
-                                    <p className="font-bold">D├╝zenlemek i├ğin yukar─▒dan bir sayfa se├ğin.</p>
+                                    <div className="text-6xl animate-bounce">📄</div>
+                                    <p className="font-bold">Düzenlemek için yukarıdan bir sayfa seçin.</p>
                                 </div>
                             ) : (
                                 <div className="p-8 max-w-5xl mx-auto space-y-8">
                                     {/* Page Info */}
                                     <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-2 gap-6">
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">SAYFA BA┼ŞLI─ŞI (SEO)</label>
+                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">SAYFA BAŞLIĞI (SEO)</label>
                                             <input
                                                 type="text"
                                                 className="w-full border-slate-200 rounded-lg font-bold"
@@ -506,8 +504,8 @@ export default function WebsiteManagerPage() {
                                     {/* Sections List */}
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-center">
-                                            <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">SAYFA B├ûL├£MLER─░</h4>
-                                            <button onClick={addSection} className="text-blue-600 font-bold text-xs hover:underline">+ B├ûL├£M EKLE</button>
+                                            <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">SAYFA BÖLÜMLERİ</h4>
+                                            <button onClick={addSection} className="text-blue-600 font-bold text-xs hover:underline">+ BÖLÜM EKLE</button>
                                         </div>
 
                                         {selectedPage.sections?.map((section: any, idx: number) => (
@@ -515,23 +513,23 @@ export default function WebsiteManagerPage() {
                                                 <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                                                     <div className="flex items-center gap-4 flex-1">
                                                         <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg font-black text-[10px] flex items-center gap-2 shadow-sm">
-                                                            <span className="opacity-50 tracking-widest uppercase">B├ûL├£M:</span>
+                                                            <span className="opacity-50 tracking-widest uppercase">BÖLÜM:</span>
                                                             <select
                                                                 className="bg-transparent text-white border-none p-0 focus:ring-0 cursor-pointer text-[10px] font-black"
                                                                 value={section.type}
                                                                 onChange={(e) => updateSectionType(idx, e.target.value)}
                                                             >
                                                                 <option value="BANNER" className="text-slate-900">BANNER (Duyuru)</option>
-                                                                <option value="NAV" className="text-slate-900">NAV (Men├╝)</option>
-                                                                <option value="HERO" className="text-slate-900">HERO (Tan─▒t─▒m)</option>
+                                                                <option value="NAV" className="text-slate-900">NAV (Menü)</option>
+                                                                <option value="HERO" className="text-slate-900">HERO (Tanıtım)</option>
                                                                 <option value="PARTNERS" className="text-slate-900">PARTNERS (Logolar)</option>
                                                                 <option value="COMPARISON" className="text-slate-900">BEFORE / AFTER</option>
-                                                                <option value="METRICS" className="text-slate-900">STAT─░ST─░KLER</option>
-                                                                <option value="FEATURES" className="text-slate-900">├ûZELL─░KLER</option>
-                                                                <option value="GRID" className="text-slate-900">B─░LG─░ KUTULARI</option>
-                                                                <option value="EXPLORE" className="text-slate-900">ANAL─░Z (EXPLORE)</option>
+                                                                <option value="METRICS" className="text-slate-900">STATİSTİKLER</option>
+                                                                <option value="FEATURES" className="text-slate-900">ÖZELLİKLER</option>
+                                                                <option value="GRID" className="text-slate-900">BİLGİ KUTULARI</option>
+                                                                <option value="EXPLORE" className="text-slate-900">ANALİZ (EXPLORE)</option>
                                                                 <option value="ROLES" className="text-slate-900">ROLLER (ACCORDION)</option>
-                                                                <option value="PRICING" className="text-slate-900">F─░YATLAMA</option>
+                                                                <option value="PRICING" className="text-slate-900">FİYATLAMA</option>
                                                                 <option value="FAQ" className="text-slate-900">S.S.S</option>
                                                                 <option value="CTA" className="text-slate-900">CTA (Buton)</option>
                                                             </select>
@@ -541,7 +539,7 @@ export default function WebsiteManagerPage() {
                                                                 <input
                                                                     type="text"
                                                                     className="font-bold bg-transparent border-none focus:ring-0 text-xl p-0 text-slate-900 placeholder:text-slate-300 w-full"
-                                                                    placeholder="B├Âl├╝m Ba┼şl─▒─ş─▒..."
+                                                                    placeholder="Bölüm Başlığı..."
                                                                     value={section.content.title || section.content.mainTitle || section.content.text || ''}
                                                                     onChange={(e) => {
                                                                         const val = e.target.value;
@@ -558,7 +556,7 @@ export default function WebsiteManagerPage() {
                                                                     })}
                                                                     className={`px-2 py-1 rounded text-[10px] font-black transition-all ${section.isActive ? 'bg-green-100 text-green-600 border border-green-200' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}
                                                                 >
-                                                                    {section.isActive ? 'AKT─░F' : 'PAS─░F'}
+                                                                    {section.isActive ? 'AKTİF' : 'PASİF'}
                                                                 </button>
                                                             </div>
                                                             <StyleFields section={section} idx={idx} type="title" />
@@ -575,8 +573,8 @@ export default function WebsiteManagerPage() {
                                                                 }
                                                             }}
                                                             className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition"
-                                                            title="Yukar─▒ Ta┼ş─▒"
-                                                        >Ô¼å´©Å</button>
+                                                            title="Yukarı Taşı"
+                                                        >⬆️</button>
                                                         <button
                                                             onClick={() => {
                                                                 const newSections = [...selectedPage.sections];
@@ -587,13 +585,13 @@ export default function WebsiteManagerPage() {
                                                                 }
                                                             }}
                                                             className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition"
-                                                            title="A┼şa─ş─▒ Ta┼ş─▒"
-                                                        >Ô¼ç´©Å</button>
+                                                            title="Aşağı Taşı"
+                                                        >⬇️</button>
                                                         <button
                                                             onClick={() => removeSection(idx)}
                                                             className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
-                                                            title="B├Âl├╝m├╝ Sil"
-                                                        >­şùæ´©Å</button>
+                                                            title="Bölümü Sil"
+                                                        >🗑️</button>
                                                     </div>
                                                 </div>
 
@@ -602,7 +600,7 @@ export default function WebsiteManagerPage() {
                                                         {section.type === 'BANNER' && (
                                                             <div className="space-y-4">
                                                                 <div>
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase mb-1 block">YAZI (HTML DESTEKL─░)</label>
+                                                                    <label className="text-[10px] font-black text-slate-500 uppercase mb-1 block">YAZI (HTML DESTEKLİ)</label>
                                                                     <input
                                                                         type="text"
                                                                         className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900 focus:ring-2 focus:ring-blue-500"
@@ -612,7 +610,7 @@ export default function WebsiteManagerPage() {
                                                                 </div>
                                                                 <div className="grid grid-cols-2 gap-4">
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">L─░NK METN─░</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LİNK METNİ</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900"
@@ -621,7 +619,7 @@ export default function WebsiteManagerPage() {
                                                                         />
                                                                     </div>
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">L─░NK URL</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LİNK URL</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900"
@@ -636,17 +634,17 @@ export default function WebsiteManagerPage() {
                                                             <div className="space-y-4">
                                                                 <div className="grid grid-cols-2 gap-4">
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">ROZET METN─░ (BADGE)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">ROZET METNİ (BADGE)</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900"
-                                                                            placeholder="├Âr: Ô¡É 4.4 | G2"
+                                                                            placeholder="ör: ⭐ 4.4 | G2"
                                                                             value={section.content.badgeText || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'badgeText', e.target.value)}
                                                                         />
                                                                     </div>
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">YORUM METN─░</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">YORUM METNİ</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900"
@@ -658,17 +656,17 @@ export default function WebsiteManagerPage() {
                                                                 </div>
 
                                                                 <div className="space-y-1">
-                                                                    <label className="text-[10px] font-black text-blue-600 uppercase block underline">ANA G├ûRSEL (HERO IMAGE)</label>
+                                                                    <label className="text-[10px] font-black text-blue-600 uppercase block underline">ANA GÖRSEL (HERO IMAGE)</label>
                                                                     <div className="flex gap-2">
                                                                         <input
                                                                             type="text"
                                                                             className="flex-1 text-sm border-blue-200 rounded-lg bg-blue-50/30 p-3 text-slate-900 focus:bg-white"
-                                                                            placeholder="G├Ârsel URL veya y├╝kleyin..."
+                                                                            placeholder="Görsel URL veya yükleyin..."
                                                                             value={section.content.visualUrl || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'visualUrl', e.target.value)}
                                                                         />
                                                                         <label className="bg-blue-600 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-black shadow-sm shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center min-w-[100px]">
-                                                                            {uploading ? 'Ôîø...' : '­şôü Y├£KLE'}
+                                                                            {uploading ? '⌛...' : '📁 YÜKLE'}
                                                                             <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'visualUrl', url))} />
                                                                         </label>
                                                                     </div>
@@ -676,7 +674,7 @@ export default function WebsiteManagerPage() {
 
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                     <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">B─░R─░NC─░ BUTON</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">BİRİNCİ BUTON</label>
                                                                         <div className="grid grid-cols-1 gap-2">
                                                                             <input
                                                                                 type="text"
@@ -695,7 +693,7 @@ export default function WebsiteManagerPage() {
                                                                         </div>
                                                                     </div>
                                                                     <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">─░K─░NC─░ BUTON</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">İKİNCİ BUTON</label>
                                                                         <div className="grid grid-cols-1 gap-2">
                                                                             <input
                                                                                 type="text"
@@ -720,7 +718,7 @@ export default function WebsiteManagerPage() {
                                                             <div className="space-y-4">
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                     <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">B─░R─░NC─░ BUTON</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">BİRİNCİ BUTON</label>
                                                                         <div className="grid grid-cols-2 gap-2">
                                                                             <input
                                                                                 type="text"
@@ -739,7 +737,7 @@ export default function WebsiteManagerPage() {
                                                                         </div>
                                                                     </div>
                                                                     <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">─░K─░NC─░ BUTON</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">İKİNCİ BUTON</label>
                                                                         <div className="grid grid-cols-2 gap-2">
                                                                             <input
                                                                                 type="text"
@@ -764,10 +762,10 @@ export default function WebsiteManagerPage() {
                                                             <div className="space-y-4">
                                                                 <div className="grid grid-cols-1 gap-4">
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">MEN├£ ├û─ŞELER─░ (Ba┼şl─▒k|Link format─▒nda, her sat─▒ra bir tane)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">MENÜ ÖĞELERİ (Başlık|Link formatında, her satıra bir tane)</label>
                                                                         <textarea
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900 min-h-[100px]"
-                                                                            placeholder="├£r├╝nler|/products&#10;Hakk─▒m─▒zda|/about"
+                                                                            placeholder="Ürünler|/products&#10;Hakkımızda|/about"
                                                                             value={(section.content.menuItems || [])?.map((m: any) => `${m.title}|${m.url}`).join('\n')}
                                                                             onChange={(e) => {
                                                                                 const lines = e.target.value.split('\n').filter(l => l.includes('|'));
@@ -782,7 +780,7 @@ export default function WebsiteManagerPage() {
                                                                 </div>
                                                                 <div className="grid grid-cols-2 gap-4">
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">G─░R─░┼Ş L─░NK─░ METN─░</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">GİRİŞ LİNKİ METNİ</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900"
@@ -791,7 +789,7 @@ export default function WebsiteManagerPage() {
                                                                         />
                                                                     </div>
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">G─░R─░┼Ş L─░NK─░ URL</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">GİRİŞ LİNKİ URL</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900"
@@ -802,7 +800,7 @@ export default function WebsiteManagerPage() {
                                                                 </div>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                     <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">B─░R─░NC─░ BUTON (Primary)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">BİRİNCİ BUTON (Primary)</label>
                                                                         <div className="grid grid-cols-2 gap-2">
                                                                             <input
                                                                                 type="text"
@@ -821,7 +819,7 @@ export default function WebsiteManagerPage() {
                                                                         </div>
                                                                     </div>
                                                                     <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">─░K─░NC─░ BUTON (Outline)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">İKİNCİ BUTON (Outline)</label>
                                                                         <div className="grid grid-cols-2 gap-2">
                                                                             <input
                                                                                 type="text"
@@ -844,24 +842,24 @@ export default function WebsiteManagerPage() {
                                                         )}
                                                         {(section.type === 'METRICS' || section.type === 'COMPARISON' || section.type === 'EXPLORE' || section.type === 'FOOTER') && (
                                                             <div className={`space-y-4 p-4 ${section.type === 'METRICS' ? 'bg-purple-50 border-purple-100' : 'bg-blue-50 border-blue-100'} rounded-xl border`}>
-                                                                <p className={`text-[10px] font-black ${section.type === 'METRICS' ? 'text-purple-400' : 'text-blue-400'} uppercase tracking-widest mb-2`}>{section.type} BA┼ŞLIKLARI</p>
+                                                                <p className={`text-[10px] font-black ${section.type === 'METRICS' ? 'text-purple-400' : 'text-blue-400'} uppercase tracking-widest mb-2`}>{section.type} BAŞLIKLARI</p>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-900">
                                                                     <div>
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">B─░R─░NC─░ KISIM (├£ST)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">BİRİNCİ KISIM (ÜST)</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg p-2"
-                                                                            placeholder="├Ârn: 20,000+ scaling teams"
+                                                                            placeholder="örn: 20,000+ scaling teams"
                                                                             value={section.content.topTitle || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'topTitle', e.target.value)}
                                                                         />
                                                                     </div>
                                                                     <div>
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">─░K─░NC─░ KISIM (ANA / RENKL─░)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">İKİNCİ KISIM (ANA / RENKLİ)</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg p-2"
-                                                                            placeholder="├Ârn: without the baggage"
+                                                                            placeholder="örn: without the baggage"
                                                                             value={section.content.mainTitle || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'mainTitle', e.target.value)}
                                                                         />
@@ -870,15 +868,15 @@ export default function WebsiteManagerPage() {
                                                                 {section.type === 'COMPARISON' && (
                                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-blue-100">
                                                                         <div>
-                                                                            <label className="text-[10px] font-black text-red-500 uppercase block mb-1 underline text-center">├ûNCES─░ (BEFORE) BA┼ŞLIK</label>
+                                                                            <label className="text-[10px] font-black text-red-500 uppercase block mb-1 underline text-center">ÖNCESİ (BEFORE) BAŞLIK</label>
                                                                             <input type="text" className="w-full text-sm border-slate-200 rounded-lg p-2" value={section.content.beforeTitle || ''} placeholder="BEFORE DATABOX" onChange={(e) => updateSectionContent(idx, 'beforeTitle', e.target.value)} />
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase block mt-2 mb-1">MADDELER (Her sat─▒ra bir tane)</label>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase block mt-2 mb-1">MADDELER (Her satıra bir tane)</label>
                                                                             <textarea className="w-full text-[11px] border-slate-200 rounded-lg p-2 min-h-[100px]" value={(section.content.beforeList || []).join('\n')} onChange={(e) => updateSectionContent(idx, 'beforeList', e.target.value.split('\n').filter(s => s.trim()))} />
                                                                         </div>
                                                                         <div>
-                                                                            <label className="text-[10px] font-black text-green-500 uppercase block mb-1 underline text-center">SONRASI (AFTER) BA┼ŞLIK</label>
+                                                                            <label className="text-[10px] font-black text-green-500 uppercase block mb-1 underline text-center">SONRASI (AFTER) BAŞLIK</label>
                                                                             <input type="text" className="w-full text-sm border-slate-200 rounded-lg p-2" value={section.content.afterTitle || ''} placeholder="AFTER DATABOX" onChange={(e) => updateSectionContent(idx, 'afterTitle', e.target.value)} />
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase block mt-2 mb-1">MADDELER (Her sat─▒ra bir tane)</label>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase block mt-2 mb-1">MADDELER (Her satıra bir tane)</label>
                                                                             <textarea className="w-full text-[11px] border-slate-200 rounded-lg p-2 min-h-[100px]" value={(section.content.afterList || []).join('\n')} onChange={(e) => updateSectionContent(idx, 'afterList', e.target.value.split('\n').filter(s => s.trim()))} />
                                                                         </div>
                                                                     </div>
@@ -887,7 +885,7 @@ export default function WebsiteManagerPage() {
                                                         )}
                                                         {!(section.type === 'PARTNERS' || section.type === 'BANNER' || section.type === 'NAV') && (
                                                             <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">ALT BA┼ŞLIK / A├çIKLAMA</label>
+                                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">ALT BAŞLIK / AÇIKLAMA</label>
                                                                 <textarea
                                                                     className="w-full text-sm border-slate-200 rounded-lg min-h-[120px] bg-white text-slate-900"
                                                                     value={section.content.subtitle || section.content.desc || ''}
@@ -898,7 +896,7 @@ export default function WebsiteManagerPage() {
                                                         )}
                                                         {(section.type === 'METRICS' || section.type === 'FEATURES' || section.type === 'EXPLORE' || section.type === 'GRID' || section.type === 'PARTNERS' || section.type === 'PRICING' || section.type === 'FAQ' || section.type === 'FOOTER') && (
                                                             <div className="space-y-4">
-                                                                <label className="text-[10px] font-black text-slate-500 uppercase block">{section.type === 'PARTNERS' ? 'LOGOLAR / REFERANSLAR' : '├û─ŞELER / MADDELER'}</label>
+                                                                <label className="text-[10px] font-black text-slate-500 uppercase block">{section.type === 'PARTNERS' ? 'LOGOLAR / REFERANSLAR' : 'ÖĞELER / MADDELER'}</label>
                                                                 <div className="space-y-3 max-h-[400px] overflow-y-auto bg-slate-100 p-4 rounded-xl border border-slate-200 text-slate-900">
                                                                     {(section.content.items || [])?.map((item: any, iidx: number) => (
                                                                         <div key={iidx} className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 space-y-3 relative group/item">
@@ -917,7 +915,7 @@ export default function WebsiteManagerPage() {
                                                                                         <input
                                                                                             className="text-sm font-medium w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
                                                                                             value={typeof item === 'string' ? item : item.name || ''}
-                                                                                            placeholder="Partner Ad─▒"
+                                                                                            placeholder="Partner Adı"
                                                                                             onChange={(e) => {
                                                                                                 const newItems = [...section.content.items];
                                                                                                 if (typeof item === 'string') {
@@ -930,7 +928,7 @@ export default function WebsiteManagerPage() {
                                                                                         />
                                                                                     </div>
                                                                                     <div>
-                                                                                        <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">LOGO / G├ûRSEL</label>
+                                                                                        <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">LOGO / GÖRSEL</label>
                                                                                         <div className="flex flex-col gap-2">
                                                                                             <div className="flex gap-2">
                                                                                                 <input
@@ -948,7 +946,7 @@ export default function WebsiteManagerPage() {
                                                                                                     }}
                                                                                                 />
                                                                                                 <label className="bg-slate-900 text-white px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1 font-bold text-[10px] hover:bg-slate-800 shadow-sm shadow-slate-200">
-                                                                                                    {uploading ? 'Ôîø' : '­şôü Y├£KLE'}
+                                                                                                    {uploading ? '⌛' : '📁 YÜKLE'}
                                                                                                     <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
                                                                                                         const newItems = [...section.content.items];
                                                                                                         const currentName = typeof item === 'string' ? item : (item.name || 'Logo');
@@ -960,7 +958,7 @@ export default function WebsiteManagerPage() {
                                                                                             {(typeof item !== 'string' && item.url) && (
                                                                                                 <div className="flex items-center gap-2">
                                                                                                     <img src={item.url} alt="Preview" className="h-10 object-contain w-min border rounded bg-white p-1" />
-                                                                                                    <span className="text-[10px] text-slate-400">G├Ârsel ├ûnizleme</span>
+                                                                                                    <span className="text-[10px] text-slate-400">Görsel Önizleme</span>
                                                                                                 </div>
                                                                                             )}
                                                                                         </div>
@@ -970,10 +968,10 @@ export default function WebsiteManagerPage() {
                                                                                 <div className="space-y-3">
                                                                                     <div className="grid grid-cols-2 gap-3">
                                                                                         <div>
-                                                                                            <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">BA┼ŞLIK / SORU</label>
+                                                                                            <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">BAŞLIK / SORU</label>
                                                                                             <input
                                                                                                 className="text-sm font-bold w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
-                                                                                                placeholder={section.type === 'FAQ' ? 'Soru' : section.type === 'PRICING' ? 'Paket Ad─▒' : section.type === 'METRICS' ? 'Stat (├Ârn: Ôåæ 55%)' : section.type === 'FOOTER' ? 'Kolon Ba┼şl─▒─ş─▒' : 'Ba┼şl─▒k'}
+                                                                                                placeholder={section.type === 'FAQ' ? 'Soru' : section.type === 'PRICING' ? 'Paket Adı' : section.type === 'METRICS' ? 'Stat (örn: ↑ 55%)' : section.type === 'FOOTER' ? 'Kolon Başlığı' : 'Başlık'}
                                                                                                 value={section.type === 'FAQ' ? (item.question || '') : (section.type === 'METRICS' ? (item.stat || '') : (item.title || ''))}
                                                                                                 onChange={(e) => {
                                                                                                     const newItems = [...section.content.items];
@@ -985,7 +983,7 @@ export default function WebsiteManagerPage() {
                                                                                         </div>
                                                                                         {section.type === 'METRICS' && (
                                                                                             <div>
-                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">ET─░KET (LABEL)</label>
+                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">ETİKET (LABEL)</label>
                                                                                                 <input
                                                                                                     className="text-sm font-bold w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
                                                                                                     placeholder="Etiket"
@@ -1000,7 +998,7 @@ export default function WebsiteManagerPage() {
                                                                                         )}
                                                                                         {section.type === 'PRICING' && (
                                                                                             <div>
-                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">F─░YAT</label>
+                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">FİYAT</label>
                                                                                                 <input
                                                                                                     className="text-sm font-black w-full border-slate-200 rounded-lg bg-blue-50 p-2 text-blue-700"
                                                                                                     placeholder="99"
@@ -1018,7 +1016,7 @@ export default function WebsiteManagerPage() {
                                                                                     {(section.type === 'PRICING' || section.type === 'METRICS') && (
                                                                                         <div className="grid grid-cols-2 gap-3">
                                                                                             <div>
-                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">L─░NK METN─░</label>
+                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">LİNK METNİ</label>
                                                                                                 <input
                                                                                                     className="text-sm w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
                                                                                                     placeholder="Buy Now"
@@ -1031,7 +1029,7 @@ export default function WebsiteManagerPage() {
                                                                                                 />
                                                                                             </div>
                                                                                             <div>
-                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">L─░NK URL</label>
+                                                                                                <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">LİNK URL</label>
                                                                                                 <input
                                                                                                     className="text-sm w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
                                                                                                     placeholder="#"
@@ -1047,10 +1045,10 @@ export default function WebsiteManagerPage() {
                                                                                     )}
 
                                                                                     <div>
-                                                                                        <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">A├çIKLAMA / CEVAP</label>
+                                                                                        <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">AÇIKLAMA / CEVAP</label>
                                                                                         <textarea
                                                                                             className="text-sm w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
-                                                                                            placeholder={section.type === 'FAQ' ? 'Cevap' : 'A├ğ─▒klama'}
+                                                                                            placeholder={section.type === 'FAQ' ? 'Cevap' : 'Açıklama'}
                                                                                             value={section.type === 'FAQ' ? (item.answer || '') : (item.desc || '')}
                                                                                             onChange={(e) => {
                                                                                                 const newItems = [...section.content.items];
@@ -1063,7 +1061,7 @@ export default function WebsiteManagerPage() {
 
                                                                                     {(section.type === 'GRID' || section.type === 'EXPLORE' || section.type === 'FEATURES' || section.type === 'METRICS') && (
                                                                                         <div>
-                                                                                            <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">{section.type === 'METRICS' ? 'LOGO URL' : '─░KON / G├ûRSEL URL'}</label>
+                                                                                            <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">{section.type === 'METRICS' ? 'LOGO URL' : 'İKON / GÖRSEL URL'}</label>
                                                                                             <div className="flex flex-col gap-2">
                                                                                                 <div className="flex gap-2">
                                                                                                     <input
@@ -1078,7 +1076,7 @@ export default function WebsiteManagerPage() {
                                                                                                         }}
                                                                                                     />
                                                                                                     <label className="bg-slate-900 text-white px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1 font-bold text-[10px] hover:bg-slate-800 shadow-sm shadow-slate-200">
-                                                                                                        {uploading ? 'Ôîø' : '­şôü Y├£KLE'}
+                                                                                                        {uploading ? '⌛' : '📁 YÜKLE'}
                                                                                                         <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
                                                                                                             const newItems = [...section.content.items];
                                                                                                             const key = section.type === 'METRICS' ? 'logo' : 'icon';
@@ -1101,7 +1099,7 @@ export default function WebsiteManagerPage() {
                                                                                     )}
                                                                                     {(section.type === 'EXPLORE' || section.type === 'PRICING' || section.type === 'ROLES' || section.type === 'FOOTER') && (
                                                                                         <div>
-                                                                                            <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">{section.type === 'FOOTER' ? 'L─░NKLER (Metin|URL)' : 'L─░STE ├û─ŞELER─░ (Her Sat─▒rda Bir ├ûzellik)'}</label>
+                                                                                            <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">{section.type === 'FOOTER' ? 'LİNKLER (Metin|URL)' : 'LİSTE ÖĞELERİ (Her Satırda Bir Özellik)'}</label>
                                                                                             <textarea
                                                                                                 className="text-[11px] w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white italic min-h-[100px]"
                                                                                                 placeholder={section.type === 'FOOTER' ? 'Metin|#' : "Madde 1&#10;Madde 2..."}
@@ -1120,17 +1118,17 @@ export default function WebsiteManagerPage() {
                                                                         </div>
                                                                     ))}
                                                                     <button className="w-full py-4 bg-white border-2 border-dashed border-slate-300 text-slate-500 font-black text-[11px] rounded-xl hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 transition uppercase tracking-widest" onClick={() => {
-                                                                        let newItem = { title: 'Yeni ├û─şe', desc: '' };
+                                                                        let newItem = { title: 'Yeni Öğe', desc: '' };
                                                                         if (section.type === 'PARTNERS') newItem = { name: 'Yeni Partner', url: '' } as any;
                                                                         if (section.type === 'FAQ') newItem = { question: 'Soru?', answer: 'Cevap' } as any;
-                                                                        if (section.type === 'PRICING') newItem = { title: 'Paket', price: '99', desc: 'A├ğ─▒klama', list: [] } as any;
-                                                                        if (section.type === 'EXPLORE') newItem = { title: 'Analiz', desc: 'A├ğ─▒klama', icon: 'Ô£¿', list: [] } as any;
+                                                                        if (section.type === 'PRICING') newItem = { title: 'Paket', price: '99', desc: 'Açıklama', list: [] } as any;
+                                                                        if (section.type === 'EXPLORE') newItem = { title: 'Analiz', desc: 'Açıklama', icon: '✨', list: [] } as any;
                                                                         if (section.type === 'METRICS') newItem = { stat: '100+', label: 'Description', logo: '' } as any;
                                                                         if (section.type === 'FOOTER') newItem = { title: 'Kolon', list: ['Link 1|#', 'Link 2|#'] } as any;
 
                                                                         const newItems = [...(section.content.items || []), newItem];
                                                                         updateSectionContent(idx, 'items', newItems);
-                                                                    }}>+ YEN─░ ├û─ŞE EKLE</button>
+                                                                    }}>+ YENİ ÖĞE EKLE</button>
                                                                 </div>
                                                             </div>
                                                         )}
@@ -1140,28 +1138,28 @@ export default function WebsiteManagerPage() {
                                                         section.type === 'FOOTER' && (
                                                             <div className="bg-slate-100 p-6 rounded-2xl border border-slate-200 space-y-4 mb-6">
                                                                 <div className="flex justify-between items-center mb-2">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">ALT B─░LG─░ (FOOTER) AYARLARI</label>
-                                                                    <span className="text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded italic">FOOTER ├ûZEL</span>
+                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">ALT BİLGİ (FOOTER) AYARLARI</label>
+                                                                    <span className="text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded italic">FOOTER ÖZEL</span>
                                                                 </div>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER LOGOSU (OPS─░YONEL)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER LOGOSU (OPSİYONEL)</label>
                                                                         <div className="flex gap-2">
                                                                             <input
                                                                                 type="text"
                                                                                 className="flex-1 text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
-                                                                                placeholder="Bo┼ş b─▒rak─▒l─▒rsa ana logo kullan─▒l─▒r"
+                                                                                placeholder="Boş bırakılırsa ana logo kullanılır"
                                                                                 value={section.content.footerLogoUrl || ''}
                                                                                 onChange={(e) => updateSectionContent(idx, 'footerLogoUrl', e.target.value)}
                                                                             />
                                                                             <label className="bg-slate-900 text-white p-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-sm shadow-slate-200">
-                                                                                {uploading ? 'Ôîø' : '­şôü Y├£KLE'}
+                                                                                {uploading ? '⌛' : '📁 YÜKLE'}
                                                                                 <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'footerLogoUrl', url))} />
                                                                             </label>
                                                                         </div>
                                                                     </div>
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER ARKA PLAN RENG─░</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER ARKA PLAN RENGİ</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
@@ -1171,7 +1169,7 @@ export default function WebsiteManagerPage() {
                                                                         />
                                                                     </div>
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO Y├£KSEKL─░─Ş─░ (PX)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO YÜKSEKLİĞİ (PX)</label>
                                                                         <input
                                                                             type="number"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
@@ -1188,12 +1186,12 @@ export default function WebsiteManagerPage() {
                                                                             checked={section.content.footerHideTitle}
                                                                             onChange={(e) => updateSectionContent(idx, 'footerHideTitle', e.target.checked)}
                                                                         />
-                                                                        <label htmlFor={`footer-hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Ba┼şl─▒─ş─▒n─▒ Gizle</label>
+                                                                        <label htmlFor={`footer-hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Başlığını Gizle</label>
                                                                     </div>
                                                                 </div>
                                                                 <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
                                                                     <p className="text-[10px] text-blue-700 italic font-medium leading-relaxed">
-                                                                        * Footer renk ve logosunu buradan de─şi┼ştirebilirsiniz. Linkleri ise a┼şa─ş─▒daki liste ├Â─şelerinden y├Ânetebilirsiniz.
+                                                                        * Footer renk ve logosunu buradan değiştirebilirsiniz. Linkleri ise aşağıdaki liste öğelerinden yönetebilirsiniz.
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -1204,7 +1202,7 @@ export default function WebsiteManagerPage() {
                                                         section.type === 'NAV' && (
                                                             <div className="bg-slate-100 p-6 rounded-2xl border border-slate-200 space-y-4 mb-6">
                                                                 <div className="flex justify-between items-center mb-2">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">S─░TE LOGOSU (ANA LOGO)</label>
+                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">SİTE LOGOSU (ANA LOGO)</label>
                                                                     <span className="text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded italic">GLOBAL AYAR</span>
                                                                 </div>
                                                                 <div className="flex gap-4 items-center">
@@ -1217,7 +1215,7 @@ export default function WebsiteManagerPage() {
                                                                             onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
                                                                         />
                                                                         <label className="bg-slate-900 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-sm shadow-slate-300 flex items-center gap-2">
-                                                                            {uploading ? 'Ôîø' : '­şôü LOGO Y├£KLE'}
+                                                                            {uploading ? '⌛' : '📁 LOGO YÜKLE'}
                                                                             <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setSettings({ ...settings, logoUrl: url }))} />
                                                                         </label>
                                                                     </div>
@@ -1229,7 +1227,7 @@ export default function WebsiteManagerPage() {
                                                                 </div>
                                                                 <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-slate-200">
                                                                     <div className="space-y-1">
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO Y├£KSEKL─░─Ş─░ (PX)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO YÜKSEKLİĞİ (PX)</label>
                                                                         <input
                                                                             type="number"
                                                                             className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900"
@@ -1246,12 +1244,12 @@ export default function WebsiteManagerPage() {
                                                                             checked={section.content.hideTitle}
                                                                             onChange={(e) => updateSectionContent(idx, 'hideTitle', e.target.checked)}
                                                                         />
-                                                                        <label htmlFor={`hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Ba┼şl─▒─ş─▒n─▒ Gizle</label>
+                                                                        <label htmlFor={`hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Başlığını Gizle</label>
                                                                     </div>
                                                                 </div>
                                                                 <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
                                                                     <p className="text-[10px] text-blue-700 italic font-medium leading-relaxed">
-                                                                        * Bu b├Âl├╝mden y├╝kledi─şiniz logo t├╝m sayfalardaki ├╝st men├╝ (Navigation) alan─▒nda g├Âr├╝nt├╝lenecektir. Men├╝ i├ğeri─şini "Men├╝ Y├Ânetimi" tab─▒ndan d├╝zenleyebilirsiniz.
+                                                                        * Bu bölümden yüklediğiniz logo tüm sayfalardaki üst menü (Navigation) alanında görüntülenecektir. Menü içeriğini "Menü Yönetimi" tabından düzenleyebilirsiniz.
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -1268,13 +1266,13 @@ export default function WebsiteManagerPage() {
                                                                         checked={section.content.showFloatingCard}
                                                                         onChange={(e) => updateSectionContent(idx, 'showFloatingCard', e.target.checked)}
                                                                     />
-                                                                    <label htmlFor={`floating-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">─░kincil Kart (Floating Card) G├Âster</label>
+                                                                    <label htmlFor={`floating-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">İkincil Kart (Floating Card) Göster</label>
                                                                 </div>
 
                                                                 {section.content.showFloatingCard && (
                                                                     <div className="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200 ring-4 ring-slate-50">
                                                                         <div className="space-y-1">
-                                                                            <label className="text-[10px] font-black text-slate-500 uppercase block">KART BA┼ŞLI─ŞI</label>
+                                                                            <label className="text-[10px] font-black text-slate-500 uppercase block">KART BAŞLIĞI</label>
                                                                             <input
                                                                                 type="text"
                                                                                 className="w-full text-sm border-slate-200 rounded-lg bg-white p-2 text-slate-900 focus:bg-white"
@@ -1283,7 +1281,7 @@ export default function WebsiteManagerPage() {
                                                                             />
                                                                         </div>
                                                                         <div className="space-y-1">
-                                                                            <label className="text-[10px] font-black text-slate-500 uppercase block">KART G├ûRSEL─░</label>
+                                                                            <label className="text-[10px] font-black text-slate-500 uppercase block">KART GÖRSELİ</label>
                                                                             <div className="flex gap-2">
                                                                                 <input
                                                                                     type="text"
@@ -1292,7 +1290,7 @@ export default function WebsiteManagerPage() {
                                                                                     onChange={(e) => updateSectionContent(idx, 'floatingCardVisualUrl', e.target.value)}
                                                                                 />
                                                                                 <label className="bg-slate-900 text-white px-4 py-2 rounded-lg cursor-pointer text-xs font-black hover:bg-slate-800 transition flex items-center justify-center min-w-[100px]">
-                                                                                    {uploading ? 'Ôîø...' : '­şôü Y├£KLE'}
+                                                                                    {uploading ? '⌛...' : '📁 YÜKLE'}
                                                                                     <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'floatingCardVisualUrl', url))} />
                                                                                 </label>
                                                                             </div>
@@ -1301,7 +1299,7 @@ export default function WebsiteManagerPage() {
                                                                 )}
 
                                                                 <div className="space-y-2">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">CANLI ├ûN─░ZLEME</label>
+                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">CANLI ÖNİZLEME</label>
                                                                     <div className="aspect-video bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center relative shadow-inner group">
                                                                         {section.content.visualUrl ? (
                                                                             <>
@@ -1309,19 +1307,19 @@ export default function WebsiteManagerPage() {
                                                                                     src={section.content.visualUrl}
                                                                                     className="w-full h-full object-contain transition duration-500 group-hover:scale-110"
                                                                                     onError={(e) => {
-                                                                                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=G├Ârsel+Y├╝klenemedi';
+                                                                                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Görsel+Yüklenemedi';
                                                                                     }}
                                                                                 />
                                                                                 <button
                                                                                     className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition shadow-sm"
                                                                                     onClick={() => updateSectionContent(idx, 'visualUrl', '')}
-                                                                                    title="G├Ârseli Kald─▒r"
-                                                                                >ÔØî</button>
+                                                                                    title="Görseli Kaldır"
+                                                                                >❌</button>
                                                                             </>
                                                                         ) : (
                                                                             <div className="flex flex-col items-center gap-2">
-                                                                                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-400">­şû╝´©Å</div>
-                                                                                <span className="text-slate-400 text-[10px] font-black italic">ANA G├ûRSEL SE├ç─░LMED─░</span>
+                                                                                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-400">🖼️</div>
+                                                                                <span className="text-slate-400 text-[10px] font-black italic">ANA GÖRSEL SEÇİLMEDİ</span>
                                                                             </div>
                                                                         )}
                                                                         {section.content.showFloatingCard && section.content.floatingCardVisualUrl && (
@@ -1336,7 +1334,7 @@ export default function WebsiteManagerPage() {
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    <p className="text-[9px] text-slate-400 italic text-center">├ûnizleme mobil ve masa├╝st├╝ aras─▒nda farkl─▒l─▒k g├Âsterebilir.</p>
+                                                                    <p className="text-[9px] text-slate-400 italic text-center">Önizleme mobil ve masaüstü arasında farklılık gösterebilir.</p>
                                                                 </div>
                                                             </div>
                                                         )}
@@ -1350,10 +1348,10 @@ export default function WebsiteManagerPage() {
                                                                         <div key={rIdx} className="bg-white p-3 rounded-lg border border-slate-200 space-y-2 text-xs">
                                                                             <div className="flex gap-2 items-end">
                                                                                 <div className="flex-1 space-y-1">
-                                                                                    <label className="text-[9px] font-black text-slate-400 uppercase">─░KON / G├ûRSEL</label>
+                                                                                    <label className="text-[9px] font-black text-slate-400 uppercase">İKON / GÖRSEL</label>
                                                                                     <div className="flex gap-1">
                                                                                         <input
-                                                                                            type="text" placeholder="─░kon" className="flex-1 border-slate-100 rounded text-slate-900 text-[10px]"
+                                                                                            type="text" placeholder="İkon" className="flex-1 border-slate-100 rounded text-slate-900 text-[10px]"
                                                                                             value={role.icon}
                                                                                             onChange={(e) => {
                                                                                                 const newItems = [...section.content.items];
@@ -1362,7 +1360,7 @@ export default function WebsiteManagerPage() {
                                                                                             }}
                                                                                         />
                                                                                         <label className="bg-slate-900 text-white px-2 py-1.5 rounded cursor-pointer transition flex items-center gap-1 font-bold text-[9px] hover:bg-slate-800">
-                                                                                            {uploading ? 'Ôîø' : '­şôü'}
+                                                                                            {uploading ? '⌛' : '📁'}
                                                                                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
                                                                                                 const newItems = [...section.content.items];
                                                                                                 newItems[rIdx].icon = url;
@@ -1372,9 +1370,9 @@ export default function WebsiteManagerPage() {
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="flex-1 space-y-1">
-                                                                                    <label className="text-[9px] font-black text-slate-400 uppercase">ROL BA┼ŞLI─ŞI</label>
+                                                                                    <label className="text-[9px] font-black text-slate-400 uppercase">ROL BAŞLIĞI</label>
                                                                                     <input
-                                                                                        type="text" placeholder="Rol Ba┼şl─▒─ş─▒" className="w-full border-slate-100 rounded font-bold text-slate-900 text-[10px]"
+                                                                                        type="text" placeholder="Rol Başlığı" className="w-full border-slate-100 rounded font-bold text-slate-900 text-[10px]"
                                                                                         value={role.title}
                                                                                         onChange={(e) => {
                                                                                             const newItems = [...section.content.items];
@@ -1387,16 +1385,16 @@ export default function WebsiteManagerPage() {
                                                                                     {role.icon && (role.icon.startsWith('http') || role.icon.startsWith('/') || role.icon.startsWith('data:')) ? (
                                                                                         <img src={role.icon} alt="Icon" className="w-6 h-6 object-contain" />
                                                                                     ) : (
-                                                                                        <span className="text-lg">{role.icon || '­şæñ'}</span>
+                                                                                        <span className="text-lg">{role.icon || '👤'}</span>
                                                                                     )}
                                                                                 </div>
                                                                                 <button className="text-red-300 hover:text-red-500 pb-1" onClick={() => {
                                                                                     const newItems = section.content.items.filter((_: any, i: number) => i !== rIdx);
                                                                                     updateSectionContent(idx, 'items', newItems);
-                                                                                }}>├ù</button>
+                                                                                }}>×</button>
                                                                             </div>
                                                                             <textarea
-                                                                                placeholder="K─▒sa a├ğ─▒klama" className="w-full border-slate-100 rounded text-slate-900"
+                                                                                placeholder="Kısa açıklama" className="w-full border-slate-100 rounded text-slate-900"
                                                                                 value={role.desc}
                                                                                 onChange={(e) => {
                                                                                     const newItems = [...section.content.items];
@@ -1405,7 +1403,7 @@ export default function WebsiteManagerPage() {
                                                                                 }}
                                                                             />
                                                                             <input
-                                                                                placeholder="├ûzellikler (virg├╝lle ay─▒r─▒n)" className="w-full border-slate-100 rounded text-[10px] text-slate-900"
+                                                                                placeholder="Özellikler (virgülle ayırın)" className="w-full border-slate-100 rounded text-[10px] text-slate-900"
                                                                                 value={(role.list || role.items || []).join(', ')}
                                                                                 onChange={(e) => {
                                                                                     const newItems = [...section.content.items];
@@ -1418,11 +1416,11 @@ export default function WebsiteManagerPage() {
                                                                     <button
                                                                         className="w-full py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black hover:bg-blue-100 transition"
                                                                         onClick={() => {
-                                                                            const newItems = [...(section.content.items || []), { title: 'Yeni Rol', desc: '', icon: '­şæñ', list: [] }];
+                                                                            const newItems = [...(section.content.items || []), { title: 'Yeni Rol', desc: '', icon: '👤', list: [] }];
                                                                             updateSectionContent(idx, 'items', newItems);
                                                                         }}
                                                                     >
-                                                                        + YEN─░ ROL EKLE
+                                                                        + YENİ ROL EKLE
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -1431,33 +1429,33 @@ export default function WebsiteManagerPage() {
                                                                 {section.type === 'COMPARISON' && (
                                                                     <div className="grid grid-cols-2 gap-4">
                                                                         <div>
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE BA┼ŞLI─ŞI</label>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE BAŞLIĞI</label>
                                                                             <input
                                                                                 type="text"
                                                                                 className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 mb-2 text-slate-900"
                                                                                 value={section.content.beforeTitle || ''}
                                                                                 onChange={(e) => updateSectionContent(idx, 'beforeTitle', e.target.value)}
                                                                             />
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE L─░STES─░</label>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE LİSTESİ</label>
                                                                             <textarea
                                                                                 className="w-full text-[10px] border-slate-200 rounded bg-slate-50 min-h-[150px] text-slate-900"
-                                                                                placeholder="Her sat─▒ra bir madde..."
+                                                                                placeholder="Her satıra bir madde..."
                                                                                 value={(section.content.beforeList || []).join('\n')}
                                                                                 onChange={(e) => updateSectionContent(idx, 'beforeList', e.target.value.split('\n'))}
                                                                             />
                                                                         </div>
                                                                         <div>
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER BA┼ŞLI─ŞI</label>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER BAŞLIĞI</label>
                                                                             <input
                                                                                 type="text"
                                                                                 className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 mb-2 text-slate-900"
                                                                                 value={section.content.afterTitle || ''}
                                                                                 onChange={(e) => updateSectionContent(idx, 'afterTitle', e.target.value)}
                                                                             />
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER L─░STES─░</label>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER LİSTESİ</label>
                                                                             <textarea
                                                                                 className="w-full text-[10px] border-slate-200 rounded bg-slate-50 min-h-[150px] text-slate-900"
-                                                                                placeholder="Her sat─▒ra bir madde..."
+                                                                                placeholder="Her satıra bir madde..."
                                                                                 value={(section.content.afterList || []).join('\n')}
                                                                                 onChange={(e) => updateSectionContent(idx, 'afterList', e.target.value.split('\n'))}
                                                                             />
@@ -1467,7 +1465,7 @@ export default function WebsiteManagerPage() {
                                                                 {!(section.type === 'HERO' || section.type === 'CTA' || section.type === 'COMPARISON' || section.type === 'BANNER' || section.type === 'PARTNERS' || section.type === 'NAV') && (
                                                                     <>
                                                                         <div>
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">ARKAPLAN RENG─░</label>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">ARKAPLAN RENGİ</label>
                                                                             <input
                                                                                 type="text"
                                                                                 className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
@@ -1491,7 +1489,7 @@ export default function WebsiteManagerPage() {
                                                                         )}
                                                                         {(section.type === 'FEATURES' || section.type === 'GRID' || section.type === 'EXPLORE' || section.type === 'METRICS' || section.type === 'ROLES') && (
                                                                             <div>
-                                                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">─░KON / G├ûRSEL BOYUTU (PX)</label>
+                                                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">İKON / GÖRSEL BOYUTU (PX)</label>
                                                                                 <input
                                                                                     type="number"
                                                                                     className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
@@ -1514,8 +1512,8 @@ export default function WebsiteManagerPage() {
                                             onClick={addSection}
                                             className="w-full py-8 border-4 border-dashed border-slate-100 rounded-2xl text-slate-300 font-black hover:border-blue-100 hover:text-blue-400 transition-all flex flex-col items-center gap-2 group"
                                         >
-                                            <span className="text-4xl group-hover:scale-110 transition">ÔŞò</span>
-                                            <span className="uppercase tracking-widest text-[10px]">YEN─░ B├ûL├£M (SECTION) EKLE</span>
+                                            <span className="text-4xl group-hover:scale-110 transition">➕</span>
+                                            <span className="uppercase tracking-widest text-[10px]">YENİ BÖLÜM (SECTION) EKLE</span>
                                         </button>
                                     </div>
                                 </div>
@@ -1530,15 +1528,15 @@ export default function WebsiteManagerPage() {
                         <div className="p-8 max-w-6xl mx-auto space-y-8">
                             <div className="flex justify-between items-center mb-6">
                                 <div>
-                                    <h2 className="text-2xl font-black text-slate-800">Men├╝ Y├Ânetimi</h2>
-                                    <p className="text-sm text-slate-500">Mega men├╝ ve dropdown yap─▒lar─▒n─▒ buradan y├Ânetebilirsiniz.</p>
+                                    <h2 className="text-2xl font-black text-slate-800">Menü Yönetimi</h2>
+                                    <p className="text-sm text-slate-500">Mega menü ve dropdown yapılarını buradan yönetebilirsiniz.</p>
                                 </div>
                                 <button
                                     onClick={saveMenus}
                                     disabled={saving}
                                     className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-sm shadow-blue-200"
                                 >
-                                    {saving ? 'KAYDED─░L─░YOR...' : 'DE─Ş─░┼Ş─░KL─░KLER─░ KAYDET'}
+                                    {saving ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                                 </button>
                             </div>
 
@@ -1547,10 +1545,10 @@ export default function WebsiteManagerPage() {
                                     <div key={menu.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                                         <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
                                             <h3 className="font-bold text-xl text-slate-800 flex items-center gap-3">
-                                                <span className="bg-slate-100 p-2 rounded-lg">­şıö</span>
+                                                <span className="bg-slate-100 p-2 rounded-lg">🍔</span>
                                                 {menu.name}
                                             </h3>
-                                            <span className="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase tracking-wider">{menu.items?.length || 0} ├û─ŞE</span>
+                                            <span className="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase tracking-wider">{menu.items?.length || 0} ÖĞE</span>
                                         </div>
 
                                         <div className="space-y-4">
@@ -1568,7 +1566,7 @@ export default function WebsiteManagerPage() {
                                                                     }
                                                                 }}
                                                                 className="text-slate-300 hover:text-blue-500"
-                                                            >Ô¼å´©Å</button>
+                                                            >⬆️</button>
                                                             <button
                                                                 onClick={() => {
                                                                     const newMenus = [...data.menus];
@@ -1578,13 +1576,13 @@ export default function WebsiteManagerPage() {
                                                                     }
                                                                 }}
                                                                 className="text-slate-300 hover:text-blue-500"
-                                                            >Ô¼ç´©Å</button>
+                                                            >⬇️</button>
                                                         </div>
 
                                                         <div className="flex-1 space-y-4">
                                                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                                                                 <div className="md:col-span-3">
-                                                                    <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">G├ûR├£NEN ─░S─░M</label>
+                                                                    <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">GÖRÜNEN İSİM</label>
                                                                     <input
                                                                         type="text"
                                                                         className="w-full text-sm border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-500"
@@ -1610,7 +1608,7 @@ export default function WebsiteManagerPage() {
                                                                     />
                                                                 </div>
                                                                 <div className="md:col-span-2">
-                                                                    <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">T─░P</label>
+                                                                    <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">TİP</label>
                                                                     <select
                                                                         className="w-full text-sm border-slate-200 rounded-lg font-bold text-slate-700 focus:ring-2 focus:ring-blue-500"
                                                                         value={item.type || 'link'}
@@ -1626,7 +1624,7 @@ export default function WebsiteManagerPage() {
                                                                         }}
                                                                     >
                                                                         <option value="link">Normal Link</option>
-                                                                        <option value="mega">Mega Men├╝</option>
+                                                                        <option value="mega">Mega Menü</option>
                                                                         {/* <option value="dropdown">Basit Liste</option> */}
                                                                     </select>
                                                                 </div>
@@ -1639,7 +1637,7 @@ export default function WebsiteManagerPage() {
                                                                         }}
                                                                         className="text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition"
                                                                     >
-                                                                        S─░L
+                                                                        SİL
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -1651,7 +1649,7 @@ export default function WebsiteManagerPage() {
                                                                         {/* Sidebar Categories */}
                                                                         <div className="bg-white p-4 rounded-xl border border-slate-200">
                                                                             <div className="flex justify-between items-center mb-2">
-                                                                                <h4 className="text-[10px] font-black text-slate-500 uppercase">KATEGOR─░LER (SOL MEN├£)</h4>
+                                                                                <h4 className="text-[10px] font-black text-slate-500 uppercase">KATEGORİLER (SOL MENÜ)</h4>
                                                                                 <button
                                                                                     onClick={() => {
                                                                                         const newMenus = [...data.menus];
@@ -1669,7 +1667,7 @@ export default function WebsiteManagerPage() {
                                                                                         <input
                                                                                             type="text"
                                                                                             className="w-1/2 text-xs border-none bg-transparent p-1.5 focus:ring-0 text-slate-900 font-bold border-r border-slate-100"
-                                                                                            placeholder="Kategori Ad─▒"
+                                                                                            placeholder="Kategori Adı"
                                                                                             value={sb.label}
                                                                                             onChange={(e) => {
                                                                                                 const newMenus = [...data.menus];
@@ -1696,11 +1694,11 @@ export default function WebsiteManagerPage() {
                                                                                             }}
                                                                                             className="text-red-300 hover:text-red-500 px-2 text-lg"
                                                                                             title="Sil"
-                                                                                        >├ù</button>
+                                                                                        >×</button>
                                                                                     </div>
                                                                                 ))}
                                                                                 {(!item.sidebar || item.sidebar.length === 0) && (
-                                                                                    <p className="text-[10px] text-slate-400 italic text-center py-4">Hen├╝z kategori eklenmedi.</p>
+                                                                                    <p className="text-[10px] text-slate-400 italic text-center py-4">Henüz kategori eklenmedi.</p>
                                                                                 )}
                                                                             </div>
                                                                         </div>
@@ -1708,7 +1706,7 @@ export default function WebsiteManagerPage() {
                                                                         {/* Content Cards */}
                                                                         <div className="md:col-span-2 bg-white p-4 rounded-xl border border-slate-200">
                                                                             <div className="flex justify-between items-center mb-2">
-                                                                                <h4 className="text-[10px] font-black text-slate-500 uppercase">─░├çER─░K KARTLARI (KATEGOR─░YE BA─ŞLI)</h4>
+                                                                                <h4 className="text-[10px] font-black text-slate-500 uppercase">İÇERİK KARTLARI (KATEGORİYE BAĞLI)</h4>
                                                                                 <button
                                                                                     onClick={() => {
                                                                                         const newMenus = [...data.menus];
@@ -1717,8 +1715,8 @@ export default function WebsiteManagerPage() {
                                                                                         newMenus[mIdx].items[i].content.push({
                                                                                             categoryId: firstCatId,
                                                                                             title: 'Yeni Kart',
-                                                                                            desc: 'A├ğ─▒klama',
-                                                                                            icon: 'Ô£¿',
+                                                                                            desc: 'Açıklama',
+                                                                                            icon: '✨',
                                                                                             link: '#'
                                                                                         });
                                                                                         setData({ ...data, menus: newMenus });
@@ -1731,7 +1729,7 @@ export default function WebsiteManagerPage() {
                                                                                     <div key={cIdx} className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-3 relative group/card">
                                                                                         <div className="flex gap-2 items-center">
                                                                                             <div className="w-1/3">
-                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BA─ŞLI KATEGOR─░</label>
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BAĞLI KATEGORİ</label>
                                                                                                 <select
                                                                                                     className="w-full text-[10px] border-slate-200 rounded-lg p-1.5 font-bold bg-white text-slate-900 border"
                                                                                                     value={content.categoryId}
@@ -1741,17 +1739,17 @@ export default function WebsiteManagerPage() {
                                                                                                         setData({ ...data, menus: newMenus });
                                                                                                     }}
                                                                                                 >
-                                                                                                    <option value="">Kategori Se├ğ...</option>
+                                                                                                    <option value="">Kategori Seç...</option>
                                                                                                     {(item.sidebar || [])?.map((s: any) => (
                                                                                                         <option key={s.id} value={s.id}>{s.label}</option>
                                                                                                     ))}
                                                                                                 </select>
                                                                                             </div>
                                                                                             <div className="w-12">
-                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">─░KON</label>
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">İKON</label>
                                                                                                 <input
                                                                                                     className="w-full text-center border-slate-200 rounded-lg p-1.5 bg-white text-slate-900 border"
-                                                                                                    placeholder="Ô£¿"
+                                                                                                    placeholder="✨"
                                                                                                     value={content.icon}
                                                                                                     onChange={(e) => {
                                                                                                         const newMenus = [...data.menus];
@@ -1761,10 +1759,10 @@ export default function WebsiteManagerPage() {
                                                                                                 />
                                                                                             </div>
                                                                                             <div className="flex-1">
-                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BA┼ŞLIK</label>
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BAŞLIK</label>
                                                                                                 <input
                                                                                                     className="w-full font-bold border-slate-200 rounded-lg p-1.5 bg-white text-slate-900 border"
-                                                                                                    placeholder="Kart Ba┼şl─▒─ş─▒"
+                                                                                                    placeholder="Kart Başlığı"
                                                                                                     value={content.title}
                                                                                                     onChange={(e) => {
                                                                                                         const newMenus = [...data.menus];
@@ -1777,14 +1775,14 @@ export default function WebsiteManagerPage() {
                                                                                                 const newMenus = [...data.menus];
                                                                                                 newMenus[mIdx].items[i].content = newMenus[mIdx].items[i].content.filter((_: any, idx: number) => idx !== cIdx);
                                                                                                 setData({ ...data, menus: newMenus });
-                                                                                            }}>├ù</button>
+                                                                                            }}>×</button>
                                                                                         </div>
                                                                                         <div className="grid grid-cols-2 gap-2">
                                                                                             <div>
-                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">A├çIKLAMA</label>
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">AÇIKLAMA</label>
                                                                                                 <input
                                                                                                     className="w-full border-slate-200 rounded-lg p-1.5 text-slate-600 bg-white border"
-                                                                                                    placeholder="K├╝├ğ├╝k a├ğ─▒klama yaz─▒s─▒"
+                                                                                                    placeholder="Küçük açıklama yazısı"
                                                                                                     value={content.desc}
                                                                                                     onChange={(e) => {
                                                                                                         const newMenus = [...data.menus];
@@ -1794,7 +1792,7 @@ export default function WebsiteManagerPage() {
                                                                                                 />
                                                                                             </div>
                                                                                             <div>
-                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">L─░NK (URL)</label>
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">LİNK (URL)</label>
                                                                                                 <input
                                                                                                     className="w-full border-slate-200 rounded-lg p-1.5 font-mono text-blue-600 bg-white border"
                                                                                                     placeholder="/services/web"
@@ -1810,7 +1808,7 @@ export default function WebsiteManagerPage() {
                                                                                     </div>
                                                                                 ))}
                                                                                 {(!item.content || item.content.length === 0) && (
-                                                                                    <p className="text-[10px] text-slate-400 italic text-center py-8">Hen├╝z i├ğerik kart─▒ eklenmedi. ├ûnce bir kategori se├ğerek ba┼şlay─▒n.</p>
+                                                                                    <p className="text-[10px] text-slate-400 italic text-center py-8">Henüz içerik kartı eklenmedi. Önce bir kategori seçerek başlayın.</p>
                                                                                 )}
                                                                             </div>
                                                                         </div>
@@ -1832,7 +1830,7 @@ export default function WebsiteManagerPage() {
                                             }}
                                             className="w-full mt-6 py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:border-blue-300 hover:text-blue-500 hover:bg-slate-50 transition uppercase tracking-widest text-xs flex justify-center items-center gap-2"
                                         >
-                                            <span className="text-xl">ÔŞò</span> YEN─░ MEN├£ ├û─ŞES─░ EKLE
+                                            <span className="text-xl">➕</span> YENİ MENÜ ÖĞESİ EKLE
                                         </button>
                                     </div>
                                 ))}
@@ -1841,7 +1839,6 @@ export default function WebsiteManagerPage() {
                     )
                 }
             </div >
-            </div >
-        </EnterprisePageShell>
+        </div >
     );
 }
