@@ -442,22 +442,45 @@ export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
                         </p>
 
                         {/* Tabs list */}
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                              {platformTabs.map((tab, idx) => {
                                  const isActive = activeTab === idx;
                                  return (
                                      <div key={idx} 
-                                        className={`cursor-pointer transition-all duration-300 rounded-md overflow-hidden shadow-sm ${isActive ? 'bg-white shadow-[0_20px_40px_rgba(0,0,0,0.06)] border-l-[3px] border-blue-600 pt-6 px-6 pb-6 mt-4' : 'p-4 pl-6 border-l-[3px] border-transparent hover:bg-white/40'}`}
+                                        className={`cursor-pointer transition-all duration-500 rounded-[12px] overflow-hidden ${isActive ? 'bg-white shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-slate-200 ring-1 ring-black/5' : 'bg-white/40 border border-slate-100 hover:bg-white/60 p-4 pl-6'}`}
                                         onClick={() => setActiveTab(idx)}
                                      >
-                                         <h3 className={`text-lg transition-colors font-bold ${isActive ? 'text-blue-600 mb-3' : 'text-[#0E1528]'}`}>
-                                             {tab.title}
-                                         </h3>
                                          {isActive && (
-                                             <p className="text-slate-500 text-[13px] font-medium leading-relaxed">
-                                                 {tab.desc}
-                                             </p>
+                                             <div className="w-full bg-[#f3f3f3] border-b border-slate-200 px-3 py-1.5 flex items-center justify-between select-none">
+                                                 <div className="flex items-center gap-2">
+                                                     <div className="w-4 h-4 bg-blue-600 rounded-[3px] flex items-center justify-center">
+                                                         <div className="w-2 h-2 border-[1.5px] border-white rounded-[2px]" />
+                                                     </div>
+                                                     <div className="text-[11px] font-semibold text-slate-600 tracking-wide">Periodya.exe</div>
+                                                 </div>
+                                                 <div className="flex items-center gap-0.5">
+                                                     <div className="w-7 h-7 rounded flex items-center justify-center hover:bg-black/5 text-slate-500 transition-colors">
+                                                         <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M1,4.5 L9,4.5 L9,5.5 L1,5.5 Z" /></svg>
+                                                     </div>
+                                                     <div className="w-7 h-7 rounded flex items-center justify-center hover:bg-black/5 text-slate-500 transition-colors">
+                                                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1"><rect x="1.5" y="1.5" width="7" height="7" /></svg>
+                                                     </div>
+                                                     <div className="w-7 h-7 rounded flex items-center justify-center hover:bg-rose-500 hover:text-white text-slate-500 transition-colors">
+                                                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1"><path d="M1,1 L9,9 M9,1 L1,9" /></svg>
+                                                     </div>
+                                                 </div>
+                                             </div>
                                          )}
+                                         <div className={isActive ? 'p-6 bg-white' : ''}>
+                                             <h3 className={`text-lg transition-colors font-bold ${isActive ? 'text-[#0E1528] mb-3' : 'text-[#0E1528]/80'}`}>
+                                                 {tab.title}
+                                             </h3>
+                                             {isActive && (
+                                                 <p className="text-slate-500 text-[13px] font-medium leading-[1.6]">
+                                                     {tab.desc}
+                                                 </p>
+                                             )}
+                                         </div>
                                      </div>
                                  )
                              })}
