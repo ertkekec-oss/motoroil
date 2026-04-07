@@ -24,10 +24,10 @@ export default async function AdminProvidersPage() {
 
     return (
         <EnterprisePageShell
-        title="Yönetim Paneli"
-        description="Sistem detaylarını yapılandırın."
-    >
-        <div className="animate-in fade-in duration-300">
+            title="Yönetim"
+            description="Sistem detaylarını yapılandırın"
+        >
+            <div className="animate-in fade-in duration-300">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
@@ -111,6 +111,8 @@ export default async function AdminProvidersPage() {
                         </div>
                     </div>
 
-                </EnterprisePageShell>
+                </div>
+            </div>
+        </EnterprisePageShell>
     );
 }

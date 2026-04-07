@@ -81,10 +81,10 @@ export default async function AdminOrdersMonitorPage({
 
     return (
         <EnterprisePageShell
-        title="Yönetim Paneli"
-        description="Sistem detaylarını yapılandırın."
-    >
-        <div className="animate-in fade-in duration-300">
+            title="Yönetim"
+            description="Sistem detaylarını yapılandırın"
+        >
+            <div className="animate-in fade-in duration-300">
 
                 {/* Header Area */}
                 <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -240,6 +240,8 @@ export default async function AdminOrdersMonitorPage({
                             <button className="px-3 py-1.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md opacity-50 cursor-not-allowed shadow-sm">SONRAKİ</button>
                         </div>
                     </div>
-                </EnterprisePageShell>
+                </div>
+            </div>
+        </EnterprisePageShell>
     );
 }

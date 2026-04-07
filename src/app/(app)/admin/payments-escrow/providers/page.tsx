@@ -61,10 +61,10 @@ export default function ProvidersPage() {
 
     return (
         <EnterprisePageShell
-        title="Yönetim Paneli"
-        description="Sistem detaylarını yapılandırın."
-    >
-        <div className="animate-in fade-in duration-300">
+            title="Yönetim"
+            description="Sistem detaylarını yapılandırın"
+        >
+            <div className="animate-in fade-in duration-300">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
@@ -154,6 +154,7 @@ export default function ProvidersPage() {
                         })}
                     </div>
                 )}
-            </EnterprisePageShell>
+            </div>
+        </EnterprisePageShell>
     );
 }

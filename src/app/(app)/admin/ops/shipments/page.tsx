@@ -73,10 +73,10 @@ export default async function ShipmentsMonitorPage() {
 
     return (
         <EnterprisePageShell
-        title="Yönetim Paneli"
-        description="Sistem detaylarını yapılandırın."
-    >
-        <div className="animate-in fade-in duration-300">
+            title="Yönetim"
+            description="Sistem detaylarını yapılandırın"
+        >
+            <div className="animate-in fade-in duration-300">
                 <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
@@ -198,6 +198,8 @@ export default async function ShipmentsMonitorPage() {
                             </tbody>
                         </table>
                     </div>
-                </EnterprisePageShell>
+                </div>
+            </div>
+        </EnterprisePageShell>
     );
 }

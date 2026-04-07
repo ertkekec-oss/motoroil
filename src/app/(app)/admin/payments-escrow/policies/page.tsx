@@ -62,14 +62,13 @@ export default function PoliciesPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
             </div>
         );
-    }
-
+}
     return (
         <EnterprisePageShell
-        title="Yönetim Paneli"
-        description="Sistem detaylarını yapılandırın."
-    >
-        <div className="animate-in fade-in duration-300">
+            title="Yönetim"
+            description="Sistem detaylarını yapılandırın"
+        >
+            <div className="animate-in fade-in duration-300">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
@@ -252,6 +251,8 @@ export default function PoliciesPage() {
                         </div>
                     </div>
 
-                </EnterprisePageShell>
+                </div>
+            </div>
+        </EnterprisePageShell>
     );
 }
