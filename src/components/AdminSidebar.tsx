@@ -192,19 +192,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
           </NavGroup>
         )}
 
-        {isSuper && (
-          <NavGroup
-            title="WEBSİTE & İÇERİK"
-            icon={Library}
-            groupKey="website_main"
-          >
-            <NavItem
-              href="/admin/website"
-              icon={LayoutDashboard}
-              label="Websitesi Yöneticisi"
-            />
-          </NavGroup>
-        )}
+
       </div>
       {/* 3. PARTİ YAZILIMLAR */}
       {isSuper && (
