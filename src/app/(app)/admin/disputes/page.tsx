@@ -58,20 +58,11 @@ export default function DisputeQueuePage() {
     };
 
     return (
-        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16">
-            <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
-                {/* Header */}
-                <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-                            <Scale className="w-6 h-6 text-indigo-500" />
-                            Uyuşmazlık Çözüm Merkezi (Disputes)
-                        </h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                            B2B işlemlerindeki finansal riskleri, emanet iadelerini ve yasal tahkim süreçlerini (Escrow Arbitration) değerlendirin.
-                        </p>
-                    </div>
-
+        <EnterprisePageShell
+            title="Uyuşmazlık Çözüm Merkezi (Disputes)"
+            description="B2B işlemlerindeki finansal riskleri, emanet iadelerini ve yasal tahkim süreçlerini (Escrow Arbitration) değerlendirin."
+            actions={
+                <>
                     <div className="flex bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden p-1 shrink-0 h-10 items-center">
                         <Filter className="w-4 h-4 text-slate-400 ml-2 mr-1" />
                         {['ALL', 'OPEN', 'NEEDS_INFO', 'IN_REVIEW', 'RESOLVED']?.map(f => (
@@ -84,8 +75,10 @@ export default function DisputeQueuePage() {
                             </button>
                         ))}
                     </div>
-                </div>
-
+                </>
+            }
+        >
+            <div className="animate-in fade-in duration-300 space-y-6">
                 {/* Main Content Container */}
                 <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden min-h-[500px] flex flex-col relative">
                     {/* Background Graphic */}
@@ -199,8 +192,8 @@ export default function DisputeQueuePage() {
                             </div>
                         )}
                     </div>
-                </div>
+                            </div>
             </div>
-        </div>
+        </EnterprisePageShell>
     );
 }

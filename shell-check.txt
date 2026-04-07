@@ -1,0 +1,10 @@
+companies/page.tsx OK
+dashboard/page.tsx OK
+ops/ledgers/page.tsx OK
+plans/page.tsx OK
+platform-finance/page.tsx OK
+products/page.tsx OK
+security/page.tsx MISSING
+system/doctor/page.tsx OK
+logs/page.tsx MISSING
+signatures/page.tsx OK

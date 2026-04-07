@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { Search, Filter, Download, ArrowUpRight, PackageOpen, RotateCw, Wallet } from 'lucide-react';
+import {  Search, Filter, Download, ArrowUpRight, PackageOpen, RotateCw, Wallet  } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 function formatDateTR(d: Date | null | undefined) {
     if (!d) return "-";
@@ -79,8 +80,11 @@ export default async function AdminOrdersMonitorPage({
     const companyMap = new Map(companies?.map(c => [c.id, c.name]));
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
-            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
+        <EnterprisePageShell
+        title="Yönetim Paneli"
+        description="Sistem detaylarını yapılandırın."
+    >
+        <div className="animate-in fade-in duration-300">
 
                 {/* Header Area */}
                 <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -236,8 +240,6 @@ export default async function AdminOrdersMonitorPage({
                             <button className="px-3 py-1.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md opacity-50 cursor-not-allowed shadow-sm">SONRAKİ</button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </EnterprisePageShell>
     );
 }

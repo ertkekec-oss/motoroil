@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Check, Info } from 'lucide-react';
+import {  Check, Info  } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 import ManualSyncButton from "./ManualSyncButton";
 
 function formatDateTR(d: Date | null | undefined) {
@@ -71,8 +72,11 @@ export default async function ShipmentsMonitorPage() {
     const awaitingSyncCount = activeCount; // Technically all active are awaiting the next sync
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 p-4 md:p-6 font-sans w-full pb-16 focus:outline-none">
-            <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-300">
+        <EnterprisePageShell
+        title="Yönetim Paneli"
+        description="Sistem detaylarını yapılandırın."
+    >
+        <div className="animate-in fade-in duration-300">
                 <div className="border-b border-slate-200 dark:border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
@@ -194,8 +198,6 @@ export default async function ShipmentsMonitorPage() {
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
+                </EnterprisePageShell>
     );
 }

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { Server, Zap, Globe, Package, RefreshCw, Layers } from "lucide-react";
+import {  Server, Zap, Globe, Package, RefreshCw, Layers  } from "lucide-react";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +23,11 @@ export default async function AdminProvidersPage() {
     ];
 
     return (
-        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen w-full font-sans pb-16">
-            <div className="max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
+        <EnterprisePageShell
+        title="Yönetim Paneli"
+        description="Sistem detaylarını yapılandırın."
+    >
+        <div className="animate-in fade-in duration-300">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
@@ -107,8 +111,6 @@ export default async function AdminProvidersPage() {
                         </div>
                     </div>
 
-                </div>
-            </div>
-        </div>
+                </EnterprisePageShell>
     );
 }
