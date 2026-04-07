@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
-import { EnterprisePageShell, EnterpriseCard, EnterpriseButton, EnterpriseSectionHeader } from '@/components/ui/enterprise';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseButton, EnterpriseSectionHeader, EnterpriseTabs } from '@/components/ui/enterprise';
 import { LayoutGrid, Search, PenTool, LayoutDashboard, Settings2, Webhook, Brush, Plus, Zap, Copy, PlusCircle } from 'lucide-react';
 
 export default function WebsiteManagerPage() {
@@ -311,48 +311,43 @@ export default function WebsiteManagerPage() {
         );
     };
 
-    if (loading) return <div className="p-8">Yükleniyor...</div>;
+    if (loading) return (
+        <EnterprisePageShell title="Website Yönetimi (CMS)" description="Yükleniyor...">
+            <div className="p-8 text-slate-500 font-bold uppercase tracking-widest text-center animate-pulse">Sistem Telemetrisi Çekiliyor...</div>
+        </EnterprisePageShell>
+    );
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Website Yönetimi (CMS)</h1>
-                    <p className="text-sm text-slate-500">Landing page ve kurumsal sayfaları dinamik olarak yönetin.</p>
-                </div>
+        <EnterprisePageShell
+            title="Website Yönetimi (CMS)"
+            description="Landing page ve kurumsal sayfaları dinamik olarak yönetin."
+            actions={
                 <div className="flex gap-2">
-                    <button
-                        onClick={() => activeTab === 'general' ? saveSettings() : savePage()}
+                    <EnterpriseButton
+                        onClick={() => activeTab === 'general' ? saveSettings() : activeTab === 'menus' ? saveMenus() : savePage()}
                         disabled={saving}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-sm shadow-blue-200"
+                        variant="primary"
                     >
                         {saving ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
-                    </button>
-                    <a href="/" target="_blank" className="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-200 transition text-sm font-bold flex items-center">
+                    </EnterpriseButton>
+                    <a href="/" target="_blank" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-2xl border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-[11px] uppercase tracking-widest font-black flex items-center h-11">
                         Önizle ↗
                     </a>
                 </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex border-b border-slate-200">
-                {[
-                    { id: 'general', label: 'Genel Ayarlar', icon: '⚙️' },
-                    { id: 'pages', label: 'Sayfa Üreticisi', icon: '📄' },
-                    { id: 'menus', label: 'Menü Yönetimi', icon: '🍔' }
-                ]?.map(tab => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`px-8 py-4 font-bold text-sm transition-all flex items-center gap-2 ${activeTab === tab.id ? 'border-b-4 border-blue-600 text-blue-600 bg-blue-50/50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
-                    >
-                        {tab.icon} {tab.label}
-                    </button>
-                ))}
-            </div>
+            }
+        >
+            <EnterpriseTabs
+                tabs={[
+                    { id: 'general', label: 'Genel Ayarlar', icon: <Settings2 className="w-4 h-4" /> },
+                    { id: 'pages', label: 'Sayfa Üreticisi', icon: <LayoutDashboard className="w-4 h-4" /> },
+                    { id: 'menus', label: 'Menü Yönetimi', icon: <LayoutGrid className="w-4 h-4" /> }
+                ]}
+                activeTab={activeTab}
+                onTabChange={(id) => setActiveTab(id as any)}
+            />
 
             {/* Content Area */}
-            <div className="">
+            <div className="space-y-4">
                 {activeTab === 'general' && (
                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div className="space-y-6">
@@ -1841,6 +1836,6 @@ export default function WebsiteManagerPage() {
                     )
                 }
             </div >
-        </div >
+        </EnterprisePageShell>
     );
 }
