@@ -358,6 +358,6 @@ export default function ExecutiveDashboard() {
                     </div>
                 )}
             </div>
-        </div>
+        </EnterprisePageShell>
     );
 }

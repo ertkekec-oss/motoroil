@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
-
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 export default function AdminPlans() {
     const { showSuccess, showError, showConfirm } = useModal();
     const [plans, setPlans] = useState<any[]>([]);
@@ -146,19 +146,18 @@ export default function AdminPlans() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex justify-between items-end">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Paketler & Fiyatlandırma</h1>
-                    <p className="text-slate-500 text-sm">Abonelik planlarını ve fiyatlarını yönetin.</p>
-                </div>
+        <EnterprisePageShell
+            title="Paketler & Fiyatlandırma"
+            description="Abonelik planlarını ve fiyatlarını yönetin."
+            actions={
                 <button
                     onClick={() => setShowModal(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm active:scale-95"
                 >
                     + Yeni Paket Ekle
                 </button>
-            </div>
+            }
+        >
 
             {loading ? (
                 <div className="p-12 text-center text-slate-400 font-medium">Veriler yükleniyor...</div>
@@ -426,7 +425,7 @@ export default function AdminPlans() {
                     </div>
                 </div>
             )}
-        </div>
+        </EnterprisePageShell>
     );
 }
 

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 export default async function PlatformFinancePage() {
   const session = await getSession();
   if (
@@ -58,24 +58,17 @@ export default async function PlatformFinancePage() {
   });
 
   return (
-    <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">
-              Platform Finans & B2B Gelir Tablosu
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Tüm ağın (Network) toplam dönen hacmi, komisyonlar ve aktif Emanet
-              (Escrow) büyüklüğü.
-            </p>
-          </div>
-          <div className="text-right">
-            <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-              Global Görünüm (SUPER_ADMIN)
-            </span>
-          </div>
+    <EnterprisePageShell
+      title="Platform Finans & B2B Gelir Tablosu"
+      description="Tüm ağın (Network) toplam dönen hacmi, komisyonlar ve aktif Emanet (Escrow) büyüklüğü."
+      actions={
+        <div className="text-right">
+          <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+            Global Görünüm (SUPER_ADMIN)
+          </span>
         </div>
+      }
+    >
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white dark:bg-[#0f172a] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow">
@@ -342,8 +335,6 @@ export default async function PlatformFinancePage() {
             )}
           </div>
         </div>
-      </div>
-            </EnterprisePageShell>
-        </div>
-    );
+      </EnterprisePageShell>
+  );
 }
