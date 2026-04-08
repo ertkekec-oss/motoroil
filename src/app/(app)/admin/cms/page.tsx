@@ -7,7 +7,8 @@ import { Plus, Globe, MonitorSmartphone, Settings, Zap, History, MousePointerCli
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
-export default async function CMSDashboard({ searchParams }: { searchParams: { tab?: string }}) {
+export default async function CMSDashboard(props: { searchParams: Promise<{ tab?: string }> }) {
+  const searchParams = await props.searchParams;
   const sessionResult: any = await getSession();
   const session = sessionResult?.user || sessionResult;
   if (!session) redirect("/auth/login");
@@ -44,6 +45,8 @@ export default async function CMSDashboard({ searchParams }: { searchParams: { t
     "use server"
     const pageId = formData.get("pageId") as string;
     if(!pageId) return;
+    
+    await prisma.cmsBlock.deleteMany({ where: { pageId } });
     await prisma.cmsPage.delete({ where: { id: pageId } });
     revalidatePath("/admin/cms");
   }
