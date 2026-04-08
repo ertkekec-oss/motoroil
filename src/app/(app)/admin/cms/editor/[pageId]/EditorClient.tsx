@@ -232,7 +232,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
       </div>
 
       {/* RIGHT SIDEBAR - INSPECTOR */}
-      <div className="w-80 bg-slate-900 border-l border-slate-800 flex flex-col shrink-0">
+      <div className="w-[420px] bg-slate-900 border-l border-slate-800 flex flex-col shrink-0">
         
         {/* Top actions */}
         <div className="h-14 border-b border-slate-800 flex items-center px-4 justify-between bg-slate-950/50 shrink-0">
