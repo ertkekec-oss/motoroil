@@ -116,7 +116,10 @@ export default async function CMSVisualEditor(props: { params: Promise<{ pageId:
           heading: '<span class="font-bold">Periodya</span> <span class="font-light">operasyonlarınızı optimize ederek ekibinizin performansını artırır ve</span> <span class="font-bold">Büyümeyi hızlandırır.</span>',
           desc: 'Günümüz rekabetçi e-ticaret pazarında, etkin ve düşük maliyetli yazılım çözümlerine olan talep hiç bu kadar kritik olmamıştı. Sizi bir adım öne taşıyoruz.',
           card1: { title: "Uzmanlık & Özelleştirme", desc: "Ekibimiz size özel tasarlanmış tam teşekküllü donanımlar ve büyüme planları sunar." },
-          card2: { title: "Kesintisiz Entegrasyon", desc: "Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir." }
+          card2: { title: "Kesintisiz Entegrasyon", desc: "Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir." },
+          visualUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80',
+          statsNumber: '1.3m',
+          statsDesc: 'Yıllık ortalama işlenen başarılı paket hacmi.'
       }},
       { id: "temp-features", pageId: page.id, type: "MODERN_FEATURES", content: {
           heading: 'Bizi <span class="text-blue-600">Farklı Kılan</span> Özellikler.',

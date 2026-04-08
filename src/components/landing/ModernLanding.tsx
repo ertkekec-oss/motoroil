@@ -104,6 +104,9 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
     const whyUsDesc = dbWhyUs?.desc || 'Günümüz rekabetçi e-ticaret pazarında, etkin ve düşük maliyetli yazılım çözümlerine olan talep hiç bu kadar kritik olmamıştı. Sizi bir adım öne taşıyoruz.';
     const whyUsCard1 = dbWhyUs?.card1 || { title: "Uzmanlık & Özelleştirme", desc: "Ekibimiz size özel tasarlanmış tam teşekküllü donanımlar ve büyüme planları sunar." };
     const whyUsCard2 = dbWhyUs?.card2 || { title: "Kesintisiz Entegrasyon", desc: "Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir." };
+    const whyUsVisualUrl = dbWhyUs?.visualUrl || 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80';
+    const whyUsStatsNumber = dbWhyUs?.statsNumber || '1.3m';
+    const whyUsStatsDesc = dbWhyUs?.statsDesc || 'Yıllık ortalama işlenen başarılı paket hacmi.';
 
     const featuresHeading = dbFeatures?.heading || 'Bizi <span class="text-blue-600">Farklı Kılan</span> Özellikler.';
     const featuresDesc = dbFeatures?.desc || 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.';
@@ -596,7 +599,7 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
 
                         {/* Main Photography Card */}
                         <div className="w-[85%] max-w-[420px] rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] relative z-20">
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Team meeting" className="w-full h-[550px] object-cover" />
+                            <img src={whyUsVisualUrl} alt="Team meeting" className="w-full h-[550px] object-cover" />
                         </div>
 
                         {/* Floating Node 1: Red/Pink (Top Left) */}
@@ -663,10 +666,10 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                         {/* Huge Number Row */}
                         <div className="flex items-center gap-6 pt-4 border-t border-slate-100">
                             <div className="text-[64px] md:text-[76px] text-[#2563EB] font-light leading-none tracking-tight">
-                                1.3m
+                                {whyUsStatsNumber}
                             </div>
                             <div className="text-sm font-bold text-[#0E1528] leading-relaxed max-w-[150px]">
-                                Yıllık ortalama işlenen başarılı paket hacmi.
+                                {whyUsStatsDesc}
                             </div>
                         </div>
                     </div>

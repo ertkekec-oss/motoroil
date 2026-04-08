@@ -173,18 +173,21 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
         ]
     };
     if (type === 'MODERN_WHY_US') return {
-        heading: '<span class="font-bold">Periodya</span> <span class="font-light">ile operasyonlarınızı kolaylaştırın.</span>',
-        desc: 'Günümüz e-ticaret dünyasında düşük maliyetli hızlı çözümler.',
-        card1: { title: "Hızlı Entegrasyon", desc: "1 saatte tüm ürünlerinizi aktarın." },
-        card2: { title: "Sürekli Destek", desc: "7/24 uzman kadromuz yanınızda." }
+        heading: '<span class="font-bold">Periodya</span> <span class="font-light">operasyonlarınızı optimize ederek ekibinizin performansını artırır ve</span> <span class="font-bold">Büyümeyi hızlandırır.</span>',
+        desc: 'Günümüz rekabetçi e-ticaret pazarında, etkin ve düşük maliyetli yazılım çözümlerine olan talep hiç bu kadar kritik olmamıştı. Sizi bir adım öne taşıyoruz.',
+        card1: { title: "Uzmanlık & Özelleştirme", desc: "Ekibimiz size özel tasarlanmış tam teşekküllü donanımlar ve büyüme planları sunar." },
+        card2: { title: "Kesintisiz Entegrasyon", desc: "Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir." },
+        visualUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80',
+        statsNumber: '1.3m',
+        statsDesc: 'Yıllık ortalama işlenen başarılı paket hacmi.'
     };
     if (type === 'MODERN_FEATURES') return {
-        heading: 'Bizi <span class="text-blue-600">Özel Kılan</span> Detaylar.',
-        desc: 'Ön saflarda yer alan teknolojimizle büyüyün.'
+        heading: 'Bizi <span class="text-blue-600">Farklı Kılan</span> Özellikler.',
+        desc: 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.'
     };
     if (type === 'MODERN_PRICING') return {
-        heading: 'Esnek Paket Seçenekleri',
-        desc: 'Sürpriz ödemeler olmadan işletmenizle büyüyen modeller.'
+        heading: 'Esnek Fiyatlandırma',
+        desc: 'Büyüme hızınıza ayak uyduran paketler.'
     };
     return {};
   };
@@ -427,6 +430,23 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kısa Açıklama</label>
                      <VisualTextEditor value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
                    </div>
+                   <div>
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Medya URL (Görsel)</label>
+                     <ImageUploadField 
+                       value={activeBlock.content.visualUrl || ''} 
+                       onChange={(val: any) => updateBlockData('visualUrl', val)}
+                     />
+                   </div>
+                   <div className="grid grid-cols-2 gap-2">
+                       <div>
+                         <label className="block text-[10px] text-slate-500 uppercase">Dev Sayı (Örn: 1.3m)</label>
+                         <input value={activeBlock.content.statsNumber || ''} onChange={e => updateBlockData('statsNumber', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" />
+                       </div>
+                       <div>
+                         <label className="block text-[10px] text-slate-500 uppercase">Sayı Açıklaması</label>
+                         <input value={activeBlock.content.statsDesc || ''} onChange={e => updateBlockData('statsDesc', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" />
+                       </div>
+                   </div>
                    <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-lg space-y-3">
                      <p className="text-xs font-bold text-blue-400">KART 1 AYARLARI</p>
                      <input placeholder="Kart 1 Başlık" value={activeBlock.content.card1?.title || ''} onChange={e => updateBlockData('card1', { ...activeBlock.content.card1, title: e.target.value })} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
@@ -492,7 +512,13 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                                     <label className="block text-[10px] text-slate-500 uppercase mt-2">Açıklama Formatı</label>
                                     <textarea value={item.desc || ''} onChange={(e) => {
                                       const arr = [...activeBlock.content.items]; arr[idx].desc = e.target.value; updateBlockData('items', arr);
-                                    }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-16 resize-none" />
+                                    }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-16 resize-none mb-2" />
+                                    
+                                    <label className="block text-[10px] text-slate-500 uppercase mb-1">Sekme Görseli</label>
+                                    <ImageUploadField 
+                                      value={item.image || ''} 
+                                      onChange={(val: any) => { const arr = [...activeBlock.content.items]; arr[idx].image = val; updateBlockData('items', arr); }}
+                                    />
                                   </>
                                 )}
                              </div>
