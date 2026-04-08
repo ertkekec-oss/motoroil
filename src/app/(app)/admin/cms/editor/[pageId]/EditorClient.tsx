@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Save, Plus, ArrowLeft, Layout, MousePointerClick, Monitor, Smartphone, Globe, Settings as SettingsIcon, GripVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ModernLanding from "@/components/landing/ModernLanding";
 
 export default function EditorClient({ initialPage, initialBlocks }: { initialPage: any, initialBlocks: any[] }) {
   const router = useRouter();
@@ -107,33 +108,10 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
         <div className="flex-1 w-full overflow-y-auto hidden-scrollbar pt-20 pb-10 flex justify-center">
           <div className={`bg-white transition-all duration-500 ${device === 'desktop' ? 'w-full max-w-[1200px] shadow-2xl rounded-t-xl' : 'w-[400px] shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-[2rem] border-8 border-slate-800 min-h-[800px]'}`}>
             
-            {/* RENDER THE BLOCKS (MOCK PREVIEW) */}
-            {blocks.map(b => (
-              <div key={b.id} className={`relative group ${activeBlockId === b.id ? 'ring-2 ring-inset ring-blue-500' : ''}`} onClick={() => setActiveBlockId(b.id)}>
-                {/* Simulated Hero Block Content */}
-                {b.type === 'Hero' && (
-                  <div className="py-24 px-8 text-center bg-gradient-to-br from-slate-50 to-white text-slate-900">
-                    <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">{b.content.title}</h1>
-                    <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-10">{b.content.subtitle}</p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                      {b.content.primaryButton && (
-                        <button className="px-8 py-3.5 bg-blue-600 text-white font-bold rounded-xl">{b.content.primaryButton.label}</button>
-                      )}
-                      {b.content.secondaryButton && (
-                        <button className="px-8 py-3.5 bg-slate-100 text-slate-900 font-bold rounded-xl">{b.content.secondaryButton.label}</button>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Selection Overlay */}
-                <div className={`absolute inset-0 border-2 border-blue-500 bg-blue-500/5 cursor-pointer z-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-start justify-end p-2 ${activeBlockId === b.id ? 'opacity-100' : ''}`}>
-                  <div className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow">
-                    {b.type} BLOCK
-                  </div>
-                </div>
-              </div>
-            ))}
+            {/* RENDER THE REAL PAGE COMPONENT */}
+            <div className="relative w-full h-full overflow-y-auto hidden-scrollbar pointer-events-auto">
+                <ModernLanding cmsData={{ sections: blocks }} />
+            </div>
 
           </div>
         </div>
@@ -174,15 +152,16 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                </div>
 
                {/* Dynamic Fields based on Type */}
-               {activeBlock.type === 'Hero' && (
+               {activeBlock.type === 'HERO' || activeBlock.type === 'MODERN_HERO' ? (
                  <div className="space-y-5">
                    <div>
-                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (Title)</label>
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (HTML Desktekli)</label>
                      <textarea 
                        value={activeBlock.content.title || ''} 
                        onChange={e => updateBlockData('title', e.target.value)}
-                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all h-24 resize-none"
+                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all h-24 resize-none font-mono"
                      />
+                     <p className="text-[10px] text-slate-500 mt-1">Örn: &lt;span class=&quot;font-bold&quot;&gt;Kalın&lt;/span&gt;</p>
                    </div>
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Alt Açıklama (Subtitle)</label>
@@ -192,27 +171,30 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                        className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all h-28 resize-none"
                      />
                    </div>
-                   
+                   <div>
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Medya URL (Görsel)</label>
+                     <input 
+                       value={activeBlock.content.visualUrl || ''} 
+                       onChange={e => updateBlockData('visualUrl', e.target.value)}
+                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                     />
+                   </div>
                    <div className="pt-4 border-t border-slate-800">
-                     <label className="block text-xs font-bold text-slate-400 mb-3 uppercase">Primary Button</label>
-                     <div className="space-y-3">
-                       <input 
-                         type="text" 
-                         placeholder="Buton Metni"
-                         value={activeBlock.content.primaryButton?.label || ''}
-                         onChange={e => updateBlockData('primaryButton', { ...activeBlock.content.primaryButton, label: e.target.value })}
-                         className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2.5 text-sm text-white outline-none"
-                       />
-                       <input 
-                         type="text" 
-                         placeholder="URL (/link)"
-                         value={activeBlock.content.primaryButton?.url || ''}
-                         onChange={e => updateBlockData('primaryButton', { ...activeBlock.content.primaryButton, url: e.target.value })}
-                         className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2.5 text-sm text-slate-300 font-mono outline-none"
-                       />
-                     </div>
+                     <label className="block text-xs font-bold text-slate-400 mb-3 uppercase">Primary Button Metni</label>
+                     <input 
+                       type="text" 
+                       placeholder="Örn: Ücretsiz Dene"
+                       value={activeBlock.content.primaryBtnText || ''}
+                       onChange={e => updateBlockData('primaryBtnText', e.target.value)}
+                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2.5 text-sm text-white outline-none"
+                     />
                    </div>
                  </div>
+               ) : (
+                  <div className="p-4 border border-blue-500/30 bg-blue-500/10 rounded-lg text-sm text-blue-200">
+                    <p className="font-bold mb-2">Bu blok tipi için form henüz tanımlanmadı.</p>
+                    <p>JSON editörü yakında eklenecek.</p>
+                  </div>
                )}
             </div>
           )}
