@@ -156,6 +156,32 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
   };
 
   const getInitialContentForType = (type: string) => {
+    if (type === 'MODERN_HEADER') return {
+        notificationText: "Yeni: Periodya'nın baştan aşağı yenilenen kullanıcı arayüzü ile tanışın! Operasyonlarınız çok daha güçlü.",
+        logoText: "Periodya",
+        menuItems: [
+            { title: "Ana Sayfa", linksTo: "#" },
+            { title: "Özellikler", linksTo: "#" },
+            { title: "Modüller", linksTo: "#" },
+            { title: "Blog", linksTo: "#" },
+            { title: "İletişim", linksTo: "#" }
+        ],
+        btn1Text: "Giriş Yap",
+        btn2Text: "Ücretsiz Dene",
+        btn2Url: "/register",
+        tickerItems: ["BAŞARI İÇİN MÜKEMMEL ÇÖZÜM", "E-TİCARET OPERASYONLARINDA MÜKEMMELLİK", "MARKANIZI PERİODYA İLE YÜKSELTİN", "İŞ HEDEFLERİNİZE ULAŞACAK TEKNOLOJİ", "GÜÇLÜ PAZAR YERİ VARLIĞI"]
+    };
+    if (type === 'MODERN_FOOTER') return {
+        brandName: "Periodya",
+        copyright: "© 2026 Periodya - IT Services. All rights reserved.",
+        contactEmail: "support@periodya.com",
+        contactPhone: "+880 (123) 456 88",
+        address: "55 Main Street, 2nd block Melbourne, Australia",
+        menu1Title: "My account",
+        menu1Items: [{title: "Forum Support", linksTo: "#"}, {title: "Help & FAQ", linksTo: "#"}, {title: "Contact Us", linksTo: "#"}, {title: "Pricing and plans", linksTo: "#"}],
+        menu2Title: "Service",
+        menu2Items: [{title: "It Consultation", linksTo: "#"}, {title: "Cloud Services", linksTo: "#"}, {title: "AI Machine Learning", linksTo: "#"}, {title: "Data Security", linksTo: "#"}]
+    };
     if (type === 'MODERN_HERO') return {
       title: '<span class="font-light">E-Ticaret</span> <span class="font-bold">ve</span><br/><span class="font-bold">Ön Muhasebede</span><br/><span class="font-bold text-[#2563EB]">Üstün</span> <span class="font-light whitespace-nowrap">Sonuçlar</span>',
       subtitle: 'Günümüzün rekabetçi ticaretinde etkili çözümler.',
@@ -298,6 +324,12 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
             {/* ADD BLOCK BUTTONS */}
             <div className="grid grid-cols-1 gap-2 mt-4 pt-4 border-t border-slate-800">
               <button 
+                onClick={() => handleAddBlock('MODERN_HEADER')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 bg-slate-950/40 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN HEADER
+              </button>
+              <button 
                 onClick={() => handleAddBlock('MODERN_HERO')}
                 className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
               >
@@ -332,6 +364,12 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                 className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
               >
                 <Plus className="w-3 h-3" /> MODERN PRICING
+              </button>
+              <button 
+                onClick={() => handleAddBlock('MODERN_FOOTER')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 bg-slate-950/40 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN FOOTER
               </button>
             </div>
         </div>
@@ -374,10 +412,16 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
              <div className="w-2 h-2 rounded-full bg-amber-500" />
              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">TASLAK</span>
            </div>
-           <button onClick={() => handleSave()} disabled={saving} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md text-sm font-bold shadow transition-colors disabled:opacity-50">
-             <Save className="w-4 h-4" />
-             {saving ? "Kaydediliyor..." : "Taslağı Kaydet"}
-           </button>
+           <div className="flex items-center gap-2">
+             <button onClick={() => handleSave(false)} disabled={saving} className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-md text-sm font-bold shadow transition-colors disabled:opacity-50 border border-slate-700">
+               <Save className="w-4 h-4" />
+               {saving ? "..." : "Taslağı Kaydet"}
+             </button>
+             <button onClick={() => handleSave(true)} disabled={saving} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md text-sm font-bold shadow transition-colors disabled:opacity-50">
+               <Globe className="w-4 h-4" />
+               Yayına Al
+             </button>
+           </div>
         </div>
 
         {/* Inspector Fields */}
@@ -406,7 +450,65 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                </div>
 
                {/* Dynamic Fields based on Type */}
-               {activeBlock.type === 'HERO' || activeBlock.type === 'MODERN_HERO' ? (
+               {activeBlock.type === 'MODERN_HEADER' ? (
+                  <div className="space-y-4">
+                     <p className="text-xs font-bold text-slate-400">Üst Bar & Menü</p>
+                     <input placeholder="Üst Bildirim Çubuğu" value={activeBlock.content.notificationText || ''} onChange={e => updateBlockData('notificationText', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                     <input placeholder="Logo Metni" value={activeBlock.content.logoText || ''} onChange={e => updateBlockData('logoText', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                     
+                     <div className="p-3 border border-slate-800 bg-slate-950/30 rounded-lg">
+                         <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-bold text-slate-400">Menü Linkleri</span>
+                            <button onClick={() => updateBlockData('menuItems', [...(activeBlock.content.menuItems || []), { title: 'Yeni', linksTo: '#' }])} className="text-[10px] bg-blue-600/20 text-blue-400 hover:bg-blue-600 px-2 py-1 rounded">+ Ekle</button>
+                         </div>
+                         {(activeBlock.content.menuItems || []).map((m: any, idx: number) => (
+                             <div key={idx} className="flex gap-2 mb-2 relative">
+                                <input value={m.title || ''} onChange={(e) => { const arr = [...activeBlock.content.menuItems]; arr[idx].title = e.target.value; updateBlockData('menuItems', arr); }} className="w-1/2 bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-7" placeholder="İsim" />
+                                <input value={m.linksTo || ''} onChange={(e) => { const arr = [...activeBlock.content.menuItems]; arr[idx].linksTo = e.target.value; updateBlockData('menuItems', arr); }} className="w-1/2 bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-7" placeholder="URL" />
+                                <button onClick={() => updateBlockData('menuItems', activeBlock.content.menuItems.filter((_: any, i: number) => i !== idx))} className="text-rose-500 font-bold px-1">X</button>
+                             </div>
+                         ))}
+                     </div>
+                     
+                     <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Butonlar</p>
+                     <div className="flex gap-2">
+                        <input placeholder="Buton 1 (Giriş Yap)" value={activeBlock.content.btn1Text || ''} onChange={e => updateBlockData('btn1Text', e.target.value)} className="w-1/2 bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                        <input placeholder="Buton 2 (Ücretsiz Dene)" value={activeBlock.content.btn2Text || ''} onChange={e => updateBlockData('btn2Text', e.target.value)} className="w-1/2 bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                     </div>
+                     <input placeholder="Buton 2 URL (/register)" value={activeBlock.content.btn2Url || ''} onChange={e => updateBlockData('btn2Url', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                     
+                     <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Akan Bant Yazıları (Virgülle Ayırın)</p>
+                     <textarea value={(activeBlock.content.tickerItems || []).join(', ')} onChange={(e) => {
+                         const arr = e.target.value.split(',').map((x: string) => x.trim()).filter(Boolean);
+                         updateBlockData('tickerItems', arr);
+                     }} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" placeholder="Yazı 1, Yazı 2..." />
+                  </div>
+               ) : activeBlock.type === 'MODERN_FOOTER' ? (
+                  <div className="space-y-4">
+                     <p className="text-xs font-bold text-slate-400">Marka & İletişim</p>
+                     <input placeholder="Marka Adı" value={activeBlock.content.brandName || ''} onChange={e => updateBlockData('brandName', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
+                     <input placeholder="İletişim Maili" value={activeBlock.content.contactEmail || ''} onChange={e => updateBlockData('contactEmail', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
+                     <input placeholder="Telefon" value={activeBlock.content.contactPhone || ''} onChange={e => updateBlockData('contactPhone', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
+                     <input placeholder="Açık Adres" value={activeBlock.content.address || ''} onChange={e => updateBlockData('address', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                     
+                     <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Menü 1</p>
+                     <input placeholder="Menü 1 Başlık" value={activeBlock.content.menu1Title || ''} onChange={e => updateBlockData('menu1Title', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
+                     <textarea value={(activeBlock.content.menu1Items || []).map((m: any) => m.title).join(', ')} onChange={(e) => {
+                         const arr = e.target.value.split(',').map((x: string) => ({ title: x.trim(), linksTo: '#' })).filter((x: any) => x.title);
+                         updateBlockData('menu1Items', arr);
+                     }} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" placeholder="Link 1, Link 2..." />
+
+                     <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Menü 2</p>
+                     <input placeholder="Menü 2 Başlık" value={activeBlock.content.menu2Title || ''} onChange={e => updateBlockData('menu2Title', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
+                     <textarea value={(activeBlock.content.menu2Items || []).map((m: any) => m.title).join(', ')} onChange={(e) => {
+                         const arr = e.target.value.split(',').map((x: string) => ({ title: x.trim(), linksTo: '#' })).filter((x: any) => x.title);
+                         updateBlockData('menu2Items', arr);
+                     }} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" placeholder="Link 1, Link 2..." />
+                     
+                     <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Telif Hakkı (Copyright)</p>
+                     <input placeholder="© 2026..." value={activeBlock.content.copyright || ''} onChange={e => updateBlockData('copyright', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                  </div>
+               ) : activeBlock.type === 'HERO' || activeBlock.type === 'MODERN_HERO' ? (
                  <div className="space-y-5">
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (Görsel Editör)</label>

@@ -88,6 +88,34 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
     const dbFeatures = cmsData?.sections?.find((s: any) => s.type === 'MODERN_FEATURES')?.content;
     const dbPricing = cmsData?.sections?.find((s: any) => s.type === 'MODERN_PRICING')?.content;
 
+    const headerData = cmsData?.sections?.find((s: any) => s.type === 'MODERN_HEADER')?.content || {
+        notificationText: "Yeni: Periodya'nın baştan aşağı yenilenen kullanıcı arayüzü ile tanışın! Operasyonlarınız çok daha güçlü.",
+        logoText: "Periodya",
+        menuItems: [
+            { title: "Ana Sayfa", linksTo: "#" },
+            { title: "Özellikler", linksTo: "#" },
+            { title: "Modüller", linksTo: "#" },
+            { title: "Blog", linksTo: "#" },
+            { title: "İletişim", linksTo: "#" }
+        ],
+        btn1Text: "Giriş Yap",
+        btn2Text: "Ücretsiz Dene",
+        btn2Url: "/register",
+        tickerItems: ["BAŞARI İÇİN MÜKEMMEL ÇÖZÜM", "E-TİCARET OPERASYONLARINDA MÜKEMMELLİK", "MARKANIZI PERİODYA İLE YÜKSELTİN", "İŞ HEDEFLERİNİZE ULAŞACAK TEKNOLOJİ", "GÜÇLÜ PAZAR YERİ VARLIĞI"]
+    };
+
+    const footerData = cmsData?.sections?.find((s: any) => s.type === 'MODERN_FOOTER')?.content || {
+        brandName: "Periodya",
+        copyright: "© 2026 Periodya - IT Services. All rights reserved.",
+        contactEmail: "support@periodya.com",
+        contactPhone: "+880 (123) 456 88",
+        address: "55 Main Street, 2nd block Melbourne, Australia",
+        menu1Title: "My account",
+        menu1Items: [{title: "Forum Support", linksTo: "#"}, {title: "Help & FAQ", linksTo: "#"}, {title: "Contact Us", linksTo: "#"}, {title: "Pricing and plans", linksTo: "#"}, {title: "Cookies Policy", linksTo: "#"}],
+        menu2Title: "Service",
+        menu2Items: [{title: "It Consultation", linksTo: "#"}, {title: "Cloud Services", linksTo: "#"}, {title: "AI Machine Learning", linksTo: "#"}, {title: "Data Security", linksTo: "#"}, {title: "Software Development", linksTo: "#"}, {title: "Cyber Security", linksTo: "#"}]
+    };
+
     // Eski hero desteği ya da fallback
     const fallbackHero = cmsData?.sections?.find((s: any) => s.type === 'HERO')?.content;
     const heroContent = dbHero || fallbackHero;
@@ -202,11 +230,13 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                 `}</style>
                 
                 {/* Top Notification Bar */}
-                <div className="bg-[#2563EB] text-white py-2.5 hidden sm:flex justify-center items-center">
-                    <div className="bg-white/10 px-6 py-1 rounded-full text-[11px] font-medium tracking-wide">
-                        Yeni: Periodya'nın baştan aşağı yenilenen kullanıcı arayüzü ile tanışın! Operasyonlarınız çok daha güçlü.
+                {headerData.notificationText && (
+                    <div className="bg-[#2563EB] text-white py-2.5 hidden sm:flex justify-center items-center">
+                        <div className="bg-white/10 px-6 py-1 rounded-full text-[11px] font-medium tracking-wide">
+                            {headerData.notificationText}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Main Navbar */}
                 <div className={`transition-colors duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md' : 'bg-white'} border-b border-slate-100`}>
@@ -214,49 +244,51 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                         {/* Logo */}
                         <div className="flex items-center gap-2">
                              <div className="flex gap-1 items-center">
-                                 {/* Mimicking the slanted 'SS' logo of Sasstech using basic shapes */}
                                  <div className="w-[18px] h-[22px] bg-blue-600 rounded-sm skew-x-[-15deg]"></div>
                                  <div className="w-[8px] h-[22px] bg-[#0E1528] rounded-sm skew-x-[-15deg]"></div>
                              </div>
-                            <span className="text-[22px] font-bold tracking-tight text-[#0E1528] ml-1">Periodya</span>
+                            <span className="text-[22px] font-bold tracking-tight text-[#0E1528] ml-1">{headerData.logoText}</span>
                         </div>
 
                         {/* Desktop Navigation */}
                         <nav className="hidden lg:flex items-center gap-8 font-semibold text-[14px] text-slate-700">
-                            <Link href="#" className="text-blue-600 flex items-center gap-1 transition-colors">Ana Sayfa <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Özellikler <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Modüller <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-blue-600 transition-colors flex items-center gap-1">Blog <span className="text-[10px] font-black">▼</span></Link>
-                            <Link href="#" className="hover:text-blue-600 transition-colors">İletişim</Link>
+                            {(headerData.menuItems || []).map((menu: any, idx: number) => (
+                                <Link key={idx} href={menu.linksTo || '#'} className={`${idx === 0 ? 'text-blue-600' : 'hover:text-blue-600'} flex items-center gap-1 transition-colors`}>
+                                    {menu.title} {idx < 4 && <span className="text-[10px] font-black">▼</span>}
+                                </Link>
+                            ))}
                         </nav>
 
                         {/* Right Actions */}
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setIsLoginOpen(true)} className="text-[13px] font-bold text-slate-500 hover:text-[#0E1528] transition-colors hidden sm:block">
-                                Giriş Yap
-                            </button>
-                            <Link href="/register" className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-sm hover:bg-blue-600 transition-colors shadow-md">
-                                Ücretsiz Dene
-                            </Link>
+                            {headerData.btn1Text && (
+                                <button onClick={() => setIsLoginOpen(true)} className="text-[13px] font-bold text-slate-500 hover:text-[#0E1528] transition-colors hidden sm:block">
+                                    {headerData.btn1Text}
+                                </button>
+                            )}
+                            {headerData.btn2Text && (
+                                <Link href={headerData.btn2Url || '/register'} className="px-7 py-3 bg-[#0E1528] text-white text-[13px] font-bold rounded-sm hover:bg-blue-600 transition-colors shadow-md">
+                                    {headerData.btn2Text}
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Bottom Ticker/Marquee Bar */}
-                <div className="bg-white border-b border-slate-100 py-3.5 overflow-hidden flex whitespace-nowrap">
-                    <div className="animate-marquee-infinite text-[11px] font-bold text-slate-500 uppercase tracking-wide">
-                        {/* We loop 3 times to ensure infinite scroll fills the screen */}
-                        {[1,2,3].map((set) => (
-                            <div key={set} className="flex items-center gap-14 px-7">
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> BAŞARI İÇİN MÜKEMMEL ÇÖZÜM</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> E-TİCARET OPERASYONLARINDA MÜKEMMELLİK</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> MARKANIZI PERİODYA İLE YÜKSELTİN</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> İŞ HEDEFLERİNİZE ULAŞACAK TEKNOLOJİ</span>
-                                <span className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> GÜÇLÜ PAZAR YERİ VARLIĞI</span>
-                            </div>
-                        ))}
+                {headerData.tickerItems && headerData.tickerItems.length > 0 && (
+                    <div className="bg-white border-b border-slate-100 py-3.5 overflow-hidden flex whitespace-nowrap">
+                        <div className="animate-marquee-infinite text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                            {[1,2,3].map((set) => (
+                                <div key={set} className="flex items-center gap-14 px-7">
+                                    {headerData.tickerItems.map((ticker: string, tIdx: number) => (
+                                        <span key={tIdx} className="flex items-center gap-2"><Activity className="w-[14px] h-[14px] text-blue-600 stroke-[2.5px]"/> {ticker}</span>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
             </header>
 
             {/* --- 2. HERO SECTION (Exsit Redesign) --- */}
@@ -796,7 +828,7 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                                      <div className="w-[18px] h-[22px] bg-blue-600 rounded-sm skew-x-[-15deg]"></div>
                                      <div className="w-[8px] h-[22px] bg-white rounded-sm skew-x-[-15deg]"></div>
                                  </div>
-                                <span className="text-[22px] font-bold tracking-tight text-white ml-2">Periodya</span>
+                                <span className="text-[22px] font-bold tracking-tight text-white ml-2">{footerData.brandName}</span>
                             </div>
                             
                             {/* Subscribe */}
@@ -812,26 +844,21 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
 
                         {/* 2. Column - My account (Span 2) */}
                         <div className="lg:col-span-2">
-                            <h4 className="text-white font-bold text-[17px] mb-8">My account</h4>
+                            <h4 className="text-white font-bold text-[17px] mb-8">{footerData.menu1Title}</h4>
                             <ul className="space-y-4 font-medium text-slate-400">
-                                <li><a href="#" className="hover:text-white transition-colors">Forum Support</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Help & FAQ</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Pricing and plans</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Cookies Policy</a></li>
+                                {(footerData.menu1Items || []).map((m: any, idx: number) => (
+                                    <li key={idx}><a href={m.linksTo || '#'} className="hover:text-white transition-colors">{m.title}</a></li>
+                                ))}
                             </ul>
                         </div>
 
                         {/* 3. Column - Service (Span 3) */}
                         <div className="lg:col-span-3">
-                            <h4 className="text-white font-bold text-[17px] mb-8">Service</h4>
+                            <h4 className="text-white font-bold text-[17px] mb-8">{footerData.menu2Title}</h4>
                             <ul className="space-y-4 font-medium text-slate-400">
-                                <li><a href="#" className="hover:text-white transition-colors">It Consultation</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Cloud Services</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">AI Machine Learning</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Data Security</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Software Development</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Cyber Security</a></li>
+                                {(footerData.menu2Items || []).map((m: any, idx: number) => (
+                                    <li key={idx}><a href={m.linksTo || '#'} className="hover:text-white transition-colors">{m.title}</a></li>
+                                ))}
                             </ul>
                         </div>
 
@@ -842,15 +869,15 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                                 <div className="mt-1 shrink-0">
                                     <svg className="w-[18px] h-[18px] text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 </div>
-                                <p className="text-[13px]">55 Main Street, 2nd block Melbourne,<br/> Australia</p>
+                                <p className="text-[13px]">{footerData.address}</p>
                             </div>
 
                             <h4 className="text-white font-bold text-[17px] mb-6">Contact</h4>
                             <div className="space-y-5 text-slate-400 font-medium">
-                                <a href="mailto:support@gmail.com" className="hover:text-white transition-colors flex items-center text-[13px]">support@gmail.com</a>
+                                <a href={`mailto:${footerData.contactEmail}`} className="hover:text-white transition-colors flex items-center text-[13px]">{footerData.contactEmail}</a>
                                 <div className="flex items-center gap-3 text-white text-[19px] tracking-tight font-bold">
                                     <svg className="w-[20px] h-[20px] text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                                    +880 (123) 456 88
+                                    {footerData.contactPhone}
                                 </div>
                             </div>
                         </div>
@@ -858,7 +885,7 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
 
                     {/* Bottom Bar */}
                     <div className="border-t border-slate-800 border-dashed pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-6 text-[12.5px] font-medium relative">
-                        <p className="text-slate-400">© 2026 <span className="text-white hover:text-blue-600 transition-colors cursor-pointer">Periodya</span> - IT Services. All rights reserved.</p>
+                        <p className="text-slate-400">{footerData.copyright}</p>
                         
                         <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 items-center">
                             <a href="#" className="flex items-center gap-2 hover:text-white transition-colors">

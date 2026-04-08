@@ -7,12 +7,13 @@ import { Plus, Globe, MonitorSmartphone, Settings, Zap, History, MousePointerCli
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
-export default async function CMSDashboard({ searchParams }: { searchParams: { tab?: string }}) {
+export default async function CMSDashboard({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined }}) {
   const sessionResult: any = await getSession();
   const session = sessionResult?.user || sessionResult;
   if (!session) redirect("/auth/login");
 
-  const activeTab = searchParams.tab || 'pages';
+  const sp: any = await searchParams;
+  const activeTab = sp?.tab || 'pages';
 
   // Fetch or Auto-create the main site
   let mainSite = await prisma.cmsSite.findFirst({
@@ -105,9 +106,9 @@ export default async function CMSDashboard({ searchParams }: { searchParams: { t
           </div>
           
           <div className="bg-slate-100/80 border border-slate-200/60 rounded-lg p-1.5 flex gap-1 shadow-inner">
-            <a href="/admin/cms?tab=pages" className={`px-5 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'pages' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}>Sayfalar (Pages)</a>
-            <a href="/admin/cms?tab=i18n" className={`px-5 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'i18n' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}>Çoklu Dil (i18n)</a>
-            <a href="/admin/cms?tab=assets" className={`px-5 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'assets' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}>Medya (Assets)</a>
+            <Link href="?tab=pages" className={`px-5 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'pages' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}>Sayfalar (Pages)</Link>
+            <Link href="?tab=i18n" className={`px-5 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'i18n' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}>Çoklu Dil (i18n)</Link>
+            <Link href="?tab=assets" className={`px-5 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'assets' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}>Medya (Assets)</Link>
           </div>
         </div>
 

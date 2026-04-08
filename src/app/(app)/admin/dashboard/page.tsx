@@ -8,19 +8,24 @@ export default function ExecutiveDashboard() {
     const { showSuccess, showError, showWarning, showConfirm, showPrompt } = useModal();
     const [range, setRange] = useState('30d');
     const [data, setData] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
     const [actionsLoading, setActionsLoading] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
         setLoading(true);
+        setError(null);
         try {
             const res = await fetch(`/api/admin/dashboard/overview?range=${range}`);
+            const json = await res.json();
             if (res.ok) {
-                const json = await res.json();
                 setData(json);
+            } else {
+                setError(json.error || "Sunucu hatası oluştu.");
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
+            setError(e.message || "Bilinmeyen bir hata oluştu.");
         } finally {
             setLoading(false);
         }
@@ -83,10 +88,18 @@ export default function ExecutiveDashboard() {
         >
             <div className="space-y-6">
                 {/* Header Section */}
-                {loading && !data && (
+                {loading && !data && !error && (
                     <div className="bg-white dark:bg-[#1e293b] p-12 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-center items-center h-64">
                         <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-slate-900 dark:border-t-emerald-500 rounded-full animate-spin mb-4"></div>
                         <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">SİSTEM TELEMETRİSİ ÇEKİLİYOR...</span>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="bg-red-50 dark:bg-red-900/10 p-12 rounded-2xl border border-dashed border-red-300 dark:border-red-900/50 shadow-sm text-center flex flex-col items-center justify-center">
+                        <div className="text-4xl mb-4 opacity-50">🚨</div>
+                        <h2 className="text-[13px] font-black text-red-900 dark:text-red-400 mb-2 uppercase tracking-widest">Sistem Hatası</h2>
+                        <p className="text-[11px] font-bold text-red-700 dark:text-red-500 max-w-lg uppercase tracking-widest">{error}</p>
                     </div>
                 )}
 

@@ -57,8 +57,23 @@ export async function GET(request: Request) {
         const takeRevenueTotal = takeRevenueCommission + takeRevenueBoost;
         const takeRate = gmvGross > 0 ? ((takeRevenueTotal / gmvGross) * 100).toFixed(2) + '%' : '0.00%';
 
+        // Safe access helpers for missing models
+        const countSafe = async (model: any, args: any) => {
+            if (model && typeof model.count === 'function') {
+                try { return await model.count(args); } catch(e) {}
+            }
+            return 0;
+        };
+
+        const findFirstSafe = async (model: any, args: any) => {
+            if (model && typeof model.findFirst === 'function') {
+                try { return await model.findFirst(args); } catch(e) {}
+            }
+            return null;
+        };
+
         // 2. Billing Health (Take latest snapshot)
-        const billingSnap = await prisma.boostBillingHealthSnapshot.findFirst({
+        const billingSnap = await findFirstSafe((prisma as any).boostBillingHealthSnapshot, {
             orderBy: { asOfDate: 'desc' }
         });
         const outstandingArBoost = billingSnap ? Number(billingSnap.outstandingArTotal) : 0;
@@ -67,13 +82,13 @@ export async function GET(request: Request) {
         const graceInvoices = billingSnap ? billingSnap.graceCount : 0;
 
         // 3. Risk (Disputes & Tickets)
-        const openDisputes = await prisma.disputeCase.count({ where: { status: { in: ['OPEN'] } } });
-        const disputesNeedingInfo = await prisma.disputeCase.count({ where: { status: 'NEEDS_INFO' } });
-        const heldEscrowCount = await prisma.disputeCase.count({ where: { escrowActionState: 'HELD_ESCROW' } });
+        const openDisputes = await countSafe((prisma as any).disputeCase, { where: { status: { in: ['OPEN'] } } });
+        const disputesNeedingInfo = await countSafe((prisma as any).disputeCase, { where: { status: 'NEEDS_INFO' } });
+        const heldEscrowCount = await countSafe((prisma as any).disputeCase, { where: { escrowActionState: 'HELD_ESCROW' } });
         const slaBreachedTickets = 0; // if modeled, query here
 
         // 4. Growth Rules
-        const activeBoostRules = await prisma.boostRule.count({ where: { status: 'ACTIVE' } });
+        const activeBoostRules = await countSafe((prisma as any).boostRule, { where: { status: 'ACTIVE' } });
 
         // 5. Queues
         const queues = {
