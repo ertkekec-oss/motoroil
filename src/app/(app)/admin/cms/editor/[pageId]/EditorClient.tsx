@@ -157,17 +157,40 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
 
   const getInitialContentForType = (type: string) => {
     if (type === 'MODERN_HERO') return {
-      title: 'Yepyeni Bir E-Ticaret Deneyimi',
-      subtitle: 'Sınırları yeniden çiziyoruz.',
-      primaryBtnText: 'Hemen Başla',
-      visualUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978'
+      title: '<span class="font-light">E-Ticaret</span> <span class="font-bold">ve</span><br/><span class="font-bold">Ön Muhasebede</span><br/><span class="font-bold text-[#2563EB]">Üstün</span> <span class="font-light whitespace-nowrap">Sonuçlar</span>',
+      subtitle: 'Günümüzün rekabetçi ticaretinde etkili çözümler.',
+      primaryBtnText: 'Ücretsiz Başla',
+      visualUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a',
+      stat1Val: '2.3M+',
+      stat1Text: '5000+ Müşteri Yorumu',
+      trustBadgeText: 'Trust pilot',
+      revenueTitle: 'Günlük Ciro',
+      revenueAmount: '₺48,200.00',
+      revenueTab1: 'Günlük',
+      revenueTab2: 'Haftalık',
+      revenueTab3: 'Aylık',
+      stat2Val: '8+',
+      stat2Text: 'Yıllık Sektör<br/>Tecrübesi'
     };
     if (type === 'MODERN_TABS') return {
+        badge: 'TECH SOLUTION',
+        heading: '<span class="font-light">The</span> <span class="font-bold">CompletePlatform</span><span class="font-light">To</span><br/> <span class="font-bold">PowerYourOperations</span>',
+        desc: "In today's competitive business, the demand for efficient and cost-effective IT solutions has never been more critical.",
+        balanceTitle: 'Your balance',
+        balanceAmount: '$1,000',
+        usabilityTitle: 'Usability testing',
+        usabilityDesc: '12 products',
+        chartTitle: 'Your Pie Chart',
+        chartFilter: 'Monthly',
         items: [
             { title: "Yeni Tab", desc: "Açıklama...", image: "https://images.unsplash.com/photo-1552664730-d307ca884978" }
         ]
     };
     if (type === 'MODERN_INTEGRATIONS') return {
+        heading: '<span class="font-extrabold">Sıradışı Bir Entegrasyon</span> <span class="font-light">Ağı</span>',
+        desc: 'Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.',
+        testimonialHeading: 'Kusursuz entegrasyon ile operasyonlarınızı hızlandırın',
+        testimonialDesc: 'Gerçek müşterilerimizden dürüst geri bildirimler.',
         items: [
             { title: "Entegrasyon 1", contentTitle: "Harika Entegrasyon", descLine1: "Açıklama 1", descLine2: "Açıklama 2", logos: ["Trendyol", "Hepsiburada"] }
         ]
@@ -183,11 +206,27 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
     };
     if (type === 'MODERN_FEATURES') return {
         heading: 'Bizi <span class="text-blue-600">Farklı Kılan</span> Özellikler.',
-        desc: 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.'
+        desc: 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.',
+        features: [
+            { title: "YZ Destekli Analiz", desc: "Ön muhasebenizde yapay zekanın hızını ve kusursuzluğunu hissedin.", icon: "bot" },
+            { title: "Derin İçgörüler", desc: "Pazar yerlerindeki satış trendlerinizi anlık ve net raporlarla takip edin.", icon: "pie-chart" },
+            { title: "Stratejik Kararlar", desc: "Gerçek verilere dayalı altyapımızla doğru zamanda en iyi ticaret kararını alın.", icon: "activity" }
+        ]
     };
     if (type === 'MODERN_PRICING') return {
         heading: 'Esnek Fiyatlandırma',
-        desc: 'Büyüme hızınıza ayak uyduran paketler.'
+        desc: 'Büyüme hızınıza ayak uyduran paketler.',
+        packages: [
+            {
+                name: "Başlangıç",
+                desc: "Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.",
+                price: "₺990",
+                period: "/ay",
+                btnText: "14 Gün Deneyin",
+                isPopular: false,
+                features: ["Sınırlı Pazar Yeri", "Stok Takibi"]
+            }
+        ]
     };
     return {};
   };
@@ -404,27 +443,90 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                        className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2.5 text-sm text-white outline-none"
                      />
                    </div>
-                 </div>
-               ) : activeBlock.type === 'MODERN_FEATURES' || activeBlock.type === 'MODERN_PRICING' ? (
-                 <div className="space-y-5">
-                   <div>
-                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kutu Başlığı (Görsel Editör)</label>
-                     <VisualTextEditor 
-                       key={activeBlock.id + '-features-heading'}
-                       value={activeBlock.content.heading || ''} 
-                       onChange={(val: any) => updateBlockData('heading', val)}
-                     />
+                   <div className="pt-4 border-t border-slate-800 grid grid-cols-2 gap-2">
+                       <div className="col-span-2"><p className="text-[10px] font-bold text-blue-400 uppercase">Sol Alt Kutu Txt</p></div>
+                       <div><input placeholder="2.3M+" value={activeBlock.content.stat1Val || ''} onChange={e => updateBlockData('stat1Val', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" /></div>
+                       <div><input placeholder="5000+ Yorum" value={activeBlock.content.stat1Text || ''} onChange={e => updateBlockData('stat1Text', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" /></div>
+                       
+                       <div className="col-span-2 mt-2"><p className="text-[10px] font-bold text-indigo-400 uppercase">Sağ Üst Rozet</p></div>
+                       <div className="col-span-2"><input placeholder="Trust pilot" value={activeBlock.content.trustBadgeText || ''} onChange={e => updateBlockData('trustBadgeText', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" /></div>
+
+                       <div className="col-span-2 mt-2"><p className="text-[10px] font-bold text-pink-400 uppercase">Sol Alt Gelir Kutusu</p></div>
+                       <div className="col-span-2"><input placeholder="Günlük Ciro" value={activeBlock.content.revenueTitle || ''} onChange={e => updateBlockData('revenueTitle', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" /></div>
+                       <div className="col-span-2"><input placeholder="₺48,200.00" value={activeBlock.content.revenueAmount || ''} onChange={e => updateBlockData('revenueAmount', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" /></div>
+                       <div className="col-span-2 flex gap-1">
+                           <input placeholder="Günlük" value={activeBlock.content.revenueTab1 || ''} onChange={e => updateBlockData('revenueTab1', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                           <input placeholder="Haftalık" value={activeBlock.content.revenueTab2 || ''} onChange={e => updateBlockData('revenueTab2', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                           <input placeholder="Aylık" value={activeBlock.content.revenueTab3 || ''} onChange={e => updateBlockData('revenueTab3', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                       </div>
+
+                       <div className="col-span-2 mt-2"><p className="text-[10px] font-bold text-sky-400 uppercase">Sağ Alt Mavi Kutu</p></div>
+                       <div><input placeholder="8+" value={activeBlock.content.stat2Val || ''} onChange={e => updateBlockData('stat2Val', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" /></div>
+                       <div><input placeholder="Yıllık Sektör<br/>Tecrübesi" value={activeBlock.content.stat2Text || ''} onChange={e => updateBlockData('stat2Text', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-xs text-white rounded outline-none h-8" /></div>
                    </div>
-                   <div>
-                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Açıklama</label>
-                     <VisualTextEditor 
-                       key={activeBlock.id + '-features-desc'}
-                       value={activeBlock.content.desc || ''} 
-                       onChange={(val: any) => updateBlockData('desc', val)}
-                     />
-                   </div>
                  </div>
-               ) : activeBlock.type === 'MODERN_WHY_US' ? (
+               ) : activeBlock.type === 'MODERN_FEATURES' ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kutu Başlığı (Görsel Editör)</label>
+                      <VisualTextEditor key={activeBlock.id + '-features-heading'} value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Açıklama</label>
+                      <VisualTextEditor key={activeBlock.id + '-features-desc'} value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
+                    </div>
+                    <div className="flex justify-between items-center mt-4 border-t border-slate-800 pt-3">
+                        <span className="text-xs font-bold text-slate-400 uppercase">Özellik Kartları</span>
+                        <button onClick={() => updateBlockData('features', [...(activeBlock.content.features || []), { title: 'Yeni', desc: 'Açıklama', icon: 'bot' }])} className="text-[10px] bg-blue-600/20 text-blue-400 hover:bg-blue-600 px-2 py-1 rounded">+ Kart Ekle</button>
+                    </div>
+                    {(activeBlock.content.features || []).map((ft: any, idx: number) => (
+                        <div key={idx} className="p-3 border border-slate-800 bg-slate-950/30 rounded-lg relative space-y-2">
+                             <button onClick={() => updateBlockData('features', activeBlock.content.features.filter((_: any, i: number) => i !== idx))} className="absolute top-2 right-2 text-rose-500 hover:text-rose-400 p-1 bg-rose-500/10 rounded">X</button>
+                             <input value={ft.title || ''} onChange={(e) => { const arr = [...activeBlock.content.features]; arr[idx].title = e.target.value; updateBlockData('features', arr); }} className="w-[85%] bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-7 font-bold" placeholder="Kart Başlığı" />
+                             <input value={ft.desc || ''} onChange={(e) => { const arr = [...activeBlock.content.features]; arr[idx].desc = e.target.value; updateBlockData('features', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-7" placeholder="Açıklama..." />
+                             <input value={ft.icon || ''} onChange={(e) => { const arr = [...activeBlock.content.features]; arr[idx].icon = e.target.value; updateBlockData('features', arr); }} className="w-1/2 bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-zinc-400 rounded outline-none h-7" placeholder="İkon Adı (bot, pie-chart...)" />
+                        </div>
+                    ))}
+                  </div>
+                ) : activeBlock.type === 'MODERN_PRICING' ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kutu Başlığı (Görsel Editör)</label>
+                      <VisualTextEditor key={activeBlock.id + '-pricing-heading'} value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Açıklama</label>
+                      <VisualTextEditor key={activeBlock.id + '-pricing-desc'} value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
+                    </div>
+                    <div className="flex justify-between items-center mt-4 border-t border-slate-800 pt-3">
+                        <span className="text-xs font-bold text-slate-400 uppercase">Fiyat Paketleri</span>
+                        <button onClick={() => updateBlockData('packages', [...(activeBlock.content.packages || []), { name: 'Yeni', desc: 'Açıklama', price: '₺0', period: '/ay', btnText: 'Satın Al', features: [], isPopular: false }])} className="text-[10px] bg-blue-600/20 text-blue-400 hover:bg-blue-600 px-2 py-1 rounded">+ Paket Ekle</button>
+                    </div>
+                    {(activeBlock.content.packages || []).map((pkg: any, idx: number) => (
+                        <div key={idx} className="p-3 border border-slate-800 bg-slate-950/30 rounded-lg relative space-y-2">
+                             <button onClick={() => updateBlockData('packages', activeBlock.content.packages.filter((_: any, i: number) => i !== idx))} className="absolute top-2 right-2 text-rose-500 hover:text-rose-400 p-1 bg-rose-500/10 rounded shadow-sm z-10 w-6 h-6 flex justify-center items-center font-bold">X</button>
+                             <div className="flex items-center gap-2 w-[85%]">
+                                <input value={pkg.name || ''} onChange={(e) => { const arr = [...activeBlock.content.packages]; arr[idx].name = e.target.value; updateBlockData('packages', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-8 font-bold" placeholder="Paket Adı" />
+                                <label className="text-[10px] flex items-center gap-1 text-emerald-400"><input type="checkbox" checked={pkg.isPopular || false} onChange={(e: any) => { const arr = [...activeBlock.content.packages]; arr[idx].isPopular = e.target.checked; updateBlockData('packages', arr); }}/> Popüler</label>
+                             </div>
+                             <textarea value={pkg.desc || ''} onChange={(e) => { const arr = [...activeBlock.content.packages]; arr[idx].desc = e.target.value; updateBlockData('packages', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-16 resize-none" placeholder="Paket Kısa Açıklaması" />
+                             
+                             <div className="flex gap-2">
+                                <input value={pkg.price || ''} onChange={(e) => { const arr = [...activeBlock.content.packages]; arr[idx].price = e.target.value; updateBlockData('packages', arr); }} className="w-1/2 bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-8" placeholder="Fiyat (örn: ₺990)" />
+                                <input value={pkg.period || ''} onChange={(e) => { const arr = [...activeBlock.content.packages]; arr[idx].period = e.target.value; updateBlockData('packages', arr); }} className="w-1/2 bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-8" placeholder="Periyot (örn: /ay)" />
+                             </div>
+                             <input value={pkg.btnText || ''} onChange={(e) => { const arr = [...activeBlock.content.packages]; arr[idx].btnText = e.target.value; updateBlockData('packages', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] font-bold text-blue-300 rounded outline-none h-8" placeholder="Buton Metni" />
+                             
+                             <label className="block text-[10px] text-slate-500 uppercase mt-2">Özellikler (Virgülle ayırın)</label>
+                             <textarea value={(pkg.features || []).join(', ')} onChange={(e) => {
+                                 const arr = [...activeBlock.content.packages]; 
+                                 arr[idx].features = e.target.value.split(',').map((x: string) => x.trim()).filter(Boolean); 
+                                 updateBlockData('packages', arr);
+                             }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-16 leading-tight break-words resize-none" placeholder="Özellik 1, Özellik 2, Özellik 3" />
+                        </div>
+                    ))}
+                  </div>
+                ) : activeBlock.type === 'MODERN_WHY_US' ? (
                  <div className="space-y-5">
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (Görsel Editör)</label>
@@ -465,13 +567,37 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                ) : activeBlock.type === 'MODERN_TABS' || activeBlock.type === 'MODERN_INTEGRATIONS' ? (
                   <div className="space-y-4">
                      {activeBlock.type === 'MODERN_TABS' && (
-                       <div className="p-3 border border-slate-800 bg-slate-950/50 rounded-lg space-y-3 mb-4">
-                          <p className="text-xs font-bold text-slate-400">Üst Metin Ayarları</p>
-                          <input placeholder="Rozet (Badge)" value={activeBlock.content.badge || ''} onChange={e => updateBlockData('badge', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
-                          <VisualTextEditor key={activeBlock.id + '-tabs-heading'} placeholder="Ana Başlık (Görsel Editör)" value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
-                          <VisualTextEditor key={activeBlock.id + '-tabs-desc'} placeholder="Alt Açıklama" value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
-                       </div>
-                     )}
+                        <div className="p-3 border border-slate-800 bg-slate-950/50 rounded-lg space-y-3 mb-4">
+                           <p className="text-xs font-bold text-slate-400">Üst Metin Ayarları</p>
+                           <input placeholder="Rozet (Badge)" value={activeBlock.content.badge || ''} onChange={e => updateBlockData('badge', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
+                           <VisualTextEditor key={activeBlock.id + '-tabs-heading'} placeholder="Ana Başlık (Görsel Editör)" value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
+                           <VisualTextEditor key={activeBlock.id + '-tabs-desc'} placeholder="Alt Açıklama" value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
+                           
+                           <p className="text-xs font-bold text-slate-400 mt-4 border-t border-slate-800 pt-3">Floating UI Metinleri</p>
+                           <div className="grid grid-cols-2 gap-2 mt-2">
+                               <input placeholder="Your balance" value={activeBlock.content.balanceTitle || ''} onChange={e => updateBlockData('balanceTitle', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                               <input placeholder="$1,000" value={activeBlock.content.balanceAmount || ''} onChange={e => updateBlockData('balanceAmount', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                               
+                               <input placeholder="Usability testing" value={activeBlock.content.usabilityTitle || ''} onChange={e => updateBlockData('usabilityTitle', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                               <input placeholder="12 products" value={activeBlock.content.usabilityDesc || ''} onChange={e => updateBlockData('usabilityDesc', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                               
+                               <input placeholder="Your Pie Chart" value={activeBlock.content.chartTitle || ''} onChange={e => updateBlockData('chartTitle', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                               <input placeholder="Monthly" value={activeBlock.content.chartFilter || ''} onChange={e => updateBlockData('chartFilter', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                           </div>
+                        </div>
+                      )}
+
+                      {activeBlock.type === 'MODERN_INTEGRATIONS' && (
+                        <div className="p-3 border border-slate-800 bg-slate-950/50 rounded-lg space-y-3 mb-4">
+                           <p className="text-xs font-bold text-slate-400">Genel Başlık ve Açıklamalar</p>
+                           <VisualTextEditor key={activeBlock.id + '-integ-heading'} placeholder="Ana Başlık (Görsel Editör)" value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
+                           <VisualTextEditor key={activeBlock.id + '-integ-desc'} placeholder="Açıklama" value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
+                           
+                           <p className="text-xs font-bold text-slate-400 mt-4 border-t border-slate-800 pt-3">Yorum Alanı (Section 2)</p>
+                           <input placeholder="Yorumlar Ana Başlık" value={activeBlock.content.testimonialHeading || ''} onChange={e => updateBlockData('testimonialHeading', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                           <input placeholder="Yorumlar Açıklama" value={activeBlock.content.testimonialDesc || ''} onChange={e => updateBlockData('testimonialDesc', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                        </div>
+                      )}
                      <div className="flex justify-between items-center mb-2">
                         <span className="text-xs font-bold text-slate-400 uppercase">Diziler (Items)</span>
                         <button 

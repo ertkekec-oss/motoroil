@@ -110,9 +110,54 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
 
     const featuresHeading = dbFeatures?.heading || 'Bizi <span class="text-blue-600">Farklı Kılan</span> Özellikler.';
     const featuresDesc = dbFeatures?.desc || 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.';
+    const featuresItems = dbFeatures?.features || [
+        { title: "YZ Destekli Analiz", desc: "Ön muhasebenizde yapay zekanın hızını ve kusursuzluğunu hissedin.", icon: "bot" },
+        { title: "Derin İçgörüler", desc: "Pazar yerlerindeki satış trendlerinizi anlık ve net raporlarla takip edin.", icon: "pie-chart" },
+        { title: "Stratejik Kararlar", desc: "Gerçek verilere dayalı altyapımızla doğru zamanda en iyi ticaret kararını alın.", icon: "activity" },
+        { title: "İşbirliği Araçları", desc: "Ekibinizle aynı panelde uyum içerisinde rolleri dağıtarak çalışın.", icon: "users" },
+        { title: "Veri Koruması", desc: "KVKK standartlarına tam uyumlu yüksek şifrelemelerle verilerinizi koruyun.", icon: "shield" },
+        { title: "7/24 Teknik Destek", desc: "Uzman kadromuzla mağazanızın operasyonlarında asla yarı yolda kalmayın.", icon: "headphones" },
+        { title: "Gelişmiş Cari CRM", desc: "Tüm tedarikçi ağınızı tek bir listede puanınıza göre otonom olarak yönetin.", icon: "target" },
+        { title: "Premium Bulut", desc: "Sunucu veya kurulum olmadan güvenle anında her cihazdan işinize erişin.", icon: "cloud" }
+    ];
 
     const pricingHeading = dbPricing?.heading || 'Esnek Fiyatlandırma';
     const pricingDesc = dbPricing?.desc || 'Büyüme hızınıza ayak uyduran paketler.';
+    const pricingPackages = dbPricing?.packages || [
+        {
+            name: "Başlangıç",
+            desc: "Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.",
+            price: "₺990",
+            period: "/ay",
+            btnText: "14 Gün Deneyin",
+            isPopular: false,
+            features: ["Sınırlı Pazar Yeri", "Stok Takibi", "E-Fatura Kesimi", "Sınırsız Güncelleme", "Standart Destek"]
+        },
+        {
+            name: "Profesyonel",
+            desc: "E-ticarette sağlam adımlar atmak isteyen profesyoneller için tam kontrol.",
+            price: "₺2,490",
+            period: "/ay",
+            btnText: "14 Gün Deneyin",
+            isPopular: true,
+            features: ["Sınırsız Pazar Yeri", "Çoklu Depo Yönetimi", "Kargo Entegrasyonu", "Sınırsız Güncelleme", "Öncelikli Destek"]
+        },
+        {
+            name: "Kurumsal",
+            desc: "Kendi altyapınızda özel sunucu ihtiyaçlarıyla sınırları kaldıran kapasite.",
+            price: "Özel",
+            period: "/yıllık",
+            btnText: "İletişime Geçin",
+            isPopular: false,
+            features: ["VDS Sunucu Yönetimi", "Sıfırdan Veri Aktarımı", "Bayi Ağı (B2B) Desteği", "Sınırsız Güncelleme", "Özel Eğitim & SLA"]
+        }
+    ];
+
+    const integData = cmsData?.sections?.find((s: any) => s.type === 'MODERN_INTEGRATIONS')?.content;
+    const integHeading = integData?.heading || '<span class="font-extrabold">Sıradışı Bir Entegrasyon</span> <span class="font-light">Ağı</span>';
+    const integDesc = integData?.desc || 'Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.';
+    const integTestHeading = integData?.testimonialHeading || 'Kusursuz entegrasyon ile operasyonlarınızı hızlandırın';
+    const integTestDesc = integData?.testimonialDesc || 'Gerçek müşterilerimizden dürüst geri bildirimler.';
 
     const tabsBadge = dbTabsData?.badge || 'TECH SOLUTION';
     const tabsHeading = dbTabsData?.heading || '<span class="font-light">The</span> <span class="font-bold">CompletePlatform</span><span class="font-light">To</span><br/> <span class="font-bold">PowerYourOperations</span>';
@@ -242,8 +287,8 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                                     <img src="https://i.pravatar.cc/100?img=3" className="w-10 h-10 rounded-full border-[3px] border-[#F4F7FF] relative z-10" alt="User" />
                                 </div>
                                 <div className="flex flex-col justify-center">
-                                    <div className="font-black text-[#0E1528] text-sm leading-none mb-1">2.3M+</div>
-                                    <div className="text-[10px] whitespace-nowrap font-bold text-slate-500 leading-none">5000+ Müşteri Yorumu</div>
+                                    <div className="font-black text-[#0E1528] text-sm leading-none mb-1">{heroContent?.stat1Val || '2.3M+'}</div>
+                                    <div className="text-[10px] whitespace-nowrap font-bold text-slate-500 leading-none">{heroContent?.stat1Text || '5000+ Müşteri Yorumu'}</div>
                                 </div>
                             </div>
 
@@ -282,7 +327,7 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                                 <div className="w-5 h-5 bg-slate-200 flex items-center justify-center rounded-[2px]"><Star className="w-3 h-3 text-white fill-white"/></div>
                             </div>
                             <div className="font-bold text-[#0E1528] text-[13px] flex items-center gap-1 mt-0.5">
-                                Trust pilot <Check className="w-3.5 h-3.5 text-white bg-blue-600 rounded-full p-0.5" />
+                                {heroContent?.trustBadgeText || 'Trust pilot'} <Check className="w-3.5 h-3.5 text-white bg-blue-600 rounded-full p-0.5" />
                             </div>
                         </div>
 
@@ -290,8 +335,8 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                         <div className="absolute bottom-12 -left-6 lg:left-[-60px] bg-white/95 backdrop-blur-md rounded-[20px] p-5 shadow-[0_30px_60px_rgba(0,0,0,0.12)] z-30 w-[260px] border border-white">
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <div className="text-[9px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Günlük Ciro</div>
-                                    <div className="text-[20px] font-black text-[#0E1528] tracking-tight leading-none">₺48,200.00</div>
+                                    <div className="text-[9px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">{heroContent?.revenueTitle || 'Günlük Ciro'}</div>
+                                    <div className="text-[20px] font-black text-[#0E1528] tracking-tight leading-none">{heroContent?.revenueAmount || '₺48,200.00'}</div>
                                 </div>
                                 <div className="w-12 h-12 rounded-full border-[3px] border-pink-100 flex items-center justify-center bg-white shadow-inner">
                                     <div className="w-9 h-9 rounded-full bg-pink-50 flex items-center justify-center">
@@ -300,16 +345,19 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                                 </div>
                             </div>
                             <div className="flex gap-4 text-[10px] font-bold text-slate-400">
-                                <span className="text-[#0E1528]">Günlük</span>
-                                <span className="hover:text-[#0E1528] cursor-pointer transition-colors">Haftalık</span>
-                                <span className="hover:text-[#0E1528] cursor-pointer transition-colors">Aylık</span>
+                                <span className="text-[#0E1528]">{heroContent?.revenueTab1 || 'Günlük'}</span>
+                                <span className="hover:text-[#0E1528] cursor-pointer transition-colors">{heroContent?.revenueTab2 || 'Haftalık'}</span>
+                                <span className="hover:text-[#0E1528] cursor-pointer transition-colors">{heroContent?.revenueTab3 || 'Aylık'}</span>
                             </div>
                         </div>
 
                         {/* Floating Card 3: Experience Blue Box (Bottom Right) */}
                         <div className="absolute -bottom-6 -right-6 lg:-right-4 bg-[#2563EB] text-white rounded-md rounded-tl-none p-6 md:p-8 shadow-[0_20px_40px_rgba(37,99,235,0.4)] z-20 w-40 md:w-48 outline outline-4 outline-[#F4F7FF]">
-                            <div className="text-4xl md:text-5xl font-black mb-2 leading-none">8+</div>
-                            <div className="text-[10px] md:text-xs font-semibold leading-tight text-white/90">Yıllık Sektör<br/>Tecrübesi</div>
+                            <div className="text-4xl md:text-5xl font-black mb-2 leading-none">{heroContent?.stat2Val || '8+'}</div>
+                            <div 
+                                className="text-[10px] md:text-xs font-semibold leading-tight text-white/90"
+                                dangerouslySetInnerHTML={{ __html: heroContent?.stat2Text || 'Yıllık Sektör<br/>Tecrübesi' }}
+                            ></div>
                         </div>
 
                         {/* Setting gear icon floating right */}
@@ -326,10 +374,11 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                 
                 {/* Header Pattern Centered */}
                 <div className="mb-10">
-                    <h2 className="text-3xl md:text-4xl lg:text-[42px] text-[#0E1528] leading-[1.1] mb-4 tracking-tight">
-                        <span className="font-extrabold">Sıradışı Bir Entegrasyon</span> <span className="font-light">Ağı</span>
-                    </h2>
-                    <p className="text-slate-500 font-medium text-[16px]">Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.</p>
+                    <h2 
+                        className="text-3xl md:text-4xl lg:text-[42px] text-[#0E1528] leading-[1.1] mb-4 tracking-tight"
+                        dangerouslySetInnerHTML={{ __html: integHeading }}
+                    ></h2>
+                    <p className="text-slate-500 font-medium text-[16px]">{integDesc}</p>
                 </div>
 
                 {/* Tabs */}
@@ -356,9 +405,9 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                         <div className="flex flex-col md:flex-row justify-between items-end mb-8 max-w-[1050px] mx-auto">
                             <div>
                                 <h2 className="text-2xl md:text-3xl lg:text-[40px] font-bold text-[#0E1528] leading-[1.1] mb-2 tracking-tight">
-                                    Kusursuz entegrasyon ile operasyonlarınızı hızlandırın
+                                    {integTestHeading}
                                 </h2>
-                                <p className="text-slate-500 font-medium text-[15px]">Gerçek müşterilerimizden dürüst geri bildirimler.</p>
+                                <p className="text-slate-500 font-medium text-[15px]">{integTestDesc}</p>
                             </div>
                             <div className="mt-4 md:mt-0 shrink-0">
                                 <Link href="#" className="px-6 py-3 bg-[#2563EB] text-white font-bold rounded-sm flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
@@ -536,8 +585,8 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                         {/* Top Right Floating Badge */}
                         <div className="absolute top-6 -right-2 lg:-right-8 bg-white rounded-md shadow-xl flex items-center p-3 gap-6 border border-slate-100 z-30">
                             <div>
-                                <div className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">Your balance</div>
-                                <div className="text-lg font-black text-[#0E1528] tracking-tight">$1,000</div>
+                                <div className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">{dbTabsData?.balanceTitle || 'Your balance'}</div>
+                                <div className="text-lg font-black text-[#0E1528] tracking-tight">{dbTabsData?.balanceAmount || '$1,000'}</div>
                             </div>
                             <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-sm border border-slate-100">
                                 <img src="https://flagcdn.com/w40/us.png" alt="USA Flag" className="w-full h-full object-cover" />
@@ -550,8 +599,8 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                                  <div className="flex gap-3 items-center">
                                      <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex justify-center items-center"><Activity className="w-4 h-4"/></div>
                                      <div>
-                                          <div className="text-[11px] font-bold text-[#0E1528] leading-tight">Usability testing</div>
-                                          <div className="text-[9px] font-semibold text-slate-500">12 products</div>
+                                          <div className="text-[11px] font-bold text-[#0E1528] leading-tight">{dbTabsData?.usabilityTitle || 'Usability testing'}</div>
+                                          <div className="text-[9px] font-semibold text-slate-500">{dbTabsData?.usabilityDesc || '12 products'}</div>
                                      </div>
                                  </div>
                                  <div className="text-[8px] text-slate-400 font-bold">● ● ●</div>
@@ -572,8 +621,8 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                         {/* Bottom Right Floating Pie Chart */}
                         <div className="absolute bottom-2 -right-4 lg:-right-10 bg-white rounded-md p-4 shadow-2xl z-30 w-[140px] border border-slate-50">
                              <div className="text-[9px] font-bold text-[#0E1528] mb-3 flex justify-between">
-                                 <span>Your Pie Chart</span>
-                                 <span className="text-slate-400 text-[8px]">Monthly ▾</span>
+                                 <span>{dbTabsData?.chartTitle || 'Your Pie Chart'}</span>
+                                 <span className="text-slate-400 text-[8px]">{dbTabsData?.chartFilter || 'Monthly'} ▾</span>
                              </div>
                              <div className="flex justify-center mb-4">
                                  <div className="w-[60px] h-[60px] rounded-full border-[10px] border-blue-600" style={{ borderRightColor: '#0E1528', rotate: '45deg' }}></div>
@@ -685,62 +734,25 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* Card 1 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">01</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Bot className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">YZ Destekli Analiz</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ön muhasebenizde yapay zekanın hızını ve kusursuzluğunu hissedin.</p>
-                    </div>
-                    {/* Card 2 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">02</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><PieChart className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Derin İçgörüler</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Pazar yerlerindeki satış trendlerinizi anlık ve net raporlarla takip edin.</p>
-                    </div>
-                    {/* Card 3 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">03</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Activity className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Stratejik Kararlar</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Gerçek verilere dayalı altyapımızla doğru zamanda en iyi ticaret kararını alın.</p>
-                    </div>
-                    {/* Card 4 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">04</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Users className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">İşbirliği Araçları</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Ekibinizle aynı panelde uyum içerisinde rolleri dağıtarak çalışın.</p>
-                    </div>
-                    {/* Card 5 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">05</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Shield className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Veri Koruması</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">KVKK standartlarına tam uyumlu yüksek şifrelemelerle verilerinizi koruyun.</p>
-                    </div>
-                    {/* Card 6 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">06</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Headphones className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">7/24 Teknik Destek</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Uzman kadromuzla mağazanızın operasyonlarında asla yarı yolda kalmayın.</p>
-                    </div>
-                    {/* Card 7 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">07</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Target className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Gelişmiş Cari CRM</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Tüm tedarikçi ağınızı tek bir listede puanınıza göre otonom olarak yönetin.</p>
-                    </div>
-                    {/* Card 8 */}
-                    <div className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">08</span>
-                        <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><Cloud className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
-                        <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">Premium Bulut</h3>
-                        <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">Sunucu veya kurulum olmadan güvenle anında her cihazdan işinize erişin.</p>
-                    </div>
+                    {featuresItems.map((ft: any, i: number) => {
+                        let IconComp = Activity;
+                        if (ft.icon === 'bot') IconComp = Bot;
+                        if (ft.icon === 'pie-chart') IconComp = PieChart;
+                        if (ft.icon === 'users') IconComp = Users;
+                        if (ft.icon === 'shield') IconComp = Shield;
+                        if (ft.icon === 'headphones') IconComp = Headphones;
+                        if (ft.icon === 'target') IconComp = Target;
+                        if (ft.icon === 'cloud') IconComp = Cloud;
+
+                        return (
+                            <div key={i} className="bg-white border border-slate-100 shadow-sm rounded-md p-8 relative flex flex-col items-start overflow-hidden hover:shadow-md hover:-translate-y-1 transition duration-300">
+                                <span className="absolute top-4 right-4 text-6xl font-black text-slate-50 pointer-events-none select-none">0{i+1}</span>
+                                <div className="mb-6 z-10 p-3 bg-blue-50/50 rounded-md"><IconComp className="w-8 h-8 text-blue-600" strokeWidth={1.5} /></div>
+                                <h3 className="text-[19px] font-bold text-[#0E1528] mb-3 z-10">{ft.title}</h3>
+                                <p className="text-[13px] font-medium text-slate-500 z-10 leading-[1.6]">{ft.desc}</p>
+                            </div>
+                        );
+                    })}
                 </div>
             </section>
 
@@ -752,51 +764,22 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 max-w-[1050px] mx-auto mt-8">
-                    {/* Basic */}
-                    <div className="bg-white border border-slate-200 rounded-[12px] p-8 lg:p-10 flex flex-col shadow-sm">
-                        <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Başlangıç</h3>
-                        <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.</p>
-                        <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺990<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-sm font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
-                        <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırlı Pazar Yeri</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Stok Takibi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>E-Fatura Kesimi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Standart Destek</li>
-                        </ul>
-                    </div>
-
-                    {/* Pro */}
-                    <div className="bg-white border-2 border-[#2563EB] rounded-[12px] p-8 lg:p-10 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#2563EB] text-white font-bold text-[11px] tracking-widest uppercase px-4 py-1.5 rounded-[6px] flex items-center gap-1.5 whitespace-nowrap"><Zap className="w-3 h-3 fill-white stroke-white"/> EN POPÜLER</div>
-                        <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Profesyonel</h3>
-                        <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">E-ticarette sağlam adımlar atmak isteyen profesyoneller için tam kontrol.</p>
-                        <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">₺2,490<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/ay</span></div>
-                        <button className="w-full py-3.5 rounded-sm font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">14 Gün Deneyin <ArrowRight className="w-4 h-4"/></button>
-                        <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Pazar Yeri</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Çoklu Depo Yönetimi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Kargo Entegrasyonu</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Öncelikli Destek</li>
-                        </ul>
-                    </div>
-
-                    {/* Enterprise */}
-                    <div className="bg-white border border-slate-200 rounded-[12px] p-8 lg:p-10 flex flex-col shadow-sm">
-                        <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">Kurumsal</h3>
-                        <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">Kendi altyapınızda özel sunucu ihtiyaçlarıyla sınırları kaldıran kapasite.</p>
-                        <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">Özel<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">/yıllık</span></div>
-                        <button className="w-full py-3.5 rounded-sm font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">İletişime Geçin <ArrowRight className="w-4 h-4"/></button>
-                        <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>VDS Sunucu Yönetimi</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sıfırdan Veri Aktarımı</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Bayi Ağı (B2B) Desteği</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Sınırsız Güncelleme</li>
-                            <li className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>Özel Eğitim & SLA</li>
-                        </ul>
-                    </div>
+                    {pricingPackages.map((pkg: any, idx: number) => (
+                        <div key={idx} className={`bg-white border-2 ${pkg.isPopular ? 'border-[#2563EB] shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative' : 'border-slate-200 shadow-sm'} rounded-[12px] p-8 lg:p-10 flex flex-col`}>
+                            {pkg.isPopular && (
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#2563EB] text-white font-bold text-[11px] tracking-widest uppercase px-4 py-1.5 rounded-[6px] flex items-center gap-1.5 whitespace-nowrap"><Zap className="w-3 h-3 fill-white stroke-white"/> EN POPÜLER</div>
+                            )}
+                            <h3 className="text-[22px] font-bold text-[#0E1528] mb-1">{pkg.name}</h3>
+                            <p className="text-slate-500 text-[13px] font-medium leading-[1.6] min-h-[40px] mb-6">{pkg.desc}</p>
+                            <div className="mb-6 font-black text-[#0E1528] text-[42px] leading-none tracking-tight">{pkg.price}<span className="text-[15px] text-slate-500 font-semibold align-bottom font-sans">{pkg.period}</span></div>
+                            <button className="w-full py-3.5 rounded-sm font-bold bg-[#2563EB] text-white hover:bg-blue-700 transition-colors mb-8 flex justify-center items-center gap-2 text-[14px]">{pkg.btnText} <ArrowRight className="w-4 h-4"/></button>
+                            <ul className="space-y-3.5 text-slate-600 text-[13.5px] font-medium">
+                                {(pkg.features || []).map((f: string, fi: number) => (
+                                    <li key={fi} className="flex items-center gap-3"><div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0"><Check className="w-3 h-3 text-white stroke-[3]"/></div>{f}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
                 </div>
             </section>
 

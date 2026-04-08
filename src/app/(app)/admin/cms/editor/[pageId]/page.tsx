@@ -37,12 +37,28 @@ export default async function CMSVisualEditor(props: { params: Promise<{ pageId:
           title: '<span class="font-light">E-Ticaret</span> <span class="font-bold">ve</span><br/><span class="font-bold">Ön Muhasebede</span><br/><span class="font-bold text-[#2563EB]">Üstün</span> <span class="font-light whitespace-nowrap">Sonuçlar</span>',
           subtitle: 'Günümüzün rekabetçi ticaretinde etkili çözümler.',
           primaryBtnText: 'Ücretsiz Başla',
-          visualUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a'
+          visualUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a',
+          stat1Val: '2.3M+',
+          stat1Text: '5000+ Müşteri Yorumu',
+          trustBadgeText: 'Trust pilot',
+          revenueTitle: 'Günlük Ciro',
+          revenueAmount: '₺48,200.00',
+          revenueTab1: 'Günlük',
+          revenueTab2: 'Haftalık',
+          revenueTab3: 'Aylık',
+          stat2Val: '8+',
+          stat2Text: 'Yıllık Sektör<br/>Tecrübesi'
       }},
       { id: "temp-tabs", pageId: page.id, type: "MODERN_TABS", content: {
           badge: 'TECH SOLUTION',
           heading: '<span class="font-light">The</span> <span class="font-bold">CompletePlatform</span><span class="font-light">To</span><br/> <span class="font-bold">PowerYourOperations</span>',
           desc: "In today's competitive business, the demand for efficient and cost-effective IT solutions has never been more critical.",
+          balanceTitle: 'Your balance',
+          balanceAmount: '$1,000',
+          usabilityTitle: 'Usability testing',
+          usabilityDesc: '12 products',
+          chartTitle: 'Your Pie Chart',
+          chartFilter: 'Monthly',
           items: [
               {
                   title: "Kişiselleştirilmiş Çözüm", 
@@ -67,6 +83,10 @@ export default async function CMSVisualEditor(props: { params: Promise<{ pageId:
           ]
       }},
       { id: "temp-integrations", pageId: page.id, type: "MODERN_INTEGRATIONS", content: {
+          heading: '<span class="font-extrabold">Sıradışı Bir Entegrasyon</span> <span class="font-light">Ağı</span>',
+          desc: 'Bütün operasyonunuz için gerekli olan tüm platformlar tek çatı altında.',
+          testimonialHeading: 'Kusursuz entegrasyon ile operasyonlarınızı hızlandırın',
+          testimonialDesc: 'Gerçek müşterilerimizden dürüst geri bildirimler.',
           items: [
               {
                   title: "Başlarken",
@@ -123,11 +143,50 @@ export default async function CMSVisualEditor(props: { params: Promise<{ pageId:
       }},
       { id: "temp-features", pageId: page.id, type: "MODERN_FEATURES", content: {
           heading: 'Bizi <span class="text-blue-600">Farklı Kılan</span> Özellikler.',
-          desc: 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.'
+          desc: 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.',
+          features: [
+              { title: "YZ Destekli Analiz", desc: "Ön muhasebenizde yapay zekanın hızını ve kusursuzluğunu hissedin.", icon: "bot" },
+              { title: "Derin İçgörüler", desc: "Pazar yerlerindeki satış trendlerinizi anlık ve net raporlarla takip edin.", icon: "pie-chart" },
+              { title: "Stratejik Kararlar", desc: "Gerçek verilere dayalı altyapımızla doğru zamanda en iyi ticaret kararını alın.", icon: "activity" },
+              { title: "İşbirliği Araçları", desc: "Ekibinizle aynı panelde uyum içerisinde rolleri dağıtarak çalışın.", icon: "users" },
+              { title: "Veri Koruması", desc: "KVKK standartlarına tam uyumlu yüksek şifrelemelerle verilerinizi koruyun.", icon: "shield" },
+              { title: "7/24 Teknik Destek", desc: "Uzman kadromuzla mağazanızın operasyonlarında asla yarı yolda kalmayın.", icon: "headphones" },
+              { title: "Gelişmiş Cari CRM", desc: "Tüm tedarikçi ağınızı tek bir listede puanınıza göre otonom olarak yönetin.", icon: "target" },
+              { title: "Premium Bulut", desc: "Sunucu veya kurulum olmadan güvenle anında her cihazdan işinize erişin.", icon: "cloud" }
+          ]
       }},
       { id: "temp-pricing", pageId: page.id, type: "MODERN_PRICING", content: {
           heading: 'Esnek Fiyatlandırma',
-          desc: 'Büyüme hızınıza ayak uyduran paketler.'
+          desc: 'Büyüme hızınıza ayak uyduran paketler.',
+          packages: [
+              {
+                  name: "Başlangıç",
+                  desc: "Küçük işletmeler için tam teşekküllü pazar yeri otomasyonu.",
+                  price: "₺990",
+                  period: "/ay",
+                  btnText: "14 Gün Deneyin",
+                  isPopular: false,
+                  features: ["Sınırlı Pazar Yeri", "Stok Takibi", "E-Fatura Kesimi", "Sınırsız Güncelleme", "Standart Destek"]
+              },
+              {
+                  name: "Profesyonel",
+                  desc: "E-ticarette sağlam adımlar atmak isteyen profesyoneller için tam kontrol.",
+                  price: "₺2,490",
+                  period: "/ay",
+                  btnText: "14 Gün Deneyin",
+                  isPopular: true,
+                  features: ["Sınırsız Pazar Yeri", "Çoklu Depo Yönetimi", "Kargo Entegrasyonu", "Sınırsız Güncelleme", "Öncelikli Destek"]
+              },
+              {
+                  name: "Kurumsal",
+                  desc: "Kendi altyapınızda özel sunucu ihtiyaçlarıyla sınırları kaldıran kapasite.",
+                  price: "Özel",
+                  period: "/yıllık",
+                  btnText: "İletişime Geçin",
+                  isPopular: false,
+                  features: ["VDS Sunucu Yönetimi", "Sıfırdan Veri Aktarımı", "Bayi Ağı (B2B) Desteği", "Sınırsız Güncelleme", "Özel Eğitim & SLA"]
+              }
+          ]
       }}
   ];
 
