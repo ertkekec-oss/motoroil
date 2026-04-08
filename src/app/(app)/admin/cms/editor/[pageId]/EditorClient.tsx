@@ -1,9 +1,101 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Save, Plus, ArrowLeft, Layout, MousePointerClick, Monitor, Smartphone, Globe, Settings as SettingsIcon, GripVertical, Trash2 } from "lucide-react";
+import { Save, Plus, ArrowLeft, Layout, MousePointerClick, Monitor, Smartphone, Globe, Settings as SettingsIcon, GripVertical, Trash2, Bold, Italic, Link as LinkIcon, Image as ImageIcon, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ModernLanding from "@/components/landing/ModernLanding";
+
+const VisualTextEditor = ({ value, onChange, placeholder }: any) => {
+  const editorRef = React.useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML === "") {
+      editorRef.current.innerHTML = value || "";
+    }
+  }, [value]);
+
+  const exec = (cmd: string, arg?: string) => {
+    document.execCommand(cmd, false, arg);
+    editorRef.current?.focus();
+    if (editorRef.current) onChange(editorRef.current.innerHTML);
+  };
+
+  const handleLink = () => {
+    const url = prompt("Link URL:");
+    if (url) exec('createLink', url);
+  };
+
+  const notifyChange = () => {
+    if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  return (
+    <div className="w-full bg-slate-900 border border-slate-700/50 rounded-md overflow-hidden flex flex-col mb-3">
+       <div className="flex items-center gap-1 bg-slate-950/80 border-b border-slate-700/50 p-1">
+          <button onClick={() => exec('bold')} className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Kalın"><Bold size={14}/></button>
+          <button onClick={() => exec('italic')} className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Eğik"><Italic size={14}/></button>
+          <button onClick={handleLink} className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white" title="Link Ekle"><LinkIcon size={14}/></button>
+          <div className="w-px h-4 bg-slate-700 mx-1"></div>
+          <div className="relative group">
+              <button className="px-2 py-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white text-[10px] font-bold">Renk</button>
+              <input type="color" onChange={(e) => exec('foreColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" title="Yazı Rengi" />
+          </div>
+          <div className="relative group">
+              <button className="px-2 py-1 bg-slate-800/50 hover:bg-slate-800 rounded text-slate-400 hover:text-white text-[10px] font-bold">Zemin</button>
+              <input type="color" onChange={(e) => exec('hiliteColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" title="Arkaplan Rengi" />
+          </div>
+          <div className="w-px h-4 bg-slate-700 mx-1"></div>
+          <button onClick={() => exec('formatBlock', 'H1')} className="px-2 py-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white text-[11px] font-bold">H1</button>
+          <button onClick={() => exec('formatBlock', 'H3')} className="px-2 py-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white text-[11px] font-bold">H3</button>
+          <button onClick={() => exec('removeFormat')} className="px-2 py-1 hover:bg-rose-900/50 rounded text-rose-400 hover:text-rose-300 text-[10px] font-bold">Temizle</button>
+       </div>
+       <div 
+          ref={editorRef}
+          contentEditable 
+          onBlur={notifyChange}
+          onKeyUp={notifyChange}
+          className="p-3 text-sm text-white focus:outline-none min-h-[80px] max-h-[250px] overflow-y-auto"
+          style={{ whiteSpace: 'pre-wrap' }}
+          data-placeholder={placeholder}
+       />
+    </div>
+  );
+}
+
+const ImageUploadField = ({ value, onChange }: any) => {
+   const handleFile = (e: any) => {
+       const file = e.target.files[0];
+       if (!file) return;
+       const reader = new FileReader();
+       reader.onloadend = () => {
+           onChange(reader.result);
+       };
+       reader.readAsDataURL(file);
+   };
+
+   return (
+       <div className="flex flex-col gap-2 mb-3">
+           {value && value.startsWith('data:image') && (
+               <img src={value} className="h-20 object-contain rounded-md border border-slate-700 bg-slate-900" alt="preview" />
+           )}
+           <div className="flex items-center gap-2">
+               <input 
+                 value={value && !value.startsWith('data:image') ? value : ''} 
+                 onChange={e => onChange(e.target.value)}
+                 placeholder="Görsel URL..."
+                 className="flex-1 bg-slate-900 border border-slate-700/50 rounded p-2.5 text-xs text-white outline-none"
+               />
+               <label className="flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white rounded px-3 h-[38px] cursor-pointer shadow-md shrink-0">
+                   <Upload size={14} className="mr-1.5" />
+                   <span className="text-xs font-bold">Yükle</span>
+                   <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
+               </label>
+           </div>
+       </div>
+   );
+};
 
 const JsonEditor = ({ value, onChange }: { value: any, onChange: (val: any) => void }) => {
   const [jsonStr, setJsonStr] = useState("");
@@ -275,28 +367,26 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                {activeBlock.type === 'HERO' || activeBlock.type === 'MODERN_HERO' ? (
                  <div className="space-y-5">
                    <div>
-                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (HTML Desktekli)</label>
-                     <textarea 
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (Görsel Editör)</label>
+                     <VisualTextEditor 
                        value={activeBlock.content.title || ''} 
-                       onChange={e => updateBlockData('title', e.target.value)}
-                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all h-24 resize-none font-mono"
+                       onChange={(val: any) => updateBlockData('title', val)}
+                       placeholder="Ana başlık buraya..."
                      />
-                     <p className="text-[10px] text-slate-500 mt-1">Örn: &lt;span class=&quot;font-bold&quot;&gt;Kalın&lt;/span&gt;</p>
                    </div>
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Alt Açıklama (Subtitle)</label>
-                     <textarea 
+                     <VisualTextEditor 
                        value={activeBlock.content.subtitle || ''} 
-                       onChange={e => updateBlockData('subtitle', e.target.value)}
-                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all h-28 resize-none"
+                       onChange={(val: any) => updateBlockData('subtitle', val)}
+                       placeholder="Alt açıklama buraya..."
                      />
                    </div>
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Medya URL (Görsel)</label>
-                     <input 
+                     <ImageUploadField 
                        value={activeBlock.content.visualUrl || ''} 
-                       onChange={e => updateBlockData('visualUrl', e.target.value)}
-                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                       onChange={(val: any) => updateBlockData('visualUrl', val)}
                      />
                    </div>
                    <div className="pt-4 border-t border-slate-800">
@@ -313,31 +403,29 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                ) : activeBlock.type === 'MODERN_FEATURES' || activeBlock.type === 'MODERN_PRICING' ? (
                  <div className="space-y-5">
                    <div>
-                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kutu Başlığı (HTML Desktekli)</label>
-                     <textarea 
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kutu Başlığı (Görsel Editör)</label>
+                     <VisualTextEditor 
                        value={activeBlock.content.heading || ''} 
-                       onChange={e => updateBlockData('heading', e.target.value)}
-                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 outline-none transition-all h-20 resize-none font-mono"
+                       onChange={(val: any) => updateBlockData('heading', val)}
                      />
                    </div>
                    <div>
-                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Açıklama (Formatlanmış Text)</label>
-                     <textarea 
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Açıklama</label>
+                     <VisualTextEditor 
                        value={activeBlock.content.desc || ''} 
-                       onChange={e => updateBlockData('desc', e.target.value)}
-                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 outline-none transition-all h-24 resize-none"
+                       onChange={(val: any) => updateBlockData('desc', val)}
                      />
                    </div>
                  </div>
                ) : activeBlock.type === 'MODERN_WHY_US' ? (
                  <div className="space-y-5">
                    <div>
-                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık</label>
-                     <textarea value={activeBlock.content.heading || ''} onChange={e => updateBlockData('heading', e.target.value)} className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2 text-sm text-white h-16 resize-none font-mono" />
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (Görsel Editör)</label>
+                     <VisualTextEditor value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
                    </div>
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kısa Açıklama</label>
-                     <textarea value={activeBlock.content.desc || ''} onChange={e => updateBlockData('desc', e.target.value)} className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2 text-sm text-white h-16 resize-none" />
+                     <VisualTextEditor value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
                    </div>
                    <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-lg space-y-3">
                      <p className="text-xs font-bold text-blue-400">KART 1 AYARLARI</p>
@@ -355,9 +443,9 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                      {activeBlock.type === 'MODERN_TABS' && (
                        <div className="p-3 border border-slate-800 bg-slate-950/50 rounded-lg space-y-3 mb-4">
                           <p className="text-xs font-bold text-slate-400">Üst Metin Ayarları</p>
-                          <input placeholder="Rozet (Badge)" value={activeBlock.content.badge || ''} onChange={e => updateBlockData('badge', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
-                          <textarea placeholder="Ana Başlık (HTML)" value={activeBlock.content.heading || ''} onChange={e => updateBlockData('heading', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" />
-                          <textarea placeholder="Alt Açıklama" value={activeBlock.content.desc || ''} onChange={e => updateBlockData('desc', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" />
+                          <input placeholder="Rozet (Badge)" value={activeBlock.content.badge || ''} onChange={e => updateBlockData('badge', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
+                          <VisualTextEditor placeholder="Ana Başlık (Görsel Editör)" value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
+                          <VisualTextEditor placeholder="Alt Açıklama" value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
                        </div>
                      )}
                      <div className="flex justify-between items-center mb-2">
@@ -387,9 +475,15 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                                     
                                     <label className="block text-[10px] text-slate-500 uppercase mt-2">Line 1 & Line 2</label>
                                     <div className="flex gap-2">
-                                      <input value={item.descLine1 || ''} onChange={(e) => { const arr = [...activeBlock.content.items]; arr[idx].descLine1 = e.target.value; updateBlockData('items', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" />
-                                      <input value={item.descLine2 || ''} onChange={(e) => { const arr = [...activeBlock.content.items]; arr[idx].descLine2 = e.target.value; updateBlockData('items', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                                      <input value={item.descLine1 || ''} onChange={(e) => { const arr = [...activeBlock.content.items]; arr[idx].descLine1 = e.target.value; updateBlockData('items', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" placeholder="Line 1" />
+                                      <input value={item.descLine2 || ''} onChange={(e) => { const arr = [...activeBlock.content.items]; arr[idx].descLine2 = e.target.value; updateBlockData('items', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" placeholder="Line 2" />
                                     </div>
+                                    <label className="block text-[10px] text-slate-500 uppercase mt-2">Entegrasyon Markaları (Virgülle Ayırın)</label>
+                                    <input placeholder="Trendyol, Hepsiburada, Amazon..." value={(item.logos || []).join(', ')} onChange={(e) => {
+                                      const arr = [...activeBlock.content.items]; 
+                                      arr[idx].logos = e.target.value.split(',').map((x: string) => x.trim()).filter(Boolean); 
+                                      updateBlockData('items', arr);
+                                    }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" />
                                   </>
                                 )}
 
