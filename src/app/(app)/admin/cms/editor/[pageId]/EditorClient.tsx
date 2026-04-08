@@ -137,6 +137,13 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
   const [saving, setSaving] = useState(false);
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
 
+  useEffect(() => {
+    setBlocks(initialBlocks);
+    if (!blocks.find(b => b.id === activeBlockId) && initialBlocks.length > 0) {
+       setActiveBlockId(initialBlocks[0].id);
+    }
+  }, [initialBlocks]);
+
   const activeBlock = blocks.find(b => b.id === activeBlockId);
 
   const updateBlockData = (key: string, value: any) => {
