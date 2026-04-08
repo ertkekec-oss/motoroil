@@ -1,15 +1,15 @@
 import React from "react";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { EnterprisePageShell } from "@/components/admin/EnterprisePageShell";
+import { EnterprisePageShell } from "@/components/ui/enterprise";
 import { Plus, Globe, MonitorSmartphone, Settings, Zap, History, MousePointerClick, Users } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
 export default async function CMSDashboard() {
-  const session = await getServerSession(authOptions);
+  const sessionResult: any = await getSession();
+  const session = sessionResult?.user || sessionResult;
   if (!session) redirect("/auth/login");
 
   // Fetch or Auto-create the main site
@@ -39,7 +39,7 @@ export default async function CMSDashboard() {
     <EnterprisePageShell
       title="İçerik Stüdyosu (CMS V2)"
       description="Yapay Zeka Destekli Büyüme ve İçerik Motoru"
-      headerActions={
+      actions={
         <div className="flex gap-3">
           <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-all shadow-sm">
             <Globe className="w-4 h-4" />

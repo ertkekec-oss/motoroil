@@ -17,13 +17,25 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
     setBlocks(prev => prev.map(b => b.id === activeBlockId ? { ...b, content: { ...b.content, [key]: value } } : b));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (publish = false) => {
     setSaving(true);
-    // TODO: Send to API
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/admin/cms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageId: initialPage.id, blocks, publish })
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        alert("Kaydetme işlemi başarısız!");
+      }
+    } catch(e) {
+      console.error(e);
+      alert("Sunucu hatası!");
+    } finally {
       setSaving(false);
-      router.refresh();
-    }, 1000);
+    }
   };
 
   return (
@@ -136,7 +148,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
              <div className="w-2 h-2 rounded-full bg-amber-500" />
              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">TASLAK</span>
            </div>
-           <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md text-sm font-bold shadow transition-colors disabled:opacity-50">
+           <button onClick={() => handleSave()} disabled={saving} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md text-sm font-bold shadow transition-colors disabled:opacity-50">
              <Save className="w-4 h-4" />
              {saving ? "Kaydediliyor..." : "Taslağı Kaydet"}
            </button>

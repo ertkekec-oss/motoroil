@@ -31,12 +31,16 @@ export default async function Page() {
     // Fetch CMS settings if available
     let cmsData = null;
     try {
-        const page = await (prisma as any).cmsPage.findUnique({
-            where: { slug: 'index' },
-            include: { sections: { orderBy: { order: 'asc' } } }
+        const page = await (prisma as any).cmsPageV2.findFirst({
+            where: { slug: 'index', status: 'PUBLISHED' },
+            include: { blocks: { orderBy: { order: 'asc' } } }
         });
-        if (page?.isActive) {
-            cmsData = page;
+        if (page) {
+            // Map blocks back to sections to preserve ModernLanding compatibility for now
+            cmsData = {
+                ...page,
+                sections: page.blocks
+            };
         }
     } catch (e) {
         console.error("Failed to load CMS data", e);

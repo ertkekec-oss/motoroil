@@ -1,11 +1,11 @@
 import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import EditorClient from "./EditorClient"
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 export default async function CMSVisualEditor({ params }: { params: { pageId: string } }) {
-  const session = await getServerSession(authOptions);
+  const sessionResult: any = await getSession();
+  const session = sessionResult?.user || sessionResult;
   if (!session) redirect("/auth/login");
 
   const page = await prisma.cmsPageV2.findUnique({
