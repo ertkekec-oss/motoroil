@@ -33,6 +33,21 @@ export default async function CMSVisualEditor(props: { params: Promise<{ pageId:
 
   // Define the ordered template of standard blocks
   const orderedTemplates = [
+      { id: "temp-header", pageId: page.id, type: "MODERN_HEADER", content: {
+          notificationText: "Yeni: Periodya'nın baştan aşağı yenilenen kullanıcı arayüzü ile tanışın! Operasyonlarınız çok daha güçlü.",
+          logoText: "Periodya",
+          menuItems: [
+              { title: "Ana Sayfa", linksTo: "#" },
+              { title: "Özellikler", linksTo: "#" },
+              { title: "Modüller", linksTo: "#" },
+              { title: "Blog", linksTo: "#" },
+              { title: "İletişim", linksTo: "#" }
+          ],
+          btn1Text: "Giriş Yap",
+          btn2Text: "Ücretsiz Dene",
+          btn2Url: "/register",
+          tickerItems: ["BAŞARI İÇİN MÜKEMMEL ÇÖZÜM", "E-TİCARET OPERASYONLARINDA MÜKEMMELLİK", "MARKANIZI PERİODYA İLE YÜKSELTİN", "İŞ HEDEFLERİNİZE ULAŞACAK TEKNOLOJİ", "GÜÇLÜ PAZAR YERİ VARLIĞI"]
+      }},
       { id: "temp-hero", pageId: page.id, type: "MODERN_HERO", content: {
           title: '<span class="font-light">E-Ticaret</span> <span class="font-bold">ve</span><br/><span class="font-bold">Ön Muhasebede</span><br/><span class="font-bold text-[#2563EB]">Üstün</span> <span class="font-light whitespace-nowrap">Sonuçlar</span>',
           subtitle: 'Günümüzün rekabetçi ticaretinde etkili çözümler.',
@@ -187,6 +202,17 @@ export default async function CMSVisualEditor(props: { params: Promise<{ pageId:
                   features: ["VDS Sunucu Yönetimi", "Sıfırdan Veri Aktarımı", "Bayi Ağı (B2B) Desteği", "Sınırsız Güncelleme", "Özel Eğitim & SLA"]
               }
           ]
+      }},
+      { id: "temp-footer", pageId: page.id, type: "MODERN_FOOTER", content: {
+          brandName: "Periodya",
+          copyright: "© 2026 Periodya - IT Services. All rights reserved.",
+          contactEmail: "support@periodya.com",
+          contactPhone: "+880 (123) 456 88",
+          address: "55 Main Street, 2nd block Melbourne, Australia",
+          menu1Title: "My account",
+          menu1Items: [{title: "Forum Support", linksTo: "#"}, {title: "Help & FAQ", linksTo: "#"}, {title: "Contact Us", linksTo: "#"}, {title: "Pricing and plans", linksTo: "#"}],
+          menu2Title: "Service",
+          menu2Items: [{title: "It Consultation", linksTo: "#"}, {title: "Cloud Services", linksTo: "#"}, {title: "AI Machine Learning", linksTo: "#"}, {title: "Data Security", linksTo: "#"}]
       }}
   ];
 
