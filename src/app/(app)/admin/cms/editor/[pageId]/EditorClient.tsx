@@ -1,9 +1,42 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Save, Plus, ArrowLeft, Layout, MousePointerClick, Monitor, Smartphone, Globe, Settings as SettingsIcon, GripVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ModernLanding from "@/components/landing/ModernLanding";
+
+const JsonEditor = ({ value, onChange }: { value: any, onChange: (val: any) => void }) => {
+  const [jsonStr, setJsonStr] = useState("");
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setJsonStr(JSON.stringify(value, null, 2));
+  }, [value]);
+
+  const handleChange = (e: any) => {
+    const newVal = e.target.value;
+    setJsonStr(newVal);
+    try {
+      const parsed = JSON.parse(newVal);
+      setError(false);
+      onChange(parsed);
+    } catch (err) {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-2">
+      <textarea
+        value={jsonStr}
+        onChange={handleChange}
+        className={`w-full bg-slate-950 border ${error ? 'border-rose-500' : 'border-slate-700/50'} rounded-lg p-3 text-xs text-green-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all h-[400px] resize-y font-mono font-medium`}
+        spellCheck={false}
+      />
+      {error && <p className="text-[10px] text-rose-500 font-bold">Geçersiz JSON formatı. Değişiklikleriniz ancak JSON geçerli olduğunda uygulanır.</p>}
+    </div>
+  );
+};
 
 export default function EditorClient({ initialPage, initialBlocks }: { initialPage: any, initialBlocks: any[] }) {
   const router = useRouter();
@@ -46,6 +79,20 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
         items: [
             { title: "Entegrasyon 1", contentTitle: "Harika Entegrasyon", descLine1: "Açıklama 1", descLine2: "Açıklama 2", logos: ["Trendyol", "Hepsiburada"] }
         ]
+    };
+    if (type === 'MODERN_WHY_US') return {
+        heading: '<span class="font-bold">Periodya</span> <span class="font-light">ile operasyonlarınızı kolaylaştırın.</span>',
+        desc: 'Günümüz e-ticaret dünyasında düşük maliyetli hızlı çözümler.',
+        card1: { title: "Hızlı Entegrasyon", desc: "1 saatte tüm ürünlerinizi aktarın." },
+        card2: { title: "Sürekli Destek", desc: "7/24 uzman kadromuz yanınızda." }
+    };
+    if (type === 'MODERN_FEATURES') return {
+        heading: 'Bizi <span class="text-blue-600">Özel Kılan</span> Detaylar.',
+        desc: 'Ön saflarda yer alan teknolojimizle büyüyün.'
+    };
+    if (type === 'MODERN_PRICING') return {
+        heading: 'Esnek Paket Seçenekleri',
+        desc: 'Sürpriz ödemeler olmadan işletmenizle büyüyen modeller.'
     };
     return {};
   };
@@ -133,6 +180,24 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                 className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
               >
                 <Plus className="w-3 h-3" /> MODERN INTEGRATIONS
+              </button>
+              <button 
+                onClick={() => handleAddBlock('MODERN_WHY_US')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN WHY US
+              </button>
+              <button 
+                onClick={() => handleAddBlock('MODERN_FEATURES')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN FEATURES
+              </button>
+              <button 
+                onClick={() => handleAddBlock('MODERN_PRICING')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN PRICING
               </button>
             </div>
         </div>
@@ -246,9 +311,16 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                    </div>
                  </div>
                ) : (
-                  <div className="p-4 border border-blue-500/30 bg-blue-500/10 rounded-lg text-sm text-blue-200">
-                    <p className="font-bold mb-2">Bu blok tipi için form henüz tanımlanmadı.</p>
-                    <p>JSON editörü yakında eklenecek.</p>
+                  <div className="space-y-4">
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">İçerik Verisi (JSON)</label>
+                       <JsonEditor 
+                         value={activeBlock.content} 
+                         onChange={(newContent) => {
+                           setBlocks(prev => prev.map(b => b.id === activeBlock.id ? { ...b, content: newContent } : b));
+                         }} 
+                       />
+                     </div>
                   </div>
                )}
             </div>

@@ -83,6 +83,10 @@ export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
     const dbTabs = cmsData?.sections?.find((s: any) => s.type === 'MODERN_TABS')?.content?.items;
     const dbIntegrations = cmsData?.sections?.find((s: any) => s.type === 'MODERN_INTEGRATIONS')?.content?.items;
     
+    const dbWhyUs = cmsData?.sections?.find((s: any) => s.type === 'MODERN_WHY_US')?.content;
+    const dbFeatures = cmsData?.sections?.find((s: any) => s.type === 'MODERN_FEATURES')?.content;
+    const dbPricing = cmsData?.sections?.find((s: any) => s.type === 'MODERN_PRICING')?.content;
+
     // Eski hero desteği ya da fallback
     const fallbackHero = cmsData?.sections?.find((s: any) => s.type === 'HERO')?.content;
     const heroContent = dbHero || fallbackHero;
@@ -94,6 +98,17 @@ export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
     const heroSubtitle = heroContent?.subtitle || 'Günümüzün rekabetçi ticaretinde, etkin ve düşük maliyetli yazılım çözümlerine olan ihtiyaç hiç bu kadar kritik olmamıştı.';
     const heroBtnText = heroContent?.primaryBtnText || 'Ücretsiz Başla';
     const visualUrl = heroContent?.visualUrl || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80';
+
+    const whyUsHeading = dbWhyUs?.heading || '<span class="font-bold">Periodya</span> <span class="font-light">operasyonlarınızı optimize ederek ekibinizin performansını artırır ve</span> <span className="font-bold">Büyümeyi hızlandırır.</span>';
+    const whyUsDesc = dbWhyUs?.desc || 'Günümüz rekabetçi e-ticaret pazarında, etkin ve düşük maliyetli yazılım çözümlerine olan talep hiç bu kadar kritik olmamıştı. Sizi bir adım öne taşıyoruz.';
+    const whyUsCard1 = dbWhyUs?.card1 || { title: "Uzmanlık & Özelleştirme", desc: "Ekibimiz size özel tasarlanmış tam teşekküllü donanımlar ve büyüme planları sunar." };
+    const whyUsCard2 = dbWhyUs?.card2 || { title: "Kesintisiz Entegrasyon", desc: "Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir." };
+
+    const featuresHeading = dbFeatures?.heading || 'Bizi <span class="text-blue-600">Farklı Kılan</span> Özellikler.';
+    const featuresDesc = dbFeatures?.desc || 'Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.';
+
+    const pricingHeading = dbPricing?.heading || 'Esnek Fiyatlandırma';
+    const pricingDesc = dbPricing?.desc || 'Büyüme hızınıza ayak uyduran paketler.';
 
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState('light');
@@ -613,28 +628,27 @@ export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
                             Neden Bizi Seçmelisiniz
                         </div>
                         
-                        <h2 className="text-[38px] md:text-[46px] text-[#0E1528] leading-[1.1] tracking-tight mb-8">
-                            <span className="font-bold">Periodya</span> <span className="font-light">operasyonlarınızı optimize ederek ekibinizin performansını artırır ve</span> <span className="font-bold">Büyümeyi hızlandırır.</span>
+                        <h2 className="text-[38px] md:text-[46px] text-[#0E1528] leading-[1.1] tracking-tight mb-8" dangerouslySetInnerHTML={{ __html: whyUsHeading }}>
                         </h2>
                         
                         <p className="text-slate-500 font-medium text-[13px] md:text-sm leading-relaxed mb-12 max-w-[480px]">
-                            Günümüz rekabetçi e-ticaret pazarında, etkin ve düşük maliyetli yazılım çözümlerine olan talep hiç bu kadar kritik olmamıştı. Sizi bir adım öne taşıyoruz.
+                            {whyUsDesc}
                         </p>
 
                         <div className="grid sm:grid-cols-2 gap-6 mb-12">
                             {/* Card 1 */}
                             <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-md border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
-                                <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">Uzmanlık & Özelleştirme</h4>
+                                <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">{whyUsCard1.title}</h4>
                                 <p className="text-slate-400 text-[12px] font-medium leading-relaxed">
-                                    Ekibimiz size özel tasarlanmış tam teşekküllü donanımlar ve büyüme planları sunar.
+                                    {whyUsCard1.desc}
                                 </p>
                             </div>
                             
                             {/* Card 2 */}
                             <div className="bg-[#FAFBFD] p-6 lg:p-8 rounded-md border border-slate-50 hover:bg-white hover:shadow-xl transition-all duration-300">
-                                <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">Kesintisiz Entegrasyon</h4>
+                                <h4 className="font-bold text-[#0E1528] text-[15px] mb-3">{whyUsCard2.title}</h4>
                                 <p className="text-slate-400 text-[12px] font-medium leading-relaxed">
-                                    Sistemlerimiz her ay yeni pazar yeri standartlarına uygun olarak kesintisiz güncellenir.
+                                    {whyUsCard2.desc}
                                 </p>
                             </div>
                         </div>
@@ -655,10 +669,9 @@ export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
 
             {/* --- NEW 8-CARD FLEX GRID (Makes Us Different) --- */}            <section className="pt-8 pb-16 md:pb-20 max-w-[1300px] mx-auto px-6 relative z-10">
                 <div className="text-center mb-16 max-w-2xl mx-auto">
-                    <h2 className="text-3xl md:text-5xl font-black text-[#0E1528] mb-4">
-                        Bizi <span className="text-blue-600">Farklı Kılan</span> Özellikler.
+                    <h2 className="text-3xl md:text-5xl font-black text-[#0E1528] mb-4" dangerouslySetInnerHTML={{ __html: featuresHeading }}>
                     </h2>
-                    <p className="text-slate-500 font-medium leading-relaxed">Sürekli yenilikçi teknolojilerle ön saflarda yer almaktan, sınırları yeniden tanımlamaktan ve e-ticaret dijital dünyasını birlikte şekillendirmekten gurur duyuyoruz.</p>
+                    <p className="text-slate-500 font-medium leading-relaxed">{featuresDesc}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -724,8 +737,8 @@ export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
             {/* --- 7. PRICING --- */}
             <section className="py-16 md:py-24 max-w-[1300px] mx-auto px-6">
                 <div className="text-center mb-16">
-                    <h2 className="text-2xl md:text-3xl font-black text-[#0E1528] mb-4">Esnek Fiyatlandırma</h2>
-                    <p className="text-slate-500 font-medium">Büyüme hızınıza ayak uyduran paketler.</p>
+                    <h2 className="text-2xl md:text-3xl font-black text-[#0E1528] mb-4">{pricingHeading}</h2>
+                    <p className="text-slate-500 font-medium">{pricingDesc}</p>
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 max-w-[1050px] mx-auto mt-8">
