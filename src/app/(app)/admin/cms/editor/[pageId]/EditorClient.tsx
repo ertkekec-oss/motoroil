@@ -372,6 +372,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (Görsel Editör)</label>
                      <VisualTextEditor 
+                       key={activeBlock.id + '-hero-title'}
                        value={activeBlock.content.title || ''} 
                        onChange={(val: any) => updateBlockData('title', val)}
                        placeholder="Ana başlık buraya..."
@@ -380,6 +381,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Alt Açıklama (Subtitle)</label>
                      <VisualTextEditor 
+                       key={activeBlock.id + '-hero-subtitle'}
                        value={activeBlock.content.subtitle || ''} 
                        onChange={(val: any) => updateBlockData('subtitle', val)}
                        placeholder="Alt açıklama buraya..."
@@ -408,6 +410,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kutu Başlığı (Görsel Editör)</label>
                      <VisualTextEditor 
+                       key={activeBlock.id + '-features-heading'}
                        value={activeBlock.content.heading || ''} 
                        onChange={(val: any) => updateBlockData('heading', val)}
                      />
@@ -415,6 +418,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Açıklama</label>
                      <VisualTextEditor 
+                       key={activeBlock.id + '-features-desc'}
                        value={activeBlock.content.desc || ''} 
                        onChange={(val: any) => updateBlockData('desc', val)}
                      />
@@ -424,11 +428,11 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                  <div className="space-y-5">
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık (Görsel Editör)</label>
-                     <VisualTextEditor value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
+                     <VisualTextEditor key={activeBlock.id + '-why-heading'} value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
                    </div>
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kısa Açıklama</label>
-                     <VisualTextEditor value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
+                     <VisualTextEditor key={activeBlock.id + '-why-desc'} value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
                    </div>
                    <div>
                      <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Medya URL (Görsel)</label>
@@ -464,8 +468,8 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                        <div className="p-3 border border-slate-800 bg-slate-950/50 rounded-lg space-y-3 mb-4">
                           <p className="text-xs font-bold text-slate-400">Üst Metin Ayarları</p>
                           <input placeholder="Rozet (Badge)" value={activeBlock.content.badge || ''} onChange={e => updateBlockData('badge', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
-                          <VisualTextEditor placeholder="Ana Başlık (Görsel Editör)" value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
-                          <VisualTextEditor placeholder="Alt Açıklama" value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
+                          <VisualTextEditor key={activeBlock.id + '-tabs-heading'} placeholder="Ana Başlık (Görsel Editör)" value={activeBlock.content.heading || ''} onChange={(val: any) => updateBlockData('heading', val)} />
+                          <VisualTextEditor key={activeBlock.id + '-tabs-desc'} placeholder="Alt Açıklama" value={activeBlock.content.desc || ''} onChange={(val: any) => updateBlockData('desc', val)} />
                        </div>
                      )}
                      <div className="flex justify-between items-center mb-2">
