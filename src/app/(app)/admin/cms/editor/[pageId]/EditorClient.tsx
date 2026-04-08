@@ -119,7 +119,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
   };
 
   return (
-    <div className="flex h-[calc(100vh-2rem)] min-h-[600px] w-full max-w-[1600px] border border-slate-800 rounded-2xl bg-slate-950 text-slate-300 font-sans overflow-hidden shadow-2xl mx-auto">
+    <div className="flex h-full w-full bg-slate-950 text-slate-300 font-sans overflow-hidden border-t border-slate-800">
       
       {/* LEFT SIDEBAR - HIERARCHY & BLOCKS */}
       <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-10 shrink-0">
