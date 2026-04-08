@@ -3,7 +3,9 @@ import { notFound, redirect } from "next/navigation"
 import EditorClient from "./EditorClient"
 import { getSession } from "@/lib/auth";
 
-export default async function CMSVisualEditor({ params }: { params: { pageId: string } }) {
+export default async function CMSVisualEditor(props: { params: Promise<{ pageId: string }> | { pageId: string } }) {
+  const params = await Promise.resolve(props.params);
+
   const sessionResult: any = await getSession();
   const session = sessionResult?.user || sessionResult;
   if (!session) redirect("/auth/login");
