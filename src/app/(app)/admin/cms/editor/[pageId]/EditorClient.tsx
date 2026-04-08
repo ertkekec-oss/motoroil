@@ -18,6 +18,38 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
     setBlocks(prev => prev.map(b => b.id === activeBlockId ? { ...b, content: { ...b.content, [key]: value } } : b));
   };
 
+  const handleAddBlock = (type: string) => {
+    const newBlock = {
+      id: `temp-${Date.now()}`,
+      type,
+      content: getInitialContentForType(type),
+      order: blocks.length,
+      isActive: true
+    };
+    setBlocks(prev => [...prev, newBlock]);
+    setActiveBlockId(newBlock.id);
+  };
+
+  const getInitialContentForType = (type: string) => {
+    if (type === 'MODERN_HERO') return {
+      title: 'Yepyeni Bir E-Ticaret Deneyimi',
+      subtitle: 'Sınırları yeniden çiziyoruz.',
+      primaryBtnText: 'Hemen Başla',
+      visualUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978'
+    };
+    if (type === 'MODERN_TABS') return {
+        items: [
+            { title: "Yeni Tab", desc: "Açıklama...", image: "https://images.unsplash.com/photo-1552664730-d307ca884978" }
+        ]
+    };
+    if (type === 'MODERN_INTEGRATIONS') return {
+        items: [
+            { title: "Entegrasyon 1", contentTitle: "Harika Entegrasyon", descLine1: "Açıklama 1", descLine2: "Açıklama 2", logos: ["Trendyol", "Hepsiburada"] }
+        ]
+    };
+    return {};
+  };
+
   const handleSave = async (publish = false) => {
     setSaving(true);
     try {
@@ -82,10 +114,27 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
             ))}
           </div>
 
-          <button className="w-full mt-4 flex items-center justify-center gap-2 p-3 border border-dashed border-slate-700 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-sm font-medium">
-            <Plus className="w-4 h-4" />
-            Yeni Blok Ekle
-          </button>
+            {/* ADD BLOCK BUTTONS */}
+            <div className="grid grid-cols-1 gap-2 mt-4 pt-4 border-t border-slate-800">
+              <button 
+                onClick={() => handleAddBlock('MODERN_HERO')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN HERO
+              </button>
+              <button 
+                onClick={() => handleAddBlock('MODERN_TABS')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN TABS
+              </button>
+              <button 
+                onClick={() => handleAddBlock('MODERN_INTEGRATIONS')}
+                className="w-full flex items-center justify-center gap-2 p-2 border border-dashed border-slate-700 rounded text-slate-400 hover:bg-slate-800 hover:text-white transition-all text-xs font-bold"
+              >
+                <Plus className="w-3 h-3" /> MODERN INTEGRATIONS
+              </button>
+            </div>
         </div>
       </div>
 
@@ -146,7 +195,13 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                     <h2 className="text-white font-bold text-lg">{activeBlock.type}</h2>
                     <p className="text-slate-500 text-xs">Blok Yöneticisi</p>
                   </div>
-                  <button className="p-2 bg-rose-500/10 text-rose-500 rounded hover:bg-rose-500/20 transition-colors">
+                  <button 
+                    onClick={() => {
+                        setBlocks(prev => prev.filter(b => b.id !== activeBlock.id));
+                        setActiveBlockId(null);
+                    }}
+                    className="p-2 bg-rose-500/10 text-rose-500 rounded hover:bg-rose-500/20 transition-colors"
+                  >
                      <Trash2 className="w-4 h-4" />
                   </button>
                </div>
