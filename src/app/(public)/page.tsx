@@ -46,5 +46,5 @@ export default async function Page() {
         console.error("Failed to load CMS data", e);
     }
 
-    return <ModernLanding cmsData={cmsData} />;
+    return <ModernLanding cmsData={cmsData ? JSON.parse(JSON.stringify(cmsData)) : null} />;
 }

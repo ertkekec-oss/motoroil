@@ -43,7 +43,11 @@ export default async function CMSVisualEditor({ params }: { params: { pageId: st
      ];
   }
 
+  // Sanitize Prisma objects for Client Component serialization
+  const sanitizedPage = JSON.parse(JSON.stringify(page));
+  const sanitizedBlocks = JSON.parse(JSON.stringify(initialBlocks));
+
   return (
-    <EditorClient initialPage={page as any} initialBlocks={initialBlocks as any} />
+    <EditorClient initialPage={sanitizedPage} initialBlocks={sanitizedBlocks} />
   )
 }
