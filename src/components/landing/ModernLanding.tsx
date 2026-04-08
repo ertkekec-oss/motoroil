@@ -77,7 +77,7 @@ const initialIntegrationItems = [
     }
 ];
 
-export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
+export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsData?: any, isEditorMode?: boolean } = {}) {
     // Dinamik İçerikler Çekiliyor
     const dbHero = cmsData?.sections?.find((s: any) => s.type === 'MODERN_HERO')?.content;
     const dbTabs = cmsData?.sections?.find((s: any) => s.type === 'MODERN_TABS')?.content?.items;
@@ -132,7 +132,7 @@ export default function ModernLanding({ cmsData }: { cmsData?: any } = {}) {
             <div className="absolute top-10 -left-64 w-[500px] h-[500px] bg-white rounded-[100px] rotate-45 opacity-40 z-0"></div>
             
             {/* --- 1. HEADER (Exsit Redesign) --- */}
-            <header className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-sm transition-all duration-300">
+            <header className={`${isEditorMode ? 'absolute' : 'fixed'} top-0 left-0 right-0 z-50 flex flex-col shadow-sm transition-all duration-300`}>
                 <style>{`
                   @keyframes marquee {
                     0% { transform: translateX(0%); }

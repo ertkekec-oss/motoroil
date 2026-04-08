@@ -119,7 +119,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
   };
 
   return (
-    <div className="flex h-[calc(100vh-6rem)] min-h-[800px] w-full max-w-[1600px] border border-slate-800 rounded-2xl bg-slate-950 text-slate-300 font-sans overflow-hidden shadow-2xl">
+    <div className="flex h-[calc(100vh-2rem)] min-h-[600px] w-full max-w-[1600px] border border-slate-800 rounded-2xl bg-slate-950 text-slate-300 font-sans overflow-hidden shadow-2xl mx-auto">
       
       {/* LEFT SIDEBAR - HIERARCHY & BLOCKS */}
       <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-10 shrink-0">
@@ -223,8 +223,8 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
           <div className={`bg-white transition-all duration-500 ${device === 'desktop' ? 'w-full max-w-[1200px] shadow-2xl rounded-t-xl' : 'w-[400px] shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-[2rem] border-8 border-slate-800 min-h-[800px]'}`}>
             
             {/* RENDER THE REAL PAGE COMPONENT */}
-            <div className="relative w-full h-full overflow-y-auto hidden-scrollbar pointer-events-auto">
-                <ModernLanding cmsData={{ sections: blocks }} />
+            <div className="relative w-full h-full overflow-y-auto hidden-scrollbar pointer-events-auto bg-slate-100 rounded-t-xl">
+                <ModernLanding cmsData={{ sections: blocks }} isEditorMode={true} />
             </div>
 
           </div>
