@@ -310,10 +310,97 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                      />
                    </div>
                  </div>
+               ) : activeBlock.type === 'MODERN_FEATURES' || activeBlock.type === 'MODERN_PRICING' ? (
+                 <div className="space-y-5">
+                   <div>
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kutu Başlığı (HTML Desktekli)</label>
+                     <textarea 
+                       value={activeBlock.content.heading || ''} 
+                       onChange={e => updateBlockData('heading', e.target.value)}
+                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 outline-none transition-all h-20 resize-none font-mono"
+                     />
+                   </div>
+                   <div>
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Açıklama (Formatlanmış Text)</label>
+                     <textarea 
+                       value={activeBlock.content.desc || ''} 
+                       onChange={e => updateBlockData('desc', e.target.value)}
+                       className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-3 text-sm text-white focus:border-blue-500 focus:ring-1 outline-none transition-all h-24 resize-none"
+                     />
+                   </div>
+                 </div>
+               ) : activeBlock.type === 'MODERN_WHY_US' ? (
+                 <div className="space-y-5">
+                   <div>
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Ana Başlık</label>
+                     <textarea value={activeBlock.content.heading || ''} onChange={e => updateBlockData('heading', e.target.value)} className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2 text-sm text-white h-16 resize-none font-mono" />
+                   </div>
+                   <div>
+                     <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Kısa Açıklama</label>
+                     <textarea value={activeBlock.content.desc || ''} onChange={e => updateBlockData('desc', e.target.value)} className="w-full bg-slate-950 border border-slate-700/50 rounded-lg p-2 text-sm text-white h-16 resize-none" />
+                   </div>
+                   <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-lg space-y-3">
+                     <p className="text-xs font-bold text-blue-400">KART 1 AYARLARI</p>
+                     <input placeholder="Kart 1 Başlık" value={activeBlock.content.card1?.title || ''} onChange={e => updateBlockData('card1', { ...activeBlock.content.card1, title: e.target.value })} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                     <input placeholder="Kart 1 Açıklama" value={activeBlock.content.card1?.desc || ''} onChange={e => updateBlockData('card1', { ...activeBlock.content.card1, desc: e.target.value })} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                   </div>
+                   <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-lg space-y-3">
+                     <p className="text-xs font-bold text-emerald-400">KART 2 AYARLARI</p>
+                     <input placeholder="Kart 2 Başlık" value={activeBlock.content.card2?.title || ''} onChange={e => updateBlockData('card2', { ...activeBlock.content.card2, title: e.target.value })} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                     <input placeholder="Kart 2 Açıklama" value={activeBlock.content.card2?.desc || ''} onChange={e => updateBlockData('card2', { ...activeBlock.content.card2, desc: e.target.value })} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                   </div>
+                 </div>
+               ) : activeBlock.type === 'MODERN_TABS' || activeBlock.type === 'MODERN_INTEGRATIONS' ? (
+                  <div className="space-y-4">
+                     <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-slate-400 uppercase">Diziler (Items)</span>
+                        <button 
+                          onClick={() => updateBlockData('items', [...(activeBlock.content.items || []), { title: "Yeni Öğe", desc: "Açıklama" }])}
+                          className="text-[10px] bg-blue-600/20 text-blue-400 hover:bg-blue-600 px-2 py-1 rounded"
+                        >
+                          + Gelişmiş Öğe Ekle
+                        </button>
+                     </div>
+                     {(activeBlock.content.items || []).map((item: any, idx: number) => (
+                         <div key={idx} className="p-3 border border-slate-800 bg-slate-950/30 rounded-lg relative">
+                             <button onClick={() => updateBlockData('items', activeBlock.content.items.filter((_: any, i: number) => i !== idx))} className="absolute top-2 right-2 text-rose-500 hover:text-rose-400 p-1 bg-rose-500/10 rounded">X</button>
+                             <div className="space-y-2 pr-6">
+                                <label className="block text-[10px] text-slate-500 uppercase">Başlık (Menü Adı)</label>
+                                <input value={item.title || ''} onChange={(e) => {
+                                  const arr = [...activeBlock.content.items]; arr[idx].title = e.target.value; updateBlockData('items', arr);
+                                }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-7" />
+                                
+                                {activeBlock.type === 'MODERN_INTEGRATIONS' && (
+                                  <>
+                                    <label className="block text-[10px] text-slate-500 uppercase mt-2">Kart Başlığı</label>
+                                    <input value={item.contentTitle || ''} onChange={(e) => {
+                                      const arr = [...activeBlock.content.items]; arr[idx].contentTitle = e.target.value; updateBlockData('items', arr);
+                                    }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-7" />
+                                    
+                                    <label className="block text-[10px] text-slate-500 uppercase mt-2">Line 1 & Line 2</label>
+                                    <div className="flex gap-2">
+                                      <input value={item.descLine1 || ''} onChange={(e) => { const arr = [...activeBlock.content.items]; arr[idx].descLine1 = e.target.value; updateBlockData('items', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                                      <input value={item.descLine2 || ''} onChange={(e) => { const arr = [...activeBlock.content.items]; arr[idx].descLine2 = e.target.value; updateBlockData('items', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" />
+                                    </div>
+                                  </>
+                                )}
+
+                                {activeBlock.type === 'MODERN_TABS' && (
+                                  <>
+                                    <label className="block text-[10px] text-slate-500 uppercase mt-2">Açıklama Formatı</label>
+                                    <textarea value={item.desc || ''} onChange={(e) => {
+                                      const arr = [...activeBlock.content.items]; arr[idx].desc = e.target.value; updateBlockData('items', arr);
+                                    }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-xs text-white rounded outline-none h-16 resize-none" />
+                                  </>
+                                )}
+                             </div>
+                         </div>
+                     ))}
+                  </div>
                ) : (
                   <div className="space-y-4">
                      <div>
-                       <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">İçerik Verisi (JSON)</label>
+                       <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Tesisat Verisi (JSON Gelişmiş Editör)</label>
                        <JsonEditor 
                          value={activeBlock.content} 
                          onChange={(newContent) => {
