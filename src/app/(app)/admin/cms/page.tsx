@@ -46,7 +46,7 @@ export default async function CMSDashboard({ searchParams }: { searchParams: { t
     if(!pageId) return;
     
     await prisma.cmsBlock.deleteMany({ where: { pageId } });
-    await prisma.cmsPage.delete({ where: { id: pageId } });
+    await prisma.cmsPageV2.delete({ where: { id: pageId } });
     revalidatePath("/admin/cms");
   }
 
