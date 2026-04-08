@@ -352,6 +352,14 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                  </div>
                ) : activeBlock.type === 'MODERN_TABS' || activeBlock.type === 'MODERN_INTEGRATIONS' ? (
                   <div className="space-y-4">
+                     {activeBlock.type === 'MODERN_TABS' && (
+                       <div className="p-3 border border-slate-800 bg-slate-950/50 rounded-lg space-y-3 mb-4">
+                          <p className="text-xs font-bold text-slate-400">Üst Metin Ayarları</p>
+                          <input placeholder="Rozet (Badge)" value={activeBlock.content.badge || ''} onChange={e => updateBlockData('badge', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
+                          <textarea placeholder="Ana Başlık (HTML)" value={activeBlock.content.heading || ''} onChange={e => updateBlockData('heading', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" />
+                          <textarea placeholder="Alt Açıklama" value={activeBlock.content.desc || ''} onChange={e => updateBlockData('desc', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" />
+                       </div>
+                     )}
                      <div className="flex justify-between items-center mb-2">
                         <span className="text-xs font-bold text-slate-400 uppercase">Diziler (Items)</span>
                         <button 

@@ -80,7 +80,8 @@ const initialIntegrationItems = [
 export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsData?: any, isEditorMode?: boolean } = {}) {
     // Dinamik İçerikler Çekiliyor
     const dbHero = cmsData?.sections?.find((s: any) => s.type === 'MODERN_HERO')?.content;
-    const dbTabs = cmsData?.sections?.find((s: any) => s.type === 'MODERN_TABS')?.content?.items;
+    const dbTabsData = cmsData?.sections?.find((s: any) => s.type === 'MODERN_TABS')?.content;
+    const dbTabs = dbTabsData?.items;
     const dbIntegrations = cmsData?.sections?.find((s: any) => s.type === 'MODERN_INTEGRATIONS')?.content?.items;
     
     const dbWhyUs = cmsData?.sections?.find((s: any) => s.type === 'MODERN_WHY_US')?.content;
@@ -109,6 +110,10 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
 
     const pricingHeading = dbPricing?.heading || 'Esnek Fiyatlandırma';
     const pricingDesc = dbPricing?.desc || 'Büyüme hızınıza ayak uyduran paketler.';
+
+    const tabsBadge = dbTabsData?.badge || 'TECH SOLUTION';
+    const tabsHeading = dbTabsData?.heading || '<span class="font-light">The</span> <span class="font-bold">CompletePlatform</span><span class="font-light">To</span><br/> <span class="font-bold">PowerYourOperations</span>';
+    const tabsDesc = dbTabsData?.desc || "In today's competitive business, the demand for efficient and cost-effective IT solutions has never been more critical.";
 
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState('light');
@@ -456,16 +461,18 @@ export default function ModernLanding({ cmsData, isEditorMode = false }: { cmsDa
                     
                     {/* Left Column (Accordion) */}
                     <div className="lg:pr-10">
-                        <div className="inline-block px-4 py-1.5 bg-white shadow-sm font-bold text-blue-600 text-[10px] uppercase rounded-full mb-6">
-                            Tech Solution
-                        </div>
-                        <h2 className="text-4xl lg:text-[46px] text-[#0E1528] leading-[1.1] tracking-tight mb-6">
-                            <span className="font-light">The</span> <span className="font-bold">CompletePlatform</span><span className="font-light">To</span><br/>
-                            <span className="font-bold">PowerYourOperations</span>
-                        </h2>
-                        <p className="text-slate-500 font-medium text-sm leading-relaxed mb-10 max-w-[420px]">
-                            In today's competitive business, the demand for efficient and cost-effective IT solutions has never been more critical.
-                        </p>
+                        <div 
+                           className="inline-block px-4 py-1.5 bg-white shadow-sm font-bold text-blue-600 text-[10px] uppercase rounded-full mb-6"
+                           dangerouslySetInnerHTML={{ __html: tabsBadge }}
+                        ></div>
+                        <h2 
+                           className="text-4xl lg:text-[46px] text-[#0E1528] leading-[1.1] tracking-tight mb-6"
+                           dangerouslySetInnerHTML={{ __html: tabsHeading }}
+                        ></h2>
+                        <p 
+                           className="text-slate-500 font-medium text-sm leading-relaxed mb-10 max-w-[420px]"
+                           dangerouslySetInnerHTML={{ __html: tabsDesc }}
+                        ></p>
 
                         {/* Tabs list */}
                         <div className="space-y-4">

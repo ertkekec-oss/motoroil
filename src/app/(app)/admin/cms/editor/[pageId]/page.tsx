@@ -40,6 +40,9 @@ export default async function CMSVisualEditor(props: { params: Promise<{ pageId:
           visualUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a'
       }},
       { id: "temp-tabs", pageId: page.id, type: "MODERN_TABS", content: {
+          badge: 'TECH SOLUTION',
+          heading: '<span class="font-light">The</span> <span class="font-bold">CompletePlatform</span><span class="font-light">To</span><br/> <span class="font-bold">PowerYourOperations</span>',
+          desc: "In today's competitive business, the demand for efficient and cost-effective IT solutions has never been more critical.",
           items: [
               {
                   title: "Kişiselleştirilmiş Çözüm", 
