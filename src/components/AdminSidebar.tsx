@@ -98,11 +98,11 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
       <div className="mb-1">
         <button
           onClick={() => toggleGroup(groupKey)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${isOpen || isChildActive ? "text-slate-100 bg-slate-800/50" : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"}`}
+          className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors text-left ${isOpen || isChildActive ? "text-slate-100 bg-slate-800/50" : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"}`}
         >
-          <div className="flex items-center gap-3">
-            <Icon className="w-4 h-4" />
-            <span>{title}</span>
+          <div className="flex items-center gap-3 pr-2">
+            <Icon className="w-4 h-4 shrink-0" />
+            <span className="truncate">{title}</span>
           </div>
           <svg
             className={`w-3.5 h-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -131,13 +131,13 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
     <nav className="flex-1 p-4 space-y-4 overflow-y-auto hidden-scrollbar">
       {/* Yönetim - Sabit başlık */}
       <div className="space-y-1 mb-6">
-        <div className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
-          Yönetim
+        <div className="px-3 mb-2 text-xs font-bold tracking-wider text-slate-500">
+          Yönetim Menüsü
         </div>
 
         {(isSuper || isFinance || isGrowth || isRisk) && (
           <NavGroup
-            title="YÖNETİM"
+            title="Sistem Yönetimi"
             icon={LayoutDashboard}
             groupKey="yonetim_main"
           >
@@ -165,7 +165,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
 
         {isSuper && (
           <NavGroup
-            title="TİCKET & KÜTÜPHANE"
+            title="Ticket & Kütüphane"
             icon={Inbox}
             groupKey="ticket_main"
           >
@@ -195,7 +195,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
 
         {isSuper && (
           <NavGroup
-            title="İÇERİK & CMS (V2)"
+            title="İçerik & CMS (V2)"
             icon={Library}
             groupKey="cms_main"
           >
@@ -220,8 +220,8 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
       {/* 3. PARTİ YAZILIMLAR */}
       {isSuper && (
         <div className="space-y-1 mb-6">
-          <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
-            3. PARTİ YAZILIMLAR & APİ
+          <div className="px-3 mb-2 mt-4 text-xs font-bold tracking-wider text-slate-500 flex items-center justify-between">
+            3. Parti Yazılımlar & API
             <Zap className="w-4 h-4 text-indigo-500" />
           </div>
           <NavItem href="/admin/integrations" icon={Network} label="Entegrasyon Merkezi (Hub)" />
@@ -231,11 +231,11 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
 
       {/* B2B GLOBAL - Sabit başlık */}
       <div className="space-y-1 mb-6">
-        <div className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
-          B2B GLOBAL
+        <div className="px-3 mb-2 text-xs font-bold tracking-wider text-slate-500">
+          B2B Global
         </div>
 
-        <NavGroup title="PERİODYA HUB" icon={Network} groupKey="hub_main">
+        <NavGroup title="Periodya Hub" icon={Network} groupKey="hub_main">
           {(isSuper || isFinance) && (
             <NavGroup
               title="Tüm Finans Yönetimi"
@@ -382,7 +382,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
 
         {isSuper && (
           <NavGroup
-            title="B2B NETWORK"
+            title="B2B Network"
             icon={Store}
             groupKey="b2b_network_main"
           >
@@ -408,8 +408,8 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
       {/* SÜREÇ YÖNETİMİ */}
       {isSuper && (
         <div className="space-y-1 mb-6">
-          <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-            SÜREÇ YÖNETİMİ
+          <div className="px-3 mb-2 mt-4 text-xs font-bold tracking-wider text-slate-500">
+            Süreç Yönetimi
           </div>
 
           <NavGroup
@@ -487,12 +487,12 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
       {/* GÜVENLİK VE AYARLAR - SABİT BAŞLIK */}
       {isSuper && (
         <div className="space-y-1">
-          <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-            GÜVENLİK VE AYARLAR
+          <div className="px-3 mb-2 mt-4 text-xs font-bold tracking-wider text-slate-500">
+            Güvenlik ve Ayarlar
           </div>
 
           <NavGroup
-            title="LOGLAR VE GÜVENLİK"
+            title="Loglar ve Güvenlik"
             icon={ShieldAlert}
             groupKey="logs_security_main"
           >
@@ -513,7 +513,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
             />
           </NavGroup>
 
-          <NavGroup title="AYARLAR" icon={Settings} groupKey="settings_main">
+          <NavGroup title="Sistem Ayarları" icon={Settings} groupKey="settings_main">
             <NavItem
               href="/admin/documents"
               icon={FileText}
