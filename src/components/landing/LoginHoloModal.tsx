@@ -52,13 +52,23 @@ export default function LoginHoloModal({ isOpen, setIsOpen }: LoginHoloModalProp
             if (step === 2 && termInput.trim()) {
                 setLogs(p => [...p, `> ${termInput}`, '> PROTOCOL ACCEPTED. PASSWORD:']);
                 setStep(4);
-            } else if (step === 4 && termPassword.trim()) {
-                setLogs(p => [...p, `> ********`, '> AUTHENTICATING...']);
-                setStep(5);
-                setTimeout(() => {
-                    setLogs(p => [...p, '> ACCESS GRANTED. WELCOME!']);
-                    setTimeout(() => setIsOpen(false), 1200);
-                }, 1800);
+            } else if (step === 4) {
+                const val = termPassword.trim().toUpperCase();
+                if (['RESET', 'FORGOT', 'ŞİFRE', 'SIFRE', 'YARDIM', 'HELP'].includes(val)) {
+                    setLogs(p => [...p, `> ${val}`, '> RECOVERY PROTOCOL OVERRIDE INITIATED...', '> ŞİFRE SIFIRLAMA BAĞLANTISI GÜVENLİ E-POSTA KANALCILIĞIYLA İLETİLDİ.']);
+                    setStep(6);
+                    setTermPassword('');
+                    setTimeout(() => {
+                        setIsOpen(false);
+                    }, 4000);
+                } else if (termPassword.trim()) {
+                    setLogs(p => [...p, `> ********`, '> AUTHENTICATING...']);
+                    setStep(5);
+                    setTimeout(() => {
+                        setLogs(p => [...p, '> ACCESS GRANTED. WELCOME!']);
+                        setTimeout(() => setIsOpen(false), 1200);
+                    }, 1800);
+                }
             }
         }
     };
@@ -135,17 +145,23 @@ export default function LoginHoloModal({ isOpen, setIsOpen }: LoginHoloModalProp
 
                         {/* Interactive Password Input */}
                         {step === 4 && (
-                            <div className="flex items-center mt-1.5">
-                                <span className="mr-3 font-black text-cyan-300">&gt;</span>
-                                <input 
-                                    autoFocus
-                                    type="password" 
-                                    autoComplete="off"
-                                    className="bg-transparent border-none outline-none text-cyan-300 w-full tracking-[0.4em] font-black selection:bg-cyan-500/30"
-                                    value={termPassword}
-                                    onChange={e => setTermPassword(e.target.value)}
-                                    onKeyDown={handleTerminalKeyDown}
-                                />
+                            <div className="flex flex-col mt-1.5 animate-in fade-in">
+                                <div className="flex items-center">
+                                    <span className="mr-3 font-black text-cyan-300">&gt;</span>
+                                    <input 
+                                        autoFocus
+                                        type={termPassword.toUpperCase() === 'RESET' || termPassword.toUpperCase() === 'SIFRE' || termPassword.toUpperCase() === 'FORGOT' ? 'text' : 'password'} 
+                                        autoComplete="off"
+                                        className="bg-transparent border-none outline-none text-cyan-300 w-full tracking-[0.4em] font-black selection:bg-cyan-500/30"
+                                        value={termPassword}
+                                        onChange={e => setTermPassword(e.target.value)}
+                                        onKeyDown={handleTerminalKeyDown}
+                                    />
+                                    <span className="w-3 h-5 bg-cyan-400 ml-1 block animate-[blink_1s_infinite]"></span>
+                                </div>
+                                <div className="ml-6 mt-3 text-[10px] text-cyan-500/50 font-medium tracking-[0.15em] uppercase pointer-events-none">
+                                    * Şifreyi mi unuttunuz? Kurtarmak için 'RESET' yazıp ENTER'a basın.
+                                </div>
                             </div>
                         )}
 
@@ -157,6 +173,16 @@ export default function LoginHoloModal({ isOpen, setIsOpen }: LoginHoloModalProp
                                     <div className="absolute inset-2 border border-b-cyan-500 border-l-cyan-500 border-t-transparent border-r-transparent rounded-full animate-[spin_2s_linear_infinite_reverse]"></div>
                                 </div>
                                 <div className="mt-6 font-bold tracking-[0.3em] text-sm animate-pulse">GÜVENLİK PROTOKOLÜ DOĞRULANIYOR...</div>
+                            </div>
+                        )}
+
+                        {/* Recovery Loading Spinner */}
+                        {step === 6 && (
+                            <div className="mt-8 text-center text-amber-400 mix-blend-screen flex flex-col items-center justify-center">
+                                <div className="relative w-16 h-16">
+                                    <div className="absolute inset-0 border-[3px] border-amber-400 border-b-transparent border-t-transparent rounded-full animate-[spin_1.5s_linear_infinite]"></div>
+                                </div>
+                                <div className="mt-6 font-bold tracking-[0.2em] text-xs animate-pulse text-amber-500">AĞ İLETİŞİMİ BEKLENİYOR...</div>
                             </div>
                         )}
                     </div>
