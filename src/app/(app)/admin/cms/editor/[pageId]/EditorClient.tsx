@@ -485,7 +485,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                      <input placeholder="Buton 2 URL (/register)" value={activeBlock.content.btn2Url || ''} onChange={e => updateBlockData('btn2Url', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white" />
                      
                      <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Akan Bant Yazıları (Virgülle Ayırın)</p>
-                     <textarea value={(activeBlock.content.tickerItems || []).join(', ')} onChange={(e) => {
+                     <textarea key={activeBlock.id + '-tickerItems'} defaultValue={(activeBlock.content.tickerItems || []).join(', ')} onChange={(e) => {
                          const arr = e.target.value.split(',').map((x: string) => x.trim()).filter(Boolean);
                          updateBlockData('tickerItems', arr);
                      }} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" placeholder="Yazı 1, Yazı 2..." />
@@ -500,14 +500,14 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                      
                      <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Menü 1</p>
                      <input placeholder="Menü 1 Başlık" value={activeBlock.content.menu1Title || ''} onChange={e => updateBlockData('menu1Title', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
-                     <textarea value={(activeBlock.content.menu1Items || []).map((m: any) => m.title).join(', ')} onChange={(e) => {
+                     <textarea key={activeBlock.id + '-menu1Items'} defaultValue={(activeBlock.content.menu1Items || []).map((m: any) => m.title).join(', ')} onChange={(e) => {
                          const arr = e.target.value.split(',').map((x: string) => ({ title: x.trim(), linksTo: '#' })).filter((x: any) => x.title);
                          updateBlockData('menu1Items', arr);
                      }} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" placeholder="Link 1, Link 2..." />
 
                      <p className="text-xs font-bold text-slate-400 border-t border-slate-800 pt-3">Menü 2</p>
                      <input placeholder="Menü 2 Başlık" value={activeBlock.content.menu2Title || ''} onChange={e => updateBlockData('menu2Title', e.target.value)} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white mb-2" />
-                     <textarea value={(activeBlock.content.menu2Items || []).map((m: any) => m.title).join(', ')} onChange={(e) => {
+                     <textarea key={activeBlock.id + '-menu2Items'} defaultValue={(activeBlock.content.menu2Items || []).map((m: any) => m.title).join(', ')} onChange={(e) => {
                          const arr = e.target.value.split(',').map((x: string) => ({ title: x.trim(), linksTo: '#' })).filter((x: any) => x.title);
                          updateBlockData('menu2Items', arr);
                      }} className="w-full bg-slate-900 border border-slate-700/50 rounded p-2 text-xs text-white h-16 resize-none" placeholder="Link 1, Link 2..." />
@@ -627,7 +627,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                              <input value={pkg.btnText || ''} onChange={(e) => { const arr = [...activeBlock.content.packages]; arr[idx].btnText = e.target.value; updateBlockData('packages', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] font-bold text-blue-300 rounded outline-none h-8" placeholder="Buton Metni" />
                              
                              <label className="block text-[10px] text-slate-500 uppercase mt-2">Özellikler (Virgülle ayırın)</label>
-                             <textarea value={(pkg.features || []).join(', ')} onChange={(e) => {
+                             <textarea key={activeBlock.id + '-pkg-features-' + idx} defaultValue={(pkg.features || []).join(', ')} onChange={(e) => {
                                  const arr = [...activeBlock.content.packages]; 
                                  arr[idx].features = e.target.value.split(',').map((x: string) => x.trim()).filter(Boolean); 
                                  updateBlockData('packages', arr);
@@ -768,7 +768,7 @@ export default function EditorClient({ initialPage, initialBlocks }: { initialPa
                                       <input value={item.descLine2 || ''} onChange={(e) => { const arr = [...activeBlock.content.items]; arr[idx].descLine2 = e.target.value; updateBlockData('items', arr); }} className="w-full bg-slate-900 border border-slate-800 p-1.5 text-[10px] text-white rounded outline-none h-7" placeholder="Line 2" />
                                     </div>
                                     <label className="block text-[10px] text-slate-500 uppercase mt-2">Entegrasyon Markaları (Virgülle Ayırın)</label>
-                                    <input placeholder="Trendyol, Hepsiburada, Amazon..." value={(item.logos || []).join(', ')} onChange={(e) => {
+                                    <input key={activeBlock.id + '-item-logos-' + idx} placeholder="Trendyol, Hepsiburada, Amazon..." defaultValue={(item.logos || []).join(', ')} onChange={(e) => {
                                       const arr = [...activeBlock.content.items]; 
                                       arr[idx].logos = e.target.value.split(',').map((x: string) => x.trim()).filter(Boolean); 
                                       updateBlockData('items', arr);

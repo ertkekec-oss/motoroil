@@ -7,24 +7,19 @@ import { ArrowLeft, Save, Globe, Shield, Database } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
-export default async function CMSSettingsPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function CMSSettingsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined }}) {
   const sessionResult: any = await getSession();
   const session = sessionResult?.user || sessionResult;
   if (!session) redirect("/auth/login");
+
+  const sp: any = await searchParams;
+  const activeTab = sp?.tab || 'general';
 
   const site = await prisma.cmsSite.findFirst({
     where: { tenantId: null },
   });
 
   if (!site) redirect("/admin/cms");
-  
-  // Safe extraction of query parameters
-  const tabParam = searchParams?.tab;
-  const activeTab = (Array.isArray(tabParam) ? tabParam[0] : tabParam) || "general";
 
   async function updateGeneralSettings(formData: FormData) {
     "use server";
