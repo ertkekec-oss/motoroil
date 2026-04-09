@@ -1000,8 +1000,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         ) : (
                                             <div className="space-y-3 max-h-[300px] overflow-y-auto custom-scroll pr-2">
                                                 {assets.map(a => (
-                                                    <div key={a.id} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl flex justify-between items-center hover:border-emerald-500/30 transition-all">
-                                                        <div className="min-w-0 pr-4">
+                                                    <div key={a.id} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl flex items-center hover:border-emerald-500/30 transition-all group">
+                                                        <div className="min-w-0 pr-4 flex-1">
                                                             <div className="font-bold text-[13px] text-slate-900 dark:text-white truncate">{a.primaryIdentifier} {a.secondaryIdentifier ? `(${a.secondaryIdentifier})` : ''}</div>
                                                             <div className="text-[11px] text-slate-500 mt-1 truncate">
                                                                 {a.brand || 'Diğer'} {a.model ? ` - ${a.model}` : ''}
@@ -1009,7 +1009,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                 {a.metadata?.currentKm ? ` • KM: ${a.metadata.currentKm.toLocaleString()}` : ''}
                                                             </div>
                                                         </div>
-                                                        <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-bold uppercase whitespace-nowrap shrink-0">Cihaz Sicili</span>
+                                                        <div className="flex flex-col items-end shrink-0 gap-2">
+                                                            <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-bold uppercase whitespace-nowrap">Cihaz Sicili</span>
+                                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <button onClick={() => {
+                                                                    if(confirm('Kayıtlı cihaz sicilini silmek istediğinize emin misiniz?')) {
+                                                                        fetch(`/api/assets/${a.id}`, { method: 'DELETE' })
+                                                                            .then(res => { if(res.ok) fetchAssets(); else alert('Silinemedi'); });
+                                                                    }
+                                                                }} className="px-2 py-1 bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded text-[10px] font-bold uppercase hover:bg-red-200 dark:hover:bg-red-500/20">SİL</button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -1024,16 +1034,26 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         ) : (
                                             <div className="space-y-3 max-h-[300px] overflow-y-auto custom-scroll pr-2">
                                                 {warranties.map(w => (
-                                                    <div key={w.id} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl flex justify-between items-center hover:border-blue-500/30 transition-all">
-                                                        <div className="min-w-0 pr-4">
+                                                    <div key={w.id} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl flex items-center hover:border-blue-500/30 transition-all group">
+                                                        <div className="min-w-0 pr-4 flex-1">
                                                             <div className="font-bold text-[13px] text-slate-900 dark:text-white flex items-center gap-1.5 truncate"><div className={`w-2 h-2 rounded-full shrink-0 ${w.status === 'Active' ? 'bg-emerald-500' : 'bg-red-500'}`}></div> <span className="truncate">{w.productName}</span></div>
                                                             <div className="text-[11px] text-slate-500 mt-1 truncate">S. No: {w.serialNo} • Fatura: {w.invoiceNo || '-'}</div>
                                                         </div>
-                                                        <div className="text-right shrink-0">
-                                                            <span className={`inline-block px-2 py-1 rounded text-[10px] font-bold uppercase ${w.status === 'Active' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400'}`}>
-                                                                {w.status === 'Active' ? 'Devam Ediyor' : 'Süresi Doldu'}
-                                                            </span>
-                                                            <div className="text-[10px] font-bold text-slate-400 mt-1">Bitiş: {new Date(w.endDate).toLocaleDateString('tr-TR')}</div>
+                                                        <div className="flex flex-col items-end shrink-0 gap-2">
+                                                            <div className="text-right">
+                                                                <span className={`inline-block px-2 py-1 rounded text-[10px] font-bold uppercase ${w.status === 'Active' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+                                                                    {w.status === 'Active' ? 'Devam Ediyor' : 'Süresi Doldu'}
+                                                                </span>
+                                                                <div className="text-[10px] font-bold text-slate-400 mt-1">Bitiş: {new Date(w.endDate).toLocaleDateString('tr-TR')}</div>
+                                                            </div>
+                                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <button onClick={() => {
+                                                                    if(confirm('Kayıtlı garanti karnesini silmek istediğinize emin misiniz?')) {
+                                                                        fetch(`/api/warranties/${w.id}`, { method: 'DELETE' })
+                                                                            .then(res => { if(res.ok) window.location.reload(); else alert('Silinemedi'); });
+                                                                    }
+                                                                }} className="px-2 py-1 bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded text-[10px] font-bold uppercase hover:bg-red-200 dark:hover:bg-red-500/20">SİL</button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))}
