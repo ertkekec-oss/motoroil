@@ -99,7 +99,13 @@ function NewWorkOrderContent() {
             setCurrentKm(selected.metadata?.currentKm?.toString() || '');
             setProductionYear(selected.productionYear?.toString() || '');
             
-            const guessedChassis = selected.secondaryIdentifier || selected.primaryIdentifier || '';
+            let pri = selected.primaryIdentifier || '';
+            let sec = selected.secondaryIdentifier || '';
+            
+            if (pri.toLowerCase().includes('sipari') || pri.toLowerCase().includes('pos')) pri = '';
+            if (sec.toLowerCase().includes('sipari') || sec.toLowerCase().includes('pos')) sec = '';
+            
+            const guessedChassis = pri || sec || selected.primaryIdentifier || '';
             setChassisNo(guessedChassis);
             
             let newDynamic: Record<string, string> = {};
