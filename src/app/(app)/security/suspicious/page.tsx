@@ -65,49 +65,50 @@ export default function SuspiciousActivityPage() {
     }, [events, pendingProducts]);
 
     return (
-        <div className="p-6 md:p-8 animate-in fade-in min-h-screen bg-slate-50 dark:bg-slate-950 pb-32">
-            {/* Header Section */}
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-                <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                        </span>
-                        <span className="text-[11px] font-bold text-red-500 uppercase tracking-wider">Canlı Güvenlik Monitörü</span>
+        <div className="bg-slate-50 dark:bg-[#0f172a] min-h-screen pb-16 w-full font-sans animate-in fade-in">
+            <div className="max-w-[1600px] mx-auto pt-8 px-4 sm:px-6 lg:px-8">
+                {/* Header Section */}
+                <header className="mb-8 flex flex-col gap-6 items-start">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="relative flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                            <span className="text-[11px] font-bold text-red-500 uppercase tracking-wider">Canlı Güvenlik Monitörü</span>
+                        </div>
+                        <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Güvenlik & Onay Merkezi</h1>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">Şüpheli işlemler ve personel ürün ekleme taleplerinin denetimi.</p>
                     </div>
-                    <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Güvenlik & Onay Merkezi</h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">Şüpheli işlemler ve personel ürün ekleme taleplerinin denetimi.</p>
-                </div>
 
-                {/* Tab Switcher */}
-                <div className="flex bg-slate-200/50 dark:bg-slate-800/50 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 w-fit shrink-0">
-                    <button
-                        onClick={() => setActiveSecurityTab('suspicious')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
-                            activeSecurityTab === 'suspicious' 
-                                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' 
-                                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                    >
-                        <ShieldAlert className="w-4 h-4" />
-                        Şüpheli İşlemler
-                        {stats.today > 0 && <span className="ml-1.5 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px]">{stats.today}</span>}
-                    </button>
-                    <button
-                        onClick={() => setActiveSecurityTab('approvals')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
-                            activeSecurityTab === 'approvals' 
-                                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' 
-                                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                    >
-                        <CheckCircle className="w-4 h-4" />
-                        Onay Bekleyenler
-                        {stats.pendingApprovals > 0 && <span className="ml-1.5 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px]">{stats.pendingApprovals}</span>}
-                    </button>
-                </div>
-            </header>
+                    {/* Tab Switcher */}
+                    <div className="flex flex-wrap bg-slate-200/50 dark:bg-slate-800/50 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 w-fit">
+                        <button
+                            onClick={() => setActiveSecurityTab('suspicious')}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                                activeSecurityTab === 'suspicious' 
+                                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' 
+                                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                        >
+                            <ShieldAlert className="w-4 h-4" />
+                            Şüpheli İşlemler
+                            {stats.today > 0 && <span className="ml-1.5 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px]">{stats.today}</span>}
+                        </button>
+                        <button
+                            onClick={() => setActiveSecurityTab('approvals')}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                                activeSecurityTab === 'approvals' 
+                                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' 
+                                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                        >
+                            <CheckCircle className="w-4 h-4" />
+                            Onay Bekleyenler
+                            {stats.pendingApprovals > 0 && <span className="ml-1.5 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px]">{stats.pendingApprovals}</span>}
+                        </button>
+                    </div>
+                </header>
 
             {activeSecurityTab === 'suspicious' ? (
                 <>
@@ -364,6 +365,7 @@ export default function SuspiciousActivityPage() {
                     )}
                 </div>
             )}
+            </div>
         </div>
     );
 }
