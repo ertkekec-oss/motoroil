@@ -29,7 +29,7 @@ export default async function NewCMSPage() {
     const site = await prisma.cmsSite.findFirst({ where: { tenantId: null } });
     if (!site) return;
 
-    const newPage = await prisma.cmsPage.create({
+    const newPage = await prisma.cmsPageV2.create({
       data: {
         title,
         slug,
