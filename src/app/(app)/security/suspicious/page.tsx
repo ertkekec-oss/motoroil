@@ -76,7 +76,7 @@ export default function SuspiciousActivityPage() {
                         </span>
                         <span className="text-[11px] font-bold text-red-500 uppercase tracking-wider">Canlı Güvenlik Monitörü</span>
                     </div>
-                    <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Satış ve Onay Merkezi</h1>
+                    <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Güvenlik & Onay Merkezi</h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">Şüpheli işlemler ve personel ürün ekleme taleplerinin denetimi.</p>
                 </div>
 
