@@ -3118,6 +3118,64 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </EnterpriseCard>
                 </div>
             )}
+            {editingAsset && (
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[6000] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <EnterpriseCard className="w-full max-w-lg shadow-2xl border-blue-500/30 text-left">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                            <h3 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-3 tracking-tight">
+                                <span className="text-2xl">??</span> Cihaz Sicilini Düzenle
+                            </h3>
+                            <button
+                                onClick={() => setEditingAsset(null)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label className="text-[11px] font-bold tracking-widest uppercase text-slate-500 mb-1.5 block">Ana Kimlik (Þase / Seri No)</label>
+                                <input type="text" value={editingAsset.primaryIdentifier || ''} onChange={e => setEditingAsset({...editingAsset, primaryIdentifier: e.target.value})} className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] text-[13px] font-bold focus:border-blue-500 outline-none" />
+                            </div>
+                            <div>
+                                <label className="text-[11px] font-bold tracking-widest uppercase text-slate-500 mb-1.5 block">Ýkincil Bilgi / Þablon Adý</label>
+                                <input type="text" value={editingAsset.secondaryIdentifier || ''} onChange={e => setEditingAsset({...editingAsset, secondaryIdentifier: e.target.value})} className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] text-[13px] font-bold focus:border-blue-500 outline-none" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[11px] font-bold tracking-widest uppercase text-slate-500 mb-1.5 block">Marka</label>
+                                    <input type="text" value={editingAsset.brand || ''} onChange={e => setEditingAsset({...editingAsset, brand: e.target.value})} className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] text-[13px] font-bold focus:border-blue-500 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="text-[11px] font-bold tracking-widest uppercase text-slate-500 mb-1.5 block">Model Serisi</label>
+                                    <input type="text" value={editingAsset.model || ''} onChange={e => setEditingAsset({...editingAsset, model: e.target.value})} className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] text-[13px] font-bold focus:border-blue-500 outline-none" />
+                                </div>
+                            </div>
+                            <button onClick={() => {
+                                fetch(/api/assets/${editingAsset.id}, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        primaryIdentifier: editingAsset.primaryIdentifier,
+                                        secondaryIdentifier: editingAsset.secondaryIdentifier,
+                                        brand: editingAsset.brand,
+                                        model: editingAsset.model
+                                    })
+                                }).then(res => res.json()).then(data => {
+                                    if(data.id) {
+                                        setEditingAsset(null);
+                                        fetchAssets();
+                                    } else {
+                                        alert('Güncellenemedi');
+                                    }
+                                })
+                            }} className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold uppercase tracking-widest text-[12px] mt-4 transition-colors">
+                                KAYDET
+                            </button>
+                        </div>
+                    </EnterpriseCard>
+                </div>
+            )}
             {/* STATEMENT MODAL */}
             <StatementModal
                 isOpen={statementOpen}
@@ -3131,3 +3189,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
         </div >
     );
 }
+
+
+
+
+
