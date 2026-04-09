@@ -353,6 +353,20 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                         </div>
                         <div className="flex items-center gap-2">
                             <button
+                                onClick={() => {
+                                    if(confirm('Bu servis kaydını tamamen silmek istediğinize emin misiniz? İşlem geri alınamaz.')) {
+                                        fetch(`/api/services/work-orders/${id}`, { method: 'DELETE' }).then(res => {
+                                            if(res.ok) router.push('/service');
+                                            else alert('Silinemedi.');
+                                        });
+                                    }
+                                }}
+                                className="h-[36px] sm:h-[40px] px-3 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 rounded-[10px] transition-all flex justify-center items-center shadow-sm mr-1"
+                                title="Kayıtı Sil"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                            <button
                                 onClick={() => handleUpdateStatus('IN_PROGRESS')}
                                 disabled={order.status === 'IN_PROGRESS'}
                                 className="h-[36px] sm:h-[40px] px-4 sm:px-6 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-blue-600 dark:text-blue-400 hover:bg-slate-50 rounded-[10px] font-bold text-[11px] sm:text-[12px] uppercase tracking-widest transition-all shadow-sm disabled:opacity-50"
