@@ -98,20 +98,47 @@ function NewWorkOrderContent() {
         if (selected) {
             setCurrentKm(selected.metadata?.currentKm?.toString() || '');
             setProductionYear(selected.productionYear?.toString() || '');
-            setChassisNo(selected.secondaryIdentifier || '');
             
+            const guessedChassis = selected.secondaryIdentifier || selected.primaryIdentifier || '';
+            setChassisNo(guessedChassis);
+            
+            let newDynamic: Record<string, string> = {};
+            // Mevcut metadata bilgilerini çek
             if (selected.metadata) {
                 const { type, currentKm, ...rest } = selected.metadata;
-                if (type) setSelectedAssetType(type);
-                setDynamicFields(rest || {});
+                // Eğer cihazın bir type kaydı varsa ve dropdown henüz bunu seçmemişse:
+                if (type && !selectedAssetType) {
+                    setSelectedAssetType(type);
+                }
+                newDynamic = rest || {};
             }
+
+            // DİNAMİK ALANLARDA (Bisiklet vb.) ŞASE BİLGİSİ VARSA OTO-DOLDUR
+            const typeToUse = selectedAssetType || selected.metadata?.type;
+            if (typeToUse && appSettings?.asset_types_schema) {
+                const schema = appSettings.asset_types_schema.find((t:any) => t.name === typeToUse || t.id === typeToUse);
+                if (schema && schema.fields) {
+                    const saseField = schema.fields.find((f:any) => 
+                        f.label.toLowerCase().includes('şas') || 
+                        f.label.toLowerCase().includes('sas') || 
+                        f.label.toLowerCase().includes('seri')
+                    );
+                    // Eğer şase alanı boşsa seçili cihazdan aktar
+                    if (saseField && (!newDynamic[saseField.id] || newDynamic[saseField.id].trim() === '')) {
+                        newDynamic[saseField.id] = guessedChassis;
+                    }
+                }
+            }
+            
+            setDynamicFields(newDynamic);
+
             if (selected.brand) {
                 setAssetBrand(selected.brand);
             }
         } else {
             setCurrentKm(''); setProductionYear(''); setChassisNo('');
         }
-    }, [assetId, assets]);
+    }, [assetId, assets, appSettings, selectedAssetType]);
 
 
     const handleCreateAsset = async () => {
