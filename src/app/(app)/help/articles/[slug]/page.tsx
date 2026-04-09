@@ -99,9 +99,10 @@ export default async function KnowledgeHubArticleDetail({ params }: { params: { 
                                     {article.summary}
                                 </p>
                             )}
-                            <div className="whitespace-pre-wrap leading-loose break-words">
-                                {article.content}
-                            </div>
+                            <div 
+                                className="whitespace-pre-wrap leading-loose break-words"
+                                dangerouslySetInnerHTML={{ __html: article.content }}
+                            />
                         </div>
                     </EnterpriseCard>
 

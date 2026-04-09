@@ -405,39 +405,39 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     if (!isAdminPath && (isInitialLoading || authLoading) && isAuthenticated) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-[#070b14] text-white font-sans fixed inset-0 z-50">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-white font-sans fixed inset-0 z-50">
                 <div className="relative flex items-center justify-center w-32 h-32 mb-10">
                     {/* Dış Halka (Indigo) */}
-                    <svg className="absolute inset-0 w-full h-full animate-[spin_3s_linear_infinite] opacity-60" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(99, 102, 241, 0.15)" strokeWidth="1.5" />
+                    <svg className="absolute inset-0 w-full h-full animate-[spin_3s_linear_infinite] opacity-80 dark:opacity-60" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="48" fill="none" className="stroke-indigo-500/30 dark:stroke-indigo-500/15" strokeWidth="1.5" />
                         <path d="M 50 2 A 48 48 0 0 1 98 50" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" />
                     </svg>
 
                     {/* İç Halka (Emerald - Ters Yönde) */}
-                    <svg className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] animate-[spin_4s_linear_infinite_reverse] opacity-50" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(16, 185, 129, 0.1)" strokeWidth="1" />
+                    <svg className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] animate-[spin_4s_linear_infinite_reverse] opacity-70 dark:opacity-50" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="48" fill="none" className="stroke-emerald-500/30 dark:stroke-emerald-500/10" strokeWidth="1" />
                         <path d="M 50 98 A 48 48 0 0 1 2 50" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                     
                     {/* Merkezi Parasal Glow */}
-                    <div className="absolute inset-4 rounded-full bg-indigo-500/10 blur-[20px] animate-pulse"></div>
+                    <div className="absolute inset-4 rounded-full bg-indigo-500/5 dark:bg-indigo-500/10 blur-[20px] animate-pulse"></div>
 
                     {/* Ana P Harfi Pulu */}
-                    <div className="relative flex items-center justify-center z-10 w-16 h-16 rounded-full bg-[#0a101d] border border-slate-800/80 shadow-[0_0_25px_rgba(99,102,241,0.2)]">
-                        <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 via-blue-400 to-emerald-400 tracking-tighter pr-1 select-none animate-pulse">P</span>
+                    <div className="relative flex items-center justify-center z-10 w-16 h-16 rounded-full bg-white dark:bg-[#0a101d] border border-white dark:border-slate-800/80 shadow-[0_0_25px_rgba(99,102,241,0.15)] dark:shadow-[0_0_25px_rgba(99,102,241,0.2)]">
+                        <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 via-blue-500 to-emerald-500 dark:from-indigo-400 dark:via-blue-400 dark:to-emerald-400 tracking-tighter pr-1 select-none animate-pulse">P</span>
                     </div>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 relative z-10">
-                    <h2 className="text-lg font-black tracking-widest text-white/90">PERİODYA YÜKLENİYOR</h2>
+                    <h2 className="text-lg font-black tracking-widest text-slate-800 dark:text-white/90">PERİODYA YÜKLENİYOR</h2>
                     <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest max-w-[280px] text-center leading-relaxed">
                         Yapay zeka asistanı ve operasyon ağları senkronize ediliyor...
                     </p>
                 </div>
 
                 {/* Cyberpunk Progress Bar Container */}
-                <div className="mt-8 w-48 h-[3px] bg-slate-800/50 rounded-full overflow-hidden relative border border-slate-700/30">
-                    <div className="absolute top-0 left-0 h-full w-[40%] bg-gradient-to-r from-indigo-500 via-emerald-400 to-blue-500 shadow-[0_0_10px_rgba(56,189,248,0.5)] animate-loading-bar"></div>
+                <div className="mt-8 w-48 h-[3px] bg-slate-200 dark:bg-slate-800/50 rounded-full overflow-hidden relative border border-slate-300/50 dark:border-slate-700/30">
+                    <div className="absolute top-0 left-0 h-full w-[40%] bg-gradient-to-r from-indigo-500 via-emerald-400 to-blue-500 shadow-[0_0_10px_rgba(56,189,248,0.3)] dark:shadow-[0_0_10px_rgba(56,189,248,0.5)] animate-loading-bar"></div>
                 </div>
 
                 <style>{`

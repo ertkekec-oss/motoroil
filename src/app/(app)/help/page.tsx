@@ -57,48 +57,41 @@ export default async function KnowledgeHubPage() {
             <div className="space-y-6">
                 <AIAssistantPanel />
 
-                {/* ADVANCED AI SEARCH HERO */}
-                <EnterpriseCard className="relative overflow-hidden bg-slate-950 dark:bg-slate-950 border-0 shadow-[0_10px_40px_-15px_rgba(30,27,75,0.6)] !p-0">
-                    <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none mix-blend-screen">
-                        <Cpu className="w-64 h-64 text-indigo-500" />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-emerald-500/5 pointer-events-none" />
-                    
-                    <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center gap-10">
-                        <div className="flex-1 space-y-6">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-black uppercase tracking-widest backdrop-blur-sm">
-                                <Sparkles className="w-3.5 h-3.5" /> Otonom Asistan Aktif
-                            </div>
-                            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
-                                Merhaba, {session.name?.split(' ')[0] || 'Kullanıcı'} <br/>
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Size nasıl yardımcı olabilirim?</span>
-                            </h1>
-                            <p className="text-slate-400 max-w-xl text-sm leading-relaxed font-medium">
-                                Ekibimiz ve otonom zekamız 7/24 hizmetinizde. Modüller hakkında bilgi almak veya bir sorunu çözmek için arama yapabilir veya doğrudan destek masasına bağlanabilirsiniz.
-                            </p>
-
-                            <div className="w-full max-w-2xl translate-y-2">
-                                <HelpSearch />
-                            </div>
+                {/* CLEAN B2B HERO */}
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-8 md:p-12 mb-8 shadow-sm flex flex-col md:flex-row items-center gap-10">
+                    <div className="flex-1 space-y-6">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-widest">
+                            <Sparkles className="w-3.5 h-3.5" /> Otonom Asistan Aktif
                         </div>
+                        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                            Merhaba, {session.name?.split(' ')[0] || 'Kullanıcı'} <br/>
+                            <span className="text-slate-500 dark:text-slate-400">Size nasıl yardımcı olabiliriz?</span>
+                        </h1>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-xl text-sm leading-relaxed font-medium">
+                            Ekibimiz ve otonom zekamız 7/24 hizmetinizde. Modüller hakkında bilgi almak veya bir sorunu çözmek için arama yapabilir veya doğrudan destek masasına bağlanabilirsiniz.
+                        </p>
 
-                        <div className="w-full md:w-80 shrink-0">
-                            <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 flex flex-col gap-4 shadow-2xl">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                                        <Activity className="w-5 h-5 text-emerald-400" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-white font-bold text-sm">Sistem Durumu</h4>
-                                        <p className="text-emerald-400 text-[10px] uppercase tracking-widest font-black">Tüm Operasyonlar Stabil</p>
-                                    </div>
+                        <div className="w-full max-w-2xl translate-y-2">
+                            <HelpSearch />
+                        </div>
+                    </div>
+
+                    <div className="w-full md:w-72 shrink-0">
+                        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-white/5 p-6 flex flex-col gap-4 shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center border border-emerald-200 dark:border-emerald-500/30">
+                                    <Activity className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                                 </div>
-                                <div className="h-px bg-white/5 w-full"></div>
-                                <ClientSideAIButton />
+                                <div>
+                                    <h4 className="text-slate-900 dark:text-white font-bold text-sm">Sistem Durumu</h4>
+                                    <p className="text-emerald-600 dark:text-emerald-400 text-[10px] uppercase tracking-widest font-black">Tüm Operasyonlar Stabil</p>
+                                </div>
                             </div>
+                            <div className="h-px bg-slate-200 dark:bg-white/5 w-full"></div>
+                            <ClientSideAIButton />
                         </div>
                     </div>
-                </EnterpriseCard>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* LEFT CONTENT COL */}
