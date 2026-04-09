@@ -103,14 +103,14 @@ export default function MailTemplatesPage() {
                                 <button
                                     key={tpl.id}
                                     onClick={() => setActiveTab(tpl.id)}
-                                    className={\`text-left p-4 border-b border-slate-100 dark:border-white/5 transition-colors \${activeTab === tpl.id ? 'bg-fuchsia-50 dark:bg-fuchsia-500/10 border-l-4 border-l-fuchsia-500' : 'hover:bg-slate-50 dark:hover:bg-white/5 border-l-4 border-l-transparent'}\`}
+                                    className={`text-left p-4 border-b border-slate-100 dark:border-white/5 transition-colors ${activeTab === tpl.id ? 'bg-fuchsia-50 dark:bg-fuchsia-500/10 border-l-4 border-l-fuchsia-500' : 'hover:bg-slate-50 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={\`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 \${activeTab === tpl.id ? 'bg-fuchsia-100 dark:bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}\`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeTab === tpl.id ? 'bg-fuchsia-100 dark:bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
                                             <Mail className="w-4 h-4" />
                                         </div>
                                         <div>
-                                            <h4 className={\`text-sm font-bold \${activeTab === tpl.id ? 'text-fuchsia-700 dark:text-fuchsia-300' : 'text-slate-800 dark:text-slate-200'}\`}>
+                                            <h4 className={`text-sm font-bold ${activeTab === tpl.id ? 'text-fuchsia-700 dark:text-fuchsia-300' : 'text-slate-800 dark:text-slate-200'}`}>
                                                 {tpl.name}
                                             </h4>
                                             <p className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">{tpl.description}</p>
@@ -148,13 +148,13 @@ export default function MailTemplatesPage() {
                                 <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full sm:w-auto">
                                     <button 
                                         onClick={() => setIsPreviewMode(false)}
-                                        className={\`flex-1 sm:flex-none flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all \${!isPreviewMode ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}\`}
+                                        className={`flex-1 sm:flex-none flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${!isPreviewMode ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                     >
                                         <Code2 className="w-4 h-4" /> Düzenle
                                     </button>
                                     <button 
                                         onClick={() => setIsPreviewMode(true)}
-                                        className={\`flex-1 sm:flex-none flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all \${isPreviewMode ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}\`}
+                                        className={`flex-1 sm:flex-none flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${isPreviewMode ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                     >
                                         <Eye className="w-4 h-4" /> Önizle
                                     </button>
