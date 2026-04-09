@@ -16,10 +16,12 @@ export async function POST(req: Request) {
     try {
         const { question, sessionId } = await req.json();
 
+        const safeSessionId = sessionId || crypto.randomUUID();
+
         const conversation = await HelpAssistantService.startConversation({
             tenantId,
             userId,
-            sessionId,
+            sessionId: safeSessionId,
             question
         });
 

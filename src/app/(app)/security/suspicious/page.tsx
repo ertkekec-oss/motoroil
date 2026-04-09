@@ -4,20 +4,23 @@ import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useInventory } from '@/contexts/InventoryContext';
 import { useModal } from '@/contexts/ModalContext';
+import { ShieldAlert, Activity, CheckCircle, XCircle, Trash2, ListFilter, AlertTriangle, PackageSearch } from 'lucide-react';
 
 export default function SuspiciousActivityPage() {
     const {
         suspiciousEvents: events,
         clearSuspiciousEvents,
         branches,
-        currentUser
     } = useApp();
+    
     const {
         pendingProducts,
         approveProduct,
         rejectProduct,
     } = useInventory();
+    
     const { showSuccess, showError, showConfirm } = useModal();
+    
     const [filter, setFilter] = useState<'all' | 'today' | 'week'>('today');
     const [branchFilter, setBranchFilter] = useState('all');
     const [activeSecurityTab, setActiveSecurityTab] = useState<'suspicious' | 'approvals'>('suspicious');
@@ -62,289 +65,303 @@ export default function SuspiciousActivityPage() {
     }, [events, pendingProducts]);
 
     return (
-        <div className="p-6 pb-32 animate-fade-in min-h-screen bg-slate-50 dark:bg-[#0f172a]">
-            <style jsx>{`
-                .bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card {
-                    background: rgba(15, 17, 30, 0.4);
-                    
-                    border: 1px solid rgba(255, 255, 255, 0.05);
-                    border-radius: 24px;
-                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card:hover {
-                    border-color: var(--primary);
-                    background: rgba(15, 17, 30, 0.6);
-                }
-                .security-badge {
-                    background: linear-gradient(135deg, #FF4B2B, #FF416C);
-                    padding: 2px 8px;
-                    border-radius: 99px;
-                    font-size: 10px;
-                    font-weight: 900;
-                    color: white;
-                    text-transform: uppercase;
-                }
-                .pulse {
-                    width: 8px;
-                    height: 8px;
-                    background: #FF416C;
-                    border-radius: 50%;
-                    box-shadow: 0 0 0 rgba(255, 65, 108, 0.4);
-                    animation: pulse-ring 1.5s infinite;
-                }
-                @keyframes pulse-ring {
-                    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
-                    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 65, 108, 0); }
-                    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
-                }
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-            `}</style>
-
-            <header className="flex justify-between items-end mb-10">
-                <div className="animate-in slide-in-from-left duration-700">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="pulse"></div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF416C]">Canlı Güvenlik Monitörü</span>
+        <div className="p-6 md:p-8 animate-in fade-in min-h-screen bg-slate-50 dark:bg-slate-950 pb-32">
+            {/* Header Section */}
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        <span className="text-[11px] font-bold text-red-500 uppercase tracking-wider">Canlı Güvenlik Monitörü</span>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tight text-white mb-1">Satış Monitörü</h1>
-                    <p className="text-white/40 font-medium">Şüpheli işlemler ve onay bekleyen talepler için merkezi kontrol.</p>
+                    <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Satış ve Onay Merkezi</h1>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">Şüpheli işlemler ve personel ürün ekleme taleplerinin denetimi.</p>
                 </div>
 
-                <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5 animate-in slide-in-from-right duration-700">
+                {/* Tab Switcher */}
+                <div className="flex bg-slate-200/50 dark:bg-slate-800/50 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 w-fit shrink-0">
                     <button
                         onClick={() => setActiveSecurityTab('suspicious')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all relative ${activeSecurityTab === 'suspicious' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                            activeSecurityTab === 'suspicious' 
+                                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' 
+                                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                        }`}
                     >
-                        🚨 ŞÜPHELİ İŞLEMLER
-                        {stats.today > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#FF416C] rounded-full text-[8px] flex items-center justify-center border-2 border-[#080911]">{stats.today}</span>}
+                        <ShieldAlert className="w-4 h-4" />
+                        Şüpheli İşlemler
+                        {stats.today > 0 && <span className="ml-1.5 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px]">{stats.today}</span>}
                     </button>
                     <button
                         onClick={() => setActiveSecurityTab('approvals')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all relative ${activeSecurityTab === 'approvals' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                            activeSecurityTab === 'approvals' 
+                                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' 
+                                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                        }`}
                     >
-                        📋 ONAY BEKLEYENLER
-                        {stats.pendingApprovals > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full text-[8px] flex items-center justify-center border-2 border-[#080911]">{stats.pendingApprovals}</span>}
+                        <CheckCircle className="w-4 h-4" />
+                        Onay Bekleyenler
+                        {stats.pendingApprovals > 0 && <span className="ml-1.5 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px]">{stats.pendingApprovals}</span>}
                     </button>
                 </div>
             </header>
 
             {activeSecurityTab === 'suspicious' ? (
                 <>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 animate-in fade-in duration-1000">
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-6 border-l-4 border-l-[#FF416C]">
-                            <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Bugün</div>
-                            <div className="text-3xl font-black text-white">{stats.today}</div>
-                            <div className="text-[10px] font-bold text-[#FF416C]/60 mt-1 uppercase">Tespit Edilen Olay</div>
+                    {/* Stat Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-[14px] bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center">
+                                <AlertTriangle className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Bugün</h4>
+                                <div className="text-2xl font-black text-slate-800 dark:text-white leading-tight">{stats.today}</div>
+                                <p className="text-[10px] font-bold text-red-500 mt-0.5 uppercase">Tespit Edilen Olay</p>
+                            </div>
                         </div>
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-6 border-l-4 border-l-amber-500">
-                            <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Son 7 Gün</div>
-                            <div className="text-3xl font-black text-white">{stats.week}</div>
-                            <div className="text-[10px] font-bold text-amber-500/60 mt-1 uppercase">Haftalık Toplam</div>
+
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-[14px] bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                                <Activity className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Son 7 Gün</h4>
+                                <div className="text-2xl font-black text-slate-800 dark:text-white leading-tight">{stats.week}</div>
+                                <p className="text-[10px] font-bold text-amber-500 mt-0.5 uppercase">Haftalık Toplam</p>
+                            </div>
                         </div>
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-6">
-                            <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Tüm Zamanlar</div>
-                            <div className="text-3xl font-black text-white">{stats.total}</div>
-                            <div className="text-[10px] font-bold text-white/20 mt-1 uppercase">Kayıtlı Olay</div>
+
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-[14px] bg-slate-50 dark:bg-slate-800 text-slate-500 flex items-center justify-center">
+                                <ListFilter className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Tüm Zamanlar</h4>
+                                <div className="text-2xl font-black text-slate-800 dark:text-white leading-tight">{stats.total}</div>
+                                <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase">Kayıtlı Olay</p>
+                            </div>
                         </div>
-                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-4 flex flex-col justify-center">
+
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-center space-y-2">
                             <select
                                 value={branchFilter}
                                 onChange={(e) => setBranchFilter(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none focus:border-primary transition-colors mb-2"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                             >
-                                <option value="all" className="bg-[#1a1c2e]">Tüm Şubeler</option>
+                                <option value="all">Tüm Şubeler</option>
                                 {branches.map(b => (
-                                    <option key={b.id} value={b.name} className="bg-[#1a1c2e]">{b.name}</option>
+                                    <option key={b.id} value={b.name}>{b.name}</option>
                                 ))}
                             </select>
                             <select
                                 value={filter}
                                 onChange={(e) => setFilter(e.target.value as any)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none focus:border-primary transition-colors"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                             >
-                                <option value="today" className="bg-[#1a1c2e]">Bugün</option>
-                                <option value="week" className="bg-[#1a1c2e]">Son 7 Gün</option>
-                                <option value="all" className="bg-[#1a1c2e]">Tümü</option>
+                                <option value="today">Sadece Bugün</option>
+                                <option value="week">Son 7 Gün</option>
+                                <option value="all">Tümü</option>
                             </select>
                         </div>
-                        {events.length > 0 && (
-                            <div className="md:col-span-4 flex justify-end">
-                                <button
-                                    onClick={() => {
-                                        showConfirm('Emin Misiniz?', 'Tüm olay kayıtlarını silmek istediğinize emin misiniz?', () => {
-                                            clearSuspiciousEvents();
-                                            showSuccess('Başarılı', 'Tüm olaylar temizlendi.');
-                                        });
-                                    }}
-                                    className="px-6 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 rounded-xl text-xs font-bold transition-all"
-                                >
-                                    🗑️ TÜMÜNÜ TEMİZLE
-                                </button>
-                            </div>
-                        )}
                     </div>
 
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex justify-between items-center group/header">
-                            <div className="flex items-center gap-4">
-                                <h3 className="text-xl font-black text-white tracking-tight group-hover/header:text-primary transition-colors">Olay Günlüğü</h3>
-                                <div className="px-2 py-0.5 rounded bg-white/5 text-[9px] font-black text-white/30 uppercase tracking-widest">Canlı Yayın</div>
+                    {/* Action Bar */}
+                    {events.length > 0 && (
+                        <div className="flex justify-end mb-4">
+                            <button
+                                onClick={() => {
+                                    showConfirm('Emin Misiniz?', 'Tüm olay kayıtlarını silmek istediğinize emin misiniz?', () => {
+                                        clearSuspiciousEvents();
+                                        showSuccess('Başarılı', 'Tüm olaylar temizlendi.');
+                                    });
+                                }}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 rounded-lg text-xs font-bold transition-colors"
+                            >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                TÜMÜNÜ TEMİZLE
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Logs Table Area */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+                        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/10">
+                            <div className="flex items-center gap-3">
+                                <h3 className="text-base font-bold text-slate-800 dark:text-white">Olay Günlüğü</h3>
+                                <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 text-[9px] font-bold uppercase tracking-wider">Canlı</span>
                             </div>
-                            <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Sıralama: En Yeni</div>
                         </div>
 
-                        <div className="max-h-[600px] overflow-y-auto p-4 space-y-4 custom-scrollbar">
-                            {filteredEvents.length === 0 ? (
-                                <div className="py-20 flex flex-col items-center justify-center text-white/10 italic">
-                                    <span className="text-6xl mb-4">🛡️</span>
-                                    <p className="text-sm font-black uppercase tracking-widest">Kayıtlı olay bulunamadı.</p>
-                                </div>
-                            ) : (
-                                filteredEvents.map((event, idx) => (
-                                    <div key={event.id} className="group p-5 rounded-[20px] bg-white/[0.02] border border-white/[0.03] hover:bg-white/[0.05] hover:border-[#FF416C]/30 transition-all animate-in fade-in slide-in-from-bottom duration-500" style={{ animationDelay: `${idx * 50}ms` }}>
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex gap-4 items-center">
-                                                <div className="w-12 h-12 rounded-2xl bg-[#FF416C]/10 flex items-center justify-center text-2xl border border-[#FF416C]/20">
-                                                    🚨
+                        {filteredEvents.length === 0 ? (
+                            <div className="py-20 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
+                                <ShieldAlert className="w-16 h-16 mb-4 opacity-20" />
+                                <p className="text-sm font-bold uppercase tracking-widest">Kayıtlı olay bulunamadı.</p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                {filteredEvents.map((event) => (
+                                    <div key={event.id} className="p-5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                        
+                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                            
+                                            <div className="flex items-start lg:items-center gap-4 flex-1">
+                                                <div className="w-10 h-10 shrink-0 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center">
+                                                    <AlertTriangle className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <div className="text-lg font-black text-white group-hover:text-[#FF416C] transition-colors line-clamp-1">"{event.detectedPhrase}"</div>
-                                                    <div className="flex items-center gap-3 text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">
-                                                        <span>{new Date(event.timestamp).toLocaleDateString('tr-TR')}</span>
-                                                        <span className="w-1 h-1 rounded-full bg-white/10"></span>
-                                                        <span>{new Date(event.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                    <div className="text-sm font-bold text-slate-800 dark:text-white">Şüpheli Cümle: <span className="text-red-500 dark:text-red-400">"{event.detectedPhrase}"</span></div>
+                                                    <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] font-semibold text-slate-500">
+                                                        <span className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">
+                                                            👤 {event.staff}
+                                                        </span>
+                                                        <span className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">
+                                                            📍 {event.branch}
+                                                        </span>
+                                                        <span>•</span>
+                                                        <span>{new Date(event.timestamp).toLocaleDateString('tr-TR')} {new Date(event.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <div className="text-[10px] font-black text-white/20 uppercase mb-1">Tespit Güveni</div>
-                                                <div className={`text-xl font-black ${event.confidence > 0.8 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                                                    %{Math.round(event.confidence * 100)}
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/5">
-                                            <div>
-                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Şube</p>
-                                                <p className="text-xs font-bold text-white/80 flex items-center gap-2">
-                                                    <span className="text-primary truncate">📍 {event.branch}</span>
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Personel</p>
-                                                <p className="text-xs font-bold text-white/80 flex items-center gap-2">
-                                                    <span className="truncate">👤 {event.staff}</span>
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Satış Kontrolü</p>
-                                                <p className={`text-xs font-black ${event.hasSaleInLast5Min ? 'text-emerald-400' : 'text-[#FF416C]'}`}>
-                                                    {event.hasSaleInLast5Min ? '✓ KAYITLI SATIŞ VAR' : '⚠️ SATIŞ KAYDI YOK!'}
-                                                </p>
-                                            </div>
-                                            <div className="flex justify-end items-center">
+                                            <div className="flex items-center gap-6 self-start lg:self-auto shrink-0">
+                                                <div className="text-left lg:text-right hidden sm:block">
+                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Analiz Güveni</div>
+                                                    <div className={`text-sm font-black ${event.confidence > 0.8 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                        %{Math.round(event.confidence * 100)}
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 hidden lg:block"></div>
+
+                                                <div className="min-w-[140px]">
+                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Satış Durumu</div>
+                                                    {event.hasSaleInLast5Min ? (
+                                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 px-2 py-1 rounded-md">
+                                                            <CheckCircle className="w-3 h-3" />
+                                                            KAYITLI SATIŞ VAR
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 bg-red-50 dark:bg-red-500/10 dark:text-red-400 px-2 py-1 rounded-md">
+                                                            <XCircle className="w-3 h-3" />
+                                                            SATIŞ YOK
+                                                        </span>
+                                                    )}
+                                                </div>
+
                                                 <button
                                                     onClick={() => {
                                                         clearSuspiciousEvents(event.id);
-                                                        showSuccess('Başarılı', 'Olay kaydı temizlendi.');
+                                                        showSuccess('İşlem Başarılı', 'Olay kaydı incelendi ve kapatıldı.');
                                                     }}
-                                                    className="px-4 py-2 bg-white/5 hover:bg-emerald-500/20 rounded-lg text-[10px] font-black text-white/40 hover:text-emerald-400 transition-all border border-transparent hover:border-emerald-500/30"
+                                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-[11px] font-bold transition-colors ml-2 shrink-0"
                                                 >
-                                                    İNCELENDİ / KAPAT
+                                                    KAPAT
                                                 </button>
                                             </div>
+
                                         </div>
                                     </div>
-                                ))
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </>
             ) : (
-                <div className="space-y-6 animate-in fade-in duration-700">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-black text-white tracking-tight px-2">Bekleyen Onay Talepleri</h3>
-                        <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl text-[10px] font-black text-amber-500 uppercase tracking-widest">
-                            {pendingProducts.filter(p => p.status === 'pending').length} Talep Aktif
-                        </div>
+                /* Approvals Tab */
+                <div className="animate-in fade-in">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">Ürün Ekleme Onayları</h3>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {pendingProducts.filter(p => p.status === 'pending').length === 0 ? (
-                            <div className="col-span-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card py-32 flex flex-col items-center justify-center text-white/10">
-                                <span className="text-6xl mb-4">✨</span>
-                                <p className="text-sm font-black uppercase tracking-widest">Tüm talepler işlendi.</p>
-                            </div>
-                        ) : (
-                            pendingProducts.filter(p => p.status === 'pending').map((pending, idx) => (
-                                <div key={pending.id} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group border-t-4 border-t-amber-500/50 hover:border-t-amber-500 transition-all animate-in zoom-in-95 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
-                                    <div className="flex justify-between items-start mb-8">
-                                        <div className="flex gap-5 items-center">
-                                            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-3xl border border-amber-500/20 shadow-sm shadow-amber-500/5 group-hover:scale-110 transition-transform">
-                                                📦
+                    {pendingProducts.filter(p => p.status === 'pending').length === 0 ? (
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-20 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 shadow-sm">
+                            <CheckCircle className="w-16 h-16 mb-4 text-emerald-500 opacity-50" />
+                            <p className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Bekleyen onay kalmadı.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {pendingProducts.filter(p => p.status === 'pending').map((pending) => (
+                                <div key={pending.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors">
+                                    <div className="p-5 flex-1">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className="flex gap-4">
+                                                <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                                                    <PackageSearch className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-base font-bold text-slate-800 dark:text-white leading-tight">{pending.productData.name}</h4>
+                                                    <p className="text-[11px] font-semibold text-slate-500 mt-1">
+                                                        Personel: <span className="text-slate-700 dark:text-slate-300">{pending.requestedBy}</span>
+                                                    </p>
+                                                    <p className="text-[10px] text-slate-400 mt-0.5">
+                                                        Tarih: {new Date(pending.requestedAt || "").toLocaleString('tr-TR')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-800/50">
+                                            <div>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Kod / Barkod</p>
+                                                <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">
+                                                    {pending.productData.code} <span className="text-slate-300 dark:text-slate-600 mx-1">|</span> {pending.productData.barcode || '-'}
+                                                </p>
                                             </div>
                                             <div>
-                                                <h4 className="text-xl font-black text-white group-hover:text-amber-400 transition-colors uppercase">{pending.productData.name}</h4>
-                                                <div className="flex items-center gap-3 mt-1">
-                                                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded">Talep: {pending.requestedBy}</span>
-                                                    <span className="text-[10px] font-bold text-white/40">{new Date(pending.requestedAt || "").toLocaleString('tr-TR')}</span>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Stok / Marka</p>
+                                                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                    {pending.productData.stock} <span className="text-slate-400 text-[10px] ml-1">ADET</span> <span className="text-slate-300 dark:text-slate-600 mx-1">|</span> {pending.productData.brand || '-'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Kategori</p>
+                                                <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{pending.productData.category}</p>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <div>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Alış</p>
+                                                    <p className="text-sm font-black text-slate-600 dark:text-slate-400">₺{Number(pending.productData.buyPrice).toLocaleString()}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Satış</p>
+                                                    <p className="text-sm font-black text-emerald-600 dark:text-emerald-400">₺{Number(pending.productData.price).toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    approveProduct(pending.id);
-                                                    showSuccess('Başarılı', 'Ürün kartı onaylandı.');
-                                                }}
-                                                className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm " title="Onayla">
-                                                ✓
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    rejectProduct(pending.id);
-                                                    showError('Reddedildi', 'Talep reddedildi.');
-                                                }}
-                                                className="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm shadow-red-500/20" title="Reddet">
-                                                ✕
-                                            </button>
-                                        </div>
+                                    </div>
+                                    
+                                    {/* Card Actions */}
+                                    <div className="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+                                        <button
+                                            onClick={() => {
+                                                rejectProduct(pending.id);
+                                                showError('Reddedildi', 'Ürün ekleme talebi reddedildi.');
+                                            }}
+                                            className="flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 text-xs font-bold transition-all"
+                                        >
+                                            <XCircle className="w-4 h-4" />
+                                            REDDET
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                approveProduct(pending.id);
+                                                showSuccess('Aktarıldı', 'Yeni ürün onaylandı ve envantere eklendi.');
+                                            }}
+                                            className="flex-1 flex justify-center items-center gap-2 py-2.5 rounded-lg text-white bg-emerald-500 hover:bg-emerald-600 text-xs font-bold transition-all shadow-sm shadow-emerald-500/20"
+                                        >
+                                            <CheckCircle className="w-4 h-4" />
+                                            ONAYLA & EKLE
+                                        </button>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-y-6 gap-x-8 bg-white/[0.02] p-6 rounded-2xl border border-white/5">
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">KOD / BARKOD</p>
-                                            <p className="text-xs font-bold text-white">{pending.productData.code} <span className="text-white/30 ml-2">|</span> <span className="text-white/40 ml-2">{pending.productData.barcode || 'Yok'}</span></p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">KATEGORİ</p>
-                                            <p className="text-xs font-bold text-white">{pending.productData.category} <span className="text-white/30 text-[10px] mx-2">➤</span> {pending.productData.type}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">FİYATLANDIRMA</p>
-                                            <div className="flex items-center gap-4">
-                                                <div className="flex flex-col">
-                                                    <span className="text-[8px] text-white/40 font-bold uppercase">ALIŞ</span>
-                                                    <span className="text-sm font-black text-amber-500">₺ {Number(pending.productData.buyPrice).toLocaleString()}</span>
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[8px] text-white/40 font-bold uppercase">SATIŞ</span>
-                                                    <span className="text-sm font-black text-emerald-400">₺ {Number(pending.productData.price).toLocaleString()}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">STOK / MARKA</p>
-                                            <p className="text-xs font-bold text-white">{pending.productData.stock} Adet <span className="text-white/30 ml-2">|</span> <span className="text-amber-500 ml-2">{pending.productData.brand || 'Belirsiz'}</span></p>
-                                        </div>
-                                    </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>
