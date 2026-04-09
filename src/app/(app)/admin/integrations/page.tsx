@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { 
     LayoutGrid, CreditCard, Truck, MessageSquare, Mail, 
-    CheckCircle2, XCircle, Settings, Plus, Info, ExternalLink, ShieldCheck, Zap
+    CheckCircle2, XCircle, Settings, Plus, Info, ExternalLink, ShieldCheck, Zap, FileText
 } from 'lucide-react';
 import { 
     EnterprisePageShell, EnterpriseCard, EnterpriseButton, 
@@ -75,6 +75,17 @@ const APP_STORE_ITEMS = [
         color: 'rose',
         isNative: true,
         legacyUrl: '/admin/settings/mail'
+    },
+    {
+        id: 'mail_templates',
+        category: 'EMAIL_TEMPLATES',
+        providerCode: 'MAIL_TEMPLATES',
+        name: 'E-Posta Şablonları',
+        description: 'Müşterilere giden sistem e-postalarının (E-Fatura, Hoşgeldin, Şifre Sıfırlama) tasarımını, renklerini ve kurumsal imza metinlerini düzenleyin.',
+        icon: <FileText className="w-8 h-8 text-fuchsia-500" />,
+        color: 'fuchsia',
+        isNative: false,
+        legacyUrl: '/admin/integrations/mail-templates'
     }
 ];
 

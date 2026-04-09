@@ -38,24 +38,29 @@ export function AIAssistantPanel() {
                 res = await fetch('/api/help/ai/message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId, message: userMsg })
+                    body: JSON.stringify({ conversationId: sessionId, content: userMsg })
                 });
             }
 
             const data = await res.json();
-            if (data.sessionId && !sessionId) {
-                setSessionId(data.sessionId);
+            
+            if (!res.ok) {
+                throw new Error(data.error || 'Server error');
             }
 
-            if (data.answer) {
-                setMessages(prev => [...prev, { id: Date.now().toString() + '1', role: 'ASSISTANT', content: data.answer }]);
+            if (data.conversationId && !sessionId) {
+                setSessionId(data.conversationId);
             }
-            if (data.suggestTicket) {
-                setMessages(prev => [...prev, { id: Date.now().toString() + '2', role: 'SYSTEM', content: 'Cevabım size yardımcı oldu mu? Eğer olmadıysa hemen bir destek talebi oluşturabiliriz.' }]);
+
+            if (data.aiAnswer) {
+                setMessages(prev => [...prev, { id: Date.now().toString() + '1', role: 'ASSISTANT', content: data.aiAnswer }]);
+                // Always append the deflection prompt directly after a successful response
+                setMessages(prev => [...prev, { id: Date.now().toString() + '2', role: 'SYSTEM', content: 'Çözümüm sorununuzu tam olarak giderdi mi?' }]);
             }
         } catch (error) {
             console.error('AI Error:', error);
             setMessages(prev => [...prev, { id: Date.now().toString() + 'err', role: 'SYSTEM', content: 'Bir hata oluştu, lütfen daha sonra tekrar deneyin.' }]);
+            setSessionId(null);
         } finally {
             setLoading(false);
         }
@@ -107,10 +112,10 @@ export function AIAssistantPanel() {
                                         : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-tl-sm shadow-sm'
                                 }`}>
                                 <div className="whitespace-pre-wrap break-words">{msg.content}</div>
-                                {msg.role === 'SYSTEM' && msg.content.includes('yardımcı oldu mu') && (
+                                {msg.role === 'SYSTEM' && (msg.content.includes('yardımcı oldu mu') || msg.content.includes('giderdi mi')) && (
                                     <div className="mt-4 flex gap-2">
-                                        <button onClick={() => setMessages(prev => [...prev, { id: Date.now().toString(), role: 'USER', content: 'Evet, işime yaradı.' }])} className="px-3 py-1.5 text-xs font-semibold rounded-md bg-white border border-rose-200 text-slate-700 hover:bg-slate-50 transition-colors">Evet</button>
-                                        <Link href="/support/new" className="px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-900 text-white hover:bg-slate-800 transition-colors">Hayır, Bilet Oluştur</Link>
+                                        <button onClick={() => setMessages(prev => [...prev, { id: Date.now().toString(), role: 'USER', content: 'Evet, çözüldü.' }])} className="px-3 py-1.5 text-xs font-semibold rounded-md bg-white border border-rose-200 text-slate-700 hover:bg-slate-50 transition-colors">Evet</button>
+                                        <Link href="/support/new" className="px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-900 text-white hover:bg-slate-800 transition-colors">Hayır, Talep Oluştur</Link>
                                     </div>
                                 )}
                             </div>
