@@ -28,6 +28,13 @@ export default async function PlatformDoctorDashboard() {
     // Health Score calculation mock
     const healthScore = Math.max(0, 100 - (activeIssues * 8));
 
+    const DIAGNOSTICS_MODULES = [
+        { name: 'Veritabanı (Prisma)', status: 'HEALTHY', icon: <Database className="w-5 h-5 text-emerald-500" /> },
+        { name: 'Cache (Redis)', status: 'HEALTHY', icon: <Server className="w-5 h-5 text-emerald-500" /> },
+        { name: 'Kuyruk (BullMQ)', status: 'HEALTHY', icon: <Activity className="w-5 h-5 text-emerald-500" /> },
+        { name: 'Harici API', status: 'WARNING', icon: <Globe className="w-5 h-5 text-amber-500" /> },
+    ];
+
     return (
         <EnterprisePageShell
             title="Platform Doctor (Sistem Sağlığı)"

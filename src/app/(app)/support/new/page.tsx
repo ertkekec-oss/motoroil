@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { EnterprisePageShell, EnterpriseCard, EnterpriseInput, EnterpriseSelect, EnterpriseButton, EnterpriseSectionHeader } from '@/components/ui/enterprise';
+import { ChevronLeft, Send, AlertTriangle, Info, MessageSquarePlus } from 'lucide-react';
 
 export default function NewTicketPage() {
     const router = useRouter();
@@ -18,6 +20,21 @@ export default function NewTicketPage() {
         priority: 'P3_NORMAL',
         description: ''
     });
+
+    const categoryOptions = [
+        { value: 'GENERAL', label: 'Genel Soru / Bilgi Talebi' },
+        { value: 'BILLING', label: 'Fatura, Kredi & Ödeme' },
+        { value: 'TECHNICAL', label: 'Teknik Destek & Sistem' },
+        { value: 'FEATURE_REQUEST', label: 'Yeni Özellik İsteği' },
+        { value: 'BUG', label: 'Sistem Hatası (Bug) Bildirimi' }
+    ];
+
+    const priorityOptions = [
+        { value: 'P3_NORMAL', label: 'Normal (Standart İşlem)' },
+        { value: 'P4_LOW', label: 'Düşük (Acelesi Yok)' },
+        { value: 'P2_HIGH', label: 'Yüksek (Operasyonu Yavaşlatıyor)' },
+        { value: 'P1_URGENT', label: 'Acil (İşleyiş Tamamen Durdu)' }
+    ];
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -56,87 +73,111 @@ export default function NewTicketPage() {
     };
 
     return (
-        <div className="p-6 md:p-8 max-w-3xl mx-auto font-sans">
-            <div className="mb-6">
-                <Link href="/support" className="text-orange-500 hover:underline flex items-center gap-1 text-sm font-medium mb-4">
-                    ← Taleplerime Dön
+        <EnterprisePageShell
+            title="Yeni Destek Talebi"
+            description="Sorununuzu detaylı bir şekilde açıklayın, destek uzmanlarımız size en kısa sürede dönüş yapacaktır."
+            actions={
+                <Link href="/support">
+                    <EnterpriseButton variant="secondary" className="h-10 px-4">
+                        <ChevronLeft className="w-4 h-4 mr-2" /> Taleplerime Dön
+                    </EnterpriseButton>
                 </Link>
-                <h1 className="text-3xl font-black text-white">Yeni Destek Talebi</h1>
-                <p className="text-gray-400 text-sm mt-1">Sorununuzu detaylı bir şekilde açıklayın, size en kısa sürede dönüş yapacağız.</p>
+            }
+        >
+            <div className="max-w-4xl mx-auto space-y-6">
+                
+                {/* INFORMATIVE BANNER */}
+                <div className="bg-indigo-50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 p-5 rounded-2xl flex gap-4 items-start shadow-sm">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 shrink-0 flex items-center justify-center border border-indigo-200 dark:border-indigo-500/30">
+                        <Info className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-black text-indigo-900 dark:text-indigo-300 tracking-wide uppercase mb-1">Hızlı Çözüm İçin Ek Bilgi</h4>
+                        <p className="text-sm font-medium text-indigo-800/80 dark:text-indigo-200/70 leading-relaxed">
+                            Talebinizin daha hızlı çözülebilmesi için lütfen karşılaştığınız sorunu adımlarıyla birlikte detaylıca tarif edin. Sisteme giriş yaptığınız cihaz ve tarayıcı bilgileriniz tanısal amaçlı olarak otomatik olarak kaydedilmektedir.
+                        </p>
+                    </div>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <EnterpriseCard>
+                        <EnterpriseSectionHeader 
+                            title="Talep Detayları" 
+                            subtitle="Yaşadığınız sorunu veya talebinizi aşağıdaki alanlara eksiksiz giriniz." 
+                            icon={<MessageSquarePlus className="w-5 h-5" />} 
+                        />
+                        
+                        {error && (
+                            <div className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 p-4 rounded-xl text-sm font-bold flex items-start gap-3 mt-4">
+                                <AlertTriangle className="w-5 h-5 shrink-0" />
+                                <span className="mt-0.5">{error}</span>
+                            </div>
+                        )}
+
+                        <div className="mt-6 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <EnterpriseSelect
+                                    label="Departman / Kategori"
+                                    name="category"
+                                    required
+                                    options={categoryOptions}
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                />
+                                
+                                <EnterpriseSelect
+                                    label="Öncelik Derecesi"
+                                    name="priority"
+                                    required
+                                    options={priorityOptions}
+                                    value={formData.priority}
+                                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                                />
+                            </div>
+
+                            <EnterpriseInput
+                                label="Konu Özeti (Başlık)"
+                                required
+                                name="subject"
+                                placeholder="Örn: E-Fatura gönderiminde 404 hatası alıyorum"
+                                value={formData.subject}
+                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                                hint="Karşılaştığınız sorunu tek cümlede özetleyin."
+                            />
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5 ml-1">
+                                    Açıklama (Detaylar)
+                                </label>
+                                <textarea
+                                    required
+                                    rows={8}
+                                    value={formData.description}
+                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Karşılaştığınız durumu lütfen adım adım, varsa hata mesajlarıyla birlikte açıklayın..."
+                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-4 rounded-xl text-slate-900 dark:text-white text-sm outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-colors placeholder:text-slate-400 resize-y shadow-inner"
+                                />
+                                <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 ml-1">Hata nasıl oluştu? Ekran uyarıları verdiyse tam hallerini yazın.</p>
+                            </div>
+                            
+                            <div className="pt-6 border-t border-slate-100 dark:border-white/5 flex justify-end">
+                                <EnterpriseButton
+                                    type="submit"
+                                    disabled={loading}
+                                    variant="primary"
+                                    className="h-12 px-8"
+                                >
+                                    {loading ? (
+                                        <div className="flex gap-2 items-center"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Gönderiliyor...</div>
+                                    ) : (
+                                        <div className="flex gap-2 items-center"><Send className="w-4 h-4" /> Destek Talebini Gönder</div>
+                                    )}
+                                </EnterpriseButton>
+                            </div>
+                        </div>
+                    </EnterpriseCard>
+                </form>
             </div>
-
-            <form onSubmit={handleSubmit} className="bg-[#0f111a] border border-white/5 p-6 md:p-8 rounded-3xl shadow-sm shadow-black/50 space-y-6">
-                {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm font-medium flex items-start gap-2">
-                        <span className="mt-0.5">⚠️</span> <span>{error}</span>
-                    </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Kategori</label>
-                        <select
-                            value={formData.category}
-                            onChange={e => setFormData({ ...formData, category: e.target.value })}
-                            className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white text-sm outline-none focus:border-orange-500/50 transition-colors"
-                        >
-                            <option value="GENERAL">Genel Soru</option>
-                            <option value="BILLING">Fatura & Ödeme</option>
-                            <option value="TECHNICAL">Teknik Destek</option>
-                            <option value="FEATURE_REQUEST">Yeni Özellik İsteği</option>
-                            <option value="BUG">Hata Bildirimi</option>
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Öncelik</label>
-                        <select
-                            value={formData.priority}
-                            onChange={e => setFormData({ ...formData, priority: e.target.value })}
-                            className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white text-sm outline-none focus:border-orange-500/50 transition-colors"
-                        >
-                            <option value="P1_URGENT">Acil (Çalışmayı Engelleyen Hata)</option>
-                            <option value="P2_HIGH">Yüksek</option>
-                            <option value="P3_NORMAL">Normal</option>
-                            <option value="P4_LOW">Düşük</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Konu Başlığı</label>
-                    <input
-                        type="text"
-                        required
-                        value={formData.subject}
-                        onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                        placeholder="Örn: E-Fatura gönderiminde 404 hatası alıyorum"
-                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white text-sm outline-none focus:border-orange-500/50 transition-colors placeholder:text-gray-600"
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Açıklama (Detaylar)</label>
-                    <p className="text-xs text-gray-500 mb-2">Hatanın nasıl oluştuğu, adımlar, aldığınız ekran uyarıları vb. tüm detayları yazın.</p>
-                    <textarea
-                        required
-                        rows={8}
-                        value={formData.description}
-                        onChange={e => setFormData({ ...formData, description: e.target.value })}
-                        placeholder="Karşılaştığınız sorunu lütfen adım adım açıklayın..."
-                        className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-orange-500/50 transition-colors placeholder:text-gray-600 resize-y"
-                    />
-                </div>
-
-                <div className="pt-4 flex justify-end">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="px-8 py-3.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all shadow-sm  disabled:opacity-50 flex items-center gap-2"
-                    >
-                        {loading ? 'Gönderiliyor...' : 'Talebi Gönder →'}
-                    </button>
-                </div>
-            </form>
-        </div>
+        </EnterprisePageShell>
     );
 }

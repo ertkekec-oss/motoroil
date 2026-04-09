@@ -68,15 +68,14 @@ export default async function OnboardingAdminPage() {
 
                 {/* Left Side: Existing Steps */}
                 <div className="lg:col-span-2 space-y-6">
-                    <EnterpriseCard noPadding>
+                    <EnterpriseCard>
                         <EnterpriseSectionHeader 
                             title="Aktif Navigasyon Adımları" 
                             subtitle="Bütün müşterilerde sıralı olarak görünecek olan keşif görevleri." 
                             icon={<ListChecks className="w-5 h-5" />}
-                            
                         />
                         
-                        <div className="p-6 md:p-8">
+                        <div className="pt-2">
                             {steps.length === 0 ? (
                                 <EnterpriseEmptyState 
                                     icon={<ListChecks className="w-10 h-10" />}
@@ -86,12 +85,12 @@ export default async function OnboardingAdminPage() {
                             ) : (
                                 <div className="space-y-4">
                                     {steps.map((step, index) => (
-                                        <div key={step.id} className={`p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl border transition-all gap-4 ${step.isActive ? 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/5 shadow-sm' : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-white/5 opacity-60'}`}>
-                                            <div className="flex items-start gap-4">
-                                                <div className="mt-2.5 cursor-grab text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400 transition-colors hidden sm:block">
+                                        <div key={step.id} className={`p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-[20px] transition-all gap-4 border ${step.isActive ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm' : 'bg-slate-50 dark:bg-slate-900/40 border-slate-100 dark:border-white/5 opacity-70 border-dashed'}`}>
+                                            <div className="flex items-start gap-5">
+                                                <div className="mt-2 text-slate-300 dark:text-slate-600 hidden sm:block">
                                                     <GripVertical className="w-5 h-5" />
                                                 </div>
-                                                <div className="mt-1 w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center font-black text-indigo-600 dark:text-indigo-400 text-sm border border-indigo-100 dark:border-indigo-500/20 shrink-0 shadow-sm">
+                                                <div className="w-10 h-10 mt-0.5 rounded-[12px] bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-600 dark:text-slate-400 text-sm border border-slate-200 dark:border-slate-700 shrink-0">
                                                     {index + 1}
                                                 </div>
                                                 <div>
@@ -101,11 +100,11 @@ export default async function OnboardingAdminPage() {
                                                     </h4>
                                                     <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1 max-w-sm line-clamp-1">{step.description || 'Açıklama girilmemiş'}</p>
                                                     
-                                                    <div className="flex flex-wrap items-center gap-3 mt-3">
-                                                        <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-1 rounded-md border border-slate-200 dark:border-white/5 truncate max-w-[200px]">
+                                                    <div className="flex flex-wrap items-center gap-2 mt-3">
+                                                        <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-[8px] border border-slate-200 dark:border-slate-700 truncate max-w-[200px]">
                                                             <LinkIcon className="w-3 h-3 text-slate-400" /> {step.href}
                                                         </span>
-                                                        <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-200 dark:border-indigo-500/20">
+                                                        <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded-[8px] border border-indigo-100 dark:border-indigo-500/20">
                                                             <Hash className="w-3 h-3 text-indigo-400" /> {step.actionKey}
                                                         </span>
                                                     </div>
@@ -114,13 +113,13 @@ export default async function OnboardingAdminPage() {
 
                                             <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto w-full sm:w-auto mt-2 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-slate-100 dark:border-white/5">
                                                 <form action={toggleStep.bind(null, step.id, step.isActive)} className="flex-1 sm:flex-none">
-                                                    <EnterpriseButton type="submit" variant="secondary" className="w-full sm:w-auto h-10 px-4 flex justify-center text-slate-600 dark:text-slate-400">
+                                                    <EnterpriseButton type="submit" variant="secondary" className="w-full sm:w-auto px-4 !h-10 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                                                         {step.isActive ? <X className="w-4 h-4 mr-1.5" /> : <Check className="w-4 h-4 mr-1.5 text-emerald-500" />}
                                                         {step.isActive ? "Pasife Al" : "Aktif Et"}
                                                     </EnterpriseButton>
                                                 </form>
                                                 <form action={deleteStep.bind(null, step.id)} className="flex-none">
-                                                    <EnterpriseButton type="submit" variant="secondary" className="h-10 px-4 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+                                                    <EnterpriseButton type="submit" variant="secondary" className="!h-10 px-4 text-rose-600 dark:text-rose-400 border-slate-200 dark:border-slate-700 hover:text-rose-700 hover:border-rose-200 hover:bg-rose-50">
                                                         <Trash2 className="w-4 h-4" />
                                                     </EnterpriseButton>
                                                 </form>
@@ -135,21 +134,26 @@ export default async function OnboardingAdminPage() {
 
                 {/* Right Side: Add New Step */}
                 <div className="lg:col-span-1 space-y-6">
-                    <EnterpriseCard className="sticky top-8 lg:order-2">
-                        <EnterpriseSectionHeader title="Yeni Adım Ekle" icon={<Plus className="w-4 h-4" />} />
+                    <EnterpriseCard className="sticky top-8 lg:order-2 space-y-6 bg-slate-900 border border-slate-800">
+                        <EnterpriseSectionHeader 
+                            title="Yeni Adım Ekle" 
+                            icon={<Plus className="w-4 h-4 text-white" />} 
+                        />
                         
-                        <form action={addStep} className="space-y-4 mt-6 pt-6 border-t border-slate-100 dark:border-white/5">
+                        <form action={addStep} className="space-y-4">
                             <EnterpriseInput 
                                 label="Görünür Başlık"
                                 name="title" 
                                 required 
                                 placeholder="Örn: İlk Ürünü Ekle" 
+                                className="!bg-[#0f172a] !border-slate-800 !text-white"
                             />
                             
                             <EnterpriseInput 
                                 label="Kısa Açıklama (Opsiyonel)"
                                 name="description" 
                                 placeholder="Örn: Kataloga yeni ürün ekleyin" 
+                                className="!bg-[#0f172a] !border-slate-800 !text-white"
                             />
                             
                             <EnterpriseInput 
@@ -157,33 +161,35 @@ export default async function OnboardingAdminPage() {
                                 name="href" 
                                 required 
                                 placeholder="Örn: /products/new" 
+                                className="!bg-[#0f172a] !border-slate-800 !text-white"
                             />
                             
                             <EnterpriseInput 
                                 label="Tetikleyici Anahtar (Action Key)"
-                                hint="OnboardingProgress modeli için benzersiz takip anahtarı."
+                                hint="OnboardingProgress modeli için eşsiz anahtar."
                                 name="actionKey" 
                                 required 
                                 placeholder="Örn: PRODUCT_ADDED" 
+                                className="!bg-[#0f172a] !border-slate-800 !text-white"
                             />
 
-                            <EnterpriseButton type="submit" variant="primary" className="w-full mt-4 h-12 flex justify-center text-[10px] uppercase tracking-widest px-0">
-                                <ShieldCheck className="w-4 h-4 mr-2" /> Sisteme Kaydet
+                            <EnterpriseButton type="submit" variant="primary" className="w-full mt-4 !h-12 bg-white text-slate-900 hover:bg-slate-100 flex justify-center text-[10px] uppercase tracking-widest px-0 border border-white">
+                                <ShieldCheck className="w-4 h-4 mr-2 text-slate-900" /> Sisteme Kaydet
                             </EnterpriseButton>
                         </form>
                     </EnterpriseCard>
 
-                    <EnterpriseCard className="bg-indigo-50/50 dark:bg-indigo-500/5 border-indigo-100 dark:border-indigo-500/20 lg:order-3">
-                        <h4 className="text-[11px] font-black text-indigo-900 dark:text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <EnterpriseCard className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 lg:order-3">
+                        <h4 className="text-[11px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
                             <Hash className="w-4 h-4" />
                             Varsayılan Anahtarlar
                         </h4>
                         <ul className="text-[11px] font-bold text-slate-600 dark:text-slate-400 space-y-3">
-                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">firstInvoice</code> <span>Fatura oluşturunca.</span></li>
-                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">firstCustomer</code> <span>Cari ekleyince.</span></li>
-                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">inventoryViewed</code> <span>Stok sayfasına girince.</span></li>
-                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">salesXViewed</code> <span>Saha satışa girince.</span></li>
-                            <li className="flex gap-2 items-center"><code className="bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-mono font-bold px-1.5 py-0.5 rounded shadow-sm border border-slate-200 dark:border-white/5">b2bHubViewed</code> <span>B2B paneline girince.</span></li>
+                            <li className="flex gap-3 items-center"><code className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-black px-2 py-1 rounded-[6px] shadow-sm border border-slate-200 dark:border-slate-700">firstInvoice</code> <span className="opacity-80">Fatura oluşturunca.</span></li>
+                            <li className="flex gap-3 items-center"><code className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-black px-2 py-1 rounded-[6px] shadow-sm border border-slate-200 dark:border-slate-700">firstCustomer</code> <span className="opacity-80">Cari ekleyince.</span></li>
+                            <li className="flex gap-3 items-center"><code className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-black px-2 py-1 rounded-[6px] shadow-sm border border-slate-200 dark:border-slate-700">inventoryViewed</code> <span className="opacity-80">Stok sayfasına girince.</span></li>
+                            <li className="flex gap-3 items-center"><code className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-black px-2 py-1 rounded-[6px] shadow-sm border border-slate-200 dark:border-slate-700">salesXViewed</code> <span className="opacity-80">Saha satışa girince.</span></li>
+                            <li className="flex gap-3 items-center"><code className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-black px-2 py-1 rounded-[6px] shadow-sm border border-slate-200 dark:border-slate-700">b2bHubViewed</code> <span className="opacity-80">B2B paneline girince.</span></li>
                         </ul>
                     </EnterpriseCard>
                 </div>
