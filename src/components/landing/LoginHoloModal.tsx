@@ -1,6 +1,6 @@
-'use client';
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginHoloModalProps {
     isOpen: boolean;
@@ -8,6 +8,8 @@ interface LoginHoloModalProps {
 }
 
 export default function LoginHoloModal({ isOpen, setIsOpen }: LoginHoloModalProps) {
+    const { login } = useAuth();
+
     // Form Inputs
     const [termInput, setTermInput] = useState('');
     const [termPassword, setTermPassword] = useState('');
@@ -47,7 +49,7 @@ export default function LoginHoloModal({ isOpen, setIsOpen }: LoginHoloModalProp
         }
     }, [isOpen]);
 
-    const handleTerminalKeyDown = (e: React.KeyboardEvent) => {
+    const handleTerminalKeyDown = async (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
             if (step === 2 && termInput.trim()) {
                 setLogs(p => [...p, `> ${termInput}`, '> PROTOCOL ACCEPTED. PASSWORD:']);
@@ -62,12 +64,19 @@ export default function LoginHoloModal({ isOpen, setIsOpen }: LoginHoloModalProp
                         setIsOpen(false);
                     }, 4000);
                 } else if (termPassword.trim()) {
-                    setLogs(p => [...p, `> ********`, '> AUTHENTICATING...']);
+                    setLogs(p => [...p, `> ********`, '> AUTHENTICATING BİOMETRIC HASH...']);
                     setStep(5);
-                    setTimeout(() => {
+                    
+                    const success = await login(termInput, termPassword);
+                    
+                    if (success) {
                         setLogs(p => [...p, '> ACCESS GRANTED. WELCOME!']);
                         setTimeout(() => setIsOpen(false), 1200);
-                    }, 1800);
+                    } else {
+                        setLogs(p => [...p, '> ACCESS DENIED: INVALID CREDENTIALS.', '> PASSWORD:']);
+                        setStep(4);
+                        setTermPassword('');
+                    }
                 }
             }
         }
@@ -133,10 +142,10 @@ export default function LoginHoloModal({ isOpen, setIsOpen }: LoginHoloModalProp
                                     type="text" 
                                     autoComplete="off"
                                     spellCheck="false"
-                                    className="bg-transparent border-none outline-none text-cyan-300 w-full font-bold uppercase tracking-wider placeholder-cyan-900/50 selection:bg-cyan-500/30"
+                                    className="bg-transparent border-none outline-none text-cyan-300 w-full font-bold tracking-wider placeholder-cyan-900/50 selection:bg-cyan-500/30"
                                     value={termInput}
-                                    placeholder="E-POSTA ADRESİNİZ"
-                                    onChange={e => setTermInput(e.target.value.toUpperCase())}
+                                    placeholder="ornek@sirket.com"
+                                    onChange={e => setTermInput(e.target.value)}
                                     onKeyDown={handleTerminalKeyDown}
                                 />
                                 <span className="w-3 h-5 bg-cyan-400 ml-1 block animate-[blink_1s_infinite]"></span>
