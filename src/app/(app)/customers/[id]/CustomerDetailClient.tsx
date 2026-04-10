@@ -54,6 +54,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [documents, setDocuments] = useState<any[]>([]);
     const [services, setServices] = useState<any[]>([]);
     const [assets, setAssets] = useState<any[]>([]);
+    const [editingAsset, setEditingAsset] = useState<any>(null);
 
     const [qrPlate, setQrPlate] = useState<string | null>(null);
     const [docsLoading, setDocsLoading] = useState(false);
