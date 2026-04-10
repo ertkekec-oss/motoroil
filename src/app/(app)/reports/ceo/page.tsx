@@ -7,20 +7,6 @@ import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 import { HelpCircle, CheckCircle2, ArrowRight, AlertTriangle, AlertCircle, MoveRight, DollarSign, Package, Users, Settings } from 'lucide-react';
 
 const riskData = [
-    { id: '1', name: 'Geciken Açık Hesap Tahsilatları', finRisk: 85, opRisk: 30, z: 50, region: 'Merkez Şube' },
-    { id: '2', name: 'Depoda Atıl Kalan Stoklar', finRisk: 40, opRisk: 75, z: 80, region: 'Ana Lojistik' },
-    { id: '3', name: 'Çok Satanlarda Tedarik Gecikmesi', finRisk: 60, opRisk: 90, z: 60, region: 'Tüm Şubeler' },
-    { id: '4', name: 'Kur Dalgalanması & Marj Aşınması', finRisk: 70, opRisk: 50, z: 40, region: 'Bölge Geneli' },
-    { id: '5', name: 'Olağan Ticari Akış', finRisk: 20, opRisk: 20, z: 90, region: 'Merkez Şube' },
-];
-
-const decisionQueue = [
-    { id: 1, action: 'Otomatik Tedarik Siparişi Oluştur', reason: 'Kritik stok seviyesinin altına düşen 14 ürün var', impact: 'Stoksuz Kalma Tehlikesi', color: 'red' },
-    { id: 2, action: 'Riskli Müşterileri Krediye Kapat', reason: 'Ödeme gecikmeleri tolerans sınırını aştı', impact: 'Nakit Akış Darboğazı', color: 'blue' },
-    { id: 3, action: 'Şubeler Arası Envanter Kaydır', reason: 'Tesisiler arası dengesiz yığılma ve acil talep', impact: 'Maliyet Optimizasyonu', color: 'emerald' },
-    { id: 4, action: 'Fiyatlandırma Şablonlarını Güncelle', reason: 'Artan tedarikçi maliyetleri satış kârlılığını düşürüyor', impact: 'Kâr Marjı Koruması', color: 'slate' },
-];
-
 const InfoTooltip = ({ content, iconClassName = "w-4 h-4 text-slate-400 hover:text-slate-600" }: { content: string, iconClassName?: string }) => (
     <div className="group relative inline-flex items-center justify-center pointer-events-auto align-middle ml-1">
         <HelpCircle className={`${iconClassName} cursor-help transition-colors`} />
@@ -49,8 +35,9 @@ export default function CEODashboardPage() {
         }
 
         const fetchData = async () => {
+            setLoading(true);
             try {
-                const res = await fetch('/api/reports/ceo-metrics');
+                const res = await fetch(`/api/reports/ceo-metrics?scope=${encodeURIComponent(scopeMode)}`);
                 const json = await res.json();
                 setData(json);
             } catch (error) {
@@ -60,7 +47,7 @@ export default function CEODashboardPage() {
             }
         };
         fetchData();
-    }, [isLoading, isAuthenticated, router]);
+    }, [isLoading, isAuthenticated, router, scopeMode]);
 
     if (isLoading || loading) {
         return (
@@ -104,7 +91,7 @@ export default function CEODashboardPage() {
                                 <InfoTooltip content="Nakit, stok ve kârlılık verilerinden hesaplanan genel performans göstergesi." />
                             </div>
                             <div className="flex items-baseline gap-1.5">
-                                <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 leading-none">81</span>
+                                <span className={`text-3xl font-black leading-none ${data.healthScore >= 70 ? 'text-emerald-600 dark:text-emerald-400' : data.healthScore >= 40 ? 'text-amber-500' : 'text-red-600'}`}>{data.healthScore || 0}</span>
                                 <span className="text-sm font-bold text-slate-400 dark:text-slate-500">/ 100</span>
                             </div>
                         </div>
@@ -273,137 +260,15 @@ export default function CEODashboardPage() {
 
             {/* 4. Ana Kart Alanı (Light Kurumsal) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                {roleMode === 'CEO' && (
-                    <>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Konsolide Ciro</span>
-                                <InfoTooltip content="Tüm şubeler ve döviz cinslerinden elde edilen net ciro tutarı." />
-                            </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">₺4.2M</div>
+                {data.roleData && data.roleData[roleMode] && data.roleData[roleMode].map((metric: any, idx: number) => (
+                    <div key={idx} className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center animate-in fade-in zoom-in-95 duration-300">
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
+                            <span>{metric.label}</span>
+                            {metric.tooltip && <InfoTooltip content={metric.tooltip} />}
                         </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Nakit Dönüş Süresi</span>
-                                <InfoTooltip content="Stokların satılıp nakde dönüşümüne kadar geçen ortalama süre." />
-                            </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">42 Gün</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Kritik Risk Sayısı</span>
-                                <InfoTooltip content="Acil müdahale gerektiren operasyonel veya finansal darboğaz sayısı." />
-                            </div>
-                            <div className="text-3xl font-black text-red-500">3</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Tahmini 30G Kâr</span>
-                                <InfoTooltip content="Gelecek 30 gün içinde beklenen operasyonel kâr tahmini." />
-                            </div>
-                            <div className="text-3xl font-black text-emerald-600">+₺124.000</div>
-                        </div>
-                    </>
-                )}
-
-                {roleMode === 'CFO' && (
-                    <>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Alacak / Borç Dengesi</span>
-                                <InfoTooltip content="Açık faturalar üzerinden hesaplanan şirketin cari nakit netliği." />
-                            </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">+ %14</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Kur Riski</span>
-                                <InfoTooltip content="Kur dalgalanmasına açık varlık/yükümlülük risk hacmi." />
-                            </div>
-                            <div className="text-3xl font-black text-amber-500">Orta</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Tahmini Nakit Açığı</span>
-                                <InfoTooltip content="15 gün içinde oluşması muhtemel nakit rezerv eksikliği." />
-                            </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">₺0 <span className="text-sm font-medium text-slate-400 ml-1">(Yok)</span></div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Geciken Tahsilatlar</span>
-                                <InfoTooltip content="Vadesi geçmiş ve tahsil edilememiş toplam alacaklar." />
-                            </div>
-                            <div className="text-3xl font-black text-red-500">₺28.000</div>
-                        </div>
-                    </>
-                )}
-
-                {roleMode === 'COO' && (
-                    <>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Kritik Stok</span>
-                                <InfoTooltip content="Tükenme seviyesinde olan veya aşırı atıl duran ürün sayısı." />
-                            </div>
-                            <div className="text-3xl font-black text-red-500">14</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Transfer Bekleyen</span>
-                                <InfoTooltip content="Depolar arası onay bekleyen sevk emri sayısı." />
-                            </div>
-                            <div className="text-3xl font-black text-amber-500">28</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Servis WIP</span>
-                                <InfoTooltip content="Devam eden ancak henüz faturalandırılmamış servis işlemleri bedeli." />
-                            </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">₺184K</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Ortalama Tedarik Süresi</span>
-                                <InfoTooltip content="Sipariş anından depoya girişine kadar geçen ortalama süre." />
-                            </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">14 Gün</div>
-                        </div>
-                    </>
-                )}
-
-                {roleMode === 'Growth' && (
-                    <>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>En Karlı Ürün</span>
-                                <InfoTooltip content="Marjı en yüksek olan ve en fazla net kâr bırakan kategori/ürün." />
-                            </div>
-                            <div className="text-xl font-black text-slate-900 dark:text-white leading-tight">Maden Yağları</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>En Hızlı Dönen SKU</span>
-                                <InfoTooltip content="Stok devir hızı en yüksek olan ve anında nakde dönen ürün." />
-                            </div>
-                            <div className="text-xl font-black text-slate-900 dark:text-white leading-tight">10W-40 Pro</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Müşteri Değer Skoru</span>
-                                <InfoTooltip content="CSAT ve LTV verilerine dayalı ortalama sadakat skoru." />
-                            </div>
-                            <div className="text-3xl font-black text-emerald-600">92/100</div>
-                        </div>
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
-                                <span>Kampanya ROI</span>
-                                <InfoTooltip content="B2B Boost kampanyalarının ortalama yatırım getirisi oranı." />
-                            </div>
-                            <div className="text-3xl font-black text-blue-600">% 415</div>
-                        </div>
-                    </>
-                )}
+                        <div className={`text-3xl font-black ${metric.valueColor || 'text-slate-900 dark:text-white'}`}>{metric.value}</div>
+                    </div>
+                ))}
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -442,8 +307,8 @@ export default function CEODashboardPage() {
                                         return null;
                                     }}
                                 />
-                                <Scatter name="Tehlike Radarı" data={riskData} fill="#8884d8">
-                                    {riskData.map((entry, index) => {
+                                <Scatter name="Tehlike Radarı" data={data.riskData || []} fill="#8884d8">
+                                    {(data.riskData || []).map((entry: any, index: number) => {
                                         const score = (entry.finRisk + entry.opRisk) / 2;
                                         let color = '#10b981'; // emerald
                                         if (score > 60) color = '#ef4444'; // red
@@ -468,7 +333,7 @@ export default function CEODashboardPage() {
                     </div>
 
                     <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                        {decisionQueue.map((item) => (
+                        {data.decisionQueue && data.decisionQueue.length > 0 ? data.decisionQueue.map((item: any) => (
                             <div key={item.id} className="flex flex-col p-4 rounded-xl border border-slate-200 dark:border-white/5 hover:border-slate-300 hover:shadow-md transition-all bg-white dark:bg-[#0f172a] relative">
                                 <div className="mb-3">
                                     <div className="text-sm font-black text-slate-900 dark:text-white mb-1 leading-tight">{item.action}</div>
@@ -493,7 +358,11 @@ export default function CEODashboardPage() {
                                     </button>
                                 </div>
                             </div>
-                        ))}
+                        )) : (
+                            <div className="text-sm text-slate-500 font-medium p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50">
+                                Tüm süreçler planlandığı gibi ilerliyor. Aktif edilecek öncelikli karar bulunamadı.
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
