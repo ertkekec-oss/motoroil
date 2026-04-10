@@ -56,7 +56,7 @@ export function PlatformDocumentGate({ module, children }: PlatformDocumentGateP
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#0f172a]">
+            <div className="flex h-full min-h-[60vh] w-full items-center justify-center bg-transparent">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
         );
