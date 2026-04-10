@@ -3152,7 +3152,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </div>
                             </div>
                             <button onClick={() => {
-                                fetch(/api/assets/, {
+                                fetch(`/api/assets/${editingAsset.id}`, {
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
