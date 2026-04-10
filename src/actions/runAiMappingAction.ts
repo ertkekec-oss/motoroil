@@ -48,12 +48,10 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
         const globalCatList = globalCats.map(g => ({ id: g.id, path: getFullName(g) }));
 
         let processedCount = 0;
+        let geminiFailed = false;
 
         // Semantic Engine Route with Google Gemini
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-        if (!GEMINI_API_KEY) {
-             return { success: false, error: "Vercel Settings panelinde GEMINI_API_KEY tanımlanmamış. Deep-B2B zekasının çalışması için Google AI Studio anahtarınızı Vercel Environment Variables kısmına kaydedin." };
-        }
         
         if (GEMINI_API_KEY) {
             
@@ -104,19 +102,15 @@ ${JSON.stringify(payload)}`;
             }
 
             if (!response) {
-                return { success: false, error: "Google Gemini sunucularına ulaşılamadı. Sunucular aşırı yoğun." };
-            }
-
-            const data = await response.json();
-            
-            if (data.error) {
-                console.error("Gemini API Error:", data.error);
-                // If it's a high demand error, give a friendly message rather than crashing
-                if (data.error.message && data.error.message.includes("high demand")) {
-                     return { success: false, error: "Google Yapay Zeka sunucuları anlık olarak aşırı yoğun (High Demand). Lütfen 1-2 dakika bekleyip tekrar deneyin." }
-                }
-                return { success: false, error: `Gemini API Hatası: ${data.error.message}` };
-            }
+                console.error("Google Gemini sunucularına ulaşılamadı. Sunucular aşırı yoğun.");
+                geminiFailed = true;
+            } else {
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error("Gemini API Error:", data.error);
+                    geminiFailed = true;
+                } else {
 
             const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{"results":[]}';
             const parsed = JSON.parse(textResponse);
@@ -170,10 +164,12 @@ ${JSON.stringify(payload)}`;
                     }
                 });
                 processedCount++;
-            }
-
-        } else {
-            // --- FALLBACK REGEX ENGINE (If no OpenAI API Key configured) ---
+                }
+            } // end of !geminiFailed block
+        } 
+        
+        if (!GEMINI_API_KEY || geminiFailed) {
+            // --- FALLBACK REGEX ENGINE (If no OpenAI API Key configured or API in High Demand) ---
             for (const p of unmappedProducts) {
                 const analysisString = `${String(p.name).toLowerCase()} ${String(p.brand || "").toLowerCase()} ${String(p.category || "").toLowerCase()}`;
                 let matchedGlobalId = null;
