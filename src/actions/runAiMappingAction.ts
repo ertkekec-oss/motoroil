@@ -20,7 +20,8 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
                 companyId,
                 OR: [{ category: null }, { category: "" }, { category: "-" }, { category: "Diğer" }, { globalCategoryId: null }]
             },
-            take: 50 // Reduced batch size to pass through heavy load Google constraints
+            take: 50, // Reduced batch size
+            orderBy: { updatedAt: 'asc' }
         });
 
         if (unmappedProducts.length === 0) {
@@ -61,11 +62,11 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
             }));
 
             const prompt = `Sen Periodya B2B ağının akıllı 'Otonom Semantic Motoru'sun.
-Aşağıdaki 'LOKAL ÜRÜNLER' listesindeki ERP kayıtlarını analiz et. Her biri için 'GLOBAL KATEGORİ LİSTESİ'nden EN UYGUN kategorinin 'id'sini tespit et.
+Aşağıdaki 'LOKAL ÜRÜNLER' listesindeki ERP kayıtlarını analiz et. Her biri için 'GLOBAL KATEGORİ LİSTESİ'nden EN UYGUN kategorinin 'id' değerini tespit et.
 1. 'derivedBrand': 'brand' alanını profesyonelce düzelt.
 2. 'seoTitle': B2B pazar yeri için ürüne mantıklı ve temizleştirilmiş bir isim üret.
-3. Yanıtın KESİN formatta bir JSON objesi olmalıdır: { "results": [ { "id": "ürün-id-buraya", "globalCategoryId": "eşleşen-kategori-idsi", "derivedBrand": "Düzeltilmiş", "seoTitle": "SEO Başlığı" } ] }
-Global dizin dışından id uydurma. Eşleşmiyorsa globalCategoryId'yi null bırak.
+3. Yanıtın KESİN formatta bir JSON objesi olmalıdır: { "results": [ { "id": "ürün-id-buraya", "globalCategoryId": "eslesen-id", "derivedBrand": "Düzeltilmiş", "seoTitle": "SEO Başlığı" } ] }
+Eşleşen kategori id'si, listedeki 'id' alanıdır. Mümkün olan en akılcı eşleşmeyi yap (Örn: Zincir Yağlama -> Motosiklet / Bisiklet ekipmanı). Hiçbir mantıklı eşleşme bulamazsan null bırak.
 
 GLOBAL KATEGORİ LİSTESİ:
 ${JSON.stringify(globalCatList)}
@@ -160,11 +161,12 @@ ${JSON.stringify(payload)}`;
                 await prisma.product.update({
                     where: { id: p.id },
                     data: {
-                        ...(updateLocalNames && result.seoTitle ? { name: result.seoTitle } : {}),
-                        ...(updateLocalNames && matchedCategoryName !== "Diğer" ? { category: matchedCategoryName } : {}),
+                        ...(updateLocalNames && result.seoTitle && result.seoTitle.length > 3 ? { name: result.seoTitle } : {}),
+                        ...(updateLocalNames && matchedCategoryName !== "Diğer" && matchedCategoryName !== "-" ? { category: matchedCategoryName } : {}),
                         b2bDescription: result.seoTitle || p.name,
                         brand: result.derivedBrand || p.brand,
-                        ...(finalGlobalId ? { globalCategoryId: finalGlobalId } : {})
+                        ...(finalGlobalId ? { globalCategoryId: finalGlobalId } : {}),
+                        updatedAt: new Date()
                     }
                 });
                 processedCount++;
@@ -218,8 +220,9 @@ ${JSON.stringify(payload)}`;
                 await prisma.product.update({
                     where: { id: p.id },
                     data: { 
-                        ...(updateLocalNames && matchedCatName !== "Diğer" ? { category: matchedCatName } : {}),
-                        ...(matchedGlobalId ? { globalCategoryId: matchedGlobalId } : {})
+                        ...(updateLocalNames && matchedCatName !== "Diğer" && matchedCatName !== "-" ? { category: matchedCatName } : {}),
+                        ...(matchedGlobalId ? { globalCategoryId: matchedGlobalId } : {}),
+                        updatedAt: new Date()
                     }
                 });
                 processedCount++;
