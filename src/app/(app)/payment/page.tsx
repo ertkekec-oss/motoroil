@@ -135,15 +135,15 @@ function PaymentContent() {
             <div className="w-full max-w-[900px] bg-white dark:bg-[#0f172a] shadow-2xl shadow-blue-900/10 dark:shadow-none rounded-[32px] overflow-hidden flex flex-col md:flex-row border border-slate-200 dark:border-white/5 animate-in fade-in zoom-in-95 duration-500">
                 
                 {/* Left Panel: Context & Amount */}
-                <div className={\`w-full md:w-2/5 p-8 sm:p-10 flex flex-col justify-between \${isPayable ? 'bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-[#0f172a]' : 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-[#0f172a]'} border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/5 relative\`}>
+                <div className={`w-full md:w-2/5 p-8 sm:p-10 flex flex-col justify-between ${isPayable ? 'bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-[#0f172a]' : 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-[#0f172a]'} border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/5 relative`}>
                     
                     {/* Decorative Background Blob */}
-                    <div className={\`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] -z-0 opacity-40 \${isPayable ? 'bg-rose-400/30' : 'bg-emerald-400/30'}\`}></div>
+                    <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] -z-0 opacity-40 ${isPayable ? 'bg-rose-400/30' : 'bg-emerald-400/30'}`}></div>
                     
                     <div className="relative z-10 flex flex-col gap-8">
                         <div>
-                            <div className={\`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 shadow-sm \${isPayable ? 'bg-white dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50' : 'bg-white dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50'}\`}>
-                                <div className={\`w-2 h-2 rounded-full animate-pulse \${isPayable ? 'bg-rose-500' : 'bg-emerald-500'}\`}></div>
+                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 shadow-sm ${isPayable ? 'bg-white dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50' : 'bg-white dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50'}`}>
+                                <div className={`w-2 h-2 rounded-full animate-pulse ${isPayable ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
                                 {isPayable ? 'ÖDEME ÇIKIŞI' : 'TAHSİLAT İŞLEMİ'}
                             </div>
                             
@@ -185,19 +185,19 @@ function PaymentContent() {
                             <div className="flex bg-slate-100 dark:bg-[#1e293b] p-1.5 rounded-2xl">
                                 <button
                                     onClick={() => setPaymentMethod('cash')}
-                                    className={\`flex-1 py-3 text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 \${paymentMethod === 'cash' ? 'bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}\`}
+                                    className={`flex-1 py-3 text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${paymentMethod === 'cash' ? 'bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                 >
                                     <span className="text-lg">💵</span> Nakit
                                 </button>
                                 <button
                                     onClick={() => setPaymentMethod('cc')}
-                                    className={\`flex-1 py-3 text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 \${paymentMethod === 'cc' ? 'bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}\`}
+                                    className={`flex-1 py-3 text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${paymentMethod === 'cc' ? 'bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                 >
                                     <span className="text-lg">💳</span> Kart
                                 </button>
                                 <button
                                     onClick={() => setPaymentMethod('iban')}
-                                    className={\`flex-1 py-3 text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 \${paymentMethod === 'iban' ? 'bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}\`}
+                                    className={`flex-1 py-3 text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${paymentMethod === 'iban' ? 'bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                 >
                                     <span className="text-lg">🏦</span> Havale
                                 </button>
@@ -239,9 +239,9 @@ function PaymentContent() {
                                             <button
                                                 key={opt.value}
                                                 onClick={() => setInstallment(opt.value)}
-                                                className={\`py-3 rounded-xl border-2 transition-all font-bold text-[12px] \${installment === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'border-slate-100 dark:border-white/5 bg-transparent text-slate-500 hover:border-slate-200 dark:hover:border-slate-700'}\`}
+                                                className={`py-3 rounded-xl border-2 transition-all font-bold text-[12px] ${installment === opt.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'border-slate-100 dark:border-white/5 bg-transparent text-slate-500 hover:border-slate-200 dark:hover:border-slate-700'}`}
                                             >
-                                                {opt.value === 1 ? 'Tek Çekim' : \`\${opt.value} Taksit\`}
+                                                {opt.value === 1 ? 'Tek Çekim' : `${opt.value} Taksit`}
                                             </button>
                                         ))}
                                     </div>
@@ -261,7 +261,7 @@ function PaymentContent() {
                         <button 
                             onClick={handlePayment}
                             disabled={isProcessing}
-                            className={\`flex-1 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-3 uppercase tracking-wide transition-all \${isPayable ? 'bg-[#e11d48] hover:bg-[#be123c] shadow-rose-500/30' : 'bg-[#059669] hover:bg-[#047857] shadow-emerald-500/30'} \${isProcessing ? 'opacity-70 scale-95' : 'shadow-xl hover:shadow-2xl hover:-translate-y-1'}\`}
+                            className={`flex-1 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-3 uppercase tracking-wide transition-all ${isPayable ? 'bg-[#e11d48] hover:bg-[#be123c] shadow-rose-500/30' : 'bg-[#059669] hover:bg-[#047857] shadow-emerald-500/30'} ${isProcessing ? 'opacity-70 scale-95' : 'shadow-xl hover:shadow-2xl hover:-translate-y-1'}`}
                         >
                             {isProcessing ? (
                                 <><span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> İŞLENİYOR...</>
