@@ -75,7 +75,7 @@ export async function GET(request: Request) {
             } catch (e) {}
 
             try {
-                const updatedInvoices = await prisma.invoice.updateMany({
+                const updatedInvoices = await prisma.salesInvoice.updateMany({
                     where: { companyId, branch: 'Merkez' },
                     data: { branch: targetBranchName }
                 });

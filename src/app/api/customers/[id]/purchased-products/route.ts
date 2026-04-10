@@ -19,13 +19,12 @@ export async function GET(
             select: { id: true, invoiceNo: true, createdAt: true, items: true, status: true, totalAmount: true }
         });
 
-        const formalInvoices = await prisma.invoice.findMany({
+        const formalInvoices = await prisma.salesInvoice.findMany({
             where: {
                 customerId,
-                type: { in: ['SATIŞ', 'SALES', 'E-FATURA', 'E-ARŞİV'] },
                 status: { notIn: ['İPTAL', 'CANCELLED'] }
             },
-            select: { id: true, invoiceNo: true, date: true, items: true, status: true, totalAmount: true }
+            select: { id: true, invoiceNo: true, invoiceDate: true, items: true, status: true, totalAmount: true }
         });
 
         const purchasedProducts: any[] = [];
@@ -66,7 +65,7 @@ export async function GET(
                         type: 'Invoice',
                         sourceId: invoice.id,
                         invoiceNo: invoice.invoiceNo || invoice.id.slice(-6).toUpperCase(),
-                        date: invoice.date,
+                        date: invoice.invoiceDate,
                         productName: item.name || item.productName || 'Faturalandırılan Ürün',
                         productId: item.productId,
                         price: item.price || item.unitPrice || 0,
