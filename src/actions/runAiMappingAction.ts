@@ -102,14 +102,16 @@ ${JSON.stringify(payload)}`;
             }
 
             if (!response) {
-                console.error("Google Gemini sunucularına ulaşılamadı. Sunucular aşırı yoğun.");
-                geminiFailed = true;
+                return { success: false, error: "Google Gemini sunucularına ulaşılamadı. Sunucular aşırı yoğun." };
             } else {
                 const data = await response.json();
                 
                 if (data.error) {
                     console.error("Gemini API Error:", data.error);
-                    geminiFailed = true;
+                    if (data.error.message && data.error.message.includes("high demand")) {
+                         return { success: false, error: "Google Yapay Zeka sunucuları anlık olarak aşırı yoğun. Lütfen birkaç dakika sonra tekrar deneyin." }
+                    }
+                    return { success: false, error: `Gemini API Hatası: ${data.error.message}` };
                 } else {
 
             const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{"results":[]}';
@@ -167,10 +169,10 @@ ${JSON.stringify(payload)}`;
                 }
             } // end of if (data.error) else
         } // end of if (!response) else
-    } // end of if (GEMINI_API_KEY) 
+        } 
         
-        if (!GEMINI_API_KEY || geminiFailed) {
-            // --- FALLBACK REGEX ENGINE (If no OpenAI API Key configured or API in High Demand) ---
+        if (!GEMINI_API_KEY) {
+            // --- FALLBACK REGEX ENGINE (If no Google AI API Key configured) ---
             for (const p of unmappedProducts) {
                 const analysisString = `${String(p.name).toLowerCase()} ${String(p.brand || "").toLowerCase()} ${String(p.category || "").toLowerCase()}`;
                 let matchedGlobalId = null;
@@ -181,7 +183,10 @@ ${JSON.stringify(payload)}`;
                     if (gc.name.toLowerCase().includes("bisiklet")) keywords.push(...["zefal", "jant", "kadro", "pedal"]);
                     if (gc.name.toLowerCase().includes("motosiklet")) keywords.push(...["zincir", "sprey", "yağ", "motul"]);
 
-                    if (keywords.some((kw: string) => analysisString.includes(kw))) {
+                    if (keywords.some((kw: string) => {
+                        const regex = new RegExp(`\\b${kw.replace(/[.*+?^$\\{\\}()|[\\]\\\\]/g, '\\\\$&')}\\b`, 'i');
+                        return regex.test(analysisString);
+                    })) {
                         matchedGlobalId = gc.id;
                         matchedCatName = gc.name;
                         break;
