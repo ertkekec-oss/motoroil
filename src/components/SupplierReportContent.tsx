@@ -76,7 +76,7 @@ export default function SupplierReportContent() {
             <header style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
                 <div>
                     <h1 className="text-gradient" style={{ fontSize: '32px', fontWeight: '900', margin: 0 }}>🚚 Tedarikçi Raporları</h1>
-                    <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Satın alma hacmi, ödeme dengesi ve performans analizi</p>
+                    <p style={{ color: 'var(--text-slate-500)', marginTop: '8px' }}>Satın alma hacmi, ödeme dengesi ve performans analizi</p>
                 </div>
 
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
@@ -91,7 +91,7 @@ export default function SupplierReportContent() {
 
                     <div style={{ display: 'flex', gap: '10px', background: 'var(--bg-card)', padding: '10px', borderRadius: '10px', border: "1px solid rgba(255,255,255,0.05)" }}>
                         <input type="date" value={dateRange.start} onChange={e => setDateRange({ ...dateRange, start: e.target.value })} style={{ background: 'transparent', border: 'none', color: 'white', outline: 'none', fontSize: '13px' }} />
-                        <span style={{ color: 'var(--text-muted)' }}>→</span>
+                        <span style={{ color: 'var(--text-slate-500)' }}>→</span>
                         <input type="date" value={dateRange.end} onChange={e => setDateRange({ ...dateRange, end: e.target.value })} style={{ background: 'transparent', border: 'none', color: 'white', outline: 'none', fontSize: '13px' }} />
                     </div>
                 </div>
@@ -99,15 +99,15 @@ export default function SupplierReportContent() {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px' }}>
                 <div className="card bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderLeft: '4px solid var(--primary)' }}>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 'bold' }}>DÖNEMLİK ALIM HACMİ</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-slate-500)', fontWeight: 'bold' }}>DÖNEMLİK ALIM HACMİ</div>
                     <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '5px' }}>₺{totalStats.totalPurchase.toLocaleString()}</div>
                 </div>
                 <div className="card bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderLeft: '4px solid var(--success)' }}>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 'bold' }}>DÖNEMLİK ÖDEMELER</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-slate-500)', fontWeight: 'bold' }}>DÖNEMLİK ÖDEMELER</div>
                     <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '5px' }}>₺{totalStats.totalPayment.toLocaleString()}</div>
                 </div>
                 <div className="card bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderLeft: '4px solid var(--error)' }}>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 'bold' }}>GÜNCEL TOPLAM BORÇ</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-slate-500)', fontWeight: 'bold' }}>GÜNCEL TOPLAM BORÇ</div>
                     <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '5px', color: 'var(--error)' }}>₺{totalStats.totalDebt.toLocaleString()}</div>
                 </div>
             </div>
@@ -154,7 +154,7 @@ export default function SupplierReportContent() {
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                        <tr style={{ background: 'rgba(255,255,255,0.02)', textAlign: 'left', fontSize: '13px', color: 'var(--text-muted)' }}>
+                        <tr style={{ background: 'rgba(255,255,255,0.02)', textAlign: 'left', fontSize: '13px', color: 'var(--text-slate-500)' }}>
                             <th style={{ padding: '15px 20px' }}>Tedarikçi Firma</th>
                             <th>İşlem Adedi</th>
                             <th>Dönem Alım</th>
@@ -165,7 +165,7 @@ export default function SupplierReportContent() {
                     </thead>
                     <tbody>
                         {supplierStats?.map(s => (
-                            <tr key={s.id} style={{ borderBottom: '1px solid var(--border-light)' }} className="hover:bg-white/5">
+                            <tr key={s.id} style={{ borderBottom: '1px solid var(--border-light)' }} className="hover:bg-slate-100 dark:bg-slate-800">
                                 <td style={{ padding: '15px 20px', fontWeight: 'bold' }}>{s.name}</td>
                                 <td>{s.count}</td>
                                 <td>₺{s.totalPurchase.toLocaleString()}</td>

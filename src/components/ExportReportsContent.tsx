@@ -115,7 +115,7 @@ export default function ExportReportsContent() {
             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-6 flex flex-col">
                 <div className="flex justify-between items-start mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Dışa Aktarılan Raporlar</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-1">Dışa Aktarılan Raporlar</h2>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Arşivlenmiş ve üretilmiş tüm sistem raporları (PDF, Excel, vb.)</p>
                     </div>
 
@@ -147,12 +147,12 @@ export default function ExportReportsContent() {
                             </thead>
                             <tbody>
                                 {reports?.map((report) => (
-                                    <tr key={report.id} className="border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                    <tr key={report.id} className="border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-100 dark:bg-slate-800 transition-colors">
                                         <td className="py-4 pl-2">
                                             <div className="flex items-center gap-3">
                                                 {getFileIcon(report.mimeType)}
                                                 <div>
-                                                    <div className="text-sm font-semibold text-slate-900 dark:text-white max-w-[300px] truncate" title={report.fileName || report.name}>
+                                                    <div className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white max-w-[300px] truncate" title={report.fileName || report.name}>
                                                         {report.name || report.fileName}
                                                     </div>
                                                     <div className="text-xs text-slate-500 mt-0.5">

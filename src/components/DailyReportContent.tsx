@@ -55,66 +55,16 @@ export default function DailyReportContent() {
 
     return (
         <div className="animate-fade-in">
-            <style jsx>{`
-                .bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card {
-                    background: var(--bg-card);
-                    
-                    border: 1px solid var(--border-light);
-                    border-radius: 24px;
-                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card:hover {
-                    border-color: var(--primary);
-                    transform: translateY(-5px);
-                    background: var(--bg-hover);
-                    box-shadow: var(--shadow-premium);
-                }
-                .pulse-box {
-                    width: 8px;
-                    height: 8px;
-                    background: var(--primary);
-                    border-radius: 50%;
-                    box-shadow: 0 0 0 rgba(255, 85, 0, 0.4);
-                    animation: pulse 1.5s infinite;
-                }
-                @keyframes pulse {
-                    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 85, 0, 0.7); }
-                    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 85, 0, 0); }
-                    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 85, 0, 0); }
-                }
-                .stat-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                    gap: 24px;
-                }
-                .gradient-text-orange { background: linear-gradient(135deg, #FF8800, #FF5500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-                .gradient-text-green { background: linear-gradient(135deg, #10B981, #059669); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-                .gradient-text-red { background: linear-gradient(135deg, #FF4B2B, #FF416C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-                .gradient-text-cyan { background: linear-gradient(135deg, #00F0FF, #00B4D8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-                .select-premium {
-                    background: var(--input-bg);
-                    border: 1px solid var(--border-light);
-                    color: var(--text-main);
-                    border-radius: 12px;
-                    padding: 8px 16px;
-                    font-size: 12px;
-                    font-weight: 700;
-                    outline: none;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .select-premium:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); }
-            `}</style>
+            
 
             <header className="flex justify-between items-end mb-10 overflow-hidden">
                 <div className="animate-in fade-in slide-in-from-left duration-700">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="pulse-box"></div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Canlı Akış Aktif</span>
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 mr-1 animate-pulse"></div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-900 dark:text-white">Canlı Akış Aktif</span>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tight text-main mb-1">Gün Özet Raporu</h1>
-                    <p className="text-muted font-medium">Şu an: {currentTimeStr} • Veriler anlık olarak güncellenmektedir.</p>
+                    <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-900 dark:text-white mb-1">Gün Özet Raporu</h1>
+                    <p className="text-slate-500 font-medium">Şu an: {currentTimeStr} • Veriler anlık olarak güncellenmektedir.</p>
                 </div>
 
                 <div className="flex items-center gap-4 bg-subtle p-1 rounded-2xl border border-subtle animate-in fade-in slide-in-from-right duration-700">
@@ -125,7 +75,7 @@ export default function DailyReportContent() {
                             onChange={(e) => setSelectedBranch(e.target.value)}
                         >
                             {branches?.map((b: any) => (
-                                <option key={b.id} value={b.name} style={{ background: "#1e293b" }}>{b.name}</option>
+                                <option key={b.id} value={b.name} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{b.name}</option>
                             ))}
                         </select>
                     )}
@@ -133,13 +83,13 @@ export default function DailyReportContent() {
                         <div className="flex bg-main/20 rounded-xl p-1">
                             <button
                                 onClick={() => setAdminActiveTab('overall')}
-                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'overall' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-muted hover:text-main'}`}
+                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'overall' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-slate-900 dark:text-white shadow-sm shadow-primary/20' : 'text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white'}`}
                             >
                                 KONSOLİDE
                             </button>
                             <button
                                 onClick={() => setAdminActiveTab('branch')}
-                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'branch' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-muted hover:text-main'}`}
+                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'branch' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-slate-900 dark:text-white shadow-sm shadow-primary/20' : 'text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white'}`}
                             >
                                 ŞUBE BAZLI
                             </button>
@@ -149,58 +99,58 @@ export default function DailyReportContent() {
             </header>
 
             <div className="stat-grid mb-10">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group">
-                    <div className="text-[10px] font-black tracking-widest text-primary mb-6 flex justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-8 group">
+                    <div className="text-[10px] font-black tracking-widest text-slate-900 dark:text-slate-900 dark:text-white mb-6 flex justify-between">
                         <span>TOPLAM CİRO</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                     </div>
-                    <div className="text-4xl font-black text-main mb-2">
-                        ₺ <span className="gradient-text-orange">{stats.sales.toLocaleString()}</span>
+                    <div className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">
+                        ₺ <span className="text-slate-900 dark:text-slate-900 dark:text-white">{stats.sales.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-muted">
-                        <span className="w-4 h-0.5 bg-primary/20"></span>
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                        <span className="w-4 h-0.5 bg-slate-200 dark:bg-slate-700"></span>
                         GÜNLÜK SATIŞ HACMİ
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-emerald-400 mb-6 flex justify-between">
                         <span>TOPLAM TAHSİLAT</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                     </div>
-                    <div className="text-4xl font-black text-white mb-2">
-                        ₺ <span className="gradient-text-green">{stats.collections.toLocaleString()}</span>
+                    <div className="text-4xl font-black text-slate-900 dark:text-white mb-2">
+                        ₺ <span className="text-slate-900 dark:text-slate-900 dark:text-white">{stats.collections.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-white/20">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                         <span className="w-4 h-0.5 bg-emerald-400/20"></span>
                         KASA GİRİŞLERİ
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-red-500 mb-6 flex justify-between">
                         <span>TOPLAM GİDER</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↘</span>
                     </div>
-                    <div className="text-4xl font-black text-white mb-2">
-                        ₺ <span className="gradient-text-red">{stats.expenses.toLocaleString()}</span>
+                    <div className="text-4xl font-black text-slate-900 dark:text-white mb-2">
+                        ₺ <span className="text-slate-900 dark:text-slate-900 dark:text-white">{stats.expenses.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-white/20">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                         <span className="w-4 h-0.5 bg-red-500/20"></span>
                         TÜM ÇIKIŞLAR
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5  -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-8 group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 dark:bg-slate-800/50  -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
                     <div className="text-[10px] font-black tracking-widest text-cyan-400 mb-6 flex justify-between">
                         <span>BAKİYE DEĞİŞİMİ</span>
                         <span className="px-2 py-0.5 rounded-full bg-cyan-400/10 text-[8px]">NET</span>
                     </div>
-                    <div className="text-4xl font-black text-white mb-2">
-                        ₺ <span className="gradient-text-cyan">{stats.net.toLocaleString()}</span>
+                    <div className="text-4xl font-black text-slate-900 dark:text-white mb-2">
+                        ₺ <span className="text-slate-900 dark:text-slate-900 dark:text-white">{stats.net.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-white/20">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                         <span className="w-4 h-0.5 bg-cyan-400/20"></span>
                         GÜNLÜK NET OPERASYON
                     </div>
@@ -208,38 +158,38 @@ export default function DailyReportContent() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-10">
+                <div className="lg:col-span-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-10">
                     <div className="flex justify-between items-center mb-10">
                         <div>
-                            <h3 className="text-xl font-black text-white mb-1">Anlık İşlem Takibi</h3>
-                            <p className="text-sm text-white/30 truncate max-w-[200px] md:max-w-none">
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-1">Anlık İşlem Takibi</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 truncate max-w-[200px] md:max-w-none">
                                 {adminActiveTab === 'overall' ? 'Tüm şubelerden gelen konsolide akış.' : `${selectedBranch} şubesi finansal akışı.`}
                             </p>
                         </div>
-                        <div className="text-[10px] font-black text-muted uppercase tracking-widest bg-subtle px-4 py-2 rounded-full border border-subtle">Bugün: {filteredTransactions.length} İşlem</div>
+                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-subtle px-4 py-2 rounded-full border border-subtle">Bugün: {filteredTransactions.length} İşlem</div>
                     </div>
 
                     <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                         {filteredTransactions.length > 0 ? (
                             filteredTransactions.slice(0, 20)?.map((t, i) => (
-                                <div key={i} className="flex-between p-5 group rounded-2xl bg-subtle border border-subtle hover:bg-hover hover:border-main hover:translate-x-1 transition-all">
+                                <div key={i} className="flex-between p-5 group rounded-2xl bg-slate-50 dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 hover:translate-x-1 transition-all">
                                     <div className="flex gap-5 items-center">
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-sm ${t.type === 'Sales' ? 'bg-orange-500/10 text-orange-400 ' :
-                                            t.type === 'Expense' ? 'bg-red-500/10 text-red-400 shadow-red-500/5' :
+                                            t.type === 'Expense' ? 'bg-red-500/10 text-red-400 ' :
                                                 t.type === 'Collection' ? 'bg-emerald-500/10 text-emerald-400 ' :
-                                                    'bg-white/10 text-white shadow-white/5'
+                                                    'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-white/5'
                                             }`}>
                                             {t.type === 'Sales' ? '💰' : t.type === 'Expense' ? '🧾' : t.type === 'Collection' ? '📥' : '💼'}
                                         </div>
                                         <div>
-                                            <div className="font-bold text-white/90 group-hover:text-white transition-colors">{(t.description || 'İşlem').split(' | REF:')[0]}</div>
+                                            <div className="font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:text-white transition-colors">{(t.description || 'İşlem').split(' | REF:')[0]}</div>
                                             <div className="flex items-center gap-3">
                                                 <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${t.type === 'Sales' ? 'bg-orange-500/20 text-orange-400' :
                                                     t.type === 'Collection' ? 'bg-emerald-500/20 text-emerald-400' :
                                                         'bg-red-500/20 text-red-400'
                                                     }`}>{t.type}</span>
-                                                <span className="w-1 h-1 rounded-full bg-white/10"></span>
-                                                <span className="text-[10px] text-white/40 font-bold">{new Date(t.date).toLocaleTimeString('tr-TR')}</span>
+                                                <span className="w-1 h-1 rounded-full bg-slate-100 dark:bg-slate-800"></span>
+                                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{new Date(t.date).toLocaleTimeString('tr-TR')}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -250,8 +200,8 @@ export default function DailyReportContent() {
                                 </div>
                             ))
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-20 text-white/20 border-2 border-dashed border-white/5 rounded-3xl">
-                                <span className="text-4xl mb-4">🌑</span>
+                            <div className="flex flex-col items-center justify-center py-20 text-slate-500 dark:text-slate-400 border-2 border-dashed border-white/5 rounded-3xl">
+                                <span className="text-4xl mb-4">📊</span>
                                 <p className="text-sm font-bold uppercase tracking-widest">Henüz bir işlem gerçekleştirilmedi.</p>
                             </div>
                         )}
@@ -259,8 +209,8 @@ export default function DailyReportContent() {
                 </div>
 
                 <div className="space-y-8">
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-10">
-                        <h3 className="text-lg font-black text-white mb-6">Kasa Dağılımı</h3>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-10">
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white mb-6">Kasa Dağılımı</h3>
                         <div className="space-y-7">
                             {kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch).slice(0, 6)?.map((kasa, i) => {
                                 const relevantKasas = kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch);
@@ -269,12 +219,12 @@ export default function DailyReportContent() {
                                 return (
                                     <div key={i} className="space-y-2 group">
                                         <div className="flex justify-between items-end">
-                                            <span className="text-[11px] font-black text-white/50 uppercase tracking-widest group-hover:text-white/80 transition-colors">{kasa.name}</span>
-                                            <span className="text-xs font-black text-white">₺ {Number(kasa.balance).toLocaleString()}</span>
+                                            <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest group-hover:text-slate-500 dark:text-slate-400 transition-colors">{kasa.name}</span>
+                                            <span className="text-xs font-black text-slate-900 dark:text-white">₺ {Number(kasa.balance).toLocaleString()}</span>
                                         </div>
-                                        <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                             <div
-                                                className={`h-full bg-gradient-to-r ${i % 2 === 0 ? 'from-primary to-orange-400' : 'from-emerald-400 to-green-600'} shadow-[0_0_10px_var(--primary-glow)] transition-all duration-1000`}
+                                                className={`h-full bg-gradient-to-r ${i % 2 === 0 ? 'from-primary to-orange-400' : 'from-emerald-400 to-green-600'} shadow-sm transition-all duration-1000`}
                                                 style={{ width: `${percentage}%` }}
                                             ></div>
                                         </div>
@@ -283,31 +233,31 @@ export default function DailyReportContent() {
                             })}
 
                             {kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch).length === 0 && (
-                                <p className="text-center text-white/20 text-xs font-bold py-10 uppercase tracking-widest">Kasa Bulunamadı</p>
+                                <p className="text-center text-slate-500 dark:text-slate-400 text-xs font-bold py-10 uppercase tracking-widest">Kasa Bulunamadı</p>
                             )}
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-10 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-10 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:rotate-12 transition-transform">💡</div>
-                        <h3 className="text-lg font-black text-white mb-4">Analitik Özet</h3>
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white mb-4">Analitik Özet</h3>
                         <div className="space-y-4">
                             <div className="flex items-start gap-3">
                                 <span className="text-emerald-400 mt-1">✓</span>
-                                <p className="text-xs text-white/60 leading-relaxed font-medium">
-                                    Bugün için <span className="text-white font-bold">{filteredTransactions.filter(t => t.type === 'Sales').length}</span> başarılı satış kapatıldı.
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                    Bugün için <span className="text-slate-900 dark:text-white font-bold">{filteredTransactions.filter(t => t.type === 'Sales').length}</span> başarılı satış kapatıldı.
                                 </p>
                             </div>
                             <div className="flex items-start gap-3">
                                 <span className="text-orange-400 mt-1">!</span>
-                                <p className="text-xs text-white/60 leading-relaxed font-medium">
-                                    Ortalama işlem tutarı ₺ <span className="text-white font-bold">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                    Ortalama işlem tutarı ₺ <span className="text-slate-900 dark:text-white font-bold">
                                         {filteredTransactions.length ? Math.round(stats.sales / (filteredTransactions.filter(t => t.type === 'Sales').length || 1)).toLocaleString() : '0'}
                                     </span> seviyesinde.
                                 </p>
                             </div>
                         </div>
-                        <button className="w-full mt-8 py-3 rounded-xl bg-primary text-white text-[10px] font-black tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-sm shadow-primary/20">
+                        <button className="w-full mt-8 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-slate-900 dark:text-white text-[10px] font-black tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-sm shadow-primary/20">
                             DETAYLI RAPOR İNDİR
                         </button>
                     </div>

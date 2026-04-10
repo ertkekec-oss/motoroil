@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine, ZAxis } from 'recharts';
 import { HelpCircle, CheckCircle2, ArrowRight, AlertTriangle, AlertCircle, MoveRight, DollarSign, Package, Users, Settings } from 'lucide-react';
 
-const riskData = [
 const InfoTooltip = ({ content, iconClassName = "w-4 h-4 text-slate-400 hover:text-slate-600" }: { content: string, iconClassName?: string }) => (
     <div className="group relative inline-flex items-center justify-center pointer-events-auto align-middle ml-1">
         <HelpCircle className={`${iconClassName} cursor-help transition-colors`} />

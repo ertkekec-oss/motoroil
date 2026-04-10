@@ -87,7 +87,7 @@ export default function ManufacturingReportContent() {
             <Factory className="w-4 h-4 text-blue-500" />
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Toplam Üretim Maliyeti</span>
           </div>
-          <div className="text-2xl font-bold dark:text-white">{formatCurrency(stats.totalCost)}</div>
+          <div className="text-2xl font-bold dark:text-slate-900 dark:text-white">{formatCurrency(stats.totalCost)}</div>
           <div className="mt-1 text-[12px] text-slate-400">Tamamlanan {stats.completedCount} emir</div>
         </div>
 
@@ -96,7 +96,7 @@ export default function ManufacturingReportContent() {
             <TrendingUp className="w-4 h-4 text-emerald-500" />
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Birim Başı Ort. Maliyet</span>
           </div>
-          <div className="text-2xl font-bold dark:text-white">{formatCurrency(stats.avgCostPerUnit)}</div>
+          <div className="text-2xl font-bold dark:text-slate-900 dark:text-white">{formatCurrency(stats.avgCostPerUnit)}</div>
           <div className="mt-1 text-[12px] text-slate-400">{stats.totalQuantity} birim üretimden</div>
         </div>
 
@@ -122,7 +122,7 @@ export default function ManufacturingReportContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Cost Trend Chart */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm">
-          <h3 className="text-[15px] font-bold mb-6 dark:text-white flex items-center gap-2">
+          <h3 className="text-[15px] font-bold mb-6 dark:text-slate-900 dark:text-white flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-blue-500" /> Günlük Üretim Maliyet Trendi
           </h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -147,7 +147,7 @@ export default function ManufacturingReportContent() {
 
         {/* Material Breakdown */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
-          <h3 className="text-[15px] font-bold mb-6 dark:text-white flex items-center gap-2">
+          <h3 className="text-[15px] font-bold mb-6 dark:text-slate-900 dark:text-white flex items-center gap-2">
             <Percent className="w-4 h-4 text-emerald-500" /> Hammadde Sarfiyat Dağılımı (Maliyet Bazlı)
           </h3>
           <div className="flex-1 flex items-center">
@@ -176,7 +176,7 @@ export default function ManufacturingReportContent() {
       {/* Details Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-          <h3 className="text-[14px] font-bold dark:text-white">Son Üretim Maliyet Detayları</h3>
+          <h3 className="text-[14px] font-bold dark:text-slate-900 dark:text-white">Son Üretim Maliyet Detayları</h3>
           <span className="text-[11px] font-medium text-slate-400">Son {orders.length} Emir Analizi</span>
         </div>
         <div className="overflow-x-auto">
@@ -194,11 +194,11 @@ export default function ManufacturingReportContent() {
               {orders.slice(0, 10).map((o) => (
                 <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="text-[13px] font-bold dark:text-white">{o.orderNumber}</div>
+                    <div className="text-[13px] font-bold dark:text-slate-900 dark:text-white">{o.orderNumber}</div>
                     <div className="text-[11px] text-slate-400">{o.product?.name}</div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="text-[13px] font-medium dark:text-white">{o.plannedQuantity} {o.product?.unit || 'Adet'}</div>
+                    <div className="text-[13px] font-medium dark:text-slate-900 dark:text-white">{o.plannedQuantity} {o.product?.unit || 'Adet'}</div>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="text-[13px] font-bold text-blue-500">{formatCurrency(o.totalEstimatedCost)}</div>
